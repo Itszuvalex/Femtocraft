@@ -1,0 +1,16 @@
+[
+{
+  "modid": "femtocraft",
+  "name": "Femtocraft",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "femtocraft.blogspot.com",
+  "updateUrl": "",
+  "authorList": ["Itszuvalex"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
