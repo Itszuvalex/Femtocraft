@@ -15,6 +15,8 @@ object Femtocraft {
   final val ID      = "Femtocraft"
   final val VERSION = Version.FULL_VERSION
   final val logger  = LogManager.getLogger(ID)
+  final val blocks  = Blocks
+  final val items   = Items
 
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
@@ -23,12 +25,17 @@ object Femtocraft {
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     PacketHandler.init()
     proxy.init()
+    blocks.preInit()
+    items.preInit()
   }
 
-  @EventHandler def load(event: FMLInitializationEvent): Unit = {
+  @EventHandler def init(event: FMLInitializationEvent): Unit = {
+    blocks.init()
+    items.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
-
+    blocks.postInit()
+    items.postInit()
   }
 }
