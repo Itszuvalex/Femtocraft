@@ -5,6 +5,9 @@ import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import cpw.mods.fml.common.Mod.EventHandler
 import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import cpw.mods.fml.common.{Mod, SidedProxy}
+import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.init.Items
+import net.minecraft.item.Item
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -15,12 +18,16 @@ object Femtocraft {
   final val ID      = "Femtocraft"
   final val VERSION = Version.FULL_VERSION
   final val logger  = LogManager.getLogger(ID)
-  final val blocks  = Blocks
-  final val items   = Items
+  final val blocks  = FemtoBlocks
+  final val items   = FemtoItems
 
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy: ProxyCommon = null
+
+  val tab = new CreativeTabs(Femtocraft.ID) {
+    override def getTabIconItem: Item = Items.nether_star
+  }
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     PacketHandler.init()

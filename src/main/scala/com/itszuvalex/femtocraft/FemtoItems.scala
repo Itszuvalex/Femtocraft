@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft
 /**
  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
  */
-object Items {
+object FemtoItems {
 
   def preInit(): Unit = {
 

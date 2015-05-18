@@ -20,6 +20,9 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import net.minecraft.client.particle.EntityFX
+import net.minecraft.world.World
+
 class ProxyCommon {
   def init(): Unit = {
     registerRendering()
@@ -34,5 +37,9 @@ class ProxyCommon {
   }
 
   def registerTickHandlers() {
+  }
+
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double): EntityFX = {
+    null
   }
 }
