@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft
 
+import com.itszuvalex.femtocraft.core.NaniteRegistry
 import com.itszuvalex.femtocraft.network.PacketHandler
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import cpw.mods.fml.common.Mod.EventHandler
@@ -34,6 +35,7 @@ object Femtocraft {
     proxy.init()
     blocks.preInit()
     items.preInit()
+    NaniteRegistry.init()
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
