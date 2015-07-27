@@ -1,0 +1,165 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+plugins {
+    id "com.github.maiflai.scalatest" version "0.6-5-g9065d91"
+}
+
+dependencies {
+    testCompile 'org.scalatest:scalatest_2.11:2+'
+    testRuntime 'org.pegdown:pegdown:1.5.0'
+}
+
+apply plugin: 'scala'
+apply plugin: 'forge'
+
+project.ext {
+    massive = "0"
+    major = "1"
+    minor = "0"
+    mcVersion = "1.7.10"
+}
+
+version = "${project.ext.mcVersion}-${project.ext.massive}.${project.ext.major}.${project.minor}"
+
+if (System.getenv().BUILD_NUMBER != null) {
+    version += "-${System.getenv().BUILD_NUMBER}"
+} else {
+    version += "-local"
+}
+
+if (System.getenv().JOB_NAME != null && System.getenv().JOB_NAME.equalsIgnoreCase("ItszuLib-1.7.10-Dev")) {
+    version += "-dev"
+}
+
+compileScala {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
+group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "femtocraft"
+
+minecraft {
+    version = "${project.ext.mcVersion}-10.13.2.1230"
+    runDir = "eclipse"
+// replacing stuff in the source
+    replace '@MASSIVE@', project.massive
+    replace '@MAJOR@', project.major
+    replace '@MINOR@', project.minor
+    replace '@MC_VERSION@', version
+    if (System.getenv("BUILD_NUMBER") != null) {
+        replace '@BUILD_NUMBER@', System.getenv("BUILD_NUMBER")
+    } else {
+        replace '@BUILD_NUMBER@', 0
+    }
+}
+
+dependencies {
+
+    // you may put jars on which you depend on in ./libs
+    // or you may define them like so..
+    //compile "some.group:artifact:version:classifier"
+    //compile "some.group:artifact:version"
+
+    // real examples
+    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // for more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+}
+
+
+sourceSets {
+    main {
+        scala {
+            srcDirs = ['src/main/scala', 'src/main/java']
+        }
+        java {
+            srcDirs = []
+        }
+    }
+    api {
+        java {
+            srcDir 'api'
+        }
+    }
+}
+
+processResources
+        {
+            // this will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
+
+            ext.srcFiles = "$projectDir/src/main/resources"
+            ext.destDir = "$projectDir/build/classes/main"
+
+            // registering inputs & outputs allow gradle to skip if UP-TO-DATE
+            inputs.files srcFiles
+            outputs.dir destDir
+
+            // replace stuff in mcmod.info, nothing else
+            from(sourceSets.main.resources.srcDirs) {
+                include 'mcmod.info'
+
+                // replace version and mcversion
+                expand 'version': project.version, 'mcversion': project.minecraft.version
+            }
+
+            // copy everything else, thats not the mcmod.info
+            from(sourceSets.main.resources.srcDirs) {
+                exclude 'mcmod.info'
+                exclude 'api-readme.txt'
+            }
+        }
+
+//Begin I don't know what I'm doing
+
+//Create API library jar
+//Must be fully qualified name or it attempts to match against scala.io Jar
+task apiJar(type: org.gradle.api.tasks.bundling.Jar) {
+    baseName = 'femtocraft-api'
+    dependsOn check
+
+    from(sourceSets.main.output) {
+        include 'com/itszuvalex/femtocraft/api/**'
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        include 'api-readme.txt'
+    }
+}
+
+task apiScalaDoc(type:  org.gradle.api.tasks.scala.ScalaDoc) {
+    include 'com/itszuvalex/femtocraft/api/**.scala'
+}
+
+task jarApiScalaDoc(type:  org.gradle.api.tasks.bundling.Jar) {
+    baseName = 'femtocraft-api-scaladoc'
+    from apiScalaDoc
+}
+
+task debug << { println configurations.compile.findAll { it.name.startsWith("scala") } }
+
+build.dependsOn apiJar
+
+
+idea { module { inheritOutputDirs = true } }

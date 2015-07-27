@@ -1,0 +1,7 @@
+.gradle/
+eclipse/
+out/
+projectFilesBackup/
+Femtocraft.iml
+Femtocraft.ipr
+Femtocraft.iws
