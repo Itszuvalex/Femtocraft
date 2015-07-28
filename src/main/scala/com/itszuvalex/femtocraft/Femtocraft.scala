@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager
 /**
  * Created by Christopher on 4/5/2015.
  */
-@Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala")
+@Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:ItszuLib")
 object Femtocraft {
   final val ID      = "Femtocraft"
   final val VERSION = Version.FULL_VERSION
