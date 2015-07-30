@@ -1,24 +1,25 @@
 package com.itszuvalex.femtocraft
 
+import com.itszuvalex.femtocraft.core.Initializable
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
  */
-object FemtoBlocks {
+object FemtoBlocks extends Initializable {
   var testBlock: Block = null
 
-  def preInit(): Unit = {
+  override def preInit(): Unit = {
     testBlock = new BlockTest
     GameRegistry.registerBlock(testBlock, "testBlock")
   }
 
-  def init(): Unit = {
+  override def init(): Unit = {
 
   }
 
-  def postInit(): Unit = {
+  override def postInit(): Unit = {
 
   }
 

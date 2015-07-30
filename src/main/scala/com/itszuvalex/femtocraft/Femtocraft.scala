@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.NaniteRegistry
-import com.itszuvalex.femtocraft.network.PacketHandler
+import com.itszuvalex.femtocraft.core.Initializable
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import cpw.mods.fml.common.Mod.EventHandler
 import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
@@ -11,16 +10,19 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import org.apache.logging.log4j.LogManager
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * Created by Christopher on 4/5/2015.
  */
 @Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:ItszuLib")
 object Femtocraft {
-  final val ID      = "Femtocraft"
-  final val VERSION = Version.FULL_VERSION
-  final val logger  = LogManager.getLogger(ID)
-  final val blocks  = FemtoBlocks
-  final val items   = FemtoItems
+  final val ID             = "Femtocraft"
+  final val VERSION        = Version.FULL_VERSION
+  final val logger         = LogManager.getLogger(ID)
+  final val initializables = ArrayBuffer[Initializable]()
+  final val blocks         = FemtoBlocks
+  final val items          = FemtoItems
 
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
@@ -31,20 +33,14 @@ object Femtocraft {
   }
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
-    PacketHandler.init()
-    proxy.init()
-    blocks.preInit()
-    items.preInit()
-    NaniteRegistry.init()
+    initializables.foreach(_.preInit())
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
-    blocks.init()
-    items.init()
+    initializables.foreach(_.init())
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
-    blocks.postInit()
-    items.postInit()
+    initializables.foreach(_.postInit())
   }
 }

@@ -1,11 +1,13 @@
-package com.itszuvalex.femtocraft.core
+package com.itszuvalex.femtocraft.core.Nanites
+
+import com.itszuvalex.femtocraft.core.Initializable
 
 import scala.collection.mutable
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 7/3/15.
  */
-object NaniteRegistry {
+object NaniteRegistry extends Initializable {
   val ARCH_BUILDER     = "Builder"
   val ARCH_RECYCLER    = "Recycler"
   val ARCH_MAINTAINER  = "Maintainer"
@@ -28,12 +30,11 @@ object NaniteRegistry {
   def getNanite(arch: String) = naniteMap.get(arch)
 
 
-  def init() = {
+  override def preInit() = {
     registerNanite(new Nanite(ARCH_BUILDER, COLOR_BUILDER))
     registerNanite(new Nanite(ARCH_RECYCLER, COLOR_RECYCLER))
     registerNanite(new Nanite(ARCH_MAINTAINER, COLOR_MAINTAINER))
     registerNanite(new Nanite(ARCH_PROVIDER, COLOR_PROVIDER))
     registerNanite(new Nanite(ARCH_ENERGIZER, COLOR_ENERGIZER))
   }
-
 }

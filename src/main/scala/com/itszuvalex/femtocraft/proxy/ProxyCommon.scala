@@ -20,11 +20,12 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.core.Initializable
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 
-class ProxyCommon {
-  def init(): Unit = {
+class ProxyCommon extends Initializable {
+  override def preInit(): Unit = {
     registerRendering()
     registerTileEntities()
     registerTickHandlers()
