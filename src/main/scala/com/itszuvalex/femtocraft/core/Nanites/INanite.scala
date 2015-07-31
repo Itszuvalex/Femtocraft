@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.core.Nanites
 
+import com.itszuvalex.femtocraft.core.Nanites.Attribute.INaniteAttribute
 import net.minecraft.item.ItemStack
 
 /**
@@ -7,12 +8,14 @@ import net.minecraft.item.ItemStack
  */
 trait INanite {
 
-  def archetype: String
+  def getArchetype: String
 
-  def color: Int
+  def getColor: Int
 
-  def attributeBase(itemStack: ItemStack, strain: INaniteStrain, attribute: String): Float
+  def getAttributeBase(itemStack: ItemStack, strain: INaniteStrain, attribute: INaniteAttribute): Float
 
-  def attributeLevelBonus(itemStack: ItemStack, strain: INaniteStrain, attribute: String) : Float
+  def getAttributeLevelBonus(itemStack: ItemStack, strain: INaniteStrain, attribute: INaniteAttribute): Float
+
+  def getAttributeModified(itemStack: ItemStack, strain: INaniteStrain, attribute: INaniteAttribute) : Float
 
 }

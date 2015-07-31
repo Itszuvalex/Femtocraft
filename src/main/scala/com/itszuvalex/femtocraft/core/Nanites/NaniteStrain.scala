@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.core.Nanites
 
-import com.itszuvalex.femtocraft.core.Nanites.NaniteStrain._
+import com.itszuvalex.femtocraft.core.Nanites.Attribute.AttributeRegistry
+import com.itszuvalex.femtocraft.core.Nanites.Trait.INaniteTrait
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 
@@ -23,33 +24,10 @@ object NaniteStrain {
   val MAX_ATTRIBUTE_BONUS             = 5
   val NANITE_STRAIN_DATA_COMPOUND_TAG = "NaniteStrain"
   val NANITE_TAG                      = "Nanite"
-  val ATTRIBUTE_COMPOUND_TAG          = "Attributes"
-  val ATTRIBUTE_BONUS_TAG             = "Bonus"
   val EXPERIENCE_COMPOUND_TAG         = "Experience"
   val LEVEL_TAG                       = "Level"
   val EXPERIENCE_CURRENT_TAG          = "Experience"
   val TRAITS_COMPOUND_TAG             = "Traits"
-}
-
-trait NaniteStrain extends Item with INaniteStrain {
-  override def getNanite(item: ItemStack): String = getNaniteTag(item).map(_.getString(NANITE_TAG)).orNull
-
-  override def getAttribute(item: ItemStack, attribute: String): Float = {
-    val attributeCompound = getNaniteTag(item).map(_.getCompoundTag(ATTRIBUTE_COMPOUND_TAG)).map(_.getCompoundTag(attribute)).orNull
-    if (attributeCompound == null) return 0
-    val bonus = attributeCompound.getInteger(ATTRIBUTE_BONUS_TAG)
-    val naniteKey = getNanite(item)
-    val nanite = NaniteRegistry.getNanite(naniteKey).orNull
-    if (nanite == null) return 0
-    val attBase = nanite.attributeBase(item, this, attribute)
-    val bonusBase = nanite.attributeLevelBonus(item, this, attribute)
-    val bonusAmt = bonus * bonusBase
-    attBase * (1f + bonusAmt)
-  }
-
-  override def getLevel(item: ItemStack): Int = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG)).map(_.getInteger(LEVEL_TAG)).getOrElse(0)
-
-  override def getExperience(item: ItemStack): Int = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG)).map(_.getInteger(EXPERIENCE_CURRENT_TAG)).getOrElse(0)
 
   def getNaniteTag(item: ItemStack): Option[NBTTagCompound] = {
     if (item == null) return None
@@ -57,9 +35,52 @@ trait NaniteStrain extends Item with INaniteStrain {
     Option(item.stackTagCompound.getCompoundTag(NANITE_STRAIN_DATA_COMPOUND_TAG))
   }
 
-  override def getTraits(item: ItemStack, traitType: String): Iterable[String] = getNaniteTag(item).map(_.getCompoundTag(TRAITS_COMPOUND_TAG)).map(_.getCompoundTag(traitType)).map(_.func_150296_c().asInstanceOf[java.util.Set[String]]).get
+  def getNanite(item: ItemStack) = getNaniteTag(item).map(_.getString(NANITE_TAG)).orNull
 
-  override def getTraits(item: ItemStack): Iterable[String] = getNaniteTag(item).map(_.getCompoundTag(TRAITS_COMPOUND_TAG)).map { traitsCompound =>
+  def setNanite(item: ItemStack, nanite: String) = getNaniteTag(item).foreach(_.setString(NANITE_TAG, nanite))
+
+  def getExperienceTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG))
+
+  def getTraitsTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(TRAITS_COMPOUND_TAG))
+
+  def getLevel(item: ItemStack) = getExperienceTag(item).map(_.getInteger(LEVEL_TAG)).getOrElse(0)
+
+  def setLevel(item: ItemStack, level: Int) = getExperienceTag(item).foreach(_.setInteger(LEVEL_TAG, level))
+
+  def getExperience(item: ItemStack) = getExperienceTag(item).map(_.getInteger(EXPERIENCE_CURRENT_TAG)).getOrElse(0)
+
+  def setExperience(item: ItemStack, exp: Int) = getExperienceTag(item).foreach(_.setInteger(EXPERIENCE_CURRENT_TAG, exp))
+
+  def getTraits(item: ItemStack, traitType: String) = getTraitsTag(item).map(_.getCompoundTag(traitType)).map(_.func_150296_c().asInstanceOf[java.util.Set[String]]).get
+
+  def getTraits(item: ItemStack) = getTraitsTag(item).map { traitsCompound =>
     traitsCompound.func_150296_c().asInstanceOf[java.util.Set[String]].map(traitsCompound.getCompoundTag).flatMap(_.func_150296_c().asInstanceOf[java.util.Set[String]])
-                                                                                                                                }.orNull
+                                                          }.orNull
+
+  def addTrait(item: ItemStack, naniteTrait: INaniteTrait) = addTrait(item, naniteTrait.getName, naniteTrait.getClassification)
+
+  def addTrait(item: ItemStack, naniteTrait: String, classification: String) = {
+    getTraitsTag(item).foreach { traits => {if (traits.hasKey(classification)) {traits.getCompoundTag(classification)} else {val compound = new NBTTagCompound; traits.setTag(TRAITS_COMPOUND_TAG, compound); compound}}.setTag(naniteTrait, new NBTTagCompound)
+                               }
+  }
+
+  def removeTrait(item: ItemStack, naniteTrait: INaniteTrait) = removeTrait(item, naniteTrait.getName, naniteTrait.getClassification)
+
+  def removeTrait(item: ItemStack, naniteTrait: String, classification: String) = {
+    getTraitsTag(item).map(_.getCompoundTag(classification)).foreach(_.removeTag(naniteTrait))
+  }
+}
+
+trait NaniteStrain extends Item with INaniteStrain {
+  override def getNanite(item: ItemStack): String = NaniteStrain.getNanite(item)
+
+  override def getAttribute(item: ItemStack, attribute: String): Float = AttributeRegistry.getAttribute(attribute).map(_.getAttributeModified(item, this)).getOrElse(0)
+
+  override def getLevel(item: ItemStack): Int = NaniteStrain.getLevel(item)
+
+  override def getExperience(item: ItemStack): Int = NaniteStrain.getExperience(item)
+
+  override def getTraits(item: ItemStack, traitType: String): Iterable[String] = NaniteStrain.getTraits(item, traitType)
+
+  override def getTraits(item: ItemStack): Iterable[String] = NaniteStrain.getTraits(item)
 }
