@@ -8,7 +8,7 @@ import com.itszuvalex.femtocraft.Femtocraft
 trait Initializable {
   register()
 
-  def register() = {
+  private def register() = {
     Femtocraft.initializables += this
   }
 
