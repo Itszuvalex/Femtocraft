@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power
 
+import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.itszulib.logistics.LocationTracker
 import net.minecraft.tileentity.TileEntity
 
@@ -22,27 +23,32 @@ object PowerManager {
    */
   def addNode(node: IPowerNode): Unit = {
     val loc = node.getNodeLoc
-    nodeTracker.trackLocation(loc)
+    System.out.println("Tracking location: " + loc)
     /* If added node doesn't have a stored parent */
     if (node.getParentLoc == null) {
-      if (!getIPowerNodesInRange(nodeTracker, node).toList.sortWith(_._2 < _._2).exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1)))
-        parentlessTracker.trackLocation(loc)
-
+      System.out.println("Finding parent")
+      if (getIPowerNodesInRange(nodeTracker, node, node.parentConnectionRadius).filter { case (cnode, _) => cnode.canAddChild(node) && node.canAddParent(cnode) }.toList.sortWith(_._2 < _._2).exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1)))
+        System.out.println("Found parent")
     }
     /* Try and add new node as parent to as many parentless nodes as possible. */
-    getIPowerNodesInRange(parentlessTracker, node).foreach { case (cnode, _) => if (cnode.setParent(node) && node.addChild(cnode)) parentlessTracker.removeLocation(cnode.getNodeLoc) }
+    getIPowerNodesInRange(parentlessTracker, node, node.childrenConnectionRadius).filter { case (cnode, _) => cnode.canAddParent(node) && node.canAddChild(cnode) }.foreach { case (cnode, _) => if (cnode.setParent(node) && node.addChild(cnode)) parentlessTracker.removeLocation(cnode.getNodeLoc) }
+
+    /* Actually track the node */
+    nodeTracker.trackLocation(loc)
+    if (node.getParentLoc == null)
+      parentlessTracker.trackLocation(loc)
   }
 
 
-  def getIPowerNodesInRange(tracker: LocationTracker, node: IPowerNode): Iterable[(Option[TileEntity] with IPowerNode, Double)] = {
+  private def getIPowerNodesInRange(tracker: LocationTracker, node: IPowerNode, radius: Float): Iterable[(TileEntity with IPowerNode, Double)] = {
     val loc = node.getNodeLoc
-    tracker.getLocationsInRange(loc, node.parentConnectionRadius).map(_.getTileEntity(force = false)).collect { case cnode: IPowerNode if cnode != node => cnode }.map(cnode => (cnode, cnode.getNodeLoc.distSqr(loc))).filter(pair =>
-                                                                                                                                                                                                                             pair._2 <= pair._1.parentConnectionRadius * pair._1.parentConnectionRadius && pair._2 <= node.childrenConnectionRadius * node.childrenConnectionRadius)
+    tracker.getLocationsInRange(loc, radius).flatMap(_.getTileEntity(force = false)).collect { case cnode: IPowerNode if cnode != node => cnode }.map(cnode => (cnode, cnode.getNodeLoc.distSqr(loc))).filter(pair =>
+                                                                                                                                                                                                                (pair._2 <= (pair._1.parentConnectionRadius * pair._1.parentConnectionRadius)) && (pair._2 <= (node.childrenConnectionRadius * node.childrenConnectionRadius)))
   }
 
   def removeNode(node: IPowerNode): Unit = {
     nodeTracker.removeLocation(node.getNodeLoc)
-
+    parentlessTracker.removeLocation(node.getNodeLoc)
   }
 
 

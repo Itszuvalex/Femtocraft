@@ -21,6 +21,8 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.core.Initializable
+import com.itszuvalex.femtocraft.power.test._
+import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 
@@ -35,6 +37,11 @@ class ProxyCommon extends Initializable {
   }
 
   def registerTileEntities(): Unit = {
+    GameRegistry.registerTileEntity(classOf[TileDiffusionNodeTest], "TileDiffusionNodeTest")
+    GameRegistry.registerTileEntity(classOf[TileDiffusionTargetNodeTest], "TileDiffusionTargeTNodeTest")
+    GameRegistry.registerTileEntity(classOf[TileDirectNodeTest], "TileDirectNodeTest")
+    GameRegistry.registerTileEntity(classOf[TileGenerationNodeTest], "TileGenerationNodeTest")
+    GameRegistry.registerTileEntity(classOf[TileTransferNodeTest], "TileTransferNodeTest")
   }
 
   def registerTickHandlers() {

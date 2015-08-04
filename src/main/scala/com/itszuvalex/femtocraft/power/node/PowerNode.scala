@@ -1,5 +1,6 @@
-package com.itszuvalex.femtocraft.power
+package com.itszuvalex.femtocraft.power.node
 
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
 import net.minecraft.tileentity.TileEntity
@@ -30,8 +31,10 @@ trait PowerNode extends TileEntity with IPowerNode {
   def savePowerConnectionInfo(compound: NBTTagCompound) = {
     val powerCompound = new NBTTagCompound
     val parentLocCompound = new NBTTagCompound
-    if (parentLoc != null) parentLoc.saveToNBT(parentLocCompound)
-    powerCompound.setTag(PowerNode.NODE_PARENT_KEY, parentLocCompound)
+    if (parentLoc != null) {
+      parentLoc.saveToNBT(parentLocCompound)
+      powerCompound.setTag(PowerNode.NODE_PARENT_KEY, parentLocCompound)
+    }
     val childrenLocsList = new NBTTagList
     childrenLocs.foreach { child =>
       val childCompound = new NBTTagCompound
@@ -55,19 +58,19 @@ trait PowerNode extends TileEntity with IPowerNode {
       val loc = Loc4(0, 0, 0, 0)
       loc.loadFromNBT(compound)
       loc
-                                                                                              }
+                                                                                                   }
   }
 
 
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if (!worldObj.isRemote) PowerManager.addNode(this)
+    if (!getWorldObj.isRemote) PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (!worldObj.isRemote) PowerManager.removeNode(this)
+    if (!getWorldObj.isRemote) PowerManager.removeNode(this)
   }
 
   override def writeToNBT(p_145841_1_ : NBTTagCompound): Unit = {
@@ -115,7 +118,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    *
    * @return Get world loc of this node.  This will be the location used for tracking and range calculations.
    */
-  override def getNodeLoc: Loc4 = Loc4(worldObj.provider.dimensionId, xCoord, yCoord, zCoord)
+  override def getNodeLoc: Loc4 = Loc4(xCoord, yCoord, zCoord, getWorldObj.provider.dimensionId)
 
   /**
    *
@@ -168,7 +171,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    *
    * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
    */
-  override def getChildren: Iterable[IPowerNode] = childrenLocs.map(_.getTileEntity(true)).collect { case node: IPowerNode => node }
+  override def getChildren: Iterable[IPowerNode] = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: IPowerNode => node }
 
   /**
    *

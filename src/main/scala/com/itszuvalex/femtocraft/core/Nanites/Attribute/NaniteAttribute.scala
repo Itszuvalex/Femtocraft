@@ -4,7 +4,6 @@ import com.itszuvalex.femtocraft.core.Nanites.Attribute.NaniteAttribute._
 import com.itszuvalex.femtocraft.core.Nanites.{INaniteStrain, NaniteStrain}
 import com.itszuvalex.itszulib.api.core.Configurable
 import net.minecraft.item.ItemStack
-import org.apache.http.client.methods
 
 /**
  * Created by Christopher on 7/31/2015.
@@ -25,7 +24,7 @@ object NaniteAttribute {
   def setAttributeBonusLevel(item: ItemStack, attribute: String, level: Int) = getAttributeTag(item, attribute).foreach(_.setInteger(ATTRIBUTE_BONUS_TAG, level))
 }
 
-@methods.Configurable
+@Configurable
 class NaniteAttribute(val name: String) extends INaniteAttribute {
   override def getName = name
 

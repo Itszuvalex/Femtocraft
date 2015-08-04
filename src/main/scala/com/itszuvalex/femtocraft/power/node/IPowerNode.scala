@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.power
+package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.itszulib.api.core.Loc4
 
@@ -6,7 +6,7 @@ import com.itszuvalex.itszulib.api.core.Loc4
  * Created by Christopher Harris (Itszuvalex) on 8/3/15.
  */
 object IPowerNode {
-  val POWER_NODE            = "Power"
+  val GENERATION_NODE       = "Generation"
   val TRANSFER_NODE         = "Transfer"
   val DIFFUSION_NODE        = "Diffusion"
   val DIFFUSION_TARGET_NODE = "Diffusion_Target"
@@ -24,7 +24,7 @@ trait IPowerNode {
 
   /**
    *
-   * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
+   * @return The IPowerNode this has as its parent.  If this is of type 'Generation', this will be itself.
    */
   def getParent: IPowerNode
 

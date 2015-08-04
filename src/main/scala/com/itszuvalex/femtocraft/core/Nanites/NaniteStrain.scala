@@ -57,16 +57,16 @@ object NaniteStrain {
     traitsCompound.func_150296_c().asInstanceOf[java.util.Set[String]].map(traitsCompound.getCompoundTag).flatMap(_.func_150296_c().asInstanceOf[java.util.Set[String]])
                                                           }.orNull
 
-  def addTrait(item: ItemStack, naniteTrait: INaniteTrait) = addTrait(item, naniteTrait.getName, naniteTrait.getClassification)
+  def addTrait(item: ItemStack, naniteTrait: INaniteTrait): Unit = addTrait(item, naniteTrait.getName, naniteTrait.getClassification)
 
-  def addTrait(item: ItemStack, naniteTrait: String, classification: String) = {
+  def addTrait(item: ItemStack, naniteTrait: String, classification: String): Unit = {
     getTraitsTag(item).foreach { traits => {if (traits.hasKey(classification)) {traits.getCompoundTag(classification)} else {val compound = new NBTTagCompound; traits.setTag(TRAITS_COMPOUND_TAG, compound); compound}}.setTag(naniteTrait, new NBTTagCompound)
                                }
   }
 
-  def removeTrait(item: ItemStack, naniteTrait: INaniteTrait) = removeTrait(item, naniteTrait.getName, naniteTrait.getClassification)
+  def removeTrait(item: ItemStack, naniteTrait: INaniteTrait): Unit = removeTrait(item, naniteTrait.getName, naniteTrait.getClassification)
 
-  def removeTrait(item: ItemStack, naniteTrait: String, classification: String) = {
+  def removeTrait(item: ItemStack, naniteTrait: String, classification: String): Unit = {
     getTraitsTag(item).map(_.getCompoundTag(classification)).foreach(_.removeTag(naniteTrait))
   }
 }
