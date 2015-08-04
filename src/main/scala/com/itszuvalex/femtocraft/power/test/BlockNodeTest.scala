@@ -20,4 +20,17 @@ abstract class BlockNodeTest extends TileContainer(Material.iron) {
     }
     super.breakBlock(p_149749_1_, p_149749_2_, p_149749_3_, p_149749_4_, p_149749_5_, p_149749_6_)
   }
+
+  /**
+   * Is this block (a) opaque and (b) a full 1m cube?  This determines whether or not to render the shared face of two
+   * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
+   */
+  override def isOpaqueCube =
+    false
+
+
+  /**
+   * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
+   */
+  override def renderAsNormalBlock = false
 }

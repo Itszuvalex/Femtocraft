@@ -1,16 +1,40 @@
 package com.itszuvalex.femtocraft.power.test
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.power.node.PowerNode
+import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
 import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.NBTTagCompound
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
-abstract class TileNodeTest extends TileEntityBase with PowerNode {
+abstract class TileNodeTest extends TileEntityBase with PowerNode with DescriptionPacket {
   override def getMod = Femtocraft
+
+  /**
+   *
+   * @param child
+   * @return True if child is successfully added.
+   */
+  override def addChild(child: IPowerNode): Boolean = {
+    val ret = super.addChild(child)
+    setUpdate()
+    ret
+  }
+
+  /**
+   *
+   * @param parent Parent being set.
+   * @return True if parent is successfully set to input parent.
+   */
+  override def setParent(parent: IPowerNode): Boolean = {
+    val ret = super.setParent(parent)
+    setUpdate()
+    ret
+  }
 
   override def initializePowerSettings(): Unit = {
   }
@@ -28,5 +52,16 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode {
     ret
   }
 
-  override def hasDescription = false
+  override def hasDescription: Boolean = true
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    savePowerConnectionInfo(compound)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    loadPowerConnectionInfo(compound)
+    setRenderUpdate()
+  }
 }

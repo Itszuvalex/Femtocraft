@@ -65,7 +65,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     val parent = getParent
     if (parent != null && parent != this) parent.removeChild(this)
     val children = getChildren
-    if(children != null) children.foreach(_.setParent(null))
+    if (children != null) children.foreach(_.setParent(null))
   }
 
 
@@ -154,7 +154,10 @@ trait PowerNode extends TileEntity with IPowerNode {
    *
    * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
    */
-  override def getParent: IPowerNode = parentLoc.getTileEntity(true).collect { case node: IPowerNode => node }.orNull
+  override def getParent: IPowerNode = parentLoc.getTileEntity(true) match {
+    case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
+    case None => null
+  }
 
   /**
    *
