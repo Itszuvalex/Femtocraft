@@ -61,6 +61,13 @@ trait PowerNode extends TileEntity with IPowerNode {
                                                                                                    }
   }
 
+  def onBlockBreak() = {
+    val parent = getParent
+    if (parent != null && parent != this) parent.removeChild(this)
+    val children = getChildren
+    if(children != null) children.foreach(_.setParent(null))
+  }
+
 
   /* Tile Entity */
   override def validate(): Unit = {
@@ -126,7 +133,8 @@ trait PowerNode extends TileEntity with IPowerNode {
    * @return True if parent is successfully set to input parent.
    */
   override def setParent(parent: IPowerNode): Boolean = {
-    parentLoc = parent.getNodeLoc
+    if (parent != null) parentLoc = parent.getNodeLoc else parentLoc = null
+    PowerManager.refreshParentlessStatus(this)
     true
   }
 
@@ -172,6 +180,14 @@ trait PowerNode extends TileEntity with IPowerNode {
    * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
    */
   override def getChildren: Iterable[IPowerNode] = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: IPowerNode => node }
+
+  /**
+   *
+   * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
+   *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
+   *         the chunk.
+   */
+  override def getChildrenLocs: scala.Iterable[Loc4] = childrenLocs
 
   /**
    *

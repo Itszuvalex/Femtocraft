@@ -63,6 +63,14 @@ trait IPowerNode {
 
   /**
    *
+   * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
+   *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
+   *         the chunk.
+   */
+  def getChildrenLocs: Iterable[Loc4]
+
+  /**
+   *
    * @param child
    * @return True if child is capable of being a child of this node.
    */

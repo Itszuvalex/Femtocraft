@@ -28,6 +28,12 @@ trait DirectNode extends PowerNode {
 
   /**
    *
+   * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
+   */
+  override def getChildren: Iterable[IPowerNode] = null
+
+  /**
+   *
    * @return The type of PowerNode this is.
    */
   override def getType = IPowerNode.DIRECT_NODE

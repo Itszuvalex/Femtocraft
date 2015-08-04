@@ -27,6 +27,12 @@ trait DiffusionTargetNode extends PowerNode {
 
   /**
    *
+   * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
+   */
+  override def getChildren: Iterable[IPowerNode] = null
+
+  /**
+   *
    * @param child
    * @return True if child is capable of being a child of this node.
    */

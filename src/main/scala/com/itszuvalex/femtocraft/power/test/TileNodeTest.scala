@@ -23,8 +23,8 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode {
     val children = getChildren
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Location is: " + loc)
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Parent is: " + (if (parentLoc == null) "null" else parentLoc))
-    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Children(" + children.size + "):")
-    children.foreach(loc => PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    " + loc.getNodeLoc))
+    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Children(" + (if (children == null) "leaf" else children.size) + "):")
+    if (children != null) children.foreach(loc => PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    " + loc.getNodeLoc))
     ret
   }
 
