@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.core.Nanites
 
 import com.itszuvalex.femtocraft.core.Initializable
-import com.itszuvalex.femtocraft.core.Nanites.Nanite._
+import com.itszuvalex.femtocraft.core.Nanites.INanite._
 
 import scala.collection.mutable
 

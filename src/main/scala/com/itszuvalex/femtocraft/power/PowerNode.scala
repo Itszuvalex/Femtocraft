@@ -1,0 +1,198 @@
+package com.itszuvalex.femtocraft.power
+
+import com.itszuvalex.itszulib.api.core.Loc4
+import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
+import net.minecraft.tileentity.TileEntity
+
+import scala.collection._
+
+/**
+ * Created by Christopher Harris (Itszuvalex) on 8/3/15.
+ */
+object PowerNode {
+  val POWER_COMPOUND_KEY = "FemtoPower"
+  val NODE_PARENT_KEY    = "Parent"
+  val NODE_CHILDREN_KEY  = "Children"
+}
+
+
+trait PowerNode extends TileEntity with IPowerNode {
+  var parentLoc   : Loc4 = null
+  val childrenLocs       = mutable.HashSet[Loc4]()
+  var powerCurrent: Long = 0
+  var powerMax    : Long = 0
+
+  initializePowerSettings()
+
+  def initializePowerSettings(): Unit
+
+
+  def savePowerConnectionInfo(compound: NBTTagCompound) = {
+    val powerCompound = new NBTTagCompound
+    val parentLocCompound = new NBTTagCompound
+    if (parentLoc != null) parentLoc.saveToNBT(parentLocCompound)
+    powerCompound.setTag(PowerNode.NODE_PARENT_KEY, parentLocCompound)
+    val childrenLocsList = new NBTTagList
+    childrenLocs.foreach { child =>
+      val childCompound = new NBTTagCompound
+      child.saveToNBT(childCompound)
+      childrenLocsList.appendTag(childCompound)
+                         }
+    powerCompound.setTag(PowerNode.NODE_CHILDREN_KEY, childrenLocsList)
+    compound.setTag(PowerNode.POWER_COMPOUND_KEY, powerCompound)
+  }
+
+  def loadPowerConnectionInfo(compound: NBTTagCompound) = {
+    val powerCompound = compound.getCompoundTag(PowerNode.POWER_COMPOUND_KEY)
+    if (powerCompound.hasKey(PowerNode.NODE_PARENT_KEY)) {
+      parentLoc = Loc4(0, 0, 0, 0)
+      parentLoc.loadFromNBT(powerCompound.getCompoundTag(PowerNode.NODE_PARENT_KEY))
+    }
+    else parentLoc = null
+    childrenLocs.clear()
+    val childrenList = powerCompound.getTagList(PowerNode.NODE_CHILDREN_KEY, 10)
+    childrenLocs ++= (0 until childrenList.tagCount()).map(childrenList.getCompoundTagAt).map { compound =>
+      val loc = Loc4(0, 0, 0, 0)
+      loc.loadFromNBT(compound)
+      loc
+                                                                                              }
+  }
+
+
+  /* Tile Entity */
+  override def validate(): Unit = {
+    super.validate()
+    PowerManager.addNode(this)
+  }
+
+  override def invalidate(): Unit = {
+    super.invalidate()
+    PowerManager.removeNode(this)
+  }
+
+  override def writeToNBT(p_145841_1_ : NBTTagCompound): Unit = {
+    super.writeToNBT(p_145841_1_)
+    savePowerConnectionInfo(p_145841_1_)
+  }
+
+  override def readFromNBT(p_145839_1_ : NBTTagCompound): Unit = {
+    super.readFromNBT(p_145839_1_)
+    loadPowerConnectionInfo(p_145839_1_)
+  }
+
+  /* IPowerNode */
+  /**
+   *
+   * @param child
+   * @return True if child is successfully added.
+   */
+  override def addChild(child: IPowerNode): Boolean = {
+    childrenLocs += child.getNodeLoc
+    true
+  }
+
+
+  /**
+   *
+   * @param child
+   * @return True if child was a child of this node, and was successfully removed.
+   */
+  override def removeChild(child: IPowerNode): Boolean = {
+    if (childrenLocs.contains(child.getNodeLoc)) {
+      childrenLocs -= child.getNodeLoc
+      true
+    }
+    else false
+  }
+
+  /**
+   *
+   * @return Amount of power capable of being stored in this node.
+   */
+  override def getPowerMax: Long = powerMax
+
+  /**
+   *
+   * @return Get world loc of this node.  This will be the location used for tracking and range calculations.
+   */
+  override def getNodeLoc: Loc4 = Loc4(worldObj.provider.dimensionId, xCoord, yCoord, zCoord)
+
+  /**
+   *
+   * @param parent Parent being set.
+   * @return True if parent is successfully set to input parent.
+   */
+  override def setParent(parent: IPowerNode): Boolean = {
+    parentLoc = parent.getNodeLoc
+    true
+  }
+
+  /**
+   *
+   * @param amount Set current stored power to the given value.
+   */
+  override def setPower(amount: Long): Unit = powerCurrent = amount
+
+  /**
+   *
+   * @return Maximum distance to look for parents in.
+   */
+  override def parentConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
+
+  /**
+   *
+   * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
+   */
+  override def getParent: IPowerNode = parentLoc.getTileEntity(true).collect { case node: IPowerNode => node }.orNull
+
+  /**
+   *
+   * @param amount Amount of power to consume.
+   * @param doUse True if actually change values, false to simulate.
+   * @return Amount of power consumed out of @amount from the internal storage of this Tile.
+   */
+  override def usePower(amount: Long, doUse: Boolean): Long = {
+    val min = Math.min(amount, powerCurrent)
+    if (doUse)
+      powerCurrent -= min
+    min
+  }
+
+  /**
+   *
+   * @return Amount of power currently stored in this node.
+   */
+  override def getPowerCurrent: Long = powerCurrent
+
+  /**
+   *
+   * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
+   */
+  override def getChildren: Iterable[IPowerNode] = childrenLocs.map(_.getTileEntity(true)).collect { case node: IPowerNode => node }
+
+  /**
+   *
+   * @return Maximum distance children can be from this node, to connect.
+   */
+  override def childrenConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
+
+  /**
+   *
+   * @param amount Amount of power to add.
+   * @param doFill True if actually change values, false to simulate.
+   * @return Amount of power used out of @amount to fill the internal storage of this Tile.
+   */
+  override def addPower(amount: Long, doFill: Boolean): Long = {
+    val min = Math.min(amount, powerMax - powerCurrent)
+    if (doFill)
+      powerCurrent += min
+    min
+  }
+
+  /**
+   *
+   * @return Loc4 of this node's parent, null if it has no parent.  This is primarily to bypass chunk churn, as a node may have a parent set but the parent is in an unloaded chunk.  If that is the case, then
+   *         it can return its parent location here, without having to explicitly load that chunk.
+   */
+  override def getParentLoc: Loc4 = parentLoc
+}
