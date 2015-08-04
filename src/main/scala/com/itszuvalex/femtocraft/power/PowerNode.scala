@@ -51,7 +51,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     else parentLoc = null
     childrenLocs.clear()
     val childrenList = powerCompound.getTagList(PowerNode.NODE_CHILDREN_KEY, 10)
-    childrenLocs ++= (0 until childrenList.tagCount()).map(childrenList.getCompoundTagAt).map { compound =>
+    childrenLocs ++= (0 until childrenList.tagCount()).view.map(childrenList.getCompoundTagAt).map { compound =>
       val loc = Loc4(0, 0, 0, 0)
       loc.loadFromNBT(compound)
       loc
@@ -62,12 +62,12 @@ trait PowerNode extends TileEntity with IPowerNode {
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    PowerManager.addNode(this)
+    if (!worldObj.isRemote) PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
-    PowerManager.removeNode(this)
+    if (!worldObj.isRemote) PowerManager.removeNode(this)
   }
 
   override def writeToNBT(p_145841_1_ : NBTTagCompound): Unit = {
