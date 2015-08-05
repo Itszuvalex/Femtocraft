@@ -15,7 +15,9 @@ import org.lwjgl.opengl.GL11
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
 object PowerNodeRenderer {
-  private val beamLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam.png")
+  private val beamLocation      = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam.png")
+  private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_outer.png")
+  private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_colored.png")
   val BEAM_WIDTH    = .1f
   val RENDER_RADIUS = 64
 }
@@ -27,7 +29,7 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer {
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
 
         val tessellator: Tessellator = Tessellator.instance
-        this.bindTexture(PowerNodeRenderer.beamLocation)
+        //        this.bindTexture(PowerNodeRenderer.beamLocation)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F)
         GL11.glDisable(GL11.GL_LIGHTING)
@@ -48,10 +50,14 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer {
           val startLoc = Vector3(x, y, z)
           val offset = Vector3(0.5f, 0.5f, 0.5f)
           val yMin: Double = (-1.0F + f3).toDouble % 1
-          val yMax: Double = diff.magnitude * 2.5  + yMin
+          val yMax: Double = diff.magnitude * (1 / (2 * PowerNodeRenderer.BEAM_WIDTH)) + yMin
+          this.bindTexture(PowerNodeRenderer.beamOuterLocation)
           FemtoRender.drawBeam(startLoc + offset, startLoc + diff + offset, PowerNodeRenderer.BEAM_WIDTH,
-                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat)//,
-//                               color.red.toInt, color.green.toInt, color.blue.toInt)
+                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat)
+          this.bindTexture(PowerNodeRenderer.beamColorLocation)
+          FemtoRender.drawBeam(startLoc + offset, startLoc + diff + offset, PowerNodeRenderer.BEAM_WIDTH,
+                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+                               color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255)
                                      }
         GL11.glEnable(GL11.GL_LIGHTING)
         GL11.glEnable(GL11.GL_TEXTURE_2D)
