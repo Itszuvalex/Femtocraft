@@ -2,10 +2,12 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
 import net.minecraft.tileentity.TileEntity
 
 import scala.collection._
+import scala.util.Random
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/3/15.
@@ -14,6 +16,7 @@ object PowerNode {
   val POWER_COMPOUND_KEY = "FemtoPower"
   val NODE_PARENT_KEY    = "Parent"
   val NODE_CHILDREN_KEY  = "Children"
+  val COLOR_KEY          = "Color"
 }
 
 
@@ -22,6 +25,9 @@ trait PowerNode extends TileEntity with IPowerNode {
   val childrenLocs       = mutable.HashSet[Loc4]()
   var powerCurrent: Long = 0
   var powerMax    : Long = 0
+  var color              = Color((Random.nextInt(125) + 130).toByte,
+                                 (Random.nextInt(125) + 130).toByte,
+                                 (Random.nextInt(125) + 130).toByte, 0).toInt
 
   initializePowerSettings()
 
@@ -42,6 +48,7 @@ trait PowerNode extends TileEntity with IPowerNode {
       childrenLocsList.appendTag(childCompound)
                          }
     powerCompound.setTag(PowerNode.NODE_CHILDREN_KEY, childrenLocsList)
+    powerCompound.setInteger(PowerNode.COLOR_KEY, color)
     compound.setTag(PowerNode.POWER_COMPOUND_KEY, powerCompound)
   }
 
@@ -52,6 +59,7 @@ trait PowerNode extends TileEntity with IPowerNode {
       parentLoc.loadFromNBT(powerCompound.getCompoundTag(PowerNode.NODE_PARENT_KEY))
     }
     else parentLoc = null
+    color = powerCompound.getInteger(PowerNode.COLOR_KEY)
     childrenLocs.clear()
     val childrenList = powerCompound.getTagList(PowerNode.NODE_CHILDREN_KEY, 10)
     childrenLocs ++= (0 until childrenList.tagCount()).view.map(childrenList.getCompoundTagAt).map { compound =>
@@ -62,6 +70,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   }
 
   def onBlockBreak() = {
+    PowerManager.removeNode(this)
     val parent = getParent
     if (parent != null && parent != this) parent.removeChild(this)
     val children = getChildren
@@ -113,6 +122,24 @@ trait PowerNode extends TileEntity with IPowerNode {
       true
     }
     else false
+  }
+
+  /**
+   *
+   * @param child
+   * @return True if child is capable of being a child of this node.
+   */
+  override def canAddChild(child: IPowerNode): Boolean = {
+    child != null && child.getNodeLoc != parentLoc
+  }
+
+  /**
+   *
+   * @param parent IPowerNode that is being checked.
+   * @return True if this node is capable of having that node as a parent.
+   */
+  override def canAddParent(parent: IPowerNode): Boolean = {
+    parent != null && !childrenLocs.contains(parent.getNodeLoc)
   }
 
   /**
@@ -211,6 +238,12 @@ trait PowerNode extends TileEntity with IPowerNode {
       powerCurrent += min
     min
   }
+
+  /**
+   *
+   * @return The color of this power node.  This is used for aesthetics.
+   */
+  override def getColor: Int = color
 
   /**
    *

@@ -25,7 +25,7 @@ object PowerManager {
     val loc = node.getNodeLoc
     /* If added node doesn't have a stored parent */
     if (node.getParentLoc == null) {
-      getIPowerNodesInRange(nodeTracker, node, node.parentConnectionRadius).view.filter { case (cnode, _) => cnode.canAddChild(node) && node.canAddParent(cnode) }.toList.sortWith(_._2 < _._2).exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1))
+      findParent(node)
     }
     /* Try and add new node as parent to as many parentless nodes as possible. */
     getIPowerNodesInRange(parentlessTracker, node, node.childrenConnectionRadius).view.filter { case (cnode, _) => cnode.canAddParent(node) && node.canAddChild(cnode) }.foreach { case (cnode, _) => if (cnode.setParent(node) && node.addChild(cnode)) parentlessTracker.removeLocation(cnode.getNodeLoc) }
@@ -42,9 +42,16 @@ object PowerManager {
                                                                                                                                                                                                                 (pair._2 <= (pair._1.parentConnectionRadius * pair._1.parentConnectionRadius)) && (pair._2 <= (node.childrenConnectionRadius * node.childrenConnectionRadius)))
   }
 
+  private def findParent(node: IPowerNode)  = {
+    getIPowerNodesInRange(nodeTracker, node, node.parentConnectionRadius).view.filter { case (cnode, _) => cnode.canAddChild(node) && node.canAddParent(cnode) }.toList.sortWith(_._2 < _._2).exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1))
+
+  }
+
   def refreshParentlessStatus(node: IPowerNode): Unit = {
-    if (node.getParentLoc == null)
+    if (node.getParentLoc == null) {
       parentlessTracker.trackLocation(node.getNodeLoc)
+      findParent(node)
+    }
     else parentlessTracker.removeLocation(node.getNodeLoc)
   }
 

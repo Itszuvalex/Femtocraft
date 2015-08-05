@@ -24,7 +24,7 @@ trait DirectNode extends PowerNode {
    * @param parent IPowerNode that is being checked.
    * @return True if this node is capable of having that node as a parent.
    */
-  override def canAddParent(parent: IPowerNode) = DirectNode.PARENT_WHITELIST.contains(parent.getType)
+  override def canAddParent(parent: IPowerNode) = super.canAddParent(parent) && DirectNode.PARENT_WHITELIST.contains(parent.getType)
 
   /**
    *

@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.power
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.render.FemtoRender
 import com.itszuvalex.itszulib.render.Vector3
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.client.renderer.{OpenGlHelper, Tessellator}
 import net.minecraft.tileentity.TileEntity
@@ -33,6 +34,7 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer {
         GL11.glDisable(GL11.GL_BLEND)
         GL11.glDepthMask(true)
         OpenGlHelper.glBlendFunc(770, 1, 1, 0)
+        val color = new Color(node.getColor)
         val f2: Float = tile.getWorldObj.getTotalWorldTime.toFloat + partialTime
         val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
         val b0: Byte = 1
@@ -46,7 +48,9 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer {
           val offset = Vector3(0.5f, 0.5f, 0.5f)
           val yMin: Double = (-1.0F + f3).toDouble
           val yMax: Double = diff.magnitude * (0.5D / d5) + yMin
-          FemtoRender.drawBeam(startLoc + offset, startLoc + diff + offset, PowerNodeRenderer.BEAM_WIDTH, xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat)
+          FemtoRender.drawBeam(startLoc + offset, startLoc + diff + offset, PowerNodeRenderer.BEAM_WIDTH,
+                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+                               color.red, color.green, color.blue)
                                      }
         GL11.glEnable(GL11.GL_LIGHTING)
         GL11.glEnable(GL11.GL_TEXTURE_2D)

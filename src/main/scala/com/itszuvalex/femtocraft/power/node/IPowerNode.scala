@@ -136,4 +136,10 @@ trait IPowerNode {
    */
   def usePower(amount: Long, doUse: Boolean): Long
 
+  /**
+   *
+   * @return The color of this power node.  This is used for aesthetics.
+   */
+  def getColor : Int
+
 }

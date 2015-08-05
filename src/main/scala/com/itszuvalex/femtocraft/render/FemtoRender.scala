@@ -11,7 +11,7 @@ object FemtoRender {
   def drawBeam(start: Vector3,
                end: Vector3,
                width: Float,
-               uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1): Unit = {
+               uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1, red : Int = 255, green : Int = 255, blue : Int = 255): Unit = {
     val rightVector = (end - start).normalize()
     val center = ((end - start) / 2) + start
     val upVector = (center - Vector3(0, 0, 0)).cross(rightVector).normalize()
@@ -22,7 +22,7 @@ object FemtoRender {
 
     val tes = Tessellator.instance
     tes.startDrawingQuads()
-    tes.setColorRGBA(255, 255, 255, 32)
+    tes.setColorRGBA(red, green, blue, 32)
     tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
     tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
     tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMax, vMax)

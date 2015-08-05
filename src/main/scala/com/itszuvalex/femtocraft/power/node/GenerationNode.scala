@@ -24,7 +24,7 @@ trait GenerationNode extends PowerNode {
    * @param child
    * @return True if child is capable of being a child of this node.
    */
-  override def canAddChild(child: IPowerNode) = GenerationNode.CHILDREN_WHITELIST.contains(child.getType)
+  override def canAddChild(child: IPowerNode) = super.canAddChild(child) && GenerationNode.CHILDREN_WHITELIST.contains(child.getType)
 
   /**
    *
