@@ -9,26 +9,47 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.client.renderer.{OpenGlHelper, Tessellator}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.{MathHelper, ResourceLocation}
+import net.minecraftforge.client.model.AdvancedModelLoader
 import org.lwjgl.opengl.GL11
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
 object PowerNodeRenderer {
-  private val beamLocation      = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam.png")
-  private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_outer.png")
-  private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_colored.png")
+  private val crystalModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals.obj")
+  private val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals Texture 64x64.png")
+  private val beamLocation         = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam.png")
+  private val beamOuterLocation    = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_outer.png")
+  private val beamColorLocation    = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_colored.png")
   val BEAM_WIDTH    = .1f
   val RENDER_RADIUS = 64
 }
 
 class PowerNodeRenderer extends TileEntitySpecialRenderer {
+  private val crystalModel = AdvancedModelLoader.loadModel(PowerNodeRenderer.crystalModelLocation)
+
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {
       case node: IPowerNode =>
+        val color = new Color(node.getColor)
+        val tessellator: Tessellator = Tessellator.instance
+
+        GL11.glPushMatrix()
+        GL11.glTranslated(x + .5, y, z + .5)
+        GL11.glScaled(.01,.01,.01)
+        tessellator.setColorRGBA(color.red.toInt & 255,
+                                 color.green.toInt & 255,
+                                 color.blue.toInt & 255,
+                                 0)
+
+        //Bind the texture and render the model
+        bindTexture(PowerNodeRenderer.crystalTexLocation)
+        crystalModel.renderAll()
+
+        GL11.glPopMatrix()
+
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
 
-        val tessellator: Tessellator = Tessellator.instance
         //        this.bindTexture(PowerNodeRenderer.beamLocation)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F)
@@ -37,7 +58,6 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer {
         GL11.glDisable(GL11.GL_BLEND)
         GL11.glDepthMask(true)
         OpenGlHelper.glBlendFunc(770, 1, 1, 0)
-        val color = new Color(node.getColor)
         val f2: Float = tile.getWorldObj.getTotalWorldTime.toFloat + partialTime
         val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
         val b0: Byte = 1
