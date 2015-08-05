@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.power.test
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.power.PowerNodeRenderer
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.power.render.PowerNodeRenderer
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
 import com.itszuvalex.itszulib.render.Vector3

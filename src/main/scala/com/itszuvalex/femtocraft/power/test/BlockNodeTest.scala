@@ -29,7 +29,7 @@ abstract class BlockNodeTest extends TileContainer(Material.iron) {
     false
 
 
-  override def getRenderBlockPass: Int = -1
+  override def getRenderBlockPass: Int = 2
 
   /**
    * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)

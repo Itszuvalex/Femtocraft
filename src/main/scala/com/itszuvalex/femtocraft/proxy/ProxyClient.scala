@@ -21,7 +21,7 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
-import com.itszuvalex.femtocraft.power.{DiffusionNodeRenderer, PowerNodeRenderer}
+import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
 import cpw.mods.fml.client.registry.ClientRegistry
 import net.minecraft.client.Minecraft
