@@ -22,6 +22,7 @@ object FemtoRender {
 
     val tes = Tessellator.instance
     tes.startDrawingQuads()
+    tes.setColorRGBA(255, 255, 255, 32)
     tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
     tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
     tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMax, vMax)

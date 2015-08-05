@@ -1,18 +1,42 @@
 package com.itszuvalex.femtocraft.power.test
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.power.PowerNodeRenderer
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
+import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.AxisAlignedBB
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
 abstract class TileNodeTest extends TileEntityBase with PowerNode with DescriptionPacket {
   override def getMod = Femtocraft
+
+  /**
+   *
+   * @param child
+   * @return True if child was a child of this node, and was successfully removed.
+   */
+  override def removeChild(child: IPowerNode): Boolean = {
+    val ret = super.removeChild(child)
+    setUpdate()
+    ret
+  }
+
+  override def getRenderBoundingBox: AxisAlignedBB = {
+    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+    AxisAlignedBB.getBoundingBox(center.x - PowerNodeRenderer.RENDER_RADIUS,
+                                 center.y - PowerNodeRenderer.RENDER_RADIUS,
+                                 center.z - PowerNodeRenderer.RENDER_RADIUS,
+                                 center.x + PowerNodeRenderer.RENDER_RADIUS,
+                                 center.y + PowerNodeRenderer.RENDER_RADIUS,
+                                 center.z + PowerNodeRenderer.RENDER_RADIUS)
+  }
 
   /**
    *

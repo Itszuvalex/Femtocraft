@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.power
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.render.FemtoRender
 import com.itszuvalex.itszulib.render.Vector3
-import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
+import net.minecraft.client.renderer.{OpenGlHelper, Tessellator}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.{MathHelper, ResourceLocation}
 import org.lwjgl.opengl.GL11
@@ -15,27 +15,27 @@ import org.lwjgl.opengl.GL11
 object PowerNodeRenderer {
   private val beamLocation = new ResourceLocation("textures/entity/beacon_beam.png")
   val BEAM_WIDTH = .1f
+  val RENDER_RADIUS = 64
 }
 
 class PowerNodeRenderer extends TileEntitySpecialRenderer {
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {
       case node: IPowerNode =>
-//        GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
+        GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
 
         val tessellator: Tessellator = Tessellator.instance
         this.bindTexture(PowerNodeRenderer.beamLocation)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F)
-//        GL11.glDisable(GL11.GL_LIGHTING)
+        GL11.glDisable(GL11.GL_LIGHTING)
         GL11.glDisable(GL11.GL_CULL_FACE)
         GL11.glDisable(GL11.GL_BLEND)
         GL11.glDepthMask(true)
-//        OpenGlHelper.glBlendFunc(770, 1, 1, 0)
+        OpenGlHelper.glBlendFunc(770, 1, 1, 0)
         val f2: Float = tile.getWorldObj.getTotalWorldTime.toFloat + partialTime
         val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
         val b0: Byte = 1
-        tessellator.setColorRGBA(255, 255, 255, 32)
         val d5: Double = b0.toDouble * 0.2D
         val xMin: Double = 0.0D
         val xMax: Double = 1.0D
