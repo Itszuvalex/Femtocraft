@@ -21,7 +21,7 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
-import com.itszuvalex.femtocraft.power.PowerNodeRenderer
+import com.itszuvalex.femtocraft.power.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
 import cpw.mods.fml.client.registry.ClientRegistry
 import net.minecraft.client.Minecraft
@@ -59,7 +59,7 @@ class ProxyClient extends ProxyCommon {
     super.registerRendering()
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new PowerNodeRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTransferNodeTest], new PowerNodeRenderer)
   }
 }
