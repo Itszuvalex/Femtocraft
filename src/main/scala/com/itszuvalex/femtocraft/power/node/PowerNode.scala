@@ -162,7 +162,11 @@ trait PowerNode extends TileEntity with IPowerNode {
    * @return True if parent is successfully set to input parent.
    */
   override def setParent(parent: IPowerNode): Boolean = {
-    if (parent != null) parentLoc = parent.getNodeLoc else parentLoc = null
+    if (parent != null) {
+      parentLoc = parent.getNodeLoc
+    } else {
+      parentLoc = null
+    }
     PowerManager.refreshParentlessStatus(this)
     true
   }
