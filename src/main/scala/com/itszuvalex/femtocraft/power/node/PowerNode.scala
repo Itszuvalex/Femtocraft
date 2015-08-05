@@ -106,6 +106,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    * @return True if child is successfully added.
    */
   override def addChild(child: IPowerNode): Boolean = {
+    if(child == null) return true
     childrenLocs += child.getNodeLoc
     true
   }
@@ -117,6 +118,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    * @return True if child was a child of this node, and was successfully removed.
    */
   override def removeChild(child: IPowerNode): Boolean = {
+    if(child == null) return true
     if (childrenLocs.contains(child.getNodeLoc)) {
       childrenLocs -= child.getNodeLoc
       true

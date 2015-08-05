@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.render.FemtoRender
 import com.itszuvalex.itszulib.render.Vector3
@@ -14,8 +15,8 @@ import org.lwjgl.opengl.GL11
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
 object PowerNodeRenderer {
-  private val beamLocation = new ResourceLocation("textures/entity/beacon_beam.png")
-  val BEAM_WIDTH = .1f
+  private val beamLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam.png")
+  val BEAM_WIDTH    = .1f
   val RENDER_RADIUS = 64
 }
 
@@ -46,11 +47,11 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer {
           val diff = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)
           val startLoc = Vector3(x, y, z)
           val offset = Vector3(0.5f, 0.5f, 0.5f)
-          val yMin: Double = (-1.0F + f3).toDouble
-          val yMax: Double = diff.magnitude * (0.5D / d5) + yMin
+          val yMin: Double = (-1.0F + f3).toDouble % 1
+          val yMax: Double = diff.magnitude * 2.5  + yMin
           FemtoRender.drawBeam(startLoc + offset, startLoc + diff + offset, PowerNodeRenderer.BEAM_WIDTH,
-                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-                               color.red, color.green, color.blue)
+                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat)//,
+//                               color.red.toInt, color.green.toInt, color.blue.toInt)
                                      }
         GL11.glEnable(GL11.GL_LIGHTING)
         GL11.glEnable(GL11.GL_TEXTURE_2D)
