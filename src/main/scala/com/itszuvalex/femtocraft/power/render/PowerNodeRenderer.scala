@@ -13,7 +13,7 @@ import net.minecraft.util.ResourceLocation
 object PowerNodeRenderer {
   private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_outer.png")
   private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_colored.png")
-  val BEAM_WIDTH    = .1f
+  val BEAM_WIDTH    = .2f
   val RENDER_RADIUS = 64
 }
 

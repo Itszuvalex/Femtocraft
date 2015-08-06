@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.client.renderer.Tessellator
+import org.lwjgl.opengl.GL11
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
@@ -22,7 +23,7 @@ object FemtoRender {
 
     val tes = Tessellator.instance
     tes.startDrawingQuads()
-    tes.setColorRGBA(red, green, blue, alpha)
+    GL11.glColor4ub(red.toByte, green.toByte, blue.toByte, alpha.toByte)
     tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
     tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
     tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMax, vMax)
