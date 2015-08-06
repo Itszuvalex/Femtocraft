@@ -25,7 +25,7 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer with CrystalRenderer w
         this.bindTexture(CrystalRenderer.crystalTexLocation)
         renderCrystal(x, y, z, node, partialTime)
         this.bindTexture(PowerNodeRenderer.beamOuterLocation)
-        renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeRenderer.BEAM_WIDTH, Color(255.toByte, 255.toByte, 255.toByte, 0.toByte))
+        renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte))
         this.bindTexture(PowerNodeRenderer.beamColorLocation)
         renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeRenderer.BEAM_WIDTH, new Color(node.getColor))
       case _ =>
