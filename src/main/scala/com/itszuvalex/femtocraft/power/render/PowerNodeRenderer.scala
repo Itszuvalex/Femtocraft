@@ -23,7 +23,7 @@ class PowerNodeRenderer extends TileEntitySpecialRenderer with CrystalRenderer w
     tile match {
       case node: IPowerNode =>
         this.bindTexture(CrystalRenderer.crystalTexLocation)
-        renderCrystal(x, y, z, node)
+        renderCrystal(x, y, z, node, partialTime)
         this.bindTexture(PowerNodeRenderer.beamOuterLocation)
         renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeRenderer.BEAM_WIDTH, Color(255.toByte, 255.toByte, 255.toByte, 0.toByte))
         this.bindTexture(PowerNodeRenderer.beamColorLocation)

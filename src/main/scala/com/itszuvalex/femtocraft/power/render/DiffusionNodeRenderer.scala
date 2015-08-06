@@ -19,7 +19,7 @@ class DiffusionNodeRenderer extends TileEntitySpecialRenderer with CrystalRender
     tile match {
       case node: IPowerNode =>
         this.bindTexture(CrystalRenderer.crystalTexLocation)
-        renderCrystal(x, y, z, node)
+        renderCrystal(x, y, z, node, partialTime)
         this.bindTexture(DiffusionNodeRenderer.beamColorLocation)
         this.renderBeamsToAllChildren(x, y, z, partialTime, node, DiffusionNodeRenderer.BEAM_WIDTH, new Color(node.getColor).setAlpha(64.toByte))
       case _ =>
