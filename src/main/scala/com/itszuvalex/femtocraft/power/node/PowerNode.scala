@@ -25,16 +25,21 @@ trait PowerNode extends TileEntity with IPowerNode {
   val childrenLocs       = mutable.HashSet[Loc4]()
   var powerCurrent: Long = 0
   var powerMax    : Long = 0
-  var color              = Color((Random.nextInt(125) + 130).toByte,
-                                 (Random.nextInt(125) + 130).toByte,
-                                 (Random.nextInt(125) + 130).toByte, 0).toInt
+  var color              = Color(255.toByte, (Random.nextInt(125) + 115).toByte,
+                                    (Random.nextInt(125) + 115).toByte,
+                                    (Random.nextInt(125) + 115).toByte  ).toInt
+  var offsetColors : Array[Int] = new Array(11)
+  (1 to 10).foreach( num => offsetColors{num} = Color((Random.nextInt(70) + 150).toByte,
+                                                      (Random.nextInt(30) - 15).toByte,
+                                                      (Random.nextInt(30) - 15).toByte,
+                                                      (Random.nextInt(30) - 15).toByte).toInt )
 
   initializePowerSettings()
 
   def initializePowerSettings(): Unit
 
 
-  def savePowerConnectionInfo(compound: NBTTagCompound) = {
+  def savePowerConnectionInfo(compound: NBTTagCompound) =  {
     val powerCompound = new NBTTagCompound
     val parentLocCompound = new NBTTagCompound
     if (parentLoc != null) {
@@ -250,6 +255,12 @@ trait PowerNode extends TileEntity with IPowerNode {
    * @return The color of this power node.  This is used for aesthetics.
    */
   override def getColor: Int = color
+
+  /**
+   *
+   * @return The color offsets of every crystal of this node. Also for aesthetics.
+   */
+  override def getOffsetColors : Array[Int] = offsetColors
 
   /**
    *

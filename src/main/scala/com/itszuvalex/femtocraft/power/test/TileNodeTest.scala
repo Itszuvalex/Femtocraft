@@ -63,16 +63,26 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with Descripti
   override def initializePowerSettings(): Unit = {
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+ override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
-    val loc = getNodeLoc
+    /* val loc = getNodeLoc
     val parentLoc = getParentLoc
     val children = getChildren
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Location is: " + loc)
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Parent is: " + (if (parentLoc == null) "null" else parentLoc))
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Children(" + (if (children == null) "leaf" else children.size) + "):")
-    if (children != null) children.foreach(loc => PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    " + loc.getNodeLoc))
+    if (children != null) children.foreach(loc => PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    " + loc.getNodeLoc)) */
+    if (PowerNodeRenderer.alphaOverride == -1) {
+      PowerNodeRenderer.setAlphaMinimal()
+      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power Beam set to \"minimal\"")
+    } else if (PowerNodeRenderer.alphaOverride == 32) {
+      PowerNodeRenderer.setAlphaOff()
+      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power Beam set to \"off\"")
+    } else {
+      PowerNodeRenderer.setAlphaOn()
+      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power Beam set to \"on\"")
+    }
     ret
   }
 
