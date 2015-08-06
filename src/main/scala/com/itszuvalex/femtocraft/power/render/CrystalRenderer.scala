@@ -25,13 +25,12 @@ trait CrystalRenderer extends TileEntitySpecialRenderer {
   def renderCrystal(x: Double, y: Double, z: Double, node: TileEntity with IPowerNode, partialTime: Float): Unit = {
     val tessellator = Tessellator.instance
     val color = new Color(node.getColor)
+    val offsetColors = node.getOffsetColors
     GL11.glPushMatrix()
     GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glScaled(.01, .01, .01)
-
-    GL11.glColor4ub(color.red, color.green, color.blue, 220.toByte)
 
     val f2: Float = node.getWorldObj.getTotalWorldTime.toFloat + partialTime
     (1 to 10).map(num => ("Gengon0" + (if (num < 10) "0") + num, num)).foreach { name =>
@@ -42,6 +41,10 @@ trait CrystalRenderer extends TileEntitySpecialRenderer {
       GL11.glTranslated(0, height, 0)
 
       if (name._2 == 1) GL11.glRotated(f2 * name._2, 0, 1, 0)
+
+      val offsetColor = new Color(offsetColors{name._2})
+
+      GL11.glColor4ub((color.red + offsetColor.red).toByte, (color.green + offsetColor.green).toByte, (color.blue + offsetColor.blue).toByte, offsetColor.alpha)
 
       crystalModel.renderPart(name._1)
       GL11.glPopMatrix()

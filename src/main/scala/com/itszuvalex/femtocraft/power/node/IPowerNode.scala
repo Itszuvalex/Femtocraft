@@ -142,4 +142,10 @@ trait IPowerNode {
    */
   def getColor : Int
 
+  /**
+   *
+   * @return The color offsets of every crystal of this node. Also for aesthetics.
+   */
+  def getOffsetColors : Array[Int]
+
 }
