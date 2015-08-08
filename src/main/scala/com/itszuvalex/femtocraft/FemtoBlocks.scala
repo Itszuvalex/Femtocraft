@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.core.Initializable
 import com.itszuvalex.femtocraft.power.test._
+import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
 
@@ -10,6 +11,8 @@ import net.minecraft.block.Block
  */
 object FemtoBlocks extends Initializable {
   var testBlock: Block = null
+
+  var crystalsWorldgen       : Block = null
 
   var testDiffusionNode      : Block = null
   var testDiffusionTargetNode: Block = null
@@ -20,6 +23,10 @@ object FemtoBlocks extends Initializable {
   override def preInit(): Unit = {
     testBlock = new BlockTest
     GameRegistry.registerBlock(testBlock, "testBlock")
+
+    crystalsWorldgen = new BlockCrystalsWorldgen
+    crystalsWorldgen.setBlockName("crystalCluster")
+    GameRegistry.registerBlock(crystalsWorldgen, "crystalCluster")
 
     testDiffusionNode = new BlockDiffusionNodeTest
     testDiffusionNode.setBlockName("testDiffusionNode")

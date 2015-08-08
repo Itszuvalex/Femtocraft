@@ -17,12 +17,12 @@ object PowerNodeRenderer {
   val RENDER_RADIUS = 64
 }
 
-class PowerNodeRenderer extends TileEntitySpecialRenderer with CrystalRenderer with BeamRenderer {
+class PowerNodeRenderer extends TileEntitySpecialRenderer with NodeCrystalRenderer with BeamRenderer {
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {
       case node: IPowerNode =>
-        this.bindTexture(CrystalRenderer.crystalTexLocation)
+        this.bindTexture(NodeCrystalRenderer.crystalTexLocation)
         renderCrystal(x, y, z, node, partialTime)
         this.bindTexture(PowerNodeRenderer.beamOuterLocation)
         renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte))

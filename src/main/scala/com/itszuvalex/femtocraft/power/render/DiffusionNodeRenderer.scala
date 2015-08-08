@@ -13,12 +13,12 @@ object DiffusionNodeRenderer {
   val RENDER_RADIUS = 64
 }
 
-class DiffusionNodeRenderer extends TileEntitySpecialRenderer with CrystalRenderer with BeamRenderer {
+class DiffusionNodeRenderer extends TileEntitySpecialRenderer with NodeCrystalRenderer with BeamRenderer {
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {
       case node: IPowerNode =>
-        this.bindTexture(CrystalRenderer.crystalTexLocation)
+        this.bindTexture(NodeCrystalRenderer.crystalTexLocation)
         renderCrystal(x, y, z, node, partialTime)
         this.bindTexture(DiffusionNodeRenderer.beamColorLocation)
         this.renderBeamsToAllChildren(x, y, z, partialTime, node, DiffusionNodeRenderer.BEAM_WIDTH, new Color(node.getColor).setAlpha(64.toByte))
