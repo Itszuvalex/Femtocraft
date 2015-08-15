@@ -26,6 +26,13 @@ trait IWorker {
 
   /**
    *
+   * @param task Task to be assigned to.
+   * @return True if this worker can work upon the task, false otherwise.
+   */
+  def canWorkTask(task: ITask) : Boolean
+
+  /**
+   *
    * @return Sets the worker to the assigned task.
    */
   def setTask(task: ITask): Unit

@@ -11,6 +11,9 @@ object DistributedManager {
   private val taskProviderTracker   = new LocationTracker
   private val workerProviderTracker = new LocationTracker
 
+  private val availableTasksTracker   = new LocationTracker
+  private val availableWorkersTracker = new LocationTracker
+
   def addTaskProvider(provider: ITaskProvider): Unit = {
     taskProviderTracker.trackLocation(provider.getLocation)
     seekNewWorkers(provider)
@@ -21,12 +24,103 @@ object DistributedManager {
     seekNewTasks(provider)
   }
 
-  def seekNewTasks(provider: IWorkerProvider) = {
-
+  def addDualProvider(provider: ITaskProvider with IWorkerProvider): Unit = {
+    taskProviderTracker.trackLocation(provider.getLocation)
+    workerProviderTracker.trackLocation(provider.getLocation)
+    seekNewWorkers(provider)
+    seekNewTasks(provider)
   }
 
-  def seekNewWorkers(provider: ITaskProvider) = {
+  /**
+   * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
+   *
+   * @param task Task that is ending.  This task's isCompleted method must return true.  The workers assigned to this task should not be manually removed.
+   */
+  def onTaskEnd(task: ITask): Unit = {
+    val taskProvider = task.getProvider
+    val workerProviders = new ArrayBuffer[IWorkerProvider]()
+    task.getWorkers.foreach { worker =>
+      task.removeWorker(worker)
+      worker.setTask(null)
+      workerProviders += worker.getProvider
+                            }
+    refreshTaskStatus(taskProvider)
+    workerProviders.foreach(seekNewTasks(_))
+  }
 
+  def seekNewTasks(provider: IWorkerProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
+    var orderingFunc = taskOrderingFunction
+    if (taskOrderingFunction == null) {
+      orderingFunc = { (a, b) =>
+        val aP = a.getPriority
+        val bP = b.getPriority
+        if (aP < bP) true
+        else if (aP == bP) a.getProvider.getLocation.distSqr(provider.getLocation) < b.getProvider.getLocation.distSqr(provider.getLocation)
+        else false
+      }
+    }
+
+    val availableTasks = availableTasksTracker.getLocationsInRange(provider.getLocation, provider.getTaskConnectionRadius)
+                         .view.map(_.getTileEntity(false)).collect { case tp: ITaskProvider => tp }.filter { tp => tp.getLocation.distSqr(provider.getLocation) < tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius }.
+                         flatMap(_.getActiveTasks).filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
+    val availableWorkers = provider.getProvidedWorkers.filter(_.getTask == null)
+    val taskProviders = new ArrayBuffer[ITaskProvider]()
+    val workerIterator = availableWorkers.iterator
+    val tasksIterator = availableTasks.iterator
+    while (workerIterator.hasNext && tasksIterator.hasNext) {
+      val task = tasksIterator.next()
+      while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap && !task.isCompleted) {
+
+      }
+    }
+    refreshWorkerStatus(provider)
+    taskProviders.foreach(refreshTaskStatus)
+  }
+
+  def seekNewWorkers(provider: ITaskProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
+    var orderingFunc = taskOrderingFunction
+    if (taskOrderingFunction == null) {
+      orderingFunc = { (a, b) =>
+        val aP = a.getPriority
+        val bP = b.getPriority
+        if (aP < bP) true
+        else if (aP == bP) a.getProvider.getLocation.distSqr(provider.getLocation) < b.getProvider.getLocation.distSqr(provider.getLocation)
+        else false
+      }
+    }
+
+    val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getLocation, provider.getWorkerConnectionRadius)
+                           .view.map(_.getTileEntity(false)).collect { case wp: IWorkerProvider => wp }.filter { wp => wp.getLocation.distSqr(provider.getLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }.
+                           toList.sortWith(_.getLocation.distSqr(provider.getLocation) < _.getLocation.distSqr(provider.getLocation)).flatMap(_.getProvidedWorkers).filter(_.getTask == null)
+    val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap && !task.isCompleted }.toList.sortWith(orderingFunc)
+    val workerProviders = new ArrayBuffer[IWorkerProvider]()
+    val workerIterator = availableWorkers.iterator
+    val tasksIterator = availableTasks.iterator
+    while (workerIterator.hasNext && tasksIterator.hasNext) {
+      val task = tasksIterator.next()
+      while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap) {
+        val worker = workerIterator.next()
+        task.addWorker(worker)
+        worker.setTask(task)
+        workerProviders += worker.getProvider
+      }
+    }
+    refreshTaskStatus(provider)
+    workerProviders.foreach(refreshWorkerStatus)
+  }
+
+  def refreshWorkerStatus(provider: IWorkerProvider) = {
+    if (provider.getProvidedWorkers.exists(_.getTask == null))
+      availableWorkersTracker.trackLocation(provider.getLocation)
+    else
+      availableWorkersTracker.removeLocation(provider.getLocation)
+  }
+
+  def refreshTaskStatus(provider: ITaskProvider) = {
+    if (provider.getActiveTasks.exists { task => task.getWorkers.size < task.getWorkerCap })
+      availableTasksTracker.trackLocation(provider.getLocation)
+    else
+      availableTasksTracker.removeLocation(provider.getLocation)
   }
 
   def removeTaskProvider(provider: ITaskProvider) = {
@@ -39,7 +133,8 @@ object DistributedManager {
                               }
                                     }
     taskProviderTracker.removeLocation(provider.getLocation)
-    workerProviders.foreach(seekNewTasks)
+    availableTasksTracker.removeLocation(provider.getLocation)
+    workerProviders.foreach(seekNewTasks(_))
   }
 
   def removeWorkerProvider(provider: IWorkerProvider) = {
@@ -54,7 +149,8 @@ object DistributedManager {
       }
                                         }
     workerProviderTracker.removeLocation(provider.getLocation)
-    taskProviders.foreach(seekNewWorkers)
+    availableWorkersTracker.removeLocation(provider.getLocation)
+    taskProviders.foreach(seekNewWorkers(_))
   }
 
 }
