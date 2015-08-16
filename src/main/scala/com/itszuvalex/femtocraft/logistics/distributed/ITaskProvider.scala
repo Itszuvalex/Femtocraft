@@ -17,7 +17,7 @@ trait ITaskProvider {
    *
    * @return Location of this provider, for use in distance calculations.
    */
-  def getLocation: Loc4
+  def getProviderLocation: Loc4
 
   /**
    *

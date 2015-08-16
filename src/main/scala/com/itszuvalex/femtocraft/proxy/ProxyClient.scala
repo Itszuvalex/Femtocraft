@@ -64,6 +64,8 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTransferNodeTest], new PowerNodeRenderer)
 
+
+
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalsWorldgen], new CrystalRenderer)
   }
 }

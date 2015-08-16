@@ -18,7 +18,7 @@ trait IWorkerProvider {
    *
    * @return Location of this worker provider, for use in distance calculations.
    */
-  def getLocation: Loc4
+  def getProviderLocation: Loc4
 
 
   /**

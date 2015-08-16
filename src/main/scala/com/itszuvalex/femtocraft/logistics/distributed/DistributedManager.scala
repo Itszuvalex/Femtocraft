@@ -15,18 +15,18 @@ object DistributedManager {
   private val availableWorkersTracker = new LocationTracker
 
   def addTaskProvider(provider: ITaskProvider): Unit = {
-    taskProviderTracker.trackLocation(provider.getLocation)
+    taskProviderTracker.trackLocation(provider.getProviderLocation)
     seekNewWorkers(provider)
   }
 
   def addWorkerProvider(provider: IWorkerProvider): Unit = {
-    workerProviderTracker.trackLocation(provider.getLocation)
+    workerProviderTracker.trackLocation(provider.getProviderLocation)
     seekNewTasks(provider)
   }
 
   def addDualProvider(provider: ITaskProvider with IWorkerProvider): Unit = {
-    taskProviderTracker.trackLocation(provider.getLocation)
-    workerProviderTracker.trackLocation(provider.getLocation)
+    taskProviderTracker.trackLocation(provider.getProviderLocation)
+    workerProviderTracker.trackLocation(provider.getProviderLocation)
     seekNewWorkers(provider)
     seekNewTasks(provider)
   }
@@ -55,25 +55,28 @@ object DistributedManager {
         val aP = a.getPriority
         val bP = b.getPriority
         if (aP < bP) true
-        else if (aP == bP) a.getProvider.getLocation.distSqr(provider.getLocation) < b.getProvider.getLocation.distSqr(provider.getLocation)
+        else if (aP == bP) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
         else false
       }
     }
 
-    val availableTasks = availableTasksTracker.getLocationsInRange(provider.getLocation, provider.getTaskConnectionRadius)
-                         .view.map(_.getTileEntity(false)).collect { case tp: ITaskProvider => tp }.filter { tp => tp.getLocation.distSqr(provider.getLocation) < tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius }.
+    val availableTasks = availableTasksTracker.getLocationsInRange(provider.getProviderLocation, provider.getTaskConnectionRadius)
+                         .view.flatMap(_.getTileEntity(false)).collect { case tp: ITaskProvider => tp }.filter { tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius }.
                          flatMap(_.getActiveTasks).filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
     val availableWorkers = provider.getProvidedWorkers.filter(_.getTask == null)
     val taskProviders = new mutable.HashSet[ITaskProvider]()
-    val workerIterator = availableWorkers.iterator
     val tasksIterator = availableTasks.iterator
-    while (workerIterator.hasNext && tasksIterator.hasNext) {
+
+    while (availableWorkers.nonEmpty && tasksIterator.hasNext) {
+      val workerIterator = availableWorkers.iterator
       val task = tasksIterator.next()
       while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap) {
         val worker = workerIterator.next()
-        task.addWorker(worker)
-        worker.setTask(task)
-        taskProviders += task.getProvider
+        if (worker.canWorkTask(task)) {
+          task.addWorker(worker)
+          worker.setTask(task)
+          taskProviders += task.getProvider
+        }
       }
     }
     refreshWorkerStatus(provider)
@@ -87,25 +90,28 @@ object DistributedManager {
         val aP = a.getPriority
         val bP = b.getPriority
         if (aP < bP) true
-        else if (aP == bP) a.getProvider.getLocation.distSqr(provider.getLocation) < b.getProvider.getLocation.distSqr(provider.getLocation)
+        else if (aP == bP) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
         else false
       }
     }
 
-    val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getLocation, provider.getWorkerConnectionRadius)
-                           .view.map(_.getTileEntity(false)).collect { case wp: IWorkerProvider => wp }.filter { wp => wp.getLocation.distSqr(provider.getLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }.
-                           toList.sortWith(_.getLocation.distSqr(provider.getLocation) < _.getLocation.distSqr(provider.getLocation)).flatMap(_.getProvidedWorkers).filter(_.getTask == null)
+    val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getProviderLocation, provider.getWorkerConnectionRadius)
+                           .view.flatMap(_.getTileEntity(false)).collect { case wp: IWorkerProvider => wp }.filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }.
+                           toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation)).flatMap(_.getProvidedWorkers).filter(_.getTask == null)
     val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
     val workerProviders = new mutable.HashSet[IWorkerProvider]()
-    val workerIterator = availableWorkers.iterator
     val tasksIterator = availableTasks.iterator
-    while (workerIterator.hasNext && tasksIterator.hasNext) {
+
+    while (availableWorkers.nonEmpty && tasksIterator.hasNext) {
+      val workerIterator = availableWorkers.iterator
       val task = tasksIterator.next()
       while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap) {
         val worker = workerIterator.next()
-        task.addWorker(worker)
-        worker.setTask(task)
-        workerProviders += worker.getProvider
+        if (worker.canWorkTask(task)) {
+          task.addWorker(worker)
+          worker.setTask(task)
+          workerProviders += worker.getProvider
+        }
       }
     }
     refreshTaskStatus(provider)
@@ -114,16 +120,16 @@ object DistributedManager {
 
   def refreshWorkerStatus(provider: IWorkerProvider) = {
     if (provider.getProvidedWorkers.exists(_.getTask == null))
-      availableWorkersTracker.trackLocation(provider.getLocation)
+      availableWorkersTracker.trackLocation(provider.getProviderLocation)
     else
-      availableWorkersTracker.removeLocation(provider.getLocation)
+      availableWorkersTracker.removeLocation(provider.getProviderLocation)
   }
 
   def refreshTaskStatus(provider: ITaskProvider) = {
     if (provider.getActiveTasks.exists { task => task.getWorkers.size < task.getWorkerCap })
-      availableTasksTracker.trackLocation(provider.getLocation)
+      availableTasksTracker.trackLocation(provider.getProviderLocation)
     else
-      availableTasksTracker.removeLocation(provider.getLocation)
+      availableTasksTracker.removeLocation(provider.getProviderLocation)
   }
 
   def removeTaskProvider(provider: ITaskProvider) = {
@@ -135,8 +141,8 @@ object DistributedManager {
         worker.setTask(null)
                               }
                                     }
-    taskProviderTracker.removeLocation(provider.getLocation)
-    availableTasksTracker.removeLocation(provider.getLocation)
+    taskProviderTracker.removeLocation(provider.getProviderLocation)
+    availableTasksTracker.removeLocation(provider.getProviderLocation)
     workerProviders.foreach(seekNewTasks(_))
   }
 
@@ -151,8 +157,8 @@ object DistributedManager {
         case _ =>
       }
                                         }
-    workerProviderTracker.removeLocation(provider.getLocation)
-    availableWorkersTracker.removeLocation(provider.getLocation)
+    workerProviderTracker.removeLocation(provider.getProviderLocation)
+    availableWorkersTracker.removeLocation(provider.getProviderLocation)
     taskProviders.foreach(seekNewWorkers(_))
   }
 
