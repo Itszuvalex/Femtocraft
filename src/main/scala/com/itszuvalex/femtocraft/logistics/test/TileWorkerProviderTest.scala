@@ -17,15 +17,14 @@ import scala.collection._
  * Created by Christopher Harris (Itszuvalex) on 8/15/15.
  */
 class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with ILogisticsConnected with DescriptionPacket {
-  val worker: IWorker = new TestWorker(this)
-  val connections     = new mutable.HashSet[Loc4]()
+  val workers = new mutable.HashSet[IWorker]()
+  workers += new TestWorker(this)
+  val connections = new mutable.HashSet[Loc4]()
 
   override def getConnections: Set[Loc4] = {
     if (worldObj.isRemote) connections
     else {
-      val task = worker.getTask
-      if (task == null) Set[Loc4]()
-      else Set(task.getProvider.getProviderLocation)
+      workers.flatMap(worker => if (worker.getTask == null) None else Option(worker.getTask.getProvider.getProviderLocation))
     }
   }
 
@@ -55,7 +54,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
 
   override def updateEntity(): Unit = {
-    worker.onTick()
+    getProvidedWorkers.foreach(_.onTick())
   }
 
   override def getMod = Femtocraft
@@ -71,7 +70,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
    *
    * @return Set of workers available to be assigned.
    */
-  override def getProvidedWorkers: Set[IWorker] = Set(worker)
+  override def getProvidedWorkers: Set[IWorker] = workers
 
   /**
    *
@@ -118,7 +117,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     if (worldObj.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>
-      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask))
+      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
                                }
     ret
   }

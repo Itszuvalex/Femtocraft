@@ -39,7 +39,7 @@ trait ITask {
    *
    * @return Set of Workers assigned to this task.
    */
-  def getWorkers: Set[IWorker]
+  def getWorkers: scala.collection.Set[IWorker]
 
   /**
    *

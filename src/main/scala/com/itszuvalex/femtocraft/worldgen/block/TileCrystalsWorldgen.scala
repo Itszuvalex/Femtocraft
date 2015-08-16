@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.worldgen.block
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
@@ -23,7 +22,7 @@ class TileCrystalsWorldgen extends TileEntityBase {
                               (Random.nextInt(125) + 115).toByte  ).toInt
 
   var colorOffsets : Array[Int] = new Array[Int](11)
-  (1 to 10).foreach( num => colorOffsets{num} = new Color((Random.nextInt(100) + 120).toByte,
+  (1 to 10).foreach( num => colorOffsets(num) = new Color(225.toByte,
                                                           Random.nextInt(30).toByte,
                                                           Random.nextInt(30).toByte,
                                                           Random.nextInt(30).toByte  ).toInt )

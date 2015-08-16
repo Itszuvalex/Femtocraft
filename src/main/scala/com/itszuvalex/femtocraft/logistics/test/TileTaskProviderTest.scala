@@ -29,7 +29,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
    *
    * @return Set of tasks hosted by the provider.
    */
-  override def getActiveTasks = tasks.toSet
+  override def getActiveTasks = tasks
 
   /**
    *
@@ -64,6 +64,9 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Tasks(" + tasks.size + "):")
     tasks.collect { case task: TestTask =>
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap + "   progress:" + task.progress + "-" + task.progressToFinish)
+      task.getWorkers.foreach { worker =>
+        PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "       Worker:" + worker.getProvider.getProviderLocation)
+                              }
                   }
     ret
   }
@@ -140,7 +143,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
      *
      * @return Set of Workers assigned to this task.
      */
-    override def getWorkers = workers.toSet
+    override def getWorkers = workers
   }
 
 }

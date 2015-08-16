@@ -11,7 +11,7 @@ trait ITaskProvider {
    *
    * @return Set of tasks hosted by the provider.
    */
-  def getActiveTasks: Set[ITask]
+  def getActiveTasks: scala.collection.Set[ITask]
 
   /**
    *
@@ -24,6 +24,6 @@ trait ITaskProvider {
    * @return Distance to accept new workers when task completes.  Do not pass high values, as this will lead to excessive blank location checking on the order of
    *         (distance/16)&#94;2
    */
-  def getWorkerConnectionRadius : Float
+  def getWorkerConnectionRadius: Float
 
 }
