@@ -54,6 +54,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
 
   override def updateEntity(): Unit = {
+    if(worldObj.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
   }
 
@@ -91,11 +92,13 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   override def invalidate(): Unit = {
     super.invalidate()
+    if(worldObj.isRemote) return
     DistributedManager.removeWorkerProvider(this)
   }
 
   override def validate(): Unit = {
     super.validate()
+    if(worldObj.isRemote) return
     DistributedManager.addWorkerProvider(this)
   }
 

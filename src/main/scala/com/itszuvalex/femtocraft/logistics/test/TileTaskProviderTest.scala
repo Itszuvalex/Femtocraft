@@ -15,6 +15,8 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   val tasks = new mutable.HashSet[ITask]()
 
   override def updateEntity(): Unit = {
+    if(worldObj.isRemote) return
+
     getActiveTasks.foreach(_.onTick())
 
     if (tasks.isEmpty) {
@@ -49,11 +51,13 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
 
   override def invalidate(): Unit = {
     super.invalidate()
+    if(worldObj.isRemote) return
     DistributedManager.removeTaskProvider(this)
   }
 
   override def validate(): Unit = {
     super.validate()
+    if(worldObj.isRemote) return
     DistributedManager.addTaskProvider(this)
   }
 
