@@ -21,7 +21,7 @@ class BlockWorkerProviderTest extends TileContainer(Material.iron) {
     false
 
 
-  override def getRenderBlockPass: Int = 2
+  override def getRenderBlockPass: Int = 0
 
   /**
    * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)

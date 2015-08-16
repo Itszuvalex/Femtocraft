@@ -50,7 +50,7 @@ object DistributedManager {
 
   def seekNewTasks(provider: IWorkerProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
     var orderingFunc = taskOrderingFunction
-    if (taskOrderingFunction == null) {
+    if (orderingFunc == null) {
       orderingFunc = { (a, b) =>
         val aP = a.getPriority
         val bP = b.getPriority
@@ -85,7 +85,7 @@ object DistributedManager {
 
   def seekNewWorkers(provider: ITaskProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
     var orderingFunc = taskOrderingFunction
-    if (taskOrderingFunction == null) {
+    if (orderingFunc == null) {
       orderingFunc = { (a, b) =>
         val aP = a.getPriority
         val bP = b.getPriority

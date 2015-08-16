@@ -17,7 +17,7 @@ object PowerNodeRenderer {
   val RENDER_RADIUS = 64
 }
 
-class PowerNodeRenderer extends TileEntitySpecialRenderer with NodeCrystalRenderer with BeamRenderer {
+class PowerNodeRenderer extends TileEntitySpecialRenderer with NodeCrystalRenderer with PowerBeamRenderer {
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {

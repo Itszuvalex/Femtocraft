@@ -2,15 +2,57 @@ package com.itszuvalex.femtocraft.logistics.test
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, IWorker, IWorkerProvider}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
+import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
+import net.minecraft.util.AxisAlignedBB
+
+import scala.collection._
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/15/15.
  */
-class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider {
+class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with ILogisticsConnected with DescriptionPacket {
   val worker: IWorker = new TestWorker(this)
+  val connections     = new mutable.HashSet[Loc4]()
+
+  override def getConnections: Set[Loc4] = {
+    if (worldObj.isRemote) connections
+    else {
+      val task = worker.getTask
+      if (task == null) Set[Loc4]()
+      else Set(task.getProvider.getProviderLocation)
+    }
+  }
+
+
+  def saveConnectionInfo(compound: NBTTagCompound) = {
+    val connectionCompound = new NBTTagCompound
+    val childrenLocsList = new NBTTagList
+    getConnections.foreach { child =>
+      val childCompound = new NBTTagCompound
+      child.saveToNBT(childCompound)
+      childrenLocsList.appendTag(childCompound)
+                           }
+    connectionCompound.setTag("tagList", childrenLocsList)
+    compound.setTag("connections", connectionCompound)
+  }
+
+  def loadConnectionInfo(compound: NBTTagCompound) = {
+    val connectionCompound = compound.getCompoundTag("connections")
+    connections.clear()
+    val childrenList = connectionCompound.getTagList("tagList", 10)
+    connections ++= (0 until childrenList.tagCount()).view.map(childrenList.getCompoundTagAt).map { compound =>
+      val loc = Loc4(0, 0, 0, 0)
+      loc.loadFromNBT(compound)
+      loc
+                                                                                                  }
+  }
+
 
   override def updateEntity(): Unit = {
     worker.onTick()
@@ -37,6 +79,17 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider {
    */
   override def getProviderLocation = getLoc
 
+  override def getRenderBoundingBox: AxisAlignedBB = {
+    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+    AxisAlignedBB.getBoundingBox(center.x - 30,
+                                 center.y - 30,
+                                 center.z - 30,
+                                 center.x + 30,
+                                 center.y + 30,
+                                 center.z + 30)
+  }
+
+
   override def invalidate(): Unit = {
     super.invalidate()
     DistributedManager.removeWorkerProvider(this)
@@ -47,8 +100,18 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider {
     DistributedManager.addWorkerProvider(this)
   }
 
+  override def hasDescription: Boolean = true
 
-  override def hasDescription = false
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    saveConnectionInfo(compound)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    loadConnectionInfo(compound)
+    setRenderUpdate()
+  }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
@@ -61,7 +124,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider {
   }
 
 
-  private class TestWorker(val provider: IWorkerProvider) extends IWorker {
+  private class TestWorker(val provider: TileWorkerProviderTest) extends IWorker {
     var task: ITask = null
 
     /**
@@ -103,6 +166,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider {
      */
     override def setTask(task: ITask): Unit = {
       this.task = task
+      provider.setUpdate()
     }
   }
 

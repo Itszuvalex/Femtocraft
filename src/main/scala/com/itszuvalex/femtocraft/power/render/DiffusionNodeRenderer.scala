@@ -13,7 +13,7 @@ object DiffusionNodeRenderer {
   val RENDER_RADIUS = 64
 }
 
-class DiffusionNodeRenderer extends TileEntitySpecialRenderer with NodeCrystalRenderer with BeamRenderer {
+class DiffusionNodeRenderer extends TileEntitySpecialRenderer with NodeCrystalRenderer with PowerBeamRenderer {
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {

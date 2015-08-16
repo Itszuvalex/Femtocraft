@@ -11,7 +11,7 @@ trait IWorkerProvider {
    *
    * @return Set of workers available to be assigned.
    */
-  def getProvidedWorkers: Set[IWorker]
+  def getProvidedWorkers: scala.collection.Set[IWorker]
 
 
   /**
