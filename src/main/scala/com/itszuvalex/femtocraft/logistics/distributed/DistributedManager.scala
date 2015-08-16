@@ -34,7 +34,7 @@ object DistributedManager {
   /**
    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
    *
-   * @param task Task that is ending.  This task's isCompleted method must return true.  The workers assigned to this task should not be manually removed.
+   * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
    */
   def onTaskEnd(task: ITask): Unit = {
     val taskProvider = task.getProvider
@@ -69,7 +69,7 @@ object DistributedManager {
     val tasksIterator = availableTasks.iterator
     while (workerIterator.hasNext && tasksIterator.hasNext) {
       val task = tasksIterator.next()
-      while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap && !task.isCompleted) {
+      while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap) {
 
       }
     }
@@ -92,7 +92,7 @@ object DistributedManager {
     val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getLocation, provider.getWorkerConnectionRadius)
                            .view.map(_.getTileEntity(false)).collect { case wp: IWorkerProvider => wp }.filter { wp => wp.getLocation.distSqr(provider.getLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }.
                            toList.sortWith(_.getLocation.distSqr(provider.getLocation) < _.getLocation.distSqr(provider.getLocation)).flatMap(_.getProvidedWorkers).filter(_.getTask == null)
-    val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap && !task.isCompleted }.toList.sortWith(orderingFunc)
+    val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap}.toList.sortWith(orderingFunc)
     val workerProviders = new ArrayBuffer[IWorkerProvider]()
     val workerIterator = availableWorkers.iterator
     val tasksIterator = availableTasks.iterator

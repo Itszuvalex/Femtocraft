@@ -63,10 +63,4 @@ trait ITask {
    * Called every tick by the ITaskProvider.
    */
   def onTick(): Unit
-
-  /**
-   *
-   * @return True if this task is completed.  When a task completes, this must return true, but workers must not be removed.
-   */
-  def isCompleted : Boolean
 }
