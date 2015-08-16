@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.logistics.distributed
 
 import com.itszuvalex.itszulib.logistics.LocationTracker
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection._
 
 /**
  * Created by Christopher on 8/15/2015.
@@ -38,7 +38,7 @@ object DistributedManager {
    */
   def onTaskEnd(task: ITask): Unit = {
     val taskProvider = task.getProvider
-    val workerProviders = new ArrayBuffer[IWorkerProvider]()
+    val workerProviders = new mutable.HashSet[IWorkerProvider]()
     task.getWorkers.foreach { worker =>
       task.removeWorker(worker)
       worker.setTask(null)
@@ -64,13 +64,16 @@ object DistributedManager {
                          .view.map(_.getTileEntity(false)).collect { case tp: ITaskProvider => tp }.filter { tp => tp.getLocation.distSqr(provider.getLocation) < tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius }.
                          flatMap(_.getActiveTasks).filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
     val availableWorkers = provider.getProvidedWorkers.filter(_.getTask == null)
-    val taskProviders = new ArrayBuffer[ITaskProvider]()
+    val taskProviders = new mutable.HashSet[ITaskProvider]()
     val workerIterator = availableWorkers.iterator
     val tasksIterator = availableTasks.iterator
     while (workerIterator.hasNext && tasksIterator.hasNext) {
       val task = tasksIterator.next()
       while (workerIterator.hasNext && task.getWorkers.size < task.getWorkerCap) {
-
+        val worker = workerIterator.next()
+        task.addWorker(worker)
+        worker.setTask(task)
+        taskProviders += task.getProvider
       }
     }
     refreshWorkerStatus(provider)
@@ -92,8 +95,8 @@ object DistributedManager {
     val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getLocation, provider.getWorkerConnectionRadius)
                            .view.map(_.getTileEntity(false)).collect { case wp: IWorkerProvider => wp }.filter { wp => wp.getLocation.distSqr(provider.getLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }.
                            toList.sortWith(_.getLocation.distSqr(provider.getLocation) < _.getLocation.distSqr(provider.getLocation)).flatMap(_.getProvidedWorkers).filter(_.getTask == null)
-    val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap}.toList.sortWith(orderingFunc)
-    val workerProviders = new ArrayBuffer[IWorkerProvider]()
+    val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
+    val workerProviders = new mutable.HashSet[IWorkerProvider]()
     val workerIterator = availableWorkers.iterator
     val tasksIterator = availableTasks.iterator
     while (workerIterator.hasNext && tasksIterator.hasNext) {
@@ -124,7 +127,7 @@ object DistributedManager {
   }
 
   def removeTaskProvider(provider: ITaskProvider) = {
-    var workerProviders = new ArrayBuffer[IWorkerProvider]()
+    var workerProviders = new mutable.HashSet[IWorkerProvider]()
     provider.getActiveTasks.foreach { task =>
       task.getWorkers.foreach { worker =>
         workerProviders += worker.getProvider
@@ -138,7 +141,7 @@ object DistributedManager {
   }
 
   def removeWorkerProvider(provider: IWorkerProvider) = {
-    var taskProviders = new ArrayBuffer[ITaskProvider]()
+    var taskProviders = new mutable.HashSet[ITaskProvider]()
     provider.getProvidedWorkers.foreach { worker =>
       worker.getTask match {
         case task: ITask =>
