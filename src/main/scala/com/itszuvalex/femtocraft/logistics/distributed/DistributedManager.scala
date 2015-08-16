@@ -59,15 +59,12 @@ object DistributedManager {
         else false
       }
     }
-    val availableTaskProviderLocs = availableTasksTracker.getLocationsInRange(provider.getProviderLocation, provider.getTaskConnectionRadius)
-    val availableTaskProviderTiles = availableTaskProviderLocs
-                                     .flatMap(_.getTileEntity(false))
 
-    val availableTaskProviders = availableTaskProviderTiles.collect { case tp: ITaskProvider => tp }
-    val availableTaskProvidersInRange = availableTaskProviders
-                                        .filter(tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < (tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius))
-
-    val availableTasks = availableTaskProvidersInRange.flatMap(_.getActiveTasks)
+    val availableTasks = availableTasksTracker.getLocationsInRange(provider.getProviderLocation, provider.getTaskConnectionRadius)
+                         .flatMap(_.getTileEntity(false))
+                         .collect { case tp: ITaskProvider => tp }
+                         .filter(tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < (tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius))
+                         .flatMap(_.getActiveTasks)
                          .filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
     val availableWorkers = provider.getProvidedWorkers.filter(_.getTask == null)
     val taskProviders = new mutable.HashSet[ITaskProvider]()
