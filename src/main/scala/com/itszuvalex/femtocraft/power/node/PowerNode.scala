@@ -2,8 +2,10 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.util.Color
-import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 
 import scala.collection._
@@ -36,21 +38,36 @@ trait PowerNode extends TileEntity with IPowerNode {
 
 
   def savePowerConnectionInfo(compound: NBTTagCompound) = {
-    val powerCompound = new NBTTagCompound
-    val parentLocCompound = new NBTTagCompound
-    if (parentLoc != null) {
-      parentLoc.saveToNBT(parentLocCompound)
-      powerCompound.setTag(PowerNode.NODE_PARENT_KEY, parentLocCompound)
-    }
-    val childrenLocsList = new NBTTagList
-    childrenLocs.foreach { child =>
-      val childCompound = new NBTTagCompound
-      child.saveToNBT(childCompound)
-      childrenLocsList.appendTag(childCompound)
-                         }
-    powerCompound.setTag(PowerNode.NODE_CHILDREN_KEY, childrenLocsList)
-    powerCompound.setInteger(PowerNode.COLOR_KEY, color)
-    compound.setTag(PowerNode.POWER_COMPOUND_KEY, powerCompound)
+    compound(PowerNode.POWER_COMPOUND_KEY ->
+             NBTCompound(
+                          PowerNode.NODE_PARENT_KEY -> parentLoc,
+                          PowerNode.NODE_CHILDREN_KEY -> NBTList(
+                                                                  childrenLocs.map { child =>
+                                                                    val compound = new NBTTagCompound
+                                                                    child.saveToNBT(compound)
+                                                                    compound
+                                                                                   }.toSeq :_*
+                                                                ),
+                          PowerNode.COLOR_KEY -> color
+                        )
+            )
+
+    //
+    //    val powerCompound = new NBTTagCompound
+    //    val parentLocCompound = new NBTTagCompound
+    //    if (parentLoc != null) {
+    //      parentLoc.saveToNBT(parentLocCompound)
+    //      powerCompound.setTag(PowerNode.NODE_PARENT_KEY, parentLocCompound)
+    //    }
+    //    val childrenLocsList = new NBTTagList
+    //    childrenLocs.foreach { child =>
+    //      val childCompound = new NBTTagCompound
+    //      child.saveToNBT(childCompound)
+    //      childrenLocsList.appendTag(childCompound)
+    //                         }
+    //    powerCompound.setTag(PowerNode.NODE_CHILDREN_KEY, childrenLocsList)
+    //    powerCompound.setInteger(PowerNode.COLOR_KEY, color)
+    //    compound.setTag(PowerNode.POWER_COMPOUND_KEY, powerCompound)
   }
 
   def loadPowerConnectionInfo(compound: NBTTagCompound) = {
@@ -191,7 +208,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def getParent: IPowerNode = if (parentLoc == null) null
   else parentLoc.getTileEntity(true) match {
     case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
-    case None => null
+    case None                                  => null
   }
 
   /**
