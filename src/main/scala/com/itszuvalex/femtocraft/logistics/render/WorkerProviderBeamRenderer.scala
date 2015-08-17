@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11
 object WorkerProviderBeamRenderer {
   private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/logistics_beam_outer.png")
   private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/logistics_beam_colored.png")
-  val BEAM_WIDTH    = .2f
+  val BEAM_WIDTH    = .08f
   val RENDER_RADIUS = 64
 }
 
@@ -72,9 +72,9 @@ class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer {
     tile match {
       case node: TileWorkerProviderTest =>
         this.bindTexture(WorkerProviderBeamRenderer.beamOuterLocation)
-        renderBeamsToAllChildren(x, y, z, partialTime, node, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte))
+        renderBeamsToAllChildren(x, y, z, partialTime, node, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
         this.bindTexture(WorkerProviderBeamRenderer.beamColorLocation)
-        renderBeamsToAllChildren(x, y, z, partialTime, node, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte))
+        renderBeamsToAllChildren(x, y, z, partialTime, node, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
       case _ =>
     }
   }
