@@ -46,7 +46,7 @@ trait PowerNode extends TileEntity with IPowerNode {
                                                                     val compound = new NBTTagCompound
                                                                     child.saveToNBT(compound)
                                                                     compound
-                                                                                   }.toSeq :_*
+                                                                                   }
                                                                 ),
                           PowerNode.COLOR_KEY -> color
                         )
