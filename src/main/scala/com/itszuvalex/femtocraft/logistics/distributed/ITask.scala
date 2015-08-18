@@ -64,17 +64,6 @@ trait ITask {
   /**
    * Called every tick by the ITaskProvider.
    */
-  def onTick(): Unit = {
-    ticks += 1
-    if (ticks % 20 == 0) {
-      ticks = 0
-      onWorkTick()
-    }
-  }
-
-  /**
-   * Called every second, usually by onTick().
-   */
-  def onWorkTick(): Unit
+  def onTick(): Unit
 
 }
