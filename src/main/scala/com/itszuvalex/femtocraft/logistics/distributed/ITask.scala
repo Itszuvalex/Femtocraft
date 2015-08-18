@@ -5,8 +5,6 @@ package com.itszuvalex.femtocraft.logistics.distributed
  */
 trait ITask {
 
-  private var ticks : Int = 0
-
   /*  /**
      *
      * @return UUID identification of task.  This should persist through save/load, and should not repeat across separate instances of the task.
@@ -65,5 +63,4 @@ trait ITask {
    * Called every tick by the ITaskProvider.
    */
   def onTick(): Unit
-
 }
