@@ -5,10 +5,12 @@ import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITas
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 
 import scala.collection._
@@ -29,32 +31,22 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   }
 
 
-  def saveConnectionInfo(compound: NBTTagCompound) = {
-    val connectionCompound = new NBTTagCompound
-    val childrenLocsList = new NBTTagList
-    getConnections.foreach { child =>
-      val childCompound = new NBTTagCompound
-      child.saveToNBT(childCompound)
-      childrenLocsList.appendTag(childCompound)
-                           }
-    connectionCompound.setTag("tagList", childrenLocsList)
-    compound.setTag("connections", connectionCompound)
-  }
+  def saveConnectionInfo(compound: NBTTagCompound) =
+    compound("connections" ->
+             NBTCompound(
+                          "tagList" -> NBTList(getConnections.map(NBTCompound))
+                        )
+            )
 
-  def loadConnectionInfo(compound: NBTTagCompound) = {
-    val connectionCompound = compound.getCompoundTag("connections")
-    connections.clear()
-    val childrenList = connectionCompound.getTagList("tagList", 10)
-    connections ++= (0 until childrenList.tagCount()).view.map(childrenList.getCompoundTagAt).map { compound =>
-      val loc = Loc4(0, 0, 0, 0)
-      loc.loadFromNBT(compound)
-      loc
-                                                                                                  }
-  }
+  def loadConnectionInfo(compound: NBTTagCompound) =
+    compound.NBTCompound("connections") { comp =>
+      connections.clear()
+      connections ++= comp.NBTList("tagList").map(Loc4(_))
+                                        }
 
 
   override def updateEntity(): Unit = {
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
   }
 
@@ -92,13 +84,13 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
     DistributedManager.removeWorkerProvider(this)
   }
 
   override def validate(): Unit = {
     super.validate()
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
     DistributedManager.addWorkerProvider(this)
   }
 
