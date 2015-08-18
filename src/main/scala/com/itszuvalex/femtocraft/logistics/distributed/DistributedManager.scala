@@ -54,8 +54,11 @@ object DistributedManager {
       orderingFunc = { (a, b) =>
         val aP = a.getPriority
         val bP = b.getPriority
+        val aFill = a.getWorkers.size / a.getWorkerCap
+        val bFill = b.getWorkers.size / b.getWorkerCap
         if (aP > bP) true
-        else if (aP == bP) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
+        else if (aP == bP) aFill < bFill
+        else if (aFill == bFill) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
         else false
       }
     }
@@ -88,8 +91,11 @@ object DistributedManager {
       orderingFunc = { (a, b) =>
         val aP = a.getPriority
         val bP = b.getPriority
+        val aFill = a.getWorkers.size / a.getWorkerCap
+        val bFill = b.getWorkers.size / b.getWorkerCap
         if (aP > bP) true
-        else if (aP == bP) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
+        else if (aP == bP) aFill < bFill
+        else if (aFill == bFill) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
         else false
       }
     }

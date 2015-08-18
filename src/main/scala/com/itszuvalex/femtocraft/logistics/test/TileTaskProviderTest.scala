@@ -77,7 +77,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
 
   class TestTask(val provider: TileTaskProviderTest) extends ITask {
     var progress         = 0
-    val progressToFinish = 500
+    val progressToFinish = 20
     val workers          = new mutable.HashSet[IWorker]()
 
     /**
@@ -102,7 +102,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     /**
      * Called every tick by the ITaskProvider.
      */
-    override def onTick(): Unit = {
+    override def onWorkTick(): Unit = {
       progress += workers.size
       if (progress >= progressToFinish) {
         cancel()
