@@ -47,20 +47,12 @@ trait PowerNode extends TileEntity with IPowerNode {
             )
 
   def loadPowerConnectionInfo(compound: NBTTagCompound) = {
-    val powerCompound = compound.getCompoundTag(PowerNode.POWER_COMPOUND_KEY)
-    if (powerCompound.hasKey(PowerNode.NODE_PARENT_KEY)) {
-      parentLoc = Loc4(0, 0, 0, 0)
-      parentLoc.loadFromNBT(powerCompound.getCompoundTag(PowerNode.NODE_PARENT_KEY))
-    }
-    else parentLoc = null
-    color = powerCompound.getInteger(PowerNode.COLOR_KEY)
-    childrenLocs.clear()
-    val childrenList = powerCompound.getTagList(PowerNode.NODE_CHILDREN_KEY, 10)
-    childrenLocs ++= (0 until childrenList.tagCount()).view.map(childrenList.getCompoundTagAt).map { compound =>
-      val loc = Loc4(0, 0, 0, 0)
-      loc.loadFromNBT(compound)
-      loc
-                                                                                                   }
+    compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
+      color = comp.Int(PowerNode.COLOR_KEY)
+      parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
+      childrenLocs.clear()
+      childrenLocs ++= comp.NBTList(PowerNode.NODE_CHILDREN_KEY).map(Loc4(_))
+                                                       }
   }
 
   def onBlockBreak() = {
