@@ -35,7 +35,7 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
       if (set.isEmpty)
         idMap.remove(id)
                       }
-    OreDictionary.getOreIDs(itemStack).foreach { oid => oresMap.get(_).map { set =>
+    OreDictionary.getOreIDs(itemStack).foreach { oid => oresMap.get(oid).map { set =>
       set -= slot
       if (set.isEmpty)
         oresMap.remove(oid)
