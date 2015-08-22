@@ -95,8 +95,11 @@ object DistributedManager {
     }
 
     val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getProviderLocation, provider.getWorkerConnectionRadius)
-                           .flatMap(_.getTileEntity(false)).collect { case wp: IWorkerProvider => wp }.filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }.
-                           toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation)).flatMap(_.getProvidedWorkers).filter(_.getTask == null)
+                           .flatMap(_.getTileEntity(false))
+                           .collect { case wp: IWorkerProvider => wp }
+                           .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
+                           .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
+                           .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
     val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
     val workerProviders = new mutable.HashSet[IWorkerProvider]()
 
