@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.logistics.storage.item
 
 import com.itszuvalex.itszulib.implicits.IDImplicits._
+import com.itszuvalex.itszulib.implicits.InventoryImplicits._
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraftforge.oredict.OreDictionary
@@ -39,7 +40,7 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
       set -= slot
       if (set.isEmpty)
         oresMap.remove(oid)
-                                                                           }
+                                                                             }
                                                }
   }
 
@@ -74,13 +75,13 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
 
   override def invalidateCache() = {
     invalid = true
-    idMap.clear()
-    oresMap.clear()
   }
 
   override def rebuildCache() = {
     invalid = false
-    (0 until inventory.getSizeInventory).map(int => (inventory.getStackInSlot(int), int)).foreach(pair => addItemStack(pair._1, pair._2))
+    idMap.clear()
+    oresMap.clear()
+    inventory.zipWithIndex.foreach(pair => addItemStack(pair._1, pair._2))
   }
 
   override def rebuildCacheIfNecessary() = {
