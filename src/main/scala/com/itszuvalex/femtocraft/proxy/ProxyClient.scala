@@ -20,8 +20,8 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
-import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
+import com.itszuvalex.femtocraft.logistics.render.{TestRenderer, WorkerProviderBeamRenderer}
+import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
@@ -69,5 +69,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileWorkerProviderTest], new WorkerProviderBeamRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalsWorldgen], new CrystalRenderer)
+
+    //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
   }
 }

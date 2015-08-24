@@ -75,9 +75,14 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     ret
   }
 
+  def particle(): Unit = {
+    Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
+  }
+
   class TestTask(val provider: TileTaskProviderTest) extends ITask {
+    var progressF        = 0.0
     var progress         = 0
-    val progressToFinish = 500
+    val progressToFinish = 20
     val workers          = new mutable.HashSet[IWorker]()
 
     /**
@@ -103,8 +108,10 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
      * Called every tick by the ITaskProvider.
      */
     override def onTick(): Unit = {
-      progress += workers.size
+      workers.foreach(worker => progressF += .05 * worker.getEfficiency("Speed"))
+      progress = math.floor(progressF).toInt
       if (progress >= progressToFinish) {
+        provider.particle()
         cancel()
       }
     }
