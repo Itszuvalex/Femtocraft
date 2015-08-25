@@ -210,7 +210,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
    *         the chunk.
    */
-  override def getChildrenLocs: scala.Iterable[Loc4] = childrenLocs
+  override def getChildrenLocs : Set[Loc4] = childrenLocs
 
   /**
    *

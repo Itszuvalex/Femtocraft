@@ -67,7 +67,7 @@ trait IPowerNode {
    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
    *         the chunk.
    */
-  def getChildrenLocs: Iterable[Loc4]
+  def getChildrenLocs: scala.collection.Set[Loc4]
 
   /**
    *
