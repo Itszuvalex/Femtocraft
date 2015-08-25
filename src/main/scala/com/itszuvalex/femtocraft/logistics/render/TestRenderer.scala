@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.logistics.render
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.render.{BetterWavefrontObject, BetterObjModelLoader}
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
@@ -18,7 +19,8 @@ object TestRenderer {
 }
 
 class TestRenderer extends TileEntitySpecialRenderer {
-  val testModel = AdvancedModelLoader.loadModel(TestRenderer.testModelLocation).asInstanceOf[WavefrontObject]
+  AdvancedModelLoader.registerModelHandler(new BetterObjModelLoader)
+  val testModel = AdvancedModelLoader.loadModel(TestRenderer.testModelLocation).asInstanceOf[BetterWavefrontObject]
 
   override def renderTileEntityAt(tile : TileEntity, x : Double, y : Double, z : Double, partialTime : Float): Unit = {
     val tesselator = Tessellator.instance
