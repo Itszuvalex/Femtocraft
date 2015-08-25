@@ -9,4 +9,12 @@ trait IPowerCrystal extends Item {
 
   def getColor(stack: ItemStack): Int
 
+  def getRange(stack: ItemStack) : Float
+
+  def getPassiveGen(stack: ItemStack) : Float
+
+  def getStorageMultiplier(stack : ItemStack) : Float
+
+  def getSize(stack: ItemStack) : String
+
 }
