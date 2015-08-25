@@ -75,14 +75,14 @@ trait PowerNode extends TileEntity with IPowerNode {
     if (!getWorldObj.isRemote) PowerManager.removeNode(this)
   }
 
-  override def writeToNBT(p_145841_1_ : NBTTagCompound): Unit = {
-    super.writeToNBT(p_145841_1_)
-    savePowerConnectionInfo(p_145841_1_)
+  override def writeToNBT(compound : NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    savePowerConnectionInfo(compound)
   }
 
-  override def readFromNBT(p_145839_1_ : NBTTagCompound): Unit = {
-    super.readFromNBT(p_145839_1_)
-    loadPowerConnectionInfo(p_145839_1_)
+  override def readFromNBT(compound : NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadPowerConnectionInfo(compound)
   }
 
   /* IPowerNode */
