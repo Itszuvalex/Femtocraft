@@ -18,12 +18,12 @@ object NaniteHive {
 
 
 trait NaniteHive extends TileEntity with INaniteHive {
-  val childrenLocs = mutable.HashSet[Loc4]()
+  val childrenNodeLocs = mutable.HashSet[Loc4]()
 
   override def addNode(node: INaniteNode) = {
     if (node == null) true
     else {
-      childrenLocs += node.getNodeLoc
+      childrenNodeLocs += node.getNodeLoc
       true
     }
   }
@@ -34,26 +34,26 @@ trait NaniteHive extends TileEntity with INaniteHive {
 
   override def removeNode(node: INaniteNode): Unit = {
     if (node == null) return
-    if (childrenLocs.contains(node.getNodeLoc)) {
-      childrenLocs -= node.getNodeLoc
+    if (childrenNodeLocs.contains(node.getNodeLoc)) {
+      childrenNodeLocs -= node.getNodeLoc
     }
   }
 
-  override def getNodes: Iterable[INaniteNode] = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: INaniteNode => node }
+  override def getNodes: Iterable[INaniteNode] = childrenNodeLocs.flatMap(_.getTileEntity(true)).collect { case node: INaniteNode => node }
 
-  override def getNodeLocs: Set[Loc4] = childrenLocs
+  override def getNodeLocs: Set[Loc4] = childrenNodeLocs
 
   def saveChildrenInfo(compound: NBTTagCompound) =
     compound(NaniteHive.HIVE_COMPOUND_KEY ->
              NBTCompound(
-                          NaniteHive.NODE_CHILDREN_KEY -> NBTList(childrenLocs.view.map(NBTCompound))
+                          NaniteHive.NODE_CHILDREN_KEY -> NBTList(childrenNodeLocs.view.map(NBTCompound))
                         )
             )
 
   def loadChildrenInfo(compound: NBTTagCompound) = {
     compound.NBTCompound(NaniteHive.HIVE_COMPOUND_KEY) { comp =>
-      childrenLocs.clear()
-      childrenLocs ++= comp.NBTList(NaniteHive.NODE_CHILDREN_KEY).map(Loc4(_))
+      childrenNodeLocs.clear()
+      childrenNodeLocs ++= comp.NBTList(NaniteHive.NODE_CHILDREN_KEY).map(Loc4(_))
                                                        }
   }
 

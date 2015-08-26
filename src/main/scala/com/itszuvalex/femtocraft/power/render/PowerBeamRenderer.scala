@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.power.node.IPowerNode
-import com.itszuvalex.femtocraft.render.FemtoRender
+import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
@@ -35,7 +35,7 @@ trait PowerBeamRenderer extends TileEntitySpecialRenderer {
     val xMax: Double = 1.0D
     val yMin: Double = (-1.0F + f3).toDouble % 1
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
-    FemtoRender.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
+    FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
                          xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
                          color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
