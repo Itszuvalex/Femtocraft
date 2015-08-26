@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.util.ForgeDirection
+import org.lwjgl.opengl.GL11
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/26/15.
@@ -16,7 +17,7 @@ import net.minecraftforge.common.util.ForgeDirection
 class PreviewableRenderHandler {
 
   @SubscribeEvent
-  def render(renderWorldLastEvent: RenderWorldLastEvent): Unit = {
+  def render(event: RenderWorldLastEvent): Unit = {
     val player = Minecraft.getMinecraft.thePlayer
     player.getCurrentEquippedItem match {
       case null =>
@@ -45,9 +46,20 @@ class PreviewableRenderHandler {
                 val bx = hitX + dir.offsetX
                 val by = hitY + dir.offsetY
                 val bz = hitZ + dir.offsetZ
+                val px = player.prevPosX + (player.posX - player.prevPosX) * event.partialTicks
+                val py = player.prevPosY + (player.posY - player.prevPosY) * event.partialTicks
+                val pz = player.prevPosZ + (player.posZ - player.prevPosZ) * event.partialTicks
+               
+                GL11.glEnable(GL11.GL_BLEND)
+                if (prev.canPlaceAtLocation(stack, world, bx, by, bz)) {
+                  GL11.glColor4f(0, 1, 0, .5f)
+                } else {
+                  GL11.glColor4f(1, 0, 0, .5f)
+                }
 
-                renderer.renderAtLocation(stack, player.getEntityWorld, bx, by, bz,
-                                          bx - player.posX, by - player.posY, bz - player.posZ)
+                renderer.renderAtLocation(stack, world, bx, by, bz,
+                                          bx - px, by - py, bz - pz)
+                GL11.glDisable(GL11.GL_BLEND)
               case _ =>
             }
           case None =>
