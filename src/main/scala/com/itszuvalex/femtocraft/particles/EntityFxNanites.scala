@@ -59,13 +59,13 @@ class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: 
 
   override def renderParticle(par1Tessellator: Tessellator, par2: Float, par3: Float, par4: Float, par5: Float, par6: Float, par7: Float) {
     Minecraft.getMinecraft.getTextureManager.bindTexture(EntityFxNanites.particleLocation)
-//    var scale = (this.particleAge.toFloat + par2) / this.particleMaxAge.toFloat * 32.0F
-//    if (scale < 0.0F) {
-//      scale = 0.0F
-//    }
-//    if (scale > 1.0F) {
-//      scale = 1.0F
-//    }
+    //    var scale = (this.particleAge.toFloat + par2) / this.particleMaxAge.toFloat * 32.0F
+    //    if (scale < 0.0F) {
+    //      scale = 0.0F
+    //    }
+    //    if (scale > 1.0F) {
+    //      scale = 1.0F
+    //    }
     glDepthMask(false)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -95,17 +95,17 @@ class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: 
   /**
    * Called to update the entity's position/logic.
    */
-  override def onUpdate {
+  override def onUpdate() {
 
 
     this.prevPosX = this.posX
     this.prevPosY = this.posY
     this.prevPosZ = this.posZ
-    if (({
-      this.particleAge += 1;
-      this.particleAge - 1
-    }) >= this.particleMaxAge) {
-      this.setDead
+    if ( {
+           this.particleAge += 1
+           this.particleAge - 1
+         } >= this.particleMaxAge) {
+      this.setDead()
     }
 
     if (this.particleAge < 20) {
@@ -120,7 +120,9 @@ class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: 
 
 
     this.setParticleTextureIndex((this.particleAge * 16 / this.particleMaxAge) % 8)
-    this.moveEntity(this.motionX, this.motionY, this.motionZ)
+    try {
+      this.moveEntity(this.motionX, this.motionY, this.motionZ)
+    } catch {case _: Throwable =>}
     if (this.posY == this.prevPosY) {
       this.motionX *= 1.1D
       this.motionZ *= 1.1D
