@@ -28,9 +28,7 @@ trait NaniteHive extends TileEntity with INaniteHive {
     }
   }
 
-  override def getType: String = "Hive"
-
-  override def getHiveLoc: Loc4 = Loc4(xCoord, yCoord, zCoord, getWorldObj.provider.dimensionId)
+  override def getHiveLoc: Loc4 = new Loc4(this)
 
   override def canAddNode(node: INaniteNode): Boolean = true
 
@@ -46,9 +44,10 @@ trait NaniteHive extends TileEntity with INaniteHive {
   override def getNodeLocs: Set[Loc4] = childrenLocs
 
   def saveChildrenInfo(compound: NBTTagCompound) =
-    compound(NaniteHive.HIVE_COMPOUND_KEY -> NBTCompound(
-                                                          NaniteHive.NODE_CHILDREN_KEY -> NBTList(childrenLocs.view.map(NBTCompound))
-                                                        )
+    compound(NaniteHive.HIVE_COMPOUND_KEY ->
+             NBTCompound(
+                          NaniteHive.NODE_CHILDREN_KEY -> NBTList(childrenLocs.view.map(NBTCompound))
+                        )
             )
 
   def loadChildrenInfo(compound: NBTTagCompound) = {

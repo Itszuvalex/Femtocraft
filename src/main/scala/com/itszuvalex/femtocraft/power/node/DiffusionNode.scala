@@ -7,8 +7,8 @@ import com.itszuvalex.itszulib.api.core.Configurable
  */
 @Configurable
 object DiffusionNode {
-  val PARENT_WHITELIST = Array(IPowerNode.GENERATION_NODE, IPowerNode.TRANSFER_NODE)
-  val CHILD_WHITELIST  = Array(IPowerNode.DIFFUSION_TARGET_NODE)
+  @Configurable val PARENT_WHITELIST = Array(IPowerNode.GENERATION_NODE, IPowerNode.TRANSFER_NODE)
+  @Configurable val CHILD_WHITELIST  = Array(IPowerNode.DIFFUSION_TARGET_NODE)
 }
 
 @Configurable
