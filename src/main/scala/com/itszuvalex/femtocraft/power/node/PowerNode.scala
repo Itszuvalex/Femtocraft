@@ -67,7 +67,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if (!getWorldObj.isRemote) PowerManager.addNode(this)
+//    if (!getWorldObj.isRemote) PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
@@ -75,14 +75,14 @@ trait PowerNode extends TileEntity with IPowerNode {
     if (!getWorldObj.isRemote) PowerManager.removeNode(this)
   }
 
-  override def writeToNBT(p_145841_1_ : NBTTagCompound): Unit = {
-    super.writeToNBT(p_145841_1_)
-    savePowerConnectionInfo(p_145841_1_)
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    savePowerConnectionInfo(compound)
   }
 
-  override def readFromNBT(p_145839_1_ : NBTTagCompound): Unit = {
-    super.readFromNBT(p_145839_1_)
-    loadPowerConnectionInfo(p_145839_1_)
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadPowerConnectionInfo(compound)
   }
 
   /* IPowerNode */
@@ -140,7 +140,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    *
    * @return Get world loc of this node.  This will be the location used for tracking and range calculations.
    */
-  override def getNodeLoc: Loc4 = Loc4(xCoord, yCoord, zCoord, getWorldObj.provider.dimensionId)
+  override def getNodeLoc: Loc4 = new Loc4(this)
 
   /**
    *
@@ -176,7 +176,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def getParent: IPowerNode = if (parentLoc == null) null
   else parentLoc.getTileEntity(true) match {
     case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
-    case None                                  => null
+    case _ => null
   }
 
   /**
@@ -210,7 +210,7 @@ trait PowerNode extends TileEntity with IPowerNode {
    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
    *         the chunk.
    */
-  override def getChildrenLocs : Set[Loc4] = childrenLocs
+  override def getChildrenLocs: Set[Loc4] = childrenLocs
 
   /**
    *

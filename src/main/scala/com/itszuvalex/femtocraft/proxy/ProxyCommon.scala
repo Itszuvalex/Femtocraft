@@ -29,7 +29,7 @@ import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 
 class ProxyCommon extends Initializable {
-  override def preInit(): Unit = {
+  override def postInit(): Unit = {
     registerRendering()
     registerTileEntities()
     registerTickHandlers()

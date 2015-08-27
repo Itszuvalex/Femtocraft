@@ -7,7 +7,11 @@ import com.itszuvalex.itszulib.api.core.Configurable
  */
 @Configurable
 object DiffusionTargetNode {
-  val PARENT_WHITELIST = Array(IPowerNode.DIFFUSION_NODE)
+  @Configurable val PARENT_WHITELIST = Array(IPowerNode.DIFFUSION_NODE)
+
+  def canAddParent(parent: IPowerNode) = DiffusionTargetNode.PARENT_WHITELIST.contains(parent.getType)
+
+  def canAddChild(child: IPowerNode) = false
 }
 
 @Configurable
@@ -23,7 +27,7 @@ trait DiffusionTargetNode extends PowerNode {
    * @param parent IPowerNode that is being checked.
    * @return True if this node is capable of having that node as a parent.
    */
-  override def canAddParent(parent: IPowerNode) = super.canAddParent(parent) && DiffusionTargetNode.PARENT_WHITELIST.contains(parent.getType)
+  override def canAddParent(parent: IPowerNode) = super.canAddParent(parent) && DiffusionTargetNode.canAddParent(parent)
 
   /**
    *
@@ -36,5 +40,5 @@ trait DiffusionTargetNode extends PowerNode {
    * @param child
    * @return True if child is capable of being a child of this node.
    */
-  override def canAddChild(child: IPowerNode) = false
+  override def canAddChild(child: IPowerNode) = DiffusionTargetNode.canAddChild(child)
 }

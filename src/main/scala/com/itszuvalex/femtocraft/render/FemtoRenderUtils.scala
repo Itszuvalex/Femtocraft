@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
-object FemtoRender {
+object FemtoRenderUtils {
 
   def drawBeam(start: Vector3,
                end: Vector3,

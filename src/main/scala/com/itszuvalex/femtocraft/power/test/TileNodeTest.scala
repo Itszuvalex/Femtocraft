@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.power.test
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
 import com.itszuvalex.femtocraft.power.render.PowerNodeRenderer
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -28,15 +29,7 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with Descripti
     ret
   }
 
-  override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
-    AxisAlignedBB.getBoundingBox(center.x - PowerNodeRenderer.RENDER_RADIUS,
-                                 center.y - PowerNodeRenderer.RENDER_RADIUS,
-                                 center.z - PowerNodeRenderer.RENDER_RADIUS,
-                                 center.x + PowerNodeRenderer.RENDER_RADIUS,
-                                 center.y + PowerNodeRenderer.RENDER_RADIUS,
-                                 center.z + PowerNodeRenderer.RENDER_RADIUS)
-  }
+
 
   /**
    *
@@ -87,5 +80,11 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with Descripti
     super.handleDescriptionNBT(compound)
     loadPowerConnectionInfo(compound)
     setRenderUpdate()
+  }
+
+  /* Tile Entity */
+  override def validate(): Unit = {
+    super.validate()
+    if(!worldObj.isRemote) PowerManager.addNode(this)
   }
 }
