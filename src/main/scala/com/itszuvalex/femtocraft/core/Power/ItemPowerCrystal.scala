@@ -44,7 +44,7 @@ object ItemPowerCrystal {
 
   def setColor(stack: ItemStack, color: Int): ItemStack = {
     if (stack != null)
-      stack.forceTag(NBT_COMPOUND_KEY ->
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
                      NBTCompound(
                                   COLOR_KEY -> color
                                 )
@@ -62,7 +62,7 @@ object ItemPowerCrystal {
 
   def setType(stack: ItemStack, ctype: String): ItemStack = {
     if (stack != null)
-      stack.forceTag(NBT_COMPOUND_KEY ->
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
                      NBTCompound(
                                   TYPE_KEY -> ctype
                                 )
@@ -80,7 +80,7 @@ object ItemPowerCrystal {
 
   def setRange(stack: ItemStack, range: Float): ItemStack = {
     if (stack != null)
-      stack.forceTag(NBT_COMPOUND_KEY ->
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
                      NBTCompound(
                                   RANGE_KEY -> range
                                 )
@@ -98,7 +98,7 @@ object ItemPowerCrystal {
 
   def setStorageMultiplier(stack: ItemStack, storage: Float): ItemStack = {
     if (stack != null)
-      stack.forceTag(NBT_COMPOUND_KEY ->
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
                      NBTCompound(
                                   STORAGE_KEY -> storage
                                 )
@@ -117,7 +117,7 @@ object ItemPowerCrystal {
 
   def setPassiveGen(stack: ItemStack, passiveGen: Float): ItemStack = {
     if (stack != null)
-      stack.forceTag(NBT_COMPOUND_KEY ->
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
                      NBTCompound(
                                   PASSIVE_GEN_KEY -> passiveGen)
                     )
@@ -134,7 +134,7 @@ object ItemPowerCrystal {
 
   def setName(stack: ItemStack, name: String): ItemStack = {
     if (stack != null)
-      stack.forceTag(NBT_COMPOUND_KEY ->
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
                      NBTCompound(
                                   NAME_KEY -> name
                                 )
