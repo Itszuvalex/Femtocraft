@@ -74,17 +74,17 @@ import net.minecraftforge.common.util.ForgeDirection
    * @return Amount of power capable of being stored.
    */
   override def getMax: Long = mountLoc match {
-    case loc => loc.getTileEntity(false).orNull match {
+    case loc if loc != null => loc.getTileEntity(false).orNull match {
       case mount: ICrystalMount =>
         mount.getCrystalStack match {
           case stack if stack.getItem.isInstanceOf[IPowerCrystal] =>
             val cry = stack.getItem.asInstanceOf[IPowerCrystal]
             (TilePowerPedestal.MAX_STORE * cry.getStorageMultiplier(stack)).toLong
-          case _                                                  =>
+          case _ => TilePowerPedestal.MAX_STORE
         }
-      case _                    =>
+      case _ => TilePowerPedestal.MAX_STORE
     }
-    case _   => TilePowerPedestal.MAX_STORE
+    case _ => TilePowerPedestal.MAX_STORE
   }
 
   /**

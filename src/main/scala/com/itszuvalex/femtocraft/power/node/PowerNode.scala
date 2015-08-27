@@ -67,7 +67,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if (!getWorldObj.isRemote) PowerManager.addNode(this)
+//    if (!getWorldObj.isRemote) PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {

@@ -57,7 +57,7 @@ object ItemPowerCrystal {
       stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
         return comp.String(TYPE_KEY)
                                                          }
-    DEFAULT_ICON_TYPE
+    null
   }
 
   def setType(stack: ItemStack, ctype: String): ItemStack = {

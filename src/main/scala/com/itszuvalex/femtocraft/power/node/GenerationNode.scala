@@ -7,7 +7,11 @@ import com.itszuvalex.itszulib.api.core.Configurable
  */
 @Configurable
 object GenerationNode {
-  val CHILDREN_WHITELIST = Array(IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_NODE)
+  @Configurable val CHILDREN_WHITELIST = Array(IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_NODE)
+
+  def canAddChild(child: IPowerNode) = GenerationNode.CHILDREN_WHITELIST.contains(child.getType)
+
+  def canAddParent(parent: IPowerNode) = false
 }
 
 @Configurable
@@ -24,7 +28,7 @@ trait GenerationNode extends PowerNode {
    * @param child
    * @return True if child is capable of being a child of this node.
    */
-  override def canAddChild(child: IPowerNode) = super.canAddChild(child) && GenerationNode.CHILDREN_WHITELIST.contains(child.getType)
+  override def canAddChild(child: IPowerNode) = super.canAddChild(child) && GenerationNode.canAddChild(child)
 
   /**
    *
@@ -44,5 +48,5 @@ trait GenerationNode extends PowerNode {
    * @param parent IPowerNode that is being checked.
    * @return True if this node is capable of having that node as a parent.
    */
-  override def canAddParent(parent: IPowerNode) = false
+  override def canAddParent(parent: IPowerNode) = GenerationNode.canAddParent(parent)
 }
