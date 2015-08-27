@@ -46,7 +46,7 @@ import net.minecraftforge.common.util.ForgeDirection
 
   /**
    *
-   * @return Direction of the mount this is connected to.  UNKNOKWN otherwise.
+   * @return Location of the mount this is connected to.  UNKNOWN otherwise.
    */
   override def mountLoc: Loc4 = mountLocation
 

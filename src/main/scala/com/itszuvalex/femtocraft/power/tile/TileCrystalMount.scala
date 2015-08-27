@@ -21,6 +21,7 @@ import scala.collection.{Set, mutable}
 object TileCrystalMount {
   val MOUNT_COMPOUND = "Mount"
   val PEDESTALS_KEY  = "Pedestals"
+  val CRYSTAL_KEY    = "Crystal"
 }
 
 class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with Inventory {
@@ -53,7 +54,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
    * @param loc Location of pedestal to connect with.
    * @return True if this block can accept a pedestal connection from this location.
    */
-  override def canAcceptPedestal(loc: Loc4): Boolean = loc.getOffset(ForgeDirection.NORTH) == getLoc
+  override def canAcceptPedestal(loc: Loc4): Boolean = getLoc.getOffset(ForgeDirection.UP) == loc
 
   /**
    *
@@ -95,6 +96,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def markDirty(): Unit = {
     super.markDirty()
     setModified()
+    setUpdate()
     getCrystalStack match {
       case null => PowerManager.removeNode(this)
       case _ => PowerManager.addNode(this)
@@ -120,6 +122,22 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   }
 
   override def defaultInventory: BaseInventory = new BaseInventory(1)
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    var co: NBTTagCompound = null
+    if (getCrystalStack != null) {
+      co = new NBTTagCompound
+      getCrystalStack.writeToNBT(compound)
+    }
+    compound(TileCrystalMount.CRYSTAL_KEY -> co)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
+    setRenderUpdate()
+  }
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
