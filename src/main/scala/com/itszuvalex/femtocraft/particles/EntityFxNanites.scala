@@ -36,7 +36,8 @@ object EntityFxNanites {
 }
 
 @SideOnly(Side.CLIENT)
-class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: Float, red: Float, green: Float, blue: Float) extends EntityFX(par1World, x, y, z, 0.0D, 0.0D, 0.0D) {
+class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: Float, red: Float, green: Float, blue: Float) extends
+EntityFX(par1World, x, y, z, 0.0D, 0.0D, 0.0D) {
 
   def this(par1World: World, x: Double, y: Double, z: Double, red: Float, green: Float, blue: Float) =
     this(par1World, x, y, z, 1.0F, red, green, blue)
@@ -120,9 +121,7 @@ class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: 
 
 
     this.setParticleTextureIndex((this.particleAge * 16 / this.particleMaxAge) % 8)
-    try {
-      this.moveEntity(this.motionX, this.motionY, this.motionZ)
-    } catch {case _: Throwable =>}
+    this.moveEntity(this.motionX, this.motionY, this.motionZ)
     if (this.posY == this.prevPosY) {
       this.motionX *= 1.1D
       this.motionZ *= 1.1D
@@ -140,5 +139,6 @@ class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: 
     this.particleTextureIndexX = par1 % 16
     this.particleTextureIndexY = 1 + par1 / 16
   }
+
 }
 

@@ -20,7 +20,6 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.core.Initializable
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
@@ -28,8 +27,8 @@ import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 
-class ProxyCommon extends Initializable {
-  override def postInit(): Unit = {
+class ProxyCommon {
+  def postInit(): Unit = {
     registerRendering()
     registerTileEntities()
     registerTickHandlers()
@@ -52,7 +51,7 @@ class ProxyCommon extends Initializable {
   def registerTickHandlers() {
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double): EntityFX = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int ): EntityFX = {
     null
   }
 }

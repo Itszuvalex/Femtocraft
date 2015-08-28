@@ -15,7 +15,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   val tasks = new mutable.HashSet[ITask]()
 
   override def updateEntity(): Unit = {
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
 
     getActiveTasks.foreach(_.onTick())
 
@@ -51,13 +51,13 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
     DistributedManager.removeTaskProvider(this)
   }
 
   override def validate(): Unit = {
     super.validate()
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
     DistributedManager.addTaskProvider(this)
   }
 
@@ -76,7 +76,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   }
 
   def particle(): Unit = {
-    Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
+//    if (worldObj.isRemote) Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
   }
 
   class TestTask(val provider: TileTaskProviderTest) extends ITask {
@@ -108,7 +108,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
      * Called every tick by the ITaskProvider.
      */
     override def onTick(): Unit = {
-      workers.foreach(worker => progressF += .05 * worker.getEfficiency("Speed"))
+      workers.foreach(worker => progressF +=.05 * worker.getEfficiency("Speed"))
       progress = math.floor(progressF).toInt
       if (progress >= progressToFinish) {
         provider.particle()

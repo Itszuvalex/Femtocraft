@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Initializable
+
+import com.itszuvalex.femtocraft.core.Cyber.block.{BlockCyberleaf, BlockCyberweave, BlockCyberwood}
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
@@ -10,7 +11,13 @@ import net.minecraft.block.Block
 /**
  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
  */
-object FemtoBlocks extends Initializable {
+object FemtoBlocks {
+  //Cyber
+  var blockCyberweave: Block = null
+  var blockCyberwood : Block = null
+  var blockCyberleaf : Block = null
+
+
   var testBlock: Block = null
 
   var crystalsWorldgen: Block = null
@@ -25,7 +32,16 @@ object FemtoBlocks extends Initializable {
   var testWorkerProvider: Block = null
 
 
-  override def preInit(): Unit = {
+  def preInit(): Unit = {
+    blockCyberweave = new BlockCyberweave().setCreativeTab(Femtocraft.tab).setBlockName("blockCyberweave")
+    GameRegistry.registerBlock(blockCyberweave, "blockCyberweave")
+
+    blockCyberwood = new BlockCyberwood().setCreativeTab(Femtocraft.tab).setBlockName("blockCyberwood")
+    GameRegistry.registerBlock(blockCyberwood, "blockCyberwood")
+
+    blockCyberleaf = new BlockCyberleaf().setCreativeTab(Femtocraft.tab).setBlockName("blockCyberleaf")
+    GameRegistry.registerBlock(blockCyberleaf, "blockCyberleaf")
+
     testBlock = new BlockTest
     GameRegistry.registerBlock(testBlock, "testBlock")
 
@@ -58,11 +74,11 @@ object FemtoBlocks extends Initializable {
     GameRegistry.registerBlock(testWorkerProvider, "testWorkerProvider")
   }
 
-  override def init(): Unit = {
+  def init(): Unit = {
 
   }
 
-  override def postInit(): Unit = {
+  def postInit(): Unit = {
 
   }
 

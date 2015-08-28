@@ -46,6 +46,13 @@ trait IPowerCrystal extends Item {
   /**
    *
    * @param stack
+   * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
+   */
+  def getTransferRate(stack: ItemStack): Int
+
+  /**
+   *
+   * @param stack
    * @return Size of the crystal.
    */
   def getType(stack: ItemStack): String

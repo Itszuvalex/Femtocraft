@@ -1,22 +1,20 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Initializable
-
 /**
  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
  */
-object FemtoFluids extends Initializable {
+object FemtoFluids {
 
 
-  override def preInit(): Unit = {
-
-  }
-
-  override def init(): Unit = {
+  def preInit(): Unit = {
 
   }
 
-  override def postInit(): Unit = {
+  def init(): Unit = {
+
+  }
+
+  def postInit(): Unit = {
 
   }
 

@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.industry
 import java.util
 import java.util.Comparator
 
-import com.itszuvalex.femtocraft.core.Initializable
 import com.itszuvalex.femtocraft.industry.recipes.CubicCraftingRecipe
 import com.itszuvalex.itszulib.util.Comparators.FluidStack.IDNBTComparator
 import com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator
@@ -15,7 +14,7 @@ import scala.collection.JavaConverters._
 /**
  * Created by Christopher on 8/24/2015.
  */
-object CubicCraftingRegistry extends Initializable {
+object CubicCraftingRegistry {
   private val recipeInputMap = new util.TreeMap[(Array[Array[ItemStack]], FluidStack), CubicCraftingRecipe](new Comparator[(Array[Array[ItemStack]], FluidStack)] {
     override def compare(o1: (Array[Array[ItemStack]], FluidStack), o2: (Array[Array[ItemStack]], FluidStack)): Int = {
       if (o1._1.length < o2._1.length) return -1
