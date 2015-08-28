@@ -20,15 +20,15 @@ class TileCrystalsWorldgen extends TileEntityBase with DescriptionPacket {
   val COLOR_COMPOUND_KEY = "ColorSettings"
 
   var color: Int = new Color(255.toByte,
-                             (Random.nextInt(125) + 115).toByte,
-                             (Random.nextInt(125) + 115).toByte,
-                             (Random.nextInt(125) + 115).toByte).toInt
+                             (Random.nextInt(125) + 110).toByte,
+                             (Random.nextInt(125) + 110).toByte,
+                             (Random.nextInt(125) + 110).toByte).toInt
 
   var colorOffsets: Array[Int] = new Array[Int](11)
-  (1 to 10).foreach(num => colorOffsets(num) = new Color(225.toByte,
-                                                         Random.nextInt(30).toByte,
-                                                         Random.nextInt(30).toByte,
-                                                         Random.nextInt(30).toByte).toInt)
+  (1 to 10).foreach(num => colorOffsets(num) = new Color((Random.nextInt(100) + 150).toByte,
+                                                         Random.nextInt(40).toByte,
+                                                         Random.nextInt(40).toByte,
+                                                         Random.nextInt(40).toByte).toInt)
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     readColorData(compound)
