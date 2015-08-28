@@ -22,7 +22,7 @@ class BlockTest() extends Block(Material.iron) {
     val spawnX = x + getBlockBoundsMinX - 1 + 2 * par5Random.nextFloat * (getBlockBoundsMaxX - getBlockBoundsMinX)
     val spawnY = y + getBlockBoundsMinY - 1 + 2 * par5Random.nextFloat * (getBlockBoundsMaxY - getBlockBoundsMinY)
     val spawnZ = z + getBlockBoundsMinZ - 1 + 2 * par5Random.nextFloat * (getBlockBoundsMaxZ - getBlockBoundsMinZ)
-    Femtocraft.proxy.spawnParticle(par1World, "nanitesBlue", spawnX, spawnY, spawnZ)
+//    Femtocraft.proxy.spawnParticle(par1World, "nanitesBlue", spawnX, spawnY, spawnZ,)
   }
 }
 

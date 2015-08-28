@@ -5,6 +5,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.util.IIcon
+import net.minecraft.world.IBlockAccess
 import net.minecraftforge.common.util.ForgeDirection
 
 /**
@@ -13,10 +14,12 @@ import net.minecraftforge.common.util.ForgeDirection
 class BlockCyberwood extends Block(Material.wood) {
   var topIcon: IIcon = null
 
+  override def canSustainLeaves(world: IBlockAccess, x: Int, y: Int, z: Int): Boolean = true
+
   override def getIcon(side: Int, meta: Int): IIcon = ForgeDirection.getOrientation(side) match {
-    case ForgeDirection.UP   => topIcon
+    case ForgeDirection.UP => topIcon
     case ForgeDirection.DOWN => topIcon
-    case _                   => blockIcon
+    case _ => blockIcon
   }
 
   override def registerBlockIcons(register: IIconRegister): Unit = {

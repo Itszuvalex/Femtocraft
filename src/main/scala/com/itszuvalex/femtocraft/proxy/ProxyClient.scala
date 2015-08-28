@@ -29,13 +29,14 @@ import com.itszuvalex.femtocraft.render.{FramePreviewableRenderer, RenderIDs}
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
+import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.client.registry.ClientRegistry
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 
 class ProxyClient extends ProxyCommon {
-  override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double): EntityFX = {
+  override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
     val mc = Minecraft.getMinecraft
     val deltaX = mc.renderViewEntity.posX - x
     val deltaY = mc.renderViewEntity.posY - y
@@ -45,17 +46,22 @@ class ProxyClient extends ProxyCommon {
     if ((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) > (renderDistance * renderDistance)) {
       return null
     }
-    if (name == "powerBlue") {
-      fx = new EntityFxPower(world, x, y, z, .1f, .1f, 1.0f)
-    }
-    else if (name == "powerGreen") {
-      fx = new EntityFxPower(world, x, y, z, .1f, 1.0f, .1f)
-    }
-    else if (name == "powerOrange") {
-      fx = new EntityFxPower(world, x, y, z, 1f, .5f, .1f)
-    }
-    else if (name == "nanitesBlue") {
-      fx = new EntityFxNanites(world, x, y, z, .1f, .1f, 1.0f)
+    val col = new Color(color)
+
+    name match {
+      case "power" =>
+        fx = new EntityFxPower(world, x, y, z,
+                               (col.red.toInt & 255).toFloat / 255f,
+                               (col.green.toInt & 255).toFloat / 255f,
+                               (col.blue.toInt & 255).toFloat / 255f
+                              )
+      case "nanites" =>
+        fx = new EntityFxNanites(world, x, y, z,
+                                 (col.red.toInt & 255).toFloat / 255f,
+                                 (col.green.toInt & 255).toFloat / 255f,
+                                 (col.blue.toInt & 255).toFloat / 255f)
+      case _ =>
+        return null
     }
     mc.effectRenderer.addEffect(fx)
     fx

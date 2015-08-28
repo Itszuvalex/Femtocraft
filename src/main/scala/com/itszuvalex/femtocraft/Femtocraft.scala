@@ -1,28 +1,28 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Initializable
+import com.itszuvalex.femtocraft.core.Cyber.CybermaterialRegistry
+import com.itszuvalex.femtocraft.network.PacketHandler
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import cpw.mods.fml.common.Mod.EventHandler
 import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
+import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import org.apache.logging.log4j.LogManager
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
  * Created by Christopher on 4/5/2015.
  */
 @Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:ItszuLib")
 object Femtocraft {
-  final val ID             = "Femtocraft"
-  final val VERSION        = Version.FULL_VERSION
-  final val logger         = LogManager.getLogger(ID)
-  final val initializables = ArrayBuffer[Initializable]()
-  final val blocks         = FemtoBlocks
-  final val items          = FemtoItems
+  final val ID      = "Femtocraft"
+  final val VERSION = Version.FULL_VERSION
+  final val logger  = LogManager.getLogger(ID)
+  final val blocks  = FemtoBlocks
+  final val items   = FemtoItems
 
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
@@ -33,14 +33,26 @@ object Femtocraft {
   }
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
-    initializables.foreach(_.preInit())
+    FemtoBlocks.preInit()
+    FemtoItems.preInit()
+    FemtoFluids.preInit()
+
+    PacketHandler.preInit()
+
+    GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
-    initializables.foreach(_.init())
+    FemtoBlocks.init()
+    FemtoItems.init()
+    FemtoFluids.init()
+    CybermaterialRegistry.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
-    initializables.foreach(_.postInit())
+    FemtoBlocks.postInit()
+    FemtoItems.postInit()
+    FemtoFluids.postInit()
+    proxy.postInit()
   }
 }

@@ -1,8 +1,6 @@
 package com.itszuvalex.femtocraft.industry
 
 import java.util
-
-import com.itszuvalex.femtocraft.core.Initializable
 import com.itszuvalex.femtocraft.industry.recipes.CrystallizerRecipe
 import com.itszuvalex.itszulib.util.Comparators.FluidStack.IDNBTComparator
 import net.minecraftforge.fluids.FluidStack
@@ -12,7 +10,7 @@ import scala.collection.JavaConverters._
 /**
  * Created by Christopher on 8/24/2015.
  */
-object CrystallizerRegistry extends Initializable {
+object CrystallizerRegistry {
   val recipeInputMap = new util.TreeMap[FluidStack, CrystallizerRecipe](IDNBTComparator).asScala
 
   def addRecipe(recipe: CrystallizerRecipe): Unit = {

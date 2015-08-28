@@ -76,7 +76,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   }
 
   def particle(): Unit = {
-    if (worldObj.isRemote) Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
+//    if (worldObj.isRemote) Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
   }
 
   class TestTask(val provider: TileTaskProviderTest) extends ITask {
