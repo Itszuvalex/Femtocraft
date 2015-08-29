@@ -23,6 +23,7 @@ object Femtocraft {
   final val logger  = LogManager.getLogger(ID)
   final val blocks  = FemtoBlocks
   final val items   = FemtoItems
+  final val fluids  = FemtoFluids
 
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
@@ -46,13 +47,13 @@ object Femtocraft {
     FemtoBlocks.init()
     FemtoItems.init()
     FemtoFluids.init()
-    CybermaterialRegistry.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
     FemtoBlocks.postInit()
     FemtoItems.postInit()
     FemtoFluids.postInit()
+    CybermaterialRegistry.postInit()
     proxy.postInit()
   }
 }

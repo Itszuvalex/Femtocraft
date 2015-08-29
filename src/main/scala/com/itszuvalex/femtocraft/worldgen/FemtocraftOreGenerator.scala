@@ -81,13 +81,15 @@ import net.minecraft.world.chunk.IChunkProvider
     val cryst = random.nextInt(crystMax - crystMin) + crystMin
 
     //Replace in sphere
-    val locs = for {
-      lx <- (x - dist) to (x + dist)
-      ly <- (y - dist) to (y + dist)
-      lz <- (z - dist) to (z + dist)
-    } yield (lx, ly, lz)
-
-    locs.filter { case (lx, ly, lz) => ((x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)) < (dist * dist) }
+    {
+      for {
+        lx <- (x - dist) to (x + dist)
+        ly <- (y - dist) to (y + dist)
+        lz <- (z - dist) to (z + dist)
+      } yield (lx, ly, lz)
+    }
+    .filter { case (lx, ly, lz) => ((x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)) < (dist * dist) }
+    .filterNot { case (ax, ay, az) => world.isAirBlock(ax, ay, az) }
     .foreach { case (lx, ly, lz) =>
       val block = world.getBlock(lx, ly, lz)
       val damage = world.getBlockMetadata(lx, ly, lz)
@@ -104,7 +106,7 @@ import net.minecraft.world.chunk.IChunkProvider
       val cx = x + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
       val cy = y + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
       val cz = z + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
-      world.setBlock(cx, cy, cz, FemtoBlocks.crystalsWorldgen)
+      world.setBlock(cx, cy, cz, FemtoBlocks.blockCrystals)
                             }
   }
 }

@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
 import java.util
-import com.itszuvalex.femtocraft.industry.recipes.ArcFurnaceRecipe
+import com.itszuvalex.femtocraft.industry.recipe.ArcFurnaceRecipe
 import com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardComparator
 import net.minecraft.item.ItemStack
 

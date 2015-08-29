@@ -20,6 +20,7 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
@@ -38,6 +39,7 @@ class ProxyCommon {
   }
 
   def registerTileEntities(): Unit = {
+    // Tests
     GameRegistry.registerTileEntity(classOf[TileDiffusionNodeTest], "TileDiffusionNodeTest")
     GameRegistry.registerTileEntity(classOf[TileDiffusionTargetNodeTest], "TileDiffusionTargeTNodeTest")
     GameRegistry.registerTileEntity(classOf[TileDirectNodeTest], "TileDirectNodeTest")
@@ -46,12 +48,16 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileCrystalsWorldgen], "TileCrystalsWorldgen")
     GameRegistry.registerTileEntity(classOf[TileTaskProviderTest], "TileTaskProviderTest")
     GameRegistry.registerTileEntity(classOf[TileWorkerProviderTest], "TileWorkerProviderTest")
+    //
+    GameRegistry.registerTileEntity(classOf[TileArcFurnace], "TileArcFurnace")
+    GameRegistry.registerTileEntity(classOf[TileCrystallizationChamber], "TileCrystallizationChamber")
+    GameRegistry.registerTileEntity(classOf[TileCentrifuge], "TileCentrifuge")
   }
 
   def registerTickHandlers() {
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int ): EntityFX = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
     null
   }
 }

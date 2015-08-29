@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.recipes
+package com.itszuvalex.femtocraft.industry.recipe
 
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fluids.FluidStack

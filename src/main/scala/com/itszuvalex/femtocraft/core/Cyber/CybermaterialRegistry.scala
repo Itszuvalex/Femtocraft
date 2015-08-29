@@ -1,9 +1,10 @@
 package com.itszuvalex.femtocraft.core.Cyber
 
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft}
+import com.itszuvalex.femtocraft.FemtoBlocks
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
-import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.item.Item
+import net.minecraftforge.oredict.OreDictionary
 
 import scala.collection.JavaConversions._
 import scala.collection._
@@ -44,20 +45,19 @@ object CybermaterialRegistry {
   def getTypeFromItem(item: Item, damage: Int) = itemMap.get((item, damage))
 
 
-  def init(): Unit = {
-    val logList = mutable.ListBuffer[ItemStack]()
-    Blocks.log.getSubBlocks(Item.getItemFromBlock(Blocks.log), Femtocraft.tab, logList)
-    Blocks.log2.getSubBlocks(Item.getItemFromBlock(Blocks.log2), Femtocraft.tab, logList)
-    logList.foreach(stack => registerBlockReplacement(Block.getBlockFromItem(stack.getItem), stack.getItemDamage, FemtoBlocks.blockCyberwood, 0))
-    val leafList = mutable.ListBuffer[ItemStack]()
-    Blocks.leaves.getSubBlocks(Item.getItemFromBlock(Blocks.leaves), Femtocraft.tab, leafList)
-    Blocks.leaves2.getSubBlocks(Item.getItemFromBlock(Blocks.leaves2), Femtocraft.tab, leafList)
-    leafList.foreach(stack =>
-                       (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberleaf, 0)))
+  def postInit(): Unit = {
+    OreDictionary.getOres("logWood")
+    .foreach { stack =>
+      (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberwood, 0))
+             }
+    OreDictionary.getOres("treeLeaves").
+    foreach { stack =>
+      (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberleaf, 0))
+            }
 
-    registerBlockReplacement(Blocks.stone, 0, FemtoBlocks.blockCyberweave, 0)
-    registerBlockReplacement(Blocks.grass, 0, FemtoBlocks.blockCyberweave, 0)
-    registerBlockReplacement(Blocks.dirt, 0, FemtoBlocks.blockCyberweave, 0)
+    (0 until 16).foreach(registerBlockReplacement(Blocks.stone, _, FemtoBlocks.blockCyberweave, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.grass, _, FemtoBlocks.blockCyberweave, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.dirt, _, FemtoBlocks.blockCyberweave, 0))
   }
 
 }

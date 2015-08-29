@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.industry
 import java.util
 import java.util.Comparator
 
-import com.itszuvalex.femtocraft.industry.recipes.CubicCraftingRecipe
+import com.itszuvalex.femtocraft.industry.recipe.CubicCraftingRecipe
 import com.itszuvalex.itszulib.util.Comparators.FluidStack.IDNBTComparator
 import com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator
 import net.minecraft.item.ItemStack

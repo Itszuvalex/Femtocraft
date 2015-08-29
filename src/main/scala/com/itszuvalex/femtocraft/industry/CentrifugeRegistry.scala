@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
 import java.util
-import com.itszuvalex.femtocraft.industry.recipes.CentrifugeRecipe
+import com.itszuvalex.femtocraft.industry.recipe.CentrifugeRecipe
 import com.itszuvalex.itszulib.util.Comparators.FluidStack.IDNBTComparator
 import net.minecraftforge.fluids.FluidStack
 

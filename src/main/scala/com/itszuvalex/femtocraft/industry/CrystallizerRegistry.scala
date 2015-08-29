@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
 import java.util
-import com.itszuvalex.femtocraft.industry.recipes.CrystallizerRecipe
+import com.itszuvalex.femtocraft.industry.recipe.CrystallizerRecipe
 import com.itszuvalex.itszulib.util.Comparators.FluidStack.IDNBTComparator
 import net.minecraftforge.fluids.FluidStack
 
