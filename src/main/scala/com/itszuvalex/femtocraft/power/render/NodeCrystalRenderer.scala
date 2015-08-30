@@ -53,8 +53,6 @@ trait NodeCrystalRenderer extends TileEntitySpecialRenderer {
       GL11.glPopMatrix()
                                                                                }
     GL11.glEnable(GL11.GL_LIGHTING)
-    GL11.glColor4f(1f, 1f, 1f, 1f)
-    tessellator.setColorRGBA(255, 255, 255, 0)
     GL11.glPopMatrix()
   }
 }

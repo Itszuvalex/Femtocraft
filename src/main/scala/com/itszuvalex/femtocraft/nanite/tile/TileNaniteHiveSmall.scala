@@ -5,11 +5,12 @@ import com.itszuvalex.femtocraft.logistics.distributed.{IWorker, IWorkerProvider
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileIndexedInventory}
 import com.itszuvalex.femtocraft.nanite.NaniteHive
 import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.femtocraft.power.node.DiffusionNode
+import com.itszuvalex.femtocraft.power.node.{DiffusionNode, IPowerNode}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
 import com.itszuvalex.itszulib.render.Vector3
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 
 import scala.collection.Set
@@ -23,6 +24,16 @@ import scala.collection.Set
 }
 
 @Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with NaniteHive with IWorkerProvider with DescriptionPacket {
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    savePowerConnectionInfo(compound)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    loadPowerConnectionInfo(compound)
+  }
 
   protected def hiveRadius = TileNaniteHiveSmall.HIVE_RADIUS
 
@@ -82,5 +93,39 @@ import scala.collection.Set
                                  center.x + hiveRadius,
                                  center.y + hiveRadius,
                                  center.z + hiveRadius)
+  }
+
+  /**
+   *
+   * @param child
+   * @return True if child was a child of this node, and was successfully removed.
+   */
+  override def removeChild(child: IPowerNode): Boolean = {
+    val ret = super.removeChild(child)
+    setUpdate()
+    ret
+  }
+
+
+  /**
+   *
+   * @param child
+   * @return True if child is successfully added.
+   */
+  override def addChild(child: IPowerNode): Boolean = {
+    val ret = super.addChild(child)
+    setUpdate()
+    ret
+  }
+
+  /**
+   *
+   * @param parent Parent being set.
+   * @return True if parent is successfully set to input parent.
+   */
+  override def setParent(parent: IPowerNode): Boolean = {
+    val ret = super.setParent(parent)
+    setUpdate()
+    ret
   }
 }

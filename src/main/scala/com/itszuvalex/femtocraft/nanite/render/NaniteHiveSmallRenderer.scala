@@ -47,6 +47,7 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
   override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {
     GL11.glPushMatrix()
     GL11.glTranslated(.5, 0, .5)
+    GL11.glColor4f(1, 1, 1, 1)
     preRender()
     model.renderAll()
     GL11.glPopMatrix()
