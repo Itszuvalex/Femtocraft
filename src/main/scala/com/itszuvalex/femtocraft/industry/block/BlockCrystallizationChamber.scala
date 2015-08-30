@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.block
 
-import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
+import com.itszuvalex.femtocraft.industry.tile.{TileCrystallizationChamber, TileArcFurnace}
 import com.itszuvalex.itszulib.core.TileContainer
 import net.minecraft.block.material.Material
 import net.minecraft.tileentity.TileEntity

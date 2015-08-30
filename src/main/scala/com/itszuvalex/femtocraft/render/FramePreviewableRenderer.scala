@@ -29,13 +29,13 @@ class FramePreviewableRenderer extends IPreviewableRenderer {
                     else {
                       Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
                     }
-                    renderer.renderAtLocation(stack, world, x, y, z, rx, ry, rz)
+                    renderer.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
                     GL11.glDisable(GL11.GL_BLEND)
                   case None           =>
                 }
               case None     =>
             }
-          case none          =>
+          case _          =>
         }
       case _                 =>
     }

@@ -1,9 +1,10 @@
 package com.itszuvalex.femtocraft
 
 
-import com.itszuvalex.femtocraft.core.Cyber.block.{BlockCyberleaf, BlockCyberweave, BlockCyberwood}
+import com.itszuvalex.femtocraft.core.Cyber.block.{BlockCyberleaf, BlockCyberweave, BlockCyberwood, BlockFrame}
 import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
+import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
@@ -24,6 +25,11 @@ object FemtoBlocks {
   var blockArcFurnace            : Block = null
   var blockCrystallizationChamber: Block = null
   var blockCentrifuge            : Block = null
+
+
+  var blockFrame: Block = null
+
+  var blockNaniteHiveSmall: Block = null
 
   //Tests
 
@@ -52,21 +58,26 @@ object FemtoBlocks {
 
 
 
-    blockCrystals = new BlockCrystalsWorldgen
-    blockCrystals.setBlockName("crystalCluster")
+    blockCrystals = new BlockCrystalsWorldgen().setCreativeTab(Femtocraft.tab).setBlockName("crystalCluster")
     GameRegistry.registerBlock(blockCrystals, "crystalCluster")
 
-    blockArcFurnace = new BlockArcFurnace
-    blockArcFurnace.setBlockName("blockArcFurnace")
+    blockArcFurnace = new BlockArcFurnace().setCreativeTab(Femtocraft.tab).setBlockName("blockArcFurnace")
     GameRegistry.registerBlock(blockArcFurnace, "blockArcFurnace")
 
-    blockCrystallizationChamber = new BlockCrystallizationChamber
-    blockCrystallizationChamber.setBlockName("blockCrystallizationChamber")
+    blockCrystallizationChamber = new BlockCrystallizationChamber().setCreativeTab(Femtocraft.tab).setBlockName("blockCrystallizationChamber")
     GameRegistry.registerBlock(blockCrystallizationChamber, "blockCrystallizationChamber")
 
-    blockCentrifuge = new BlockCentrifuge
-    blockCentrifuge.setBlockName("blockCentrifuge")
+    blockCentrifuge = new BlockCentrifuge().setCreativeTab(Femtocraft.tab).setBlockName("blockCentrifuge")
     GameRegistry.registerBlock(blockCentrifuge, "blockCentrifuge")
+
+
+
+    blockFrame = new BlockFrame().setCreativeTab(Femtocraft.tab).setBlockName("blockFrame")
+    GameRegistry.registerBlock(blockFrame, "blockFrame")
+
+    blockNaniteHiveSmall = new BlockNaniteHiveSmall().setCreativeTab(Femtocraft.tab).setBlockName("blockNaniteHive_small")
+    GameRegistry.registerBlock(blockNaniteHiveSmall, "blockNaniteHive_small")
+
     //tests
 
     testBlock = new BlockTest

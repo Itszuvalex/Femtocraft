@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.power.render
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
@@ -21,6 +22,11 @@ object NodeCrystalRenderer {
 
 trait NodeCrystalRenderer extends TileEntitySpecialRenderer {
   val crystalModel = AdvancedModelLoader.loadModel(NodeCrystalRenderer.crystalModelLocation).asInstanceOf[WavefrontObject]
+
+  def renderNode(node: TileEntity with IPowerNode, x:Double, y:Double, z:Double, partialTime: Float) = {
+    Minecraft.getMinecraft.getTextureManager.bindTexture(NodeCrystalRenderer.crystalTexLocation)
+    renderCrystal(x, y, z, node, partialTime)
+  }
 
   def renderCrystal(x: Double, y: Double, z: Double, node: TileEntity with IPowerNode, partialTime: Float): Unit = {
     val tessellator = Tessellator.instance
