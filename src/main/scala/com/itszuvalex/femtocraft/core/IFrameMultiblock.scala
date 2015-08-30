@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.core
 
+import com.itszuvalex.itszulib.api.core.Loc4
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
@@ -18,6 +19,8 @@ trait IFrameMultiblock {
   def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int): Boolean
 
   def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean
+
+  def getTakenLocations(world: World, x: Int, y: Int, z: Int): scala.collection.Set[Loc4]
 
   def getRequiredResources: scala.collection.IndexedSeq[ItemStack]
 

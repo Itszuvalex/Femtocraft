@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.core
 
+import com.itszuvalex.femtocraft.industry.multiblock.{MultiblockArcFurnace, MultiblockCentrifuge, MultiblockCrystallizationChamber}
+
 import scala.collection._
 
 /**
@@ -11,4 +13,10 @@ object FrameMultiblockRegistry {
   def registerMultiblock(multi: IFrameMultiblock) = frameMap.put(multi.getName, multi)
 
   def getMultiblock(name: String) = frameMap.get(name)
+
+  def init(): Unit = {
+    registerMultiblock(new MultiblockArcFurnace)
+    registerMultiblock(new MultiblockCentrifuge)
+    registerMultiblock(new MultiblockCrystallizationChamber)
+  }
 }

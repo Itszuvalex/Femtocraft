@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL11
  */
 @SideOnly(Side.CLIENT)
 class FramePreviewableRenderer extends IPreviewableRenderer {
+  lazy val generic = new GenericFrameMultiblockRenderer
+
   override def renderAtLocation(stack: ItemStack, world: World, x: Int, y: Int, z: Int, rx: Double, ry: Double, rz: Double): Unit = {
     stack.getItem match {
       case frame: IFrameItem =>
@@ -20,24 +22,25 @@ class FramePreviewableRenderer extends IPreviewableRenderer {
           case multi: String =>
             FrameMultiblockRegistry.getMultiblock(multi) match {
               case Some(mb) =>
-                MultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
-                  case Some(renderer) =>
-                    GL11.glEnable(GL11.GL_BLEND)
-                    if (mb.canPlaceAtLocation(world, x, y, z)) {
-                      Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
-                    }
-                    else {
-                      Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
-                    }
-                    renderer.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
-                    GL11.glDisable(GL11.GL_BLEND)
-                  case None           =>
+                GL11.glEnable(GL11.GL_BLEND)
+                if (mb.canPlaceAtLocation(world, x, y, z)) {
+                  Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
                 }
-              case None     =>
+                else {
+                  Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
+                }
+                MultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
+                  case Some(renderer) => renderer.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
+                  case None =>
+                    generic.multi = mb
+                    generic.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
+                }
+                GL11.glDisable(GL11.GL_BLEND)
+              case None =>
             }
-          case _          =>
+          case _ =>
         }
-      case _                 =>
+      case _ =>
     }
   }
 }

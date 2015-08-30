@@ -8,6 +8,9 @@ object RenderIDs {
   var framePreviewableID = 0
 
   //Multiblock IDs
+  var multiblockArcFurnaceID = 0
+  var multiblockCentrifugeID = 0
+  var multiblockCrystallizerID = 0
 
   //Regular IDs
   var naniteHiveSmallID = 0
