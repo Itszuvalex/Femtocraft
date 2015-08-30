@@ -4,6 +4,8 @@ import com.itszuvalex.itszulib.api.core.Saveable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.item.ItemStack
 
+import scala.collection.Set
+
 /**
  * Created by Christopher on 8/29/2015.
  */
@@ -42,5 +44,9 @@ trait TileIndexedInventory extends TileEntityBase with IIndexedInventory {
 
   override def invalidateCache() = indInventory.invalidateCache()
 
-  override def rebuildCacheIfNecessary(): Unit = ???
+  override def rebuildCacheIfNecessary(): Unit = indInventory.rebuildCacheIfNecessary()
+
+  override def getContainedOres: Set[String] = indInventory.getContainedOres
+
+  override def getContainedIDs: Set[Int] = indInventory.getContainedIDs
 }

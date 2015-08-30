@@ -21,9 +21,13 @@ trait IIndexedInventory {
 
   def getSlotsByOreName(name: String): Option[mutable.HashSet[Int]]
 
-  def containsItemStack(itemStack: ItemStack) : Boolean
+  def containsItemStack(itemStack: ItemStack): Boolean
 
-  def containsOre(ore: String) : Boolean
+  def containsOre(ore: String): Boolean
+
+  def getContainedOres: scala.collection.Set[String]
+
+  def getContainedIDs: scala.collection.Set[Int]
 
   def isValid: Boolean
 
