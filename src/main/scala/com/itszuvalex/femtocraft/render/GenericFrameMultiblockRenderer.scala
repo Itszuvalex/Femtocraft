@@ -6,6 +6,7 @@ import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
+import org.lwjgl.opengl.GL11
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/30/15.
@@ -27,11 +28,21 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
    */
   override def previewRenderAtWorldLocation(stack: ItemStack, world: World, x: Int, y: Int, z: Int, rx: Double, ry: Double, rz: Double): Unit = {
     Tessellator.instance.startDrawingQuads()
+    GL11.glDisable(GL11.GL_CULL_FACE)
+    GL11.glEnable(GL11.GL_BLEND)
+    if (multi.canPlaceAtLocation(world, x, y, z)) {
+      Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
+    }
+    else {
+      Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
+    }
     multi.getTakenLocations(world, x, y, z)
     .foreach { loc =>
       RenderUtils.renderCube(rx.toFloat + (loc.x - x), ry.toFloat + (loc.y - y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, FemtoBlocks.blockFrame.getIcon(0, 0))
              }
     Tessellator.instance.draw()
+    GL11.glEnable(GL11.GL_CULL_FACE)
+    GL11.glDisable(GL11.GL_BLEND)
   }
 
   /**

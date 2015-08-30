@@ -22,6 +22,8 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
+import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
+import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
@@ -30,7 +32,7 @@ import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
-import cpw.mods.fml.client.registry.ClientRegistry
+import cpw.mods.fml.client.registry.{ClientRegistry, RenderingRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
@@ -74,10 +76,10 @@ class ProxyClient extends ProxyCommon {
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
 
 
-//    val naniveHiveRenderer = new NaniteHiveSmallRenderer
-//    RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId
-//    RenderingRegistry.registerBlockHandler(RenderIDs.naniteHiveSmallID, naniveHiveRenderer)
-//    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], naniveHiveRenderer)
+    val naniveHiveRenderer = new NaniteHiveSmallRenderer
+    RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId
+    RenderingRegistry.registerBlockHandler(RenderIDs.naniteHiveSmallID, naniveHiveRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], naniveHiveRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)

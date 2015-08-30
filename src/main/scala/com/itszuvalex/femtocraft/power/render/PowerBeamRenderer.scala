@@ -36,18 +36,20 @@ trait PowerBeamRenderer extends TileEntitySpecialRenderer {
     val yMin: Double = (-1.0F + f3).toDouble % 1
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
     FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
-                         xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-                         color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
+                              xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+                              color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
 
   def beamRenderTeardown(): Unit = {
     GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_TEXTURE_2D)
+    GL11.glEnable(GL11.GL_CULL_FACE)
+    GL11.glDisable(GL11.GL_BLEND)
     GL11.glDepthMask(true)
   }
 
   def beamRenderSetup(): Unit = {
-//    GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
+    //    GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
 
     //        this.bindTexture(PowerNodeRenderer.beamLocation)
     GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F)
