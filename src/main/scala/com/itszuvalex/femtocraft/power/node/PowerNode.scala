@@ -40,9 +40,9 @@ trait PowerNode extends TileEntity with IPowerNode {
   def savePowerConnectionInfo(compound: NBTTagCompound) =
     compound(PowerNode.POWER_COMPOUND_KEY ->
              NBTCompound(
-                          PowerNode.NODE_PARENT_KEY -> parentLoc,
-                          PowerNode.NODE_CHILDREN_KEY -> NBTList(childrenLocs.view.map(NBTCompound)),
-                          PowerNode.COLOR_KEY -> color
+                          PowerNode.NODE_PARENT_KEY -> getParentLoc,
+                          PowerNode.NODE_CHILDREN_KEY -> NBTList(getChildrenLocs.view.map(NBTCompound)),
+                          PowerNode.COLOR_KEY -> getColor
                         )
             )
 

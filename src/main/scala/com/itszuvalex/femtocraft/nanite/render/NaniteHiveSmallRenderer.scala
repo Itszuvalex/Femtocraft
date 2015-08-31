@@ -4,13 +4,14 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.power.render.DiffusionNodeBeamRenderer
 import com.itszuvalex.femtocraft.render.RenderIDs
+import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderBlocks
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
+import net.minecraft.util.{MathHelper, ResourceLocation}
 import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
@@ -20,22 +21,31 @@ import org.lwjgl.opengl.GL11
  * Created by Christopher on 8/29/2015.
  */
 object NaniteHiveSmallRenderer {
-  val hiveModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/Nanite Hive Small.obj")
-  val hiveTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/nanite hive small.png")
+  val hiveModelLocation    = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/Nanite Hive Small.obj")
+  val hiveTexLocation      = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/nanite hive small.png")
+  val hiveColorTexLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/nanite hive small color.png")
 }
 
 class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler with DiffusionNodeBeamRenderer {
   val model = AdvancedModelLoader.loadModel(NaniteHiveSmallRenderer.hiveModelLocation).asInstanceOf[WavefrontObject]
 
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTick: Float): Unit =
+  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit =
     tile match {
       case node: IPowerNode =>
         GL11.glPushMatrix()
         GL11.glTranslated(x + .5, y, z + .5)
         preRender()
-        model.renderAll()
+        model.renderPart("Box001")
+        val time = node.getWorldObj.getTotalWorldTime.toFloat
+        GL11.glRotatef(time + partialTime, 0, 1, 0)
+        model.renderPart("Sphere001")
+        Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveColorTexLocation)
+        val color = new Color(node.getColor)
+        val shift = Math.abs(MathHelper.sin(time * .03f)*.5f) + .5f
+        GL11.glColor4ub(((color.red.toInt & 255) * shift).toByte, ((color.green & 255) * shift).toByte, ((color.blue & 255) * shift).toByte, 255.toByte)
+        model.renderPart("Sphere001")
         GL11.glPopMatrix()
-        renderDiffuseBeams(node, x, y, z, partialTick)
+        renderDiffuseBeams(node, x, y, z, partialTime)
       case _                =>
     }
 
@@ -50,6 +60,9 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
     GL11.glColor4f(1, 1, 1, 1)
     preRender()
     model.renderAll()
+    Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveColorTexLocation)
+    GL11.glColor4ub(0, 0, 0, 255.toByte)
+    model.renderPart("Sphere001")
     GL11.glPopMatrix()
   }
 
@@ -58,7 +71,6 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
   }
 
   def preRender() = {
-    GL11.glScalef(.025f, .025f, .025f)
     Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveTexLocation)
   }
 }

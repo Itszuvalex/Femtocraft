@@ -10,6 +10,7 @@ import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
 import com.itszuvalex.itszulib.render.Vector3
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 
@@ -70,6 +71,18 @@ import scala.collection.Set
 
   override def initializePowerSettings(): Unit = {
 
+  }
+
+  /**
+   *
+   * @return The color of this power node.  This is used for aesthetics.
+   */
+  override def getColor: Int = {
+    if (getParentLoc != null) getParentLoc.getTileEntity(false).get match {
+      case i: IPowerNode => i.getColor
+      case _             => Color(255.toByte, 0, 0, 0).toInt
+    }
+    else Color(255.toByte, 0, 0, 0).toInt
   }
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(TileNaniteHiveSmall.INVENTORY_SIZE)
