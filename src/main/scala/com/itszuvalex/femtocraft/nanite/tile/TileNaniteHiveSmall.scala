@@ -85,7 +85,7 @@ import scala.collection.Set
     else Color(255.toByte, 0, 0, 0).toInt
   }
 
-  override def defaultInventory: IndexedInventory = new IndexedInventory(TileNaniteHiveSmall.INVENTORY_SIZE)
+  override def defaultInventory: IndexedInventory = new IndexedInventory(TileNaniteHiveSmall.INVENTORY_SIZE + 3)
 
   /* Tile Entity */
   override def validate(): Unit = {
