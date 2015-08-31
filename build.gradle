@@ -37,13 +37,13 @@ project.ext {
 
 version = "${project.ext.mcVersion}-${project.ext.massive}.${project.ext.major}.${project.minor}"
 
-if (System.getenv().BUILD_NUMBER != null) {
-    version += "-${System.getenv().BUILD_NUMBER}"
+if (System.getenv().CRICLE_BUILD_NUM != null) {
+    version += "-${System.getenv().CIRCLE_BUILD_NUM}"
 } else {
     version += "-local"
 }
 
-if (System.getenv().JOB_NAME != null && System.getenv().JOB_NAME.equalsIgnoreCase("ItszuLib-1.7.10-Dev")) {
+if (System.getenv().CIRCLE_BRANCH != null && !System.getenv().CIRCLE_BRANCH.equalsIgnoreCase("master")) {
     version += "-dev"
 }
 
@@ -63,8 +63,8 @@ minecraft {
     replace '@MAJOR@', project.major
     replace '@MINOR@', project.minor
     replace '@MC_VERSION@', version
-    if (System.getenv("BUILD_NUMBER") != null) {
-        replace '@BUILD_NUMBER@', System.getenv("BUILD_NUMBER")
+    if (System.getenv("CIRCLE_BUILD_NUM") != null) {
+        replace '@BUILD_NUMBER@', System.getenv("CIRCLE_BUILD_NUM")
     } else {
         replace '@BUILD_NUMBER@', 0
     }
