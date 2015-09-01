@@ -3,10 +3,11 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.core.Cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.PacketHandler
-import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import cpw.mods.fml.common.Mod.EventHandler
 import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
+import cpw.mods.fml.common.network.NetworkRegistry
 import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
@@ -30,6 +31,10 @@ object Femtocraft {
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy: ProxyCommon = null
 
+  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.proxyGuiClient",
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
+  var guiProxy: ProxyGuiCommon = null
+
   val tab = new CreativeTabs(Femtocraft.ID) {
     override def getTabIconItem: Item = Items.nether_star
   }
@@ -42,6 +47,7 @@ object Femtocraft {
     PacketHandler.preInit()
 
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
+    NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {

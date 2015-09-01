@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, IWorker, IWorkerProvider}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
+import com.itszuvalex.itszulib.core.traits.tile.TileDescriptionPacket
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
@@ -18,7 +18,7 @@ import scala.collection._
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/15/15.
  */
-class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with ILogisticsConnected with DescriptionPacket {
+class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with ILogisticsConnected with TileDescriptionPacket {
   val workers = new mutable.HashSet[IWorker]()
   workers += new TestWorker(this)
   val connections = new mutable.HashSet[Loc4]()

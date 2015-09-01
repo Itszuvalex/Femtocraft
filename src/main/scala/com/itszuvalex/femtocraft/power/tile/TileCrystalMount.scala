@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.core.Power.{ICrystalMount, IPowerCrystal}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.core.traits.tile.Inventory
+import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.core.{BaseInventory, TileEntityBase}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -24,12 +24,10 @@ object TileCrystalMount {
   val CRYSTAL_KEY    = "Crystal"
 }
 
-class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with Inventory {
+class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
   private val pedestalLocs = mutable.HashSet[Loc4]()
 
   override def getMod: AnyRef = Femtocraft
-
-  override def initializePowerSettings(): Unit = {}
 
   /**
    *
@@ -69,9 +67,9 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
    */
   override def canAddChild(child: IPowerNode): Boolean = getType match {
     case IPowerNode.GENERATION_NODE => GenerationNode.canAddChild(child)
-    case IPowerNode.TRANSFER_NODE => TransferNode.canAddChild(child)
-    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddChild(child)
-    case _ => false
+    case IPowerNode.TRANSFER_NODE   => TransferNode.canAddChild(child)
+    case IPowerNode.DIFFUSION_NODE  => DiffusionNode.canAddChild(child)
+    case _                          => false
   }
 
   /**
@@ -81,9 +79,9 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
    */
   override def canAddParent(parent: IPowerNode): Boolean = getType match {
     case IPowerNode.GENERATION_NODE => GenerationNode.canAddParent(parent)
-    case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
-    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
-    case _ => false
+    case IPowerNode.TRANSFER_NODE   => TransferNode.canAddParent(parent)
+    case IPowerNode.DIFFUSION_NODE  => DiffusionNode.canAddParent(parent)
+    case _                          => false
   }
 
   override def hasDescription: Boolean = true
@@ -99,7 +97,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setUpdate()
     getCrystalStack match {
       case null => PowerManager.removeNode(this)
-      case _ => PowerManager.addNode(this)
+      case _    => PowerManager.addNode(this)
     }
   }
 
@@ -113,12 +111,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
         case item: IPowerCrystal =>
           item.getType(stack) match {
             case IPowerCrystal.TYPE_LARGE => IPowerNode.GENERATION_NODE
-            case null => null
-            case _ => IPowerNode.TRANSFER_NODE
+            case null                     => null
+            case _                        => IPowerNode.TRANSFER_NODE
           }
-        case _ => null
+        case _                   => null
       }
-    case _ => null
+    case _                      => null
   }
 
   override def defaultInventory: BaseInventory = new BaseInventory(1)

@@ -32,11 +32,6 @@ trait PowerNode extends TileEntity with IPowerNode {
                                  (Random.nextInt(125) + 130).toByte,
                                  (Random.nextInt(125) + 130).toByte).toInt
 
-  initializePowerSettings()
-
-  def initializePowerSettings(): Unit
-
-
   def savePowerConnectionInfo(compound: NBTTagCompound) =
     compound(PowerNode.POWER_COMPOUND_KEY ->
              NBTCompound(
@@ -67,7 +62,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-//    if (!getWorldObj.isRemote) PowerManager.addNode(this)
+    //    if (!getWorldObj.isRemote) PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
@@ -176,7 +171,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def getParent: IPowerNode = if (parentLoc == null) null
   else parentLoc.getTileEntity(true) match {
     case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
-    case _ => null
+    case _                                     => null
   }
 
   /**

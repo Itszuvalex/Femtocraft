@@ -91,5 +91,5 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
     if (invalid) rebuildCache()
   }
 
-  override def isValid: Boolean = !invalid
+  override def isCacheValid: Boolean = !invalid
 }

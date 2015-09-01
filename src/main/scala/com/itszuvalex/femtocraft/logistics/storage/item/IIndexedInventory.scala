@@ -29,7 +29,7 @@ trait IIndexedInventory {
 
   def getContainedIDs: scala.collection.Set[Int]
 
-  def isValid: Boolean
+  def isCacheValid: Boolean
 
   def invalidateCache()
 

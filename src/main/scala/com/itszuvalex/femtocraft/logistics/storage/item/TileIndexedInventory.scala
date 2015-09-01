@@ -40,7 +40,7 @@ trait TileIndexedInventory extends TileEntityBase with IIndexedInventory {
 
   override def getSlotsByItemID(id: Int) = indInventory.getSlotsByItemID(id)
 
-  override def isValid = indInventory.isValid
+  override def isCacheValid = indInventory.isCacheValid
 
   override def invalidateCache() = indInventory.invalidateCache()
 

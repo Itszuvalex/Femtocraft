@@ -3,19 +3,16 @@ package com.itszuvalex.femtocraft.power.test
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
-import com.itszuvalex.femtocraft.power.render.PowerNodeRenderer
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
-import com.itszuvalex.itszulib.render.Vector3
+import com.itszuvalex.itszulib.core.traits.tile.TileDescriptionPacket
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
  */
-abstract class TileNodeTest extends TileEntityBase with PowerNode with DescriptionPacket {
+abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescriptionPacket {
   override def getMod = Femtocraft
 
   /**
@@ -28,7 +25,6 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with Descripti
     setUpdate()
     ret
   }
-
 
 
   /**
@@ -51,9 +47,6 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with Descripti
     val ret = super.setParent(parent)
     setUpdate()
     ret
-  }
-
-  override def initializePowerSettings(): Unit = {
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
@@ -85,6 +78,6 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with Descripti
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if(!worldObj.isRemote) PowerManager.addNode(this)
+    if (!worldObj.isRemote) PowerManager.addNode(this)
   }
 }

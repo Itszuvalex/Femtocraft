@@ -8,7 +8,7 @@ import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{DiffusionNode, IPowerNode}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.DescriptionPacket
+import com.itszuvalex.itszulib.core.traits.tile.TileDescriptionPacket
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
@@ -24,7 +24,7 @@ import scala.collection.Set
                 val INVENTORY_SIZE = 36
 }
 
-@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with NaniteHive with IWorkerProvider with DescriptionPacket {
+@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with NaniteHive with IWorkerProvider with TileDescriptionPacket {
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
@@ -68,10 +68,6 @@ import scala.collection.Set
   override def getProviderLocation: Loc4 = getLoc
 
   override def hasDescription = true
-
-  override def initializePowerSettings(): Unit = {
-
-  }
 
   /**
    *

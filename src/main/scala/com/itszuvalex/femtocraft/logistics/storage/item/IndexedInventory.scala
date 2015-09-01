@@ -143,7 +143,7 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
 
   override def invalidateCache() = inventoryCache.invalidateCache()
 
-  override def isValid = inventoryCache.isValid
+  override def isCacheValid = inventoryCache.isCacheValid
 
   override def rebuildCacheIfNecessary() = inventoryCache.rebuildCacheIfNecessary()
 
