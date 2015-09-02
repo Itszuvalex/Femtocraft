@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
@@ -28,6 +28,10 @@ import net.minecraftforge.fluids.{Fluid, FluidTank, IFluidTank}
   override def canFill(from: ForgeDirection, fluid: Fluid) = false
 
   override def canDrain(from: ForgeDirection, fluid: Fluid) = isValidMultiBlock
+
+  override def hasGUI = isValidMultiBlock
+
+  override def getGuiID = GuiIDs.ArcFurnaceGuiID
 
   /**
    *

@@ -56,7 +56,7 @@ group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide
 archivesBaseName = "femtocraft"
 
 minecraft {
-    version = "${project.ext.mcVersion}-10.13.2.1230"
+    version = "${project.ext.mcVersion}-10.13.4.1448-${project.ext.mcVersion}"
     runDir = "eclipse"
 // replacing stuff in the source
     replace '@MASSIVE@', project.massive

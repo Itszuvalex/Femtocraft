@@ -31,7 +31,7 @@ object Femtocraft {
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy: ProxyCommon = null
 
-  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.proxyGuiClient",
+  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
   var guiProxy: ProxyGuiCommon = null
 

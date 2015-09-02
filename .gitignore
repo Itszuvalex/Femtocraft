@@ -5,3 +5,6 @@ projectFilesBackup/
 Femtocraft.iml
 Femtocraft.ipr
 Femtocraft.iws
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
