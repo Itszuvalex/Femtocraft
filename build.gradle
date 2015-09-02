@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         mavenCentral()
@@ -13,6 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath group: 'com.layer', name: 'gradle-git-repo-plugin', version: '2.0.2'
     }
 }
 
@@ -27,6 +27,12 @@ dependencies {
 
 apply plugin: 'scala'
 apply plugin: 'forge'
+apply plugin: 'maven-publish'
+apply plugin: 'git-repo'
+
+repositories {
+    github("Itszuvalex", "ItszuLib-Release", "master", "releases")
+}
 
 project.ext {
     massive = "0"
@@ -71,6 +77,9 @@ minecraft {
 }
 
 dependencies {
+    def name = "${project.mcVersion}-0.1.0-24-dev"
+    compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "deobf"
+    compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "src"
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -148,18 +157,99 @@ task apiJar(type: org.gradle.api.tasks.bundling.Jar) {
     }
 }
 
-task apiScalaDoc(type:  org.gradle.api.tasks.scala.ScalaDoc) {
+task apiScalaDoc(type: org.gradle.api.tasks.scala.ScalaDoc) {
     include 'com/itszuvalex/femtocraft/api/**.scala'
 }
 
-task jarApiScalaDoc(type:  org.gradle.api.tasks.bundling.Jar) {
+task jarApiScalaDoc(type: org.gradle.api.tasks.bundling.Jar) {
     baseName = 'femtocraft-api-scaladoc'
     from apiScalaDoc
 }
 
 task debug << { println configurations.compile.findAll { it.name.startsWith("scala") } }
 
+task getArtifacts(dependsOn: build) {
+    outputs.files files(fileTree(dir: "$projectDir/build/libs").include('**/*.jar'))
+}
+
+//task getModJar << {
+//    outputs.file file(fileTree(dir: "$projectDir/build/libs", include: '**/*.jar', exclude: '**/*api*').iterator().next())
+//}
+
+//task readOutputs(dependsOn: assemble) {
+//      outputs.files  jar.outputs.getFiles()
+//}
+
+task jarSource(type: org.gradle.api.tasks.bundling.Jar) {
+    baseName = "${archivesBaseName}-src"
+    dependsOn check
+    from sourceSets.main.scala.srcDirs
+}
+
+task jarDeobf(type: org.gradle.api.tasks.bundling.Jar) {
+    baseName = "${archivesBaseName}-deobf"
+    dependsOn check
+
+    from(sourceSets.main.output)
+}
+
 build.dependsOn apiJar
 
+publish.dependsOn assemble
+
+gitPublishConfig {
+    org = "itszuvalex"
+    repo = "femtocraft-release"
+}
+
+publishing {
+
+    publications {
+
+        mod(MavenPublication) {
+            groupId group
+            version project.version
+
+            artifact jar.outputs.files.iterator().next()
+        }
+        api(MavenPublication) {
+            groupId group
+            version project.version
+
+            artifact apiJar {
+                classifier "api"
+            }
+        }
+        src(MavenPublication) {
+            groupId group
+            version project.version
+
+            artifact jarSource {
+                classifier "src"
+            }
+        }
+        deobf(MavenPublication) {
+            groupId group
+            version project.version
+
+            artifact jarDeobf {
+                classifier 'deobf'
+            }
+        }
+        scalaDoc(MavenPublication) {
+            groupId group
+            version project.version
+
+            artifact jarApiScalaDoc {
+                classifier "api-scaladoc"
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
+        }
+    }
+}
 
 idea { module { inheritOutputDirs = true } }
