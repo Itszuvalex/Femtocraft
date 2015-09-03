@@ -36,7 +36,14 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     else {
       Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
     }
-    multi.getTakenLocations(world, x, y, z)
+    multi.getTakenLocations(world, x, y, z).toList.sortWith { case (a1, a2) =>
+      a1.distSqr((rx + x).toInt,
+                 (ry + y).toInt,
+                 (rz + z).toInt) <
+      a2.distSqr((rx + x).toInt,
+                 (ry + y).toInt,
+                 (rz + z).toInt)
+                                                            }
     .foreach { loc =>
       RenderUtils.renderCube(rx.toFloat + (loc.x - x), ry.toFloat + (loc.y - y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, FemtoBlocks.blockFrame.getIcon(0, 0))
              }
