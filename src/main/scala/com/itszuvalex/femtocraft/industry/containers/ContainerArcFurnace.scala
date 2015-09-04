@@ -23,7 +23,7 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
   private var lastCookTime = 0
   private var lastPower    = 0L
 
-  addSlotToContainer(new Slot(tile.asInstanceOf[IInventory], 0, 0, 0))
+  addSlotToContainer(new Slot(tile.indInventory, 0, 0, 0))
   addPlayerInventorySlots(inv)
 
   override def addCraftingToCrafters(par1ICrafting: ICrafting) {

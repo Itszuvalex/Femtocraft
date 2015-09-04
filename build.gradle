@@ -77,7 +77,7 @@ minecraft {
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-24-dev"
+    def name = "${project.mcVersion}-0.1.0-26-dev"
     compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "deobf"
     compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "src"
 

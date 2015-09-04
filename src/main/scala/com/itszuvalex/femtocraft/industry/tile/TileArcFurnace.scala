@@ -29,7 +29,7 @@ import net.minecraftforge.fluids.{Fluid, FluidTank, IFluidTank}
 
   override def canDrain(from: ForgeDirection, fluid: Fluid) = isValidMultiBlock
 
-  override def hasGUI = isValidMultiBlock
+  override def hasGUI = /*isValidMultiBlock*/ true
 
   override def getGuiID = GuiIDs.ArcFurnaceGuiID
 

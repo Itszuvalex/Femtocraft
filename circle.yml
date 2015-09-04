@@ -1,3 +1,7 @@
 general:
     artifacts:
         - "build/libs/*"
+    branches:
+      only:
+        - master
+        - develop
