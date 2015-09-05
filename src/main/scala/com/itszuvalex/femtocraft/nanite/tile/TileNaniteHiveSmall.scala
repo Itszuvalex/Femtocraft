@@ -74,9 +74,9 @@ import scala.collection.Set
    * @return The color of this power node.  This is used for aesthetics.
    */
   override def getColor: Int = {
-    if (getParentLoc != null) getParentLoc.getTileEntity(false).get match {
+    if (getParentLoc != null) getParentLoc.getTileEntity(false).orNull match {
       case i: IPowerNode => i.getColor
-      case _             => Color(255.toByte, 0, 0, 0).toInt
+      case _ => Color(255.toByte, 0, 0, 0).toInt
     }
     else Color(255.toByte, 0, 0, 0).toInt
   }
