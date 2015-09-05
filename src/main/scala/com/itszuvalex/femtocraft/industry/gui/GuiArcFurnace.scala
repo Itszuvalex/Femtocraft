@@ -4,11 +4,13 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.containers.ContainerArcFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.util.StringUtil
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiButton}
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiFlowLayout, GuiItemStack}
 import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 import net.minecraft.util.{ResourceLocation, StatCollector}
 import org.lwjgl.opengl.GL11
 
@@ -22,21 +24,28 @@ import org.lwjgl.opengl.GL11
 @SideOnly(Side.CLIENT) class GuiArcFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileArcFurnace) extends
 GuiBase(new ContainerArcFurnace(player, inv, tile)) {
 
-  override def anchorX_=(_x: Int) = {}
-
-  override def anchorY_=(_y: Int) = {}
-
-  override def panelHeight_=(_height: Int) = {}
-
-  override def panelWidth_=(_width: Int) = {}
-
+  private val elements = new GuiFlowLayout(10, 10, 90, 90,
+                                           //                         new GuiButton(10, 10, 30, 30, "test") {
+                                           //                           override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
+                                           //                             super.render(screenX, screenY, mouseX, mouseY, partialTicks)
+                                           //                             fontRendererObj.drawString("" + mouseX + ", " + mouseY, screenX + mouseX - 5, screenY + mouseY + 5, Int.MaxValue)
+                                           //                           }
+                                           //                         }
+                                           //                         ,
+                                           new GuiItemStack(10, 10, new ItemStack(Items.redstone)),
+                                           new GuiItemStack(20, 20, new ItemStack(Items.glowstone_dust)),
+                                           new GuiItemStack(20, 20, new ItemStack(Items.glowstone_dust)),
+                                           new GuiItemStack(20, 20, new ItemStack(Items.glowstone_dust)),
+                                           new GuiItemStack(20, 20, new ItemStack(Items.glowstone_dust)),
+                                           new GuiItemStack(20, 20, new ItemStack(Items.glowstone_dust)),
+                                           new GuiItemStack(20, 20, new ItemStack(Items.glowstone_dust))
+                                          )
+  elements.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
+  elements.bufferHorizontal = 1
+  elements.bufferVertical = 1
   add(
-       new GuiButton(10, 10, 30, 30, "test") {
-         override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
-           super.render(screenX, screenY, mouseX, mouseY, partialTicks)
-           fontRendererObj.drawString("" + mouseX + ", " + mouseY, screenX + mouseX - 5, screenY + mouseY + 5, Int.MaxValue)
-         }
-       }
+       elements
+
      )
 
 
