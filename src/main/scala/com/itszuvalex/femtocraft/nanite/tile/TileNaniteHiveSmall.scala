@@ -1,16 +1,19 @@
 package com.itszuvalex.femtocraft.nanite.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{IWorker, IWorkerProvider}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileIndexedInventory}
 import com.itszuvalex.femtocraft.nanite.NaniteHive
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{DiffusionNode, IPowerNode}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileDescriptionPacket
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.inventory.IInventory
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 
@@ -21,10 +24,10 @@ import scala.collection.Set
  */
 @Configurable object TileNaniteHiveSmall {
   @Configurable val HIVE_RADIUS    = 20f
-                val INVENTORY_SIZE = 36
+                val INVENTORY_SIZE = 30
 }
 
-@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with NaniteHive with IWorkerProvider with TileDescriptionPacket {
+@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with NaniteHive with IWorkerProvider with TileDescriptionPacket with IInventory {
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
@@ -34,11 +37,16 @@ import scala.collection.Set
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     loadPowerConnectionInfo(compound)
+    setRenderUpdate()
   }
 
   protected def hiveRadius = TileNaniteHiveSmall.HIVE_RADIUS
 
   override def getMod: AnyRef = Femtocraft
+
+  override def getGuiID: Int = GuiIDs.NaniteHiveGuiID
+
+  override def hasGUI: Boolean = true
 
   /**
    *
@@ -81,7 +89,7 @@ import scala.collection.Set
     else Color(255.toByte, 0, 0, 0).toInt
   }
 
-  override def defaultInventory: IndexedInventory = new IndexedInventory(TileNaniteHiveSmall.INVENTORY_SIZE + 3)
+  override def defaultInventory: IndexedInventory = new IndexedInventory(TileNaniteHiveSmall.INVENTORY_SIZE)
 
   /* Tile Entity */
   override def validate(): Unit = {
@@ -137,4 +145,31 @@ import scala.collection.Set
     setUpdate()
     ret
   }
+
+  override def closeInventory(): Unit = indInventory.closeInventory()
+
+  override def decrStackSize(p_70298_1_ : Int, p_70298_2_ : Int): ItemStack = {
+    markDirty()
+    indInventory.decrStackSize(p_70298_1_, p_70298_2_)
+  }
+
+  override def getSizeInventory: Int = indInventory.getSizeInventory
+
+  override def getInventoryStackLimit: Int = indInventory.getInventoryStackLimit
+
+  override def isItemValidForSlot(p_94041_1_ : Int, p_94041_2_ : ItemStack): Boolean = indInventory.isItemValidForSlot(p_94041_1_, p_94041_2_)
+
+  override def getStackInSlotOnClosing(p_70304_1_ : Int): ItemStack = indInventory.getStackInSlotOnClosing(p_70304_1_)
+
+  override def openInventory(): Unit = indInventory.openInventory()
+
+  override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit = indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_)
+
+  override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUseableByPlayer(p_70300_1_)
+
+  override def getStackInSlot(p_70301_1_ : Int): ItemStack = indInventory.getStackInSlot(p_70301_1_)
+
+  override def hasCustomInventoryName: Boolean = indInventory.hasCustomInventoryName
+
+  override def getInventoryName: String = indInventory.getInventoryName
 }
