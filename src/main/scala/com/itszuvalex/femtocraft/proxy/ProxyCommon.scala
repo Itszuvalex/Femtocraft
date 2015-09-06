@@ -20,21 +20,24 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.core.Cyber.TileFrame
+import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
+import com.itszuvalex.femtocraft.render.ItemFrameTest
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
+import net.minecraftforge.common.MinecraftForge
 
 class ProxyCommon {
   def postInit(): Unit = {
     registerRendering()
     registerTileEntities()
     registerTickHandlers()
+    registerEventHandlers()
   }
 
   def registerRendering() {
@@ -64,5 +67,9 @@ class ProxyCommon {
 
   def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
     null
+  }
+
+  def registerEventHandlers(): Unit = {
+    MinecraftForge.EVENT_BUS.register(new ItemFrameTest)
   }
 }
