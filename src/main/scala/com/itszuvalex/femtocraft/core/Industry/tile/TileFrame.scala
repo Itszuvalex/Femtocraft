@@ -37,37 +37,52 @@ object TileFrame {
   def getBox(sizeX: Int, sizeY: Int, sizeZ: Int): Array[Array[Array[Array[Array[Array[Boolean]]]]]] = {
     val arr = Array.ofDim[Array[Array[Array[Boolean]]]](sizeX, sizeY, sizeZ)
 
-    for (i <- 0 until sizeX) {
-      for (j <- 0 until sizeY) {
-        for (k <- 0 until sizeZ) {
-          if (i == 0 && j == 0 && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(true, false, false, false), Array(true, false, false, true)), Array(Array(true, false, false, false), Array(true, true, false, true)))
-          else if (i == sizeX - 1 && j == 0 && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, true, false, false), Array(true, true, false, false)), Array(Array(false, true, false, false), Array(true, true, true, false)))
-          else if (i == 0 && j == sizeY - 1 && k == 0) arr(i)(j)(k) = Array(Array(Array(true, false, false, true), Array(true, false, false, false), Array(false, false, false, false)), Array(Array(true, true, false, true), Array(true, false, false, false)))
-          else if (i == 0 && j == 0 && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, false, true), Array(false, false, true, true)), Array(Array(false, false, false, true), Array(true, false, true, true)))
-          else if (i == sizeX - 1 && j == sizeY - 1 && k == 0) arr(i)(j)(k) = Array(Array(Array(true, true, false, false), Array(false, true, false, false), Array(false, false, false, false)), Array(Array(true, true, true, false), Array(false, true, false, false)))
-          else if (i == 0 && j == sizeY - 1 && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, true, true), Array(false, false, false, true), Array(false, false, false, false)), Array(Array(true, false, true, true), Array(false, false, false, true)))
-          else if (i == sizeX - 1 && j == 0 && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, true, false), Array(false, true, true, false)), Array(Array(false, false, true, false), Array(false, true, true, true)))
-          else if (i == sizeX - 1 && j == sizeY - 1 && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, true, true, false), Array(false, false, true, false), Array(false, false, false, false)), Array(Array(false, true, true, true), Array(false, false, true, false)))
-
-          else if (i == 0 && j == 0 && (k > 0 && k < sizeZ - 1)) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(false, false, false, true)), Array(Array(false, false, false, false), Array(true, false, false, true)))
-          else if (i == 0 && j == sizeY - 1 && (k > 0 && k < sizeZ - 1)) arr(i)(j)(k) = Array(Array(Array(false, false, false, true), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(true, false, false, true), Array(false, false, false, false)))
-          else if (i == sizeX - 1 && j == 0 && (k > 0 && k < sizeZ - 1)) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(false, true, false, false)), Array(Array(false, false, false, false), Array(false, true, true, false)))
-          else if (i == sizeX - 1 && j == sizeY - 1 && (k > 0 && k < sizeZ - 1)) arr(i)(j)(k) = Array(Array(Array(false, true, false, false), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(false, true, true, false), Array(false, false, false, false)))
-          else if (i == 0 && (j > 0 && j < sizeY - 1) && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(true, false, false, false), Array(false, false, false, false)), Array(Array(true, false, false, false), Array(true, false, false, false)))
-          else if (i == 0 && (j > 0 && j < sizeY - 1) && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, false, true), Array(false, false, false, false)), Array(Array(false, false, false, true), Array(false, false, false, true)))
-          else if (i == sizeX - 1 && (j > 0 && j < sizeY - 1) && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, true, false, false), Array(false, false, false, false)), Array(Array(false, true, false, false), Array(false, true, false, false)))
-          else if (i == sizeX - 1 && (j > 0 && j < sizeY - 1) && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, true, false), Array(false, false, false, false)), Array(Array(false, false, true, false), Array(false, false, true, false)))
-          else if ((i > 0 && i < sizeX - 1) && j == 0 && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(true, false, false, false)), Array(Array(false, false, false, false), Array(true, true, false, false)))
-          else if ((i > 0 && i < sizeX - 1) && j == 0 && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(false, false, true, false)), Array(Array(false, false, false, false), Array(false, false, true, true)))
-          else if ((i > 0 && i < sizeX - 1) && j == sizeY - 1 && k == 0) arr(i)(j)(k) = Array(Array(Array(true, false, false, false), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(true, true, false, false), Array(false, false, false, false)))
-          else if ((i > 0 && i < sizeX - 1) && j == sizeY - 1 && k == sizeZ - 1) arr(i)(j)(k) = Array(Array(Array(false, false, true, false), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(false, false, true, true), Array(false, false, false, false)))
-
-          else arr(i)(j)(k) = fullArray(false)
-        }
-      }
-    }
-
+    (0 until sizeX).foreach { case locX =>
+      (0 until sizeY).foreach { case locY =>
+        (0 until sizeZ).foreach { case locZ =>
+          arr(locX)(locY)(locZ) = renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
+                                }
+                              }
+                            }
     arr
+  }
+
+  def renderPieces(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
+    val MaxX = sizeX - 1
+    val MaxY = sizeY - 1
+    val MaxZ = sizeZ - 1
+    //Commented if statements are not required :
+    //  Match statements are ordered, and the if statements refer to previous
+    //   case statements, so they will always be true regardless.
+    //   The only difference in this change is the case where those variables
+    //   are <0 or > maxZ.  Following this change, they will render as if they were in-bounds.
+    //
+    //Also, stable identifiers in match are backticked for syntactic redundancy.
+    // This will match against MaxX's actual value, not assigning the name of MaxX to whatever is in
+    // the pattern.
+    (locX, locY, locZ) match {
+      case (0, 0, 0) => Array(Array(Array(false, false, false, false), Array(true, false, false, false), Array(true, false, false, true)), Array(Array(true, false, false, false), Array(true, true, false, true)))
+      case (`MaxX`, 0, 0) => Array(Array(Array(false, false, false, false), Array(false, true, false, false), Array(true, true, false, false)), Array(Array(false, true, false, false), Array(true, true, true, false)))
+      case (0, `MaxY`, 0) => Array(Array(Array(true, false, false, true), Array(true, false, false, false), Array(false, false, false, false)), Array(Array(true, true, false, true), Array(true, false, false, false)))
+      case (0, 0, `MaxZ`) => Array(Array(Array(false, false, false, false), Array(false, false, false, true), Array(false, false, true, true)), Array(Array(false, false, false, true), Array(true, false, true, true)))
+      case (`MaxX`, `MaxY`, 0) => Array(Array(Array(true, true, false, false), Array(false, true, false, false), Array(false, false, false, false)), Array(Array(true, true, true, false), Array(false, true, false, false)))
+      case (0, `MaxY`, `MaxZ`) => Array(Array(Array(false, false, true, true), Array(false, false, false, true), Array(false, false, false, false)), Array(Array(true, false, true, true), Array(false, false, false, true)))
+      case (`MaxX`, 0, `MaxZ`) => Array(Array(Array(false, false, false, false), Array(false, false, true, false), Array(false, true, true, false)), Array(Array(false, false, true, false), Array(false, true, true, true)))
+      case (`MaxX`, `MaxY`, `MaxZ`) => Array(Array(Array(false, true, true, false), Array(false, false, true, false), Array(false, false, false, false)), Array(Array(false, true, true, true), Array(false, false, true, false)))
+      case (0, 0, `MaxZ`) => Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(false, false, false, true)), Array(Array(false, false, false, false), Array(true, false, false, true)))
+      case (0, `MaxY`, _) /*if z > 0 && z < MaxZ*/ => Array(Array(Array(false, false, false, true), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(true, false, false, true), Array(false, false, false, false)))
+      case (`MaxX`, 0, _) /*if z > 0 && z < MaxZ*/ => Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(false, true, false, false)), Array(Array(false, false, false, false), Array(false, true, true, false)))
+      case (`MaxX`, `MaxY`, _) /*if z > 0 && z < MaxZ*/ => Array(Array(Array(false, true, false, false), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(false, true, true, false), Array(false, false, false, false)))
+      case (0, _, 0) /*if y > 0 && y < MaxY*/ => Array(Array(Array(false, false, false, false), Array(true, false, false, false), Array(false, false, false, false)), Array(Array(true, false, false, false), Array(true, false, false, false)))
+      case (0, _, `MaxZ`) /*if y > 0 && y < MaxY*/ => Array(Array(Array(false, false, false, false), Array(false, false, false, true), Array(false, false, false, false)), Array(Array(false, false, false, true), Array(false, false, false, true)))
+      case (`MaxX`, _, 0) /*if y > 0 && y < MaxY*/ => Array(Array(Array(false, false, false, false), Array(false, true, false, false), Array(false, false, false, false)), Array(Array(false, true, false, false), Array(false, true, false, false)))
+      case (`MaxX`, _, `MaxZ`) /*if y > 0 && y < MaxY*/ => Array(Array(Array(false, false, false, false), Array(false, false, true, false), Array(false, false, false, false)), Array(Array(false, false, true, false), Array(false, false, true, false)))
+      case (_, 0, 0) /*if x > 0 && x < MaxX*/ => Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(true, false, false, false)), Array(Array(false, false, false, false), Array(true, true, false, false)))
+      case (_, 0, `MaxZ`) /*if x > 0 && x < MaxX*/ => Array(Array(Array(false, false, false, false), Array(false, false, false, false), Array(false, false, true, false)), Array(Array(false, false, false, false), Array(false, false, true, true)))
+      case (_, `MaxY`, 0) /*if x > 0 && x < MaxX*/ => Array(Array(Array(true, false, false, false), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(true, true, false, false), Array(false, false, false, false)))
+      case (_, `MaxY`, `MaxZ`) /*if x > 0 && x < MaxX*/ => Array(Array(Array(false, false, true, false), Array(false, false, false, false), Array(false, false, false, false)), Array(Array(false, false, true, true), Array(false, false, false, false)))
+      case _ => fullArray(false)
+    }
   }
 
   def bToI(boolean: Boolean): Int = {
