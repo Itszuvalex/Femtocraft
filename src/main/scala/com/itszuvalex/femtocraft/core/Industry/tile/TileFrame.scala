@@ -37,9 +37,9 @@ object TileFrame {
   def getBox(sizeX: Int, sizeY: Int, sizeZ: Int): Array[Array[Array[Array[Array[Array[Boolean]]]]]] = {
     val arr = Array.ofDim[Array[Array[Array[Boolean]]]](sizeX, sizeY, sizeZ)
 
-    for (i <- 0 to sizeX - 1) {
-      for (j <- 0 to sizeY - 1) {
-        for (k <- 0 to sizeZ - 1) {
+    for (i <- 0 until sizeX) {
+      for (j <- 0 until sizeY) {
+        for (k <- 0 until sizeZ) {
           if (i == 0 && j == 0 && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(true, false, false, false), Array(true, false, false, true)), Array(Array(true, false, false, false), Array(true, true, false, true)))
           else if (i == sizeX - 1 && j == 0 && k == 0) arr(i)(j)(k) = Array(Array(Array(false, false, false, false), Array(false, true, false, false), Array(true, true, false, false)), Array(Array(false, true, false, false), Array(true, true, true, false)))
           else if (i == 0 && j == sizeY - 1 && k == 0) arr(i)(j)(k) = Array(Array(Array(true, false, false, true), Array(true, false, false, false), Array(false, false, false, false)), Array(Array(true, true, false, true), Array(true, false, false, false)))
@@ -74,9 +74,7 @@ object TileFrame {
     if (boolean) 1 else 0
   }
 
-  def iToB(int: Int): Boolean = {
-    if (int != 0) true else false
-  }
+  def iToB(int: Int): Boolean = int != 0
 
   def getSaveableInt(arr: Array[Array[Array[Boolean]]]): Int = {
     var ret = 0
@@ -137,7 +135,16 @@ class TileFrame(var thingsToRender: Array[Array[Array[Boolean]]]) extends TileEn
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     thingsToRender = TileFrame.getFromSaveableInt(compound.getInteger(TileFrame.RENDER_SETTINGS_KEY))
-    //worldObj.setTileEntity(xCoord, yCoord, zCoord, new TileFrame(TileFrame.getFromSaveableInt(compound.getInteger(TileFrame.RENDER_SETTINGS_KEY))))
+  }
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, TileFrame.getSaveableInt(thingsToRender))
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    thingsToRender = TileFrame.getFromSaveableInt(compound.getInteger(TileFrame.RENDER_SETTINGS_KEY))
   }
 
 }
