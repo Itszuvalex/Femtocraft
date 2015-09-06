@@ -16,16 +16,16 @@ object TileFrame {
    * @return Settings array (3-dim Boolean array)
    */
   def fullArray(bool: Boolean) = Array(
-    Array(
-      Array(bool, bool, bool, bool),
-      Array(bool, bool, bool, bool),
-      Array(bool, bool, bool, bool)
-    ),
-    Array(
-      Array(bool, bool, bool, bool),
-      Array(bool, bool, bool, bool)
-    )
-  )
+                                        Array(
+                                               Array(bool, bool, bool, bool),
+                                               Array(bool, bool, bool, bool),
+                                               Array(bool, bool, bool, bool)
+                                             ),
+                                        Array(
+                                               Array(bool, bool, bool, bool),
+                                               Array(bool, bool, bool, bool)
+                                             )
+                                      )
 
   /**
    * Returns a 3-dim array of settings arrays representing a box. Minimum size 2x2x2.
@@ -103,25 +103,24 @@ object TileFrame {
 
   def getFromSaveableInt(int: Int): Array[Array[Array[Boolean]]] = {
     val ret = Array(
-                Array(
-                  Array(iToB((int & 524288) >> 19), iToB((int & 262144) >> 18), iToB((int & 131072) >> 17), iToB((int & 65536) >> 16)),
-                  Array(iToB((int & 32768) >> 15), iToB((int & 16384) >> 14), iToB((int & 8192) >> 13), iToB((int & 4096) >> 12)),
-                  Array(iToB((int & 2048) >> 11), iToB((int & 1024) >> 10), iToB((int & 512) >> 9), iToB((int & 256) >> 8))
-                ),
-                Array(
-                  Array(iToB((int & 128) >> 7), iToB((int & 64) >> 6), iToB((int & 32) >> 5), iToB((int & 16) >> 4)),
-                  Array(iToB((int & 8) >> 3), iToB((int & 4) >> 2), iToB((int & 2) >> 1), iToB(int & 1))
-                )
-              )
+                     Array(
+                            Array(iToB((int & 524288) >> 19), iToB((int & 262144) >> 18), iToB((int & 131072) >> 17), iToB((int & 65536) >> 16)),
+                            Array(iToB((int & 32768) >> 15), iToB((int & 16384) >> 14), iToB((int & 8192) >> 13), iToB((int & 4096) >> 12)),
+                            Array(iToB((int & 2048) >> 11), iToB((int & 1024) >> 10), iToB((int & 512) >> 9), iToB((int & 256) >> 8))
+                          ),
+                     Array(
+                            Array(iToB((int & 128) >> 7), iToB((int & 64) >> 6), iToB((int & 32) >> 5), iToB((int & 16) >> 4)),
+                            Array(iToB((int & 8) >> 3), iToB((int & 4) >> 2), iToB((int & 2) >> 1), iToB(int & 1))
+                          )
+                   )
     ret
   }
 }
 
 // "values" are all objects in that category, clockwise, starting from north/northwest (Boolean: render or not)
 // Parameter:[Edges:[Top[values], Middle:[values], Bottom:[values]], Corners:[Top:[values], Bottom:[values]]]
-class TileFrame(var thingsToRender: Array[Array[Array[Boolean]]]) extends TileEntityBase {
-
-  def this() = this(TileFrame.fullArray(true))
+class TileFrame() extends TileEntityBase {
+  var thingsToRender = TileFrame.fullArray(true)
 
   override def getMod: AnyRef = Femtocraft
 

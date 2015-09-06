@@ -25,12 +25,10 @@ import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, 
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
-import com.itszuvalex.femtocraft.render.ItemFrameTest
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
-import net.minecraftforge.common.MinecraftForge
 
 class ProxyCommon {
   def postInit(): Unit = {
@@ -70,6 +68,5 @@ class ProxyCommon {
   }
 
   def registerEventHandlers(): Unit = {
-    MinecraftForge.EVENT_BUS.register(new ItemFrameTest)
   }
 }

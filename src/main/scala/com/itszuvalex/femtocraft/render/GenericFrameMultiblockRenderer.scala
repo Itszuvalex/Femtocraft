@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.render
 
-import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.core.{IFrameMultiblock, IFrameMultiblockRenderer}
 import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 import org.lwjgl.opengl.GL11
@@ -45,7 +45,7 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
                  (rz + z).toInt)
                                                             }
     .foreach { loc =>
-      RenderUtils.renderCube(rx.toFloat + (loc.x - x), ry.toFloat + (loc.y - y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, FemtoBlocks.blockFrame.getIcon(0, 0))
+      RenderUtils.renderCube(rx.toFloat + (loc.x - x), ry.toFloat + (loc.y - y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, Blocks.iron_block.getIcon(0, 0))
              }
     Tessellator.instance.draw()
     GL11.glEnable(GL11.GL_CULL_FACE)
