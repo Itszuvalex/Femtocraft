@@ -12,8 +12,6 @@ trait IFrameMultiblock {
 
   def getName: String
 
-  def getNumFrames: Int
-
   def getAllowedFrameTypes: Array[String]
 
   def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int): Boolean

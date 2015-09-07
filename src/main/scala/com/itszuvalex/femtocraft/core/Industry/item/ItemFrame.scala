@@ -1,10 +1,9 @@
-package com.itszuvalex.femtocraft.industry.item
+package com.itszuvalex.femtocraft.core.Industry.item
 
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.core.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
@@ -64,7 +63,7 @@ class ItemFrame extends Item with IFrameItem {
       world.getTileEntity(px, py, pz) match {
         case frame: TileFrame =>
           frame.calculateRendering(xWidth, yHeight, zWidth, px - bx, py - by, pz - bz)
-//          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
+          //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
           frame.formMultiBlock(world, bx, by, bz)
           frame.multiBlock = multiString
         case _ =>

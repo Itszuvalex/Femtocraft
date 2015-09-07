@@ -38,5 +38,4 @@ class MultiblockArcFurnace extends IFrameMultiblock {
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
-  override def getNumFrames: Int = 2 * 3 * 2
 }

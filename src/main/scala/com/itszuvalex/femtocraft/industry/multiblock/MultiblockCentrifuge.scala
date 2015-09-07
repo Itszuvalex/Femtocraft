@@ -36,5 +36,4 @@ class MultiblockCentrifuge extends IFrameMultiblock {
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
-  override def getNumFrames: Int = 5 * 3 * 3
 }

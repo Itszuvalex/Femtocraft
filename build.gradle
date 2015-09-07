@@ -32,6 +32,9 @@ apply plugin: 'git-repo'
 
 repositories {
     github("Itszuvalex", "ItszuLib-Release", "master", "releases")
+//    maven {
+//        url "https://github.com/Itszuvalex/ItszuLib-Release/raw/master/releases/com/itszuvalex/itszulib/ItszuLib"
+//    }
 }
 
 project.ext {

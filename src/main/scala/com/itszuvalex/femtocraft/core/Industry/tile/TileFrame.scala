@@ -20,6 +20,10 @@ object TileFrame {
 
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
+  def fullRenderIndexes = (0 until 20).map(markIndexes)
+
+  def markIndexes(mark: Int) = (mark / 12, (mark / 4) % 3, mark % 4)
+
   def getRenderMark(i: Int, j: Int, k: Int, renderInt: Int) = (renderInt & (1 << TileFrame.getSaveableIndentation(i, j, k))) > 0
 
   def setRenderMark(bool: Boolean, i: Int, j: Int, k: Int, marker: Int): Int = {

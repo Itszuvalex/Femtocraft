@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.core.Industry.render
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
@@ -15,45 +16,54 @@ import org.lwjgl.opengl.GL11
 object FrameRenderer {
   val frameModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/frame/Frame.obj")
   val frameTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/frame/frame.png")
+
+  lazy val frameModel = AdvancedModelLoader.loadModel(FrameRenderer.frameModelLocation).asInstanceOf[WavefrontObject]
+
+  val sidemap1 = Array("N", "E", "S", "W")
+  val sidemap2 = Array("NW", "NE", "SE", "SW")
+
+  def renderFrameAt(x: Double, y: Double, z: Double, partialTime: Float, marks: Set[(Int, Int, Int)]): Unit = {
+    Minecraft.getMinecraft.getTextureManager.bindTexture(frameTexLocation)
+    GL11.glPushMatrix()
+    GL11.glDisable(GL11.GL_LIGHTING)
+    GL11.glTranslated(x + .5, y, z + .5)
+    GL11.glEnable(GL11.GL_CULL_FACE)
+    GL11.glDisable(GL11.GL_BLEND)
+    GL11.glColor4f(1f, 1f, 1f, 1f)
+
+    marks.foreach { case (a, b, c) =>
+      frameModel.renderPart(
+                             ((a, b, c) match {
+                               case (_, 0, _) => "T"
+                               case (0, 2, _) => "B"
+                               case (1, 1, _) => "B"
+                               case _ => ""
+                             })
+                             + (if (a == 0 && b != 1) sidemap1 else sidemap2)(c)
+                           )
+                  }
+
+    GL11.glEnable(GL11.GL_BLEND)
+    GL11.glEnable(GL11.GL_LIGHTING)
+    GL11.glPopMatrix()
+  }
+
 }
 
 class FrameRenderer extends TileEntitySpecialRenderer {
-  val frameModel = AdvancedModelLoader.loadModel(FrameRenderer.frameModelLocation).asInstanceOf[WavefrontObject]
-  val sidemap1   = Array("N", "E", "S", "W")
-  val sidemap2   = Array("NW", "NE", "SE", "SW")
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit =
     tile match {
       case frame: TileFrame =>
-        this.bindTexture(FrameRenderer.frameTexLocation)
-        GL11.glPushMatrix()
-        GL11.glDisable(GL11.GL_LIGHTING)
-        GL11.glTranslated(x + .5, y, z + .5)
-        GL11.glEnable(GL11.GL_CULL_FACE)
-        GL11.glDisable(GL11.GL_BLEND)
-        GL11.glColor4f(1f, 1f, 1f, 1f);
-        {
-          for {
-            a <- 0 to 1
-            b <- 0 to (2 - a)
-            c <- 0 to 3
-            if frame.getRenderMark(a, b, c)
-          } yield (a, b, c)
-        }.foreach { case (a, b, c) =>
-          frameModel.renderPart(
-                                 ((a, b, c) match {
-                                   case (_, 0, _) => "T"
-                                   case (0, 2, _) => "B"
-                                   case (1, 1, _) => "B"
-                                   case _ => ""
-                                 })
-                                 + (if (a == 0 && b != 1) sidemap1 else sidemap2)(c)
-                               )
-                  }
-
-        GL11.glEnable(GL11.GL_BLEND)
-        GL11.glEnable(GL11.GL_LIGHTING)
-        GL11.glPopMatrix()
+        FrameRenderer.renderFrameAt(x, y, z, partialTime, {
+                                                            for {
+                                                              a <- 0 to 1
+                                                              b <- 0 to (2 - a)
+                                                              c <- 0 to 3
+                                                              if frame.getRenderMark(a, b, c)
+                                                            } yield (a, b, c)
+                                                          }.toSet
+                                   )
 
       case _ =>
     }

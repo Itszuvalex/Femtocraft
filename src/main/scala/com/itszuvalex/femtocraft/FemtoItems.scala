@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
+import com.itszuvalex.femtocraft.core.Industry.item.ItemFrame
 import com.itszuvalex.femtocraft.core.Power.ItemPowerCrystal
-import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
 

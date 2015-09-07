@@ -20,7 +20,8 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.core.Industry.render.FrameRenderer
+import com.itszuvalex.femtocraft.FemtoItems
+import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
@@ -38,6 +39,7 @@ import cpw.mods.fml.client.registry.{ClientRegistry, RenderingRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
+import net.minecraftforge.client.MinecraftForgeClient
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
@@ -53,7 +55,7 @@ class ProxyClient extends ProxyCommon {
     val col = new Color(color)
 
     name match {
-      case "power"   =>
+      case "power" =>
         fx = new EntityFxPower(world, x, y, z,
                                (col.red.toInt & 255).toFloat / 255f,
                                (col.green.toInt & 255).toFloat / 255f,
@@ -64,7 +66,7 @@ class ProxyClient extends ProxyCommon {
                                  (col.red.toInt & 255).toFloat / 255f,
                                  (col.green.toInt & 255).toFloat / 255f,
                                  (col.blue.toInt & 255).toFloat / 255f)
-      case _         =>
+      case _ =>
         return null
     }
     mc.effectRenderer.addEffect(fx)
@@ -92,6 +94,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalsWorldgen], new CrystalRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
+    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
