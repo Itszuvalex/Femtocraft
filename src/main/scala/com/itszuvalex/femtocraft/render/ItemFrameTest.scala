@@ -38,8 +38,7 @@ class ItemFrameTest extends Item with IFrameItem {
     val bz = z + dir.offsetZ
     val xWidth = 2
     val yHeight = 3
-    val zWidth = 2
-    val frameArray = TileFrame.getBox(xWidth, yHeight, zWidth);
+    val zWidth = 2;
     {
       for {
         i <- bx until (bx + xWidth)
@@ -50,7 +49,7 @@ class ItemFrameTest extends Item with IFrameItem {
       world.setBlock(px, py, pz, FemtoBlocks.blockFrame)
       world.getTileEntity(px, py, pz) match {
         case frame: TileFrame =>
-          frame.thingsToRender = frameArray(px - bx)(py - by)(pz - bz)
+          frame.calculateRendering(xWidth, yHeight, zWidth, px - bx, py - by, pz - bz)
         case _ =>
       }
               }
