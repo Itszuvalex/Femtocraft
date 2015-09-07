@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.core.Power.ItemPowerCrystal
-import com.itszuvalex.femtocraft.render.ItemFrameTest
+import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
 
@@ -12,14 +12,14 @@ object FemtoItems {
   var itemPowerCrystal: Item = null
 
 
-  var itemFrameTest: Item = null
+  var itemFrame: Item = null
 
   def preInit(): Unit = {
     itemPowerCrystal = new ItemPowerCrystal().setCreativeTab(Femtocraft.tab)
     GameRegistry.registerItem(itemPowerCrystal, "itemPowerCrystal")
 
-    itemFrameTest = new ItemFrameTest().setCreativeTab(Femtocraft.tab)
-    GameRegistry.registerItem(itemFrameTest, "itemFrameTest")
+    itemFrame = new ItemFrame().setCreativeTab(Femtocraft.tab)
+    GameRegistry.registerItem(itemFrame, "itemFrameTest")
   }
 
   def init(): Unit = {

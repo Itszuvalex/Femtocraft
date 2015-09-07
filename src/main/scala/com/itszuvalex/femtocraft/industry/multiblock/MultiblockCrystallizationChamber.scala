@@ -15,7 +15,7 @@ import scala.collection.Set
  */
 class MultiblockCrystallizationChamber extends IFrameMultiblock {
   override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int): Boolean =
-    getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z))
+    getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
   override def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean = getTakenLocations(world, x, y, z).forall(loc => world.setBlock(x, y, z, FemtoBlocks.blockCrystallizationChamber))
 

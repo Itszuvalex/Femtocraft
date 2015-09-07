@@ -15,7 +15,7 @@ import scala.collection.Set
  */
 class MultiblockArcFurnace extends IFrameMultiblock {
   override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int) =
-    getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z))
+    getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
   override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
                                                                                       for {
