@@ -25,7 +25,6 @@ GuiBase(new ContainerNaniteHive(player, inv, tile)) {
   xSize = GuiNaniteHive.WIDTH
   ySize = GuiNaniteHive.HEIGHT
 
-
   /**
    * Draw the foreground layer for the GuiContainer (everything in front of the items)
    */

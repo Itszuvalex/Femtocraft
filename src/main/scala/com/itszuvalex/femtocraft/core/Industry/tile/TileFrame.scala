@@ -18,6 +18,8 @@ object TileFrame {
   val RENDER_SETTINGS_KEY = "RenderSettings"
   val MULTIBLOCK_KEY      = "Multiblock"
 
+  var shouldDrop = true
+
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
   def fullRenderIndexes = (0 until 20).map(markIndexes)
@@ -122,12 +124,14 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
 
 
   def onBlockBreak(): Unit = {
+    if (getWorldObj.isRemote) return
+
     if (isController) {
       FrameMultiblockRegistry.getMultiblock(multiBlock) match {
         case Some(multi) =>
           multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
             getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
-            InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, new Random)
+            if (TileFrame.shouldDrop) InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, new Random)
                                                                                }
         case _ =>
       }
