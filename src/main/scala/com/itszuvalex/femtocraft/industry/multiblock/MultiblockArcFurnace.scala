@@ -35,6 +35,8 @@ class MultiblockArcFurnace extends IFrameMultiblock {
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockArcFurnaceID
 
+  override def numFrames = 2 * 3 * 2
+
   override def getRequiredResources: IndexedSeq[ItemStack] = Array(new ItemStack(FemtoBlocks.blockCyberweave, 20),
                                                                    new ItemStack(Items.iron_ingot, 32),
                                                                    new ItemStack(Items.gold_ingot, 4),

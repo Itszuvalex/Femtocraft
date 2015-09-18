@@ -24,7 +24,7 @@ object FrameRenderer {
   def renderFrameAt(x: Double, y: Double, z: Double, partialTime: Float, marks: Set[(Int, Int, Int)]): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(frameTexLocation)
     GL11.glPushMatrix()
-    GL11.glDisable(GL11.GL_LIGHTING)
+//    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
@@ -43,7 +43,7 @@ object FrameRenderer {
                   }
 
     GL11.glEnable(GL11.GL_BLEND)
-    GL11.glEnable(GL11.GL_LIGHTING)
+//    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 

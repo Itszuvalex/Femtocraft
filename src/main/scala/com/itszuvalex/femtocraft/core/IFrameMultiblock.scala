@@ -20,6 +20,8 @@ trait IFrameMultiblock {
 
   def getTakenLocations(world: World, x: Int, y: Int, z: Int): scala.collection.Set[Loc4]
 
+  def numFrames: Int
+
   def getRequiredResources: scala.collection.IndexedSeq[ItemStack]
 
   @SideOnly(Side.CLIENT)

@@ -32,6 +32,8 @@ class MultiblockCentrifuge extends IFrameMultiblock {
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockCentrifugeID
 
+  override def numFrames = 3 * 5 * 3
+
   override def getRequiredResources: IndexedSeq[ItemStack] = for (x <- 0 until 0) yield null
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")

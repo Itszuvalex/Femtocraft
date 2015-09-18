@@ -32,6 +32,8 @@ class MultiblockCrystallizationChamber extends IFrameMultiblock {
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockCrystallizerID
 
+  override def numFrames = 3 * 5 * 3
+
   override def getRequiredResources: IndexedSeq[ItemStack] = for (x <- 0 until 0) yield null
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
