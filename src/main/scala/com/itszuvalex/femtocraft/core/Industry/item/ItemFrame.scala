@@ -6,7 +6,6 @@ import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
@@ -54,11 +53,17 @@ class ItemFrame extends Item with IFrameItem {
   override def renderID: Int = RenderIDs.framePreviewableID
 
 
+  override def onItemRightClick(item: ItemStack, world: World, player: EntityPlayer): ItemStack = {
+    if (player.isSneaking) {
+      player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+    }
+    super.onItemRightClick(item, world, player)
+  }
+
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    if (player.isSneaking && !world.isRemote) {
-      FMLNetworkHandler.openGui(player, Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, x, y, z)
-      return true
+    if (player.isSneaking) {
+      return false
     }
     val multiString = getSelectedMultiblock(itemStack)
     if (multiString == null || multiString.isEmpty) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
@@ -103,7 +108,7 @@ class ItemFrame extends Item with IFrameItem {
           //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
           frame.formMultiBlock(world, bx, by, bz)
           frame.multiBlock = multiString
-        case _ =>
+        case _                =>
       }
               }
     true
