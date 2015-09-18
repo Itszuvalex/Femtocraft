@@ -12,4 +12,6 @@ trait IFrameItem extends Item with IPreviewable {
 
   def getSelectedMultiblock(stack: ItemStack): String
 
+  def setSelectedMultiblock(stack: ItemStack, multi: String)
+
 }

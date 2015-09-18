@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.core.IFrameMultiblock
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
 import cpw.mods.fml.relauncher.{Side, SideOnly}
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 
@@ -34,7 +35,10 @@ class MultiblockArcFurnace extends IFrameMultiblock {
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockArcFurnaceID
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = for {x <- 0 until 0} yield null
+  override def getRequiredResources: IndexedSeq[ItemStack] = Array(new ItemStack(FemtoBlocks.blockCyberweave, 20),
+                                                                   new ItemStack(Items.iron_ingot, 32),
+                                                                   new ItemStack(Items.gold_ingot, 4),
+                                                                   new ItemStack(Items.redstone, 18))
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 

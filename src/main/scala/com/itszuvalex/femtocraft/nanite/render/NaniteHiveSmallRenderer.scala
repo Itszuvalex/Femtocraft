@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.nanite.render
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.power.render.DiffusionNodeBeamRenderer
 import com.itszuvalex.femtocraft.render.RenderIDs
@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderBlocks
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{MathHelper, ResourceLocation}
+import net.minecraft.util.MathHelper
 import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
@@ -21,9 +21,9 @@ import org.lwjgl.opengl.GL11
  * Created by Christopher on 8/29/2015.
  */
 object NaniteHiveSmallRenderer {
-  val hiveModelLocation    = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/Nanite Hive Small.obj")
-  val hiveTexLocation      = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/nanite hive small.png")
-  val hiveColorTexLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/nanite hive small/nanite hive small color.png")
+  val hiveModelLocation    = Resources.Model("nanite hive small/Nanite Hive Small.obj")
+  val hiveTexLocation      = Resources.Model("nanite hive small/nanite hive small.png")
+  val hiveColorTexLocation = Resources.Model("nanite hive small/nanite hive small color.png")
 }
 
 class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler with DiffusionNodeBeamRenderer {
@@ -41,12 +41,12 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
         model.renderPart("Sphere001")
         Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveColorTexLocation)
         val color = new Color(node.getColor)
-        val shift = Math.abs(MathHelper.sin(time * .03f)*.5f) + .5f
+        val shift = Math.abs(MathHelper.sin(time * .03f) * .5f) + .5f
         GL11.glColor4ub(((color.red.toInt & 255) * shift).toByte, ((color.green & 255) * shift).toByte, ((color.blue & 255) * shift).toByte, 255.toByte)
         model.renderPart("Sphere001")
         GL11.glPopMatrix()
         renderDiffuseBeams(node, x, y, z, partialTime)
-      case _                =>
+      case _ =>
     }
 
 

@@ -11,11 +11,12 @@ object GuiIDs {
     n - 1
   }
 
-  val CrystalMountGuiID    = nextID
-  val ArcFurnaceGuiID      = nextID
-  val CentrifugeGuiID      = nextID
-  val CrystallizerGuiID    = nextID
-  val Cubic2DCraftingGuiID = nextID
-  val Cubic3DCraftingGuiID = nextID
-  val NaniteHiveGuiID      = nextID
+  val CrystalMountGuiID            = nextID
+  val ArcFurnaceGuiID              = nextID
+  val CentrifugeGuiID              = nextID
+  val CrystallizerGuiID            = nextID
+  val Cubic2DCraftingGuiID         = nextID
+  val Cubic3DCraftingGuiID         = nextID
+  val NaniteHiveGuiID              = nextID
+  val FrameMultiblockSelectorGuiID = nextID
 }

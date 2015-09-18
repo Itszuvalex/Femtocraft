@@ -1,11 +1,10 @@
 package com.itszuvalex.femtocraft.core.Industry.render
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
@@ -14,8 +13,8 @@ import org.lwjgl.opengl.GL11
  * Created by Alex on 05.09.2015.
  */
 object FrameRenderer {
-  val frameModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/frame/Frame.obj")
-  val frameTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/frame/frame.png")
+  val frameModelLocation = Resources.Model("frame/Frame.obj")
+  val frameTexLocation   = Resources.Model("frame/frame.png")
 
   lazy val frameModel = AdvancedModelLoader.loadModel(FrameRenderer.frameModelLocation).asInstanceOf[WavefrontObject]
 

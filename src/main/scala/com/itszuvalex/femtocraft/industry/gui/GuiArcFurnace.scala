@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.container.ContainerArcFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.util.StringUtil
@@ -9,14 +9,14 @@ import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.util.{ResourceLocation, StatCollector}
+import net.minecraft.util.StatCollector
 import org.lwjgl.opengl.GL11
 
 /**
  * Created by Christopher on 9/1/2015.
  */
 @SideOnly(Side.CLIENT) object GuiArcFurnace {
-  val texture = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/guis/GuiCrystalMount.png")
+  val texture = Resources.TexGui("GuiCrystalMount.png")
 }
 
 @SideOnly(Side.CLIENT) class GuiArcFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileArcFurnace) extends

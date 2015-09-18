@@ -14,6 +14,8 @@ object FrameMultiblockRegistry {
 
   def getMultiblock(name: String) = frameMap.get(name)
 
+  def getMultiblocksForFrameType(ftype: String) = frameMap.values.filter(_.getAllowedFrameTypes.contains(ftype))
+
   def init(): Unit = {
     registerMultiblock(new MultiblockArcFurnace)
     registerMultiblock(new MultiblockCentrifuge)
