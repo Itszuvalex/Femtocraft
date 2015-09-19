@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.industry.gui
 import com.itszuvalex.femtocraft.core.{FrameMultiblockRegistry, IFrameItem, IFrameMultiblock}
 import com.itszuvalex.femtocraft.industry.container.ContainerMultiblockSelection
 import com.itszuvalex.femtocraft.industry.gui.GuiMultiblockSelection.GuiMultiblockSelector
+import com.itszuvalex.femtocraft.network.PacketHandler
+import com.itszuvalex.femtocraft.network.messages.MessageMultiblockSelection
 import com.itszuvalex.femtocraft.{FemtoItems, Resources}
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
@@ -83,7 +85,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                           case null              => null
                           case frame: IFrameItem =>
                             val multis = FrameMultiblockRegistry.getMultiblocksForFrameType(frame.getFrameType(is))
-                            val selectors = (multis ++ multis).map(new GuiMultiblockSelector(this, _))
+                            val selectors = multis.map(new GuiMultiblockSelector(this, _))
                             selectors.find(_.multi.getName.equalsIgnoreCase(frame.getSelectedMultiblock(is))) match {
                               case Some(g) => selectMultiblock(g)
                               case None    =>
@@ -115,6 +117,16 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
         override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
       },
       pageLabel,
+      new GuiButton((GuiMultiblockSelection.WIDTH - 100) / 2,
+                    GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 15,
+                    100, 12, "Clear Selection") {
+        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
+          if (super.onMouseClick(mouseX, mouseY, button)) {
+            clearSelection()
+            true
+          } else false
+        }
+      },
       new GuiButton(GuiMultiblockSelection.WIDTH - GuiMultiblockSelection.xSelectionMin - 10,
                     GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
                     10, 10, "v") {
@@ -136,8 +148,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
       case is   => is.getItem match {
         case null              =>
         case frame: IFrameItem =>
-          //TODO: Send packet to server
-          frame.setSelectedMultiblock(is, multi.multi.getName)
+          PacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(multi.multi.getName))
       }
     }
   }
@@ -150,8 +161,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
       case is   => is.getItem match {
         case null              =>
         case frame: IFrameItem =>
-          //TODO: Send packet to server
-          frame.setSelectedMultiblock(is, null)
+          PacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(null))
       }
     }
   }

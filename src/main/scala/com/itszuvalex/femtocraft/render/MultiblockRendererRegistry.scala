@@ -11,7 +11,7 @@ import scala.collection.mutable
 @SideOnly(Side.CLIENT)
 object MultiblockRendererRegistry {
   private val renderMap = mutable.HashMap[Int, IFrameMultiblockRenderer]()
-  private var lastID    = 0
+  private var lastID    = 1
 
   def bindRenderer(renderer: IFrameMultiblockRenderer): Int = {
     val id = lastID

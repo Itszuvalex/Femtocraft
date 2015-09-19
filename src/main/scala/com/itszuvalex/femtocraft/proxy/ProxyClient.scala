@@ -23,6 +23,8 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.FemtoItems
 import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.industry.render.ArcFurnaceRenderer
+import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
@@ -30,7 +32,7 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
-import com.itszuvalex.femtocraft.render.{FramePreviewableRenderer, RenderIDs}
+import com.itszuvalex.femtocraft.render.{FramePreviewableRenderer, MultiblockRendererRegistry, RenderIDs}
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
@@ -55,7 +57,7 @@ class ProxyClient extends ProxyCommon {
     val col = new Color(color)
 
     name match {
-      case "power" =>
+      case "power"   =>
         fx = new EntityFxPower(world, x, y, z,
                                (col.red.toInt & 255).toFloat / 255f,
                                (col.green.toInt & 255).toFloat / 255f,
@@ -66,7 +68,7 @@ class ProxyClient extends ProxyCommon {
                                  (col.red.toInt & 255).toFloat / 255f,
                                  (col.green.toInt & 255).toFloat / 255f,
                                  (col.blue.toInt & 255).toFloat / 255f)
-      case _ =>
+      case _         =>
         return null
     }
     mc.effectRenderer.addEffect(fx)
@@ -79,6 +81,9 @@ class ProxyClient extends ProxyCommon {
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
 
+    val arcFurnaceRenderer = new ArcFurnaceRenderer
+    RenderIDs.multiblockArcFurnaceID = MultiblockRendererRegistry.bindRenderer(arcFurnaceRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileArcFurnace], arcFurnaceRenderer)
 
     val naniveHiveRenderer = new NaniteHiveSmallRenderer
     RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId

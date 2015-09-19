@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.core.Industry.item
 
+import java.util
+
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.core.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
@@ -47,7 +49,7 @@ class ItemFrame extends Item with IFrameItem {
 
   override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 
-  override def setSelectedMultiblock(stack: ItemStack, name: String) = ItemFrame.setSelection _
+  override def setSelectedMultiblock(stack: ItemStack, name: String) = ItemFrame.setSelection(stack, name)
 
 
   override def renderID: Int = RenderIDs.framePreviewableID
@@ -58,6 +60,15 @@ class ItemFrame extends Item with IFrameItem {
       player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
     }
     super.onItemRightClick(item, world, player)
+  }
+
+
+  override def addInformation(stack: ItemStack, player: EntityPlayer, tooltip: util.List[_], advanced: Boolean): Unit = {
+    super.addInformation(stack, player, tooltip, advanced)
+    val list = tooltip.asInstanceOf[util.List[String]]
+    list.add("Frame: " + getFrameType(stack))
+    val selected = getSelectedMultiblock(stack)
+    list.add("Selected: " + (if (selected == null || selected.isEmpty) "none" else selected))
   }
 
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
