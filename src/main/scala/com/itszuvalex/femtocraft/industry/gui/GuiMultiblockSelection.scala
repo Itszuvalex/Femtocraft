@@ -109,7 +109,6 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                     10, 10, "^") {
         override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
           selectionFlow.pageBackward()
-          refreshPageLabelText()
           true
         } else false
 
@@ -121,7 +120,6 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                     10, 10, "v") {
         override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
           selectionFlow.pageForward()
-          refreshPageLabelText()
           true
         } else false
 
@@ -164,5 +162,10 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
     val k = (width - xSize) / 2
     val l = (height - ySize) / 2
     drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
+  }
+
+  override def renderUpdate(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
+    refreshPageLabelText()
+    super.renderUpdate(screenX, screenY, mouseX, mouseY, partialTicks)
   }
 }
