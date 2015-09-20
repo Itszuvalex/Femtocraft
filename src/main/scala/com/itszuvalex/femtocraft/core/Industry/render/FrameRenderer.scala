@@ -55,7 +55,7 @@ object FrameRenderer {
 
     GL11.glPushMatrix()
     GL11.glTranslated(x + dx, y + dy, z + dz)
-    GL11.glDisable(GL11.GL_LIGHTING)
+//    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
     GL11.glColor4f(1f, 1f, 1f, 1f)
@@ -69,7 +69,7 @@ object FrameRenderer {
     GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - 16 * math.min(16f, targetTime - time)).toByte)
     model.renderPart("Stage" + (if (currentPart < 10) "0" else "") + currentPart)
 
-    GL11.glEnable(GL11.GL_LIGHTING)
+//    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 

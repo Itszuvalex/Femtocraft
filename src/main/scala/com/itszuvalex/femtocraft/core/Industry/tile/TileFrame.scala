@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.core.Industry.tile
 import java.util.Random
 
 import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.{Resources, FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.InventoryUtils
@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.util.ForgeDirection
+import org.apache.logging.log4j.Level
 
 /**
  * Created by Christopher on 8/29/2015.
@@ -20,7 +21,8 @@ object TileFrame {
   val MULTIBLOCK_KEY      = "Multiblock"
   val PROGRESS_KEY        = "BuildProgress"
 
-  var shouldDrop = true
+  var shouldDrop        = true
+  var shouldFullyRemove = true
 
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
@@ -48,27 +50,27 @@ object TileFrame {
     val MaxY = sizeY - 1
     val MaxZ = sizeZ - 1
     (locX, locY, locZ) match {
-      case (0, 0, 0) => setRenderMarks(true, 0, 4, 8, 11, 12, 16, 17, 19)
-      case (`MaxX`, 0, 0) => setRenderMarks(true, 0, 5, 8, 9, 13, 16, 17, 18)
-      case (0, `MaxY`, 0) => setRenderMarks(true, 0, 0, 3, 4, 12, 13, 15, 16)
-      case (0, 0, `MaxZ`) => setRenderMarks(true, 0, 7, 10, 11, 15, 16, 18, 19)
-      case (`MaxX`, `MaxY`, 0) => setRenderMarks(true, 0, 0, 1, 5, 12, 13, 14, 17)
-      case (0, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 3, 7, 12, 14, 15, 19)
-      case (`MaxX`, 0, `MaxZ`) => setRenderMarks(true, 0, 6, 9, 10, 14, 17, 18, 19)
+      case (0, 0, 0)                => setRenderMarks(true, 0, 4, 8, 11, 12, 16, 17, 19)
+      case (`MaxX`, 0, 0)           => setRenderMarks(true, 0, 5, 8, 9, 13, 16, 17, 18)
+      case (0, `MaxY`, 0)           => setRenderMarks(true, 0, 0, 3, 4, 12, 13, 15, 16)
+      case (0, 0, `MaxZ`)           => setRenderMarks(true, 0, 7, 10, 11, 15, 16, 18, 19)
+      case (`MaxX`, `MaxY`, 0)      => setRenderMarks(true, 0, 0, 1, 5, 12, 13, 14, 17)
+      case (0, `MaxY`, `MaxZ`)      => setRenderMarks(true, 0, 2, 3, 7, 12, 14, 15, 19)
+      case (`MaxX`, 0, `MaxZ`)      => setRenderMarks(true, 0, 6, 9, 10, 14, 17, 18, 19)
       case (`MaxX`, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 1, 2, 6, 13, 14, 15, 18)
-      case (0, 0, _) => setRenderMarks(true, 0, 11, 16, 19)
-      case (0, `MaxY`, _) => setRenderMarks(true, 0, 3, 12, 15)
-      case (`MaxX`, 0, _) => setRenderMarks(true, 0, 9, 17, 18)
-      case (`MaxX`, `MaxY`, _) => setRenderMarks(true, 0, 1, 13, 14)
-      case (0, _, 0) => setRenderMarks(true, 0, 4, 12, 16)
-      case (0, _, `MaxZ`) => setRenderMarks(true, 0, 7, 15, 19)
-      case (`MaxX`, _, 0) => setRenderMarks(true, 0, 5, 13, 17)
-      case (`MaxX`, _, `MaxZ`) => setRenderMarks(true, 0, 6, 14, 18)
-      case (_, 0, 0) => setRenderMarks(true, 0, 8, 16, 17)
-      case (_, 0, `MaxZ`) => setRenderMarks(true, 0, 10, 18, 19)
-      case (_, `MaxY`, 0) => setRenderMarks(true, 0, 0, 12, 13)
-      case (_, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 14, 15)
-      case _ => fullRender(false)
+      case (0, 0, _)                => setRenderMarks(true, 0, 11, 16, 19)
+      case (0, `MaxY`, _)           => setRenderMarks(true, 0, 3, 12, 15)
+      case (`MaxX`, 0, _)           => setRenderMarks(true, 0, 9, 17, 18)
+      case (`MaxX`, `MaxY`, _)      => setRenderMarks(true, 0, 1, 13, 14)
+      case (0, _, 0)                => setRenderMarks(true, 0, 4, 12, 16)
+      case (0, _, `MaxZ`)           => setRenderMarks(true, 0, 7, 15, 19)
+      case (`MaxX`, _, 0)           => setRenderMarks(true, 0, 5, 13, 17)
+      case (`MaxX`, _, `MaxZ`)      => setRenderMarks(true, 0, 6, 14, 18)
+      case (_, 0, 0)                => setRenderMarks(true, 0, 8, 16, 17)
+      case (_, 0, `MaxZ`)           => setRenderMarks(true, 0, 10, 18, 19)
+      case (_, `MaxY`, 0)           => setRenderMarks(true, 0, 0, 12, 13)
+      case (_, `MaxY`, `MaxZ`)      => setRenderMarks(true, 0, 2, 14, 15)
+      case _                        => fullRender(false)
     }
   }
 
@@ -79,14 +81,14 @@ object TileFrame {
 }
 
 class TileFrame() extends TileEntityBase with MultiBlockComponent {
-  var renderInt          = TileFrame.fullRender(true)
-  var multiBlock: String = null
-  var progress: Int = 0
-  var inProgressCurrentRenderedPart: Int = 0
-  var inProgressModelLoc: ResourceLocation = null
-  var inProgressTexLoc: ResourceLocation = null
-  var inProgressPartDelay: Int = 100
-  var inProgressNextTargetTime: Float = 0
+  var renderInt                                       = TileFrame.fullRender(true)
+  var multiBlock                   : String           = null
+  var progress                     : Int              = 0
+  var inProgressCurrentRenderedPart: Int              = 0
+  var inProgressModelLoc           : ResourceLocation = null
+  var inProgressTexLoc             : ResourceLocation = null
+  var inProgressPartDelay          : Int              = 100
+  var inProgressNextTargetTime     : Float            = 0
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
@@ -109,18 +111,33 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
 
   }
 
-  override def updateEntity(): Unit = {
-    super.updateEntity()
-    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressNextTargetTime) /* Replace frame multiblock with actual machine */ Femtocraft.logger.info("Machine built!")
+  override def serverUpdate(): Unit = {
+    super.serverUpdate()
+    if (!isController) return
+    if (getWorldObj.getTotalWorldTime % 10 == 0 && progress < 100) {
+      progress += 1
+      setUpdate()
+    }
+    if (progress >= 100 && getWorldObj.getTotalWorldTime >= inProgressNextTargetTime) {
+      FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+        case Some(multi) =>
+          TileFrame.shouldDrop = false
+          TileFrame.shouldFullyRemove = false
+          multi.formAtLocation(getWorldObj, xCoord, yCoord, zCoord)
+          TileFrame.shouldFullyRemove = true
+          TileFrame.shouldDrop = true
+        case _           =>
+      }
+    }
   }
 
   override def clientUpdate(): Unit = {
     super.clientUpdate()
+    if (!isController) return
     if (multiBlock == null) return
-    if (worldObj.getTotalWorldTime % 10 == 0 && progress < 100) progress += 1
     val lastPart = inProgressCurrentRenderedPart
     renderInProgressMachine(math.ceil(progress / 10d).toInt, multiBlock.toLowerCase + "/" + multiBlock + " In-Progress.obj", multiBlock.toLowerCase + "/" + multiBlock + " In-Progress.png", 100)
-    if (lastPart != inProgressCurrentRenderedPart) inProgressNextTargetTime = worldObj.getTotalWorldTime + inProgressPartDelay
+    if (lastPart != inProgressCurrentRenderedPart) inProgressNextTargetTime = getWorldObj.getTotalWorldTime + inProgressPartDelay
   }
 
   def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)
@@ -161,25 +178,26 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
     multiBlock = compound.getString(TileFrame.MULTIBLOCK_KEY)
     if (multiBlock == "") multiBlock = null
     progress = compound.getInteger(TileFrame.PROGRESS_KEY)
+    setRenderUpdate()
   }
 
 
   def onBlockBreak(): Unit = {
     if (getWorldObj.isRemote) return
 
-    if (isController) {
+    if (isController && TileFrame.shouldFullyRemove) {
       FrameMultiblockRegistry.getMultiblock(multiBlock) match {
         case Some(multi) =>
           multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
             getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
             if (TileFrame.shouldDrop) InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, new Random)
                                                                                }
-        case _ =>
+        case _           =>
       }
     }
     else getWorldObj.getTileEntity(info.x, info.y, info.z) match {
       case frame: TileFrame => getWorldObj.setBlockToAir(info.x, info.y, info.z)
-      case _ =>
+      case _                =>
     }
   }
 }

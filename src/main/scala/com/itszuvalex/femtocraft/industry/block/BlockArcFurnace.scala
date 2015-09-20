@@ -11,4 +11,10 @@ import net.minecraft.world.World
  */
 class BlockArcFurnace extends TileContainer(Material.iron) {
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileArcFurnace
+
+  override def isOpaqueCube: Boolean = false
+
+  override def renderAsNormalBlock(): Boolean = false
+
+  override def getRenderBlockPass: Int = -1
 }

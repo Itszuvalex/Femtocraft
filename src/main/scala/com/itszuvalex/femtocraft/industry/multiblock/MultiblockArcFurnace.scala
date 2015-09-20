@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.core.IFrameMultiblock
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.multiblock.IMultiBlockComponent
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -27,8 +28,14 @@ class MultiblockArcFurnace extends IFrameMultiblock {
                                                                                     }.toSet
 
 
-  override def formAtLocation(world: World, x: Int, y: Int, z: Int) =
-    getTakenLocations(world, x, y, z).forall(loc => world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockArcFurnace))
+  override def formAtLocation(world: World, x: Int, y: Int, z: Int) = {
+    val locations = getTakenLocations(world, x, y, z)
+    if (locations.forall(loc => world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockArcFurnace))) {
+      locations.flatMap(_.getTileEntity(true)).collect { case n: IMultiBlockComponent => n }.map(_.formMultiBlock(world, x, y, z))
+      true
+    }
+    else false
+  }
 
   override def getName = "Arc Furnace"
 

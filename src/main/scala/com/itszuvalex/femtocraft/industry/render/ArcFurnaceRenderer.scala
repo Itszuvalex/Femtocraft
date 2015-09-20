@@ -58,6 +58,7 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblock
   override def renderAtLocation(rx: Double, ry: Double, rz: Double): Unit = {
     GL11.glPushMatrix()
     GL11.glTranslated(rx + 1, ry, rz + 1)
+    GL11.glColor3f(1, 1, 1)
     Minecraft.getMinecraft.getTextureManager.bindTexture(ArcFurnaceRenderer.textureLoc)
     model.renderAll()
     GL11.glPopMatrix()
