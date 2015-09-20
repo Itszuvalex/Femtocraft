@@ -8,7 +8,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.common.util.ForgeDirection
-import net.minecraftforge.fluids.{Fluid, FluidTank, IFluidTank}
+import net.minecraftforge.fluids.{Fluid, FluidTank}
 
 /**
  * Created by Christopher Harris (Itszuvalex) on 8/28/15.
@@ -24,13 +24,13 @@ import net.minecraftforge.fluids.{Fluid, FluidTank, IFluidTank}
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(1)
 
-  override def defaultTank: IFluidTank = new FluidTank(TileArcFurnace.FLUID_TANK_SIZE)
+  override def defaultTank: FluidTank = new FluidTank(TileArcFurnace.FLUID_TANK_SIZE)
 
   override def canFill(from: ForgeDirection, fluid: Fluid) = false
 
   override def canDrain(from: ForgeDirection, fluid: Fluid) = isValidMultiBlock
 
-  override def hasGUI = /*isValidMultiBlock*/ true
+  override def hasGUI = isValidMultiBlock
 
   override def getGuiID = GuiIDs.ArcFurnaceGuiID
 

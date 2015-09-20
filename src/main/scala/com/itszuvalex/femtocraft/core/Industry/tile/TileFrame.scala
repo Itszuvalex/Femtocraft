@@ -11,7 +11,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.util.ForgeDirection
-import org.apache.logging.log4j.Level
 
 /**
  * Created by Christopher on 8/29/2015.
@@ -148,7 +147,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
 
   override def getMod: AnyRef = Femtocraft
 
-  override def hasDescription: Boolean = true
+  override def hasDescription: Boolean = isValidMultiBlock
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
@@ -185,19 +184,21 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
   def onBlockBreak(): Unit = {
     if (getWorldObj.isRemote) return
 
-    if (isController && TileFrame.shouldFullyRemove) {
-      FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-        case Some(multi) =>
-          multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
-            getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
-            if (TileFrame.shouldDrop) InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, new Random)
-                                                                               }
-        case _           =>
+    if (TileFrame.shouldFullyRemove) {
+      if (isController) {
+        FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+          case Some(multi) =>
+            multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
+              getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
+              if (TileFrame.shouldDrop) InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, new Random)
+                                                                                 }
+          case _           =>
+        }
       }
-    }
-    else getWorldObj.getTileEntity(info.x, info.y, info.z) match {
-      case frame: TileFrame => getWorldObj.setBlockToAir(info.x, info.y, info.z)
-      case _                =>
+      else getWorldObj.getTileEntity(info.x, info.y, info.z) match {
+        case frame: TileFrame => getWorldObj.setBlockToAir(info.x, info.y, info.z)
+        case _                =>
+      }
     }
   }
 }
