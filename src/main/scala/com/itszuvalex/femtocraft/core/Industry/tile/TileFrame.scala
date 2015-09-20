@@ -3,12 +3,13 @@ package com.itszuvalex.femtocraft.core.Industry.tile
 import java.util.Random
 
 import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{Resources, FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.util.ForgeDirection
 
 /**
@@ -17,6 +18,7 @@ import net.minecraftforge.common.util.ForgeDirection
 object TileFrame {
   val RENDER_SETTINGS_KEY = "RenderSettings"
   val MULTIBLOCK_KEY      = "Multiblock"
+  val PROGRESS_KEY        = "BuildProgress"
 
   var shouldDrop = true
 
@@ -76,18 +78,49 @@ object TileFrame {
 
 }
 
-// "values" are all objects in that category, clockwise, starting from north/northwest (Boolean: render or not)
-// Parameter:[Edges:[Top[values], Middle:[values], Bottom:[values]], Corners:[Top:[values], Bottom:[values]]]
 class TileFrame() extends TileEntityBase with MultiBlockComponent {
   var renderInt          = TileFrame.fullRender(true)
   var multiBlock: String = null
+  var progress: Int = 0
+  var inProgressCurrentRenderedPart: Int = 0
+  var inProgressModelLoc: ResourceLocation = null
+  var inProgressTexLoc: ResourceLocation = null
+  var inProgressPartDelay: Int = 100
+  var inProgressNextTargetTime: Float = 0
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
   }
 
+  /**
+   * Sets the correct variables for the frame renderer to render the in-progress machine model.
+   * @param currentRenderedPart Number of the last (or currently) rendered part of the machine.
+   * @param modelLoc Location of the model in the "_in-progress" folder. Example: "arc furnace/Arc Furnace In-Progress.obj"
+   * @param texLoc Location of the texture in the "_in-progress" folder. Example: "arc furnace/Arc Furnace In-Progress.png"
+   */
+  def renderInProgressMachine(currentRenderedPart: Int, modelLoc: String, texLoc: String, partDelay: Int): Unit = {
+    inProgressCurrentRenderedPart = currentRenderedPart
+    if (inProgressModelLoc == null) inProgressModelLoc = Resources.Model("_in-progress/" + modelLoc)
+    if (inProgressTexLoc == null) inProgressTexLoc = Resources.Model("_in-progress/" + texLoc)
+    inProgressPartDelay = partDelay
+  }
+
   def calculateRendering(connectedDirs: Array[ForgeDirection]): Unit = {
 
+  }
+
+  override def updateEntity(): Unit = {
+    super.updateEntity()
+    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressNextTargetTime) /* Replace frame multiblock with actual machine */ Femtocraft.logger.info("Machine built!")
+  }
+
+  override def clientUpdate(): Unit = {
+    super.clientUpdate()
+    if (multiBlock == null) return
+    if (worldObj.getTotalWorldTime % 10 == 0 && progress < 100) progress += 1
+    val lastPart = inProgressCurrentRenderedPart
+    renderInProgressMachine(math.ceil(progress / 10d).toInt, multiBlock.toLowerCase + "/" + multiBlock + " In-Progress.obj", multiBlock.toLowerCase + "/" + multiBlock + " In-Progress.png", 100)
+    if (lastPart != inProgressCurrentRenderedPart) inProgressNextTargetTime = worldObj.getTotalWorldTime + inProgressPartDelay
   }
 
   def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)
@@ -103,23 +136,31 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
-    compound.setString(TileFrame.MULTIBLOCK_KEY, multiBlock)
+    compound.setString(TileFrame.MULTIBLOCK_KEY, if (multiBlock != null) multiBlock else "")
+    compound.setInteger(TileFrame.PROGRESS_KEY, progress)
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     renderInt = compound.getInteger(TileFrame.RENDER_SETTINGS_KEY)
     multiBlock = compound.getString(TileFrame.MULTIBLOCK_KEY)
+    if (multiBlock == "") multiBlock = null
+    progress = compound.getInteger(TileFrame.PROGRESS_KEY)
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
+    compound.setString(TileFrame.MULTIBLOCK_KEY, if (multiBlock != null) multiBlock else "")
+    compound.setInteger(TileFrame.PROGRESS_KEY, progress)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     renderInt = compound.getInteger(TileFrame.RENDER_SETTINGS_KEY)
+    multiBlock = compound.getString(TileFrame.MULTIBLOCK_KEY)
+    if (multiBlock == "") multiBlock = null
+    progress = compound.getInteger(TileFrame.PROGRESS_KEY)
   }
 
 

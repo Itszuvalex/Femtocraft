@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
@@ -47,6 +48,31 @@ object FrameRenderer {
     GL11.glPopMatrix()
   }
 
+  def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, worldTime: Float,
+                         currentPart: Int, modelLoc: ResourceLocation, texLoc: ResourceLocation, targetTime: Float): Unit = {
+    val model = AdvancedModelLoader.loadModel(modelLoc).asInstanceOf[WavefrontObject]
+    Minecraft.getMinecraft.getTextureManager.bindTexture(texLoc)
+
+    GL11.glPushMatrix()
+    GL11.glTranslated(x + dx, y + dy, z + dz)
+    GL11.glDisable(GL11.GL_LIGHTING)
+    GL11.glEnable(GL11.GL_BLEND)
+    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+    GL11.glColor4f(1f, 1f, 1f, 1f)
+
+    if (currentPart > 1) {
+      for (i <- 1 until currentPart) {
+        model.renderPart("Stage" + (if (i < 10) "0" else "") + i)
+      }
+    }
+    val time = worldTime + partialTime
+    GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - 16 * math.min(16f, targetTime - time)).toByte)
+    model.renderPart("Stage" + (if (currentPart < 10) "0" else "") + currentPart)
+
+    GL11.glEnable(GL11.GL_LIGHTING)
+    GL11.glPopMatrix()
+  }
+
 }
 
 class FrameRenderer extends TileEntitySpecialRenderer {
@@ -63,6 +89,20 @@ class FrameRenderer extends TileEntitySpecialRenderer {
                                                             } yield (a, b, c)
                                                           }.toSet
                                    )
+        //TODO: Replace hardcoded offset values with automatic assignment by multiblock size and controller position
+        if (frame.inProgressCurrentRenderedPart > 0 && frame.isController) {
+          FrameRenderer.renderInProgressAt(x, y, z,
+                                            1d,
+                                            0d,
+                                            1d,
+                                            partialTime,
+                                            frame.getWorldObj.getTotalWorldTime.toFloat,
+                                            frame.inProgressCurrentRenderedPart,
+                                            frame.inProgressModelLoc,
+                                            frame.inProgressTexLoc,
+                                            frame.inProgressNextTargetTime
+                                          )
+        }
 
       case _ =>
     }
