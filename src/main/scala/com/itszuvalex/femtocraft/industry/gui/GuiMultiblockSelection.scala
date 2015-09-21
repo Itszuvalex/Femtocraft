@@ -88,7 +88,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                             val selectors = multis.map(new GuiMultiblockSelector(this, _))
                             selectors.find(_.multi.getName.equalsIgnoreCase(frame.getSelectedMultiblock(is))) match {
                               case Some(g) => selectMultiblock(g)
-                              case None    =>
+                              case None    => clearSelection()
                             }
                             selectors.toSeq
                         }

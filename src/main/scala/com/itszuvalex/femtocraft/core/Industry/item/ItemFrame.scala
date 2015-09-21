@@ -11,6 +11,7 @@ import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 
@@ -23,7 +24,7 @@ object ItemFrame {
 
   def getSelection(stack: ItemStack): String = {
     if (stack != null) {
-      if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound()
+      if (stack.getTagCompound == null) return null
       stack.getTagCompound.NBTCompound(FRAME_COMPOUND) { comp =>
         return comp.String(SELECTION_TAG)
                                                        }
@@ -33,7 +34,7 @@ object ItemFrame {
 
   def setSelection(stack: ItemStack, name: String) = {
     if (stack != null) {
-      if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound()
+      if (stack.getTagCompound == null) stack.stackTagCompound = new NBTTagCompound()
       stack.getTagCompound()(
                               FRAME_COMPOUND -> NBTCompound(
                                                              SELECTION_TAG -> name
@@ -58,8 +59,10 @@ class ItemFrame extends Item with IFrameItem {
   override def onItemRightClick(item: ItemStack, world: World, player: EntityPlayer): ItemStack = {
     if (player.isSneaking) {
       player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+      item
     }
-    super.onItemRightClick(item, world, player)
+    else
+      super.onItemRightClick(item, world, player)
   }
 
 
@@ -74,7 +77,8 @@ class ItemFrame extends Item with IFrameItem {
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     if (player.isSneaking) {
-      return false
+      player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+      return true
     }
     val multiString = getSelectedMultiblock(itemStack)
     if (multiString == null || multiString.isEmpty) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)

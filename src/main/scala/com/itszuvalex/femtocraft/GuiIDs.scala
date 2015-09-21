@@ -19,4 +19,5 @@ object GuiIDs {
   val Cubic3DCraftingGuiID         = nextID
   val NaniteHiveGuiID              = nextID
   val FrameMultiblockSelectorGuiID = nextID
+  val FrameMultiblockGuiID         = nextID
 }

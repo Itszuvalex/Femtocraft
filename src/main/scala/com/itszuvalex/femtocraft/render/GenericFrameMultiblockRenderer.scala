@@ -73,4 +73,10 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
    */
   override def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit = {
   }
+
+  /**
+   *
+   * @return Bounding box for rendering.  (X, Y, Z) (Length, Height, Width)
+   */
+  override def boundingBox: (Int, Int, Int) = (2, 2, 2)
 }

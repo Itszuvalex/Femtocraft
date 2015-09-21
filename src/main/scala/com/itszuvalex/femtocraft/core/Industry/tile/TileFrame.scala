@@ -3,10 +3,13 @@ package com.itszuvalex.femtocraft.core.Industry.tile
 import java.util.Random
 
 import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, Resources}
+import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.InventoryUtils
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
@@ -79,7 +82,7 @@ object TileFrame {
 
 }
 
-class TileFrame() extends TileEntityBase with MultiBlockComponent {
+class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory {
   var renderInt                                       = TileFrame.fullRender(true)
   var multiBlock                   : String           = null
   var progress                     : Int              = 0
@@ -201,4 +204,47 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent {
       }
     }
   }
+
+
+  override def hasGUI: Boolean = isValidMultiBlock
+
+  override def getGuiID: Int = GuiIDs.FrameMultiblockGuiID
+
+  override def defaultInventory: IndexedInventory = new IndexedInventory(9)
+
+  override def decrStackSize(p_70298_1_ : Int, p_70298_2_ : Int): ItemStack =
+    if (isController) indInventory.decrStackSize(p_70298_1_, p_70298_2_) else forwardToDifferentController[ItemStack, TileFrame](_.decrStackSize(p_70298_1_, p_70298_2_))
+
+  override def closeInventory(): Unit =
+    if (isController) indInventory.closeInventory() else forwardToController(_.closeInventory())
+
+  override def getSizeInventory: Int =
+    if (isController) indInventory.getSizeInventory else forwardToController(_.getSizeInventory)
+
+  override def getInventoryStackLimit: Int =
+    if (isController) indInventory.getInventoryStackLimit else forwardToController(_.getInventoryStackLimit)
+
+  override def isItemValidForSlot(p_94041_1_ : Int, p_94041_2_ : ItemStack): Boolean =
+    if (isController) indInventory.isItemValidForSlot(p_94041_1_, p_94041_2_) else forwardToController(_.isItemValidForSlot(p_94041_1_, p_94041_2_))
+
+  override def getStackInSlotOnClosing(p_70304_1_ : Int): ItemStack =
+    if (isController) indInventory.getStackInSlotOnClosing(p_70304_1_) else forwardToController(_.getStackInSlotOnClosing(p_70304_1_))
+
+  override def openInventory(): Unit =
+    if (isController) indInventory.openInventory() else forwardToController(_.openInventory())
+
+  override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit =
+    if (isController) indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_) else forwardToController(_.setInventorySlotContents(p_70299_1_, p_70299_2_))
+
+  override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean =
+    if (isController) indInventory.isUseableByPlayer(p_70300_1_) else forwardToController(_.isUseableByPlayer(p_70300_1_))
+
+  override def getStackInSlot(p_70301_1_ : Int): ItemStack =
+    if (isController) indInventory.getStackInSlot(p_70301_1_) else forwardToController(_.getStackInSlot(p_70301_1_))
+
+  override def hasCustomInventoryName: Boolean =
+    if (isController) indInventory.hasCustomInventoryName else forwardToController(_.hasCustomInventoryName)
+
+  override def getInventoryName: String =
+    if (isController) indInventory.getInventoryName else forwardToController(_.getInventoryName)
 }

@@ -25,7 +25,7 @@ object FrameRenderer {
   def renderFrameAt(x: Double, y: Double, z: Double, partialTime: Float, marks: Set[(Int, Int, Int)]): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(frameTexLocation)
     GL11.glPushMatrix()
-//    GL11.glDisable(GL11.GL_LIGHTING)
+    //    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
@@ -37,25 +37,28 @@ object FrameRenderer {
                                case (_, 0, _) => "T"
                                case (0, 2, _) => "B"
                                case (1, 1, _) => "B"
-                               case _ => ""
+                               case _         => ""
                              })
                              + (if (a == 0 && b != 1) sidemap1 else sidemap2)(c)
                            )
                   }
 
     GL11.glEnable(GL11.GL_BLEND)
-//    GL11.glEnable(GL11.GL_LIGHTING)
+    //    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 
   def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, worldTime: Float,
                          currentPart: Int, modelLoc: ResourceLocation, texLoc: ResourceLocation, targetTime: Float): Unit = {
-    val model = AdvancedModelLoader.loadModel(modelLoc).asInstanceOf[WavefrontObject]
+    var model: WavefrontObject = null
+    try {
+      model = AdvancedModelLoader.loadModel(modelLoc).asInstanceOf[WavefrontObject]
+    } catch {case e: Exception => return}
     Minecraft.getMinecraft.getTextureManager.bindTexture(texLoc)
 
     GL11.glPushMatrix()
     GL11.glTranslated(x + dx, y + dy, z + dz)
-//    GL11.glDisable(GL11.GL_LIGHTING)
+    //    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
     GL11.glColor4f(1f, 1f, 1f, 1f)
@@ -69,7 +72,7 @@ object FrameRenderer {
     GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - 16 * math.min(16f, targetTime - time)).toByte)
     model.renderPart("Stage" + (if (currentPart < 10) "0" else "") + currentPart)
 
-//    GL11.glEnable(GL11.GL_LIGHTING)
+    //    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 
@@ -92,15 +95,15 @@ class FrameRenderer extends TileEntitySpecialRenderer {
         //TODO: Replace hardcoded offset values with automatic assignment by multiblock size and controller position
         if (frame.inProgressCurrentRenderedPart > 0 && frame.isController) {
           FrameRenderer.renderInProgressAt(x, y, z,
-                                            1d,
-                                            0d,
-                                            1d,
-                                            partialTime,
-                                            frame.getWorldObj.getTotalWorldTime.toFloat,
-                                            frame.inProgressCurrentRenderedPart,
-                                            frame.inProgressModelLoc,
-                                            frame.inProgressTexLoc,
-                                            frame.inProgressNextTargetTime
+                                           1d,
+                                           0d,
+                                           1d,
+                                           partialTime,
+                                           frame.getWorldObj.getTotalWorldTime.toFloat,
+                                           frame.inProgressCurrentRenderedPart,
+                                           frame.inProgressModelLoc,
+                                           frame.inProgressTexLoc,
+                                           frame.inProgressNextTargetTime
                                           )
         }
 

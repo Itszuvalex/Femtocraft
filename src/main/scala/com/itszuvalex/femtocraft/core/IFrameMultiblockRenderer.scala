@@ -42,4 +42,10 @@ trait IFrameMultiblockRenderer {
    * @param rz
    */
   def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit
+
+  /**
+   *
+   * @return Bounding box for rendering.  (X, Y, Z) (Length, Height, Width)
+   */
+  def boundingBox: (Int, Int, Int)
 }
