@@ -13,7 +13,7 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
 
   (0 until 9).foreach { i =>
-    addSlotToContainer(new Slot(tile, i, 7 + 18 * i, 62))
+    addSlotToContainer(new Slot(tile, i, 8 + 18 * i, 62))
                       }
 
   addPlayerInventorySlots(inv)

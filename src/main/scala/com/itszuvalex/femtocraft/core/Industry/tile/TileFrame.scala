@@ -210,6 +210,14 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   }
 
 
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+    if (hasGUI) {
+      par5EntityPlayer.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
+      true
+    }
+    else false
+  }
+
   override def hasGUI: Boolean = isValidMultiBlock
 
   override def getGuiID: Int = GuiIDs.FrameMultiblockGuiID
