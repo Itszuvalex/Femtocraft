@@ -189,14 +189,18 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
     if (TileFrame.shouldFullyRemove) {
       if (isController) {
+        val random = new Random
         FrameMultiblockRegistry.getMultiblock(multiBlock) match {
           case Some(multi) =>
             multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
               getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
-              if (TileFrame.shouldDrop) InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, new Random)
+              if (TileFrame.shouldDrop) {
+                InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, random)
+              }
                                                                                  }
           case _           =>
         }
+        indInventory.getInventory.foreach {InventoryUtils.dropItem(_, getWorldObj, xCoord, yCoord, zCoord, random)}
       }
       else getWorldObj.getTileEntity(info.x, info.y, info.z) match {
         case frame: TileFrame => getWorldObj.setBlockToAir(info.x, info.y, info.z)
@@ -212,39 +216,39 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 
-  override def decrStackSize(p_70298_1_ : Int, p_70298_2_ : Int): ItemStack =
-    if (isController) indInventory.decrStackSize(p_70298_1_, p_70298_2_) else forwardToDifferentController[ItemStack, TileFrame](_.decrStackSize(p_70298_1_, p_70298_2_))
+  override def decrStackSize(slot: Int, amt: Int): ItemStack =
+    if (isController) indInventory.decrStackSize(slot, amt) else forwardToController[TileFrame, ItemStack](_.decrStackSize(slot, amt))
 
   override def closeInventory(): Unit =
-    if (isController) indInventory.closeInventory() else forwardToController(_.closeInventory())
+    if (isController) indInventory.closeInventory() else forwardToController[TileFrame, Unit](_.closeInventory())
 
   override def getSizeInventory: Int =
-    if (isController) indInventory.getSizeInventory else forwardToController(_.getSizeInventory)
+    if (isController) indInventory.getSizeInventory else forwardToController[TileFrame, Int](_.getSizeInventory)
 
   override def getInventoryStackLimit: Int =
-    if (isController) indInventory.getInventoryStackLimit else forwardToController(_.getInventoryStackLimit)
+    if (isController) indInventory.getInventoryStackLimit else forwardToController[TileFrame, Int](_.getInventoryStackLimit)
 
-  override def isItemValidForSlot(p_94041_1_ : Int, p_94041_2_ : ItemStack): Boolean =
-    if (isController) indInventory.isItemValidForSlot(p_94041_1_, p_94041_2_) else forwardToController(_.isItemValidForSlot(p_94041_1_, p_94041_2_))
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean =
+    if (isController) indInventory.isItemValidForSlot(slot, item) else forwardToController[TileFrame, Boolean](_.isItemValidForSlot(slot, item))
 
-  override def getStackInSlotOnClosing(p_70304_1_ : Int): ItemStack =
-    if (isController) indInventory.getStackInSlotOnClosing(p_70304_1_) else forwardToController(_.getStackInSlotOnClosing(p_70304_1_))
+  override def getStackInSlotOnClosing(slot: Int): ItemStack =
+    if (isController) indInventory.getStackInSlotOnClosing(slot) else forwardToController[TileFrame, ItemStack](_.getStackInSlotOnClosing(slot))
 
   override def openInventory(): Unit =
-    if (isController) indInventory.openInventory() else forwardToController(_.openInventory())
+    if (isController) indInventory.openInventory() else forwardToController[TileFrame, Unit](_.openInventory())
 
-  override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit =
-    if (isController) indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_) else forwardToController(_.setInventorySlotContents(p_70299_1_, p_70299_2_))
+  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit =
+    if (isController) indInventory.setInventorySlotContents(slot, item) else forwardToController[TileFrame, Unit](_.setInventorySlotContents(slot, item))
 
-  override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean =
-    if (isController) indInventory.isUseableByPlayer(p_70300_1_) else forwardToController(_.isUseableByPlayer(p_70300_1_))
+  override def isUseableByPlayer(player: EntityPlayer): Boolean =
+    if (isController) indInventory.isUseableByPlayer(player) else forwardToController[TileFrame, Boolean](_.isUseableByPlayer(player))
 
-  override def getStackInSlot(p_70301_1_ : Int): ItemStack =
-    if (isController) indInventory.getStackInSlot(p_70301_1_) else forwardToController(_.getStackInSlot(p_70301_1_))
+  override def getStackInSlot(slot: Int): ItemStack =
+    if (isController) indInventory.getStackInSlot(slot) else forwardToController[TileFrame, ItemStack](_.getStackInSlot(slot))
 
   override def hasCustomInventoryName: Boolean =
-    if (isController) indInventory.hasCustomInventoryName else forwardToController(_.hasCustomInventoryName)
+    if (isController) indInventory.hasCustomInventoryName else forwardToController[TileFrame, Boolean](_.hasCustomInventoryName)
 
   override def getInventoryName: String =
-    if (isController) indInventory.getInventoryName else forwardToController(_.getInventoryName)
+    if (isController) indInventory.getInventoryName else forwardToController[TileFrame, String](_.getInventoryName)
 }

@@ -12,7 +12,7 @@ class MessageMultiblockSelection(var multi: String) extends IMessage with IMessa
 
   override def toBytes(buf: ByteBuf): Unit = {
     buf.writeInt(if (multi == null || multi.isEmpty) 0 else multi.length)
-    buf.writeBytes(multi.getBytes)
+    if (multi != null && !multi.isEmpty) buf.writeBytes(multi.getBytes)
   }
 
   override def fromBytes(buf: ByteBuf): Unit = {
@@ -28,14 +28,15 @@ class MessageMultiblockSelection(var multi: String) extends IMessage with IMessa
   override def onMessage(message: MessageMultiblockSelection, ctx: MessageContext): IMessage = {
     val player = ctx.getServerHandler.playerEntity
     player.getHeldItem match {
+      case null  =>
       case stack =>
         stack.getItem match {
+          case null             =>
           case item: IFrameItem =>
             item.setSelectedMultiblock(stack, message.multi)
             player.inventory.markDirty()
           case _                =>
         }
-      case _     =>
     }
     null
   }

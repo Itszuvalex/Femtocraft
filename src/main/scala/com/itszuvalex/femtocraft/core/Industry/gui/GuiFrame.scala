@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.core.Industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
 
@@ -17,9 +18,9 @@ object GuiFrame {
 
 class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrame(player, inv, tile)) {
 
-//  add(
-//       (0 until 9).map(i => new GuiItemStack(7 + 18 * i, 62, null)): _*
-//     )
+  add(
+       (0 until 9).map(i => new GuiItemStack(7 + 18 * i, 61, null)): _*
+     )
 
 
   override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
@@ -28,5 +29,6 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
     val k = (width - xSize) / 2
     val l = (height - ySize) / 2
     drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
+    RenderHelper.enableGUIStandardItemLighting()
   }
 }
