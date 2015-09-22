@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.model.AdvancedModelLoader
+import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
@@ -17,6 +18,8 @@ import org.lwjgl.opengl.GL11
 object ArcFurnaceRenderer {
   val modelLoc   = Resources.Model("arc furnace/Arc Furnace.obj")
   val textureLoc = Resources.Model("arc furnace/Arc Furnace Template.png")
+  val inProgressModelLoc = Resources.Model("_in-progress/arc furnace/Arc Furnace In-Progress.obj")
+  val inProgressTexLoc = Resources.Model("_in-progress/arc furnace/Arc Furnace In-Progress.png")
 }
 
 
@@ -30,6 +33,10 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblock
       case _                                               =>
     }
   }
+
+  override val previewModel = AdvancedModelLoader.loadModel(ArcFurnaceRenderer.inProgressModelLoc).asInstanceOf[WavefrontObject]
+
+  override val previewTexture = ArcFurnaceRenderer.inProgressTexLoc
 
   /**
    * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.

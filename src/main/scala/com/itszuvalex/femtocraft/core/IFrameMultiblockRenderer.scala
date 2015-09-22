@@ -2,7 +2,9 @@ package com.itszuvalex.femtocraft.core
 
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
+import net.minecraftforge.client.model.obj.WavefrontObject
 
 /**
  * Created by Christopher on 8/26/2015.
@@ -23,6 +25,16 @@ trait IFrameMultiblockRenderer {
    */
   def previewRenderAtWorldLocation(stack: ItemStack, world: World, x: Int, y: Int, z: Int,
                                    rx: Double, ry: Double, rz: Double): Unit
+
+  /**
+   * In-Progress model of the multiblock.
+   */
+  val previewModel: WavefrontObject
+
+  /**
+   * In-Progress model texture of the multiblock.
+   */
+  val previewTexture: ResourceLocation
 
   /**
    * Coordinates to render at.  This is for things like generic menu rendering, etc.

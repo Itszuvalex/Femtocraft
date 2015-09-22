@@ -103,8 +103,8 @@ class ItemFrame extends Item with IFrameItem {
     if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
 
     val locations = multi.getTakenLocations(world, bx, by, bz)
-    if (itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    else itemStack.stackSize -= multi.numFrames
+    if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
 
     val xWidth = 2
     val yHeight = 3
