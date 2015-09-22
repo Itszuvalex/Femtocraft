@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.render
 
+import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.core.{IFrameMultiblock, IFrameMultiblockRenderer}
 import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.client.renderer.Tessellator
@@ -13,9 +14,6 @@ import org.lwjgl.opengl.GL11
  */
 class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
   var multi: IFrameMultiblock = null
-
-  override val previewModel = null
-  override val previewTexture = null
 
   /**
    * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
@@ -53,6 +51,25 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     Tessellator.instance.draw()
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
+  }
+
+
+  /**
+   * Render function for machine in-progress rendering.
+   *
+   * @param x xPos to render at
+   * @param y yPos to render at
+   * @param z zPos to render at
+   * @param dx x offset
+   * @param dy y offset
+   * @param dz z offset
+   * @param partialTime Partial tick time
+   * @param frame Controller TileFrame of the machine.
+   *              Store any data that should persist between render calls in `frame.inProgressData`.
+   *              If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it replaces the frame with the machine.
+   */
+  override def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, frame: TileFrame): Unit = {
+   
   }
 
   /**
