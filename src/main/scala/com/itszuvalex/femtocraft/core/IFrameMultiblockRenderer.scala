@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.core
 
+import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -27,14 +28,20 @@ trait IFrameMultiblockRenderer {
                                    rx: Double, ry: Double, rz: Double): Unit
 
   /**
-   * In-Progress model of the multiblock.
+   * Render function for machine in-progress rendering.
+   *
+   * @param x xPos to render at
+   * @param y yPos to render at
+   * @param z zPos to render at
+   * @param dx x offset
+   * @param dy y offset
+   * @param dz z offset
+   * @param partialTime Partial tick time
+   * @param frame Controller TileFrame of the machine.
+   *              Store any data that should persist between render calls in `frame.inProgressData`.
+   *              If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it replaces the frame with the machine.
    */
-  val previewModel: WavefrontObject
-
-  /**
-   * In-Progress model texture of the multiblock.
-   */
-  val previewTexture: ResourceLocation
+  def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, frame: TileFrame): Unit
 
   /**
    * Coordinates to render at.  This is for things like generic menu rendering, etc.
