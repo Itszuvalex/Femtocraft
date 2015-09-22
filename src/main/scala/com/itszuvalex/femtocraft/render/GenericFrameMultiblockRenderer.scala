@@ -14,6 +14,9 @@ import org.lwjgl.opengl.GL11
 class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
   var multi: IFrameMultiblock = null
 
+  override val previewModel = null
+  override val previewTexture = null
+
   /**
    * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
    *

@@ -1,10 +1,14 @@
 package com.itszuvalex.femtocraft.core.Industry.block
 
+import com.itszuvalex.femtocraft.FemtoItems
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.itszulib.core.TileContainer
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.MovingObjectPosition
 import net.minecraft.world.World
 
 /**
@@ -26,4 +30,6 @@ class BlockFrame extends TileContainer(Material.iron) {
     }
     super.breakBlock(world, x, y, z, block, p_149749_6_)
   }
+
+  override def getPickBlock(target: MovingObjectPosition, world: World, x: Int, y: Int, z: Int, player: EntityPlayer): ItemStack = new ItemStack(FemtoItems.itemFrame)
 }

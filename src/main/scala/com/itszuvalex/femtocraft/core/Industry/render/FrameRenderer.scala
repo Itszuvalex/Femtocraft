@@ -1,7 +1,9 @@
 package com.itszuvalex.femtocraft.core.Industry.render
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.core.{IFrameMultiblock, IFrameMultiblockRenderer, FrameMultiblockRegistry}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.render.MultiblockRendererRegistry
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
@@ -18,6 +20,7 @@ object FrameRenderer {
   val frameTexLocation   = Resources.Model("frame/frame.png")
 
   lazy val frameModel = AdvancedModelLoader.loadModel(FrameRenderer.frameModelLocation).asInstanceOf[WavefrontObject]
+  var inProgressMachineRenderer: IFrameMultiblockRenderer = null
 
   val sidemap1 = Array("N", "E", "S", "W")
   val sidemap2 = Array("NW", "NE", "SE", "SW")
@@ -48,13 +51,9 @@ object FrameRenderer {
     GL11.glPopMatrix()
   }
 
-  def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, worldTime: Float,
-                         currentPart: Int, modelLoc: ResourceLocation, texLoc: ResourceLocation, targetTime: Float): Unit = {
-    var model: WavefrontObject = null
-    try {
-      model = AdvancedModelLoader.loadModel(modelLoc).asInstanceOf[WavefrontObject]
-    } catch {case e: Exception => return}
-    Minecraft.getMinecraft.getTextureManager.bindTexture(texLoc)
+  def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, frame: TileFrame): Unit = {
+
+    Minecraft.getMinecraft.getTextureManager.bindTexture(inProgressMachineRenderer.previewTexture)
 
     GL11.glPushMatrix()
     GL11.glTranslated(x + dx, y + dy, z + dz)
@@ -63,15 +62,21 @@ object FrameRenderer {
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
     GL11.glColor4f(1f, 1f, 1f, 1f)
 
+    val timePerPart = frame.totalMachineBuildTime / inProgressMachineRenderer.previewModel.groupObjects.size()
+    val currentPart = math.ceil(frame.progress / inProgressMachineRenderer.previewModel.groupObjects.size().toDouble).toInt
+
     if (currentPart > 1) {
       for (i <- 1 until currentPart) {
-        model.renderPart("Stage" + (if (i < 10) "0" else "") + i)
+        inProgressMachineRenderer.previewModel.renderPart("Stage" + (if (i < 10) "0" else "") + i)
       }
     }
-    val time = worldTime + partialTime
-    GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - 16 * math.min(16f, targetTime - time)).toByte)
-    model.renderPart("Stage" + (if (currentPart < 10) "0" else "") + currentPart)
-
+    val time = frame.getWorldObj.getTotalWorldTime + partialTime
+    if (currentPart != frame.inProgressLastPart) {
+      frame.inProgressTargetTime = time + timePerPart
+      frame.inProgressLastPart = currentPart
+    }
+    GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - (256 / math.min(16f, timePerPart)) * math.min(math.min(16f, timePerPart), frame.inProgressTargetTime - time)).toByte)
+    inProgressMachineRenderer.previewModel.renderPart("Stage" + (if (currentPart < 10) "0" else "") + currentPart)
     //    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
@@ -93,17 +98,23 @@ class FrameRenderer extends TileEntitySpecialRenderer {
                                                           }.toSet
                                    )
         //TODO: Replace hardcoded offset values with automatic assignment by multiblock size and controller position
-        if (frame.inProgressCurrentRenderedPart > 0 && frame.isController) {
+        if (frame.progress > 0 && frame.isController) {
+          FrameMultiblockRegistry.getMultiblock(frame.multiBlock) match {
+            case Some(mb) =>
+              MultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
+                case Some(render) =>
+                  if (render.previewModel == null || render.previewTexture == null) return
+                  FrameRenderer.inProgressMachineRenderer = render
+                case _ => return
+              }
+            case _ => return
+          }
           FrameRenderer.renderInProgressAt(x, y, z,
                                            1d,
                                            0d,
                                            1d,
                                            partialTime,
-                                           frame.getWorldObj.getTotalWorldTime.toFloat,
-                                           frame.inProgressCurrentRenderedPart,
-                                           frame.inProgressModelLoc,
-                                           frame.inProgressTexLoc,
-                                           frame.inProgressNextTargetTime
+                                           frame
                                           )
         }
 

@@ -86,27 +86,12 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   var renderInt                                       = TileFrame.fullRender(true)
   var multiBlock                   : String           = null
   var progress                     : Int              = 0
-  var inProgressCurrentRenderedPart: Int              = 0
-  var inProgressModelLoc           : ResourceLocation = null
-  var inProgressTexLoc             : ResourceLocation = null
-  var inProgressPartDelay          : Int              = 100
-  var inProgressNextTargetTime     : Float            = 0
+  var totalMachineBuildTime        : Float            = 500f
+  var inProgressLastPart           : Int              = 0
+  var inProgressTargetTime         : Float            = 0f
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
-  }
-
-  /**
-   * Sets the correct variables for the frame renderer to render the in-progress machine model.
-   * @param currentRenderedPart Number of the last (or currently) rendered part of the machine.
-   * @param modelLoc Location of the model in the "_in-progress" folder. Example: "arc furnace/Arc Furnace In-Progress.obj"
-   * @param texLoc Location of the texture in the "_in-progress" folder. Example: "arc furnace/Arc Furnace In-Progress.png"
-   */
-  def renderInProgressMachine(currentRenderedPart: Int, modelLoc: String, texLoc: String, partDelay: Int): Unit = {
-    inProgressCurrentRenderedPart = currentRenderedPart
-    if (inProgressModelLoc == null) inProgressModelLoc = Resources.Model("_in-progress/" + modelLoc)
-    if (inProgressTexLoc == null) inProgressTexLoc = Resources.Model("_in-progress/" + texLoc)
-    inProgressPartDelay = partDelay
   }
 
   def calculateRendering(connectedDirs: Array[ForgeDirection]): Unit = {
@@ -116,11 +101,11 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   override def serverUpdate(): Unit = {
     super.serverUpdate()
     if (!isController) return
-    if (getWorldObj.getTotalWorldTime % 10 == 0 && progress < 100) {
+    if (getWorldObj.getTotalWorldTime % (totalMachineBuildTime / 100) == 0 && progress < 100) {
       progress += 1
       setUpdate()
     }
-    if (progress >= 100 && getWorldObj.getTotalWorldTime >= inProgressNextTargetTime) {
+    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressTargetTime) {
       FrameMultiblockRegistry.getMultiblock(multiBlock) match {
         case Some(multi) =>
           TileFrame.shouldDrop = false
@@ -137,9 +122,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     super.clientUpdate()
     if (!isController) return
     if (multiBlock == null) return
-    val lastPart = inProgressCurrentRenderedPart
-    renderInProgressMachine(math.ceil(progress / 10d).toInt, multiBlock.toLowerCase + "/" + multiBlock + " In-Progress.obj", multiBlock.toLowerCase + "/" + multiBlock + " In-Progress.png", 100)
-    if (lastPart != inProgressCurrentRenderedPart) inProgressNextTargetTime = getWorldObj.getTotalWorldTime + inProgressPartDelay
   }
 
   def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)
