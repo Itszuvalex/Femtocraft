@@ -8,12 +8,15 @@ import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.InventoryUtils
+import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.util.ForgeDirection
+
+import scala.collection.mutable
 
 /**
  * Created by Christopher on 8/29/2015.
@@ -83,12 +86,11 @@ object TileFrame {
 }
 
 class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory {
-  var renderInt                                       = TileFrame.fullRender(true)
-  var multiBlock                   : String           = null
-  var progress                     : Int              = 0
-  var totalMachineBuildTime        : Float            = 500f
-  var inProgressLastPart           : Int              = 0
-  var inProgressTargetTime         : Float            = 0f
+  var renderInt                                               = TileFrame.fullRender(true)
+  var multiBlock                   : String                   = null
+  var progress                     : Int                      = 0
+  var totalMachineBuildTime        : Float                    = 500f
+  var inProgressData               : mutable.Map[String, Any] = mutable.Map()
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
@@ -105,7 +107,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
       progress += 1
       setUpdate()
     }
-    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressTargetTime) {
+    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressData.getOrElseUpdate("targetTime", 0f).asInstanceOf[Float]) {
       FrameMultiblockRegistry.getMultiblock(multiBlock) match {
         case Some(multi) =>
           TileFrame.shouldDrop = false
