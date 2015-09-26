@@ -32,7 +32,7 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
-import com.itszuvalex.femtocraft.render.{FramePreviewableRenderer, MultiblockRendererRegistry, RenderIDs}
+import com.itszuvalex.femtocraft.render.{CyberPreviewableRenderer, FramePreviewableRenderer, MultiblockRendererRegistry, RenderIDs}
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
@@ -80,6 +80,7 @@ class ProxyClient extends ProxyCommon {
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
+    RenderIDs.seedPreviewableID = PreviewableRendererRegistry.bindRenderer(new CyberPreviewableRenderer)
 
     val arcFurnaceRenderer = new ArcFurnaceRenderer
     RenderIDs.multiblockArcFurnaceID = MultiblockRendererRegistry.bindRenderer(arcFurnaceRenderer)
