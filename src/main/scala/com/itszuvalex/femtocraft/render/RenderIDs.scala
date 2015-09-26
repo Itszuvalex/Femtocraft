@@ -6,6 +6,7 @@ package com.itszuvalex.femtocraft.render
 object RenderIDs {
   // Previewable IDs
   var framePreviewableID = 0
+  var seedPreviewableID = 0
 
   //Multiblock IDs
   var multiblockArcFurnaceID = 0
