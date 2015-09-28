@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.core.Industry.gui
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.core.Industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.itszulib.gui._

@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.core.{FrameMultiblockRegistry, IFrameItem, IFrameMultiblock}
+import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRegistry, IFrameItem, IFrameMultiblock}
 import com.itszuvalex.femtocraft.industry.container.ContainerMultiblockSelection
 import com.itszuvalex.femtocraft.industry.gui.GuiMultiblockSelection.GuiMultiblockSelector
 import com.itszuvalex.femtocraft.network.PacketHandler

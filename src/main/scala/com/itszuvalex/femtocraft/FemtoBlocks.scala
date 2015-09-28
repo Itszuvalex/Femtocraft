@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
 
-import com.itszuvalex.femtocraft.core.Cyber.block.{BlockCyberleaf, BlockCyberweave, BlockCyberwood}
+import com.itszuvalex.femtocraft.core.Cyber.block.{BlockCyberBase, BlockCyberleaf, BlockCyberweave, BlockCyberwood}
 import com.itszuvalex.femtocraft.core.Industry.block.BlockFrame
 import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
@@ -28,7 +28,8 @@ object FemtoBlocks {
   var blockCentrifuge            : Block = null
 
 
-  var blockFrame: Block = null
+  var blockFrame: Block     = null
+  var blockCyberBase: Block = null
 
   var blockNaniteHiveSmall: Block = null
 
@@ -75,6 +76,9 @@ object FemtoBlocks {
 
     blockFrame = new BlockFrame().setCreativeTab(Femtocraft.tab).setBlockName("blockFrame")
     GameRegistry.registerBlock(blockFrame, "blockFrame")
+
+    blockCyberBase = new BlockCyberBase().setBlockName("blockCyberBase")
+    GameRegistry.registerBlock(blockCyberBase, "blockCyberBase")
 
     blockNaniteHiveSmall = new BlockNaniteHiveSmall().setCreativeTab(Femtocraft.tab).setBlockName("blockNaniteHive_small")
     GameRegistry.registerBlock(blockNaniteHiveSmall, "blockNaniteHive_small")

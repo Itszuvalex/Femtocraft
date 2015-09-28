@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.core
+package com.itszuvalex.femtocraft.core.Industry
 
 import com.itszuvalex.femtocraft.industry.multiblock.{MultiblockArcFurnace, MultiblockCentrifuge, MultiblockCrystallizationChamber}
 

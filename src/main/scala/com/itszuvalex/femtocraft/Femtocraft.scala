@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.core.Cyber.CybermaterialRegistry
-import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.PacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator

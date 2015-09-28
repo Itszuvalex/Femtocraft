@@ -1,8 +1,7 @@
 package com.itszuvalex.femtocraft.core.Industry.tile
 
 import java.util.Random
-
-import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -118,12 +117,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
         case _           =>
       }
     }
-  }
-
-  override def clientUpdate(): Unit = {
-    super.clientUpdate()
-    if (!isController) return
-    if (multiBlock == null) return
   }
 
   def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)

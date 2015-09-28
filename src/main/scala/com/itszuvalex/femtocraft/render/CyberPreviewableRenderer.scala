@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.core.Cyber.item.ItemBaseSeed
+import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.itszulib.api.IPreviewableRenderer
-import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.init.Blocks
@@ -38,8 +38,8 @@ class CyberPreviewableRenderer extends IPreviewableRenderer {
     Tessellator.instance.startDrawingQuads()
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glEnable(GL11.GL_BLEND)
-    if (ItemBaseSeed.areAllPlaceable(baseLocations) &&
-        ItemBaseSeed.arePartsAtYPlaceable(slotLocations, y + ItemBaseSeed.baseHeightMap(ItemBaseSeed.getSize(stack)))
+    if (TileCyberBase.areAllPlaceable(baseLocations) &&
+        TileCyberBase.arePartsAtYPlaceable(slotLocations, y + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))
        ) Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f) else Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
     baseLocations.toList.sortWith { case (a1, a2) =>
       a1.distSqr((rx + x).toInt,
@@ -52,7 +52,7 @@ class CyberPreviewableRenderer extends IPreviewableRenderer {
       .foreach { loc =>
       RenderUtils.renderCube(rx.toFloat + (loc.x - x), ry.toFloat + (loc.y - y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, Blocks.iron_block.getIcon(0, 0))
     }
-    if (ItemBaseSeed.areAllPlaceable(slotLocations)) Tessellator.instance.setColorRGBA_F(0, .75f, 1, .5f) else Tessellator.instance.setColorRGBA_F(.75f, 0, 1, .5f)
+    if (TileCyberBase.areAllPlaceable(slotLocations)) Tessellator.instance.setColorRGBA_F(0, .75f, 1, .5f) else Tessellator.instance.setColorRGBA_F(.75f, 0, 1, .5f)
     slotLocations.toList.sortWith { case (a1, a2) =>
       a1.distSqr((rx + x).toInt,
         (ry + y).toInt,

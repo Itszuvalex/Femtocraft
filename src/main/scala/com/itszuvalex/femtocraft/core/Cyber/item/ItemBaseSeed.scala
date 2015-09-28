@@ -2,7 +2,8 @@ package com.itszuvalex.femtocraft.core.Cyber.item
 
 import java.util
 
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -13,15 +14,13 @@ import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{ItemStack, Item}
 import net.minecraft.world.World
-import net.minecraftforge.common.DimensionManager
+import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * Created by Alex on 26.09.2015.
  */
 object ItemBaseSeed {
   val SIZE_TAG = "BaseSize"
-  val baseHeightMap = Map(1 -> 1, 2 -> 1, 3 -> 2)
-  val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
 
   /**
    * @param stack Stack of ItemBaseSeed
@@ -83,13 +82,7 @@ object ItemBaseSeed {
    */
   def getBaseLocations(stack: ItemStack, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) Set.empty[Loc4]
-    else {
-      for {
-        bx <- 0 until getSize(stack)
-        by <- 0 until baseHeightMap(getSize(stack))
-        bz <- 0 until getSize(stack)
-      } yield Loc4(x + bx, y + by, z + bz, dim)
-    }.toSet
+    else TileCyberBase.getBaseLocations(getSize(stack), x, y, z, dim)
   }
 
   /**
@@ -102,28 +95,8 @@ object ItemBaseSeed {
    */
   def getSlotLocations(stack: ItemStack, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) Set.empty[Loc4]
-    else {
-      for {
-        bx <- 0 until getSize(stack)
-        by <- baseHeightMap(getSize(stack)) until (baseHeightMap(getSize(stack)) + slotHeightMap(getSize(stack)))
-        bz <- 0 until getSize(stack)
-      } yield Loc4(x + bx, y + by, z + bz, dim)
-    }.toSet
+    else TileCyberBase.getSlotLocations(getSize(stack), x, y, z, dim)
   }
-
-  /**
-   * @param locs Set of locations to check
-   * @return True if all blocks at all locations in locs are air or replaceable, false otherwise
-   */
-  def areAllPlaceable(locs: Set[Loc4]) = locs.forall( loc => {val world = DimensionManager.getWorld(loc.dim); world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z)} )
-
-  /**
-   * Used to check whether the first slot above a base is blocked, to deny construction of the base if it is.
-   * @param locs Set of locations to check
-   * @param y Y plane to check
-   * @return True if all blocks of all locations in locs that have the given y coordinate are air or replaceable, false otherwise
-   */
-  def arePartsAtYPlaceable(locs: Set[Loc4], y: Int) = locs.forall( loc => {val world = DimensionManager.getWorld(loc.dim); world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z) || loc.y != y} )
 }
 
 class ItemBaseSeed extends Item with IPreviewable {
@@ -138,14 +111,38 @@ class ItemBaseSeed extends Item with IPreviewable {
   }
 
   override def onItemRightClick(stack: ItemStack, world: World, player: EntityPlayer): ItemStack = {
-    ItemBaseSeed.setSize(stack, ItemBaseSeed.getSize(stack) match {
-                                  case 1 => 2
-                                  case 2 => 3
-                                  case 3 => 1
-                                  case _ => 1
-                                }
-                        )
+    if (player.isSneaking) {
+      ItemBaseSeed.setSize(stack, ItemBaseSeed.getSize(stack) match {
+                                    case 1 => 2
+                                    case 2 => 3
+                                    case 3 => 1
+                                    case _ => 1
+                                  }
+                          )
+    }
     stack
+  }
+
+  override def onItemUse(stack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    if (player.isSneaking) return false
+    var dir = ForgeDirection.getOrientation(side)
+    if (world.getBlock(x, y, z).isReplaceable(world, x, y, z)) dir = ForgeDirection.UNKNOWN
+    var bx = x + dir.offsetX
+    var by = y + dir.offsetY
+    var bz = z + dir.offsetZ
+    if (ItemBaseSeed.getSize(stack) == 3) { bx -= 1; bz -= 1 }
+    val locs = TileCyberBase.getBaseLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId)
+    if (!TileCyberBase.areAllPlaceable(locs)) return false
+    locs.foreach { loc =>
+      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockCyberBase)
+      world.getTileEntity(loc.x, loc.y, loc.z) match {
+        case te: TileCyberBase =>
+          te.size = ItemBaseSeed.getSize(stack)
+          te.formMultiBlock(world, bx, by, bz)
+        case _ =>
+      }
+    }
+    true
   }
 
 }

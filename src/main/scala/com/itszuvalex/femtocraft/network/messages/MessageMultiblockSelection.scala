@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.network.messages
 
-import com.itszuvalex.femtocraft.core.IFrameItem
+import com.itszuvalex.femtocraft.core.Industry.IFrameItem
 import cpw.mods.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
 import io.netty.buffer.ByteBuf
 
