@@ -15,17 +15,17 @@ import org.lwjgl.opengl.GL11
  * Created by Alex on 28.09.2015.
  */
 object CyberBaseRenderer {
-  //TODO: Create those models and textures!
-  val smallBaseModelLoc: ResourceLocation = null
-  val smallBaseTexLoc: ResourceLocation = null
+  //TODO: Create more models and textures!
+  val smallBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1.obj")
+  val smallBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1 Template.png")
   val medBaseModelLoc: ResourceLocation = null
   val medBaseTexLoc: ResourceLocation = null
   val largeBaseModelLoc: ResourceLocation = null
   val largeBaseTexLoc: ResourceLocation = null
 
-  lazy val smallBaseModel = AdvancedModelLoader.loadModel(smallBaseModelLoc).asInstanceOf[WavefrontObject]
-  lazy val medBaseModel = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
-  lazy val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
+  val smallBaseModel = AdvancedModelLoader.loadModel(smallBaseModelLoc).asInstanceOf[WavefrontObject]
+  //val medBaseModel = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
+  //val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
 
   def renderBase(tile: TileCyberBase, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     GL11.glPushMatrix()
@@ -35,14 +35,18 @@ object CyberBaseRenderer {
         model = smallBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(smallBaseTexLoc)
         GL11.glTranslated(x + .5, y, z + .5)
-      case 2 =>
+      case 2 => /*
         model = medBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(medBaseTexLoc)
-        GL11.glTranslated(x + 1, y, z + 1)
-      case 3 =>
+        GL11.glTranslated(x + 1, y, z + 1) */
+        GL11.glPopMatrix()
+        return
+      case 3 => /*
         model = largeBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(largeBaseTexLoc)
-        GL11.glTranslated(x + 1.5, y, z + 1.5)
+        GL11.glTranslated(x + 1.5, y, z + 1.5) */
+        GL11.glPopMatrix()
+        return
     }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
@@ -60,7 +64,7 @@ class CyberBaseRenderer extends TileEntitySpecialRenderer {
     tile match {
       case base: TileCyberBase =>
         if (!base.isController) return
-        //TODO: CyberBaseRenderer.renderBase(base, x, y, z, partialTime)
+        CyberBaseRenderer.renderBase(base, x, y, z, partialTime)
         if (base.currentlyBuildingMachine > -1 && base.currentMachineBuildProgress > 0) {
           CyberMachineRegistry.getMachine(base.machines(base.currentlyBuildingMachine)) match {
             case Some(machine) =>

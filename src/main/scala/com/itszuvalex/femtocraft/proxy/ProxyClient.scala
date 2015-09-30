@@ -21,6 +21,8 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.FemtoItems
+import com.itszuvalex.femtocraft.core.Cyber.render.CyberBaseRenderer
+import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
@@ -102,6 +104,8 @@ class ProxyClient extends ProxyCommon {
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
+
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCyberBase], new CyberBaseRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 

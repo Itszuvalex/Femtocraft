@@ -10,9 +10,11 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{TileFluidTank, MultiBlockComponent}
 import com.itszuvalex.itszulib.util.InventoryUtils
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.{NBTTagString, NBTTagCompound}
 import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids._
@@ -23,6 +25,14 @@ import scala.collection.mutable
  * Created by Alex on 27.09.2015.
  */
 object TileCyberBase {
+  val CURRENT_MACHINE_KEY = "CurrentMachine"
+  val PROGRESS_KEY = "Progress"
+  val FIRST_FREE_SLOT_KEY = "FirstFreeSlot"
+  val MACHINES_KEY = "Machines"
+  val SLOTS_KEY = "MachineSlots"
+  val SIZE_KEY = "Size"
+  val BASE_COMPOUND_KEY = "CyberBaseInfo"
+
   val baseHeightMap = Map(1 -> 1, 2 -> 1, 3 -> 2)
   val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
 
@@ -80,7 +90,7 @@ object TileCyberBase {
 class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank with IInventory {
   var size: Int                                 = 1
   var machines: Array[String]                   = Array.empty[String]
-  var machineSlotMap: mutable.Map[Int, Int]     = mutable.Map.empty[Int, Int]
+  var machineSlotMap: Array[Int]                = Array.empty[Int]
   var firstFreeSlot: Int                        = 0
   var currentlyBuildingMachine: Int             = -1
   var currentMachineBuildProgress: Int          = 0
@@ -151,6 +161,55 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     }
   }
 
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    val comp = new NBTTagCompound()
+    comp.setInteger(TileCyberBase.SIZE_KEY, size)
+    comp.setInteger(TileCyberBase.CURRENT_MACHINE_KEY, currentlyBuildingMachine)
+    comp.setInteger(TileCyberBase.PROGRESS_KEY, currentMachineBuildProgress)
+    comp.setInteger(TileCyberBase.FIRST_FREE_SLOT_KEY, firstFreeSlot)
+    comp.setTag(TileCyberBase.MACHINES_KEY, NBTList(for(i <- 0 until machines.length) yield new NBTTagString(machines(i))))
+    comp.setIntArray(TileCyberBase.SLOTS_KEY, machineSlotMap)
+    compound.setTag(TileCyberBase.BASE_COMPOUND_KEY, comp)
+  }
+
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    val comp = compound.getCompoundTag(TileCyberBase.BASE_COMPOUND_KEY)
+    size = comp.getInteger(TileCyberBase.SIZE_KEY)
+    currentlyBuildingMachine = comp.getInteger(TileCyberBase.CURRENT_MACHINE_KEY)
+    currentMachineBuildProgress = comp.getInteger(TileCyberBase.PROGRESS_KEY)
+    firstFreeSlot = comp.getInteger(TileCyberBase.FIRST_FREE_SLOT_KEY)
+    val machineList = comp.getTagList(TileCyberBase.MACHINES_KEY, 8)
+    machines = { for (i <- 0 until machineList.tagCount()) yield machineList.getStringTagAt(i) }.toArray
+    machineSlotMap = comp.getIntArray(TileCyberBase.SLOTS_KEY)
+  }
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    val comp = new NBTTagCompound()
+    comp.setInteger(TileCyberBase.SIZE_KEY, size)
+    comp.setInteger(TileCyberBase.CURRENT_MACHINE_KEY, currentlyBuildingMachine)
+    comp.setInteger(TileCyberBase.PROGRESS_KEY, currentMachineBuildProgress)
+    comp.setInteger(TileCyberBase.FIRST_FREE_SLOT_KEY, firstFreeSlot)
+    comp.setTag(TileCyberBase.MACHINES_KEY, NBTList(for(i <- 0 until machines.length) yield new NBTTagString(machines(i))))
+    comp.setIntArray(TileCyberBase.SLOTS_KEY, machineSlotMap)
+    compound.setTag(TileCyberBase.BASE_COMPOUND_KEY, comp)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    val comp = compound.getCompoundTag(TileCyberBase.BASE_COMPOUND_KEY)
+    size = comp.getInteger(TileCyberBase.SIZE_KEY)
+    currentlyBuildingMachine = comp.getInteger(TileCyberBase.CURRENT_MACHINE_KEY)
+    currentMachineBuildProgress = comp.getInteger(TileCyberBase.PROGRESS_KEY)
+    firstFreeSlot = comp.getInteger(TileCyberBase.FIRST_FREE_SLOT_KEY)
+    val machineList = comp.getTagList(TileCyberBase.MACHINES_KEY, 8)
+    machines = { for (i <- 0 until machineList.tagCount()) yield machineList.getStringTagAt(i) }.toArray
+    machineSlotMap = comp.getIntArray(TileCyberBase.SLOTS_KEY)
+    setRenderUpdate()
+  }
+
   override def getMod: AnyRef = Femtocraft
 
   override def decrStackSize(slot : Int, amt : Int): ItemStack = if (isController) indInventory.decrStackSize(slot, amt) else forwardToController[TileCyberBase, ItemStack](_.decrStackSize(slot, amt))
@@ -179,7 +238,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 
-  override def hasDescription: Boolean = true
+  override def hasDescription: Boolean = isValidMultiBlock
 
   override def defaultTank: FluidTank = new FluidTank(0)
 

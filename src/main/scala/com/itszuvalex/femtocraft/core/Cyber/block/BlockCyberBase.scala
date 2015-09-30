@@ -14,6 +14,12 @@ import net.minecraft.world.World
 class BlockCyberBase extends TileContainer(Material.iron) {
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileCyberBase
 
+  override def renderAsNormalBlock: Boolean = true
+
+  override def getRenderBlockPass: Int = 0
+
+  override def isOpaqueCube: Boolean = false
+
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, par6: Int): Unit = {
     world.getTileEntity(x, y, z) match {
       case base: TileCyberBase => base.onBlockBreak()
