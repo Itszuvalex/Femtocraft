@@ -18,13 +18,13 @@ object CyberBaseRenderer {
   //TODO: Create more models and textures!
   val smallBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1.obj")
   val smallBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1 Template.png")
-  val medBaseModelLoc: ResourceLocation = null
-  val medBaseTexLoc: ResourceLocation = null
+  val medBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 2x2.obj")
+  val medBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 2x2 Template.png")
   val largeBaseModelLoc: ResourceLocation = null
   val largeBaseTexLoc: ResourceLocation = null
 
   val smallBaseModel = AdvancedModelLoader.loadModel(smallBaseModelLoc).asInstanceOf[WavefrontObject]
-  //val medBaseModel = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
+  val medBaseModel = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
   //val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
 
   def renderBase(tile: TileCyberBase, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
@@ -35,12 +35,10 @@ object CyberBaseRenderer {
         model = smallBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(smallBaseTexLoc)
         GL11.glTranslated(x + .5, y, z + .5)
-      case 2 => /*
+      case 2 =>
         model = medBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(medBaseTexLoc)
-        GL11.glTranslated(x + 1, y, z + 1) */
-        GL11.glPopMatrix()
-        return
+        GL11.glTranslated(x + 1, y, z + 1)
       case 3 => /*
         model = largeBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(largeBaseTexLoc)
