@@ -15,17 +15,16 @@ import org.lwjgl.opengl.GL11
  * Created by Alex on 28.09.2015.
  */
 object CyberBaseRenderer {
-  //TODO: Create more models and textures!
   val smallBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1.obj")
   val smallBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1 Template.png")
   val medBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 2x2.obj")
   val medBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 2x2 Template.png")
-  val largeBaseModelLoc: ResourceLocation = null
-  val largeBaseTexLoc: ResourceLocation = null
+  val largeBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 3x3.obj")
+  val largeBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 3x3 Template.png")
 
   val smallBaseModel = AdvancedModelLoader.loadModel(smallBaseModelLoc).asInstanceOf[WavefrontObject]
   val medBaseModel = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
-  //val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
+  val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
 
   def renderBase(tile: TileCyberBase, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     GL11.glPushMatrix()
@@ -39,12 +38,10 @@ object CyberBaseRenderer {
         model = medBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(medBaseTexLoc)
         GL11.glTranslated(x + 1, y, z + 1)
-      case 3 => /*
+      case 3 =>
         model = largeBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(largeBaseTexLoc)
-        GL11.glTranslated(x + 1.5, y, z + 1.5) */
-        GL11.glPopMatrix()
-        return
+        GL11.glTranslated(x + 1.5, y, z + 1.5)
     }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
