@@ -13,6 +13,9 @@ object RenderIDs {
   var multiblockCentrifugeID = 0
   var multiblockCrystallizerID = 0
 
+  //Cyber Machine IDs
+  var growthChamberID = 0
+
   //Regular IDs
   var naniteHiveSmallID = 0
 }

@@ -21,11 +21,14 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.FemtoItems
+import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRendererRegistry
 import com.itszuvalex.femtocraft.core.Cyber.render.CyberBaseRenderer
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.cyber.render.GrowthChamberRenderer
+import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.femtocraft.industry.render.ArcFurnaceRenderer
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
@@ -88,6 +91,10 @@ class ProxyClient extends ProxyCommon {
     val arcFurnaceRenderer = new ArcFurnaceRenderer
     RenderIDs.multiblockArcFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(arcFurnaceRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileArcFurnace], arcFurnaceRenderer)
+
+    val growthChamberRenderer = new GrowthChamberRenderer
+    RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGrowthChamber], growthChamberRenderer)
 
     val naniveHiveRenderer = new NaniteHiveSmallRenderer
     RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId

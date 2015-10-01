@@ -106,7 +106,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
       progress += 1
       setUpdate()
     }
-    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressData.getOrElseUpdate("targetTime", 0f).asInstanceOf[Float]) {
+    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressData.getOrElse("targetTime", 0f).asInstanceOf[Float]) {
       FrameMultiblockRegistry.getMultiblock(multiBlock) match {
         case Some(multi) =>
           TileFrame.shouldDrop = false

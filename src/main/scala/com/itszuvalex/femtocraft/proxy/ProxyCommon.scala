@@ -22,6 +22,7 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
@@ -56,6 +57,7 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileArcFurnace], "TileArcFurnace")
     GameRegistry.registerTileEntity(classOf[TileCrystallizationChamber], "TileCrystallizationChamber")
     GameRegistry.registerTileEntity(classOf[TileCentrifuge], "TileCentrifuge")
+    GameRegistry.registerTileEntity(classOf[TileGrowthChamber], "TileGrowthChamber")
 
     GameRegistry.registerTileEntity(classOf[TileFrame], "TileFrame")
     GameRegistry.registerTileEntity(classOf[TileNaniteHiveSmall], "TileNaniteHive")

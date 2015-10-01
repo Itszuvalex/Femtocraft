@@ -14,20 +14,18 @@ import net.minecraftforge.fluids.FluidStack
 object ICyberMachine {
   /**
    * Helper function for easy implementation of getTakenLocations using known machine variables.
-   * @param x X position of base controller
-   * @param y Y position of base controller
-   * @param z Y position of base controller
+   * @param x X position of machine controller
+   * @param y Y position of machine controller
+   * @param z Y position of machine controller
    * @param dim Dimension ID of the machine
    * @param size Size number
    * @param slots Number of occupied slots
-   * @param firstSlot ID of the first slot occupied by the machine
-   * @return Set of locations occupied by the machine
    */
-  def getTakenLocations(x: Int, y: Int, z: Int, dim: Int, size: Int, slots: Int, firstSlot: Int): Set[Loc4] = {
+  def getTakenLocations(x: Int, y: Int, z: Int, dim: Int, size: Int, slots: Int): Set[Loc4] = {
     {
       for {
         bx <- 0 until size
-        by <- (TileCyberBase.baseHeightMap(size) + firstSlot) until (TileCyberBase.baseHeightMap(size) + firstSlot + slots)
+        by <- 0 until slots
         bz <- 0 until size
       } yield Loc4(x + bx, y + by, z + bz, dim)
     }.toSet
@@ -46,9 +44,8 @@ trait ICyberMachine {
    * @param world World of the machine
    * @param baseController The controller TileEntity of the base.
    * @param machineIndex The index of the machine on this base, 0 being the lowest machine
-   * @return Whether or not it formed correctly
    */
-  def formAtBaseAndSlot(world: World, baseController: TileCyberBase, machineIndex: Int): Boolean
+  def formAtBaseAndIndex(world: World, baseController: TileCyberBase, machineIndex: Int): Unit
 
   /**
    * This should destroy the machine completely with all that needs to be done afterwards (drop items etc.).
@@ -59,7 +56,7 @@ trait ICyberMachine {
    */
   def breakMachine(world: World, x: Int, y: Int, z: Int): Unit
 
-  def getTakenLocations(world: World, x: Int, y: Int, z: Int): scala.collection.Set[Loc4]
+  def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4]
 
   def getRequiredBaseSize: Int
 

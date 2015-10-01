@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Cyber.CybermaterialRegistry
+import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRegistry, CybermaterialRegistry}
 import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.PacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
@@ -55,6 +55,7 @@ object Femtocraft {
     FemtoItems.init()
     FemtoFluids.init()
     FrameMultiblockRegistry.init()
+    CyberMachineRegistry.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {

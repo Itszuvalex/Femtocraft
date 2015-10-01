@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.core.Cyber
 
+import com.itszuvalex.femtocraft.cyber.machine.MachineGrowthChamber
+
 import scala.collection.mutable
 
 /**
@@ -17,6 +19,6 @@ object CyberMachineRegistry {
   def getMachinesThatFitIn(size: Int, remainingSlots: Int) = getMachinesForSize(size).filter(_.getRequiredSlots <= remainingSlots)
 
   def init(): Unit = {
-
+    registerMachine(new MachineGrowthChamber)
   }
 }
