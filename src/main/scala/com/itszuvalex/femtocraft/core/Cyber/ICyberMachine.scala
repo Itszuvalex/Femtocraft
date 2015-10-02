@@ -56,6 +56,28 @@ trait ICyberMachine {
    */
   def breakMachine(world: World, x: Int, y: Int, z: Int): Unit
 
+  /**
+   * Function for accepting item broadcasts.
+   * @param item Item broadcasted
+   * @param world World of the machine
+   * @param x Controller X
+   * @param y Controller Y
+   * @param z Controller Z
+   * @return Remaining items
+   */
+  def receiveItemBroadcast(item: ItemStack, world: World, x: Int, y: Int, z: Int): ItemStack
+
+  /**
+   * Function for accepting fluid broadcasts.
+   * @param fluid Fluid broadcasted
+   * @param world World of the machine
+   * @param x Controller X
+   * @param y Controller Y
+   * @param z Controller Z
+   * @return Remaining fluid
+   */
+  def receiveFluidBroadcast(fluid: FluidStack, world: World, x: Int, y: Int, z: Int): FluidStack
+
   def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4]
 
   def getRequiredBaseSize: Int

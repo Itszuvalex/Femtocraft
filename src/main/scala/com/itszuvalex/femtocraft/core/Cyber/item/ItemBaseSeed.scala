@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.core.Cyber.item
 import java.util
 
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.logistics.storage.item.IndexedInventory
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.IPreviewable
@@ -138,6 +139,7 @@ class ItemBaseSeed extends Item with IPreviewable {
       world.getTileEntity(loc.x, loc.y, loc.z) match {
         case te: TileCyberBase =>
           te.size = ItemBaseSeed.getSize(stack)
+          te.indInventory.setInventorySize(math.pow(te.size + 1, 2).toInt + 9)
           te.formMultiBlock(world, bx, by, bz)
         case _ =>
       }

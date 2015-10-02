@@ -72,4 +72,26 @@ class MachineGrowthChamber extends ICyberMachine {
   }
 
   override def getRequiredBaseSize: Int = 2
+
+  /**
+   * Function for accepting item broadcasts.
+   * @param item Item broadcasted
+   * @param world World of the machine
+   * @param x Controller X
+   * @param y Controller Y
+   * @param z Controller Z
+   * @return Remaining items
+   */
+  override def receiveItemBroadcast(item: ItemStack, world: World, x: Int, y: Int, z: Int): ItemStack = item
+
+  /**
+   * Function for accepting fluid broadcasts.
+   * @param fluid Fluid broadcasted
+   * @param world World of the machine
+   * @param x Controller X
+   * @param y Controller Y
+   * @param z Controller Z
+   * @return Remaining fluid
+   */
+  override def receiveFluidBroadcast(fluid: FluidStack, world: World, x: Int, y: Int, z: Int): FluidStack = fluid
 }

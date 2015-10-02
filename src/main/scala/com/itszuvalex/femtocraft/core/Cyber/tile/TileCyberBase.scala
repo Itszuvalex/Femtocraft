@@ -183,6 +183,74 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     firstFreeSlot = slot
   }
 
+  /**
+   * Tries to put an item into the base's buffer inventory. If not all of it fits, the rest is returned.
+   * @param item ItemStack to put into buffer inventory.
+   * @return Remaining ItemStack, null if empty.
+   */
+  def putItem(item: ItemStack): ItemStack = {
+    for (id <- 9 until indInventory.getSizeInventory) {
+      val invStack = indInventory.getStackInSlot(id)
+      if (item.isItemEqual(invStack) && ItemStack.areItemStackTagsEqual(item, invStack)) {
+        val fitAmount = indInventory.getInventoryStackLimit - invStack.stackSize
+        if (item.stackSize <= fitAmount) {
+          indInventory.removeItemStack(invStack, id)
+          invStack.stackSize += item.stackSize
+          indInventory.addItemStack(invStack, id)
+          item.stackSize = 0
+        } else {
+          indInventory.removeItemStack(invStack, id)
+          invStack.stackSize = indInventory.getInventoryStackLimit
+          indInventory.addItemStack(invStack, id)
+          item.stackSize -= fitAmount
+        }
+      } else if (invStack == null) {
+        indInventory.addItemStack(item, id)
+        item.stackSize = 0
+      }
+    }
+    if (item.stackSize == 0) null else item
+  }
+
+  /**
+   * Broadcasts an ItemStack to all machines on this base. If not all is accepted, the rest tries to go into the base's buffer inventory.
+   * If it doesn't all fit in there, the rest is returned.
+   * @param _item ItemStack to broadcast
+   * @return Remaining ItemStack, null if empty.
+   */
+  def broadcastItem(_item: ItemStack): ItemStack = {
+    if (!isController) { return forwardToController[TileCyberBase, ItemStack](_.broadcastItem(_item)) }
+    var item = _item
+    for (i <- 0 until firstEmpty(machines)) {
+      CyberMachineRegistry.getMachine(machines(i)) match {
+        case Some(m) =>
+          item = m.receiveItemBroadcast(item, worldObj, xCoord, yFromSlot(machineSlotMap(i)), zCoord)
+          if (item.stackSize == 0) return null
+        case _ =>
+      }
+    }
+    putItem(item)
+  }
+
+  /**
+   * Broadcasts a FluidStack to all machines on this base. If not all is accepted, the rest is returned.
+   * @param _fluid FluidStack to broadcast
+   * @return Remaining FluidStack, null if empty.
+   */
+  def broadcastFluid(_fluid: FluidStack): FluidStack = {
+    if (!isController) { return forwardToController[TileCyberBase, FluidStack](_.broadcastFluid(_fluid)) }
+    var fluid = _fluid
+    for (i <- 0 until firstEmpty(machines)) {
+      CyberMachineRegistry.getMachine(machines(i)) match {
+        case Some(m) =>
+          fluid = m.receiveFluidBroadcast(fluid, worldObj, xCoord, yFromSlot(machineSlotMap(i)), zCoord)
+          if (fluid.amount == 0) return null
+        case _ =>
+      }
+    }
+    fluid
+  }
+
   override def serverUpdate(): Unit = {
     if (!isController || currentlyBuildingMachine == -1) return
     if (worldObj.getTotalWorldTime % (totalMachineBuildTime / 100) == 0 && currentMachineBuildProgress < 100) {
@@ -277,11 +345,11 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   override def getInventoryName: String = if (isController) indInventory.getInventoryName else forwardToController[TileCyberBase, String](_.getInventoryName)
 
-  override def defaultInventory: IndexedInventory = new IndexedInventory(9)
+  override def defaultInventory: IndexedInventory = new IndexedInventory(13)
 
   override def hasDescription: Boolean = isValidMultiBlock
 
-  override def defaultTank: FluidTank = new FluidTank(0)
+  override def defaultTank: FluidTank = new FluidTank(2000)
 
   override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
 
