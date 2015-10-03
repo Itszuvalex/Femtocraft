@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.core.Industry.tile
 
 import java.util.Random
-import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRendererRegistry, FrameMultiblockRegistry}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -12,7 +12,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.ResourceLocation
+import net.minecraft.util.{AxisAlignedBB, ResourceLocation}
 import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.mutable
@@ -97,6 +97,22 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   def calculateRendering(connectedDirs: Array[ForgeDirection]): Unit = {
 
+  }
+
+
+  override def getRenderBoundingBox: AxisAlignedBB = {
+    if (isController) {
+      FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+        case Some(m) =>
+          FrameMultiblockRendererRegistry.getRenderer(m.multiblockRenderID) match {
+            case Some(r) =>
+              return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + r.boundingBox._1, yCoord + r.boundingBox._2, zCoord + r.boundingBox._3)
+            case _ =>
+          }
+        case _ =>
+      }
+    }
+    super.getRenderBoundingBox
   }
 
   override def serverUpdate(): Unit = {

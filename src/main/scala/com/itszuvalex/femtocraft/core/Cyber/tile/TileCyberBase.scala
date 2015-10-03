@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.core.Cyber.tile
 
 import java.util.Random
 
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft}
+import com.itszuvalex.femtocraft.{GuiIDs, FemtoBlocks, Femtocraft}
 import com.itszuvalex.femtocraft.core.Cyber.item.ItemBaseSeed
 import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRegistry
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
@@ -15,6 +15,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.{NBTTagString, NBTTagCompound}
+import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.World
 import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.common.util.ForgeDirection
@@ -102,14 +104,27 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     if (worldObj.isRemote) return true
     if (isValidMultiBlock) {
       if (player.isSneaking) {
-        if (isController) Femtocraft.logger.info(currentlyBuildingMachine + " " + currentMachineBuildProgress) else Femtocraft.logger.info("Not controller")
+        buildMachine("GrowthChamber")
         return true
       } else {
-        buildMachine("GrowthChamber")
+        if (hasGUI) player.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
         return true
       }
     }
     false
+  }
+
+  override def getRenderBoundingBox: AxisAlignedBB = {
+    if (isController) {
+      var yOffset = 0
+      if (currentlyBuildingMachine == -1) {
+        yOffset = TileCyberBase.baseHeightMap(size)
+      } else {
+        yOffset = TileCyberBase.baseHeightMap(size) + TileCyberBase.slotHeightMap(size)
+      }
+      return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + size, yCoord + yOffset, zCoord + size)
+    }
+    super.getRenderBoundingBox
   }
 
   def onBlockBreak(): Unit = {
@@ -318,6 +333,10 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     machineSlotMap = comp.getIntArray(TileCyberBase.SLOTS_KEY)
     setRenderUpdate()
   }
+
+  override def hasGUI: Boolean = isValidMultiBlock
+
+  override def getGuiID: Int = GuiIDs.CyberBaseGuiID
 
   override def getMod: AnyRef = Femtocraft
 

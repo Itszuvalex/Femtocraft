@@ -20,4 +20,5 @@ object GuiIDs {
   val NaniteHiveGuiID              = nextID
   val FrameMultiblockSelectorGuiID = nextID
   val FrameMultiblockGuiID         = nextID
+  val CyberBaseGuiID               = nextID
 }
