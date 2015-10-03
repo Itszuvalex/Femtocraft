@@ -1,8 +1,9 @@
 package com.itszuvalex.femtocraft
 
 
-import com.itszuvalex.femtocraft.core.Cyber.block.{BlockCyberleaf, BlockCyberweave, BlockCyberwood}
+import com.itszuvalex.femtocraft.core.Cyber.block._
 import com.itszuvalex.femtocraft.core.Industry.block.BlockFrame
+import com.itszuvalex.femtocraft.cyber.block.BlockGrowthChamber
 import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
@@ -26,9 +27,12 @@ object FemtoBlocks {
   var blockArcFurnace            : Block = null
   var blockCrystallizationChamber: Block = null
   var blockCentrifuge            : Block = null
+  var blockGrowthChamber         : Block = null
 
 
-  var blockFrame: Block = null
+  var blockFrame              : Block = null
+  var blockCyberBase          : Block = null
+  var blockInProgressMachine  : Block = null
 
   var blockNaniteHiveSmall: Block = null
 
@@ -71,10 +75,19 @@ object FemtoBlocks {
     blockCentrifuge = new BlockCentrifuge().setCreativeTab(Femtocraft.tab).setBlockName("blockCentrifuge")
     GameRegistry.registerBlock(blockCentrifuge, "blockCentrifuge")
 
+    blockGrowthChamber = new BlockGrowthChamber().setBlockName("blockGrowthChamber")
+    GameRegistry.registerBlock(blockGrowthChamber, "blockGrowthChamber")
+
 
 
     blockFrame = new BlockFrame().setCreativeTab(Femtocraft.tab).setBlockName("blockFrame")
     GameRegistry.registerBlock(blockFrame, "blockFrame")
+
+    blockCyberBase = new BlockCyberBase().setBlockName("blockCyberBase")
+    GameRegistry.registerBlock(blockCyberBase, "blockCyberBase")
+
+    blockInProgressMachine = new BlockInProgressMachine().setBlockName("blockInProgressMachine").setBlockUnbreakable().setResistance(Float.MaxValue / 3f)
+    GameRegistry.registerBlock(blockInProgressMachine, "blockInProgressMachine")
 
     blockNaniteHiveSmall = new BlockNaniteHiveSmall().setCreativeTab(Femtocraft.tab).setBlockName("blockNaniteHive_small")
     GameRegistry.registerBlock(blockNaniteHiveSmall, "blockNaniteHive_small")

@@ -1,12 +1,10 @@
 package com.itszuvalex.femtocraft.render
 
-import com.itszuvalex.femtocraft.core.{FrameMultiblockRegistry, IFrameItem}
+import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRendererRegistry, FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.itszulib.api.IPreviewableRenderer
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import net.minecraft.client.renderer.Tessellator
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
-import org.lwjgl.opengl.GL11
 
 /**
  * Created by Christopher on 8/26/2015.
@@ -22,7 +20,7 @@ class FramePreviewableRenderer extends IPreviewableRenderer {
           case multi: String =>
             FrameMultiblockRegistry.getMultiblock(multi) match {
               case Some(mb) =>
-                MultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
+                FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
                   case Some(renderer) => renderer.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
                   case None =>
                     generic.multi = mb

@@ -1,13 +1,11 @@
 package com.itszuvalex.femtocraft.core.Industry.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.{IFrameMultiblock, IFrameMultiblockRenderer, FrameMultiblockRegistry}
+import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRendererRegistry, FrameMultiblockRegistry}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.render.MultiblockRendererRegistry
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
@@ -66,19 +64,12 @@ class FrameRenderer extends TileEntitySpecialRenderer {
                                                             } yield (a, b, c)
                                                           }.toSet
                                    )
-        //TODO: Replace hardcoded offset values with automatic assignment by multiblock size and controller position
         if (frame.progress > 0 && frame.isController) {
           FrameMultiblockRegistry.getMultiblock(frame.multiBlock) match {
             case Some(mb) =>
-              MultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
+              FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
                 case Some(render) =>
-                  render.renderInProgressAt(x, y, z,
-                    1d,
-                    0d,
-                    1d,
-                    partialTime,
-                    frame
-                  )
+                  render.renderInProgressAt(x, y, z, partialTime, frame)
                 case _ =>
               }
             case _ =>

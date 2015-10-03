@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.industry.multiblock
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.core.IFrameMultiblock
+import com.itszuvalex.femtocraft.core.Industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.IMultiBlockComponent

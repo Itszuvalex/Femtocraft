@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.IFrameMultiblockRenderer
+import com.itszuvalex.femtocraft.core.Industry.IFrameMultiblockRenderer
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import net.minecraft.client.Minecraft
@@ -35,12 +35,12 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblock
     }
   }
 
-  override def renderInProgressAt(x: Double, y: Double, z: Double, dx: Double, dy: Double, dz: Double, partialTime: Float, frame: TileFrame): Unit = {
+  override def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, frame: TileFrame): Unit = {
 
     Minecraft.getMinecraft.getTextureManager.bindTexture(ArcFurnaceRenderer.inProgressTexLoc)
 
     GL11.glPushMatrix()
-    GL11.glTranslated(x + dx, y + dy, z + dz)
+    GL11.glTranslated(x + 1, y, z + 1)
     //    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)

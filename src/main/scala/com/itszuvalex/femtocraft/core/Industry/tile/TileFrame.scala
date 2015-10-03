@@ -1,8 +1,7 @@
 package com.itszuvalex.femtocraft.core.Industry.tile
 
 import java.util.Random
-
-import com.itszuvalex.femtocraft.core.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -107,7 +106,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
       progress += 1
       setUpdate()
     }
-    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressData.getOrElseUpdate("targetTime", 0f).asInstanceOf[Float]) {
+    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressData.getOrElse("targetTime", 0f).asInstanceOf[Float]) {
       FrameMultiblockRegistry.getMultiblock(multiBlock) match {
         case Some(multi) =>
           TileFrame.shouldDrop = false
@@ -118,12 +117,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
         case _           =>
       }
     }
-  }
-
-  override def clientUpdate(): Unit = {
-    super.clientUpdate()
-    if (!isController) return
-    if (multiBlock == null) return
   }
 
   def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)

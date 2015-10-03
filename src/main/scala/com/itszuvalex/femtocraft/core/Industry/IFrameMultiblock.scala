@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.core
+package com.itszuvalex.femtocraft.core.Industry
 
 import com.itszuvalex.itszulib.api.core.Loc4
 import cpw.mods.fml.relauncher.{Side, SideOnly}

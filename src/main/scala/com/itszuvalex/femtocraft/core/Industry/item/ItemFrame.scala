@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.core.Industry.item
 import java.util
 
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.core.{FrameMultiblockRegistry, IFrameItem}
+import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._

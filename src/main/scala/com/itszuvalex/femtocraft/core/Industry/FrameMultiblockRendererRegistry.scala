@@ -1,6 +1,5 @@
-package com.itszuvalex.femtocraft.render
+package com.itszuvalex.femtocraft.core.Industry
 
-import com.itszuvalex.femtocraft.core.IFrameMultiblockRenderer
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.mutable
@@ -9,7 +8,7 @@ import scala.collection.mutable
  * Created by Christopher on 8/26/2015.
  */
 @SideOnly(Side.CLIENT)
-object MultiblockRendererRegistry {
+object FrameMultiblockRendererRegistry {
   private val renderMap = mutable.HashMap[Int, IFrameMultiblockRenderer]()
   private var lastID    = 1
 
