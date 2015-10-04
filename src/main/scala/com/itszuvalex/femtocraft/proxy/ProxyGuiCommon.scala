@@ -1,6 +1,8 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
+import com.itszuvalex.femtocraft.core.Cyber.container.ContainerCyberBase
+import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.core.Industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.container.{ContainerArcFurnace, ContainerMultiblockSelection}
@@ -19,6 +21,7 @@ class ProxyGuiCommon extends IGuiHandler {
     (ID, world.getTileEntity(x, y, z)) match {
       case (GuiIDs.FrameMultiblockSelectorGuiID, _)          => new ContainerMultiblockSelection
       case (GuiIDs.FrameMultiblockGuiID, te: TileFrame)      => new ContainerFrame(player, player.inventory, te)
+      case (GuiIDs.CyberBaseGuiID, te: TileCyberBase)        => new ContainerCyberBase(player, player.inventory, te)
       case (GuiIDs.ArcFurnaceGuiID, te: TileArcFurnace)      => new ContainerArcFurnace(player, player.inventory, te)
       case (GuiIDs.NaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
       case (_, _)                                            => null

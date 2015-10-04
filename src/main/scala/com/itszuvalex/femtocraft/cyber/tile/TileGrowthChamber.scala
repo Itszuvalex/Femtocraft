@@ -8,6 +8,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.AxisAlignedBB
 
 /**
  * Created by Alex on 30.09.2015.
@@ -29,6 +30,8 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
       case _ =>
     }
   }
+
+  override def getRenderBoundingBox = AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 2, yCoord + 2, zCoord + 2)
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
