@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{ItemStack, Item}
 import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
+import net.minecraftforge.fluids.{FluidRegistry, FluidStack, FluidTank}
 
 /**
  * Created by Alex on 26.09.2015.
@@ -140,6 +141,12 @@ class ItemBaseSeed extends Item with IPreviewable {
         case te: TileCyberBase =>
           te.size = ItemBaseSeed.getSize(stack)
           te.indInventory.setInventorySize(math.pow(te.size + 1, 2).toInt + 9)
+          te.size match {
+            case 1 => te.tanks = Array(new FluidTank(2000), new FluidTank(1000))
+            case 2 => te.tanks = Array(new FluidTank(2000), new FluidTank(2000))
+            case 3 => te.tanks = Array(new FluidTank(2000), new FluidTank(2000), new FluidTank(2000))
+          }
+          te.tanks(0).setFluid(new FluidStack(/* FemtoFluids.cybermass */ FluidRegistry.WATER, 0))
           te.formMultiBlock(world, bx, by, bz)
         case _ =>
       }

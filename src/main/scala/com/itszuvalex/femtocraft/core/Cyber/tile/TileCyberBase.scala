@@ -8,16 +8,14 @@ import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRegistry
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.{TileFluidTank, MultiBlockComponent}
+import com.itszuvalex.itszulib.core.traits.tile.{TileMultiFluidTank, MultiBlockComponent}
 import com.itszuvalex.itszulib.util.InventoryUtils
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.{NBTTagString, NBTTagCompound}
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.world.World
 import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids._
@@ -90,7 +88,7 @@ object TileCyberBase {
   def arePartsAtYPlaceable(locs: Set[Loc4], y: Int) = locs.forall( loc => {val world = DimensionManager.getWorld(loc.dim); world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z) || loc.y != y} )
 }
 
-class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank with IInventory {
+class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileMultiFluidTank with IInventory {
   var size: Int                                 = 1
   var machines: Array[String]                   = new Array[String](10)
   var machineSlotMap: Array[Int]                = new Array[Int](10)
@@ -104,7 +102,8 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     if (worldObj.isRemote) return true
     if (isValidMultiBlock) {
       if (player.isSneaking) {
-        buildMachine("GrowthChamber")
+        //buildMachine("GrowthChamber")
+        Femtocraft.logger.info("c:" + tanks(0).getFluidAmount + " 1:" + tanks(1).getFluidAmount + (if (size == 3) " 2:" + tanks(2).getFluidAmount else ""))
         return true
       } else {
         if (hasGUI) player.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
@@ -228,13 +227,24 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   /**
+   * Tries to put an item into the base's buffer tanks. If not all of it fits, the rest is returned.
+   * @param fluid FluidStack to put into buffer tanks.
+   * @return Remaining FluidStack, null if empty.
+   */
+  def putFluid(fluid: FluidStack): FluidStack = {
+    if (!isController) return forwardToController[TileCyberBase, FluidStack](_.putFluid(fluid))
+    fluid.amount -= fill(ForgeDirection.DOWN, fluid, true)
+    if (fluid.amount == 0) null else fluid
+  }
+
+  /**
    * Broadcasts an ItemStack to all machines on this base. If not all is accepted, the rest tries to go into the base's buffer inventory.
    * If it doesn't all fit in there, the rest is returned.
    * @param _item ItemStack to broadcast
    * @return Remaining ItemStack, null if empty.
    */
   def broadcastItem(_item: ItemStack): ItemStack = {
-    if (!isController) { return forwardToController[TileCyberBase, ItemStack](_.broadcastItem(_item)) }
+    if (!isController) return forwardToController[TileCyberBase, ItemStack](_.broadcastItem(_item))
     var item = _item
     for (i <- 0 until firstEmpty(machines)) {
       CyberMachineRegistry.getMachine(machines(i)) match {
@@ -248,7 +258,8 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   /**
-   * Broadcasts a FluidStack to all machines on this base. If not all is accepted, the rest is returned.
+   * Broadcasts a FluidStack to all machines on this base. If not all is accepted, the rest tries to go into the base's buffer tanks.
+   * If it doesn't all fit in there, the rset is returned.
    * @param _fluid FluidStack to broadcast
    * @return Remaining FluidStack, null if empty.
    */
@@ -263,10 +274,11 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
         case _ =>
       }
     }
-    fluid
+    putFluid(fluid)
   }
 
   override def serverUpdate(): Unit = {
+    fill(ForgeDirection.DOWN, new FluidStack(FluidRegistry.LAVA, 2), true)
     if (!isController || currentlyBuildingMachine == -1) return
     if (worldObj.getTotalWorldTime % (totalMachineBuildTime / 100) == 0 && currentMachineBuildProgress < 100) {
       currentMachineBuildProgress += 1
@@ -307,6 +319,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     val machineList = comp.getTagList(TileCyberBase.MACHINES_KEY, 8)
     for (i <- 0 until machineList.tagCount()) setToStrOrNull(machines, i, machineList.getStringTagAt(i))
     machineSlotMap = comp.getIntArray(TileCyberBase.SLOTS_KEY)
+    indInventory.setInventorySize(9 + math.pow(size + 1, 2).toInt)
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
@@ -331,6 +344,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     val machineList = comp.getTagList(TileCyberBase.MACHINES_KEY, 8)
     for (i <- 0 until machineList.tagCount()) setToStrOrNull(machines, i, machineList.getStringTagAt(i))
     machineSlotMap = comp.getIntArray(TileCyberBase.SLOTS_KEY)
+    indInventory.setInventorySize(9 + math.pow(size + 1, 2).toInt)
     setRenderUpdate()
   }
 
@@ -368,9 +382,36 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   override def hasDescription: Boolean = isValidMultiBlock
 
-  override def defaultTank: FluidTank = new FluidTank(2000)
+  override def defaultTanks: Array[FluidTank] = Array(new FluidTank(2000), new FluidTank(1000))
 
-  override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
+  // Disabled UP because blocks directly on top of the base (that aren't machines) are generally forbidden.
+  override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = from != ForgeDirection.UP
 
-  override def canDrain(from: ForgeDirection, fluid: Fluid): Boolean = false
+  override def canDrain(from: ForgeDirection, fluid: Fluid): Boolean = from != ForgeDirection.UP
+
+  override def fill(from: ForgeDirection, fluid: FluidStack, doFill: Boolean): Int = {
+    var filled = 0
+    if (fluid.getFluid == /* FemtoFluids.cybermass */ FluidRegistry.WATER) {
+      val filled2 = tanks(0).fill(fluid, doFill)
+      fluid.amount -= filled2
+      if (fluid.amount == 0) return filled2
+      filled = filled2
+    }
+    filled += tanks(1).fill(fluid, doFill)
+    fluid.amount -= filled
+    if (size < 3 || fluid.amount == 0) return filled
+    filled += tanks(2).fill(fluid, doFill)
+    filled
+  }
+
+  override def drain(from: ForgeDirection, maxDrain: Int, doDrain: Boolean): FluidStack = {
+    if (size == 3) {
+      val ret = tanks(2).drain(maxDrain, false)
+      if (ret == null || ret.amount == 0) return tanks(1).drain(maxDrain, doDrain)
+      return tanks(2).drain(maxDrain, doDrain)
+    }
+    tanks(1).drain(maxDrain, doDrain)
+  }
+
+  override def drain(from: ForgeDirection, resource: FluidStack, doDrain: Boolean): FluidStack = drain(from, resource.amount, doDrain)
 }
