@@ -278,7 +278,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   override def serverUpdate(): Unit = {
-    fill(ForgeDirection.DOWN, new FluidStack(FluidRegistry.LAVA, 2), true)
+    // Test code: fill(ForgeDirection.DOWN, new FluidStack(FluidRegistry.LAVA, 2), true)
     if (!isController || currentlyBuildingMachine == -1) return
     if (worldObj.getTotalWorldTime % (totalMachineBuildTime / 100) == 0 && currentMachineBuildProgress < 100) {
       currentMachineBuildProgress += 1
@@ -413,5 +413,14 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     tanks(1).drain(maxDrain, doDrain)
   }
 
-  override def drain(from: ForgeDirection, resource: FluidStack, doDrain: Boolean): FluidStack = drain(from, resource.amount, doDrain)
+  override def drain(from: ForgeDirection, resource: FluidStack, doDrain: Boolean): FluidStack = {
+    var t2rf = false
+    if (size == 3) {
+      t2rf = tanks(2).getFluid.getFluid == resource.getFluid
+    }
+    val t1rf = tanks(1).getFluid.getFluid == resource.getFluid
+    if (t2rf) return tanks(2).drain(resource.amount, doDrain)
+    if (t1rf) return tanks(1).drain(resource.amount, doDrain)
+    null
+  }
 }
