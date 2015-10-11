@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.core.Cyber.gui
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.core.Cyber.container.ContainerCyberBase
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.itszulib.gui.{GuiLabel, GuiFluidTank, GuiItemStack, GuiBase}
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiLabel, GuiFluidTank, GuiItemStack}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.RenderHelper

@@ -2,13 +2,11 @@ package com.itszuvalex.femtocraft.core.Cyber.container
 
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.itszulib.container.ContainerInv
-import cpw.mods.fml.relauncher.{Side, SideOnly}
+import com.itszuvalex.itszulib.core.FluidSlotContainer
+import com.itszuvalex.itszulib.gui.FluidSlot
 import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
-import net.minecraft.inventory.{ICrafting, Slot}
+import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fluids.{FluidRegistry, FluidStack}
-
-import scala.collection.JavaConversions._
 
 /**
  * Created by Alex on 03.10.2015.
@@ -21,20 +19,27 @@ object ContainerCyberBase {
   val BUFFER_2_AMOUNT_ID = 4
 }
 
-class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileCyberBase) extends ContainerInv[TileCyberBase](player, tile, 0, 0) {
+class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileCyberBase) extends ContainerInv[TileCyberBase](player, tile, 0, 0) with FluidSlotContainer {
   val bufferSlotSize = tile.size + 1
 
+  /*
   var lastCybermassAmount = 0
   var lastB1FluidID = 0
   var lastB1FluidAmount = 0
   var lastB2FluidID = 0
   var lastB2FluidAmount = 0
+  */
 
   for (i <- 0 until 9) addSlotToContainer(new Slot(tile, i, 89 + 18 * (i % 3), 37 + 18 * (i / 3)))
   for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) addSlotToContainer(new Slot(tile, i + 9, 8 + 18 * (i % bufferSlotSize), 19 + 18 * (i / bufferSlotSize)))
 
+  addFluidSlotToContainer(new FluidSlot(tile, 0, 0, 152, 22))
+  addFluidSlotToContainer(new FluidSlot(tile, 1, 1, 177, 22))
+  if (tile.size == 3) addFluidSlotToContainer(new FluidSlot(tile, 2, 2, 197, 22))
+
   addPlayerInventorySlots(inv, 8, 95)
 
+  /*
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
     crafters.foreach { case crafter: ICrafting =>
@@ -81,6 +86,7 @@ class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileC
       case _ =>
     }
   }
+  */
 
   override def eligibleForInput(item: ItemStack): Boolean = false
 
