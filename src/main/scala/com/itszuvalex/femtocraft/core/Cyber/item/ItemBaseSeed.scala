@@ -3,8 +3,7 @@ package com.itszuvalex.femtocraft.core.Cyber.item
 import java.util
 
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.logistics.storage.item.IndexedInventory
-import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -142,9 +141,9 @@ class ItemBaseSeed extends Item with IPreviewable {
           te.size = ItemBaseSeed.getSize(stack)
           te.indInventory.setInventorySize(math.pow(te.size + 1, 2).toInt + 9)
           te.size match {
-            case 1 => te.tanks = Array(new FluidTank(2000), new FluidTank(1000))
-            case 2 => te.tanks = Array(new FluidTank(2000), new FluidTank(2000))
-            case 3 => te.tanks = Array(new FluidTank(2000), new FluidTank(2000), new FluidTank(2000))
+            case 1 => te.tanks = Array(new FluidTank(2000), new FluidTank(2000))
+            case 2 => te.tanks = Array(new FluidTank(2000), new FluidTank(4000))
+            case 3 => te.tanks = Array(new FluidTank(2000), new FluidTank(4000), new FluidTank(4000))
           }
           te.tanks(0).setFluid(new FluidStack(/* FemtoFluids.cybermass */ FluidRegistry.WATER, 0))
           te.formMultiBlock(world, bx, by, bz)

@@ -278,7 +278,9 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   override def serverUpdate(): Unit = {
-    // Test code: fill(ForgeDirection.DOWN, new FluidStack(FluidRegistry.LAVA, 2), true)
+    /* Test Code: fill(ForgeDirection.DOWN, new FluidStack(FluidRegistry.LAVA, 2), true)
+                  setUpdateTanks() */
+    super.serverUpdate()
     if (!isController || currentlyBuildingMachine == -1) return
     if (worldObj.getTotalWorldTime % (totalMachineBuildTime / 100) == 0 && currentMachineBuildProgress < 100) {
       currentMachineBuildProgress += 1
@@ -382,7 +384,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   override def hasDescription: Boolean = isValidMultiBlock
 
-  override def defaultTanks: Array[FluidTank] = Array(new FluidTank(2000), new FluidTank(1000))
+  override def defaultTanks: Array[FluidTank] = Array(new FluidTank(2000), new FluidTank(2000))
 
   // Disabled UP because blocks directly on top of the base (that aren't machines) are generally forbidden.
   override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = from != ForgeDirection.UP
@@ -391,6 +393,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   override def fill(from: ForgeDirection, fluid: FluidStack, doFill: Boolean): Int = {
     var filled = 0
+    setUpdateTanks()
     if (fluid.getFluid == /* FemtoFluids.cybermass */ FluidRegistry.WATER) {
       val filled2 = tanks(0).fill(fluid, doFill)
       fluid.amount -= filled2
@@ -405,6 +408,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   override def drain(from: ForgeDirection, maxDrain: Int, doDrain: Boolean): FluidStack = {
+    setUpdateTanks()
     if (size == 3) {
       val ret = tanks(2).drain(maxDrain, false)
       if (ret == null || ret.amount == 0) return tanks(1).drain(maxDrain, doDrain)
@@ -419,6 +423,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       t2rf = tanks(2).getFluid.getFluid == resource.getFluid
     }
     val t1rf = tanks(1).getFluid.getFluid == resource.getFluid
+    setUpdateTanks()
     if (t2rf) return tanks(2).drain(resource.amount, doDrain)
     if (t1rf) return tanks(1).drain(resource.amount, doDrain)
     null
