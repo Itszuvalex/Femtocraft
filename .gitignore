@@ -1,10 +1,18 @@
 .gradle/
-eclipse/
 out/
+
+#Minecraft Forge
+logs/
+crash-reports/
+config/
+
+#IDE
+.idea/
 projectFilesBackup/
 Femtocraft.iml
 Femtocraft.ipr
 Femtocraft.iws
+eclipse/
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
