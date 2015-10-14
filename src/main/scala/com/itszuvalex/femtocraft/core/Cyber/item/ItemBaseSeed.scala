@@ -145,7 +145,6 @@ class ItemBaseSeed extends Item with IPreviewable {
             case 2 => te.tanks = Array(new FluidTank(2000), new FluidTank(4000))
             case 3 => te.tanks = Array(new FluidTank(2000), new FluidTank(4000), new FluidTank(4000))
           }
-          te.tanks(0).setFluid(new FluidStack(/* FemtoFluids.cybermass */ FluidRegistry.WATER, 0))
           te.formMultiBlock(world, bx, by, bz)
         case _ =>
       }

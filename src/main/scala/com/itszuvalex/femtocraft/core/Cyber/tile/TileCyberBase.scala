@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.core.Cyber.tile
 
 import java.util.Random
 
-import com.itszuvalex.femtocraft.{GuiIDs, FemtoBlocks, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoFluids, GuiIDs, FemtoBlocks, Femtocraft}
 import com.itszuvalex.femtocraft.core.Cyber.item.ItemBaseSeed
 import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRegistry
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
@@ -394,7 +394,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   override def fill(from: ForgeDirection, fluid: FluidStack, doFill: Boolean): Int = {
     var filled = 0
     setUpdateTanks()
-    if (fluid.getFluid == /* FemtoFluids.cybermass */ FluidRegistry.WATER) {
+    if (fluid.getFluid == FemtoFluids.cybermass) {
       val filled2 = tanks(0).fill(fluid, doFill)
       fluid.amount -= filled2
       if (fluid.amount == 0) return filled2
