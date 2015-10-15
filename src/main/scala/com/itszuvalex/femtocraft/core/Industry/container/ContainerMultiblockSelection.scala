@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.container
+package com.itszuvalex.femtocraft.core.Industry.container
 
 import com.itszuvalex.itszulib.container.ContainerBase
 import net.minecraft.entity.player.EntityPlayer

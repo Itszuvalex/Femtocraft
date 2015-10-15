@@ -3,9 +3,9 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.core.Cyber.gui.GuiCyberBase
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.core.Industry.gui.GuiFrame
+import com.itszuvalex.femtocraft.core.Industry.gui.{GuiMultiblockSelection, GuiFrame}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.industry.gui.{GuiArcFurnace, GuiMultiblockSelection}
+import com.itszuvalex.femtocraft.industry.gui.GuiArcFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
