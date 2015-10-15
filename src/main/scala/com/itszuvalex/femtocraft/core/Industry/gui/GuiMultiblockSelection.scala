@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.core.Industry.gui
 import com.itszuvalex.femtocraft.core.Industry.container.ContainerMultiblockSelection
 import com.itszuvalex.femtocraft.core.Industry.gui.GuiMultiblockSelection.GuiMultiblockSelector
 import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRegistry, IFrameItem, IFrameMultiblock}
-import com.itszuvalex.femtocraft.network.PacketHandler
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageMultiblockSelection
 import com.itszuvalex.femtocraft.{FemtoItems, Resources}
 import com.itszuvalex.itszulib.gui._
@@ -148,7 +148,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
       case is   => is.getItem match {
         case null              =>
         case frame: IFrameItem =>
-          PacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(multi.multi.getName))
+          FemtoPacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(multi.multi.getName))
       }
     }
   }
@@ -161,7 +161,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
       case is   => is.getItem match {
         case null              =>
         case frame: IFrameItem =>
-          PacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(null))
+          FemtoPacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(null))
       }
     }
   }
