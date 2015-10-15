@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRegistry, CybermaterialRegistry}
 import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.network.PacketHandler
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import cpw.mods.fml.common.Mod.EventHandler
@@ -44,7 +44,7 @@ object Femtocraft {
     FemtoItems.preInit()
     FemtoFluids.preInit()
 
-    PacketHandler.preInit()
+    FemtoPacketHandler.preInit()
 
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)

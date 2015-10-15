@@ -8,7 +8,7 @@ import cpw.mods.fml.relauncher.Side
 /**
  * Created by Christopher Harris (Itszuvalex) on 4/6/15.
  */
-object PacketHandler {
+object FemtoPacketHandler {
   val INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(Femtocraft.ID.toLowerCase)
 
   private var messageIndex = 1

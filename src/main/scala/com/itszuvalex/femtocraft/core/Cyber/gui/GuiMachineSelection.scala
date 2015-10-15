@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.core.Cyber.gui
 
-import com.itszuvalex.femtocraft.network.PacketHandler
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageBuildMachine
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRegistry, ICyberMachine}
@@ -148,7 +148,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
   def buildMachine(): Unit = {
     if (selected != null){
       var message = new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, selected.machine.getName)
-      PacketHandler.INSTANCE.sendToServer(message)
+      FemtoPacketHandler.INSTANCE.sendToServer(message)
     }
     player.openGui(te.getMod, te.getGuiID, te.getWorldObj, te.info.x, te.info.y, te.info.z)
   }
