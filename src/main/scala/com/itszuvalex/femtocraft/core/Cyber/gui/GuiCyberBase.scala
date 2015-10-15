@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.core.Cyber.gui
 
-import com.itszuvalex.femtocraft.{FemtoFluids, Resources}
+import com.itszuvalex.femtocraft.{GuiIDs, FemtoFluids, Resources}
 import com.itszuvalex.femtocraft.core.Cyber.container.ContainerCyberBase
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiLabel, GuiFluidTank, GuiItemStack}
+import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.RenderHelper
@@ -58,8 +58,17 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
   bufferTank1.setShouldRender(false)
   if (tile.size == 3) bufferTank2.setShouldRender(false)
 
+  val buildButton = new GuiButton(176, 95, 50, 16, "Build Machine") {
+    override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
+      player.openGui(tile.getMod, GuiIDs.CyberBaseBuildGuiID, tile.getWorldObj, tile.info.x, tile.info.y, tile.info.z)
+      true
+    } else false
+  }
+  
+  buildButton.setShouldRender(false)
+
   {
-    val elems = List(nameLabel, cybermassTank, bufferTank1) ++ inputSlots ++ bufferSlots
+    val elems = List(nameLabel, cybermassTank, bufferTank1, buildButton) ++ inputSlots ++ bufferSlots
     add(elems: _*)
     if (tile.size == 3) add(bufferTank2)
   }
@@ -79,6 +88,7 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
     cybermassTank.render(anchorX + cybermassTank.anchorX, anchorY + cybermassTank.anchorY, mouseX - anchorX - cybermassTank.anchorX, mouseY - anchorY - cybermassTank.anchorY, partialTicks)
     bufferTank1.render(anchorX + bufferTank1.anchorX, anchorY + bufferTank1.anchorY, mouseX - anchorX - bufferTank1.anchorX, mouseY - anchorY - bufferTank1.anchorY, partialTicks)
     if (tile.size == 3) bufferTank2.render(anchorX + bufferTank2.anchorX, anchorY + bufferTank2.anchorY, mouseX - anchorX - bufferTank2.anchorX, mouseY - anchorY - bufferTank2.anchorY, partialTicks)
+    buildButton.render(anchorX + buildButton.anchorX, anchorY + buildButton.anchorY, mouseX - anchorX - buildButton.anchorX, mouseY - anchorY - buildButton.anchorY, partialTicks)
     inputSlots.foreach(gui => gui.render(anchorX + gui.anchorX, anchorY + gui.anchorY, mouseX - anchorX - gui.anchorX, mouseY - anchorY - gui.anchorY, partialTicks))
     bufferSlots.foreach(gui => gui.render(anchorX + gui.anchorX, anchorY + gui.anchorY, mouseX - anchorX - gui.anchorX, mouseY - anchorY - gui.anchorY, partialTicks))
 

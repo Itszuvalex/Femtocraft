@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.network
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.network.messages.MessageMultiblockSelection
+import com.itszuvalex.femtocraft.network.messages.{MessageBuildMachine, MessageMultiblockSelection}
 import cpw.mods.fml.common.network.NetworkRegistry
 import cpw.mods.fml.relauncher.Side
 
@@ -20,6 +20,7 @@ object PacketHandler {
 
   def preInit(): Unit = {
     INSTANCE.registerMessage(classOf[MessageMultiblockSelection], classOf[MessageMultiblockSelection], nextIndex, Side.SERVER)
+    INSTANCE.registerMessage(classOf[MessageBuildMachine], classOf[MessageBuildMachine], nextIndex, Side.SERVER)
   }
 
 }

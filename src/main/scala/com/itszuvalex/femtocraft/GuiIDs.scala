@@ -21,4 +21,5 @@ object GuiIDs {
   val FrameMultiblockSelectorGuiID = nextID
   val FrameMultiblockGuiID         = nextID
   val CyberBaseGuiID               = nextID
+  val CyberBaseBuildGuiID          = nextID
 }

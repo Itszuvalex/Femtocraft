@@ -23,7 +23,7 @@ class MachineGrowthChamber extends ICyberMachine {
    */
   override def getName: String = "GrowthChamber"
 
-  override def getRequiredFluid: FluidStack = null
+  override def getRequiredCybermass: Int = 500
 
   override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = ICyberMachine.getTakenLocations(x, y, z, world.provider.dimensionId, getRequiredBaseSize, getRequiredSlots)
 
@@ -32,7 +32,7 @@ class MachineGrowthChamber extends ICyberMachine {
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.growthChamberID
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq.empty[ItemStack]
+  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq(new ItemStack(FemtoBlocks.blockCyberweave, 20))
 
   /**
    * This function should place all machine blocks and make them a multiblock.

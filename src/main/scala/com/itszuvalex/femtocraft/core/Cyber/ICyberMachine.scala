@@ -86,7 +86,7 @@ trait ICyberMachine {
 
   def getRequiredResources: scala.collection.IndexedSeq[ItemStack]
 
-  def getRequiredFluid: FluidStack
+  def getRequiredCybermass: Int
 
   @SideOnly(Side.CLIENT)
   def multiblockRenderID: Int
