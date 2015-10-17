@@ -182,12 +182,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       case Some(m) =>
         if (remainingSlots < m.getRequiredSlots) return
         if (size != m.getRequiredBaseSize) return
-        if (m.getRequiredResources.forall{ is => var x = 0
-                                                 if (indInventory.getSlotsByItemStack(is).orNull == null) return
-                                                 indInventory.getSlotsByItemStack(is).get.foreach(slot => x += indInventory.getStackInSlot(slot).stackSize)
-                                                 x >= is.stackSize
-                                         }
-           )
         m.getTakenLocations(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord).foreach { loc =>
           worldObj.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockInProgressMachine)
         }
