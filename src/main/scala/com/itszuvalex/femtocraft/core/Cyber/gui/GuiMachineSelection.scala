@@ -17,10 +17,10 @@ import org.lwjgl.opengl.GL11
  * Created by Alex on 15.10.2015.
  */
 object GuiMachineSelection {
-  val texture         = Resources.TexGui("GuiMultiblockSelector.png")
+  val texture         = Resources.TexGui("GuiMachineSelector.png")
   val xSelectionMin   = 7
   val ySelectionMin   = 7
-  val SelectionHeight = 110
+  val SelectionHeight = 108
   val SelectionWidth  = 212
   val WIDTH           = 225
   val HEIGHT          = 166
@@ -32,10 +32,9 @@ object GuiMachineSelection {
       new GuiLabel(2, 2,
         panelWidth - 40, panelHeight / 2, machine.getName
       ),
-      new GuiFlowLayout(2, panelHeight - 20, panelWidth - 4, panelHeight / 2,
+      new GuiFlowLayout(2, panelHeight - 19, panelWidth - 4, panelHeight / 2,
         machine.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
-      new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass),
-        (panelHeight - Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT) / 2,
+      new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass), 2,
         Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass),
         Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT,
         "Cybermass: " + machine.getRequiredCybermass)
@@ -80,7 +79,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
       GuiMachineSelection.SelectionWidth,
       GuiMachineSelection.SelectionHeight,
       {
-        val machines = CyberMachineRegistry.getMachinesThatFitIn(te.size, TileCyberBase.slotHeightMap(te.size) - te.firstFreeSlot)
+        val machines = CyberMachineRegistry.getMachinesThatFitIn(te.size, te.remainingSlots)
         val selectors = machines.map(new GuiMachineSelector(this, _))
         clearSelection()
         selectors.toSeq
@@ -146,10 +145,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
   }
 
   def buildMachine(): Unit = {
-    if (selected != null){
-      var message = new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, selected.machine.getName)
-      FemtoPacketHandler.INSTANCE.sendToServer(message)
-    }
+    if (selected != null) FemtoPacketHandler.INSTANCE.sendToServer(new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, selected.machine.getName))
     player.openGui(te.getMod, te.getGuiID, te.getWorldObj, te.info.x, te.info.y, te.info.z)
   }
 

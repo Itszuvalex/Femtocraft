@@ -21,7 +21,7 @@ class MachineGrowthChamber extends ICyberMachine {
   /**
    * @return Name of the machine
    */
-  override def getName: String = "GrowthChamber"
+  override def getName: String = "Growth Chamber"
 
   override def getRequiredCybermass: Int = 500
 

@@ -38,19 +38,21 @@ object TileCyberBase {
   val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
 
   /**
-   * @param size Size number of the machine
    * @param x X coord of lower-north-west corner
    * @param y Y coord of lower-north-west-corner
    * @param z Z coord of lower-north-west corner
-   * @param dim Dimension id of the machine
-   * @return Set of locations that are occupied by the base
+   * @param dim Dimension ID
+   * @param xSize X Size fo the cube
+   * @param ySize Y Size fo the cube
+   * @param zSize Z Size fo the cube
+   * @return Set[Loc4] that represents a cube of the passed size.
    */
-  def getBaseLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
+  def getLocationCube(x: Int, y: Int, z: Int, dim: Int, xSize: Int, ySize: Int, zSize: Int): Set[Loc4] = {
     {
       for {
-        bx <- 0 until size
-        by <- 0 until baseHeightMap(size)
-        bz <- 0 until size
+        bx <- 0 until xSize
+        by <- 0 until ySize
+        bz <- 0 until zSize
       } yield Loc4(x + bx, y + by, z + bz, dim)
     }.toSet
   }
@@ -61,17 +63,21 @@ object TileCyberBase {
    * @param y Y coord of lower-north-west-corner
    * @param z Z coord of lower-north-west corner
    * @param dim Dimension id of the machine
+   * @return Set of locations that are occupied by the base
+   */
+  def getBaseLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
+    getLocationCube(x, y, z, dim, size, baseHeightMap(size), size)
+
+  /**
+   * @param size Size number of the machine
+   * @param x X coord of lower-north-west corner
+   * @param y Y coord of lower-north-west-corner
+   * @param z Z coord of lower-north-west corner
+   * @param dim Dimension id of the machine
    * @return Set of locations that are occupied by the machine slots of the base
    */
-  def getSlotLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
-    {
-      for {
-        bx <- 0 until size
-        by <- baseHeightMap(size) until (baseHeightMap(size) + slotHeightMap(size))
-        bz <- 0 until size
-      } yield Loc4(x + bx, y + by, z + bz, dim)
-    }.toSet
-  }
+  def getSlotLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
+    getLocationCube(x, y + baseHeightMap(size), z, dim, size, slotHeightMap(size), size)
 
   /**
    * @param locs Set of locations to check
@@ -89,23 +95,20 @@ object TileCyberBase {
 }
 
 class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileMultiFluidTank with IInventory {
-  var size: Int                                 = 1
-  var machines: Array[String]                   = new Array[String](10)
-  var machineSlotMap: Array[Int]                = new Array[Int](10)
-  var firstFreeSlot: Int                        = 0
-  var currentlyBuildingMachine: Int             = -1
-  var currentMachineBuildProgress: Int          = 0
-  var totalMachineBuildTime: Float              = 100f
-  var inProgressData: mutable.Map[String, Any]  = mutable.Map.empty[String, Any]
+  var size: Int                                               = 1
+  var machines: Array[String]                                 = new Array[String](10)
+  var machineSlotMap: Array[Int]                              = new Array[Int](10)
+  var firstFreeSlot: Int                                      = 0
+  var currentlyBuildingMachine: Int                           = -1
+  var currentMachineBuildProgress: Int                        = 0
+  var totalMachineBuildTime: Float                            = 100f
+  var inProgressData: mutable.Map[String, Any]                = mutable.Map.empty[String, Any]
+  private var breaking: Boolean                               = false
 
   override def onSideActivate(player: EntityPlayer, side: Int): Boolean = {
     if (worldObj.isRemote) return true
     if (isValidMultiBlock) {
-      if (player.isSneaking) {
-        //buildMachine("GrowthChamber")
-        Femtocraft.logger.info("c:" + tanks(0).getFluidAmount + " 1:" + tanks(1).getFluidAmount + (if (size == 3) " 2:" + tanks(2).getFluidAmount else ""))
-        return true
-      } else {
+      if (!player.isSneaking) {
         if (hasGUI) player.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
         return true
       }
@@ -163,15 +166,28 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   def yFromSlot(slot: Int): Int = yCoord + TileCyberBase.baseHeightMap(size) + slot
 
+  def remainingSlots: Int = {
+    val max = TileCyberBase.slotHeightMap(size) - firstFreeSlot
+    for (i <- 0 until max) {
+      if (TileCyberBase.areAllPlaceable(TileCyberBase.getLocationCube(xCoord, yFromSlot(firstFreeSlot), zCoord, worldObj.provider.dimensionId, size, max - i, size))) return max - i
+    }
+    0
+  }
+
   def buildMachine(name: String): Unit = {
     if (worldObj.isRemote) return
     if (!isController) forwardToController[TileCyberBase, Unit](_.buildMachine(name))
     if (currentlyBuildingMachine > -1) return
     CyberMachineRegistry.getMachine(name) match {
       case Some(m) =>
-        if (TileCyberBase.slotHeightMap(size) - firstFreeSlot < m.getRequiredSlots) return
-        if (!TileCyberBase.areAllPlaceable(m.getTakenLocations(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord))) return
+        if (remainingSlots < m.getRequiredSlots) return
         if (size != m.getRequiredBaseSize) return
+        if (m.getRequiredResources.forall{ is => var x = 0
+                                                 if (indInventory.getSlotsByItemStack(is).orNull == null) return
+                                                 indInventory.getSlotsByItemStack(is).get.foreach(slot => x += indInventory.getStackInSlot(slot).stackSize)
+                                                 x >= is.stackSize
+                                         }
+           )
         m.getTakenLocations(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord).foreach { loc =>
           worldObj.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockInProgressMachine)
         }
@@ -183,6 +199,8 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   def breakMachinesUpwardsFromSlot(slot: Int): Unit = {
+    if (breaking) return
+    breaking = true
     machineSlotMap.zipWithIndex.foreach { mac =>
       if (mac._1 >= slot) {
         CyberMachineRegistry.getMachine(machines(mac._2)) match {
@@ -195,6 +213,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       }
     }
     firstFreeSlot = slot
+    breaking = false
   }
 
   /**

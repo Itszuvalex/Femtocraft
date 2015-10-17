@@ -134,6 +134,8 @@ class ItemBaseSeed extends Item with IPreviewable {
     if (ItemBaseSeed.getSize(stack) == 3) { bx -= 1; bz -= 1 }
     val locs = TileCyberBase.getBaseLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId)
     if (!TileCyberBase.areAllPlaceable(locs)) return false
+    if (!TileCyberBase.arePartsAtYPlaceable(TileCyberBase.getSlotLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId),
+                                                                           by + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))) return false
     locs.foreach { loc =>
       world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockCyberBase)
       world.getTileEntity(loc.x, loc.y, loc.z) match {

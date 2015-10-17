@@ -42,7 +42,7 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
 
   val bufferSlots = {
     for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
-  }.toSeq
+}.toSeq
 
   inputSlots.foreach(_.setShouldRender(false))
   bufferSlots.foreach(_.setShouldRender(false))
@@ -58,9 +58,9 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
   bufferTank1.setShouldRender(false)
   if (tile.size == 3) bufferTank2.setShouldRender(false)
 
-  val buildButton = new GuiButton(176, 95, 50, 16, "Build Machine") {
+  val buildButton = new GuiButton(171, 94, 45, 20, "Build Machine") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
-      player.openGui(tile.getMod, GuiIDs.CyberBaseBuildGuiID, tile.getWorldObj, tile.info.x, tile.info.y, tile.info.z)
+      if (tile.currentlyBuildingMachine == -1) player.openGui(tile.getMod, GuiIDs.CyberBaseBuildGuiID, tile.getWorldObj, tile.info.x, tile.info.y, tile.info.z)
       true
     } else false
   }
