@@ -34,38 +34,50 @@ class GrowthChamberRenderer extends TileEntitySpecialRenderer with ICyberMachine
 
     GrowthChamberRenderer.model.renderOnly("Base", "Top")
 
-    val time = tile.getWorldObj.getTotalWorldTime + partialTime
-
-    GL11.glTranslated(0, 1.9, .6)
-    GL11.glRotated((1 + math.sin(time * .05)) * 20, 1, 0, 0)
-    GL11.glTranslated(0, -1.9, -.6)
-    GrowthChamberRenderer.model.renderPart("Sprinkler1")
-    GL11.glTranslated(0, 1.9, .6)
-    GL11.glRotated((1 + math.sin(time * .05)) * -20, 1, 0, 0)
-    GL11.glTranslated(0, -1.9, -.6)
-    GL11.glTranslated(-.5196, 1.9, -.3)
-    GL11.glRotated((1 + math.sin(time * .05)) * 20, -.577350269189626, 0, 1)
-    GL11.glTranslated(.5196, -1.9, .3)
-    GrowthChamberRenderer.model.renderPart("Sprinkler2")
-    GL11.glTranslated(-.5196, 1.9, -.3)
-    GL11.glRotated((1 + math.sin(time * .05)) * -20, -.577350269189626, 0, 1)
-    GL11.glTranslated(.5196, -1.9, .3)
-    GL11.glTranslated(.5196, 1.9, -.3)
-    GL11.glRotated((1 + math.sin(time * .05)) * -20, .577350269189626, 0, 1)
-    GL11.glTranslated(-.5196, -1.9, .3)
-    GrowthChamberRenderer.model.renderPart("Sprinkler3")
-    GL11.glTranslated(.5196, 1.9, -.3)
-    GL11.glRotated((1 + math.sin(time * .05)) * 20, .577350269189626, 0, 1)
-    GL11.glTranslated(-.5196, -1.9, .3)
-
     /*
     Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.testTex)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
     GL11.glEnable(GL11.GL_CULL_FACE)
+
+    Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
     */
 
-    //Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+    if (Minecraft.getMinecraft.gameSettings.particleSetting == 0) {
+      val time = tile.getWorldObj.getTotalWorldTime + partialTime
+
+      GL11.glTranslated(0, 1.9, .6)
+      GL11.glRotated((1 + math.sin(time * .05)) * 20, 1, 0, 0)
+      GL11.glTranslated(0, -1.9, -.6)
+      GrowthChamberRenderer.model.renderPart("Sprinkler1")
+      GL11.glTranslated(0, 1.9, .6)
+      GL11.glRotated((1 + math.sin(time * .05)) * -20, 1, 0, 0)
+      GL11.glTranslated(0, -1.9, -.6)
+      GL11.glTranslated(-.5196, 1.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 1)) * 20, -.577350269189626, 0, 1)
+      GL11.glTranslated(.5196, -1.9, .3)
+      GrowthChamberRenderer.model.renderPart("Sprinkler2")
+      GL11.glTranslated(-.5196, 1.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 1)) * -20, -.577350269189626, 0, 1)
+      GL11.glTranslated(.5196, -1.9, .3)
+      GL11.glTranslated(.5196, 1.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 2)) * -20, .577350269189626, 0, 1)
+      GL11.glTranslated(-.5196, -1.9, .3)
+      GrowthChamberRenderer.model.renderPart("Sprinkler3")
+      GL11.glTranslated(.5196, 1.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 2)) * 20, .577350269189626, 0, 1)
+      GL11.glTranslated(-.5196, -1.9, .3)
+
+      GL11.glTranslated(-(x + 1), -y, -(z + 1))
+      Minecraft.getMinecraft.effectRenderer.renderParticles(Minecraft.getMinecraft.renderViewEntity, partialTime)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+      GL11.glEnable(GL11.GL_BLEND)
+      GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+      GL11.glEnable(GL11.GL_CULL_FACE)
+      GL11.glTranslated(x + 1, y, z + 1)
+      GL11.glColor4f(1f, 1f, 1f, 1f)
+    }
+
     GrowthChamberRenderer.model.renderPart("Glass")
 
     GL11.glPopMatrix()
