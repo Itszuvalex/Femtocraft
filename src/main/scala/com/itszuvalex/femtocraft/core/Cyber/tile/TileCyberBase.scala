@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.core.Cyber.tile
 
 import java.util.Random
 
-import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
 import com.itszuvalex.femtocraft.{FemtoFluids, GuiIDs, FemtoBlocks, Femtocraft}
 import com.itszuvalex.femtocraft.core.Cyber.item.ItemBaseSeed
 import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRegistry
@@ -10,10 +9,8 @@ import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileM
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{TileMultiFluidTank, MultiBlockComponent}
-import com.itszuvalex.itszulib.render.{Point3D, Vector3}
 import com.itszuvalex.itszulib.util.InventoryUtils
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
