@@ -5,6 +5,8 @@ import com.itszuvalex.femtocraft.core.Cyber.container.{ContainerMachineSelection
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.core.Industry.container.{ContainerMultiblockSelection, ContainerFrame}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.cyber.container.ContainerGrowthChamber
+import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.femtocraft.industry.container.ContainerArcFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
@@ -19,13 +21,14 @@ import net.minecraft.world.World
 class ProxyGuiCommon extends IGuiHandler {
   override def getServerGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(x, y, z)) match {
-      case (GuiIDs.FrameMultiblockSelectorGuiID, _)          => new ContainerMultiblockSelection
-      case (GuiIDs.FrameMultiblockGuiID, te: TileFrame)      => new ContainerFrame(player, player.inventory, te)
-      case (GuiIDs.CyberBaseGuiID, te: TileCyberBase)        => new ContainerCyberBase(player, player.inventory, te)
-      case (GuiIDs.CyberBaseBuildGuiID, _: TileCyberBase)    => new ContainerMachineSelection
-      case (GuiIDs.ArcFurnaceGuiID, te: TileArcFurnace)      => new ContainerArcFurnace(player, player.inventory, te)
-      case (GuiIDs.NaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
-      case (_, _)                                            => null
+      case (GuiIDs.FrameMultiblockSelectorGuiID, _)           => new ContainerMultiblockSelection
+      case (GuiIDs.FrameMultiblockGuiID, te: TileFrame)       => new ContainerFrame(player, player.inventory, te)
+      case (GuiIDs.CyberBaseGuiID, te: TileCyberBase)         => new ContainerCyberBase(player, player.inventory, te)
+      case (GuiIDs.CyberBaseBuildGuiID, _: TileCyberBase)     => new ContainerMachineSelection
+      case (GuiIDs.ArcFurnaceGuiID, te: TileArcFurnace)       => new ContainerArcFurnace(player, player.inventory, te)
+      case (GuiIDs.NaniteHiveGuiID, te: TileNaniteHiveSmall)  => new ContainerNaniteHive(player, player.inventory, te)
+      case (GuiIDs.GrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)
+      case (_, _)                                             => null
     }
   }
 
