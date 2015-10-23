@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
+import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
+import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
@@ -9,14 +11,16 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{TileFluidTank, MultiBlockComponent}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.{Point3D, Vector3}
+import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.common.util.ForgeDirection
-import net.minecraftforge.fluids.{FluidTank, Fluid}
+import net.minecraftforge.fluids.{FluidRegistry, FluidStack, FluidTank, Fluid}
+
+import java.util.Random
 
 /**
  * Created by Alex on 30.09.2015.
@@ -24,12 +28,15 @@ import net.minecraftforge.fluids.{FluidTank, Fluid}
 object TileGrowthChamber {
   val MACHINE_INDEX_KEY = "MachineIndex"
   val BASE_POS_COMPOUND_KEY = "BasePos"
+  val PROGRESS_TICKS_KEY = "ProgressTicks"
 }
 
-class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory with TileFluidTank {
-  var machineIndex: Int = -1
-  var basePos: Loc4     = null
-  var progress: Int     = 0
+class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
+  var machineIndex: Int                  = -1
+  var basePos: Loc4                      = null
+  var progress: Int                      = 0
+  var progressTicks: Int                 = 0
+  var currentRecipe: GrowthChamberRecipe = null
 
   override def onSideActivate(player: EntityPlayer, side: Int): Boolean = {
     if (hasGUI) player.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
@@ -100,9 +107,24 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     Minecraft.getMinecraft.effectRenderer.addEffect(new FXWaterSpray(worldObj, xCoord + x4, yCoord + cy, zCoord + z4, dirVec.x - .012500000000000004, dirVec.y, dirVec.z - .021650635094610966, .04f, .2f, yCoord + .21))
   }
 
+  def outputItems(): Unit = {
+
+  }
+
   override def serverUpdate(): Unit = {
     if (!isController) return
-    if (worldObj.getTotalWorldTime % 5 == 0 && progress < 100) progress += 1
+    if (currentRecipe == null) return
+    progressTicks += 1
+    val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
+    if (progress == newProgress) return
+    progress = math.min(newProgress, 100)
+    if (progress == 100) {
+      indInventory.decrStackSize(0, currentRecipe.input.stackSize)
+      outputItems()
+      currentRecipe = null
+      progress = 0
+      progressTicks = 0
+    }
   }
 
   override def clientUpdate(): Unit = {
@@ -121,24 +143,32 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     super.writeToNBT(compound)
     compound.setInteger(TileGrowthChamber.MACHINE_INDEX_KEY, machineIndex)
     compound.setTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY, NBTCompound(basePos))
+    compound.setInteger(TileGrowthChamber.PROGRESS_TICKS_KEY, progressTicks)
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     machineIndex = compound.getInteger(TileGrowthChamber.MACHINE_INDEX_KEY)
     basePos = Loc4(compound.getCompoundTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY))
+    progressTicks = compound.getInteger(TileGrowthChamber.PROGRESS_TICKS_KEY)
+    currentRecipe = GrowthChamberRegistry.findMatchingRecipe(indInventory.getStackInSlot(0)).orNull
+    if (currentRecipe != null) progress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     compound.setInteger(TileGrowthChamber.MACHINE_INDEX_KEY, machineIndex)
     compound.setTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY, NBTCompound(basePos))
+    compound.setInteger(TileGrowthChamber.PROGRESS_TICKS_KEY, progressTicks)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     machineIndex = compound.getInteger(TileGrowthChamber.MACHINE_INDEX_KEY)
     basePos = Loc4(compound.getCompoundTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY))
+    progressTicks = compound.getInteger(TileGrowthChamber.PROGRESS_TICKS_KEY)
+    currentRecipe = GrowthChamberRegistry.findMatchingRecipe(indInventory.getStackInSlot(0)).orNull
+    if (currentRecipe != null) progress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
   }
 
   override def getMod: AnyRef = Femtocraft
@@ -147,35 +177,28 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
   override def getGuiID: Int = GuiIDs.GrowthChamberGuiID
 
-  override def defaultInventory: IndexedInventory = new IndexedInventory(10)
+  override def defaultInventory: IndexedInventory = new IndexedInventory(10) {
+
+    override def isItemValidForSlot(id: Int, stack: ItemStack): Boolean = {
+      if (id == 0 && GrowthChamberRegistry.findMatchingRecipe(stack).orNull == null) false
+      else super.isItemValidForSlot(id, stack)
+    }
+
+    override def setInventorySlotContents(id: Int, stack: ItemStack): Unit = {
+      super.setInventorySlotContents(id, stack)
+      if (id == 0) currentRecipe = GrowthChamberRegistry.findMatchingRecipe(getStackInSlot(0)).orNull
+    }
+
+  }
 
   override def hasDescription: Boolean = true
 
-  override def decrStackSize(p_70298_1_ : Int, p_70298_2_ : Int): ItemStack = indInventory.decrStackSize(p_70298_1_, p_70298_2_)
-
-  override def closeInventory(): Unit = indInventory.closeInventory()
-
-  override def getSizeInventory: Int = indInventory.getSizeInventory
-
-  override def getInventoryStackLimit: Int = indInventory.getInventoryStackLimit
-
-  override def isItemValidForSlot(p_94041_1_ : Int, p_94041_2_ : ItemStack): Boolean = indInventory.isItemValidForSlot(p_94041_1_, p_94041_2_)
-
-  override def getStackInSlotOnClosing(p_70304_1_ : Int): ItemStack = indInventory.getStackInSlotOnClosing(p_70304_1_)
-
-  override def openInventory(): Unit = indInventory.openInventory()
-
-  override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit = indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_)
-
-  override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUseableByPlayer(p_70300_1_)
-
-  override def getStackInSlot(p_70301_1_ : Int): ItemStack = indInventory.getStackInSlot(p_70301_1_)
-
-  override def hasCustomInventoryName: Boolean = indInventory.hasCustomInventoryName
-
-  override def getInventoryName: String = indInventory.getInventoryName
-
   override def defaultTank: FluidTank = new FluidTank(5000)
+
+  override def fill(from: ForgeDirection, resource: FluidStack, doFill: Boolean): Int = {
+    if (resource.getFluid != FluidRegistry.WATER) 0
+    else tank.fill(resource, doFill)
+  }
 
   override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
 

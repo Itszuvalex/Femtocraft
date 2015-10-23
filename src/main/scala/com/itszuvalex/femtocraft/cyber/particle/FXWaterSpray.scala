@@ -6,8 +6,6 @@ import net.minecraftforge.fluids.FluidRegistry
 
 class FXWaterSpray(world: World, x: Double, y: Double, z: Double, xVel: Double, yVel: Double, zVel: Double, gravity: Float, scale: Float, yToStopAt: Double = 0) extends EntityFX(world, x, y, z, xVel, yVel, zVel) {
 
-  val origY = y
-
   particleGravity = gravity
   this.particleMaxAge = 30
   setSize(0.2f, 0.2f)

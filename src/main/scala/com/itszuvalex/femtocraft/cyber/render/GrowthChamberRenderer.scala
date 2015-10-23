@@ -3,11 +3,13 @@ package com.itszuvalex.femtocraft.cyber.render
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.core.Cyber.ICyberMachineRenderer
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.cyber.{IRecipeRenderer, GrowthChamberRegistry}
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
@@ -42,6 +44,38 @@ class GrowthChamberRenderer extends TileEntitySpecialRenderer with ICyberMachine
 
     Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
     */
+
+    val recipe = tile.asInstanceOf[TileGrowthChamber].currentRecipe
+    if (recipe != null) {
+      recipe.renderType match {
+        case 0 =>
+        case 1 =>
+          recipe.renderObj match {
+            case rl: ResourceLocation =>
+              Minecraft.getMinecraft.getTextureManager.bindTexture(rl)
+              GL11.glDisable(GL11.GL_CULL_FACE)
+              GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
+              GL11.glEnable(GL11.GL_CULL_FACE)
+            case ar: Array[ResourceLocation] =>
+              val ind = math.ceil(ar.length * (tile.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1
+              Minecraft.getMinecraft.getTextureManager.bindTexture(ar(ind))
+              GL11.glDisable(GL11.GL_CULL_FACE)
+              GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
+              GL11.glEnable(GL11.GL_CULL_FACE)
+          }
+          Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+        case 2 =>
+          GL11.glPopMatrix()
+          recipe.renderObj.asInstanceOf[IRecipeRenderer].renderAtCenterLocation(x + 1, y + .2, z + 1, partialTime, tile.asInstanceOf[TileGrowthChamber].progress)
+          Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+          GL11.glPushMatrix()
+          GL11.glEnable(GL11.GL_BLEND)
+          GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+          GL11.glEnable(GL11.GL_CULL_FACE)
+          GL11.glTranslated(x + 1, y, z + 1)
+          GL11.glColor4f(1f, 1f, 1f, 1f)
+      }
+    }
 
     if (Minecraft.getMinecraft.gameSettings.particleSetting == 0) {
       val time = tile.getWorldObj.getTotalWorldTime + partialTime

@@ -5,6 +5,7 @@ import java.util.Random
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.core.Cyber.ICyberMachine
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -12,6 +13,7 @@ import com.itszuvalex.itszulib.util.InventoryUtils
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
+import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.FluidStack
 
 /**
@@ -93,5 +95,10 @@ class MachineGrowthChamber extends ICyberMachine {
    * @param z Controller Z
    * @return Remaining fluid
    */
-  override def receiveFluidBroadcast(fluid: FluidStack, world: World, x: Int, y: Int, z: Int): FluidStack = fluid
+  override def receiveFluidBroadcast(fluid: FluidStack, world: World, x: Int, y: Int, z: Int): FluidStack = {
+    val tile = world.getTileEntity(x, y, z).asInstanceOf[TileGrowthChamber]
+    val filledAmt = tile.fill(ForgeDirection.DOWN, fluid, true)
+    fluid.amount -= filledAmt
+    if (fluid.amount == 0) null else fluid
+  }
 }

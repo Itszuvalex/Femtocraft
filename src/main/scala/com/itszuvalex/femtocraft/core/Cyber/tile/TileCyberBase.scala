@@ -218,7 +218,10 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   def putItem(item: ItemStack): ItemStack = {
     for (id <- 9 until indInventory.getSizeInventory) {
       val invStack = indInventory.getStackInSlot(id)
-      if (item.isItemEqual(invStack) && ItemStack.areItemStackTagsEqual(item, invStack)) {
+      if (invStack == null) {
+          indInventory.addItemStack(item, id)
+          item.stackSize = 0
+      } else if (item.isItemEqual(invStack) && ItemStack.areItemStackTagsEqual(item, invStack)) {
         val fitAmount = indInventory.getInventoryStackLimit - invStack.stackSize
         if (item.stackSize <= fitAmount) {
           indInventory.removeItemStack(invStack, id)
@@ -231,9 +234,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
           indInventory.addItemStack(invStack, id)
           item.stackSize -= fitAmount
         }
-      } else if (invStack == null) {
-        indInventory.addItemStack(item, id)
-        item.stackSize = 0
       }
     }
     if (item.stackSize == 0) null else item

@@ -15,8 +15,8 @@ class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: Til
 
   var prevProgress = 0
 
-  addSlotToContainer(new Slot(te, 0, 8, 21))
-  for (i <- 0 to 8) { addSlotToContainer(new Slot(te, i + 1, 80 + 18 * (i % 3), 21 + 18 * math.floor(i / 3d).toInt )) }
+  addSlotToContainer(new Slot(te.indInventory, 0, 8, 21))
+  for (i <- 0 to 8) { addSlotToContainer(new Slot(te.indInventory, i + 1, 80 + 18 * (i % 3), 21 + 18 * math.floor(i / 3d).toInt )) }
 
   addPlayerInventorySlots(inv)
 
