@@ -2,6 +2,8 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRegistry, CybermaterialRegistry}
 import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
+import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
@@ -12,7 +14,7 @@ import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Items
-import net.minecraft.item.Item
+import net.minecraft.item.{ItemStack, Item}
 import org.apache.logging.log4j.LogManager
 
 /**
@@ -56,6 +58,7 @@ object Femtocraft {
     FemtoFluids.init()
     FrameMultiblockRegistry.init()
     CyberMachineRegistry.init()
+    GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.wheat_seeds, 1), IndexedSeq(new ItemStack(Items.wheat_seeds, 3), new ItemStack(Items.wheat, 1)), 500, GrowthChamberRecipe.TYPE_TEXTURE, Resources.Texture("test.png")))
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {

@@ -45,7 +45,7 @@ class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val t
     val l = (height - ySize) / 2
     drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
 
-    drawTexturedModalRect(k + 27, l + 20, 180, 20, math.floor(tile.progress * .5).toInt, 51)
+    drawTexturedModalRect(k + 27, l + 20, 180, 20, math.ceil(tile.progress * .5).toInt, 51)
 
     nameLabel.render(anchorX + nameLabel.anchorX, anchorY + nameLabel.anchorY, mouseX - anchorX - nameLabel.anchorX, mouseY - anchorY - nameLabel.anchorY, partialTicks)
     inputSlot.render(anchorX + inputSlot.anchorX, anchorY + inputSlot.anchorY, mouseX - anchorX - inputSlot.anchorX, mouseY - anchorY - inputSlot.anchorY, partialTicks)

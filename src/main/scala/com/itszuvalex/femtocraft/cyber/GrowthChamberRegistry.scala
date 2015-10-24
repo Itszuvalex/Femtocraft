@@ -29,7 +29,15 @@ object GrowthChamberRegistry {
     recipeInputMap.put(recipe.input, recipe)
   }
 
-  def findMatchingRecipe(input: ItemStack) = recipeInputMap.get(input)
+  def findMatchingRecipe(input: ItemStack): Option[GrowthChamberRecipe] = {
+    if (input == null) return None
+    recipeInputMap.foreach { pair =>
+      if (pair._1.isItemEqual(input) && ItemStack.areItemStackTagsEqual(pair._1, input)) return Some(pair._2)
+    }
+    None
+  }
+
+  def findMatchingRecipeExact(input: ItemStack) = recipeInputMap.get(input)
 
   def getAllRecipes = recipeInputMap.values
 }

@@ -107,8 +107,33 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     Minecraft.getMinecraft.effectRenderer.addEffect(new FXWaterSpray(worldObj, xCoord + x4, yCoord + cy, zCoord + z4, dirVec.x - .012500000000000004, dirVec.y, dirVec.z - .021650635094610966, .04f, .2f, yCoord + .21))
   }
 
-  def outputItems(): Unit = {
+  private def putItemStack(id: Int, stack: ItemStack, doPut: Boolean): Int = {
+    val curStack = indInventory.getStackInSlot(id)
+    if (curStack == null) {
+      if (doPut) indInventory.setInventorySlotContents(id, stack)
+      if (doPut) indInventory.markDirty()
+      stack.stackSize
+    } else if (curStack.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(curStack, stack)) {
+      val amt = math.min(stack.stackSize, math.min(stack.getMaxStackSize, indInventory.getInventoryStackLimit) - curStack.stackSize)
+      if (doPut && amt > 0) {
+        curStack.stackSize += amt
+        indInventory.setInventorySlotContents(id, curStack)
+        indInventory.markDirty()
+      }
+      amt
+    } else 0
+  }
 
+  def outputItems(doOut: Boolean): Boolean = {
+    if (currentRecipe == null) return false
+    currentRecipe.outputs.forall { item =>
+      val remItem = item.copy()
+      val minI = if (GrowthChamberRegistry.findMatchingRecipe(item).isDefined) 0 else 1
+      for (i <- minI to 9) {
+        if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem, doOut)
+      }
+      remItem.stackSize == 0
+    }
   }
 
   override def serverUpdate(): Unit = {
@@ -119,11 +144,13 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     if (progress == newProgress) return
     progress = math.min(newProgress, 100)
     if (progress == 100) {
-      indInventory.decrStackSize(0, currentRecipe.input.stackSize)
-      outputItems()
-      currentRecipe = null
-      progress = 0
-      progressTicks = 0
+      if (outputItems(false)) {
+        outputItems(true)
+        indInventory.decrStackSize(0, currentRecipe.input.stackSize)
+        indInventory.markDirty()
+        progress = 0
+        progressTicks = 0
+      }
     }
   }
 
@@ -180,13 +207,19 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
   override def defaultInventory: IndexedInventory = new IndexedInventory(10) {
 
     override def isItemValidForSlot(id: Int, stack: ItemStack): Boolean = {
-      if (id == 0 && GrowthChamberRegistry.findMatchingRecipe(stack).orNull == null) false
+      if (id == 0 && GrowthChamberRegistry.findMatchingRecipe(stack).isEmpty) false
       else super.isItemValidForSlot(id, stack)
     }
 
     override def setInventorySlotContents(id: Int, stack: ItemStack): Unit = {
       super.setInventorySlotContents(id, stack)
       if (id == 0) currentRecipe = GrowthChamberRegistry.findMatchingRecipe(getStackInSlot(0)).orNull
+    }
+
+    override def decrStackSize(id: Int, amt: Int): ItemStack = {
+      val stack = super.decrStackSize(id, amt)
+      if (id == 0 && getStackInSlot(id) == null) currentRecipe = null
+      stack
     }
 
   }
