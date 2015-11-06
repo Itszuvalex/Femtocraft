@@ -6,6 +6,7 @@ import com.itszuvalex.itszulib.container.ContainerInv
 import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
 import net.minecraft.inventory.{ICrafting, Slot}
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fluids.{FluidRegistry, FluidStack}
 
 import scala.collection.JavaConversions._
 
@@ -15,6 +16,7 @@ import scala.collection.JavaConversions._
 class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: TileGrowthChamber) extends ContainerInv[TileGrowthChamber](player, te, 0, 9) {
 
   var prevProgress = 0
+  var prevWaterAmt = 0
 
   addSlotToContainer(new Slot(te.indInventory, 0, 8, 21) {
     override def isItemValid(stack: ItemStack): Boolean = GrowthChamberRegistry.findMatchingRecipe(stack).isDefined
@@ -23,15 +25,5 @@ class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: Til
 
   addPlayerInventorySlots(inv)
 
-  override def detectAndSendChanges(): Unit = {
-    crafters.foreach { case crafter: ICrafting =>
-      if (te.progress != prevProgress) crafter.sendProgressBarUpdate(this, 0, te.progress)
-    }
-  }
-
-  override def updateProgressBar(id: Int, value: Int): Unit = {
-    if (id == 0) te.progress = value
-  }
-
-  override def eligibleForInput(item: ItemStack): Boolean = false
+  override def eligibleForInput(item: ItemStack): Boolean = GrowthChamberRegistry.findMatchingRecipe(item).isDefined
 }

@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.network
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.network.messages.{MessageBuildMachine, MessageMultiblockSelection}
+import com.itszuvalex.femtocraft.network.messages.{MessageGrowthChamberUpdate, MessageBuildMachine, MessageMultiblockSelection}
 import cpw.mods.fml.common.network.NetworkRegistry
 import cpw.mods.fml.relauncher.Side
 
@@ -21,6 +21,7 @@ object FemtoPacketHandler {
   def preInit(): Unit = {
     INSTANCE.registerMessage(classOf[MessageMultiblockSelection], classOf[MessageMultiblockSelection], nextIndex, Side.SERVER)
     INSTANCE.registerMessage(classOf[MessageBuildMachine], classOf[MessageBuildMachine], nextIndex, Side.SERVER)
+    INSTANCE.registerMessage(classOf[MessageGrowthChamberUpdate], classOf[MessageGrowthChamberUpdate], nextIndex, Side.CLIENT)
   }
 
 }

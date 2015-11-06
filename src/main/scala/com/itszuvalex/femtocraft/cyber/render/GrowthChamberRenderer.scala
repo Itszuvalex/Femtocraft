@@ -57,7 +57,7 @@ class GrowthChamberRenderer extends TileEntitySpecialRenderer with ICyberMachine
               GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
               GL11.glEnable(GL11.GL_CULL_FACE)
             case ar: Array[ResourceLocation] =>
-              val ind = math.ceil(ar.length * (tile.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1
+              val ind = math.max(math.ceil(ar.length * (tile.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1, 0)
               Minecraft.getMinecraft.getTextureManager.bindTexture(ar(ind))
               GL11.glDisable(GL11.GL_CULL_FACE)
               GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")

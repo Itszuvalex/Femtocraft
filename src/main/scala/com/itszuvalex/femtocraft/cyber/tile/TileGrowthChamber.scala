@@ -2,6 +2,8 @@ package com.itszuvalex.femtocraft.cyber.tile
 
 import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
+import com.itszuvalex.femtocraft.network.messages.MessageGrowthChamberUpdate
 import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
@@ -10,6 +12,8 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{TileFluidTank, MultiBlockComponent}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import com.itszuvalex.itszulib.network.PacketHandler
+import com.itszuvalex.itszulib.network.messages.MessageFluidTankUpdate
 import com.itszuvalex.itszulib.render.{Point3D, Vector3}
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.client.Minecraft
@@ -37,6 +41,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
   var progress: Int                      = 0
   var progressTicks: Int                 = 0
   var currentRecipe: GrowthChamberRecipe = null
+  var updateRecipeOnStackDecr: Boolean   = true
 
   override def onSideActivate(player: EntityPlayer, side: Int): Boolean = {
     if (hasGUI) player.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
@@ -118,7 +123,6 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
       if (doPut && amt > 0) {
         curStack.stackSize += amt
         indInventory.setInventorySlotContents(id, curStack)
-        indInventory.markDirty()
       }
       amt
     } else 0
@@ -130,7 +134,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
       val remItem = item.copy()
       val minI = if (GrowthChamberRegistry.findMatchingRecipe(item).isDefined) 0 else 1
       for (i <- minI to 9) {
-        if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem, doOut)
+        if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem.copy(), doOut)
       }
       remItem.stackSize == 0
     }
@@ -138,6 +142,10 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
   override def serverUpdate(): Unit = {
     if (!isController) return
+    if (tank.getFluidAmount > 0) {
+      tank.drain(1, true)
+      PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(xCoord, yCoord, zCoord, if (tank.getFluid != null) tank.getFluid.getFluidID else -1, tank.getFluidAmount), worldObj.provider.dimensionId)
+    }
     if (currentRecipe == null) return
     progressTicks += 1
     val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
@@ -145,18 +153,23 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     progress = math.min(newProgress, 100)
     if (progress == 100) {
       if (outputItems(false)) {
-        outputItems(true)
+        updateRecipeOnStackDecr = false
         indInventory.decrStackSize(0, currentRecipe.input.stackSize)
+        updateRecipeOnStackDecr = true
+        outputItems(true)
         indInventory.markDirty()
         progress = 0
         progressTicks = 0
       }
     }
+    FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progress), worldObj.provider.dimensionId)
+    worldObj.markBlockForUpdate(info.x, info.y, info.z)
   }
 
   override def clientUpdate(): Unit = {
     if (!isController) return
     if (Minecraft.getMinecraft.gameSettings.particleSetting > 0) return
+    if (tank.getFluidAmount == 0) return
     val time = worldObj.getTotalWorldTime
     if (time % 3 != 0) return
     particles1(time)
@@ -213,12 +226,22 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
     override def setInventorySlotContents(id: Int, stack: ItemStack): Unit = {
       super.setInventorySlotContents(id, stack)
-      if (id == 0) currentRecipe = GrowthChamberRegistry.findMatchingRecipe(getStackInSlot(0)).orNull
+      if (id == 0) {
+        currentRecipe = GrowthChamberRegistry.findMatchingRecipe(getStackInSlot(0)).orNull
+        if (currentRecipe == null) {
+          progress = 0
+          progressTicks = 0
+        }
+      }
     }
 
     override def decrStackSize(id: Int, amt: Int): ItemStack = {
       val stack = super.decrStackSize(id, amt)
-      if (id == 0 && getStackInSlot(id) == null) currentRecipe = null
+      if (updateRecipeOnStackDecr && id == 0 && getStackInSlot(id) == null) {
+        currentRecipe = null
+        progress = 0
+        progressTicks = 0
+      }
       stack
     }
 
