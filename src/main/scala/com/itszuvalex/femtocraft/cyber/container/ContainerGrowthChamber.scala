@@ -25,5 +25,21 @@ class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: Til
 
   addPlayerInventorySlots(inv)
 
+  override def detectAndSendChanges(): Unit = {
+    super.detectAndSendChanges()
+    crafters.foreach { case crafter: ICrafting =>
+      if (te.progress != prevProgress) crafter.sendProgressBarUpdate(this, 0, te.progress); prevProgress = te.progress
+      if (te.tank.getFluidAmount != prevWaterAmt) crafter.sendProgressBarUpdate(this, 1, te.tank.getFluidAmount); prevWaterAmt = te.tank.getFluidAmount
+    }
+  }
+
+  override def updateProgressBar(id: Int, value: Int): Unit = {
+    super.updateProgressBar(id, value)
+    id match {
+      case 0 => te.progress = value
+      case 1 => te.tank.setFluid(if (value == 0) null else new FluidStack(FluidRegistry.WATER, value))
+    }
+  }
+
   override def eligibleForInput(item: ItemStack): Boolean = GrowthChamberRegistry.findMatchingRecipe(item).isDefined
 }

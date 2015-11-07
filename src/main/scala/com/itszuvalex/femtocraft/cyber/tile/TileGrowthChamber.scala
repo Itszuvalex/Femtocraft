@@ -144,7 +144,6 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     if (!isController) return
     if (tank.getFluidAmount > 0) {
       tank.drain(1, true)
-      PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(xCoord, yCoord, zCoord, if (tank.getFluid != null) tank.getFluid.getFluidID else -1, tank.getFluidAmount), worldObj.provider.dimensionId)
     }
     if (currentRecipe == null) return
     progressTicks += 1
@@ -168,6 +167,16 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
   override def clientUpdate(): Unit = {
     if (!isController) return
+    // Update progress and water amount client-side, will be synced once container is opened
+    if (tank.getFluidAmount > 0) {
+      tank.drain(1, true)
+    }
+    if (currentRecipe != null) {
+      progressTicks += 1
+      val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
+      if (progress != newProgress) progress = math.min(newProgress, 100)
+    }
+    // Spawn particles, if water exists and particle setting is "All"
     if (Minecraft.getMinecraft.gameSettings.particleSetting > 0) return
     if (tank.getFluidAmount == 0) return
     val time = worldObj.getTotalWorldTime
@@ -252,8 +261,26 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
   override def defaultTank: FluidTank = new FluidTank(5000)
 
   override def fill(from: ForgeDirection, resource: FluidStack, doFill: Boolean): Int = {
-    if (resource.getFluid != FluidRegistry.WATER) 0
-    else tank.fill(resource, doFill)
+    if (resource == null) 0
+    else if (resource.getFluid != FluidRegistry.WATER) 0
+    else {
+      val amt = super.fill(from, resource, doFill)
+      if (doFill) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.x, info.y, info.z, if (tank.getFluid == null) -1 else tank.getFluid.getFluidID, tank.getFluidAmount), worldObj.provider.dimensionId)
+      amt
+    }
+  }
+
+  override def drain(from: ForgeDirection, maxDrain: Int, doDrain: Boolean): FluidStack = {
+    val stack = super.drain(from, maxDrain, doDrain)
+    if (doDrain) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.x, info.y, info.z, if (tank.getFluid == null) -1 else tank.getFluid.getFluidID, tank.getFluidAmount), worldObj.provider.dimensionId)
+    stack
+  }
+
+  override def drain(from: ForgeDirection, resource: FluidStack, doDrain: Boolean): FluidStack = {
+    if (resource == null || !resource.isFluidEqual(tank.getFluid)) return null
+    val stack = super.drain(from, resource, doDrain)
+    if (doDrain) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.x, info.y, info.z, if (tank.getFluid == null) -1 else tank.getFluid.getFluidID, tank.getFluidAmount), worldObj.provider.dimensionId)
+    stack
   }
 
   override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
