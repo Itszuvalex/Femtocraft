@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
-import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
+import com.itszuvalex.femtocraft.cyber.{IRecipeRenderer, GrowthChamberRegistry}
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageGrowthChamberUpdate
@@ -20,7 +20,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.{ResourceLocation, AxisAlignedBB}
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.{FluidRegistry, FluidStack, FluidTank, Fluid}
 
@@ -33,6 +33,7 @@ object TileGrowthChamber {
   val MACHINE_INDEX_KEY = "MachineIndex"
   val BASE_POS_COMPOUND_KEY = "BasePos"
   val PROGRESS_TICKS_KEY = "ProgressTicks"
+  val INVENTORY_KEY = "Inventory"
 }
 
 class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
@@ -40,6 +41,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
   var basePos: Loc4                      = null
   var progress: Int                      = 0
   var progressTicks: Int                 = 0
+  var lastGrowthStage: Int               = 0
   var currentRecipe: GrowthChamberRecipe = null
   var updateRecipeOnStackDecr: Boolean   = true
 
@@ -144,12 +146,24 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     if (!isController) return
     if (tank.getFluidAmount > 0) {
       tank.drain(1, true)
+      if (tank.getFluidAmount == 0) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(xCoord, yCoord, zCoord, -1, 0), worldObj.provider.dimensionId)
     }
     if (currentRecipe == null) return
     progressTicks += 1
     val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
     if (progress == newProgress) return
     progress = math.min(newProgress, 100)
+    currentRecipe.renderObj match {
+      case ar: Array[ResourceLocation] =>
+        val ind = math.max(math.ceil(ar.length * (progress / 100d)).toInt - 1, 0)
+        if (ind != lastGrowthStage) {
+          FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progressTicks), worldObj.provider.dimensionId)
+          lastGrowthStage = ind
+        }
+      case obj: IRecipeRenderer =>
+        FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progressTicks), worldObj.provider.dimensionId)
+      case _ =>
+    }
     if (progress == 100) {
       if (outputItems(false)) {
         updateRecipeOnStackDecr = false
@@ -159,10 +173,10 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
         indInventory.markDirty()
         progress = 0
         progressTicks = 0
+        FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progressTicks), worldObj.provider.dimensionId)
+        worldObj.markBlockForUpdate(info.x, info.y, info.z)
       }
     }
-    FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progress), worldObj.provider.dimensionId)
-    worldObj.markBlockForUpdate(info.x, info.y, info.z)
   }
 
   override def clientUpdate(): Unit = {
@@ -209,6 +223,9 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     compound.setInteger(TileGrowthChamber.MACHINE_INDEX_KEY, machineIndex)
     compound.setTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY, NBTCompound(basePos))
     compound.setInteger(TileGrowthChamber.PROGRESS_TICKS_KEY, progressTicks)
+    val comp = new NBTTagCompound
+    indInventory.saveToNBT(comp)
+    compound.setTag(TileGrowthChamber.INVENTORY_KEY, comp)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
@@ -216,6 +233,8 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     machineIndex = compound.getInteger(TileGrowthChamber.MACHINE_INDEX_KEY)
     basePos = Loc4(compound.getCompoundTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY))
     progressTicks = compound.getInteger(TileGrowthChamber.PROGRESS_TICKS_KEY)
+    val comp = compound.getCompoundTag(TileGrowthChamber.INVENTORY_KEY)
+    indInventory.loadFromNBT(comp)
     currentRecipe = GrowthChamberRegistry.findMatchingRecipe(indInventory.getStackInSlot(0)).orNull
     if (currentRecipe != null) progress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
   }
