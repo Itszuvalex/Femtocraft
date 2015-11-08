@@ -20,9 +20,7 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import java.util
-
-import com.itszuvalex.femtocraft.{Femtocraft, FemtoItems}
+import com.itszuvalex.femtocraft.FemtoItems
 import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRendererRegistry
 import com.itszuvalex.femtocraft.core.Cyber.render.CyberBaseRenderer
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
@@ -46,17 +44,11 @@ import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.client.registry.{ClientRegistry, RenderingRegistry}
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
-import net.minecraft.client.renderer.WorldRenderer
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
-import net.minecraftforge.client.event.RenderWorldEvent
 import net.minecraftforge.common.MinecraftForge
-
-import java.util.Collections
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
