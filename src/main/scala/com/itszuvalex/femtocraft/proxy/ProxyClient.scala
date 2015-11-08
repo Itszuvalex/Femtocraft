@@ -20,7 +20,9 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.FemtoItems
+import java.util
+
+import com.itszuvalex.femtocraft.{Femtocraft, FemtoItems}
 import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRendererRegistry
 import com.itszuvalex.femtocraft.core.Cyber.render.CyberBaseRenderer
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
@@ -38,16 +40,23 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
-import com.itszuvalex.femtocraft.render.{CyberPreviewableRenderer, FramePreviewableRenderer, RenderIDs}
+import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.client.registry.{ClientRegistry, RenderingRegistry}
+import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
+import net.minecraftforge.client.event.RenderWorldEvent
+import net.minecraftforge.common.MinecraftForge
+
+import java.util.Collections
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
@@ -117,5 +126,9 @@ class ProxyClient extends ProxyCommon {
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
+  }
+
+  override def registerEventHandlers(): Unit = {
+    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
   }
 }
