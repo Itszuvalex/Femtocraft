@@ -10,7 +10,7 @@ import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidT
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.common.util.ForgeDirection
@@ -37,12 +37,18 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   var basePos         : Loc4  = null
   var velocityAddition: Float = .2f
   var grabRadius      : Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
-  var serverSet               = new mutable.HashSet[Entity]()
+  var entitySet               = new mutable.HashSet[Entity]()
   var clientSet               = mutable.HashSet[Int]()
 
-  def grabbedSet: mutable.HashSet[Entity] = if (getWorldObj.isRemote) {
-    clientSet.flatMap(id => Option(getWorldObj.getEntityByID(id)))
-  } else serverSet
+  def grabbedSet: mutable.HashSet[Entity] = {
+    if (getWorldObj.isRemote) {
+      //Find entities based on ids passed by server.  Cache the found entities so we don't keep looking them up from the worldObj every call.
+      val entities = clientSet.flatMap(id => Option(getWorldObj.getEntityByID(id)))
+      clientSet --= entities.map(_.getEntityId)
+      entitySet ++= entities
+    }
+    entitySet
+  }
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
@@ -117,7 +123,8 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     super.handleDescriptionNBT(compound)
     clientSet ++= compound.IntArray(TileGraspingVines.COMPOUND_IDLIST) match {
       case ia =>
-        grabbedSet.clear()
+        clientSet.clear()
+        entitySet.clear()
         clientSet ++= ia
       case _ =>
     }
@@ -139,7 +146,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
 
   override def canDrain(from: ForgeDirection, fluid: Fluid): Boolean = false
 
-  override def defaultInventory: IndexedInventory = new IndexedInventory(0)
+  override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 
   override def hasDescription: Boolean = true
 }
