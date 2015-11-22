@@ -27,8 +27,6 @@ class MachineGrowthChamber extends ICyberMachine {
 
   override def getRequiredCybermass: Int = 500
 
-  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = ICyberMachine.getTakenLocations(x, y, z, world.provider.dimensionId, getRequiredBaseSize, getRequiredSlots)
-
   override def getRequiredSlots: Int = 2
 
   @SideOnly(Side.CLIENT)
@@ -68,7 +66,6 @@ class MachineGrowthChamber extends ICyberMachine {
   override def breakMachine(world: World, x: Int, y: Int, z: Int): Unit = {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
-      world.removeTileEntity(loc.x, loc.y, loc.z)
     }
     getRequiredResources.foreach( stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }

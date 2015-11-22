@@ -1,49 +1,44 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
-import com.itszuvalex.femtocraft.cyber.{IRecipeRenderer, GrowthChamberRegistry}
-import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
-import com.itszuvalex.femtocraft.network.FemtoPacketHandler
-import com.itszuvalex.femtocraft.network.messages.MessageGrowthChamberUpdate
-import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
+import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
+import com.itszuvalex.femtocraft.cyber.{GrowthChamberRegistry, IRecipeRenderer}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.{TileFluidTank, MultiBlockComponent}
+import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.network.PacketHandler
 import com.itszuvalex.itszulib.network.messages.MessageFluidTankUpdate
 import com.itszuvalex.itszulib.render.{Point3D, Vector3}
-import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.{ResourceLocation, AxisAlignedBB}
+import net.minecraft.util.{AxisAlignedBB, ResourceLocation}
 import net.minecraftforge.common.util.ForgeDirection
-import net.minecraftforge.fluids.{FluidRegistry, FluidStack, FluidTank, Fluid}
-
-import java.util.Random
+import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, FluidTank}
 
 /**
- * Created by Alex on 30.09.2015.
- */
+  * Created by Alex on 30.09.2015.
+  */
 object TileGrowthChamber {
-  val MACHINE_INDEX_KEY = "MachineIndex"
+  val MACHINE_INDEX_KEY     = "MachineIndex"
   val BASE_POS_COMPOUND_KEY = "BasePos"
-  val PROGRESS_TICKS_KEY = "ProgressTicks"
-  val INVENTORY_KEY = "Inventory"
+  val PROGRESS_TICKS_KEY    = "ProgressTicks"
+  val INVENTORY_KEY         = "Inventory"
 }
 
 class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex: Int                  = -1
-  var basePos: Loc4                      = null
-  var progress: Int                      = 0
-  var progressTicks: Int                 = 0
-  var lastGrowthStage: Int               = 0
-  var currentRecipe: GrowthChamberRecipe = null
-  var updateRecipeOnStackDecr: Boolean   = true
+  var machineIndex           : Int                 = -1
+  var basePos                : Loc4                = null
+  var progress               : Int                 = 0
+  var progressTicks          : Int                 = 0
+  var lastGrowthStage        : Int                 = 0
+  var currentRecipe          : GrowthChamberRecipe = null
+  var updateRecipeOnStackDecr: Boolean             = true
 
   override def onSideActivate(player: EntityPlayer, side: Int): Boolean = {
     if (hasGUI) player.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
@@ -76,9 +71,9 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
   def particles2(time: Long): Unit = {
     val d_xz = (1 + math.sin(time * .05 + 1)) * .5 * .08034845121081742
-    val cx = .4804 + .86602540378443864 * d_xz
+    val cx =.4804 +.86602540378443864 * d_xz
     val cy = 1.775 + (1 + math.sin(time * .05 + 1)) * .5 * .02924444461012775
-    val cz = .7 + .5 * d_xz
+    val cz =.7 +.5 * d_xz
     val x1 = cx + .07031249999999999
     val z1 = cz - .12178482240718669
     val x2 = cx + .023437499999999997
@@ -96,9 +91,9 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
   def particles3(time: Long): Unit = {
     val d_xz = (1 + math.sin(time * .05 + 2)) * .5 * .08034845121081742
-    val cx = 1.5196 - .86602540378443864 * d_xz
+    val cx = 1.5196 -.86602540378443864 * d_xz
     val cy = 1.775 + (1 + math.sin(time * .05 + 2)) * .5 * .02924444461012775
-    val cz = .7 + .5 * d_xz
+    val cz =.7 +.5 * d_xz
     val x1 = cx + .07031249999999999
     val z1 = cz + .12178482240718669
     val x2 = cx + .023437499999999997
@@ -139,14 +134,15 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
         if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem.copy(), doOut)
       }
       remItem.stackSize == 0
-    }
+                                 }
   }
 
   override def serverUpdate(): Unit = {
     if (!isController) return
     if (tank.getFluidAmount > 0) {
       tank.drain(1, true)
-      if (tank.getFluidAmount == 0) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(xCoord, yCoord, zCoord, -1, 0), worldObj.provider.dimensionId)
+      if (tank.getFluidAmount == 0)
+        setUpdate()
     }
     if (currentRecipe == null) return
     progressTicks += 1
@@ -157,11 +153,11 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
       case ar: Array[ResourceLocation] =>
         val ind = math.max(math.ceil(ar.length * (progress / 100d)).toInt - 1, 0)
         if (ind != lastGrowthStage) {
-          FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progressTicks), worldObj.provider.dimensionId)
+          setUpdate()
           lastGrowthStage = ind
         }
       case obj: IRecipeRenderer =>
-        FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progressTicks), worldObj.provider.dimensionId)
+        setUpdate()
       case _ =>
     }
     if (progress == 100) {
@@ -173,8 +169,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
         indInventory.markDirty()
         progress = 0
         progressTicks = 0
-        FemtoPacketHandler.INSTANCE.sendToDimension(new MessageGrowthChamberUpdate(xCoord, yCoord, zCoord, progressTicks), worldObj.provider.dimensionId)
-        worldObj.markBlockForUpdate(info.x, info.y, info.z)
+        setUpdate()
       }
     }
   }
@@ -284,6 +279,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     else if (resource.getFluid != FluidRegistry.WATER) 0
     else {
       val amt = super.fill(from, resource, doFill)
+      //todo: pull out packets
       if (doFill) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.x, info.y, info.z, if (tank.getFluid == null) -1 else tank.getFluid.getFluidID, tank.getFluidAmount), worldObj.provider.dimensionId)
       amt
     }
@@ -291,6 +287,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
 
   override def drain(from: ForgeDirection, maxDrain: Int, doDrain: Boolean): FluidStack = {
     val stack = super.drain(from, maxDrain, doDrain)
+    //todo: pull out packets
     if (doDrain) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.x, info.y, info.z, if (tank.getFluid == null) -1 else tank.getFluid.getFluidID, tank.getFluidAmount), worldObj.provider.dimensionId)
     stack
   }
@@ -298,6 +295,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
   override def drain(from: ForgeDirection, resource: FluidStack, doDrain: Boolean): FluidStack = {
     if (resource == null || !resource.isFluidEqual(tank.getFluid)) return null
     val stack = super.drain(from, resource, doDrain)
+    //todo: pull out packets
     if (doDrain) PacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.x, info.y, info.z, if (tank.getFluid == null) -1 else tank.getFluid.getFluidID, tank.getFluidAmount), worldObj.provider.dimensionId)
     stack
   }

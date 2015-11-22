@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.core.Cyber.block._
 import com.itszuvalex.femtocraft.core.Industry.block.BlockFrame
-import com.itszuvalex.femtocraft.cyber.block.BlockGrowthChamber
+import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber}
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
@@ -13,8 +13,8 @@ import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 5/3/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
+  */
 object FemtoBlocks {
   //Cyber
   var blockCyberweave: Block = null
@@ -28,11 +28,19 @@ object FemtoBlocks {
   var blockCrystallizationChamber: Block = null
   var blockCentrifuge            : Block = null
   var blockGrowthChamber         : Block = null
+  var blockBioBeacon             : Block = null
+  var blockCondensationArray     : Block = null
+  var blockCybermatDisintegrator : Block = null
+  var blockGraspingVines         : Block = null
+  var blockLashingVines          : Block = null
+  var blockMetabolicConverter    : Block = null
+  var blockPhotosynthesisTower   : Block = null
+  var blockSporeDistributor      : Block = null
 
 
-  var blockFrame              : Block = null
-  var blockCyberBase          : Block = null
-  var blockInProgressMachine  : Block = null
+  var blockFrame            : Block = null
+  var blockCyberBase        : Block = null
+  var blockInProgressMachine: Block = null
 
   var blockNaniteHiveSmall: Block = null
 
@@ -78,7 +86,29 @@ object FemtoBlocks {
     blockGrowthChamber = new BlockGrowthChamber().setBlockName("blockGrowthChamber")
     GameRegistry.registerBlock(blockGrowthChamber, "blockGrowthChamber")
 
+    blockBioBeacon = new BlockBioBeacon().setBlockName("blockBioBeacon")
+    GameRegistry.registerBlock(blockBioBeacon, "BlockBioBeacon")
 
+    blockCondensationArray = new BlockCondensationArray().setBlockName("blockCondensationArray")
+    GameRegistry.registerBlock(blockCondensationArray, "blockCondensationArray")
+
+    blockCybermatDisintegrator = new BlockCybermatDisintegrator().setBlockName("blockCybermatDisintegrator")
+    GameRegistry.registerBlock(blockCybermatDisintegrator, "blockCybermatDisintegrator")
+
+    blockGraspingVines = new BlockGraspingVines().setBlockName("blockGraspingVines")
+    GameRegistry.registerBlock(blockGraspingVines, "blockGraspingVines")
+
+    blockLashingVines = new BlockLashingVines().setBlockName("blockLashingVines")
+    GameRegistry.registerBlock(blockLashingVines, "blockLashingVines")
+
+    blockMetabolicConverter = new BlockMetabolicConverter().setBlockName("blockMetabolicConverter")
+    GameRegistry.registerBlock(blockMetabolicConverter, "blockMetabolicConverter")
+
+    blockPhotosynthesisTower = new BlockPhotosynthesisTower().setBlockName("blockPhotosynthesisTower")
+    GameRegistry.registerBlock(blockPhotosynthesisTower, "blockPhotosynthesisTower")
+
+    blockSporeDistributor = new BlockSporeDistributor().setBlockName("blockSporeDistributor")
+    GameRegistry.registerBlock(blockSporeDistributor, "blockSporeDistributor")
 
     blockFrame = new BlockFrame().setCreativeTab(Femtocraft.tab).setBlockName("blockFrame")
     GameRegistry.registerBlock(blockFrame, "blockFrame")

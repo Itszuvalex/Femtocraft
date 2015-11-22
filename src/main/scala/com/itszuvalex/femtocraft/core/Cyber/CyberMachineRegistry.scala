@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.core.Cyber
 
-import com.itszuvalex.femtocraft.cyber.machine.MachineGrowthChamber
+import com.itszuvalex.femtocraft.cyber.machine._
 
 import scala.collection.mutable
 
 /**
- * Created by Alex on 27.09.2015.
- */
+  * Created by Alex on 27.09.2015.
+  */
 object CyberMachineRegistry {
   private val machineMap = mutable.HashMap[String, ICyberMachine]()
 
@@ -20,5 +20,13 @@ object CyberMachineRegistry {
 
   def init(): Unit = {
     registerMachine(new MachineGrowthChamber)
+    registerMachine(new MachineBioBeacon)
+    registerMachine(new MachineCondensationArray)
+    registerMachine(new MachineCybermatDisintegrator)
+    registerMachine(new MachineGraspingVines)
+    registerMachine(new MachineLashingVines)
+    registerMachine(new MachineMetabolicConverter)
+    registerMachine(new MachinePhotosynthesisTower)
+    registerMachine(new MachineSporeDistributor)
   }
 }

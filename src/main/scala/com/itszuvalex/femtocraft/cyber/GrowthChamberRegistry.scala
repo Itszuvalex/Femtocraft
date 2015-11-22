@@ -4,17 +4,17 @@ import java.util
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
-import com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardComparator
+import com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 
 import scala.collection.JavaConverters._
 
 /**
- * Created by Alex on 19.10.2015.
- */
+  * Created by Alex on 19.10.2015.
+  */
 object GrowthChamberRegistry {
-  val recipeInputMap = new util.TreeMap[ItemStack, GrowthChamberRecipe](IDDamageWildCardComparator).asScala
+  val recipeInputMap = new util.TreeMap[ItemStack, GrowthChamberRecipe](IDDamageWildCardNBTComparator).asScala
 
   def addRecipe(recipe: GrowthChamberRecipe): Unit = {
     if (recipe == null || recipe.input == null) return
@@ -29,15 +29,7 @@ object GrowthChamberRegistry {
     recipeInputMap.put(recipe.input, recipe)
   }
 
-  def findMatchingRecipe(input: ItemStack): Option[GrowthChamberRecipe] = {
-    if (input == null) return None
-    recipeInputMap.foreach { pair =>
-      if (pair._1.isItemEqual(input) && ItemStack.areItemStackTagsEqual(pair._1, input)) return Some(pair._2)
-    }
-    None
-  }
-
-  def findMatchingRecipeExact(input: ItemStack) = recipeInputMap.get(input)
+  def findMatchingRecipe(input: ItemStack) = recipeInputMap.get(input)
 
   def getAllRecipes = recipeInputMap.values
 }
