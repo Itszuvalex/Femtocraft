@@ -85,6 +85,8 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
         toRemove += entity
       else {
         entity match {
+          case p if p.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) > (grabRadius * grabRadius) =>
+            toRemove += p
           case p: EntityPlayer if p.capabilities.isCreativeMode =>
           case _ =>
             val targetPos = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
@@ -93,8 +95,8 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
             entity.addVelocity(vel.x, vel.y, vel.z)
         }
       }
-      if (toRemove.nonEmpty) setUpdate()
       toRemove.foreach(removeEntity)
+      if (toRemove.nonEmpty) setUpdate()
                        }
   }
 
@@ -108,8 +110,8 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   }
 
   def removeEntity(entity: Entity): Boolean = {
-    if (grabbedSet.contains(entity.getUniqueID)) {
-      grabbedSet.remove(entity.getUniqueID)
+    if (grabbedSet.contains(entity)) {
+      grabbedSet.remove(entity)
       TileGraspingVines.grabbedHashSet -= entity.getUniqueID
       true
     } else false
