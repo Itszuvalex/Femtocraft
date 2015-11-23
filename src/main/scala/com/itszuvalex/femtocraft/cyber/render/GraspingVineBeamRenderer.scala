@@ -2,10 +2,8 @@ package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.cyber.tile.TileGraspingVines
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
-import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.entity.Entity
 import org.lwjgl.opengl.GL11
@@ -26,10 +24,9 @@ trait GraspingVineBeamRenderer extends TileEntitySpecialRenderer {
   def renderBeamToEntity(x: Double, y: Double, z: Double, node: TileGraspingVines, entity: Entity, color: Color, partialTime: Float, beamWidth: Float): Unit = {
     //    val f2: Float = node.getWorldObj.getTotalWorldTime.toFloat + partialTime
     //    val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
-    val player = Minecraft.getMinecraft.thePlayer
-    val px = player.prevPosX + (player.posX - player.prevPosX) * partialTime
-    val py = player.prevPosY + (player.posY - player.prevPosY) * partialTime
-    val pz = player.prevPosZ + (player.posZ - player.prevPosZ) * partialTime
+    val px = (entity.prevPosX + (entity.posX - entity.prevPosX) * partialTime) + entity.width / 2f
+    val py = (entity.prevPosY + (entity.posY - entity.prevPosY) * partialTime) + entity.height / 2f
+    val pz = (entity.prevPosZ + (entity.posZ - entity.prevPosZ) * partialTime) + entity.width / 2f
     val nloc = node.getLoc
     val diff = Vector3(px, py, pz) - Vector3(nloc.x, nloc.y, nloc.z)
     val startLoc = Vector3(x, y, z)
@@ -38,7 +35,7 @@ trait GraspingVineBeamRenderer extends TileEntitySpecialRenderer {
     val xMax: Double = 1.0D
     val yMin: Double = 0.0D
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
-    FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
+    FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff, beamWidth,
                               xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
                               color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }

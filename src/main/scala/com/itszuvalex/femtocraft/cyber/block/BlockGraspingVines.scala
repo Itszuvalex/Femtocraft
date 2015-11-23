@@ -16,11 +16,11 @@ class BlockGraspingVines extends TileContainer(Material.iron) {
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileGraspingVines
 
-  override def renderAsNormalBlock = true
+  override def renderAsNormalBlock = false
 
   override def getRenderBlockPass = 2
 
-  override def isOpaqueCube = true
+  override def isOpaqueCube = false
 
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, par6: Int): Unit = {
     world.getTileEntity(x, y, z) match {

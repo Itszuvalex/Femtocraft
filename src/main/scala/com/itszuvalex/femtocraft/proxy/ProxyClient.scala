@@ -27,8 +27,8 @@ import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
 import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.cyber.render.GrowthChamberRenderer
-import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
+import com.itszuvalex.femtocraft.cyber.render.{GraspingVinesRenderer, GrowthChamberRenderer}
+import com.itszuvalex.femtocraft.cyber.tile.{TileGraspingVines, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.render.ArcFurnaceRenderer
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
@@ -64,7 +64,7 @@ class ProxyClient extends ProxyCommon {
     val col = new Color(color)
 
     name match {
-      case "power"   =>
+      case "power" =>
         fx = new EntityFxPower(world, x, y, z,
                                (col.red.toInt & 255).toFloat / 255f,
                                (col.green.toInt & 255).toFloat / 255f,
@@ -75,7 +75,7 @@ class ProxyClient extends ProxyCommon {
                                  (col.red.toInt & 255).toFloat / 255f,
                                  (col.green.toInt & 255).toFloat / 255f,
                                  (col.blue.toInt & 255).toFloat / 255f)
-      case _         =>
+      case _ =>
         return null
     }
     mc.effectRenderer.addEffect(fx)
@@ -96,6 +96,10 @@ class ProxyClient extends ProxyCommon {
     val growthChamberRenderer = new GrowthChamberRenderer
     RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGrowthChamber], growthChamberRenderer)
+
+    val graspingVinesRenderer = new GraspingVinesRenderer
+    RenderIDs.graspingVinesID = CyberMachineRendererRegistry.bindRenderer(graspingVinesRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGraspingVines], graspingVinesRenderer)
 
     val naniveHiveRenderer = new NaniteHiveSmallRenderer
     RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId

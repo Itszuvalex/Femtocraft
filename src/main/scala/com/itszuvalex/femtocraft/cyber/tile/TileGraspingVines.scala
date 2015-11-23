@@ -22,7 +22,7 @@ import scala.collection.mutable
 @Configurable
 object TileGraspingVines {
   @Configurable
-  val DEFAULT_GRAB_RADIUS = 32f
+  val DEFAULT_GRAB_RADIUS = 8f
   val grabbedHashSet      = new mutable.HashSet[UUID]()
 
   val COMPOUND_IDLIST = "IDList"
@@ -51,13 +51,13 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   }
 
   override def serverUpdate(): Unit = {
+    if (findAndGrabEntities(grabRadius))
+      setUpdate()
     super.serverUpdate()
   }
 
   override def updateEntity(): Unit = {
     super.updateEntity()
-    if (findAndGrabEntities(grabRadius))
-      setUpdate()
     pullEntities()
   }
 
@@ -93,6 +93,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
             entity.addVelocity(vel.x, vel.y, vel.z)
         }
       }
+      if (toRemove.nonEmpty) setUpdate()
       toRemove.foreach(removeEntity)
                        }
   }
@@ -121,7 +122,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    clientSet ++= compound.IntArray(TileGraspingVines.COMPOUND_IDLIST) match {
+    compound.IntArray(TileGraspingVines.COMPOUND_IDLIST) match {
       case ia =>
         clientSet.clear()
         entitySet.clear()
@@ -149,4 +150,14 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 
   override def hasDescription: Boolean = true
+
+  override def getRenderBoundingBox: AxisAlignedBB = {
+    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+    AxisAlignedBB.getBoundingBox(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
+  }
 }
