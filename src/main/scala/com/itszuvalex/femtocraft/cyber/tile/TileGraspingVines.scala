@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.cyber.tile
 import java.util.UUID
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -51,8 +52,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   }
 
   override def serverUpdate(): Unit = {
-    if (findAndGrabEntities(grabRadius))
-      setUpdate()
+    findAndGrabEntities(grabRadius)
     super.serverUpdate()
   }
 
@@ -61,8 +61,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     pullEntities()
   }
 
-  def findAndGrabEntities(radius: Float): Boolean = {
-    var changed = false
+  def findAndGrabEntities(radius: Float): Unit = {
     getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
                                                                                     yCoord + .5f - radius,
                                                                                     zCoord + .5f - radius,
@@ -72,10 +71,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     .asInstanceOf[java.util.List[Entity]]
     .view
     .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) <= radius * radius }
-    .foreach { entity =>
-      changed = grabEntity(entity) || changed
-             }
-    changed
+    .foreach(grabEntity)
   }
 
   def pullEntities() = {
@@ -96,7 +92,6 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
         }
       }
       toRemove.foreach(removeEntity)
-      if (toRemove.nonEmpty) setUpdate()
                        }
   }
 
@@ -105,6 +100,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     else {
       TileGraspingVines.grabbedHashSet += entity.getUniqueID
       grabbedSet += entity
+      setUpdate()
       true
     }
   }
@@ -113,6 +109,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     if (grabbedSet.contains(entity)) {
       grabbedSet.remove(entity)
       TileGraspingVines.grabbedHashSet -= entity.getUniqueID
+      setUpdate()
       true
     } else false
   }
@@ -139,7 +136,15 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     compound(TileGraspingVines.COMPOUND_IDLIST -> grabbedSet.map(_.getEntityId).toArray)
   }
 
-  def onBlockBreak() = {}
+  def onBlockBreak(): Unit = {
+    if (!isValidMultiBlock) return
+    basePos.getTileEntity() match {
+      case Some(te: TileCyberBase) =>
+        te.breakMachinesUpwardsFromSlot(te.machineSlotMap(machineIndex))
+      case _ =>
+    }
+  }
+
 
   override def getMod: AnyRef = Femtocraft
 
