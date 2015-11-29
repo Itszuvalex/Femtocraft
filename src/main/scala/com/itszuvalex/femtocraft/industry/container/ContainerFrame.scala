@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft.industry.container
 
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.container.ContainerInv
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 /**
- * Created by Christopher on 9/21/2015.
- */
+  * Created by Christopher on 9/21/2015.
+  */
 class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerInv[TileFrame](player, tile, 0, 0) {
 
 

@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 
 /**
- * Created by Christopher on 8/26/2015.
- */
+  * Created by Christopher on 8/26/2015.
+  */
 trait IFrameMultiblock {
 
   def getName: String

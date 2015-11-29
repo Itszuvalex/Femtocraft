@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRendererRegistry, CyberMachineRegistry}
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CyberMachineRendererRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
@@ -12,18 +12,18 @@ import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Alex on 28.09.2015.
- */
+  * Created by Alex on 28.09.2015.
+  */
 object CyberBaseRenderer {
   val smallBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1.obj")
-  val smallBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 1x1 Template.png")
-  val medBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 2x2.obj")
-  val medBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 2x2 Template.png")
+  val smallBaseTexLoc  : ResourceLocation = Resources.Model("cyber base/Base 1x1 Template.png")
+  val medBaseModelLoc  : ResourceLocation = Resources.Model("cyber base/Base 2x2.obj")
+  val medBaseTexLoc    : ResourceLocation = Resources.Model("cyber base/Base 2x2 Template.png")
   val largeBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 3x3.obj")
-  val largeBaseTexLoc: ResourceLocation = Resources.Model("cyber base/Base 3x3 Template.png")
+  val largeBaseTexLoc  : ResourceLocation = Resources.Model("cyber base/Base 3x3 Template.png")
 
   val smallBaseModel = AdvancedModelLoader.loadModel(smallBaseModelLoc).asInstanceOf[WavefrontObject]
-  val medBaseModel = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
+  val medBaseModel   = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
   val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
 
   def renderBase(tile: TileCyberBase, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
@@ -55,7 +55,7 @@ object CyberBaseRenderer {
 }
 
 class CyberBaseRenderer extends TileEntitySpecialRenderer {
-  override def renderTileEntityAt(tile : TileEntity, x : Double, y : Double, z : Double, partialTime : Float): Unit = {
+  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     tile match {
       case base: TileCyberBase =>
         if (!base.isController) return

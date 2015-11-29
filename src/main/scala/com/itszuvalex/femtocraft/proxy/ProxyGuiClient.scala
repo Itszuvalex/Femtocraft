@@ -1,22 +1,18 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.core.Cyber.gui.{GuiMachineSelection, GuiCyberBase}
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.core.Industry.gui.{GuiMultiblockSelection, GuiFrame}
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.cyber.gui.GuiGrowthChamber
-import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
-import com.itszuvalex.femtocraft.industry.gui.GuiArcFurnace
-import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
+import com.itszuvalex.femtocraft.cyber.gui.{GuiCyberBase, GuiGrowthChamber, GuiMachineSelection}
+import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
+import com.itszuvalex.femtocraft.industry.gui.{GuiArcFurnace, GuiFrame, GuiMultiblockSelection}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.world.World
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 11/21/14.
- */
+  * Created by Christopher Harris (Itszuvalex) on 11/21/14.
+  */
 class ProxyGuiClient extends ProxyGuiCommon {
   override def getClientGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(x, y, z)) match {

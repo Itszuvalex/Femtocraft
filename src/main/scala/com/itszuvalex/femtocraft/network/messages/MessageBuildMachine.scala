@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.network.messages
 
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import cpw.mods.fml.common.network.simpleimpl.{MessageContext, IMessageHandler, IMessage}
+import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
+import cpw.mods.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
 import io.netty.buffer.ByteBuf
 
 /**
- * Created by Alex on 15.10.2015.
- */
+  * Created by Alex on 15.10.2015.
+  */
 class MessageBuildMachine(var x: Int, var y: Int, var z: Int, var machine: String) extends IMessage with IMessageHandler[MessageBuildMachine, IMessage] {
   def this() = this(0, 0, 0, null)
 

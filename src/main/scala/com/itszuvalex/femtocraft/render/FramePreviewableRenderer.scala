@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft.render
 
-import com.itszuvalex.femtocraft.core.Industry.{FrameMultiblockRendererRegistry, FrameMultiblockRegistry, IFrameItem}
+import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, IFrameItem}
 import com.itszuvalex.itszulib.api.IPreviewableRenderer
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
 
 /**
- * Created by Christopher on 8/26/2015.
- */
+  * Created by Christopher on 8/26/2015.
+  */
 @SideOnly(Side.CLIENT)
 class FramePreviewableRenderer extends IPreviewableRenderer {
   lazy val generic = new GenericFrameMultiblockRenderer

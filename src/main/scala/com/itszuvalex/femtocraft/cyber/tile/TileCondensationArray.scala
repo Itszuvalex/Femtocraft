@@ -12,8 +12,8 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
   * Created by Christopher on 11/21/2015.
   */
 class TileCondensationArray extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex           : Int                 = -1
-  var basePos                : Loc4                = null
+  var machineIndex: Int  = -1
+  var basePos     : Loc4 = null
 
   def onBlockBreak() = {}
 

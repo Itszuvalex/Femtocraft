@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft.industry.render
 
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
+import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import net.minecraft.item.ItemStack
 import net.minecraftforge.client.IItemRenderer
 import net.minecraftforge.client.IItemRenderer.{ItemRenderType, ItemRendererHelper}
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 9/7/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 9/7/15.
+  */
 class FrameItemRenderer extends IItemRenderer {
   override def handleRenderType(item: ItemStack, `type`: ItemRenderType): Boolean = {
     `type` match {

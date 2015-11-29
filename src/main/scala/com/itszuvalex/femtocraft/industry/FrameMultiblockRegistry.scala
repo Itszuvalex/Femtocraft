@@ -5,8 +5,8 @@ import com.itszuvalex.femtocraft.industry.multiblock.{MultiblockArcFurnace, Mult
 import scala.collection._
 
 /**
- * Created by Christopher on 8/26/2015.
- */
+  * Created by Christopher on 8/26/2015.
+  */
 object FrameMultiblockRegistry {
   private val frameMap = mutable.HashMap[String, IFrameMultiblock]()
 

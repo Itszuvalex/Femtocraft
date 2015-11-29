@@ -1,20 +1,20 @@
 package com.itszuvalex.femtocraft.cyber.container
 
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
 import com.itszuvalex.itszulib.container.ContainerInv
-import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
+import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 /**
- * Created by Alex on 03.10.2015.
- */
+  * Created by Alex on 03.10.2015.
+  */
 object ContainerCyberBase {
   val CYBERMASS_AMOUNT_ID = 0
-  val BUFFER_1_FID_ID = 1
-  val BUFFER_1_AMOUNT_ID = 2
-  val BUFFER_2_FID_ID = 3
-  val BUFFER_2_AMOUNT_ID = 4
+  val BUFFER_1_FID_ID     = 1
+  val BUFFER_1_AMOUNT_ID  = 2
+  val BUFFER_2_FID_ID     = 3
+  val BUFFER_2_AMOUNT_ID  = 4
 }
 
 class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileCyberBase) extends ContainerInv[TileCyberBase](player, tile, 0, 0) {

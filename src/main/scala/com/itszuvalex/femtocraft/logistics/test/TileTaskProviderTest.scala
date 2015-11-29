@@ -9,8 +9,8 @@ import net.minecraft.entity.player.EntityPlayer
 import scala.collection._
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/15/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/15/15.
+  */
 class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   val tasks = new mutable.HashSet[ITask]()
 
@@ -28,22 +28,22 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   override def getMod = Femtocraft
 
   /**
-   *
-   * @return Set of tasks hosted by the provider.
-   */
+    *
+    * @return Set of tasks hosted by the provider.
+    */
   override def getActiveTasks = tasks
 
   /**
-   *
-   * @return Location of this provider, for use in distance calculations.
-   */
+    *
+    * @return Location of this provider, for use in distance calculations.
+    */
   override def getProviderLocation = getLoc
 
   /**
-   *
-   * @return Distance to accept new workers when task completes.  Do not pass high values, as this will lead to excessive blank location checking on the order of
-   *         (distance/16)&#94;2
-   */
+    *
+    * @return Distance to accept new workers when task completes.  Do not pass high values, as this will lead to excessive blank location checking on the order of
+    *         (distance/16)&#94;2
+    */
   override def getWorkerConnectionRadius = 30f
 
   override def hasDescription = false
@@ -76,7 +76,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   }
 
   def particle(): Unit = {
-//    if (worldObj.isRemote) Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
+    //    if (worldObj.isRemote) Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
   }
 
   class TestTask(val provider: TileTaskProviderTest) extends ITask {
@@ -86,10 +86,10 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     val workers          = new mutable.HashSet[IWorker]()
 
     /**
-     *
-     * @param worker Worker to add.
-     * @return True if worker successfully assigned, false otherwise (incompatible type, storage is full.)
-     */
+      *
+      * @param worker Worker to add.
+      * @return True if worker successfully assigned, false otherwise (incompatible type, storage is full.)
+      */
     override def addWorker(worker: IWorker): Boolean = {
       if (workers.size >= getWorkerCap) false
       else {
@@ -99,14 +99,14 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     }
 
     /**
-     *
-     * @return Maximum number of workers to be assigned to this task.
-     */
+      *
+      * @return Maximum number of workers to be assigned to this task.
+      */
     override def getWorkerCap: Int = 1
 
     /**
-     * Called every tick by the ITaskProvider.
-     */
+      * Called every tick by the ITaskProvider.
+      */
     override def onTick(): Unit = {
       workers.foreach(worker => progressF +=.05 * worker.getEfficiency("Speed"))
       progress = math.floor(progressF).toInt
@@ -117,43 +117,43 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     }
 
     /**
-     * Cancels the task.  Removes all workers, removes it from ITaskProvider's open task list.
-     */
+      * Cancels the task.  Removes all workers, removes it from ITaskProvider's open task list.
+      */
     override def cancel(): Unit = {
       provider.tasks -= this
       DistributedManager.onTaskEnd(this)
     }
 
     /**
-     *
-     * @return String identification of 'type' of task.  Used to check for worker suitability.
-     */
+      *
+      * @return String identification of 'type' of task.  Used to check for worker suitability.
+      */
     override def getTaskType: String = "Some type"
 
     /**
-     *
-     * @return The Provider hosting this task.
-     */
+      *
+      * @return The Provider hosting this task.
+      */
     override def getProvider = provider
 
     /**
-     *
-     * @return Task priority.  Higher values are higher priority.
-     */
+      *
+      * @return Task priority.  Higher values are higher priority.
+      */
     override def getPriority: Int = 0
 
     /**
-     *
-     * @param worker Worker to remove.
-     */
+      *
+      * @param worker Worker to remove.
+      */
     override def removeWorker(worker: IWorker): Unit = {
       workers -= worker
     }
 
     /**
-     *
-     * @return Set of Workers assigned to this task.
-     */
+      *
+      * @return Set of Workers assigned to this task.
+      */
     override def getWorkers = workers
   }
 

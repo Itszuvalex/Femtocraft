@@ -11,8 +11,8 @@ import net.minecraft.item.ItemStack
 import scala.collection.JavaConversions._
 
 /**
- * Created by Christopher on 9/1/2015.
- */
+  * Created by Christopher on 9/1/2015.
+  */
 object ContainerArcFurnace {
   private val COOK_INDEX        = 0
   private val POWER_BIG_INDEX   = 1
@@ -39,8 +39,8 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
   }
 
   /**
-   * Looks for changes made in the container, sends them to every listener.
-   */
+    * Looks for changes made in the container, sends them to every listener.
+    */
   override def detectAndSendChanges() {
     super.detectAndSendChanges()
     crafters.foreach { case icrafting: ICrafting =>

@@ -1,6 +1,8 @@
 package com.itszuvalex.femtocraft.power
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.power.IPowerCrystal._
+import com.itszuvalex.femtocraft.power.ItemPowerCrystal._
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -12,8 +14,8 @@ import net.minecraft.util.IIcon
 import scala.collection._
 
 /**
- * Created by Christopher on 8/26/2015.
- */
+  * Created by Christopher on 8/26/2015.
+  */
 object ItemPowerCrystal {
   val TEXTURE_PREFIX   = "ItemCrystal"
   val NBT_COMPOUND_KEY = "PowerCrystal"
@@ -25,7 +27,7 @@ object ItemPowerCrystal {
   val TRANSFER_KEY     = "Transfer"
   val NAME_KEY         = "Name"
 
-  val DEFAULT_ICON_TYPE = IPowerCrystal.TYPE_LARGE
+  val DEFAULT_ICON_TYPE = TYPE_LARGE
 
   private val typeIconMap = mutable.HashMap[String, IIcon]()
 
@@ -176,37 +178,37 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
   override def getColorFromItemStack(stack: ItemStack, renderPass: Int): Int = if (renderPass > 0) super.getColorFromItemStack(stack, renderPass) else getColor(stack)
 
   /**
-   *
-   * @param stack
-   * @return Color of the crystal.
-   */
+    *
+    * @param stack
+    * @return Color of the crystal.
+    */
   override def getColor(stack: ItemStack) = ItemPowerCrystal.getColor(stack)
 
   /**
-   *
-   * @param stack
-   * @return Size of the crystal.
-   */
+    *
+    * @param stack
+    * @return Size of the crystal.
+    */
   override def getType(stack: ItemStack) = ItemPowerCrystal.getType(stack)
 
   /**
-   *
-   * @param stack
-   * @return Range to allow connections in.
-   */
-  override def getRange(stack: ItemStack) = ItemPowerCrystal.getRange(stack)
+    *
+    * @param stack
+    * @return Range to allow connections in.
+    */
+  override def getRange(stack: ItemStack) = getRange(stack)
 
   /**
-   *
-   * @param stack
-   * @return Amount to multiply storage amount by.
-   */
-  override def getStorageMultiplier(stack: ItemStack) = ItemPowerCrystal.getStorageMultiplier(stack)
+    *
+    * @param stack
+    * @return Amount to multiply storage amount by.
+    */
+  override def getStorageMultiplier(stack: ItemStack) = getStorageMultiplier(stack)
 
   override def registerIcons(ir: IIconRegister): Unit = {
-    ItemPowerCrystal.addMapping(TYPE_SMALL, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_SMALL))
-    ItemPowerCrystal.addMapping(TYPE_MEDIUM, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_MEDIUM))
-    ItemPowerCrystal.addMapping(TYPE_LARGE, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_LARGE))
+    addMapping(TYPE_SMALL, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_SMALL))
+    addMapping(TYPE_MEDIUM, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_MEDIUM))
+    addMapping(TYPE_LARGE, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_LARGE))
   }
 
   override def getIcon(stack: ItemStack, pass: Int): IIcon = getIconFromStack(stack)
@@ -216,23 +218,23 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
   private def getIconFromStack(stack: ItemStack): IIcon = {
     ItemPowerCrystal.getIcon(ItemPowerCrystal.getType(stack))
     .getOrElse(
-        ItemPowerCrystal.getIcon(ItemPowerCrystal.DEFAULT_ICON_TYPE).orNull
+                ItemPowerCrystal.getIcon(DEFAULT_ICON_TYPE).orNull
               )
   }
 
   /**
-   *
-   * @param stack
-   * @return Amount of power to generate per tick.
-   */
-  override def getPassiveGen(stack: ItemStack) = ItemPowerCrystal.getPassiveGen(stack)
+    *
+    * @param stack
+    * @return Amount of power to generate per tick.
+    */
+  override def getPassiveGen(stack: ItemStack) = getPassiveGen(stack)
 
   override def getName(stack: ItemStack) = ItemPowerCrystal.getName(stack)
 
   /**
-   *
-   * @param stack
-   * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
-   */
-  override def getTransferRate(stack: ItemStack): Int = ItemPowerCrystal.getTransferRate(stack)
+    *
+    * @param stack
+    * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
+    */
+  override def getTransferRate(stack: ItemStack): Int = getTransferRate(stack)
 }

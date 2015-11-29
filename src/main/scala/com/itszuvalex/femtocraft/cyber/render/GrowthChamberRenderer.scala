@@ -1,10 +1,8 @@
 package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.Cyber.ICyberMachineRenderer
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.cyber.IRecipeRenderer
-import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
+import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
+import com.itszuvalex.femtocraft.cyber.{ICyberMachineRenderer, IRecipeRenderer}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack

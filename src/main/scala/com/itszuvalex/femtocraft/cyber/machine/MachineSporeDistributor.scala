@@ -3,9 +3,8 @@ package com.itszuvalex.femtocraft.cyber.machine
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.core.Cyber.ICyberMachine
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.cyber.tile.TileSporeDistributor
+import com.itszuvalex.femtocraft.cyber.ICyberMachine
+import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileSporeDistributor}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.util.InventoryUtils

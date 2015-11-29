@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
+import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -12,8 +12,8 @@ import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher on 9/21/2015.
- */
+  * Created by Christopher on 9/21/2015.
+  */
 object GuiFrame {
   val texture = Resources.TexGui("GuiInventoryBase.png")
 }
@@ -35,7 +35,7 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
   val reqItems      = multiblock match {
     case Some(m) =>
       m.getRequiredResources.map(new GuiItemStack(0, 0, _, false))
-    case None    => Seq[GuiElement]()
+    case None => Seq[GuiElement]()
   }
   val layout        = new GuiFlowLayout(7, 11 + frender.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
 

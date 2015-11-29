@@ -1,19 +1,17 @@
 package com.itszuvalex.femtocraft.cyber.gui
 
-import com.itszuvalex.femtocraft.{GuiIDs, FemtoFluids, Resources}
 import com.itszuvalex.femtocraft.cyber.container.ContainerCyberBase
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.{FemtoFluids, GuiIDs, Resources}
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.renderer.RenderHelper
-import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
-import net.minecraftforge.fluids.FluidTank
+import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Alex on 03.10.2015.
- */
+  * Created by Alex on 03.10.2015.
+  */
 object GuiCyberBase {
   val texture = Resources.TexGui("GuiCyberBase.png")
 }
@@ -29,20 +27,20 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
     Minecraft.getMinecraft.fontRenderer
   }
 
-  val name = tile.size + "x" + tile.size + " Cyber Base"
+  val name      = tile.size + "x" + tile.size + " Cyber Base"
   val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth(name)) / 2, 7,
-                                frender.getStringWidth(name), frender.FONT_HEIGHT,
-                                name)
-  
+                               frender.getStringWidth(name), frender.FONT_HEIGHT,
+                               name)
+
   nameLabel.setShouldRender(false)
 
   val inputSlots = {
-    for (i <- 0 until 9) yield new GuiItemStack(88 + 18 * (i % 3), 36 + 18 * (i / 3), null)
-  }.toSeq
+                     for (i <- 0 until 9) yield new GuiItemStack(88 + 18 * (i % 3), 36 + 18 * (i / 3), null)
+                   }.toSeq
 
   val bufferSlots = {
-    for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
-}.toSeq
+                      for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
+                    }.toSeq
 
   inputSlots.foreach(_.setShouldRender(false))
   bufferSlots.foreach(_.setShouldRender(false))
@@ -53,7 +51,7 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
 
   var bufferTank2: GuiFluidTank = null
   if (tile.size == 3) bufferTank2 = new GuiFluidTank(196, 21, this, tile, 2, 3, null, true)
-  
+
   cybermassTank.setShouldRender(false)
   bufferTank1.setShouldRender(false)
   if (tile.size == 3) bufferTank2.setShouldRender(false)
@@ -64,7 +62,7 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
       true
     } else false
   }
-  
+
   buildButton.setShouldRender(false)
 
   {

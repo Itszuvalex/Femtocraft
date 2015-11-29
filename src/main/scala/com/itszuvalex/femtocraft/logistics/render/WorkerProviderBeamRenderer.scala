@@ -12,8 +12,8 @@ import net.minecraft.util.{MathHelper, ResourceLocation}
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/5/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/5/15.
+  */
 object WorkerProviderBeamRenderer {
   private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/logistics_beam_outer.png")
   private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/logistics_beam_colored.png")
@@ -44,8 +44,8 @@ class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer {
     val yMin: Double = (-1.0F + f3).toDouble % 1
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
     FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
-                         xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-                         color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
+                              xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+                              color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
 
   def beamRenderTeardown(): Unit = {

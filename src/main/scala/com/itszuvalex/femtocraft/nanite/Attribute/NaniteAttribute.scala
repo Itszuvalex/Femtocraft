@@ -1,14 +1,13 @@
 package com.itszuvalex.femtocraft.nanite.Attribute
 
 import com.itszuvalex.femtocraft.nanite.Attribute.NaniteAttribute._
-import com.itszuvalex.femtocraft.core.Nanites.INaniteStrain
 import com.itszuvalex.femtocraft.nanite.{INaniteStrain, NaniteStrain}
 import com.itszuvalex.itszulib.api.core.Configurable
 import net.minecraft.item.ItemStack
 
 /**
- * Created by Christopher on 7/31/2015.
- */
+  * Created by Christopher on 7/31/2015.
+  */
 @Configurable
 object NaniteAttribute {
   val MAX_BONUS_LEVELS       = 5

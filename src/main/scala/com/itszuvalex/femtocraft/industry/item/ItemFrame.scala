@@ -2,9 +2,8 @@ package com.itszuvalex.femtocraft.industry.item
 
 import java.util
 
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.core.Industry.IFrameItem
-import com.itszuvalex.femtocraft.industry.{IFrameItem, FrameMultiblockRegistry}
+import com.itszuvalex.femtocraft.industry.tile.TileFrame
+import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -17,8 +16,8 @@ import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/30/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/30/15.
+  */
 object ItemFrame {
   val FRAME_COMPOUND = "Frame"
   val SELECTION_TAG  = "Selection"
@@ -124,7 +123,7 @@ class ItemFrame extends Item with IFrameItem {
           //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
           frame.formMultiBlock(world, bx, by, bz)
           frame.multiBlock = multiString
-        case _                =>
+        case _ =>
       }
               }
     true

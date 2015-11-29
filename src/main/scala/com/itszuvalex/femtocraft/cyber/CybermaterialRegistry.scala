@@ -10,8 +10,8 @@ import scala.collection.JavaConversions._
 import scala.collection._
 
 /**
- * Created by Christopher on 7/29/2015.
- */
+  * Created by Christopher on 7/29/2015.
+  */
 object CybermaterialRegistry {
   private val blockMassTypeMap = mutable.HashMap[String, mutable.HashMap[(Block, Int), Int]]()
   private val itemMassTypeMap  = mutable.HashMap[String, mutable.HashMap[(Item, Int), Int]]()

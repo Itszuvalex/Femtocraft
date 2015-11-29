@@ -9,8 +9,8 @@ import net.minecraft.world.IBlockAccess
 import net.minecraftforge.common.util.ForgeDirection
 
 /**
- * Created by Christopher on 8/27/2015.
- */
+  * Created by Christopher on 8/27/2015.
+  */
 class BlockCyberwood extends Block(Material.wood) {
   var topIcon: IIcon = null
 

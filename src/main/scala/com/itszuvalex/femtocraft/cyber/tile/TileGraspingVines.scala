@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.cyber.tile
 import java.util.UUID
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase

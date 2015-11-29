@@ -9,8 +9,8 @@ import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.common.{EnumPlantType, IPlantable}
 
 /**
- * Created by Christopher on 8/27/2015.
- */
+  * Created by Christopher on 8/27/2015.
+  */
 class BlockCyberweave extends Block(Material.iron) {
   setStepSound(Block.soundTypeMetal)
 

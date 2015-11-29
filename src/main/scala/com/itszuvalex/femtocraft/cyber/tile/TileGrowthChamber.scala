@@ -1,6 +1,5 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.cyber.{GrowthChamberRegistry, IRecipeRenderer}

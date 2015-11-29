@@ -5,14 +5,14 @@ import net.minecraft.client.renderer.Tessellator
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/4/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
+  */
 object FemtoRenderUtils {
 
   def drawBeam(start: Vector3,
                end: Vector3,
                width: Float,
-               uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1, red : Int = 255, green : Int = 255, blue : Int = 255, alpha : Int = 0): Unit = {
+               uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1, red: Int = 255, green: Int = 255, blue: Int = 255, alpha: Int = 0): Unit = {
     val rightVector = (end - start).normalize()
     val center = ((end - start) / 2) + start
     val upVector = (center - Vector3(0, 0, 0)).cross(rightVector).normalize()

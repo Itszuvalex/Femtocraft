@@ -12,8 +12,8 @@ import net.minecraftforge.fluids.FluidStack
 import scala.collection.JavaConverters._
 
 /**
- * Created by Christopher on 8/24/2015.
- */
+  * Created by Christopher on 8/24/2015.
+  */
 object CubicCraftingRegistry {
   private val recipeInputMap = new util.TreeMap[(Array[Array[ItemStack]], FluidStack), CubicCraftingRecipe](new Comparator[(Array[Array[ItemStack]], FluidStack)] {
     override def compare(o1: (Array[Array[ItemStack]], FluidStack), o2: (Array[Array[ItemStack]], FluidStack)): Int = {

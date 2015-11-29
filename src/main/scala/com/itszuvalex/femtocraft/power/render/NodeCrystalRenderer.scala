@@ -13,8 +13,8 @@ import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/5/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/5/15.
+  */
 object NodeCrystalRenderer {
   val crystalModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals.obj")
   val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals Texture 64x64.png")
@@ -23,7 +23,7 @@ object NodeCrystalRenderer {
 trait NodeCrystalRenderer extends TileEntitySpecialRenderer {
   val crystalModel = AdvancedModelLoader.loadModel(NodeCrystalRenderer.crystalModelLocation).asInstanceOf[WavefrontObject]
 
-  def renderNode(node: TileEntity with IPowerNode, x:Double, y:Double, z:Double, partialTime: Float) = {
+  def renderNode(node: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTime: Float) = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(NodeCrystalRenderer.crystalTexLocation)
     renderCrystal(x, y, z, node, partialTime)
   }

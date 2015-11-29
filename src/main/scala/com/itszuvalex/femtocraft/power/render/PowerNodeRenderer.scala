@@ -4,8 +4,8 @@ import com.itszuvalex.femtocraft.power.node.IPowerNode
 import net.minecraft.tileentity.TileEntity
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/4/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
+  */
 
 object PowerNodeRenderer {
   val RENDER_RADIUS = PowerNodeBeamRenderer.RENDER_RADIUS
@@ -16,6 +16,6 @@ class PowerNodeRenderer extends PowerNodeBeamRenderer with NodeCrystalRenderer {
     case node: IPowerNode =>
       renderNode(node, x, y, z, partialTime)
       renderPowerBeams(node, x, y, z, partialTime)
-    case _                =>
+    case _ =>
   }
 }

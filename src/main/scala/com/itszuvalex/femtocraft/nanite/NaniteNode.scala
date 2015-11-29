@@ -7,8 +7,8 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/25/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/25/15.
+  */
 object NaniteNode {
   val NODE_COMPOUND_KEY = "NaniteNode"
   val NODE_PARENT_KEY   = "Parent"

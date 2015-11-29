@@ -1,9 +1,8 @@
 package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRendererRegistry
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.industry.{FrameMultiblockRendererRegistry, FrameMultiblockRegistry}
+import com.itszuvalex.femtocraft.industry.tile.TileFrame
+import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
@@ -12,8 +11,8 @@ import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Alex on 05.09.2015.
- */
+  * Created by Alex on 05.09.2015.
+  */
 object FrameRenderer {
   val frameModelLocation = Resources.Model("frame/Frame.obj")
   val frameTexLocation   = Resources.Model("frame/frame.png")
@@ -38,9 +37,9 @@ object FrameRenderer {
                                case (_, 0, _) => "T"
                                case (0, 2, _) => "B"
                                case (1, 1, _) => "B"
-                               case _         => ""
+                               case _ => ""
                              })
-                             + (if (a == 0 && b != 1) sidemap1 else sidemap2)(c)
+                             + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
                            )
                   }
 

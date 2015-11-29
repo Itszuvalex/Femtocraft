@@ -1,11 +1,11 @@
 package com.itszuvalex.femtocraft.nanite
 
-import com.itszuvalex.femtocraft.core.Nanites.Attribute.INaniteAttribute
+import com.itszuvalex.femtocraft.nanite.Attribute.INaniteAttribute
 import net.minecraft.item.ItemStack
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 7/3/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 7/3/15.
+  */
 class Nanite(private val arch: String, private val col: Int) extends INanite {
   override def getArchetype = arch
 

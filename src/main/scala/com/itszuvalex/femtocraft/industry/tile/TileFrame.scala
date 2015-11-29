@@ -18,8 +18,8 @@ import net.minecraftforge.common.util.ForgeDirection
 import scala.collection.mutable
 
 /**
- * Created by Christopher on 8/29/2015.
- */
+  * Created by Christopher on 8/29/2015.
+  */
 object TileFrame {
   val RENDER_SETTINGS_KEY = "RenderSettings"
   val MULTIBLOCK_KEY      = "Multiblock"
@@ -54,27 +54,27 @@ object TileFrame {
     val MaxY = sizeY - 1
     val MaxZ = sizeZ - 1
     (locX, locY, locZ) match {
-      case (0, 0, 0)                => setRenderMarks(true, 0, 4, 8, 11, 12, 16, 17, 19)
-      case (`MaxX`, 0, 0)           => setRenderMarks(true, 0, 5, 8, 9, 13, 16, 17, 18)
-      case (0, `MaxY`, 0)           => setRenderMarks(true, 0, 0, 3, 4, 12, 13, 15, 16)
-      case (0, 0, `MaxZ`)           => setRenderMarks(true, 0, 7, 10, 11, 15, 16, 18, 19)
-      case (`MaxX`, `MaxY`, 0)      => setRenderMarks(true, 0, 0, 1, 5, 12, 13, 14, 17)
-      case (0, `MaxY`, `MaxZ`)      => setRenderMarks(true, 0, 2, 3, 7, 12, 14, 15, 19)
-      case (`MaxX`, 0, `MaxZ`)      => setRenderMarks(true, 0, 6, 9, 10, 14, 17, 18, 19)
+      case (0, 0, 0) => setRenderMarks(true, 0, 4, 8, 11, 12, 16, 17, 19)
+      case (`MaxX`, 0, 0) => setRenderMarks(true, 0, 5, 8, 9, 13, 16, 17, 18)
+      case (0, `MaxY`, 0) => setRenderMarks(true, 0, 0, 3, 4, 12, 13, 15, 16)
+      case (0, 0, `MaxZ`) => setRenderMarks(true, 0, 7, 10, 11, 15, 16, 18, 19)
+      case (`MaxX`, `MaxY`, 0) => setRenderMarks(true, 0, 0, 1, 5, 12, 13, 14, 17)
+      case (0, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 3, 7, 12, 14, 15, 19)
+      case (`MaxX`, 0, `MaxZ`) => setRenderMarks(true, 0, 6, 9, 10, 14, 17, 18, 19)
       case (`MaxX`, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 1, 2, 6, 13, 14, 15, 18)
-      case (0, 0, _)                => setRenderMarks(true, 0, 11, 16, 19)
-      case (0, `MaxY`, _)           => setRenderMarks(true, 0, 3, 12, 15)
-      case (`MaxX`, 0, _)           => setRenderMarks(true, 0, 9, 17, 18)
-      case (`MaxX`, `MaxY`, _)      => setRenderMarks(true, 0, 1, 13, 14)
-      case (0, _, 0)                => setRenderMarks(true, 0, 4, 12, 16)
-      case (0, _, `MaxZ`)           => setRenderMarks(true, 0, 7, 15, 19)
-      case (`MaxX`, _, 0)           => setRenderMarks(true, 0, 5, 13, 17)
-      case (`MaxX`, _, `MaxZ`)      => setRenderMarks(true, 0, 6, 14, 18)
-      case (_, 0, 0)                => setRenderMarks(true, 0, 8, 16, 17)
-      case (_, 0, `MaxZ`)           => setRenderMarks(true, 0, 10, 18, 19)
-      case (_, `MaxY`, 0)           => setRenderMarks(true, 0, 0, 12, 13)
-      case (_, `MaxY`, `MaxZ`)      => setRenderMarks(true, 0, 2, 14, 15)
-      case _                        => fullRender(false)
+      case (0, 0, _) => setRenderMarks(true, 0, 11, 16, 19)
+      case (0, `MaxY`, _) => setRenderMarks(true, 0, 3, 12, 15)
+      case (`MaxX`, 0, _) => setRenderMarks(true, 0, 9, 17, 18)
+      case (`MaxX`, `MaxY`, _) => setRenderMarks(true, 0, 1, 13, 14)
+      case (0, _, 0) => setRenderMarks(true, 0, 4, 12, 16)
+      case (0, _, `MaxZ`) => setRenderMarks(true, 0, 7, 15, 19)
+      case (`MaxX`, _, 0) => setRenderMarks(true, 0, 5, 13, 17)
+      case (`MaxX`, _, `MaxZ`) => setRenderMarks(true, 0, 6, 14, 18)
+      case (_, 0, 0) => setRenderMarks(true, 0, 8, 16, 17)
+      case (_, 0, `MaxZ`) => setRenderMarks(true, 0, 10, 18, 19)
+      case (_, `MaxY`, 0) => setRenderMarks(true, 0, 0, 12, 13)
+      case (_, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 14, 15)
+      case _ => fullRender(false)
     }
   }
 
@@ -85,11 +85,11 @@ object TileFrame {
 }
 
 class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory {
-  var renderInt                                               = TileFrame.fullRender(true)
-  var multiBlock                   : String                   = null
-  var progress                     : Int                      = 0
-  var totalMachineBuildTime        : Float                    = 500f
-  var inProgressData               : mutable.Map[String, Any] = mutable.Map()
+  var renderInt                                       = TileFrame.fullRender(true)
+  var multiBlock           : String                   = null
+  var progress             : Int                      = 0
+  var totalMachineBuildTime: Float                    = 500f
+  var inProgressData       : mutable.Map[String, Any] = mutable.Map()
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
@@ -130,7 +130,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           multi.formAtLocation(getWorldObj, xCoord, yCoord, zCoord)
           TileFrame.shouldFullyRemove = true
           TileFrame.shouldDrop = true
-        case _           =>
+        case _ =>
       }
     }
   }
@@ -191,13 +191,13 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
                 InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, random)
               }
                                                                                  }
-          case _           =>
+          case _ =>
         }
         indInventory.getInventory.foreach {InventoryUtils.dropItem(_, getWorldObj, xCoord, yCoord, zCoord, random)}
       }
       else getWorldObj.getTileEntity(info.x, info.y, info.z) match {
         case frame: TileFrame => getWorldObj.setBlockToAir(info.x, info.y, info.z)
-        case _                =>
+        case _ =>
       }
     }
   }

@@ -10,16 +10,16 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/4/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/4/15.
+  */
 abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescriptionPacket {
   override def getMod = Femtocraft
 
   /**
-   *
-   * @param child
-   * @return True if child was a child of this node, and was successfully removed.
-   */
+    *
+    * @param child
+    * @return True if child was a child of this node, and was successfully removed.
+    */
   override def removeChild(child: IPowerNode): Boolean = {
     val ret = super.removeChild(child)
     setUpdate()
@@ -28,10 +28,10 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescr
 
 
   /**
-   *
-   * @param child
-   * @return True if child is successfully added.
-   */
+    *
+    * @param child
+    * @return True if child is successfully added.
+    */
   override def addChild(child: IPowerNode): Boolean = {
     val ret = super.addChild(child)
     setUpdate()
@@ -39,10 +39,10 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescr
   }
 
   /**
-   *
-   * @param parent Parent being set.
-   * @return True if parent is successfully set to input parent.
-   */
+    *
+    * @param parent Parent being set.
+    * @return True if parent is successfully set to input parent.
+    */
   override def setParent(parent: IPowerNode): Boolean = {
     val ret = super.setParent(parent)
     setUpdate()

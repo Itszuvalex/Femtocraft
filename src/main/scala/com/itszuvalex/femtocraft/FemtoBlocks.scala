@@ -1,10 +1,8 @@
 package com.itszuvalex.femtocraft
 
 
-import com.itszuvalex.femtocraft.core.Cyber.block._
-import com.itszuvalex.femtocraft.core.Industry.block.BlockFrame
 import com.itszuvalex.femtocraft.cyber.block._
-import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber}
+import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber, BlockFrame}
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._

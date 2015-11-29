@@ -9,8 +9,8 @@ import net.minecraftforge.oredict.OreDictionary
 import scala.collection.mutable
 
 /**
- * Created by Christopher on 8/21/2015.
- */
+  * Created by Christopher on 8/21/2015.
+  */
 
 class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedInventory {
   protected lazy val idMap   = mutable.HashMap[Int, mutable.HashSet[Int]]()

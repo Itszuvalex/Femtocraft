@@ -12,8 +12,8 @@ import net.minecraft.util.{ResourceLocation, StatCollector}
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher on 9/1/2015.
- */
+  * Created by Christopher on 9/1/2015.
+  */
 @SideOnly(Side.CLIENT) object GuiNaniteHive {
   val texture = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/guis/GuiNaniteHive_small.png")
   val WIDTH   = 226
@@ -26,8 +26,8 @@ GuiBase(new ContainerNaniteHive(player, inv, tile)) {
   ySize = GuiNaniteHive.HEIGHT
 
   /**
-   * Draw the foreground layer for the GuiContainer (everything in front of the items)
-   */
+    * Draw the foreground layer for the GuiContainer (everything in front of the items)
+    */
   protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
     val s = "Small Nanite Hive"
     fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
@@ -35,8 +35,8 @@ GuiBase(new ContainerNaniteHive(player, inv, tile)) {
   }
 
   /**
-   * Draw the background layer for the GuiContainer (everything behind the items)
-   */
+    * Draw the background layer for the GuiContainer (everything behind the items)
+    */
   protected def drawGuiContainerBackgroundLayer(par1: Float, par2: Int, par3: Int) {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
     Minecraft.getMinecraft.getTextureManager.bindTexture(GuiNaniteHive.texture)

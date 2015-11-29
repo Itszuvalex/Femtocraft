@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.nanite
 import net.minecraft.item.ItemStack
 
 /**
- * Created by Christopher on 7/29/2015.
- */
+  * Created by Christopher on 7/29/2015.
+  */
 trait INaniteStrain {
 
   def getNanite(item: ItemStack): String

@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.logistics.distributed
 
 /**
- * Created by Christopher on 8/15/2015.
- */
+  * Created by Christopher on 8/15/2015.
+  */
 trait IWorker {
   /*
     /**
@@ -13,40 +13,40 @@ trait IWorker {
   */
 
   /**
-   *
-   * @return The provider offering up this worker.
-   */
+    *
+    * @return The provider offering up this worker.
+    */
   def getProvider: IWorkerProvider
 
   /**
-   *
-   * @return The task the worker is assigned to, null otherwise.
-   */
+    *
+    * @return The task the worker is assigned to, null otherwise.
+    */
   def getTask: ITask
 
   /**
-   *
-   * @param task Task to be assigned to.
-   * @return True if this worker can work upon the task, false otherwise.
-   */
-  def canWorkTask(task: ITask) : Boolean
+    *
+    * @param task Task to be assigned to.
+    * @return True if this worker can work upon the task, false otherwise.
+    */
+  def canWorkTask(task: ITask): Boolean
 
   /**
-   *
-   * @return Sets the worker to the assigned task.
-   */
+    *
+    * @return Sets the worker to the assigned task.
+    */
   def setTask(task: ITask): Unit
 
   /**
-   *
-   * @param attribute Attribute to ask about.
-   * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
-   */
+    *
+    * @param attribute Attribute to ask about.
+    * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
+    */
   def getEfficiency(attribute: String): Double
 
   /**
-   * Called every tick by the IWorkerProvider.
-   */
+    * Called every tick by the IWorkerProvider.
+    */
   def onTick(): Unit
 
 }

@@ -5,8 +5,8 @@ import cpw.mods.fml.relauncher.{Side, SideOnly}
 import scala.collection.mutable
 
 /**
- * Created by Christopher on 8/26/2015.
- */
+  * Created by Christopher on 8/26/2015.
+  */
 @SideOnly(Side.CLIENT)
 object FrameMultiblockRendererRegistry {
   private val renderMap = mutable.HashMap[Int, IFrameMultiblockRenderer]()

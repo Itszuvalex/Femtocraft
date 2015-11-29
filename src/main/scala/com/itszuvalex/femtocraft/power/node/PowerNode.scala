@@ -12,8 +12,8 @@ import scala.collection._
 import scala.util.Random
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/3/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/3/15.
+  */
 object PowerNode {
   val POWER_COMPOUND_KEY = "FemtoPower"
   val NODE_PARENT_KEY    = "Parent"
@@ -82,10 +82,10 @@ trait PowerNode extends TileEntity with IPowerNode {
 
   /* IPowerNode */
   /**
-   *
-   * @param child
-   * @return True if child is successfully added.
-   */
+    *
+    * @param child
+    * @return True if child is successfully added.
+    */
   override def addChild(child: IPowerNode): Boolean = {
     if (child == null) return true
     childrenLocs += child.getNodeLoc
@@ -94,10 +94,10 @@ trait PowerNode extends TileEntity with IPowerNode {
 
 
   /**
-   *
-   * @param child
-   * @return True if child was a child of this node, and was successfully removed.
-   */
+    *
+    * @param child
+    * @return True if child was a child of this node, and was successfully removed.
+    */
   override def removeChild(child: IPowerNode): Boolean = {
     if (child == null) return true
     if (childrenLocs.contains(child.getNodeLoc)) {
@@ -108,40 +108,40 @@ trait PowerNode extends TileEntity with IPowerNode {
   }
 
   /**
-   *
-   * @param child
-   * @return True if child is capable of being a child of this node.
-   */
+    *
+    * @param child
+    * @return True if child is capable of being a child of this node.
+    */
   override def canAddChild(child: IPowerNode): Boolean = {
     child != null && child.getNodeLoc != parentLoc
   }
 
   /**
-   *
-   * @param parent IPowerNode that is being checked.
-   * @return True if this node is capable of having that node as a parent.
-   */
+    *
+    * @param parent IPowerNode that is being checked.
+    * @return True if this node is capable of having that node as a parent.
+    */
   override def canAddParent(parent: IPowerNode): Boolean = {
     parent != null && !childrenLocs.contains(parent.getNodeLoc)
   }
 
   /**
-   *
-   * @return Amount of power capable of being stored in this node.
-   */
+    *
+    * @return Amount of power capable of being stored in this node.
+    */
   override def getPowerMax: Long = powerMax
 
   /**
-   *
-   * @return Get world loc of this node.  This will be the location used for tracking and range calculations.
-   */
+    *
+    * @return Get world loc of this node.  This will be the location used for tracking and range calculations.
+    */
   override def getNodeLoc: Loc4 = new Loc4(this)
 
   /**
-   *
-   * @param parent Parent being set.
-   * @return True if parent is successfully set to input parent.
-   */
+    *
+    * @param parent Parent being set.
+    * @return True if parent is successfully set to input parent.
+    */
   override def setParent(parent: IPowerNode): Boolean = {
     if (parent != null) {
       parentLoc = parent.getNodeLoc
@@ -153,33 +153,33 @@ trait PowerNode extends TileEntity with IPowerNode {
   }
 
   /**
-   *
-   * @param amount Set current stored power to the given value.
-   */
+    *
+    * @param amount Set current stored power to the given value.
+    */
   override def setPower(amount: Long): Unit = powerCurrent = amount
 
   /**
-   *
-   * @return Maximum distance to look for parents in.
-   */
+    *
+    * @return Maximum distance to look for parents in.
+    */
   override def parentConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
 
   /**
-   *
-   * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
-   */
+    *
+    * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
+    */
   override def getParent: IPowerNode = if (parentLoc == null) null
   else parentLoc.getTileEntity(true) match {
     case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
-    case _                                     => null
+    case _ => null
   }
 
   /**
-   *
-   * @param amount Amount of power to consume.
-   * @param doUse True if actually change values, false to simulate.
-   * @return Amount of power consumed out of @amount from the internal storage of this Tile.
-   */
+    *
+    * @param amount Amount of power to consume.
+    * @param doUse True if actually change values, false to simulate.
+    * @return Amount of power consumed out of @amount from the internal storage of this Tile.
+    */
   override def usePower(amount: Long, doUse: Boolean): Long = {
     val min = Math.min(amount, powerCurrent)
     if (doUse)
@@ -188,37 +188,37 @@ trait PowerNode extends TileEntity with IPowerNode {
   }
 
   /**
-   *
-   * @return Amount of power currently stored in this node.
-   */
+    *
+    * @return Amount of power currently stored in this node.
+    */
   override def getPowerCurrent: Long = powerCurrent
 
   /**
-   *
-   * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
-   */
+    *
+    * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
+    */
   override def getChildren: Iterable[IPowerNode] = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: IPowerNode => node }
 
   /**
-   *
-   * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
-   *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
-   *         the chunk.
-   */
+    *
+    * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
+    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
+    *         the chunk.
+    */
   override def getChildrenLocs: Set[Loc4] = childrenLocs
 
   /**
-   *
-   * @return Maximum distance children can be from this node, to connect.
-   */
+    *
+    * @return Maximum distance children can be from this node, to connect.
+    */
   override def childrenConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
 
   /**
-   *
-   * @param amount Amount of power to add.
-   * @param doFill True if actually change values, false to simulate.
-   * @return Amount of power used out of @amount to fill the internal storage of this Tile.
-   */
+    *
+    * @param amount Amount of power to add.
+    * @param doFill True if actually change values, false to simulate.
+    * @return Amount of power used out of @amount to fill the internal storage of this Tile.
+    */
   override def addPower(amount: Long, doFill: Boolean): Long = {
     val min = Math.min(amount, powerMax - powerCurrent)
     if (doFill)
@@ -227,15 +227,15 @@ trait PowerNode extends TileEntity with IPowerNode {
   }
 
   /**
-   *
-   * @return The color of this power node.  This is used for aesthetics.
-   */
+    *
+    * @return The color of this power node.  This is used for aesthetics.
+    */
   override def getColor: Int = color
 
   /**
-   *
-   * @return Loc4 of this node's parent, null if it has no parent.  This is primarily to bypass chunk churn, as a node may have a parent set but the parent is in an unloaded chunk.  If that is the case, then
-   *         it can return its parent location here, without having to explicitly load that chunk.
-   */
+    *
+    * @return Loc4 of this node's parent, null if it has no parent.  This is primarily to bypass chunk churn, as a node may have a parent set but the parent is in an unloaded chunk.  If that is the case, then
+    *         it can return its parent location here, without having to explicitly load that chunk.
+    */
   override def getParentLoc: Loc4 = parentLoc
 }

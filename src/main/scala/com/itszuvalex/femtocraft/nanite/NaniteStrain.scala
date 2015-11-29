@@ -1,15 +1,15 @@
 package com.itszuvalex.femtocraft.nanite
 
-import com.itszuvalex.femtocraft.core.Nanites.Attribute.AttributeRegistry
-import com.itszuvalex.femtocraft.core.Nanites.Trait.INaniteTrait
+import com.itszuvalex.femtocraft.nanite.Attribute.AttributeRegistry
+import com.itszuvalex.femtocraft.nanite.Trait.INaniteTrait
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.JavaConversions._
 
 /**
- * Created by Christopher on 7/29/2015.
- */
+  * Created by Christopher on 7/29/2015.
+  */
 object NaniteStrain {
   val MAX_LEVEL                       = 10
   val XP_PER_LEVEL_MULT               = 100

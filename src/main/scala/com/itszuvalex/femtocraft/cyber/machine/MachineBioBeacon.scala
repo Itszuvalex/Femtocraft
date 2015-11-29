@@ -3,9 +3,8 @@ package com.itszuvalex.femtocraft.cyber.machine
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.core.Cyber.ICyberMachine
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.cyber.tile.TileBioBeacon
+import com.itszuvalex.femtocraft.cyber.ICyberMachine
+import com.itszuvalex.femtocraft.cyber.tile.{TileBioBeacon, TileCyberBase}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.util.InventoryUtils
@@ -87,7 +86,7 @@ class MachineBioBeacon extends ICyberMachine {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
                                               }
-    getRequiredResources.foreach( stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
+    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
 
   override def getRequiredBaseSize = 1

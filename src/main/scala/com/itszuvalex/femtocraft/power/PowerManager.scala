@@ -5,8 +5,8 @@ import com.itszuvalex.itszulib.logistics.LocationTracker
 import net.minecraft.tileentity.TileEntity
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/3/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/3/15.
+  */
 object PowerManager {
   val nodeTracker       = new LocationTracker
   val parentlessTracker = new LocationTracker
@@ -17,10 +17,10 @@ object PowerManager {
   }
 
   /**
-   * Attempts to add node to the IPowerNode mapping.  If the node has no parent location, PowerManager will attempt to find a parent for it.  If one is not found,
-   * it will add the node to its parentless list, and will then try to find a parent for it every time a new node is added.
-   * @param node Node to be added.
-   */
+    * Attempts to add node to the IPowerNode mapping.  If the node has no parent location, PowerManager will attempt to find a parent for it.  If one is not found,
+    * it will add the node to its parentless list, and will then try to find a parent for it every time a new node is added.
+    * @param node Node to be added.
+    */
   def addNode(node: IPowerNode): Unit = {
     val loc = node.getNodeLoc
     /* If added node doesn't have a stored parent */

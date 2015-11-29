@@ -16,8 +16,8 @@ import net.minecraft.util.AxisAlignedBB
 import scala.collection._
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/15/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/15/15.
+  */
 class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with ILogisticsConnected with TileDescriptionPacket {
   val workers = new mutable.HashSet[IWorker]()
   workers += new TestWorker(this)
@@ -53,22 +53,22 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   override def getMod = Femtocraft
 
   /**
-   *
-   * @return Distance to accept new tasks when workers complete their own.  Do not pass high values, as this will lead to excessive blank location checking on the order of
-   *         (distance/16)&#94;2
-   */
+    *
+    * @return Distance to accept new tasks when workers complete their own.  Do not pass high values, as this will lead to excessive blank location checking on the order of
+    *         (distance/16)&#94;2
+    */
   override def getTaskConnectionRadius = 30f
 
   /**
-   *
-   * @return Set of workers available to be assigned.
-   */
+    *
+    * @return Set of workers available to be assigned.
+    */
   override def getProvidedWorkers: Set[IWorker] = workers
 
   /**
-   *
-   * @return Location of this worker provider, for use in distance calculations.
-   */
+    *
+    * @return Location of this worker provider, for use in distance calculations.
+    */
   override def getProviderLocation = getLoc
 
   override def getRenderBoundingBox: AxisAlignedBB = {
@@ -122,42 +122,42 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     var task: ITask = null
 
     /**
-     *
-     * @param task Task to be assigned to.
-     * @return True if this worker can work upon the task, false otherwise.
-     */
+      *
+      * @param task Task to be assigned to.
+      * @return True if this worker can work upon the task, false otherwise.
+      */
     override def canWorkTask(task: ITask) = true
 
     /**
-     *
-     * @return The task the worker is assigned to, null otherwise.
-     */
+      *
+      * @return The task the worker is assigned to, null otherwise.
+      */
     override def getTask = task
 
     /**
-     * Called every tick by the IWorkerProvider.
-     */
+      * Called every tick by the IWorkerProvider.
+      */
     override def onTick(): Unit = {
 
     }
 
     /**
-     *
-     * @param attribute Attribute to ask about.
-     * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
-     */
+      *
+      * @param attribute Attribute to ask about.
+      * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
+      */
     override def getEfficiency(attribute: String) = 1d
 
     /**
-     *
-     * @return The provider offering up this worker.
-     */
+      *
+      * @return The provider offering up this worker.
+      */
     override def getProvider = provider
 
     /**
-     *
-     * @return Sets the worker to the assigned task.
-     */
+      *
+      * @return Sets the worker to the assigned task.
+      */
     override def setTask(task: ITask): Unit = {
       this.task = task
       provider.setUpdate()

@@ -1,9 +1,8 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRegistry, CybermaterialRegistry}
-import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
+import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CybermaterialRegistry, GrowthChamberRegistry}
+import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
@@ -14,12 +13,12 @@ import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Items
-import net.minecraft.item.{ItemStack, Item}
+import net.minecraft.item.{Item, ItemStack}
 import org.apache.logging.log4j.LogManager
 
 /**
- * Created by Christopher on 4/5/2015.
- */
+  * Created by Christopher on 4/5/2015.
+  */
 @Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:ItszuLib")
 object Femtocraft {
   final val ID      = "Femtocraft"

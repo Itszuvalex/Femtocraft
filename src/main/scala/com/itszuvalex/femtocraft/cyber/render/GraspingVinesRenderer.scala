@@ -1,9 +1,8 @@
 package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.Cyber.ICyberMachineRenderer
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.cyber.tile.TileGraspingVines
+import com.itszuvalex.femtocraft.cyber.ICyberMachineRenderer
+import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer

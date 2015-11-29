@@ -9,7 +9,7 @@ class DiffusionNodeRenderer extends DiffusionNodeBeamRenderer with NodeCrystalRe
       case node: IPowerNode =>
         renderNode(node, x, y, z, partialTime)
         renderDiffuseBeams(node, x, y, z, partialTime)
-      case _                =>
+      case _ =>
     }
   }
 }

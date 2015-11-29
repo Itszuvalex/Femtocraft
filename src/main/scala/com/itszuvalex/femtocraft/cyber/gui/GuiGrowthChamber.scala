@@ -3,15 +3,15 @@ package com.itszuvalex.femtocraft.cyber.gui
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.cyber.container.ContainerGrowthChamber
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
-import com.itszuvalex.itszulib.gui.{GuiLabel, GuiFluidTank, GuiItemStack, GuiBase}
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiFluidTank, GuiItemStack, GuiLabel}
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
+import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraftforge.fluids.FluidRegistry
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Alex on 18.10.2015.
- */
+  * Created by Alex on 18.10.2015.
+  */
 object GuiGrowthChamber {
   val texture = Resources.TexGui("GuiGrowthChamber.png")
 }
@@ -21,12 +21,12 @@ class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val t
   def frender = Minecraft.getMinecraft.fontRenderer
 
   val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth("Growth Chamber")) / 2, 7,
-    frender.getStringWidth("Growth Chamber"), frender.FONT_HEIGHT,
-    "Growth Chamber")
+                               frender.getStringWidth("Growth Chamber"), frender.FONT_HEIGHT,
+                               "Growth Chamber")
 
   val inputSlot = new GuiItemStack(7, 20)
 
-  val outputSlots = { for (i <- 0 to 8) yield new GuiItemStack(79 + 18 * (i % 3), 20 + 18 * math.floor(i / 3d).toInt) }
+  val outputSlots = {for (i <- 0 to 8) yield new GuiItemStack(79 + 18 * (i % 3), 20 + 18 * math.floor(i / 3d).toInt)}
 
   val waterTank = new GuiFluidTank(151, 10, this, tile, 3, FluidRegistry.WATER, true)
 
@@ -36,7 +36,7 @@ class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val t
     add(elems: _*)
   }
 
-  override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX : Int, mouseY : Int): Unit = {
+  override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
     GL11.glDisable(GL11.GL_BLEND)
     GL11.glDisable(GL11.GL_LIGHTING)

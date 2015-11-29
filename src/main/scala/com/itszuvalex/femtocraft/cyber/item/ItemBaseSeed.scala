@@ -2,31 +2,30 @@ package com.itszuvalex.femtocraft.cyber.item
 
 import java.util
 
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems}
+import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
 import com.itszuvalex.femtocraft.render.RenderIDs
+import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems}
 import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
-
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.{ItemStack, Item}
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
-import net.minecraftforge.fluids.{FluidRegistry, FluidStack, FluidTank}
+import net.minecraftforge.fluids.FluidTank
 
 /**
- * Created by Alex on 26.09.2015.
- */
+  * Created by Alex on 26.09.2015.
+  */
 object ItemBaseSeed {
   val SIZE_TAG = "BaseSize"
 
   /**
-   * @param stack Stack of ItemBaseSeed
-   * @return Size number of the stack (1, 2 or 3), 0 if not an ItemBaseSeed stack
-   */
+    * @param stack Stack of ItemBaseSeed
+    * @return Size number of the stack (1, 2 or 3), 0 if not an ItemBaseSeed stack
+    */
   def getSize(stack: ItemStack): Int = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return 0
     if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound(SIZE_TAG -> 1)
@@ -35,9 +34,9 @@ object ItemBaseSeed {
   }
 
   /**
-   * @param stack Stack of ItemBaseSeed
-   * @param value Size number to set stack to (1, 2 or 3), invalid numbers do nothing
-   */
+    * @param stack Stack of ItemBaseSeed
+    * @param value Size number to set stack to (1, 2 or 3), invalid numbers do nothing
+    */
   def setSize(stack: ItemStack, value: Int): Unit = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return
     if (value < 1 || value > 3) return
@@ -48,11 +47,11 @@ object ItemBaseSeed {
   }
 
   /**
-   * Tool for simple and correct creation of an ItemBaseSeed stack.
-   * @param stackSize Desired stack size
-   * @param baseSize Desired size number (1, 2 or 3)
-   * @return An ItemBaseSeed stack with the specified properties, null if invalid baseSize
-   */
+    * Tool for simple and correct creation of an ItemBaseSeed stack.
+    * @param stackSize Desired stack size
+    * @param baseSize Desired size number (1, 2 or 3)
+    * @return An ItemBaseSeed stack with the specified properties, null if invalid baseSize
+    */
   def createStack(stackSize: Int, baseSize: Int): ItemStack = {
     if (baseSize < 1 || baseSize > 3) return null
     val stack = new ItemStack(FemtoItems.itemBaseSeed, stackSize)
@@ -61,9 +60,9 @@ object ItemBaseSeed {
   }
 
   /**
-   * @param stack Stack of ItemBaseSeed
-   * @return Descriptive string for the size number of stack
-   */
+    * @param stack Stack of ItemBaseSeed
+    * @return Descriptive string for the size number of stack
+    */
   def getSizeString(stack: ItemStack): String = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return ""
     getSize(stack) match {
@@ -74,26 +73,26 @@ object ItemBaseSeed {
   }
 
   /**
-   * @param stack Stack of ItemBaseSeed
-   * @param x X coord of lower-north-west corner
-   * @param y Y coord of lower-north-west-corner
-   * @param z Z coord of lower-north-west corner
-   * @param dim Dimension id of the machine
-   * @return Set of locations that are occupied by the base that would be planted with stack
-   */
+    * @param stack Stack of ItemBaseSeed
+    * @param x X coord of lower-north-west corner
+    * @param y Y coord of lower-north-west-corner
+    * @param z Z coord of lower-north-west corner
+    * @param dim Dimension id of the machine
+    * @return Set of locations that are occupied by the base that would be planted with stack
+    */
   def getBaseLocations(stack: ItemStack, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) Set.empty[Loc4]
     else TileCyberBase.getBaseLocations(getSize(stack), x, y, z, dim)
   }
 
   /**
-   * @param stack Stack of ItemBaseSeed
-   * @param x X coord of lower-north-west corner
-   * @param y Y coord of lower-north-west-corner
-   * @param z Z coord of lower-north-west corner
-   * @param dim Dimension id of the machine
-   * @return Set of locations that are occupied by the machine slots of the base that would be planted with stack
-   */
+    * @param stack Stack of ItemBaseSeed
+    * @param x X coord of lower-north-west corner
+    * @param y Y coord of lower-north-west-corner
+    * @param z Z coord of lower-north-west corner
+    * @param dim Dimension id of the machine
+    * @return Set of locations that are occupied by the machine slots of the base that would be planted with stack
+    */
   def getSlotLocations(stack: ItemStack, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) Set.empty[Loc4]
     else TileCyberBase.getSlotLocations(getSize(stack), x, y, z, dim)
@@ -114,11 +113,11 @@ class ItemBaseSeed extends Item with IPreviewable {
   override def onItemRightClick(stack: ItemStack, world: World, player: EntityPlayer): ItemStack = {
     if (player.isSneaking) {
       ItemBaseSeed.setSize(stack, ItemBaseSeed.getSize(stack) match {
-                                    case 1 => 2
-                                    case 2 => 3
-                                    case 3 => 1
-                                    case _ => 1
-                                  }
+        case 1 => 2
+        case 2 => 3
+        case 3 => 1
+        case _ => 1
+      }
                           )
     }
     stack
@@ -131,11 +130,11 @@ class ItemBaseSeed extends Item with IPreviewable {
     var bx = x + dir.offsetX
     var by = y + dir.offsetY
     var bz = z + dir.offsetZ
-    if (ItemBaseSeed.getSize(stack) == 3) { bx -= 1; bz -= 1 }
+    if (ItemBaseSeed.getSize(stack) == 3) {bx -= 1; bz -= 1}
     val locs = TileCyberBase.getBaseLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId)
     if (!TileCyberBase.areAllPlaceable(locs)) return false
     if (!TileCyberBase.arePartsAtYPlaceable(TileCyberBase.getSlotLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId),
-                                                                           by + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))) return false
+                                            by + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))) return false
     locs.foreach { loc =>
       world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockCyberBase)
       world.getTileEntity(loc.x, loc.y, loc.z) match {
@@ -150,7 +149,7 @@ class ItemBaseSeed extends Item with IPreviewable {
           te.formMultiBlock(world, bx, by, bz)
         case _ =>
       }
-    }
+                 }
     true
   }
 

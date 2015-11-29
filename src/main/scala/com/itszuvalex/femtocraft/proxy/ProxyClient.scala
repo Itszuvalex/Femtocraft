@@ -21,16 +21,12 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.FemtoItems
-import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRendererRegistry
-import com.itszuvalex.femtocraft.core.Cyber.render.CyberBaseRenderer
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRendererRegistry
-import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.cyber.render.{GraspingVinesRenderer, GrowthChamberRenderer}
-import com.itszuvalex.femtocraft.cyber.tile.{TileGraspingVines, TileGrowthChamber}
-import com.itszuvalex.femtocraft.industry.render.ArcFurnaceRenderer
-import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
+import com.itszuvalex.femtocraft.cyber.CyberMachineRendererRegistry
+import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesRenderer, GrowthChamberRenderer}
+import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
+import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
+import com.itszuvalex.femtocraft.industry.render.{ArcFurnaceRenderer, FrameItemRenderer, FrameRenderer}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer

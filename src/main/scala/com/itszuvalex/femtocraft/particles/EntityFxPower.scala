@@ -31,8 +31,8 @@ import net.minecraft.world.World
 import org.lwjgl.opengl.GL11._
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 9/25/14.
- */
+  * Created by Christopher Harris (Itszuvalex) on 9/25/14.
+  */
 
 object EntityFxPower {
   val particleLocation = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/particles/particles.png")
@@ -102,8 +102,8 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
   }
 
   /**
-   * Called to update the entity's position/logic.
-   */
+    * Called to update the entity's position/logic.
+    */
   override def onUpdate {
     this.prevPosX = this.posX
     this.prevPosY = this.posY

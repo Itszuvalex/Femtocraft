@@ -1,10 +1,12 @@
 package com.itszuvalex.femtocraft.nanite
 
+import com.itszuvalex.femtocraft.nanite.INanite._
+
 import scala.collection.mutable
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 7/3/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 7/3/15.
+  */
 object NaniteRegistry {
 
 

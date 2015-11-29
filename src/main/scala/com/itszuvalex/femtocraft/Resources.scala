@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft
 import net.minecraft.util.ResourceLocation
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 9/17/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 9/17/15.
+  */
 object Resources {
   def Texture(name: String) = Femtocraft("textures/" + name)
 

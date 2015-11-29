@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
 import java.util
+
 import com.itszuvalex.femtocraft.industry.recipe.CentrifugeRecipe
 import com.itszuvalex.itszulib.util.Comparators.FluidStack.IDNBTComparator
 import net.minecraftforge.fluids.FluidStack
@@ -8,8 +9,8 @@ import net.minecraftforge.fluids.FluidStack
 import scala.collection.JavaConverters._
 
 /**
- * Created by Christopher on 8/24/2015.
- */
+  * Created by Christopher on 8/24/2015.
+  */
 object CentrifugeRegistry {
   val recipeInputMap = new util.TreeMap[FluidStack, CentrifugeRecipe](IDNBTComparator).asScala
 

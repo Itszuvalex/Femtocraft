@@ -11,8 +11,8 @@ import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/28/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/28/15.
+  */
 @Configurable object TileArcFurnace {
   @Configurable val FLUID_TANK_SIZE = 2000
 }
@@ -35,9 +35,9 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
   override def getGuiID = GuiIDs.ArcFurnaceGuiID
 
   /**
-   *
-   * @return The type of PowerNode this is.
-   */
+    *
+    * @return The type of PowerNode this is.
+    */
   override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
 
   override def getRenderBoundingBox: AxisAlignedBB = {

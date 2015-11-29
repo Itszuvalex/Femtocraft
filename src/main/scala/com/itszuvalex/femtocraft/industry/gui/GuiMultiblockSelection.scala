@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.industry.container.ContainerMultiblockSelection
+import com.itszuvalex.femtocraft.industry.gui.GuiMultiblockSelection.GuiMultiblockSelector
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem, IFrameMultiblock}
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageMultiblockSelection
@@ -13,8 +14,8 @@ import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher on 9/1/2015.
- */
+  * Created by Christopher on 9/1/2015.
+  */
 object GuiMultiblockSelection {
   val texture         = Resources.TexGui("GuiMultiblockSelector.png")
   val xSelectionMin   = 7
@@ -80,14 +81,14 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                       GuiMultiblockSelection.SelectionHeight,
                       (stack match {
                         case null => null
-                        case is   => is.getItem match {
-                          case null              => null
+                        case is => is.getItem match {
+                          case null => null
                           case frame: IFrameItem =>
                             val multis = FrameMultiblockRegistry.getMultiblocksForFrameType(frame.getFrameType(is))
                             val selectors = multis.map(new GuiMultiblockSelector(this, _))
                             selectors.find(_.multi.getName.equalsIgnoreCase(frame.getSelectedMultiblock(is))) match {
                               case Some(g) => selectMultiblock(g)
-                              case None    => clearSelection()
+                              case None => clearSelection()
                             }
                             selectors.toSeq
                         }
@@ -144,8 +145,8 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
     selected = multi
     stack match {
       case null =>
-      case is   => is.getItem match {
-        case null              =>
+      case is => is.getItem match {
+        case null =>
         case frame: IFrameItem =>
           FemtoPacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(multi.multi.getName))
       }
@@ -157,8 +158,8 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
     selected = null
     stack match {
       case null =>
-      case is   => is.getItem match {
-        case null              =>
+      case is => is.getItem match {
+        case null =>
         case frame: IFrameItem =>
           FemtoPacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(null))
       }
