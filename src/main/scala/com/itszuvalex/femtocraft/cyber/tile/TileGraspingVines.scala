@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
-import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
+import com.itszuvalex.itszulib.api.core.{Configurable, Loc4, Saveable}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
@@ -33,12 +34,12 @@ object TileGraspingVines {
   */
 @Configurable
 class TileGraspingVines extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex    : Int   = -1
-  var basePos         : Loc4  = null
-  var velocityAddition: Float = .2f
-  var grabRadius      : Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
-  var entitySet               = new mutable.HashSet[Entity]()
-  var clientSet               = mutable.HashSet[Int]()
+            var machineIndex    : Int   = -1
+  @Saveable var basePos         : Loc4  = null
+            var velocityAddition: Float = .2f
+            var grabRadius      : Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
+            var entitySet               = new mutable.HashSet[Entity]()
+            var clientSet               = mutable.HashSet[Int]()
 
   def grabbedSet: mutable.HashSet[Entity] = {
     if (getWorldObj.isRemote) {
@@ -136,7 +137,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   }
 
   def onBlockBreak(): Unit = {
-    if (!isValidMultiBlock) return
+    if (!isValidMultiBlock || worldObj.isRemote) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
         te.breakMachinesUpwardsFromSlot(te.machineSlotMap(machineIndex))
@@ -165,5 +166,10 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
                                  center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
                                  center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
                                  center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
+  }
+
+  override def formMultiBlock(world: World, x: Int, y: Int, z: Int): Boolean = {
+    setModified()
+    super.formMultiBlock(world, x, y, z)
   }
 }

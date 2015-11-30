@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.{AxisAlignedBB, ResourceLocation}
+import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, FluidTank}
 
@@ -302,4 +303,9 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
   override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
 
   override def canDrain(from: ForgeDirection, fluid: Fluid): Boolean = false
+
+  override def formMultiBlock(world: World, x: Int, y: Int, z: Int): Boolean = {
+    setModified()
+    super.formMultiBlock(world, x, y, z)
+  }
 }

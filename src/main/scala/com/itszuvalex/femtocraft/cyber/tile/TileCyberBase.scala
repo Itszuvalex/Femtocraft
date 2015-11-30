@@ -138,7 +138,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       breakMachinesUpwardsFromSlot(0)
       TileCyberBase.getBaseLocations(size, xCoord, yCoord, zCoord, worldObj.provider.dimensionId).foreach { loc =>
         worldObj.setBlockToAir(loc.x, loc.y, loc.z)
-        worldObj.removeTileEntity(loc.x, loc.y, loc.z)
                                                                                                           }
       InventoryUtils.dropItem(ItemBaseSeed.createStack(1, size), worldObj, xCoord + (size / 2), yCoord, zCoord + (size / 2), new Random())
     } else {
@@ -150,8 +149,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   private def firstEmpty(ar: Array[String]): Int = {
-    for (i <- 0 until ar.length) if (ar(i) == null) return i
-    ar.length
+    ar.indices.find(ar(_) == null).getOrElse(ar.length)
   }
 
   private def getOrNullStr(ar: Array[String], index: Int): String = {
@@ -190,6 +188,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     currentlyBuildingMachine = firstEmpty(machines)
     machines(currentlyBuildingMachine) = name
     machineSlotMap(currentlyBuildingMachine) = firstFreeSlot
+    setModified()
   }
 
   def breakMachinesUpwardsFromSlot(slot: Int): Unit = {
@@ -208,6 +207,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
                                         }
     firstFreeSlot = slot
     breaking = false
+    setModified()
   }
 
   /**

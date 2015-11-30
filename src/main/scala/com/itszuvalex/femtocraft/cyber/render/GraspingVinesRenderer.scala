@@ -35,10 +35,10 @@ class GraspingVinesRenderer extends TileEntitySpecialRenderer with ICyberMachine
         GL11.glPopMatrix()
 
         Minecraft.getMinecraft.getTextureManager.bindTexture(GraspingVinesRenderer.vineTexture)
-        renderBeamsToEntities(x, y, z, partialTime, t, t.grabbedSet.toSet, .1f, new Color(255.toByte, 255.toByte, 255.toByte, 255.toByte))
+        renderBeamsToEntities(x, y, z, partialTime, t, t.grabbedSet.toSet, .1f, new Color(255.toByte, 200.toByte, 255.toByte, 200.toByte))
 
         Minecraft.getMinecraft.getTextureManager.bindTexture(GraspingVinesRenderer.vineColoredTexture)
-        renderBeamsToEntities(x, y, z, partialTime, t, t.grabbedSet.toSet, .1f, new Color(255.toByte, 255.toByte, 255.toByte, 255.toByte))
+        renderBeamsToEntities(x, y, z, partialTime, t, t.grabbedSet.toSet, .1f, new Color(255.toByte, 0.toByte, 255.toByte, 0.toByte))
       case _ =>
     }
   }

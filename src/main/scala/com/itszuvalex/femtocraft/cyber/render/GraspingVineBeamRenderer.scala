@@ -35,7 +35,7 @@ trait GraspingVineBeamRenderer extends TileEntitySpecialRenderer {
     val nloc = node.getLoc
     val diff = Vector3(px, py, pz) - Vector3(nloc.x, nloc.y, nloc.z)
     val startLoc = Vector3(x, y, z)
-    val offset = Vector3(0.5f, 0.5f, 0.5f)
+    val offset = Vector3(0.5f, 1f, 0.5f)
     val xMin: Double = 0.0D
     val xMax: Double = 1.0D
     val yMin: Double = 0.0D
