@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CyberMachineRendererRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
@@ -60,17 +59,17 @@ class CyberBaseRenderer extends TileEntitySpecialRenderer {
       case base: TileCyberBase =>
         if (!base.isController) return
         CyberBaseRenderer.renderBase(base, x, y, z, partialTime)
-        if (base.currentlyBuildingMachine > -1 && base.currentMachineBuildProgress > 0) {
-          CyberMachineRegistry.getMachine(base.machines(base.currentlyBuildingMachine)) match {
-            case Some(machine) =>
-              CyberMachineRendererRegistry.getRenderer(machine.multiblockRenderID) match {
-                case Some(render) =>
-                  render.renderInProgressAt(x, y + TileCyberBase.baseHeightMap(base.size) + base.machineSlotMap(base.currentlyBuildingMachine), z, partialTime, base)
-                case _ =>
-              }
-            case _ =>
-          }
-        }
+      //        if (base.currentlyBuildingMachine > -1 && base.currentMachineBuildProgress > 0) {
+      //          CyberMachineRegistry.getMachine(base.machines(base.currentlyBuildingMachine)) match {
+      //            case Some(machine) =>
+      //              CyberMachineRendererRegistry.getRenderer(machine.multiblockRenderID) match {
+      //                case Some(render) =>
+      //                  render.renderInProgressAt(x, y + TileCyberBase.baseHeightMap(base.size) + base.machineSlotMap(base.currentlyBuildingMachine), z, partialTime, base)
+      //                case _ =>
+      //              }
+      //            case _ =>
+      //          }
+      //        }
       case _ =>
     }
   }

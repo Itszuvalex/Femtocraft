@@ -139,11 +139,11 @@ class GrowthChamberRenderer extends TileEntitySpecialRenderer with ICyberMachine
     * @param y yPos to render at
     * @param z zPos to render at
     * @param partialTime Partial tick time
-    * @param baseController Controller TileCyberBase of the machine.
-    *                       Store any data that should persist between render calls in `baseController.inProgressData`.
-    *                       If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.
+    * @param progressPercentage Controller TileCyberBase of the machine.
+    *        Store any data that should persist between render calls in `baseController.inProgressData`.
+    *        If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.
     */
-  override def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, baseController: TileCyberBase): Unit = {
+  override def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, progressPercentage: Float): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
     GL11.glPushMatrix()
     GL11.glEnable(GL11.GL_BLEND)
@@ -151,7 +151,7 @@ class GrowthChamberRenderer extends TileEntitySpecialRenderer with ICyberMachine
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glTranslated(x + 1, y, z + 1)
 
-    val progressD = baseController.currentMachineBuildProgress / 100d
+    val progressD = progressPercentage
     GL11.glScaled(progressD, progressD, progressD)
 
     GrowthChamberRenderer.model.renderOnly("Base", "Top", "Sprinkler1", "Sprinkler2", "Sprinkler3")

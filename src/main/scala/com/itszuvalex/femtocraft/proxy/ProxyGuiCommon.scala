@@ -20,7 +20,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.FrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
       case (GuiIDs.FrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
       case (GuiIDs.CyberBaseGuiID, te: TileCyberBase) => new ContainerCyberBase(player, player.inventory, te)
-      case (GuiIDs.CyberBaseBuildGuiID, _: TileCyberBase) => new ContainerMachineSelection
+      case (GuiIDs.CyberBaseBuildGuiID, te: TileCyberBase) => new ContainerMachineSelection(te)
       case (GuiIDs.ArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
       case (GuiIDs.NaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
       case (GuiIDs.GrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)

@@ -140,7 +140,7 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
     if (!isValidMultiBlock || worldObj.isRemote) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
-        te.breakMachinesUpwardsFromSlot(te.machineSlotMap(machineIndex))
+        te.breakMachinesUpwardsFromSlot(machineIndex)
       case _ =>
     }
   }

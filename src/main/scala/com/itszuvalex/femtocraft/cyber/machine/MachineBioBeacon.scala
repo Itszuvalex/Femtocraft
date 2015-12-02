@@ -59,7 +59,7 @@ class MachineBioBeacon extends ICyberMachine {
     */
   override def formAtBaseAndIndex(world: World, baseController: TileCyberBase, machineIndex: Int): Unit = {
     val mx = baseController.xCoord
-    val my = baseController.yFromSlot(baseController.machineSlotMap(machineIndex))
+    val my = baseController.yFromSlot(machineIndex)
     val mz = baseController.zCoord
     getTakenLocations(world, mx, my, mz).foreach { loc =>
       world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockBioBeacon)

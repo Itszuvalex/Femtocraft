@@ -15,11 +15,11 @@ trait ICyberMachineRenderer {
     * @param y yPos to render at
     * @param z zPos to render at
     * @param partialTime Partial tick time
-    * @param baseController Controller TileCyberBase of the machine.
-    *                       Store any data that should persist between render calls in `baseController.inProgressData`.
-    *                       If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.
+    * @param progressPercentage Controller TileCyberBase of the machine.
+    *        Store any data that should persist between render calls in `baseController.inProgressData`.
+    *        If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.
     */
-  def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, baseController: TileCyberBase): Unit
+  def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, progressPercentage: Float): Unit
 
   /**
     * Coordinates to render at.  This is for things like generic menu rendering, etc.

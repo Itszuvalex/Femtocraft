@@ -68,7 +68,9 @@ object GuiMachineSelection {
 
 }
 
-class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCyberBase) extends GuiBase(new ContainerMachineSelection) {
+class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCyberBase) extends GuiBase(new ContainerMachineSelection(te)) {
+  val container = this.inventorySlots.asInstanceOf[ContainerMachineSelection]
+
 
   xSize = GuiMachineSelection.WIDTH
   ySize = GuiMachineSelection.HEIGHT
@@ -78,7 +80,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
                       GuiMachineSelection.ySelectionMin,
                       GuiMachineSelection.SelectionWidth,
                       GuiMachineSelection.SelectionHeight, {
-                        val machines = CyberMachineRegistry.getMachinesThatFitIn(te.size, te.remainingSlots)
+                        val machines = CyberMachineRegistry.getMachinesThatFitIn(te.size, container.slots)
                         val selectors = machines.map(new GuiMachineSelector(this, _))
                         clearSelection()
                         selectors.toSeq
@@ -89,11 +91,21 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
   val pageLabel = new GuiLabel((GuiMachineSelection.WIDTH - 100) / 2,
                                GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
                                100, 10, "")
+  //  val slotLabel = new GuiLabel(2,
+  //                               GuiMachineSelection.SelectionHeight - 20,
+  //                               100, 10, "")
+
   refreshPageLabelText()
+
+  //  refreshSlotLabelText()
 
   private def refreshPageLabelText() = {
     pageLabel.text = "Displaying " + (selectionFlow.startingIndex + 1) + "-" + (selectionFlow.endingIndex + 1) + " of " + selectionFlow.numElements
   }
+
+  //  private def refreshSlotLabelText() = {
+  //    slotLabel.text = "Free Slots:" + container.slots + " of " + TileCyberBase.slotHeightMap(te.size)
+  //  }
 
   add(selectionFlow,
       new GuiButton(GuiMachineSelection.xSelectionMin,
@@ -107,6 +119,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
         override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
       },
       pageLabel,
+      //      slotLabel,
       new GuiButton((GuiMachineSelection.WIDTH - 100) / 2,
                     GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 15,
                     100, 12, "Clear Selection") {
@@ -145,7 +158,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
 
   def buildMachine(): Unit = {
     if (selected != null) FemtoPacketHandler.INSTANCE.sendToServer(new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, te.getWorldObj.provider.dimensionId, selected.machine.getName))
-//    player.openGui(te.getMod, te.getGuiID, te.getWorldObj, te.info.x, te.info.y, te.info.z)
+    //    player.openGui(te.getMod, te.getGuiID, te.getWorldObj, te.info.x, te.info.y, te.info.z)
   }
 
   def clearSelection() = {

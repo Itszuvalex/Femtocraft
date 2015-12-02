@@ -49,7 +49,7 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     if (!isValidMultiBlock) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
-        te.breakMachinesUpwardsFromSlot(te.machineSlotMap(machineIndex))
+        te.breakMachinesUpwardsFromSlot(machineIndex)
       case _ =>
     }
   }
