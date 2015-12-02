@@ -194,6 +194,12 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
                                                                                                           }
       InventoryUtils.dropItem(ItemBaseSeed.createStack(1, size), worldObj, xCoord + (size / 2), yCoord, zCoord + (size / 2), new Random())
     }
+    else {
+      worldObj.getTileEntity(info.x, info.y, info.z) match {
+        case te: TileCyberBase => worldObj.setBlockToAir(info.x, info.y, info.z)
+        case _ =>
+      }
+    }
   }
 
   def yFromSlot(slot: Int): Int = yCoord + TileCyberBase.baseHeightMap(size) + slot
