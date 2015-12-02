@@ -58,7 +58,7 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
 
   val buildButton = new GuiButton(171, 94, 45, 20, "Build Machine") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
-      if (tile.currentlyBuildingMachine == -1) player.openGui(tile.getMod, GuiIDs.CyberBaseBuildGuiID, tile.getWorldObj, tile.info.x, tile.info.y, tile.info.z)
+      player.openGui(tile.getMod, GuiIDs.CyberBaseBuildGuiID, tile.getWorldObj, tile.info.x, tile.info.y, tile.info.z)
       true
     } else false
   }

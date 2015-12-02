@@ -144,8 +144,8 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
   }
 
   def buildMachine(): Unit = {
-    if (selected != null) FemtoPacketHandler.INSTANCE.sendToServer(new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, selected.machine.getName))
-    player.openGui(te.getMod, te.getGuiID, te.getWorldObj, te.info.x, te.info.y, te.info.z)
+    if (selected != null) FemtoPacketHandler.INSTANCE.sendToServer(new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, te.getWorldObj.provider.dimensionId, selected.machine.getName))
+//    player.openGui(te.getMod, te.getGuiID, te.getWorldObj, te.info.x, te.info.y, te.info.z)
   }
 
   def clearSelection() = {
