@@ -3,10 +3,11 @@ package com.itszuvalex.femtocraft.cyber.tile
 import java.util.UUID
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.cyber.machine.MachineGraspingVines
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4, Saveable}
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
+import com.itszuvalex.itszulib.core.traits.tile.TileFluidTank
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.Entity
@@ -24,7 +25,7 @@ import scala.collection.mutable
 object TileGraspingVines {
   @Configurable
   val DEFAULT_GRAB_RADIUS = 8f
-  val grabbedHashSet      = new mutable.HashSet[UUID]()
+  val grabbedHashSet = new mutable.HashSet[UUID]()
 
   val COMPOUND_IDLIST = "IDList"
 }
@@ -33,45 +34,45 @@ object TileGraspingVines {
   * Created by Christopher on 11/21/2015.
   */
 @Configurable
-class TileGraspingVines extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
-            var machineIndex    : Int   = -1
-  @Saveable var basePos         : Loc4  = null
-            var velocityAddition: Float = .2f
-            var grabRadius      : Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
-            var entitySet               = new mutable.HashSet[Entity]()
-            var clientSet               = mutable.HashSet[Int]()
-
-  def grabbedSet: mutable.HashSet[Entity] = {
-    if (getWorldObj.isRemote) {
-      //Find entities based on ids passed by server.  Cache the found entities so we don't keep looking them up from the worldObj every call.
-      val entities = clientSet.flatMap(id => Option(getWorldObj.getEntityByID(id)))
-      clientSet --= entities.map(_.getEntityId)
-      entitySet ++= entities
-    }
-    entitySet
-  }
+class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
+  var machineIndex: Int = -1
+  @Saveable var basePos: Loc4 = null
+  var velocityAddition: Float = .2f
+  var grabRadius: Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
+  var entitySet = new mutable.HashSet[Entity]()
+  var clientSet = mutable.HashSet[Int]()
 
   override def serverUpdate(): Unit = {
     findAndGrabEntities(grabRadius)
     super.serverUpdate()
   }
 
+  def findAndGrabEntities(radius: Float): Unit = {
+    getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
+      yCoord + .5f - radius,
+      zCoord + .5f - radius,
+      xCoord + .5f + radius,
+      yCoord + .5f + radius,
+      zCoord + .5f + radius))
+      .asInstanceOf[java.util.List[Entity]]
+      .view
+      .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) <= radius * radius }
+      .foreach(grabEntity)
+  }
+
+  def grabEntity(entity: Entity): Boolean = {
+    if (TileGraspingVines.grabbedHashSet.contains(entity.getUniqueID)) false
+    else {
+      TileGraspingVines.grabbedHashSet += entity.getUniqueID
+      grabbedSet += entity
+      setUpdate()
+      true
+    }
+  }
+
   override def updateEntity(): Unit = {
     super.updateEntity()
     pullEntities()
-  }
-
-  def findAndGrabEntities(radius: Float): Unit = {
-    getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
-                                                                                    yCoord + .5f - radius,
-                                                                                    zCoord + .5f - radius,
-                                                                                    xCoord + .5f + radius,
-                                                                                    yCoord + .5f + radius,
-                                                                                    zCoord + .5f + radius))
-    .asInstanceOf[java.util.List[Entity]]
-    .view
-    .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) <= radius * radius }
-    .foreach(grabEntity)
   }
 
   def pullEntities() = {
@@ -92,17 +93,17 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
         }
       }
       toRemove.foreach(removeEntity)
-                       }
+    }
   }
 
-  def grabEntity(entity: Entity): Boolean = {
-    if (TileGraspingVines.grabbedHashSet.contains(entity.getUniqueID)) false
-    else {
-      TileGraspingVines.grabbedHashSet += entity.getUniqueID
-      grabbedSet += entity
-      setUpdate()
-      true
+  def grabbedSet: mutable.HashSet[Entity] = {
+    if (getWorldObj.isRemote) {
+      //Find entities based on ids passed by server.  Cache the found entities so we don't keep looking them up from the worldObj every call.
+      val entities = clientSet.flatMap(id => Option(getWorldObj.getEntityByID(id)))
+      clientSet --= entities.map(_.getEntityId)
+      entitySet ++= entities
     }
+    entitySet
   }
 
   def removeEntity(entity: Entity): Boolean = {
@@ -161,15 +162,17 @@ class TileGraspingVines extends TileEntityBase with MultiBlockComponent with Til
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
     AxisAlignedBB.getBoundingBox(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
+      center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
   }
 
   override def formMultiBlock(world: World, x: Int, y: Int, z: Int): Boolean = {
     setModified()
     super.formMultiBlock(world, x, y, z)
   }
+
+  override def getCyberMachine = MachineGraspingVines.NAME
 }

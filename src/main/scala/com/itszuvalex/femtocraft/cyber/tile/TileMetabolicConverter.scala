@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.cyber.machine.MachineMetabolicConverter
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -11,7 +12,7 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
 /**
   * Created by Christopher on 11/21/2015.
   */
-class TileMetabolicConverter extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
+class TileMetabolicConverter extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
   var machineIndex: Int  = -1
   var basePos     : Loc4 = null
 
@@ -28,4 +29,6 @@ class TileMetabolicConverter extends TileEntityBase with MultiBlockComponent wit
   override def defaultInventory: IndexedInventory = new IndexedInventory(0)
 
   override def hasDescription: Boolean = true
+
+  override def getCyberMachine = MachineMetabolicConverter.NAME
 }

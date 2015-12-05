@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
+import com.itszuvalex.femtocraft.cyber.machine.{MachineGrowthChamber, MachineGraspingVines}
 import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.cyber.{GrowthChamberRegistry, IRecipeRenderer}
@@ -31,7 +32,7 @@ object TileGrowthChamber {
   val INVENTORY_KEY         = "Inventory"
 }
 
-class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileFluidTank {
+class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
   var machineIndex           : Int                 = -1
   var basePos                : Loc4                = null
   var progress               : Int                 = 0
@@ -308,4 +309,6 @@ class TileGrowthChamber extends TileEntityBase with MultiBlockComponent with Til
     setModified()
     super.formMultiBlock(world, x, y, z)
   }
+
+  override def getCyberMachine = MachineGrowthChamber.NAME
 }

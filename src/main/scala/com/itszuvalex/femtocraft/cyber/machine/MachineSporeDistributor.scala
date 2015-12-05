@@ -16,11 +16,15 @@ import net.minecraftforge.fluids.FluidStack
 /**
   * Created by Christopher on 11/21/2015.
   */
+object MachineSporeDistributor {
+  val NAME = "Spore Distributor"
+}
+
 class MachineSporeDistributor extends ICyberMachine {
   /**
     * @return Name of the machine
     */
-  override def getName = "Spore Distributor"
+  override def getName = MachineSporeDistributor.NAME
 
   override def getRequiredSlots = 2
 
@@ -37,8 +41,6 @@ class MachineSporeDistributor extends ICyberMachine {
 
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.sporeDistributorID
-
-  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq()
 
   /**
     * Function for accepting fluid broadcasts.
@@ -70,7 +72,7 @@ class MachineSporeDistributor extends ICyberMachine {
           te.formMultiBlock(world, mx, my, mz)
         case _ =>
       }
-                                                 }
+    }
   }
 
   override def getRequiredCybermass: Int = 0
@@ -85,9 +87,11 @@ class MachineSporeDistributor extends ICyberMachine {
   override def breakMachine(world: World, x: Int, y: Int, z: Int): Unit = {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
-                                              }
+    }
     getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
+
+  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq()
 
   override def getRequiredBaseSize = 1
 }

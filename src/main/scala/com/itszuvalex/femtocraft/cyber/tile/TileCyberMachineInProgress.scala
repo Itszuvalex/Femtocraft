@@ -95,12 +95,13 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
   def onBlockBreak(): Unit = {
     if (!isController) {
       worldObj.getTileEntity(info.x, info.y, info.z) match {
-        case cont: TileCyberMachineInProgress if finished =>
-          return
+        case cont: TileCyberMachineInProgress =>
+          cont.onBlockBreak()
         case _ =>
       }
+      return
     }
-    else if (isController && finished) return
+    else if (finished) return
 
     baseController.getTileEntity(true) match {
       case Some(cb: TileCyberBase) =>

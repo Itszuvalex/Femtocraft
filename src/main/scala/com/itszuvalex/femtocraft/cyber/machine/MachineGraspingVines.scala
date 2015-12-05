@@ -16,11 +16,14 @@ import net.minecraftforge.fluids.FluidStack
 /**
   * Created by Christopher on 11/21/2015.
   */
+object MachineGraspingVines {
+  val NAME = "Grasping Vines"
+}
 class MachineGraspingVines extends ICyberMachine {
   /**
     * @return Name of the machine
     */
-  override def getName = "Grasping Vines"
+  override def getName = MachineGraspingVines.NAME
 
   override def getRequiredSlots = 2
 

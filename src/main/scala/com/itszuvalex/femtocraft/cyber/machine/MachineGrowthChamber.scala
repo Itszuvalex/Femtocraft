@@ -17,11 +17,15 @@ import net.minecraftforge.fluids.FluidStack
 /**
   * Created by Alex on 30.09.2015.
   */
+object MachineGrowthChamber {
+  val NAME = "Growth Chamber"
+}
+
 class MachineGrowthChamber extends ICyberMachine {
   /**
     * @return Name of the machine
     */
-  override def getName: String = "Growth Chamber"
+  override def getName = MachineGrowthChamber.NAME
 
   override def getRequiredCybermass: Int = 500
 
@@ -29,8 +33,6 @@ class MachineGrowthChamber extends ICyberMachine {
 
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.growthChamberID
-
-  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq(new ItemStack(FemtoBlocks.blockCyberweave, 20))
 
   /**
     * This function should place all machine blocks and make them a multiblock.
@@ -51,7 +53,7 @@ class MachineGrowthChamber extends ICyberMachine {
           te.formMultiBlock(world, mx, my, mz)
         case _ =>
       }
-                                                 }
+    }
   }
 
   /**
@@ -64,9 +66,11 @@ class MachineGrowthChamber extends ICyberMachine {
   override def breakMachine(world: World, x: Int, y: Int, z: Int): Unit = {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
-                                              }
+    }
     getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
+
+  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq(new ItemStack(FemtoBlocks.blockCyberweave, 20))
 
   override def getRequiredBaseSize: Int = 2
 

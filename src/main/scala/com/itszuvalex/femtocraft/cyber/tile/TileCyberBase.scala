@@ -6,9 +6,8 @@ import com.itszuvalex.femtocraft.cyber.item.ItemBaseSeed
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase.MachineMapping
 import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, ICyberMachineMultiblock}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
-import com.itszuvalex.femtocraft.{GuiIDs, FemtoBlocks, FemtoFluids, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoFluids, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{Loc4, NBTSerializable}
-import com.itszuvalex.itszulib.api.multiblock.IMultiBlockComponent
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileMultiFluidTank}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -19,7 +18,6 @@ import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids._
 
@@ -31,19 +29,75 @@ import scala.collection.mutable
 object TileCyberBase {
   val MACHINES_KEY = "Machines"
   val COMPOUND_KEY = "CyberBase"
+  val baseHeightMap = Map(1 -> 1, 2 -> 1, 3 -> 2)
+  val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
 
-  private object MachineMapping {
-    def apply(compound: NBTTagCompound) = {
-      val mapping = new MachineMapping()
-      mapping.loadFromNBT(compound)
-      mapping
-    }
+  /**
+    * @param size Size number of the machine
+    * @param x X coord of lower-north-west corner
+    * @param y Y coord of lower-north-west-corner
+    * @param z Z coord of lower-north-west corner
+    * @param dim Dimension id of the machine
+    * @return Set of locations that are occupied by the base
+    */
+  def getBaseLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
+    getLocationCube(x, y, z, dim, size, baseHeightMap(size), size)
+
+  /**
+    * @param size Size number of the machine
+    * @param x X coord of lower-north-west corner
+    * @param y Y coord of lower-north-west-corner
+    * @param z Z coord of lower-north-west corner
+    * @param dim Dimension id of the machine
+    * @return Set of locations that are occupied by the machine slots of the base
+    */
+  def getSlotLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
+    getLocationCube(x, y + baseHeightMap(size), z, dim, size, slotHeightMap(size), size)
+
+  /**
+    * @param x X coord of lower-north-west corner
+    * @param y Y coord of lower-north-west-corner
+    * @param z Z coord of lower-north-west corner
+    * @param dim Dimension ID
+    * @param xSize X Size fo the cube
+    * @param ySize Y Size fo the cube
+    * @param zSize Z Size fo the cube
+    * @return Set[Loc4] that represents a cube of the passed size.
+    */
+  def getLocationCube(x: Int, y: Int, z: Int, dim: Int, xSize: Int, ySize: Int, zSize: Int): Set[Loc4] = {
+    {
+      for {
+        bx <- 0 until xSize
+        by <- 0 until ySize
+        bz <- 0 until zSize
+      } yield Loc4(x + bx, y + by, z + bz, dim)
+    }.toSet
   }
+
+  /**
+    * @param locs Set of locations to check
+    * @return True if all blocks at all locations in locs are air or replaceable, false otherwise
+    */
+  def areAllPlaceable(locs: Set[Loc4]) =
+    locs.forall(loc => {
+      val world = loc.getWorld.get
+      world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z)
+    })
+
+  /**
+    * Used to check whether the first slot above a base is blocked, to deny construction of the base if it is.
+    * @param locs Set of locations to check
+    * @param y Y plane to check
+    * @return True if all blocks of all locations in locs that have the given y coordinate are air or replaceable, false otherwise
+    */
+  def arePartsAtYPlaceable(locs: Set[Loc4], y: Int) =
+    locs.forall(loc => {
+      val world = loc.getWorld.get
+      world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z) || loc.y != y
+    })
 
   private case class MachineMapping(var startingSlot: Int,
                                     var controllerLoc: Loc4) extends NBTSerializable with Ordered[MachineMapping] {
-    private def this() = this(0, null)
-
     def cyberMachine = {
       val name =
         controllerLoc.getTileEntity(true) match {
@@ -72,105 +126,31 @@ object TileCyberBase {
           this.startingSlot.compareTo(y.startingSlot)
       }
     }
+
+    private def this() = this(0, null)
   }
 
-  val baseHeightMap = Map(1 -> 1, 2 -> 1, 3 -> 2)
-  val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
-
-  /**
-    * @param x X coord of lower-north-west corner
-    * @param y Y coord of lower-north-west-corner
-    * @param z Z coord of lower-north-west corner
-    * @param dim Dimension ID
-    * @param xSize X Size fo the cube
-    * @param ySize Y Size fo the cube
-    * @param zSize Z Size fo the cube
-    * @return Set[Loc4] that represents a cube of the passed size.
-    */
-  def getLocationCube(x: Int, y: Int, z: Int, dim: Int, xSize: Int, ySize: Int, zSize: Int): Set[Loc4] = {
-    {
-      for {
-        bx <- 0 until xSize
-        by <- 0 until ySize
-        bz <- 0 until zSize
-      } yield Loc4(x + bx, y + by, z + bz, dim)
-    }.toSet
+  private object MachineMapping {
+    def apply(compound: NBTTagCompound) = {
+      val mapping = new MachineMapping()
+      mapping.loadFromNBT(compound)
+      mapping
+    }
   }
-
-  /**
-    * @param size Size number of the machine
-    * @param x X coord of lower-north-west corner
-    * @param y Y coord of lower-north-west-corner
-    * @param z Z coord of lower-north-west corner
-    * @param dim Dimension id of the machine
-    * @return Set of locations that are occupied by the base
-    */
-  def getBaseLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
-    getLocationCube(x, y, z, dim, size, baseHeightMap(size), size)
-
-  /**
-    * @param size Size number of the machine
-    * @param x X coord of lower-north-west corner
-    * @param y Y coord of lower-north-west-corner
-    * @param z Z coord of lower-north-west corner
-    * @param dim Dimension id of the machine
-    * @return Set of locations that are occupied by the machine slots of the base
-    */
-  def getSlotLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
-    getLocationCube(x, y + baseHeightMap(size), z, dim, size, slotHeightMap(size), size)
-
-  /**
-    * @param locs Set of locations to check
-    * @return True if all blocks at all locations in locs are air or replaceable, false otherwise
-    */
-  def areAllPlaceable(locs: Set[Loc4]) =
-    locs.forall(loc => {
-      val world = loc.getWorld.get
-      world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z)
-    })
-
-  /**
-    * Used to check whether the first slot above a base is blocked, to deny construction of the base if it is.
-    * @param locs Set of locations to check
-    * @param y Y plane to check
-    * @return True if all blocks of all locations in locs that have the given y coordinate are air or replaceable, false otherwise
-    */
-  def arePartsAtYPlaceable(locs: Set[Loc4], y: Int) =
-    locs.forall(loc => {
-      val world = loc.getWorld.get
-      world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z) || loc.y != y
-    })
 }
 
 class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileMultiFluidTank with IInventory {
   var size: Int = 1
-  private var machinesList = mutable.TreeSet[MachineMapping]()
   //  var machineSlotMap             : Array[Int]               = new Array[Int](10) // Wtf is this here for?
   //  var currentlyBuildingMachine   : Int                      = -1 //No need to have the base track the building.
   //  var currentMachineBuildProgress: Int                      = 0  //The machine itself can do it.
   //  var totalMachineBuildTime      : Float                    = 100f
   var inProgressData: mutable.Map[String, Any] = mutable.Map.empty[String, Any]
+  private var machinesList = mutable.TreeSet[MachineMapping]()
   //Though this is the pickle.
   private var breaking: Boolean = false
 
-  private def getMachine(slot: Int): Option[MachineMapping] = {
-    var ret: MachineMapping = null
-    machinesList.foreach { machine =>
-      machine.startingSlot match {
-        case i if i < slot => ret = machine
-        case i if i == slot => return Option(machine)
-        case _ => return Option(ret)
-      }
-    }
-    Option(ret)
-  }
-
   def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine).getOrElse(0)
-
-  private def topSlotForMachine(machine: MachineMapping): Int = {
-    machine.startingSlot + machine.cyberMachine.map(_.getRequiredSlots).getOrElse(0)
-  }
-
 
   override def onSideActivate(player: EntityPlayer, side: Int): Boolean = {
     if (isValidMultiBlock) {
@@ -181,6 +161,12 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     }
     false
   }
+
+  override def hasGUI: Boolean = isValidMultiBlock
+
+  override def getGuiID: Int = GuiIDs.CyberBaseGuiID
+
+  override def getMod: AnyRef = Femtocraft
 
   override def getRenderBoundingBox: AxisAlignedBB = if (isController) {
     AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + size, yCoord + TileCyberBase.baseHeightMap(size), zCoord + size)
@@ -204,6 +190,39 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
         case _ =>
       }
     }
+  }
+
+  def breakMachinesUpwardsFromSlot(slot: Int): Unit = {
+    if (breaking) return
+    breaking = true
+    (slot until TileCyberBase.slotHeightMap(size))
+      .foreach {
+        getMachine(_) match {
+          case Some(m) =>
+            m.cyberMachine match {
+              case Some(c) =>
+                c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
+                machinesList.remove(m)
+              case None =>
+            }
+          case None =>
+        }
+
+      }
+    breaking = false
+    setModified()
+  }
+
+  private def getMachine(slot: Int): Option[MachineMapping] = {
+    var ret: MachineMapping = null
+    machinesList.foreach { machine =>
+      machine.startingSlot match {
+        case i if i < slot => ret = machine
+        case i if i == slot => return Option(machine)
+        case _ => return Option(ret)
+      }
+    }
+    Option(ret)
   }
 
   def yFromSlot(slot: Int): Int = yCoord + TileCyberBase.baseHeightMap(size) + slot
@@ -240,27 +259,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     //    currentlyBuildingMachine = firstEmpty(machines)
     //    machines(currentlyBuildingMachine) = name
     //    machineSlotMap(currentlyBuildingMachine) = firstFreeSlot
-    setModified()
-  }
-
-  def breakMachinesUpwardsFromSlot(slot: Int): Unit = {
-    if (breaking) return
-    breaking = true
-    (slot until TileCyberBase.slotHeightMap(size))
-      .foreach {
-        getMachine(_) match {
-          case Some(m) =>
-            m.cyberMachine match {
-              case Some(c) =>
-                c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
-                machinesList.remove(m)
-              case None =>
-            }
-          case None =>
-        }
-
-      }
-    breaking = false
     setModified()
   }
 
@@ -348,22 +346,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     null
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    compound(TileCyberBase.COMPOUND_KEY ->
-      NBTCompound(
-        TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound))
-      ))
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    compound.NBTCompound(TileCyberBase.COMPOUND_KEY) { comp =>
-      machinesList.clear()
-      machinesList ++= comp.NBTList(TileCyberBase.MACHINES_KEY).map(MachineMapping(_))
-    }
-  }
-
   //  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
   //    super.saveToDescriptionCompound(compound)
   //    val comp = new NBTTagCompound()
@@ -389,11 +371,21 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   //    setRenderUpdate()
   //  }
 
-  override def hasGUI: Boolean = isValidMultiBlock
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    compound(TileCyberBase.COMPOUND_KEY ->
+      NBTCompound(
+        TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound))
+      ))
+  }
 
-  override def getGuiID: Int = GuiIDs.CyberBaseGuiID
-
-  override def getMod: AnyRef = Femtocraft
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    compound.NBTCompound(TileCyberBase.COMPOUND_KEY) { comp =>
+      machinesList.clear()
+      machinesList ++= comp.NBTList(TileCyberBase.MACHINES_KEY).map(MachineMapping(_))
+    }
+  }
 
   override def decrStackSize(slot: Int, amt: Int): ItemStack = if (isController) indInventory.decrStackSize(slot, amt) else forwardToController[TileCyberBase, ItemStack](_.decrStackSize(slot, amt))
 
@@ -466,5 +458,9 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     if (t2rf) return tanks(2).drain(resource.amount, doDrain)
     if (t1rf) return tanks(1).drain(resource.amount, doDrain)
     null
+  }
+
+  private def topSlotForMachine(machine: MachineMapping): Int = {
+    machine.startingSlot + machine.cyberMachine.map(_.getRequiredSlots).getOrElse(0)
   }
 }
