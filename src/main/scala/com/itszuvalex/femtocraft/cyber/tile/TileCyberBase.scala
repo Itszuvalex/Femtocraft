@@ -44,14 +44,18 @@ object TileCyberBase {
                                     var controllerLoc: Loc4) extends NBTSerializable with Ordered[MachineMapping] {
     private def this() = this(0, null)
 
-    def cyberMachine = CyberMachineRegistry.getMachine(controllerLoc.getTileEntity(true) match {
-                                                         case a: ICyberMachineMultiblock => a.getCyberMachine
-                                                         case _ => null
-                                                       })
+    def cyberMachine = {
+      val name =
+        controllerLoc.getTileEntity(true) match {
+          case Some(a: ICyberMachineMultiblock) => a.getCyberMachine
+          case _ => null
+        }
+      CyberMachineRegistry.getMachine(name)
+    }
 
     override def saveToNBT(compound: NBTTagCompound): Unit = {
       compound("startingSlot" -> startingSlot,
-               "controllerLoc" -> NBTCompound(controllerLoc))
+        "controllerLoc" -> NBTCompound(controllerLoc))
     }
 
     override def loadFromNBT(compound: NBTTagCompound): Unit = {
@@ -121,7 +125,7 @@ object TileCyberBase {
     */
   def areAllPlaceable(locs: Set[Loc4]) =
     locs.forall(loc => {
-      val world = DimensionManager.getWorld(loc.dim)
+      val world = loc.getWorld.get
       world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z)
     })
 
@@ -133,7 +137,7 @@ object TileCyberBase {
     */
   def arePartsAtYPlaceable(locs: Set[Loc4], y: Int) =
     locs.forall(loc => {
-      val world = DimensionManager.getWorld(loc.dim)
+      val world = loc.getWorld.get
       world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z) || loc.y != y
     })
 }
@@ -153,15 +157,15 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     var ret: MachineMapping = null
     machinesList.foreach { machine =>
       machine.startingSlot match {
-        case `slot` => return Option(machine)
         case i if i < slot => ret = machine
+        case i if i == slot => return Option(machine)
         case _ => return Option(ret)
       }
-                         }
+    }
     Option(ret)
   }
 
-  def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine).getOrElse(0) + 1
+  def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine).getOrElse(0)
 
   private def topSlotForMachine(machine: MachineMapping): Int = {
     machine.startingSlot + machine.cyberMachine.map(_.getRequiredSlots).getOrElse(0)
@@ -191,7 +195,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       breakMachinesUpwardsFromSlot(0)
       TileCyberBase.getBaseLocations(size, xCoord, yCoord, zCoord, worldObj.provider.dimensionId).foreach { loc =>
         worldObj.setBlockToAir(loc.x, loc.y, loc.z)
-                                                                                                          }
+      }
       InventoryUtils.dropItem(ItemBaseSeed.createStack(1, size), worldObj, xCoord + (size / 2), yCoord, zCoord + (size / 2), new Random())
     }
     else {
@@ -208,24 +212,29 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   def buildMachine(name: String): Unit = {
     if (worldObj.isRemote) return
-    if (!isController) forwardToController[TileCyberBase, Unit](_.buildMachine(name))
+    if (!isController) {
+      forwardToController[TileCyberBase, Unit](_.buildMachine(name))
+      return
+    }
     CyberMachineRegistry.getMachine(name) match {
       case Some(m) =>
         if (size != m.getRequiredBaseSize) return
         if (remainingSlots < m.getRequiredSlots) return
-        var multiBlockComponent: IMultiBlockComponent = null
-        m.getTakenLocations(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord).foreach { loc =>
+        val freeSlot = firstFreeSlot
+        val slotY = yFromSlot(freeSlot)
+        val controllerLoc = Loc4(xCoord, slotY, zCoord, worldObj.provider.dimensionId)
+        m.getTakenLocations(worldObj, controllerLoc.x, controllerLoc.y, controllerLoc.z).foreach { loc =>
           worldObj.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockCyberMachineInProgress)
           worldObj.getTileEntity(loc.x, loc.y, loc.z) match {
             case cin: TileCyberMachineInProgress =>
               cin.machineInProgress = name
-              cin.formMultiBlock(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord)
+              cin.slot = freeSlot
+              cin.baseController = getLoc
+              cin.formMultiBlock(worldObj, controllerLoc.x, controllerLoc.y, controllerLoc.z)
             case _ =>
           }
-                                                                                        }
-        val controllerLoc = if (multiBlockComponent == null) Loc4(xCoord, yFromSlot(firstFreeSlot), zCoord, worldObj.provider.dimensionId)
-        else Loc4(multiBlockComponent.getInfo.x, multiBlockComponent.getInfo.y, multiBlockComponent.getInfo.z, worldObj.provider.dimensionId)
-        machinesList += MachineMapping(firstFreeSlot, controllerLoc)
+        }
+        machinesList += MachineMapping(freeSlot, controllerLoc)
       case _ => return
     }
     //    currentlyBuildingMachine = firstEmpty(machines)
@@ -238,19 +247,19 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     if (breaking) return
     breaking = true
     (slot until TileCyberBase.slotHeightMap(size))
-    .foreach {
-               getMachine(_) match {
-                 case Some(m) =>
-                   m.cyberMachine match {
-                     case Some(c) =>
-                       c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
-                       machinesList.remove(m)
-                     case None =>
-                   }
-                 case None =>
-               }
+      .foreach {
+        getMachine(_) match {
+          case Some(m) =>
+            m.cyberMachine match {
+              case Some(c) =>
+                c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
+                machinesList.remove(m)
+              case None =>
+            }
+          case None =>
+        }
 
-             }
+      }
     breaking = false
     setModified()
   }
@@ -323,7 +332,9 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     * @return Remaining FluidStack, null if empty.
     */
   def broadcastFluid(_fluid: FluidStack): FluidStack = {
-    if (!isController) {return forwardToController[TileCyberBase, FluidStack](_.broadcastFluid(_fluid))}
+    if (!isController) {
+      return forwardToController[TileCyberBase, FluidStack](_.broadcastFluid(_fluid))
+    }
     //    var fluid = _fluid
     //    for (i <- 0 until firstEmpty(machines)) {
     //      CyberMachineRegistry.getMachine(machines(i)) match {
@@ -340,9 +351,9 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     compound(TileCyberBase.COMPOUND_KEY ->
-             NBTCompound(
-                          TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound))
-                        ))
+      NBTCompound(
+        TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound))
+      ))
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
@@ -350,7 +361,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     compound.NBTCompound(TileCyberBase.COMPOUND_KEY) { comp =>
       machinesList.clear()
       machinesList ++= comp.NBTList(TileCyberBase.MACHINES_KEY).map(MachineMapping(_))
-                                                     }
+    }
   }
 
   //  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
