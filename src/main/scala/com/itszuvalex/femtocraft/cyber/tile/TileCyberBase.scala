@@ -6,7 +6,7 @@ import com.itszuvalex.femtocraft.cyber.item.ItemBaseSeed
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase.MachineMapping
 import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, ICyberMachineMultiblock}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
-import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoFluids, Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{GuiIDs, FemtoBlocks, FemtoFluids, Femtocraft}
 import com.itszuvalex.itszulib.api.core.{Loc4, NBTSerializable}
 import com.itszuvalex.itszulib.api.multiblock.IMultiBlockComponent
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -42,7 +42,7 @@ object TileCyberBase {
 
   private case class MachineMapping(var startingSlot: Int,
                                     var controllerLoc: Loc4) extends NBTSerializable with Ordered[MachineMapping] {
-    private def this() = this("", 0, null)
+    private def this() = this(0, null)
 
     def cyberMachine = CyberMachineRegistry.getMachine(controllerLoc.getTileEntity(true) match {
                                                          case a: ICyberMachineMultiblock => a.getCyberMachine
@@ -215,8 +215,13 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
         if (remainingSlots < m.getRequiredSlots) return
         var multiBlockComponent: IMultiBlockComponent = null
         m.getTakenLocations(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord).foreach { loc =>
-          worldObj.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockInProgressMachine)
-                                                                                          //TODO: Tell in progress machine what type of machine it's building.
+          worldObj.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockCyberMachineInProgress)
+          worldObj.getTileEntity(loc.x, loc.y, loc.z) match {
+            case cin: TileCyberMachineInProgress =>
+              cin.machineInProgress = name
+              cin.formMultiBlock(worldObj, xCoord, yFromSlot(firstFreeSlot), zCoord)
+            case _ =>
+          }
                                                                                         }
         val controllerLoc = if (multiBlockComponent == null) Loc4(xCoord, yFromSlot(firstFreeSlot), zCoord, worldObj.provider.dimensionId)
         else Loc4(multiBlockComponent.getInfo.x, multiBlockComponent.getInfo.y, multiBlockComponent.getInfo.z, worldObj.provider.dimensionId)

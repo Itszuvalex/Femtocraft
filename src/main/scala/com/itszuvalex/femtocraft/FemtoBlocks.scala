@@ -36,9 +36,9 @@ object FemtoBlocks {
   var blockSporeDistributor      : Block = null
 
 
-  var blockFrame            : Block = null
-  var blockCyberBase        : Block = null
-  var blockInProgressMachine: Block = null
+  var blockFrame                 : Block = null
+  var blockCyberBase             : Block = null
+  var blockCyberMachineInProgress: Block = null
 
   var blockNaniteHiveSmall: Block = null
 
@@ -114,8 +114,8 @@ object FemtoBlocks {
     blockCyberBase = new BlockCyberBase().setBlockName("blockCyberBase")
     GameRegistry.registerBlock(blockCyberBase, "blockCyberBase")
 
-    blockInProgressMachine = new BlockInProgressMachine().setBlockName("blockInProgressMachine").setBlockUnbreakable().setResistance(Float.MaxValue / 3f)
-    GameRegistry.registerBlock(blockInProgressMachine, "blockInProgressMachine")
+    blockCyberMachineInProgress = new BlockCyberMachineInProgress().setBlockName("blockInProgressMachine").setBlockUnbreakable().setResistance(Float.MaxValue / 3f)
+    GameRegistry.registerBlock(blockCyberMachineInProgress, "blockInProgressMachine")
 
     blockNaniteHiveSmall = new BlockNaniteHiveSmall().setCreativeTab(Femtocraft.tab).setBlockName("blockNaniteHive_small")
     GameRegistry.registerBlock(blockNaniteHiveSmall, "blockNaniteHive_small")
