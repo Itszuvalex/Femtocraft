@@ -16,11 +16,15 @@ import net.minecraftforge.fluids.FluidStack
 /**
   * Created by Christopher on 11/21/2015.
   */
+object MachineBioBeacon {
+  val NAME = "Bio Beacon"
+}
+
 class MachineBioBeacon extends ICyberMachine {
   /**
     * @return Name of the machine
     */
-  override def getName = "Bio Beacon"
+  override def getName = MachineBioBeacon.NAME
 
   override def getRequiredSlots = 2
 

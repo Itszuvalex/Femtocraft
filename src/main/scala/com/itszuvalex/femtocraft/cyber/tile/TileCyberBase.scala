@@ -2,9 +2,9 @@ package com.itszuvalex.femtocraft.cyber.tile
 
 import java.util.Random
 
-import com.itszuvalex.femtocraft.cyber.CyberMachineRegistry
 import com.itszuvalex.femtocraft.cyber.item.ItemBaseSeed
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase.MachineMapping
+import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, ICyberMachineMultiblock}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoFluids, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{Loc4, NBTSerializable}
@@ -40,21 +40,21 @@ object TileCyberBase {
     }
   }
 
-  private case class MachineMapping(var machine: String,
-                                    var startingSlot: Int,
+  private case class MachineMapping(var startingSlot: Int,
                                     var controllerLoc: Loc4) extends NBTSerializable with Ordered[MachineMapping] {
     private def this() = this("", 0, null)
 
-    def cyberMachine = CyberMachineRegistry.getMachine(machine)
+    def cyberMachine = CyberMachineRegistry.getMachine(controllerLoc.getTileEntity(true) match {
+                                                         case a: ICyberMachineMultiblock => a.getCyberMachine
+                                                         case _ => null
+                                                       })
 
     override def saveToNBT(compound: NBTTagCompound): Unit = {
-      compound("machine" -> machine,
-               "startingSlot" -> startingSlot,
+      compound("startingSlot" -> startingSlot,
                "controllerLoc" -> NBTCompound(controllerLoc))
     }
 
     override def loadFromNBT(compound: NBTTagCompound): Unit = {
-      machine = compound.String("machine")
       startingSlot = compound.Int("startingSlot")
       controllerLoc = compound.NBTCompound("controllerLoc")(Loc4(_))
     }
@@ -161,7 +161,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     Option(ret)
   }
 
-  def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine).getOrElse(0)
+  def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine).getOrElse(0) + 1
 
   private def topSlotForMachine(machine: MachineMapping): Int = {
     machine.startingSlot + machine.cyberMachine.map(_.getRequiredSlots).getOrElse(0)
@@ -220,7 +220,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
                                                                                         }
         val controllerLoc = if (multiBlockComponent == null) Loc4(xCoord, yFromSlot(firstFreeSlot), zCoord, worldObj.provider.dimensionId)
         else Loc4(multiBlockComponent.getInfo.x, multiBlockComponent.getInfo.y, multiBlockComponent.getInfo.z, worldObj.provider.dimensionId)
-        machinesList += MachineMapping(name, firstFreeSlot, controllerLoc)
+        machinesList += MachineMapping(firstFreeSlot, controllerLoc)
       case _ => return
     }
     //    currentlyBuildingMachine = firstEmpty(machines)
