@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.cyber.container
 import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.itszulib.container.ContainerInv
+import com.itszuvalex.itszulib.gui.OutputSlot
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.inventory.{ICrafting, Slot}
 import net.minecraft.item.ItemStack
@@ -21,7 +22,7 @@ class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: Til
   addSlotToContainer(new Slot(te.indInventory, 0, 8, 21) {
     override def isItemValid(stack: ItemStack): Boolean = GrowthChamberRegistry.findMatchingRecipe(stack).isDefined
   })
-  for (i <- 0 to 8) {addSlotToContainer(new Slot(te.indInventory, i + 1, 80 + 18 * (i % 3), 21 + 18 * math.floor(i / 3d).toInt))}
+  for (i <- 0 to 8) {addSlotToContainer(new OutputSlot(te.indInventory, i + 1, 80 + 18 * (i % 3), 21 + 18 * math.floor(i / 3d).toInt))}
 
   addPlayerInventorySlots(inv)
 

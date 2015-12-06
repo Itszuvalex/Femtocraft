@@ -29,6 +29,7 @@ import scala.collection.mutable
 object TileCyberBase {
   val MACHINES_KEY = "Machines"
   val COMPOUND_KEY = "CyberBase"
+  val SIZE_KEY = "Size"
   val baseHeightMap = Map(1 -> 1, 2 -> 1, 3 -> 2)
   val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
 
@@ -42,17 +43,6 @@ object TileCyberBase {
     */
   def getBaseLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
     getLocationCube(x, y, z, dim, size, baseHeightMap(size), size)
-
-  /**
-    * @param size Size number of the machine
-    * @param x X coord of lower-north-west corner
-    * @param y Y coord of lower-north-west-corner
-    * @param z Z coord of lower-north-west corner
-    * @param dim Dimension id of the machine
-    * @return Set of locations that are occupied by the machine slots of the base
-    */
-  def getSlotLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
-    getLocationCube(x, y + baseHeightMap(size), z, dim, size, slotHeightMap(size), size)
 
   /**
     * @param x X coord of lower-north-west corner
@@ -73,6 +63,17 @@ object TileCyberBase {
       } yield Loc4(x + bx, y + by, z + bz, dim)
     }.toSet
   }
+
+  /**
+    * @param size Size number of the machine
+    * @param x X coord of lower-north-west corner
+    * @param y Y coord of lower-north-west-corner
+    * @param z Z coord of lower-north-west corner
+    * @param dim Dimension id of the machine
+    * @return Set of locations that are occupied by the machine slots of the base
+    */
+  def getSlotLocations(size: Int, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] =
+    getLocationCube(x, y + baseHeightMap(size), z, dim, size, slotHeightMap(size), size)
 
   /**
     * @param locs Set of locations to check
@@ -137,6 +138,7 @@ object TileCyberBase {
       mapping
     }
   }
+
 }
 
 class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileMultiFluidTank with IInventory {
@@ -195,19 +197,14 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   def breakMachinesUpwardsFromSlot(slot: Int): Unit = {
     if (breaking) return
     breaking = true
-    (slot until TileCyberBase.slotHeightMap(size))
-      .foreach {
-        getMachine(_) match {
-          case Some(m) =>
-            m.cyberMachine match {
-              case Some(c) =>
-                c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
-                machinesList.remove(m)
-              case None =>
-            }
+    (slot until TileCyberBase.slotHeightMap(size)).flatMap(getMachine).toSet[MachineMapping]
+      .foreach { m =>
+        m.cyberMachine match {
+          case Some(c) =>
+            c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
+            machinesList.remove(m)
           case None =>
         }
-
       }
     breaking = false
     setModified()
@@ -232,7 +229,10 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   def buildMachine(name: String): Unit = {
     if (worldObj.isRemote) return
     if (!isController) {
-      forwardToController[TileCyberBase, Unit](_.buildMachine(name))
+      worldObj.getTileEntity(info.x, info.y, info.z) match {
+        case base: TileCyberBase => base.buildMachine(name)
+        case _ =>
+      }
       return
     }
     CyberMachineRegistry.getMachine(name) match {
@@ -346,37 +346,27 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     null
   }
 
-  //  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-  //    super.saveToDescriptionCompound(compound)
-  //    val comp = new NBTTagCompound()
-  //    comp.setInteger(TileCyberBase.SIZE_KEY, size)
-  //    comp.setInteger(TileCyberBase.CURRENT_MACHINE_KEY, currentlyBuildingMachine)
-  //    comp.setInteger(TileCyberBase.PROGRESS_KEY, currentMachineBuildProgress)
-  //    comp.setInteger(TileCyberBase.FIRST_FREE_SLOT_KEY, firstFreeSlot)
-  //    comp.setTag(TileCyberBase.MACHINES_KEY, NBTList(for (i <- machines.indices) yield new NBTTagString(getOrNullStr(machines, i))))
-  //    comp.setIntArray(TileCyberBase.SLOTS_KEY, machineSlotMap)
-  //    compound.setTag(TileCyberBase.BASE_COMPOUND_KEY, comp)
-  //  }
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    val comp = new NBTTagCompound()
+    comp.setInteger(TileCyberBase.SIZE_KEY, size)
+    compound.setTag(TileCyberBase.COMPOUND_KEY, comp)
+  }
 
-  //  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-  //    super.handleDescriptionNBT(compound)
-  //    val comp = compound.getCompoundTag(TileCyberBase.BASE_COMPOUND_KEY)
-  //    size = comp.getInteger(TileCyberBase.SIZE_KEY)
-  //    currentlyBuildingMachine = comp.getInteger(TileCyberBase.CURRENT_MACHINE_KEY)
-  //    currentMachineBuildProgress = comp.getInteger(TileCyberBase.PROGRESS_KEY)
-  //    val machineList = comp.getTagList(TileCyberBase.MACHINES_KEY, 8)
-  //    for (i <- 0 until machineList.tagCount()) setToStrOrNull(machines, i, machineList.getStringTagAt(i))
-  //    machineSlotMap = comp.getIntArray(TileCyberBase.SLOTS_KEY)
-  //    indInventory.setInventorySize(9 + math.pow(size + 1, 2).toInt)
-  //    setRenderUpdate()
-  //  }
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    val comp = compound.getCompoundTag(TileCyberBase.COMPOUND_KEY)
+    size = comp.getInteger(TileCyberBase.SIZE_KEY)
+    setRenderUpdate()
+  }
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     compound(TileCyberBase.COMPOUND_KEY ->
       NBTCompound(
-        TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound))
-      ))
+        TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound)),
+        TileCyberBase.SIZE_KEY -> size)
+    )
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
@@ -384,6 +374,8 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     compound.NBTCompound(TileCyberBase.COMPOUND_KEY) { comp =>
       machinesList.clear()
       machinesList ++= comp.NBTList(TileCyberBase.MACHINES_KEY).map(MachineMapping(_))
+      size = comp.Int(TileCyberBase.SIZE_KEY)
+      Unit
     }
   }
 

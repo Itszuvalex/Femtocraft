@@ -5,10 +5,11 @@ import java.util.UUID
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.machine.MachineGraspingVines
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
-import com.itszuvalex.itszulib.api.core.{Configurable, Loc4, Saveable}
+import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileFluidTank
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
@@ -27,7 +28,9 @@ object TileGraspingVines {
   val DEFAULT_GRAB_RADIUS = 8f
   val grabbedHashSet = new mutable.HashSet[UUID]()
 
-  val COMPOUND_IDLIST = "IDList"
+  val COMPOUND_IDLIST_KEY = "IDList"
+  val BASE_POS_KEY = "BasePos"
+  val INDEX_KEY = "Index"
 }
 
 /**
@@ -36,7 +39,7 @@ object TileGraspingVines {
 @Configurable
 class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
   var machineIndex: Int = -1
-  @Saveable var basePos: Loc4 = null
+  var basePos: Loc4 = null
   var velocityAddition: Float = .2f
   var grabRadius: Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
   var entitySet = new mutable.HashSet[Entity]()
@@ -96,6 +99,15 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     }
   }
 
+  def removeEntity(entity: Entity): Boolean = {
+    if (grabbedSet.contains(entity)) {
+      grabbedSet.remove(entity)
+      TileGraspingVines.grabbedHashSet -= entity.getUniqueID
+      setUpdate()
+      true
+    } else false
+  }
+
   def grabbedSet: mutable.HashSet[Entity] = {
     if (getWorldObj.isRemote) {
       //Find entities based on ids passed by server.  Cache the found entities so we don't keep looking them up from the worldObj every call.
@@ -106,23 +118,14 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     entitySet
   }
 
-  def removeEntity(entity: Entity): Boolean = {
-    if (grabbedSet.contains(entity)) {
-      grabbedSet.remove(entity)
-      TileGraspingVines.grabbedHashSet -= entity.getUniqueID
-      setUpdate()
-      true
-    } else false
-  }
-
   override def invalidate(): Unit = {
     super.invalidate()
-    grabbedSet.foreach(entity => TileGraspingVines.grabbedHashSet.remove(entity.getUniqueID))
+    grabbedSet.foreach(removeEntity)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    compound.IntArray(TileGraspingVines.COMPOUND_IDLIST) match {
+    compound.IntArray(TileGraspingVines.COMPOUND_IDLIST_KEY) match {
       case ia =>
         clientSet.clear()
         entitySet.clear()
@@ -134,11 +137,14 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
-    compound(TileGraspingVines.COMPOUND_IDLIST -> grabbedSet.map(_.getEntityId).toArray)
+    compound(TileGraspingVines.COMPOUND_IDLIST_KEY -> grabbedSet.map(_.getEntityId).toArray)
   }
 
   def onBlockBreak(): Unit = {
-    if (!isValidMultiBlock || worldObj.isRemote) return
+    if (!isController) {
+      worldObj.setBlockToAir(info.x, info.y, info.z)
+      return
+    }
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
         te.breakMachinesUpwardsFromSlot(machineIndex)
@@ -146,6 +152,21 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     }
   }
 
+
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    compound.NBTCompound(TileGraspingVines.BASE_POS_KEY) { compound =>
+      basePos = Loc4(compound)
+      machineIndex = compound.Int(TileGraspingVines.INDEX_KEY)
+      Unit
+    }
+  }
+
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    compound(TileGraspingVines.BASE_POS_KEY -> NBTCompound(basePos),
+      TileGraspingVines.INDEX_KEY -> machineIndex)
+  }
 
   override def getMod: AnyRef = Femtocraft
 
@@ -167,11 +188,6 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
       center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
       center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
       center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
-  }
-
-  override def formMultiBlock(world: World, x: Int, y: Int, z: Int): Boolean = {
-    setModified()
-    super.formMultiBlock(world, x, y, z)
   }
 
   override def getCyberMachine = MachineGraspingVines.NAME

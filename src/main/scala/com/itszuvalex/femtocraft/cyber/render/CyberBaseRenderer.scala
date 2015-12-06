@@ -41,6 +41,7 @@ object CyberBaseRenderer {
         model = largeBaseModel
         Minecraft.getMinecraft.getTextureManager.bindTexture(largeBaseTexLoc)
         GL11.glTranslated(x + 1.5, y, z + 1.5)
+      case _ =>
     }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
