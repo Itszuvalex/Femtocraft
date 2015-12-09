@@ -20,8 +20,8 @@ import net.minecraft.util.AxisAlignedBB
 import scala.collection.Set
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/25/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/25/15.
+  */
 @Configurable object TileNaniteHiveSmall {
   @Configurable val HIVE_RADIUS    = 20f
                 val INVENTORY_SIZE = 30
@@ -49,38 +49,38 @@ import scala.collection.Set
   override def hasGUI: Boolean = true
 
   /**
-   *
-   * @return Maximum distance children can be from this node, to connect.
-   */
+    *
+    * @return Maximum distance children can be from this node, to connect.
+    */
   override def childrenConnectionRadius = hiveRadius
 
   /**
-   *
-   * @return Distance to accept new tasks when workers complete their own.  Do not pass high values, as this will lead to excessive blank location checking on the order of
-   *         (distance/16)&#94;2
-   */
+    *
+    * @return Distance to accept new tasks when workers complete their own.  Do not pass high values, as this will lead to excessive blank location checking on the order of
+    *         (distance/16)&#94;2
+    */
   override def getTaskConnectionRadius = hiveRadius
 
   override def connectionRadius = hiveRadius
 
   /**
-   *
-   * @return Set of workers available to be assigned.
-   */
+    *
+    * @return Set of workers available to be assigned.
+    */
   override def getProvidedWorkers: Set[IWorker] = Set()
 
   /**
-   *
-   * @return Location of this worker provider, for use in distance calculations.
-   */
+    *
+    * @return Location of this worker provider, for use in distance calculations.
+    */
   override def getProviderLocation: Loc4 = getLoc
 
   override def hasDescription = true
 
   /**
-   *
-   * @return The color of this power node.  This is used for aesthetics.
-   */
+    *
+    * @return The color of this power node.  This is used for aesthetics.
+    */
   override def getColor: Int = {
     if (getParentLoc != null) getParentLoc.getTileEntity(false).orNull match {
       case i: IPowerNode => i.getColor
@@ -113,10 +113,10 @@ import scala.collection.Set
   }
 
   /**
-   *
-   * @param child
-   * @return True if child was a child of this node, and was successfully removed.
-   */
+    *
+    * @param child
+    * @return True if child was a child of this node, and was successfully removed.
+    */
   override def removeChild(child: IPowerNode): Boolean = {
     val ret = super.removeChild(child)
     setUpdate()
@@ -125,10 +125,10 @@ import scala.collection.Set
 
 
   /**
-   *
-   * @param child
-   * @return True if child is successfully added.
-   */
+    *
+    * @param child
+    * @return True if child is successfully added.
+    */
   override def addChild(child: IPowerNode): Boolean = {
     val ret = super.addChild(child)
     setUpdate()
@@ -136,10 +136,10 @@ import scala.collection.Set
   }
 
   /**
-   *
-   * @param parent Parent being set.
-   * @return True if parent is successfully set to input parent.
-   */
+    *
+    * @param parent Parent being set.
+    * @return True if parent is successfully set to input parent.
+    */
   override def setParent(parent: IPowerNode): Boolean = {
     val ret = super.setParent(parent)
     setUpdate()

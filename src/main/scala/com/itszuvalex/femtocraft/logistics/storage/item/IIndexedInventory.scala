@@ -5,8 +5,8 @@ import net.minecraft.item.ItemStack
 import scala.collection.mutable
 
 /**
- * Created by Christopher on 8/21/2015.
- */
+  * Created by Christopher on 8/21/2015.
+  */
 trait IIndexedInventory {
 
   def addItemStack(itemStack: ItemStack, slot: Int): Unit

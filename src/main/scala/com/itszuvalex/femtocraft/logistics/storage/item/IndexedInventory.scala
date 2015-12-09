@@ -33,9 +33,9 @@ import net.minecraft.nbt.NBTTagCompound
 import scala.collection.Set
 
 /**
- *
- * @param size Utility class for storing and saving/loading ItemStack[]s with ease.
- */
+  *
+  * @param size Utility class for storing and saving/loading ItemStack[]s with ease.
+  */
 class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with NBTSerializable {
   @Saveable private var inventory      = new Array[ItemStack](size)
   private lazy      val inventoryCache = new IndexedInventoryCache(this)
@@ -43,8 +43,8 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   def this() = this(0)
 
   /**
-   * @return ItemStack[] that backs this inventory class. Modifications to it modify this.
-   */
+    * @return ItemStack[] that backs this inventory class. Modifications to it modify this.
+    */
   def getInventory: Array[ItemStack] = inventory
 
   override def getSizeInventory = inventory.length
@@ -105,11 +105,11 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   }
 
   /**
-   * Changes size of the inventory to be equal to size.  Keeps current inventory from slots 0 -> (size-1), and will
-   * drop extra itemstacks.
-   *
-   * @param size new size of inventory
-   */
+    * Changes size of the inventory to be equal to size.  Keeps current inventory from slots 0 -> (size-1), and will
+    * drop extra itemstacks.
+    *
+    * @param size new size of inventory
+    */
   def setInventorySize(size: Int) = {
     inventory = util.Arrays.copyOfRange(inventory, 0, size)
     invalidateCache()

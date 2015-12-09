@@ -1,8 +1,9 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Cyber.{CyberMachineRegistry, CybermaterialRegistry}
-import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.network.PacketHandler
+import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
+import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CybermaterialRegistry, GrowthChamberRegistry}
+import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import cpw.mods.fml.common.Mod.EventHandler
@@ -12,12 +13,12 @@ import cpw.mods.fml.common.registry.GameRegistry
 import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Items
-import net.minecraft.item.Item
+import net.minecraft.item.{Item, ItemStack}
 import org.apache.logging.log4j.LogManager
 
 /**
- * Created by Christopher on 4/5/2015.
- */
+  * Created by Christopher on 4/5/2015.
+  */
 @Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:ItszuLib")
 object Femtocraft {
   final val ID      = "Femtocraft"
@@ -44,10 +45,12 @@ object Femtocraft {
     FemtoItems.preInit()
     FemtoFluids.preInit()
 
-    PacketHandler.preInit()
+    FemtoPacketHandler.preInit()
 
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
+
+    registerRecipes()
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
@@ -64,5 +67,22 @@ object Femtocraft {
     FemtoFluids.postInit()
     CybermaterialRegistry.postInit()
     proxy.postInit()
+  }
+
+  def registerRecipes(): Unit = {
+    GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.wheat_seeds, 1),
+                                                            IndexedSeq(new ItemStack(Items.wheat_seeds, 2),
+                                                                       new ItemStack(Items.wheat, 1)
+                                                                      ),
+                                                            500,
+                                                            GrowthChamberRecipe.TYPE_TEXTURE,
+                                                            Array(Resources.Texture("recipes/wheat0.png"),
+                                                                  Resources.Texture("recipes/wheat1.png"),
+                                                                  Resources.Texture("recipes/wheat2.png"),
+                                                                  Resources.Texture("recipes/wheat3.png"),
+                                                                  Resources.Texture("recipes/wheat4.png"),
+                                                                  Resources.Texture("recipes/wheat5.png"),
+                                                                  Resources.Texture("recipes/wheat6.png"),
+                                                                  Resources.Texture("recipes/wheat7.png"))))
   }
 }

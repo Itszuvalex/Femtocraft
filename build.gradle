@@ -46,7 +46,7 @@ project.ext {
 
 version = "${project.ext.mcVersion}-${project.ext.massive}.${project.ext.major}.${project.minor}"
 
-if (System.getenv().CRICLE_BUILD_NUM != null) {
+if (System.getenv().CIRCLE_BUILD_NUM != null) {
     version += "-${System.getenv().CIRCLE_BUILD_NUM}"
 } else {
     version += "-local"
@@ -80,7 +80,7 @@ minecraft {
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-49-dev"
+    def name = "${project.mcVersion}-0.1.0-70-dev"
     compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "deobf"
     compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "src"
 

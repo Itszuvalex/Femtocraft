@@ -9,8 +9,8 @@ import net.minecraft.tileentity.TileEntity
 import scala.collection._
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/25/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/25/15.
+  */
 object NaniteHive {
   val HIVE_COMPOUND_KEY = "NaniteHive"
   val NODE_CHILDREN_KEY = "Children"

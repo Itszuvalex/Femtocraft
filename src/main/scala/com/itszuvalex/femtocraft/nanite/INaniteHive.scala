@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.nanite
 import com.itszuvalex.itszulib.api.core.Loc4
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/24/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/24/15.
+  */
 trait INaniteHive {
 
   def getType: String

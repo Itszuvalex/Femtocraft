@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.cyber.block
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.itszulib.core.TileContainer
 import net.minecraft.block.Block
@@ -8,9 +9,11 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 
 /**
- * Created by Alex on 30.09.2015.
- */
+  * Created by Alex on 30.09.2015.
+  */
 class BlockGrowthChamber extends TileContainer(Material.iron) {
+  setCreativeTab(Femtocraft.tab)
+
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileGrowthChamber
 
   override def renderAsNormalBlock = false

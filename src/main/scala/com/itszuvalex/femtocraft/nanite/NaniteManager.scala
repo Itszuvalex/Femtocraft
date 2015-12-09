@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.nanite
 import com.itszuvalex.itszulib.logistics.LocationTracker
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/24/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/24/15.
+  */
 object NaniteManager {
   private val hiveTracker           = new LocationTracker
   private val parentlessNodeTracker = new LocationTracker

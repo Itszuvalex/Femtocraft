@@ -94,8 +94,8 @@ EntityFX(par1World, x, y, z, 0.0D, 0.0D, 0.0D) {
   }
 
   /**
-   * Called to update the entity's position/logic.
-   */
+    * Called to update the entity's position/logic.
+    */
   override def onUpdate() {
 
 

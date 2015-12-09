@@ -21,16 +21,12 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.FemtoItems
-import com.itszuvalex.femtocraft.core.Cyber.CyberMachineRendererRegistry
-import com.itszuvalex.femtocraft.core.Cyber.render.CyberBaseRenderer
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.core.Industry.FrameMultiblockRendererRegistry
-import com.itszuvalex.femtocraft.core.Industry.render.{FrameItemRenderer, FrameRenderer}
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.cyber.render.GrowthChamberRenderer
-import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
-import com.itszuvalex.femtocraft.industry.render.ArcFurnaceRenderer
-import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
+import com.itszuvalex.femtocraft.cyber.CyberMachineRendererRegistry
+import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesRenderer, GrowthChamberRenderer}
+import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
+import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
+import com.itszuvalex.femtocraft.industry.render.{ArcFurnaceRenderer, FrameItemRenderer, FrameRenderer}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
@@ -38,7 +34,7 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render.{DiffusionNodeRenderer, PowerNodeRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
-import com.itszuvalex.femtocraft.render.{CyberPreviewableRenderer, FramePreviewableRenderer, RenderIDs}
+import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
@@ -48,6 +44,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
+import net.minecraftforge.common.MinecraftForge
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
@@ -63,7 +60,7 @@ class ProxyClient extends ProxyCommon {
     val col = new Color(color)
 
     name match {
-      case "power"   =>
+      case "power" =>
         fx = new EntityFxPower(world, x, y, z,
                                (col.red.toInt & 255).toFloat / 255f,
                                (col.green.toInt & 255).toFloat / 255f,
@@ -74,7 +71,7 @@ class ProxyClient extends ProxyCommon {
                                  (col.red.toInt & 255).toFloat / 255f,
                                  (col.green.toInt & 255).toFloat / 255f,
                                  (col.blue.toInt & 255).toFloat / 255f)
-      case _         =>
+      case _ =>
         return null
     }
     mc.effectRenderer.addEffect(fx)
@@ -95,6 +92,10 @@ class ProxyClient extends ProxyCommon {
     val growthChamberRenderer = new GrowthChamberRenderer
     RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGrowthChamber], growthChamberRenderer)
+
+    val graspingVinesRenderer = new GraspingVinesRenderer
+    RenderIDs.graspingVinesID = CyberMachineRendererRegistry.bindRenderer(graspingVinesRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGraspingVines], graspingVinesRenderer)
 
     val naniveHiveRenderer = new NaniteHiveSmallRenderer
     RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId
@@ -117,5 +118,9 @@ class ProxyClient extends ProxyCommon {
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
+  }
+
+  override def registerEventHandlers(): Unit = {
+    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
   }
 }

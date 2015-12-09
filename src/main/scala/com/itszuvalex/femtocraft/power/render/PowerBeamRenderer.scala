@@ -11,8 +11,8 @@ import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/5/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/5/15.
+  */
 
 trait PowerBeamRenderer extends TileEntitySpecialRenderer {
 

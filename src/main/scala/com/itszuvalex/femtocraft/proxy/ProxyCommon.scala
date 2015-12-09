@@ -20,10 +20,8 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.core.Cyber.tile.TileCyberBase
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber}
+import com.itszuvalex.femtocraft.cyber.tile._
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber, TileFrame}
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
@@ -58,8 +56,18 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileCrystallizationChamber], "TileCrystallizationChamber")
     GameRegistry.registerTileEntity(classOf[TileCentrifuge], "TileCentrifuge")
     GameRegistry.registerTileEntity(classOf[TileGrowthChamber], "TileGrowthChamber")
+    GameRegistry.registerTileEntity(classOf[TileBioBeacon], "TileBioBeacon")
+    GameRegistry.registerTileEntity(classOf[TileCondensationArray], "TileCondensationArray")
+    GameRegistry.registerTileEntity(classOf[TileCybermatDisintegrator], "TileCybermatDisintegrator")
+    GameRegistry.registerTileEntity(classOf[TileGraspingVines], "TileGraspingVines")
+    GameRegistry.registerTileEntity(classOf[TileLashingVines], "TileLashingVines")
+    GameRegistry.registerTileEntity(classOf[TileMetabolicConverter], "TileMetabolicConverter")
+    GameRegistry.registerTileEntity(classOf[TilePhotosynthesisTower], "TilePhotosynthesisTower")
+    GameRegistry.registerTileEntity(classOf[TileSporeDistributor], "TileSporeDistributor")
 
     GameRegistry.registerTileEntity(classOf[TileFrame], "TileFrame")
+    GameRegistry.registerTileEntity(classOf[TileCyberMachineInProgress], "TileCyberMachineInProgress")
+
     GameRegistry.registerTileEntity(classOf[TileNaniteHiveSmall], "TileNaniteHive")
 
     GameRegistry.registerTileEntity(classOf[TileCyberBase], "TileCyberBase")

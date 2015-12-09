@@ -1,19 +1,19 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.core.Cyber.item.ItemBaseSeed
-import com.itszuvalex.femtocraft.core.Industry.item.ItemFrame
-import com.itszuvalex.femtocraft.core.Power.ItemPowerCrystal
+import com.itszuvalex.femtocraft.cyber.item.ItemBaseSeed
+import com.itszuvalex.femtocraft.industry.item.ItemFrame
+import com.itszuvalex.femtocraft.power.ItemPowerCrystal
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 5/3/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
+  */
 object FemtoItems {
   var itemPowerCrystal: Item = null
 
 
-  var itemFrame: Item = null
+  var itemFrame   : Item = null
   var itemBaseSeed: Item = null
 
   def preInit(): Unit = {

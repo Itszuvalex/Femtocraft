@@ -5,4 +5,4 @@ package com.itszuvalex.femtocraft.industry.gui
   */
 class GuiCrystallizationChamber {
 
- }
+}

@@ -9,8 +9,8 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 
 /**
- * Created by Christopher on 8/29/2015.
- */
+  * Created by Christopher on 8/29/2015.
+  */
 class BlockNaniteHiveSmall extends TileContainer(Material.iron) {
   override def isOpaqueCube = false
 
@@ -21,7 +21,7 @@ class BlockNaniteHiveSmall extends TileContainer(Material.iron) {
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, p_149749_6_ : Int): Unit = {
     world.getTileEntity(x, y, z) match {
       case hive: TileNaniteHiveSmall => hive.onBlockBreak()
-      case _                         =>
+      case _ =>
     }
     super.breakBlock(world, x, y, z, block, p_149749_6_)
   }

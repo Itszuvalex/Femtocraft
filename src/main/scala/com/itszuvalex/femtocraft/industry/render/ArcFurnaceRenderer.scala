@@ -1,9 +1,8 @@
 package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.core.Industry.IFrameMultiblockRenderer
-import com.itszuvalex.femtocraft.core.Industry.tile.TileFrame
-import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
+import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
@@ -14,12 +13,12 @@ import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher on 9/19/2015.
- */
+  * Created by Christopher on 9/19/2015.
+  */
 object ArcFurnaceRenderer {
-  val modelLoc   = Resources.Model("arc furnace/Arc Furnace.obj")
-  val textureLoc = Resources.Model("arc furnace/Arc Furnace Template.png")
-  val inProgressModel = AdvancedModelLoader.loadModel(Resources.Model("_in-progress/arc furnace/Arc Furnace In-Progress.obj")).asInstanceOf[WavefrontObject]
+  val modelLoc         = Resources.Model("arc furnace/Arc Furnace.obj")
+  val textureLoc       = Resources.Model("arc furnace/Arc Furnace Template.png")
+  val inProgressModel  = AdvancedModelLoader.loadModel(Resources.Model("_in-progress/arc furnace/Arc Furnace In-Progress.obj")).asInstanceOf[WavefrontObject]
   val inProgressTexLoc = Resources.Model("_in-progress/arc furnace/Arc Furnace In-Progress.png")
 }
 
@@ -31,7 +30,7 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblock
     tile match {
       case furnace: TileArcFurnace if furnace.isController =>
         renderAtLocation(x, y, z)
-      case _                                               =>
+      case _ =>
     }
   }
 
@@ -66,29 +65,29 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblock
   }
 
   /**
-   * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
-   *
-   * @param stack ItemStack of IPreviewable Item
-   * @param world World
-   * @param x X Location
-   * @param y Y Location
-   * @param z Z Location
-   * @param rx X Render location
-   * @param ry Y Render location
-   * @param rz Z Render location
-   */
+    * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
+    *
+    * @param stack ItemStack of IPreviewable Item
+    * @param world World
+    * @param x X Location
+    * @param y Y Location
+    * @param z Z Location
+    * @param rx X Render location
+    * @param ry Y Render location
+    * @param rz Z Render location
+    */
   override def previewRenderAtWorldLocation(stack: ItemStack, world: World, x: Int, y: Int, z: Int, rx: Double, ry: Double, rz: Double): Unit = {
     renderAtLocation(rx, ry, rz)
   }
 
 
   /**
-   * Coordinates to render at.  This is for things like generic menu rendering, etc.
-   *
-   * @param rx
-   * @param ry
-   * @param rz
-   */
+    * Coordinates to render at.  This is for things like generic menu rendering, etc.
+    *
+    * @param rx
+    * @param ry
+    * @param rz
+    */
   override def renderAtLocation(rx: Double, ry: Double, rz: Double): Unit = {
     GL11.glPushMatrix()
     GL11.glTranslated(rx + 1, ry, rz + 1)
@@ -99,20 +98,20 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblock
   }
 
   /**
-   * Render using information contained in stack.
-   *
-   * @param stack
-   * @param rx
-   * @param ry
-   * @param rz
-   */
+    * Render using information contained in stack.
+    *
+    * @param stack
+    * @param rx
+    * @param ry
+    * @param rz
+    */
   override def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit = {
     renderAtLocation(rx, ry, rz)
   }
 
   /**
-   *
-   * @return Bounding box for rendering.  (X, Y, Z) (Length, Height, Width)
-   */
+    *
+    * @return Bounding box for rendering.  (X, Y, Z) (Length, Height, Width)
+    */
   override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 }

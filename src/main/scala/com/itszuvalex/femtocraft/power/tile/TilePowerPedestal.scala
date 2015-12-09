@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.core.Power.{ICrystalMount, IPowerCrystal, IPowerPedestal}
+import com.itszuvalex.femtocraft.power.{IPowerCrystal, ICrystalMount, IPowerPedestal}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -10,8 +10,8 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.util.ForgeDirection
 
 /**
- * Created by Christopher on 8/27/2015.
- */
+  * Created by Christopher on 8/27/2015.
+  */
 @Configurable object TilePowerPedestal {
   @Configurable val MAX_STORE: Long   = 10000
                 val PEDESTAL_COMPOUND = "Pedestal"
@@ -26,17 +26,17 @@ import net.minecraftforge.common.util.ForgeDirection
   override def getMod: AnyRef = Femtocraft
 
   /**
-   *
-   * @param loc Location of mount.
-   */
+    *
+    * @param loc Location of mount.
+    */
   override def setMount(loc: Loc4): Unit = mountLocation = loc
 
   /**
-   *
-   * @param amount Amount of power to attempt to consume.
-   * @param doConsume Pass true to actually consume resources.  False simulates the store.
-   * @return Amount of @amount successfully removed.
-   */
+    *
+    * @param amount Amount of power to attempt to consume.
+    * @param doConsume Pass true to actually consume resources.  False simulates the store.
+    * @return Amount of @amount successfully removed.
+    */
   override def consume(amount: Long, doConsume: Boolean): Long = {
     val ret = Math.min(amount, getStored)
     if (doConsume)
@@ -45,17 +45,17 @@ import net.minecraftforge.common.util.ForgeDirection
   }
 
   /**
-   *
-   * @return Location of the mount this is connected to.  UNKNOWN otherwise.
-   */
+    *
+    * @return Location of the mount this is connected to.  UNKNOWN otherwise.
+    */
   override def mountLoc: Loc4 = mountLocation
 
   /**
-   *
-   * @param amount Amount of power to store.
-   * @param doStore Pass true to actually consume resources.  False simulates the store.
-   * @return Amount of @amount successfully stored.
-   */
+    *
+    * @param amount Amount of power to store.
+    * @param doStore Pass true to actually consume resources.  False simulates the store.
+    * @return Amount of @amount successfully stored.
+    */
   override def store(amount: Long, doStore: Boolean): Long = {
     val ret = Math.min(amount, getMax - getStored)
     if (doStore)
@@ -64,15 +64,15 @@ import net.minecraftforge.common.util.ForgeDirection
   }
 
   /**
-   *
-   * @return Amount of power stored.
-   */
+    *
+    * @return Amount of power stored.
+    */
   override def getStored: Long = stored
 
   /**
-   *
-   * @return Amount of power capable of being stored.
-   */
+    *
+    * @return Amount of power capable of being stored.
+    */
   override def getMax: Long = mountLoc match {
     case loc if loc != null => loc.getTileEntity(false).orNull match {
       case mount: ICrystalMount =>
@@ -88,10 +88,10 @@ import net.minecraftforge.common.util.ForgeDirection
   }
 
   /**
-   *
-   * @param loc Location to accept mount connection at.
-   * @return True if mount can be added to this location.
-   */
+    *
+    * @param loc Location to accept mount connection at.
+    * @return True if mount can be added to this location.
+    */
   override def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(ForgeDirection.UP) == loc || getLoc.getOffset(ForgeDirection.DOWN) == loc
 
   override def hasDescription: Boolean = false

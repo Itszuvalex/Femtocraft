@@ -5,8 +5,8 @@ import com.itszuvalex.itszulib.logistics.LocationTracker
 import scala.collection._
 
 /**
- * Created by Christopher on 8/15/2015.
- */
+  * Created by Christopher on 8/15/2015.
+  */
 object DistributedManager {
   private val taskProviderTracker   = new LocationTracker
   private val workerProviderTracker = new LocationTracker
@@ -32,10 +32,10 @@ object DistributedManager {
   }
 
   /**
-   * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
-   *
-   * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
-   */
+    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
+    *
+    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
+    */
   def onTaskEnd(task: ITask): Unit = {
     val taskProvider = task.getProvider
     val workerProviders = new mutable.HashSet[IWorkerProvider]()

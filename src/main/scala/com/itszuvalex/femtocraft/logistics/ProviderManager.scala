@@ -2,13 +2,12 @@ package com.itszuvalex.femtocraft.logistics
 
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.logistics.LocationTracker
-import net.minecraftforge.fluids.FluidStack
 
 import scala.collection.mutable
 
 /**
- * Created by Christopher on 7/29/2015.
- */
+  * Created by Christopher on 7/29/2015.
+  */
 object ProviderManager {
   private val providerMap = mutable.HashMap[Class[_], LocationTracker]()
 

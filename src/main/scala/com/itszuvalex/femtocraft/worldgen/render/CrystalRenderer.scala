@@ -12,8 +12,8 @@ import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 8/5/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 8/5/15.
+  */
 object CrystalRenderer {
   val crystalModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals.obj")
   val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals Texture 64x64.png")
@@ -45,7 +45,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
 
       if (name._2 == 1) GL11.glRotated(f2 * name._2, 0, 1, 0)
 
-      val colorOffset : Color = new Color(crystal.colorOffsets{name._2})
+      val colorOffset: Color = new Color(crystal.colorOffsets {name._2})
 
       GL11.glColor4ub((color.red + colorOffset.red - 15).toByte, (color.green + colorOffset.green - 15).toByte, (color.blue + colorOffset.blue - 15).toByte, colorOffset.alpha)
 

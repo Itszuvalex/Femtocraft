@@ -7,8 +7,8 @@ import net.minecraft.block.material.Material
 import net.minecraft.world.World
 
 /**
- * Created by Christopher Harris (Itszuvalex) on 5/18/15.
- */
+  * Created by Christopher Harris (Itszuvalex) on 5/18/15.
+  */
 
 class BlockTest() extends Block(Material.iron) {
 
@@ -22,7 +22,7 @@ class BlockTest() extends Block(Material.iron) {
     val spawnX = x + getBlockBoundsMinX - 1 + 2 * par5Random.nextFloat * (getBlockBoundsMaxX - getBlockBoundsMinX)
     val spawnY = y + getBlockBoundsMinY - 1 + 2 * par5Random.nextFloat * (getBlockBoundsMaxY - getBlockBoundsMinY)
     val spawnZ = z + getBlockBoundsMinZ - 1 + 2 * par5Random.nextFloat * (getBlockBoundsMaxZ - getBlockBoundsMinZ)
-//    Femtocraft.proxy.spawnParticle(par1World, "nanitesBlue", spawnX, spawnY, spawnZ,)
+    //    Femtocraft.proxy.spawnParticle(par1World, "nanitesBlue", spawnX, spawnY, spawnZ,)
   }
 }
 

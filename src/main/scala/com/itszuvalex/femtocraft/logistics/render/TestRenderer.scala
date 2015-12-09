@@ -10,17 +10,17 @@ import net.minecraftforge.client.model.obj.WavefrontObject
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Alex on 19.08.2015.
- */
+  * Created by Alex on 19.08.2015.
+  */
 object TestRenderer {
-  val testModelLocation     = new ResourceLocation(Femtocraft.ID + ":" + "")
-  val testTexLocation       = new ResourceLocation(Femtocraft.ID + ":" + "")
+  val testModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "")
+  val testTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "")
 }
 
 class TestRenderer extends TileEntitySpecialRenderer {
   val testModel = AdvancedModelLoader.loadModel(TestRenderer.testModelLocation).asInstanceOf[WavefrontObject]
 
-  override def renderTileEntityAt(tile : TileEntity, x : Double, y : Double, z : Double, partialTime : Float): Unit = {
+  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     val tesselator = Tessellator.instance
     this.bindTexture(TestRenderer.testTexLocation)
     GL11.glPushMatrix()

@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack
 import scala.collection.{Set, mutable}
 
 /**
- * Created by Christopher on 8/29/2015.
- */
+  * Created by Christopher on 8/29/2015.
+  */
 trait TileMultiblockIndexedInventory extends TileEntityBase with TileIndexedInventory {
   self: MultiBlockComponent =>
 

@@ -11,8 +11,8 @@ import net.minecraft.nbt.NBTTagCompound
 import scala.util.Random
 
 /**
- * Created by Alex on 08.08.2015.
- */
+  * Created by Alex on 08.08.2015.
+  */
 
 class TileCrystalsWorldgen extends TileEntityBase with TileDescriptionPacket {
   val COLOR_KEY          = "Color"

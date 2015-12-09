@@ -13,8 +13,8 @@ import net.minecraft.util.StatCollector
 import org.lwjgl.opengl.GL11
 
 /**
- * Created by Christopher on 9/1/2015.
- */
+  * Created by Christopher on 9/1/2015.
+  */
 @SideOnly(Side.CLIENT) object GuiArcFurnace {
   val texture = Resources.TexGui("GuiCrystalMount.png")
 }
@@ -32,8 +32,8 @@ GuiBase(new ContainerArcFurnace(player, inv, tile)) {
   }
 
   /**
-   * Draw the foreground layer for the GuiContainer (everything in front of the items)
-   */
+    * Draw the foreground layer for the GuiContainer (everything in front of the items)
+    */
   protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
     val s = "Micro-Furnace"
     fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
@@ -41,8 +41,8 @@ GuiBase(new ContainerArcFurnace(player, inv, tile)) {
   }
 
   /**
-   * Draw the background layer for the GuiContainer (everything behind the items)
-   */
+    * Draw the background layer for the GuiContainer (everything behind the items)
+    */
   protected def drawGuiContainerBackgroundLayer(par1: Float, par2: Int, par3: Int) {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
     Minecraft.getMinecraft.getTextureManager.bindTexture(GuiArcFurnace.texture)

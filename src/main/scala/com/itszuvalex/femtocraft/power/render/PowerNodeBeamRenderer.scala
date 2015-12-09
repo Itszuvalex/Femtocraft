@@ -9,8 +9,8 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 
 /**
- * Created by Christopher on 8/29/2015.
- */
+  * Created by Christopher on 8/29/2015.
+  */
 object PowerNodeBeamRenderer {
   private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_outer.png")
   private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_colored.png")
@@ -19,7 +19,7 @@ object PowerNodeBeamRenderer {
 }
 
 trait PowerNodeBeamRenderer extends TileEntitySpecialRenderer with PowerBeamRenderer {
-  def renderPowerBeams(node: TileEntity with IPowerNode, x:Double, y:Double, z:Double, partialTime: Float) = {
+  def renderPowerBeams(node: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTime: Float) = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamOuterLocation)
     renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte))
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamColorLocation)

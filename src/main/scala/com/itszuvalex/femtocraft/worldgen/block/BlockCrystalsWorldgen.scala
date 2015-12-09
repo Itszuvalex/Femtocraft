@@ -9,15 +9,15 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 
 /**
- * Created by Alex on 08.08.2015.
- */
+  * Created by Alex on 08.08.2015.
+  */
 class BlockCrystalsWorldgen extends TileContainer(Material.glass) {
   setCreativeTab(Femtocraft.tab)
 
   /**
-   * Is this block (a) opaque and (b) a full 1m cube?  This determines whether or not to render the shared face of two
-   * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
-   */
+    * Is this block (a) opaque and (b) a full 1m cube?  This determines whether or not to render the shared face of two
+    * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
+    */
   override def isOpaqueCube =
     false
 
@@ -25,8 +25,8 @@ class BlockCrystalsWorldgen extends TileContainer(Material.glass) {
   override def getRenderBlockPass: Int = 2
 
   /**
-   * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
-   */
+    * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
+    */
   override def renderAsNormalBlock = false
 
   override def randomDisplayTick(world: World, x: Int, y: Int, z: Int, rand: Random): Unit = world.getTileEntity(x, y, z) match {

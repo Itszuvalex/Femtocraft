@@ -6,8 +6,8 @@ import net.minecraftforge.fluids.FluidStack
 import scala.beans.BeanProperty
 
 /**
- * Created by Christopher on 8/24/2015.
- */
+  * Created by Christopher on 8/24/2015.
+  */
 case class ArcFurnaceRecipe(@BeanProperty input: ItemStack,
                             @BeanProperty output: FluidStack,
                             @BeanProperty tempMin: Int,

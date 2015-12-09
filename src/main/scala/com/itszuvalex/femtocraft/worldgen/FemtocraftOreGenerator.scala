@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.worldgen
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.core.Cyber.CybermaterialRegistry
+import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
 import com.itszuvalex.itszulib.api.core.Configurable
 import cpw.mods.fml.common.IWorldGenerator
@@ -11,8 +11,8 @@ import net.minecraft.world.World
 import net.minecraft.world.chunk.IChunkProvider
 
 /**
- * Created by Christopher on 8/27/2015.
- */
+  * Created by Christopher on 8/27/2015.
+  */
 @Configurable object FemtocraftOreGenerator {
   @Configurable val GENERATION_WEIGHT = 1
 
