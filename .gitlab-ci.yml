@@ -1,0 +1,19 @@
+artifacts:
+  paths:
+  - build/libs/
+
+full_build:
+  only:
+    - master
+    - develop
+  script:
+    - apt-get install gradle -y
+    - gradle setupDecompWorkspace
+    - gradle build
+
+cache:
+  untracked: true
+  paths:
+  - /
+
+
