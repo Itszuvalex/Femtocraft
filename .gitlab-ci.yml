@@ -1,8 +1,8 @@
-artifacts:
-  paths:
-  - build/libs/
+stages:
+  - build
 
 full_build:
+  stage: build
   only:
     - master
     - develop
@@ -10,10 +10,10 @@ full_build:
     - apt-get install gradle -y
     - gradle setupDecompWorkspace
     - gradle build
-
-cache:
-  untracked: true
-  paths:
-  - /
-
-
+  artifacts:
+    paths:
+      - build/libs/
+  cache:
+    untracked: true
+    paths:
+      - /
