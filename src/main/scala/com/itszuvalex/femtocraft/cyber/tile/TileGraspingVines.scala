@@ -29,8 +29,6 @@ object TileGraspingVines {
   val grabbedHashSet = new mutable.HashSet[UUID]()
 
   val COMPOUND_IDLIST_KEY = "IDList"
-  val BASE_POS_KEY = "BasePos"
-  val INDEX_KEY = "Index"
 }
 
 /**
@@ -38,8 +36,6 @@ object TileGraspingVines {
   */
 @Configurable
 class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex: Int = -1
-  var basePos: Loc4 = null
   var velocityAddition: Float = .2f
   var grabRadius: Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
   var entitySet = new mutable.HashSet[Entity]()
@@ -52,14 +48,14 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   def findAndGrabEntities(radius: Float): Unit = {
     getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
-      yCoord + .5f - radius,
+      yCoord + 1f - radius,
       zCoord + .5f - radius,
       xCoord + .5f + radius,
-      yCoord + .5f + radius,
+      yCoord + 1f + radius,
       zCoord + .5f + radius))
       .asInstanceOf[java.util.List[Entity]]
       .view
-      .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) <= radius * radius }
+      .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + 1d, zCoord + .5d) <= radius * radius }
       .foreach(grabEntity)
   }
 
@@ -134,7 +130,6 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     }
   }
 
-
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     compound(TileGraspingVines.COMPOUND_IDLIST_KEY -> grabbedSet.map(_.getEntityId).toArray)
@@ -145,27 +140,12 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
       worldObj.setBlockToAir(info.x, info.y, info.z)
       return
     }
+    if(worldObj.isRemote) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
         te.breakMachinesUpwardsFromSlot(machineIndex)
       case _ =>
     }
-  }
-
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    compound.NBTCompound(TileGraspingVines.BASE_POS_KEY) { compound =>
-      basePos = Loc4(compound)
-      machineIndex = compound.Int(TileGraspingVines.INDEX_KEY)
-      Unit
-    }
-  }
-
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    compound(TileGraspingVines.BASE_POS_KEY -> NBTCompound(basePos),
-      TileGraspingVines.INDEX_KEY -> machineIndex)
   }
 
   override def getMod: AnyRef = Femtocraft
@@ -181,7 +161,7 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
   override def hasDescription: Boolean = true
 
   override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+    val center = Vector3(xCoord + .5f, yCoord + 1f, zCoord + .5f)
     AxisAlignedBB.getBoundingBox(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
       center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
       center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,

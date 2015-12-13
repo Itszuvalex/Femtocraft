@@ -33,8 +33,6 @@ object TileGrowthChamber {
 }
 
 class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex           : Int                 = -1
-  var basePos                : Loc4                = null
   var progress               : Int                 = 0
   var progressTicks          : Int                 = 0
   var lastGrowthStage        : Int                 = 0
@@ -200,15 +198,11 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
-    compound.setInteger(TileGrowthChamber.MACHINE_INDEX_KEY, machineIndex)
-    compound.setTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY, NBTCompound(basePos))
     compound.setInteger(TileGrowthChamber.PROGRESS_TICKS_KEY, progressTicks)
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
-    machineIndex = compound.getInteger(TileGrowthChamber.MACHINE_INDEX_KEY)
-    basePos = Loc4(compound.getCompoundTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY))
     progressTicks = compound.getInteger(TileGrowthChamber.PROGRESS_TICKS_KEY)
     currentRecipe = GrowthChamberRegistry.findMatchingRecipe(indInventory.getStackInSlot(0)).orNull
     if (currentRecipe != null) progress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
@@ -216,8 +210,6 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
-    compound.setInteger(TileGrowthChamber.MACHINE_INDEX_KEY, machineIndex)
-    compound.setTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY, NBTCompound(basePos))
     compound.setInteger(TileGrowthChamber.PROGRESS_TICKS_KEY, progressTicks)
     val comp = new NBTTagCompound
     indInventory.saveToNBT(comp)
@@ -226,8 +218,6 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    machineIndex = compound.getInteger(TileGrowthChamber.MACHINE_INDEX_KEY)
-    basePos = Loc4(compound.getCompoundTag(TileGrowthChamber.BASE_POS_COMPOUND_KEY))
     progressTicks = compound.getInteger(TileGrowthChamber.PROGRESS_TICKS_KEY)
     val comp = compound.getCompoundTag(TileGrowthChamber.INVENTORY_KEY)
     indInventory.loadFromNBT(comp)

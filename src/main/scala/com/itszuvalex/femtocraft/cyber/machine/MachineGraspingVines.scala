@@ -89,7 +89,7 @@ class MachineGraspingVines extends ICyberMachine {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
     }
-    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
+//    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
 
   override def getRequiredBaseSize = 1

@@ -152,7 +152,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   //Though this is the pickle.
   private var breaking: Boolean = false
 
-  def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine).getOrElse(0)
+  def firstFreeSlot: Int = machinesList.lastOption.map(topSlotForMachine(_) + 1).getOrElse(0)
 
   override def onSideActivate(player: EntityPlayer, side: Int): Boolean = {
     if (isValidMultiBlock) {
@@ -171,8 +171,12 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   override def getMod: AnyRef = Femtocraft
 
   override def getRenderBoundingBox: AxisAlignedBB = if (isController) {
-    AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + size, yCoord + TileCyberBase.baseHeightMap(size), zCoord + size)
+    AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + size, yCoord + getBaseheight, zCoord + size)
   } else super.getRenderBoundingBox
+
+  def getBaseheight: Int = {
+    TileCyberBase.baseHeightMap(size)
+  }
 
   def onBlockBreak(): Unit = {
     if (worldObj.isRemote) return
@@ -197,7 +201,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   def breakMachinesUpwardsFromSlot(slot: Int): Unit = {
     if (breaking) return
     breaking = true
-    (slot until TileCyberBase.slotHeightMap(size)).flatMap(getMachine).toSet[MachineMapping]
+    (slot until getNumSlots).flatMap(getMachine).toSet[MachineMapping]
       .foreach { m =>
         m.cyberMachine match {
           case Some(c) =>
@@ -207,7 +211,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
         }
       }
     breaking = false
-    setModified()
   }
 
   private def getMachine(slot: Int): Option[MachineMapping] = {
@@ -222,9 +225,11 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     Option(ret)
   }
 
-  def yFromSlot(slot: Int): Int = yCoord + TileCyberBase.baseHeightMap(size) + slot
+  def yFromSlot(slot: Int): Int = yCoord + getBaseheight + slot
 
-  def remainingSlots = TileCyberBase.slotHeightMap(size) - machinesList.lastOption.map(topSlotForMachine).getOrElse(0)
+  def remainingSlots = getNumSlots - machinesList.lastOption.map(topSlotForMachine(_) + 1).getOrElse(0)
+
+  def getNumSlots = TileCyberBase.slotHeightMap(size)
 
   def buildMachine(name: String): Unit = {
     if (worldObj.isRemote) return
@@ -247,19 +252,15 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
           worldObj.getTileEntity(loc.x, loc.y, loc.z) match {
             case cin: TileCyberMachineInProgress =>
               cin.machineInProgress = name
-              cin.slot = freeSlot
-              cin.baseController = getLoc
+              cin.setIndexInBase(freeSlot)
+              cin.setBasePos(getLoc)
               cin.formMultiBlock(worldObj, controllerLoc.x, controllerLoc.y, controllerLoc.z)
             case _ =>
           }
         }
         machinesList += MachineMapping(freeSlot, controllerLoc)
-      case _ => return
+      case _ =>
     }
-    //    currentlyBuildingMachine = firstEmpty(machines)
-    //    machines(currentlyBuildingMachine) = name
-    //    machineSlotMap(currentlyBuildingMachine) = firstFreeSlot
-    setModified()
   }
 
   /**
@@ -453,6 +454,6 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   }
 
   private def topSlotForMachine(machine: MachineMapping): Int = {
-    machine.startingSlot + machine.cyberMachine.map(_.getRequiredSlots).getOrElse(0)
+    machine.startingSlot + machine.cyberMachine.map(_.getRequiredSlots - 1).getOrElse(0)
   }
 }

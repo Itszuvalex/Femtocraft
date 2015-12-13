@@ -72,7 +72,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
   val container = this.inventorySlots.asInstanceOf[ContainerMachineSelection]
 
   val thisgui = this
-  var lastSlotNum = 0
+  var lastSlotNum = -1
 
   val selectionFlow =
     new GuiFlowLayout(GuiMachineSelection.xSelectionMin,
@@ -86,6 +86,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
         val selectors = machines.map(new GuiMachineSelector(thisgui, _))
         thisgui.clearSelection()
         this.add(selectors.toSeq: _*)
+        layoutElements()
       }
     }
 
@@ -103,7 +104,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
 
   refreshPageLabelText()
 
-    refreshSlotLabelText()
+//    refreshSlotLabelText()
 
   def selectMultiblock(machine: GuiMachineSelector) = {
     if (selected != null) selected.setSelected(false)
@@ -111,9 +112,9 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
     selected = machine
   }
 
-    private def refreshSlotLabelText() = {
-      slotLabel.text = "Free Slots:" + container.slots + " of " + TileCyberBase.slotHeightMap(te.size)
-    }
+//    private def refreshSlotLabelText() = {
+//      slotLabel.text = "Free Slots:" + container.slots + " of " + TileCyberBase.slotHeightMap(te.size)
+//    }
 
   add(selectionFlow,
     new GuiButton(GuiMachineSelection.xSelectionMin,
@@ -127,7 +128,7 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
       override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
     },
     pageLabel,
-          slotLabel,
+//          slotLabel,
     new GuiButton((GuiMachineSelection.WIDTH - 100) / 2,
       GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 15,
       100, 12, "Clear Selection") {

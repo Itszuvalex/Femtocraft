@@ -11,14 +11,14 @@ import scala.collection.JavaConversions._
   * Created by Alex on 15.10.2015.
   */
 class ContainerMachineSelection(val tile: TileCyberBase) extends ContainerBase {
-  var slots = tile.remainingSlots
+  var slots =  -1
 
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
     crafters.foreach { case crafter: ICrafting =>
-      if (tile.remainingSlots != slots) crafter.sendProgressBarUpdate(this, 0, tile.remainingSlots)
-      slots = tile.remainingSlots
+      if (tile.remainingSlots != slots) sendUpdateToCrafter(this, crafter, 0, tile.remainingSlots)
                      }
+    slots = tile.remainingSlots
   }
 
   override def updateProgressBar(id: Int, value: Int): Unit = {

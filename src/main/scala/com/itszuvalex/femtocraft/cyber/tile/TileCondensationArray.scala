@@ -13,9 +13,6 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
   * Created by Christopher on 11/21/2015.
   */
 class TileCondensationArray extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex: Int = -1
-  var basePos: Loc4 = null
-
   def onBlockBreak() = {}
 
   override def getMod: AnyRef = Femtocraft

@@ -67,7 +67,7 @@ class MachineGrowthChamber extends ICyberMachine {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
     }
-    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
+//    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
 
   override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq(new ItemStack(FemtoBlocks.blockCyberweave, 20))

@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.cyber.CyberMachineRegistry
+import com.itszuvalex.femtocraft.cyber.{ICyberMachineMultiblock, CyberMachineRegistry}
 import com.itszuvalex.femtocraft.cyber.machine.MachineGrowthChamber
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberMachineInProgress._
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -16,16 +16,11 @@ import net.minecraft.nbt.NBTTagCompound
 object TileCyberMachineInProgress {
   val COMPOUND_KEY = "Compound"
   val MACHINE_KEY = "Machine"
-  val SLOT_KEY = "Slot"
-  val BASE_LOC_KEY = "BaseLoc"
   val BUILD_TIME_KEY = "BuildTime"
 }
 
 class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultiblock {
-
   var machineInProgress: String = null
-  var baseController: Loc4 = null
-  var slot: Int = 0
   var buildTime: Int = 0
 
   var finished = false
@@ -41,7 +36,9 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
       CyberMachineRegistry.getMachine(machineInProgress) match {
         case Some(machine) =>
           finished = true
-          machine.formAtBaseAndIndex(worldObj, baseController.getTileEntity(true).get.asInstanceOf[TileCyberBase], slot)
+          machine.formAtBaseAndIndex(worldObj, basePos.getTileEntity(true).get.asInstanceOf[TileCyberBase], machineIndex)
+          machine.getTakenLocations(worldObj, xCoord, yCoord, zCoord).flatMap(_.getTileEntity(true)).collect{case m: ICyberMachineMultiblock => m}.
+          foreach(_.setIndexInBase(getIndexInBase))
         case _ =>
       }
     }
@@ -54,8 +51,6 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
     compound.NBTCompound(COMPOUND_KEY) {
       comp =>
         machineInProgress = comp.String(MACHINE_KEY)
-        baseController = comp.NBTCompound(BASE_LOC_KEY)(Loc4(_))
-        slot = comp.Int(SLOT_KEY)
         buildTime = comp.Int(BUILD_TIME_KEY)
         Unit
     }
@@ -66,8 +61,6 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
     compound(COMPOUND_KEY ->
       NBTCompound(
         MACHINE_KEY -> machineInProgress,
-        BASE_LOC_KEY -> NBTCompound(baseController),
-        SLOT_KEY -> slot,
         BUILD_TIME_KEY -> buildTime))
   }
 
@@ -103,9 +96,9 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
     }
     else if (finished) return
 
-    baseController.getTileEntity(true) match {
+    getBasePos.getTileEntity(true) match {
       case Some(cb: TileCyberBase) =>
-        cb.breakMachinesUpwardsFromSlot(slot)
+        cb.breakMachinesUpwardsFromSlot(getIndexInBase)
       case _ =>
     }
   }

@@ -2,6 +2,8 @@ package com.itszuvalex.femtocraft.cyber.gui
 
 import com.itszuvalex.femtocraft.cyber.container.ContainerCyberBase
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
+import com.itszuvalex.femtocraft.network.messages.MessageOpenGui
 import com.itszuvalex.femtocraft.{FemtoFluids, GuiIDs, Resources}
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
@@ -22,33 +24,29 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
   ySize = 177
 
   val bufferSlotSize = tile.size + 1
-
-  def frender: FontRenderer = {
-    Minecraft.getMinecraft.fontRenderer
-  }
-
-  val name      = tile.size + "x" + tile.size + " Cyber Base"
+  val name = tile.size + "x" + tile.size + " Cyber Base"
   val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth(name)) / 2, 7,
-                               frender.getStringWidth(name), frender.FONT_HEIGHT,
-                               name)
+    frender.getStringWidth(name), frender.FONT_HEIGHT,
+    name)
+  val inputSlots = {
+    for (i <- 0 until 9) yield new GuiItemStack(88 + 18 * (i % 3), 36 + 18 * (i / 3), null)
+  }.toSeq
 
   nameLabel.setShouldRender(false)
-
-  val inputSlots = {
-                     for (i <- 0 until 9) yield new GuiItemStack(88 + 18 * (i % 3), 36 + 18 * (i / 3), null)
-                   }.toSeq
-
   val bufferSlots = {
-                      for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
-                    }.toSeq
+    for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
+  }.toSeq
+  val cybermassTank = new GuiFluidTank(151, 21, this, tile, 0, 3, FemtoFluids.cybermass, true)
 
   inputSlots.foreach(_.setShouldRender(false))
   bufferSlots.foreach(_.setShouldRender(false))
-
-  val cybermassTank = new GuiFluidTank(151, 21, this, tile, 0, 3, FemtoFluids.cybermass, true)
-
   val bufferTank1 = new GuiFluidTank(176, 21, this, tile, 1, 3, null, true)
-
+  val buildButton = new GuiButton(171, 94, 45, 20, "Build Machine") {
+    override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
+      FemtoPacketHandler.INSTANCE.sendToServer(new MessageOpenGui(tile.info.x, tile.info.y, tile.info.z, tile.getWorldObj.provider.dimensionId, GuiIDs.CyberBaseBuildGuiID))
+      true
+    } else false
+  }
   var bufferTank2: GuiFluidTank = null
   if (tile.size == 3) bufferTank2 = new GuiFluidTank(196, 21, this, tile, 2, 3, null, true)
 
@@ -56,11 +54,8 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
   bufferTank1.setShouldRender(false)
   if (tile.size == 3) bufferTank2.setShouldRender(false)
 
-  val buildButton = new GuiButton(171, 94, 45, 20, "Build Machine") {
-    override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
-      player.openGui(tile.getMod, GuiIDs.CyberBaseBuildGuiID, tile.getWorldObj, tile.info.x, tile.info.y, tile.info.z)
-      true
-    } else false
+  def frender: FontRenderer = {
+    Minecraft.getMinecraft.fontRenderer
   }
 
   buildButton.setShouldRender(false)
