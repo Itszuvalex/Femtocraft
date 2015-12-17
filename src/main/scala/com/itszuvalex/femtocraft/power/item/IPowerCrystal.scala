@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.power
+package com.itszuvalex.femtocraft.power.item
 
 import net.minecraft.item.{Item, ItemStack}
 

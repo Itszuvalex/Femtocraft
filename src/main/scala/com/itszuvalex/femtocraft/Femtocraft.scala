@@ -27,18 +27,15 @@ object Femtocraft {
   final val blocks  = FemtoBlocks
   final val items   = FemtoItems
   final val fluids  = FemtoFluids
-
-  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
-              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
-  var proxy: ProxyCommon = null
-
-  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
-              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
-  var guiProxy: ProxyGuiCommon = null
-
   val tab = new CreativeTabs(Femtocraft.ID) {
     override def getTabIconItem: Item = Items.nether_star
   }
+  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
+  var proxy: ProxyCommon = null
+  @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
+  var guiProxy: ProxyGuiCommon = null
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     FemtoBlocks.preInit()
@@ -51,22 +48,6 @@ object Femtocraft {
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
 
     registerRecipes()
-  }
-
-  @EventHandler def init(event: FMLInitializationEvent): Unit = {
-    FemtoBlocks.init()
-    FemtoItems.init()
-    FemtoFluids.init()
-    FrameMultiblockRegistry.init()
-    CyberMachineRegistry.init()
-  }
-
-  @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
-    FemtoBlocks.postInit()
-    FemtoItems.postInit()
-    FemtoFluids.postInit()
-    CybermaterialRegistry.postInit()
-    proxy.postInit()
   }
 
   def registerRecipes(): Unit = {
@@ -84,5 +65,21 @@ object Femtocraft {
                                                                   Resources.Texture("recipes/wheat5.png"),
                                                                   Resources.Texture("recipes/wheat6.png"),
                                                                   Resources.Texture("recipes/wheat7.png"))))
+  }
+
+  @EventHandler def init(event: FMLInitializationEvent): Unit = {
+    FemtoBlocks.init()
+    FemtoItems.init()
+    FemtoFluids.init()
+    FrameMultiblockRegistry.init()
+    CyberMachineRegistry.init()
+  }
+
+  @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
+    FemtoBlocks.postInit()
+    FemtoItems.postInit()
+    FemtoFluids.postInit()
+    CybermaterialRegistry.postInit()
+    proxy.postInit()
   }
 }

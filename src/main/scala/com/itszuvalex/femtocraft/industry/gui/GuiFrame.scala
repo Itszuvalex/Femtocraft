@@ -23,11 +23,6 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
   val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth(tile.multiBlock)) / 2, 7,
                                frender.getStringWidth(tile.multiBlock), frender.FONT_HEIGHT,
                                tile.multiBlock)
-
-  def frender: FontRenderer = {
-    Minecraft.getMinecraft.fontRenderer
-  }
-
   val requiredLabel = new GuiLabel((panelWidth - frender.getStringWidth("Required")) / 2, 9 + frender.FONT_HEIGHT,
                                    frender.getStringWidth("Required"), frender.FONT_HEIGHT,
                                    "Required")
@@ -38,9 +33,12 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
     case None => Seq[GuiElement]()
   }
   val layout        = new GuiFlowLayout(7, 11 + frender.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
-
   val itemSlots =
     (0 until 9).map(i => new GuiItemStack(7 + 18 * i, 61, null)).toSeq
+
+  def frender: FontRenderer = {
+    Minecraft.getMinecraft.fontRenderer
+  }
 
   itemSlots.foreach(_.setShouldRender(false))
 

@@ -76,10 +76,10 @@ class ProxyCommon {
   def registerTickHandlers() {
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
-    null
+  def registerEventHandlers(): Unit = {
   }
 
-  def registerEventHandlers(): Unit = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
+    null
   }
 }

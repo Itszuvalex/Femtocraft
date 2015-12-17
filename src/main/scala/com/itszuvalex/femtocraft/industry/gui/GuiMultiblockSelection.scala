@@ -73,7 +73,6 @@ object GuiMultiblockSelection {
 class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends GuiBase(new ContainerMultiblockSelection) {
   xSize = GuiMultiblockSelection.WIDTH
   ySize = GuiMultiblockSelection.HEIGHT
-  var selected: GuiMultiblockSelector = null
   val selectionFlow                   =
     new GuiFlowLayout(GuiMultiblockSelection.xSelectionMin,
                       GuiMultiblockSelection.ySelectionMin,
@@ -94,15 +93,25 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                         }
                       }): _*
                      )
-  selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
-
   val pageLabel = new GuiLabel((GuiMultiblockSelection.WIDTH - 100) / 2,
                                GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
                                100, 10, "")
+  selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
+  var selected: GuiMultiblockSelector = null
   refreshPageLabelText()
 
-  private def refreshPageLabelText() = {
-    pageLabel.text = "Displaying " + (selectionFlow.startingIndex + 1) + "-" + (selectionFlow.endingIndex + 1) + " of " + selectionFlow.numElements
+  def selectMultiblock(multi: GuiMultiblockSelector) = {
+    if (selected != null) selected.setSelected(false)
+    multi.setSelected(true)
+    selected = multi
+    stack match {
+      case null =>
+      case is => is.getItem match {
+        case null =>
+        case frame: IFrameItem =>
+          FemtoPacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(multi.multi.getName))
+      }
+    }
   }
 
   add(selectionFlow,
@@ -139,20 +148,6 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
       }
      )
 
-  def selectMultiblock(multi: GuiMultiblockSelector) = {
-    if (selected != null) selected.setSelected(false)
-    multi.setSelected(true)
-    selected = multi
-    stack match {
-      case null =>
-      case is => is.getItem match {
-        case null =>
-        case frame: IFrameItem =>
-          FemtoPacketHandler.INSTANCE.sendToServer(new MessageMultiblockSelection(multi.multi.getName))
-      }
-    }
-  }
-
   def clearSelection() = {
     if (selected != null) selected.setSelected(false)
     selected = null
@@ -177,5 +172,9 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
   override def renderUpdate(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
     refreshPageLabelText()
     super.renderUpdate(screenX, screenY, mouseX, mouseY, partialTicks)
+  }
+
+  private def refreshPageLabelText() = {
+    pageLabel.text = "Displaying " + (selectionFlow.startingIndex + 1) + "-" + (selectionFlow.endingIndex + 1) + " of " + selectionFlow.numElements
   }
 }

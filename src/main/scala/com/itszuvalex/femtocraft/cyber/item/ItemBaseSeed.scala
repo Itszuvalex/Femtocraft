@@ -23,14 +23,16 @@ object ItemBaseSeed {
   val SIZE_TAG = "BaseSize"
 
   /**
-    * @param stack Stack of ItemBaseSeed
-    * @return Size number of the stack (1, 2 or 3), 0 if not an ItemBaseSeed stack
+    * Tool for simple and correct creation of an ItemBaseSeed stack.
+    * @param stackSize Desired stack size
+    * @param baseSize Desired size number (1, 2 or 3)
+    * @return An ItemBaseSeed stack with the specified properties, null if invalid baseSize
     */
-  def getSize(stack: ItemStack): Int = {
-    if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return 0
-    if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound(SIZE_TAG -> 1)
-    if (stack.getTagCompound.Int(ItemBaseSeed.SIZE_TAG) < 1 || stack.getTagCompound.Int(SIZE_TAG) > 3) stack.getTagCompound.setInteger(SIZE_TAG, 1)
-    stack.getTagCompound.Int(SIZE_TAG)
+  def createStack(stackSize: Int, baseSize: Int): ItemStack = {
+    if (baseSize < 1 || baseSize > 3) return null
+    val stack = new ItemStack(FemtoItems.itemBaseSeed, stackSize)
+    setSize(stack, baseSize)
+    stack
   }
 
   /**
@@ -47,19 +49,6 @@ object ItemBaseSeed {
   }
 
   /**
-    * Tool for simple and correct creation of an ItemBaseSeed stack.
-    * @param stackSize Desired stack size
-    * @param baseSize Desired size number (1, 2 or 3)
-    * @return An ItemBaseSeed stack with the specified properties, null if invalid baseSize
-    */
-  def createStack(stackSize: Int, baseSize: Int): ItemStack = {
-    if (baseSize < 1 || baseSize > 3) return null
-    val stack = new ItemStack(FemtoItems.itemBaseSeed, stackSize)
-    setSize(stack, baseSize)
-    stack
-  }
-
-  /**
     * @param stack Stack of ItemBaseSeed
     * @return Descriptive string for the size number of stack
     */
@@ -70,6 +59,17 @@ object ItemBaseSeed {
       case 2 => "Medium (2x2)"
       case 3 => "Large (3x3)"
     }
+  }
+
+  /**
+    * @param stack Stack of ItemBaseSeed
+    * @return Size number of the stack (1, 2 or 3), 0 if not an ItemBaseSeed stack
+    */
+  def getSize(stack: ItemStack): Int = {
+    if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return 0
+    if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound(SIZE_TAG -> 1)
+    if (stack.getTagCompound.Int(ItemBaseSeed.SIZE_TAG) < 1 || stack.getTagCompound.Int(SIZE_TAG) > 3) stack.getTagCompound.setInteger(SIZE_TAG, 1)
+    stack.getTagCompound.Int(SIZE_TAG)
   }
 
   /**

@@ -38,6 +38,11 @@ trait NaniteNode extends TileEntity with INaniteNode {
 
   override def getNodeLoc = new Loc4(this)
 
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    saveParentInfo(compound)
+  }
+
   def saveParentInfo(compound: NBTTagCompound) =
     compound(NaniteNode.NODE_COMPOUND_KEY ->
              NBTCompound(
@@ -45,19 +50,14 @@ trait NaniteNode extends TileEntity with INaniteNode {
                         )
             )
 
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadParentInfo(compound)
+  }
+
   def loadParentInfo(compound: NBTTagCompound) =
     compound.NBTCompound(NaniteNode.NODE_COMPOUND_KEY) { comp =>
       parentLoc = comp.NBTCompound(NaniteNode.NODE_PARENT_KEY)(Loc4(_))
       Unit
                                                        }
-
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    saveParentInfo(compound)
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadParentInfo(compound)
-  }
 }

@@ -38,7 +38,7 @@ trait IPowerPedestal {
 
   /**
     *
-    * @return Direction of the mount this is connected to.  UNKNOKWN otherwise.
+    * @return Location of the mount this is connected to.
     */
   def mountLoc: Loc4
 

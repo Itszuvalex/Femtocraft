@@ -1,15 +1,13 @@
 package com.itszuvalex.femtocraft.cyber.tile
 
-import com.itszuvalex.femtocraft.cyber.machine.{MachineGrowthChamber, MachineGraspingVines}
+import com.itszuvalex.femtocraft.cyber.machine.MachineGrowthChamber
 import com.itszuvalex.femtocraft.cyber.particle.FXWaterSpray
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.cyber.{GrowthChamberRegistry, IRecipeRenderer}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import com.itszuvalex.itszulib.core.traits.tile.TileFluidTank
 import com.itszuvalex.itszulib.network.PacketHandler
 import com.itszuvalex.itszulib.network.messages.MessageFluidTankUpdate
 import com.itszuvalex.itszulib.render.{Point3D, Vector3}
@@ -44,6 +42,12 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
     hasGUI
   }
 
+  override def getMod: AnyRef = Femtocraft
+
+  override def hasGUI: Boolean = isValidMultiBlock
+
+  override def getGuiID: Int = GuiIDs.GrowthChamberGuiID
+
   def onBlockBreak(): Unit = {
     if (!isValidMultiBlock) return
     basePos.getTileEntity() match {
@@ -51,6 +55,92 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
         te.breakMachinesUpwardsFromSlot(machineIndex)
       case _ =>
     }
+  }
+
+  override def serverUpdate(): Unit = {
+    if (!isController) return
+    if (tank.getFluidAmount > 0) {
+      tank.drain(1, true)
+      if (tank.getFluidAmount == 0)
+        setUpdate()
+    }
+    if (currentRecipe == null) return
+    progressTicks += 1
+    val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
+    if (progress == newProgress) return
+    progress = math.min(newProgress, 100)
+    currentRecipe.renderObj match {
+      case ar: Array[ResourceLocation] =>
+        val ind = math.max(math.ceil(ar.length * (progress / 100d)).toInt - 1, 0)
+        if (ind != lastGrowthStage) {
+          setUpdate()
+          lastGrowthStage = ind
+        }
+      case obj: IRecipeRenderer =>
+        setUpdate()
+      case _ =>
+    }
+    if (progress == 100) {
+      if (outputItems(false)) {
+        updateRecipeOnStackDecr = false
+        indInventory.decrStackSize(0, currentRecipe.input.stackSize)
+        updateRecipeOnStackDecr = true
+        outputItems(true)
+        indInventory.markDirty()
+        progress = 0
+        progressTicks = 0
+        setUpdate()
+      }
+    }
+  }
+
+  def outputItems(doOut: Boolean): Boolean = {
+    if (currentRecipe == null) return false
+    currentRecipe.outputs.forall { item =>
+      val remItem = item.copy()
+      val minI = if (GrowthChamberRegistry.findMatchingRecipe(item).isDefined) 0 else 1
+      for (i <- minI to 9) {
+        if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem.copy(), doOut)
+      }
+      remItem.stackSize == 0
+                                 }
+  }
+
+  private def putItemStack(id: Int, stack: ItemStack, doPut: Boolean): Int = {
+    val curStack = indInventory.getStackInSlot(id)
+    if (curStack == null) {
+      if (doPut) indInventory.setInventorySlotContents(id, stack)
+      if (doPut) indInventory.markDirty()
+      stack.stackSize
+    } else if (curStack.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(curStack, stack)) {
+      val amt = math.min(stack.stackSize, math.min(stack.getMaxStackSize, indInventory.getInventoryStackLimit) - curStack.stackSize)
+      if (doPut && amt > 0) {
+        curStack.stackSize += amt
+        indInventory.setInventorySlotContents(id, curStack)
+      }
+      amt
+    } else 0
+  }
+
+  override def clientUpdate(): Unit = {
+    if (!isController) return
+    // Update progress and water amount client-side, will be synced once container is opened
+    if (tank.getFluidAmount > 0) {
+      tank.drain(1, true)
+    }
+    if (currentRecipe != null) {
+      progressTicks += 1
+      val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
+      if (progress != newProgress) progress = math.min(newProgress, 100)
+    }
+    // Spawn particles, if water exists and particle setting is "All"
+    if (Minecraft.getMinecraft.gameSettings.particleSetting > 0) return
+    if (tank.getFluidAmount == 0) return
+    val time = worldObj.getTotalWorldTime
+    if (time % 3 != 0) return
+    particles1(time)
+    particles2(time)
+    particles3(time)
   }
 
   def particles1(time: Long): Unit = {
@@ -108,92 +198,6 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
     Minecraft.getMinecraft.effectRenderer.addEffect(new FXWaterSpray(worldObj, xCoord + x4, yCoord + cy, zCoord + z4, dirVec.x - .012500000000000004, dirVec.y, dirVec.z - .021650635094610966, .04f, .2f, yCoord + .21))
   }
 
-  private def putItemStack(id: Int, stack: ItemStack, doPut: Boolean): Int = {
-    val curStack = indInventory.getStackInSlot(id)
-    if (curStack == null) {
-      if (doPut) indInventory.setInventorySlotContents(id, stack)
-      if (doPut) indInventory.markDirty()
-      stack.stackSize
-    } else if (curStack.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(curStack, stack)) {
-      val amt = math.min(stack.stackSize, math.min(stack.getMaxStackSize, indInventory.getInventoryStackLimit) - curStack.stackSize)
-      if (doPut && amt > 0) {
-        curStack.stackSize += amt
-        indInventory.setInventorySlotContents(id, curStack)
-      }
-      amt
-    } else 0
-  }
-
-  def outputItems(doOut: Boolean): Boolean = {
-    if (currentRecipe == null) return false
-    currentRecipe.outputs.forall { item =>
-      val remItem = item.copy()
-      val minI = if (GrowthChamberRegistry.findMatchingRecipe(item).isDefined) 0 else 1
-      for (i <- minI to 9) {
-        if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem.copy(), doOut)
-      }
-      remItem.stackSize == 0
-                                 }
-  }
-
-  override def serverUpdate(): Unit = {
-    if (!isController) return
-    if (tank.getFluidAmount > 0) {
-      tank.drain(1, true)
-      if (tank.getFluidAmount == 0)
-        setUpdate()
-    }
-    if (currentRecipe == null) return
-    progressTicks += 1
-    val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
-    if (progress == newProgress) return
-    progress = math.min(newProgress, 100)
-    currentRecipe.renderObj match {
-      case ar: Array[ResourceLocation] =>
-        val ind = math.max(math.ceil(ar.length * (progress / 100d)).toInt - 1, 0)
-        if (ind != lastGrowthStage) {
-          setUpdate()
-          lastGrowthStage = ind
-        }
-      case obj: IRecipeRenderer =>
-        setUpdate()
-      case _ =>
-    }
-    if (progress == 100) {
-      if (outputItems(false)) {
-        updateRecipeOnStackDecr = false
-        indInventory.decrStackSize(0, currentRecipe.input.stackSize)
-        updateRecipeOnStackDecr = true
-        outputItems(true)
-        indInventory.markDirty()
-        progress = 0
-        progressTicks = 0
-        setUpdate()
-      }
-    }
-  }
-
-  override def clientUpdate(): Unit = {
-    if (!isController) return
-    // Update progress and water amount client-side, will be synced once container is opened
-    if (tank.getFluidAmount > 0) {
-      tank.drain(1, true)
-    }
-    if (currentRecipe != null) {
-      progressTicks += 1
-      val newProgress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
-      if (progress != newProgress) progress = math.min(newProgress, 100)
-    }
-    // Spawn particles, if water exists and particle setting is "All"
-    if (Minecraft.getMinecraft.gameSettings.particleSetting > 0) return
-    if (tank.getFluidAmount == 0) return
-    val time = worldObj.getTotalWorldTime
-    if (time % 3 != 0) return
-    particles1(time)
-    particles2(time)
-    particles3(time)
-  }
-
   override def getRenderBoundingBox = AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 2, yCoord + 2, zCoord + 2)
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
@@ -224,12 +228,6 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
     currentRecipe = GrowthChamberRegistry.findMatchingRecipe(indInventory.getStackInSlot(0)).orNull
     if (currentRecipe != null) progress = math.floor((progressTicks * 100) / currentRecipe.ticks.toDouble).toInt
   }
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = isValidMultiBlock
-
-  override def getGuiID: Int = GuiIDs.GrowthChamberGuiID
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(10) {
 

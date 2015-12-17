@@ -13,10 +13,10 @@ import scala.collection.JavaConversions._
   */
 object ContainerCyberBase {
   val CYBERMASS_AMOUNT_ID = 0
-  val BUFFER_1_FID_ID = 1
-  val BUFFER_1_AMOUNT_ID = 2
-  val BUFFER_2_FID_ID = 3
-  val BUFFER_2_AMOUNT_ID = 4
+  val BUFFER_1_FID_ID     = 1
+  val BUFFER_1_AMOUNT_ID  = 2
+  val BUFFER_2_FID_ID     = 3
+  val BUFFER_2_AMOUNT_ID  = 4
 }
 
 class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileCyberBase) extends ContainerInv[TileCyberBase](player, tile, 0, 0) {
@@ -30,7 +30,7 @@ class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileC
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
     crafters.foreach { case crafter: ICrafting =>
-    }
+                     }
   }
 
   override def updateProgressBar(id: Int, value: Int): Unit = {

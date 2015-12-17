@@ -33,11 +33,6 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
     updatePower(par1ICrafting)
   }
 
-  def updatePower(par1ICrafting: ICrafting): Unit = {
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent & 0xFFFFFFFFL).toInt)
-  }
-
   /**
     * Looks for changes made in the container, sends them to every listener.
     */
@@ -55,6 +50,10 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
     lastPower = inventory.getPowerCurrent
   }
 
+  def updatePower(par1ICrafting: ICrafting): Unit = {
+    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
+    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent & 0xFFFFFFFFL).toInt)
+  }
 
   @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {
     case ContainerArcFurnace.COOK_INDEX =>

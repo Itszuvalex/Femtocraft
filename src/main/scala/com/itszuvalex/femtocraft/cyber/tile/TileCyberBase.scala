@@ -27,9 +27,9 @@ import scala.collection.mutable
   * Created by Alex on 27.09.2015.
   */
 object TileCyberBase {
-  val MACHINES_KEY = "Machines"
-  val COMPOUND_KEY = "CyberBase"
-  val SIZE_KEY = "Size"
+  val MACHINES_KEY  = "Machines"
+  val COMPOUND_KEY  = "CyberBase"
+  val SIZE_KEY      = "Size"
   val baseHeightMap = Map(1 -> 1, 2 -> 1, 3 -> 2)
   val slotHeightMap = Map(1 -> 4, 2 -> 6, 3 -> 10)
 
@@ -110,7 +110,7 @@ object TileCyberBase {
 
     override def saveToNBT(compound: NBTTagCompound): Unit = {
       compound("startingSlot" -> startingSlot,
-        "controllerLoc" -> NBTCompound(controllerLoc))
+               "controllerLoc" -> NBTCompound(controllerLoc))
     }
 
     override def loadFromNBT(compound: NBTTagCompound): Unit = {
@@ -142,13 +142,13 @@ object TileCyberBase {
 }
 
 class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with TileMultiFluidTank with IInventory {
-  var size: Int = 1
+  var size          : Int                      = 1
   //  var machineSlotMap             : Array[Int]               = new Array[Int](10) // Wtf is this here for?
   //  var currentlyBuildingMachine   : Int                      = -1 //No need to have the base track the building.
   //  var currentMachineBuildProgress: Int                      = 0  //The machine itself can do it.
   //  var totalMachineBuildTime      : Float                    = 100f
   var inProgressData: mutable.Map[String, Any] = mutable.Map.empty[String, Any]
-  private var machinesList = mutable.TreeSet[MachineMapping]()
+  private var machinesList      = mutable.TreeSet[MachineMapping]()
   //Though this is the pickle.
   private var breaking: Boolean = false
 
@@ -187,7 +187,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       breakMachinesUpwardsFromSlot(0)
       TileCyberBase.getBaseLocations(size, xCoord, yCoord, zCoord, worldObj.provider.dimensionId).foreach { loc =>
         worldObj.setBlockToAir(loc.x, loc.y, loc.z)
-      }
+                                                                                                          }
       InventoryUtils.dropItem(ItemBaseSeed.createStack(1, size), worldObj, xCoord + (size / 2), yCoord, zCoord + (size / 2), new Random())
     }
     else {
@@ -202,14 +202,14 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     if (breaking) return
     breaking = true
     (slot until getNumSlots).flatMap(getMachine).toSet[MachineMapping]
-      .foreach { m =>
-        m.cyberMachine match {
-          case Some(c) =>
-            c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
-            machinesList.remove(m)
-          case None =>
-        }
+    .foreach { m =>
+      m.cyberMachine match {
+        case Some(c) =>
+          c.breakMachine(m.controllerLoc.getWorld.get, m.controllerLoc.x, m.controllerLoc.y, m.controllerLoc.z)
+          machinesList.remove(m)
+        case None =>
       }
+             }
     breaking = false
   }
 
@@ -221,15 +221,15 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
         case i if i == slot => return Option(machine)
         case _ => return Option(ret)
       }
-    }
+                         }
     Option(ret)
   }
+
+  def getNumSlots = TileCyberBase.slotHeightMap(size)
 
   def yFromSlot(slot: Int): Int = yCoord + getBaseheight + slot
 
   def remainingSlots = getNumSlots - machinesList.lastOption.map(topSlotForMachine(_) + 1).getOrElse(0)
-
-  def getNumSlots = TileCyberBase.slotHeightMap(size)
 
   def buildMachine(name: String): Unit = {
     if (worldObj.isRemote) return
@@ -257,7 +257,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
               cin.formMultiBlock(worldObj, controllerLoc.x, controllerLoc.y, controllerLoc.z)
             case _ =>
           }
-        }
+                                                                                                 }
         machinesList += MachineMapping(freeSlot, controllerLoc)
       case _ =>
     }
@@ -364,10 +364,10 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     compound(TileCyberBase.COMPOUND_KEY ->
-      NBTCompound(
-        TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound)),
-        TileCyberBase.SIZE_KEY -> size)
-    )
+             NBTCompound(
+                          TileCyberBase.MACHINES_KEY -> NBTList(machinesList.map(NBTCompound)),
+                          TileCyberBase.SIZE_KEY -> size)
+            )
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
@@ -377,7 +377,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       machinesList ++= comp.NBTList(TileCyberBase.MACHINES_KEY).map(MachineMapping(_))
       size = comp.Int(TileCyberBase.SIZE_KEY)
       Unit
-    }
+                                                     }
   }
 
   override def decrStackSize(slot: Int, amt: Int): ItemStack = if (isController) indInventory.decrStackSize(slot, amt) else forwardToController[TileCyberBase, ItemStack](_.decrStackSize(slot, amt))

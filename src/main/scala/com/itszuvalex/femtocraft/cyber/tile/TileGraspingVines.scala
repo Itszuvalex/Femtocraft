@@ -5,17 +5,15 @@ import java.util.UUID
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.machine.MachineGraspingVines
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
-import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
+import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileFluidTank
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
@@ -26,7 +24,7 @@ import scala.collection.mutable
 object TileGraspingVines {
   @Configurable
   val DEFAULT_GRAB_RADIUS = 8f
-  val grabbedHashSet = new mutable.HashSet[UUID]()
+  val grabbedHashSet      = new mutable.HashSet[UUID]()
 
   val COMPOUND_IDLIST_KEY = "IDList"
 }
@@ -37,9 +35,9 @@ object TileGraspingVines {
 @Configurable
 class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
   var velocityAddition: Float = .2f
-  var grabRadius: Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
-  var entitySet = new mutable.HashSet[Entity]()
-  var clientSet = mutable.HashSet[Int]()
+  var grabRadius      : Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
+  var entitySet               = new mutable.HashSet[Entity]()
+  var clientSet               = mutable.HashSet[Int]()
 
   override def serverUpdate(): Unit = {
     findAndGrabEntities(grabRadius)
@@ -48,15 +46,15 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   def findAndGrabEntities(radius: Float): Unit = {
     getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
-      yCoord + 1f - radius,
-      zCoord + .5f - radius,
-      xCoord + .5f + radius,
-      yCoord + 1f + radius,
-      zCoord + .5f + radius))
-      .asInstanceOf[java.util.List[Entity]]
-      .view
-      .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + 1d, zCoord + .5d) <= radius * radius }
-      .foreach(grabEntity)
+                                                                                    yCoord + 1f - radius,
+                                                                                    zCoord + .5f - radius,
+                                                                                    xCoord + .5f + radius,
+                                                                                    yCoord + 1f + radius,
+                                                                                    zCoord + .5f + radius))
+    .asInstanceOf[java.util.List[Entity]]
+    .view
+    .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + 1d, zCoord + .5d) <= radius * radius }
+    .foreach(grabEntity)
   }
 
   def grabEntity(entity: Entity): Boolean = {
@@ -92,7 +90,12 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
         }
       }
       toRemove.foreach(removeEntity)
-    }
+                       }
+  }
+
+  override def invalidate(): Unit = {
+    super.invalidate()
+    grabbedSet.foreach(removeEntity)
   }
 
   def removeEntity(entity: Entity): Boolean = {
@@ -112,11 +115,6 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
       entitySet ++= entities
     }
     entitySet
-  }
-
-  override def invalidate(): Unit = {
-    super.invalidate()
-    grabbedSet.foreach(removeEntity)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
@@ -140,7 +138,7 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
       worldObj.setBlockToAir(info.x, info.y, info.z)
       return
     }
-    if(worldObj.isRemote) return
+    if (worldObj.isRemote) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
         te.breakMachinesUpwardsFromSlot(machineIndex)
@@ -163,11 +161,11 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(xCoord + .5f, yCoord + 1f, zCoord + .5f)
     AxisAlignedBB.getBoundingBox(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
+                                 center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
   }
 
   override def getCyberMachine = MachineGraspingVines.NAME

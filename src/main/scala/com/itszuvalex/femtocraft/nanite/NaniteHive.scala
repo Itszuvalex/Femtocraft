@@ -43,6 +43,11 @@ trait NaniteHive extends TileEntity with INaniteHive {
 
   override def getNodeLocs: Set[Loc4] = childrenNodeLocs
 
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    saveChildrenInfo(compound)
+  }
+
   def saveChildrenInfo(compound: NBTTagCompound) =
     compound(NaniteHive.HIVE_COMPOUND_KEY ->
              NBTCompound(
@@ -50,21 +55,16 @@ trait NaniteHive extends TileEntity with INaniteHive {
                         )
             )
 
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadChildrenInfo(compound)
+  }
+
   def loadChildrenInfo(compound: NBTTagCompound) = {
     compound.NBTCompound(NaniteHive.HIVE_COMPOUND_KEY) { comp =>
       childrenNodeLocs.clear()
       childrenNodeLocs ++= comp.NBTList(NaniteHive.NODE_CHILDREN_KEY).map(Loc4(_))
                                                        }
-  }
-
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    saveChildrenInfo(compound)
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadChildrenInfo(compound)
   }
 
 }

@@ -23,28 +23,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   workers += new TestWorker(this)
   val connections = new mutable.HashSet[Loc4]()
 
-  override def getConnections: Set[Loc4] = {
-    if (worldObj.isRemote) connections
-    else {
-      workers.flatMap(worker => if (worker.getTask == null) None else Option(worker.getTask.getProvider.getProviderLocation))
-    }
-  }
-
-
-  def saveConnectionInfo(compound: NBTTagCompound) =
-    compound("connections" ->
-             NBTCompound(
-                          "tagList" -> NBTList(getConnections.map(NBTCompound))
-                        )
-            )
-
-  def loadConnectionInfo(compound: NBTTagCompound) =
-    compound.NBTCompound("connections") { comp =>
-      connections.clear()
-      connections ++= comp.NBTList("tagList").map(Loc4(_))
-                                        }
-
-
   override def updateEntity(): Unit = {
     if (worldObj.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
@@ -61,12 +39,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   /**
     *
-    * @return Set of workers available to be assigned.
-    */
-  override def getProvidedWorkers: Set[IWorker] = workers
-
-  /**
-    *
     * @return Location of this worker provider, for use in distance calculations.
     */
   override def getProviderLocation = getLoc
@@ -80,7 +52,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
                                  center.y + 30,
                                  center.z + 30)
   }
-
 
   override def invalidate(): Unit = {
     super.invalidate()
@@ -101,11 +72,31 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     saveConnectionInfo(compound)
   }
 
+  def saveConnectionInfo(compound: NBTTagCompound) =
+    compound("connections" ->
+             NBTCompound(
+                          "tagList" -> NBTList(getConnections.map(NBTCompound))
+                        )
+            )
+
+  override def getConnections: Set[Loc4] = {
+    if (worldObj.isRemote) connections
+    else {
+      workers.flatMap(worker => if (worker.getTask == null) None else Option(worker.getTask.getProvider.getProviderLocation))
+    }
+  }
+
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     loadConnectionInfo(compound)
     setRenderUpdate()
   }
+
+  def loadConnectionInfo(compound: NBTTagCompound) =
+    compound.NBTCompound("connections") { comp =>
+      connections.clear()
+      connections ++= comp.NBTList("tagList").map(Loc4(_))
+                                        }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
@@ -117,6 +108,11 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     ret
   }
 
+  /**
+    *
+    * @return Set of workers available to be assigned.
+    */
+  override def getProvidedWorkers: Set[IWorker] = workers
 
   private class TestWorker(val provider: TileWorkerProviderTest) extends IWorker {
     var task: ITask = null
@@ -133,6 +129,15 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
       * @return The task the worker is assigned to, null otherwise.
       */
     override def getTask = task
+
+    /**
+      *
+      * @return Sets the worker to the assigned task.
+      */
+    override def setTask(task: ITask): Unit = {
+      this.task = task
+      provider.setUpdate()
+    }
 
     /**
       * Called every tick by the IWorkerProvider.
@@ -153,15 +158,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
       * @return The provider offering up this worker.
       */
     override def getProvider = provider
-
-    /**
-      *
-      * @return Sets the worker to the assigned task.
-      */
-    override def setTask(task: ITask): Unit = {
-      this.task = task
-      provider.setUpdate()
-    }
   }
 
 }

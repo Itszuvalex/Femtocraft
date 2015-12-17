@@ -24,24 +24,24 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
   ySize = 177
 
   val bufferSlotSize = tile.size + 1
-  val name = tile.size + "x" + tile.size + " Cyber Base"
-  val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth(name)) / 2, 7,
-    frender.getStringWidth(name), frender.FONT_HEIGHT,
-    name)
-  val inputSlots = {
-    for (i <- 0 until 9) yield new GuiItemStack(88 + 18 * (i % 3), 36 + 18 * (i / 3), null)
-  }.toSeq
+  val name           = tile.size + "x" + tile.size + " Cyber Base"
+  val nameLabel      = new GuiLabel((panelWidth - frender.getStringWidth(name)) / 2, 7,
+                                    frender.getStringWidth(name), frender.FONT_HEIGHT,
+                                    name)
+  val inputSlots     = {
+                         for (i <- 0 until 9) yield new GuiItemStack(88 + 18 * (i % 3), 36 + 18 * (i / 3), null)
+                       }.toSeq
 
   nameLabel.setShouldRender(false)
-  val bufferSlots = {
-    for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
-  }.toSeq
+  val bufferSlots   = {
+                        for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) yield new GuiItemStack(7 + 18 * (i % bufferSlotSize), 18 + 18 * (i / bufferSlotSize), null)
+                      }.toSeq
   val cybermassTank = new GuiFluidTank(151, 21, this, tile, 0, 3, FemtoFluids.cybermass, true)
 
   inputSlots.foreach(_.setShouldRender(false))
   bufferSlots.foreach(_.setShouldRender(false))
-  val bufferTank1 = new GuiFluidTank(176, 21, this, tile, 1, 3, null, true)
-  val buildButton = new GuiButton(171, 94, 45, 20, "Build Machine") {
+  val bufferTank1               = new GuiFluidTank(176, 21, this, tile, 1, 3, null, true)
+  val buildButton               = new GuiButton(171, 94, 45, 20, "Build Machine") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
       FemtoPacketHandler.INSTANCE.sendToServer(new MessageOpenGui(tile.info.x, tile.info.y, tile.info.z, tile.getWorldObj.provider.dimensionId, GuiIDs.CyberBaseBuildGuiID))
       true

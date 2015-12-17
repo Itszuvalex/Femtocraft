@@ -37,8 +37,8 @@ import scala.collection.Set
   * @param size Utility class for storing and saving/loading ItemStack[]s with ease.
   */
 class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with NBTSerializable {
-  @Saveable private var inventory      = new Array[ItemStack](size)
   private lazy      val inventoryCache = new IndexedInventoryCache(this)
+  @Saveable private var inventory      = new Array[ItemStack](size)
 
   def this() = this(0)
 
@@ -75,6 +75,16 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def setInventorySlotContents(i: Int, itemstack: ItemStack) {
     removeItemStack(inventory(i), i)
     addItemStack(itemstack, i)
+  }
+
+  override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
+    inventory(slot) = itemStack
+    inventoryCache.addItemStack(itemStack, slot)
+  }
+
+  override def removeItemStack(itemStack: ItemStack, slot: Int): Unit = {
+    inventory(slot) = null
+    inventoryCache.removeItemStack(itemStack, slot)
   }
 
   override def getInventoryName = "femto.BaseInventory.ImLazyAndDidntCodeThis"
@@ -115,17 +125,9 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
     invalidateCache()
   }
 
+  override def invalidateCache() = inventoryCache.invalidateCache()
+
   def getComparatorInputOverride = Container.calcRedstoneFromInventory(this)
-
-  override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
-    inventory(slot) = itemStack
-    inventoryCache.addItemStack(itemStack, slot)
-  }
-
-  override def removeItemStack(itemStack: ItemStack, slot: Int): Unit = {
-    inventory(slot) = null
-    inventoryCache.removeItemStack(itemStack, slot)
-  }
 
   override def getSlotsByOreID(id: Int) = inventoryCache.getSlotsByOreID(id)
 
@@ -140,8 +142,6 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def rebuildCache() = inventoryCache.rebuildCache()
 
   override def getSlotsByItemID(id: Int) = inventoryCache.getSlotsByItemID(id)
-
-  override def invalidateCache() = inventoryCache.invalidateCache()
 
   override def isCacheValid = inventoryCache.isCacheValid
 

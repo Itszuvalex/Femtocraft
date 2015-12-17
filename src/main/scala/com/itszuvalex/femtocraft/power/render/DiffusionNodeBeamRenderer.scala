@@ -12,9 +12,9 @@ import net.minecraft.util.ResourceLocation
   * Created by Christopher on 8/29/2015.
   */
 object DiffusionNodeBeamRenderer {
-  private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/diffusion_particles_colored.png")
   val BEAM_WIDTH    = .1f
   val RENDER_RADIUS = 64
+  private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/diffusion_particles_colored.png")
 }
 
 trait DiffusionNodeBeamRenderer extends TileEntitySpecialRenderer with PowerBeamRenderer {

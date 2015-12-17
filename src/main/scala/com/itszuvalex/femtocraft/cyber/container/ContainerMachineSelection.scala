@@ -11,7 +11,7 @@ import scala.collection.JavaConversions._
   * Created by Alex on 15.10.2015.
   */
 class ContainerMachineSelection(val tile: TileCyberBase) extends ContainerBase {
-  var slots =  -1
+  var slots = -1
 
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()

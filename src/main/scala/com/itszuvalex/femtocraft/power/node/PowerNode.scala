@@ -23,32 +23,14 @@ object PowerNode {
 
 
 trait PowerNode extends TileEntity with IPowerNode {
-  var parentLoc   : Loc4 = null
   val childrenLocs       = mutable.HashSet[Loc4]()
+  var parentLoc   : Loc4 = null
   var powerCurrent: Long = 0
   var powerMax    : Long = 0
   var color              = Color(255.toByte,
                                  (Random.nextInt(125) + 130).toByte,
                                  (Random.nextInt(125) + 130).toByte,
                                  (Random.nextInt(125) + 130).toByte).toInt
-
-  def savePowerConnectionInfo(compound: NBTTagCompound) =
-    compound(PowerNode.POWER_COMPOUND_KEY ->
-             NBTCompound(
-                          PowerNode.NODE_PARENT_KEY -> getParentLoc,
-                          PowerNode.NODE_CHILDREN_KEY -> NBTList(getChildrenLocs.view.map(NBTCompound)),
-                          PowerNode.COLOR_KEY -> getColor
-                        )
-            )
-
-  def loadPowerConnectionInfo(compound: NBTTagCompound) = {
-    compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
-      color = comp.Int(PowerNode.COLOR_KEY)
-      parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
-      childrenLocs.clear()
-      childrenLocs ++= comp.NBTList(PowerNode.NODE_CHILDREN_KEY).map(Loc4(_))
-                                                       }
-  }
 
   def onBlockBreak() = {
     PowerManager.removeNode(this)
@@ -58,6 +40,21 @@ trait PowerNode extends TileEntity with IPowerNode {
     if (children != null) children.foreach(_.setParent(null))
   }
 
+  /**
+    *
+    * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
+    */
+  override def getParent: IPowerNode = if (parentLoc == null) null
+  else parentLoc.getTileEntity(true) match {
+    case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
+    case _ => null
+  }
+
+  /**
+    *
+    * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
+    */
+  override def getChildren = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: IPowerNode => node }
 
   /* Tile Entity */
   override def validate(): Unit = {
@@ -75,12 +72,52 @@ trait PowerNode extends TileEntity with IPowerNode {
     savePowerConnectionInfo(compound)
   }
 
+  def savePowerConnectionInfo(compound: NBTTagCompound) =
+    compound(PowerNode.POWER_COMPOUND_KEY ->
+             NBTCompound(
+                          PowerNode.NODE_PARENT_KEY -> getParentLoc,
+                          PowerNode.NODE_CHILDREN_KEY -> NBTList(getChildrenLocs.view.map(NBTCompound)),
+                          PowerNode.COLOR_KEY -> getColor
+                        )
+            )
+
+  /* IPowerNode */
+
+  /**
+    *
+    * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
+    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
+    *         the chunk.
+    */
+  override def getChildrenLocs: Set[Loc4] = childrenLocs
+
+  /**
+    *
+    * @return The color of this power node.  This is used for aesthetics.
+    */
+  override def getColor: Int = color
+
+  /**
+    *
+    * @return Loc4 of this node's parent, null if it has no parent.  This is primarily to bypass chunk churn, as a node may have a parent set but the parent is in an unloaded chunk.  If that is the case, then
+    *         it can return its parent location here, without having to explicitly load that chunk.
+    */
+  override def getParentLoc: Loc4 = parentLoc
+
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     loadPowerConnectionInfo(compound)
   }
 
-  /* IPowerNode */
+  def loadPowerConnectionInfo(compound: NBTTagCompound) = {
+    compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
+      color = comp.Int(PowerNode.COLOR_KEY)
+      parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
+      childrenLocs.clear()
+      childrenLocs ++= comp.NBTList(PowerNode.NODE_CHILDREN_KEY).map(Loc4(_))
+                                                       }
+  }
+
   /**
     *
     * @param child
@@ -91,7 +128,6 @@ trait PowerNode extends TileEntity with IPowerNode {
     childrenLocs += child.getNodeLoc
     true
   }
-
 
   /**
     *
@@ -121,7 +157,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     * @param parent IPowerNode that is being checked.
     * @return True if this node is capable of having that node as a parent.
     */
-  override def canAddParent(parent: IPowerNode): Boolean = {
+  override def canSetParent(parent: IPowerNode): Boolean = {
     parent != null && !childrenLocs.contains(parent.getNodeLoc)
   }
 
@@ -166,16 +202,6 @@ trait PowerNode extends TileEntity with IPowerNode {
 
   /**
     *
-    * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
-    */
-  override def getParent: IPowerNode = if (parentLoc == null) null
-  else parentLoc.getTileEntity(true) match {
-    case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
-    case _ => null
-  }
-
-  /**
-    *
     * @param amount Amount of power to consume.
     * @param doUse True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
@@ -195,20 +221,6 @@ trait PowerNode extends TileEntity with IPowerNode {
 
   /**
     *
-    * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
-    */
-  override def getChildren: Iterable[IPowerNode] = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: IPowerNode => node }
-
-  /**
-    *
-    * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
-    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
-    *         the chunk.
-    */
-  override def getChildrenLocs: Set[Loc4] = childrenLocs
-
-  /**
-    *
     * @return Maximum distance children can be from this node, to connect.
     */
   override def childrenConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
@@ -225,17 +237,4 @@ trait PowerNode extends TileEntity with IPowerNode {
       powerCurrent += min
     min
   }
-
-  /**
-    *
-    * @return The color of this power node.  This is used for aesthetics.
-    */
-  override def getColor: Int = color
-
-  /**
-    *
-    * @return Loc4 of this node's parent, null if it has no parent.  This is primarily to bypass chunk churn, as a node may have a parent set but the parent is in an unloaded chunk.  If that is the case, then
-    *         it can return its parent location here, without having to explicitly load that chunk.
-    */
-  override def getParentLoc: Loc4 = parentLoc
 }

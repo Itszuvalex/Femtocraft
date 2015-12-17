@@ -38,5 +38,5 @@ trait ICrystalMount extends IPowerNode {
     *
     * @return Set of all locations that have pedestal connections.
     */
-  def getPedestalDirections: scala.collection.Set[Loc4]
+  def getPedestalLocations: scala.collection.Set[Loc4]
 }

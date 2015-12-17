@@ -17,8 +17,6 @@ class MultiblockCrystallizationChamber extends IFrameMultiblock {
   override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int): Boolean =
     getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
-  override def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean = getTakenLocations(world, x, y, z).forall(loc => world.setBlock(x, y, z, FemtoBlocks.blockCrystallizationChamber))
-
   override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
                                                                                       for {
                                                                                         lx <- -2 to 2
@@ -26,6 +24,8 @@ class MultiblockCrystallizationChamber extends IFrameMultiblock {
                                                                                         lz <- -1 to 1
                                                                                       } yield Loc4(x + lx, y + ly, z + lz, world.provider.dimensionId)
                                                                                     }.toSet
+
+  override def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean = getTakenLocations(world, x, y, z).forall(loc => world.setBlock(x, y, z, FemtoBlocks.blockCrystallizationChamber))
 
   override def getName = "Crystallization Chamber"
 

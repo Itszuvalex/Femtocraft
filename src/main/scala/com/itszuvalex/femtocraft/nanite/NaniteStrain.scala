@@ -29,29 +29,29 @@ object NaniteStrain {
   val EXPERIENCE_CURRENT_TAG          = "Experience"
   val TRAITS_COMPOUND_TAG             = "Traits"
 
+  def getNanite(item: ItemStack) = getNaniteTag(item).map(_.getString(NANITE_TAG)).orNull
+
   def getNaniteTag(item: ItemStack): Option[NBTTagCompound] = {
     if (item == null) return None
     if (item.stackTagCompound == null || item.stackTagCompound.hasNoTags) return None
     Option(item.stackTagCompound.getCompoundTag(NANITE_STRAIN_DATA_COMPOUND_TAG))
   }
 
-  def getNanite(item: ItemStack) = getNaniteTag(item).map(_.getString(NANITE_TAG)).orNull
-
   def setNanite(item: ItemStack, nanite: String) = getNaniteTag(item).foreach(_.setString(NANITE_TAG, nanite))
-
-  def getExperienceTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG))
-
-  def getTraitsTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(TRAITS_COMPOUND_TAG))
 
   def getLevel(item: ItemStack) = getExperienceTag(item).map(_.getInteger(LEVEL_TAG)).getOrElse(0)
 
   def setLevel(item: ItemStack, level: Int) = getExperienceTag(item).foreach(_.setInteger(LEVEL_TAG, level))
+
+  def getExperienceTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG))
 
   def getExperience(item: ItemStack) = getExperienceTag(item).map(_.getInteger(EXPERIENCE_CURRENT_TAG)).getOrElse(0)
 
   def setExperience(item: ItemStack, exp: Int) = getExperienceTag(item).foreach(_.setInteger(EXPERIENCE_CURRENT_TAG, exp))
 
   def getTraits(item: ItemStack, traitType: String) = getTraitsTag(item).map(_.getCompoundTag(traitType)).map(_.func_150296_c().asInstanceOf[java.util.Set[String]]).get
+
+  def getTraitsTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(TRAITS_COMPOUND_TAG))
 
   def getTraits(item: ItemStack) = getTraitsTag(item).map { traitsCompound =>
     traitsCompound.func_150296_c().asInstanceOf[java.util.Set[String]].map(traitsCompound.getCompoundTag).flatMap(_.func_150296_c().asInstanceOf[java.util.Set[String]])

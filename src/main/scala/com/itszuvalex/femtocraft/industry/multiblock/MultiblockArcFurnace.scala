@@ -19,15 +19,6 @@ class MultiblockArcFurnace extends IFrameMultiblock {
   override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int) =
     getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
-  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
-                                                                                      for {
-                                                                                        bx <- 0 until 2
-                                                                                        by <- 0 until 3
-                                                                                        bz <- 0 until 2
-                                                                                      } yield Loc4(x + bx, y + by, z + bz, world.provider.dimensionId)
-                                                                                    }.toSet
-
-
   override def formAtLocation(world: World, x: Int, y: Int, z: Int) = {
     val locations = getTakenLocations(world, x, y, z)
     if (locations.forall(loc => world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockArcFurnace))) {
@@ -36,6 +27,14 @@ class MultiblockArcFurnace extends IFrameMultiblock {
     }
     else false
   }
+
+  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
+                                                                                      for {
+                                                                                        bx <- 0 until 2
+                                                                                        by <- 0 until 3
+                                                                                        bz <- 0 until 2
+                                                                                      } yield Loc4(x + bx, y + by, z + bz, world.provider.dimensionId)
+                                                                                    }.toSet
 
   override def getName = "Arc Furnace"
 

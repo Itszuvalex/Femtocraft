@@ -17,28 +17,28 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 15.10.2015.
   */
 object GuiMachineSelection {
-  val texture = Resources.TexGui("GuiMachineSelector.png")
-  val xSelectionMin = 7
-  val ySelectionMin = 7
+  val texture         = Resources.TexGui("GuiMachineSelector.png")
+  val xSelectionMin   = 7
+  val ySelectionMin   = 7
   val SelectionHeight = 108
-  val SelectionWidth = 212
-  val WIDTH = 225
-  val HEIGHT = 166
+  val SelectionWidth  = 212
+  val WIDTH           = 225
+  val HEIGHT          = 166
 
   class GuiMachineSelector(val gui: GuiMachineSelection, val machine: ICyberMachine) extends GuiButton(0, 0, SelectionWidth, SelectionHeight / 4) {
     var isSelected = false
 
     add(
-      new GuiLabel(2, 2,
-        panelWidth - 40, panelHeight / 2, machine.getName
-      ),
-      new GuiFlowLayout(2, panelHeight - 19, panelWidth - 4, panelHeight / 2,
-        machine.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
-      new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass), 2,
-        Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass),
-        Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT,
-        "Cybermass: " + machine.getRequiredCybermass)
-    )
+         new GuiLabel(2, 2,
+                      panelWidth - 40, panelHeight / 2, machine.getName
+                     ),
+         new GuiFlowLayout(2, panelHeight - 19, panelWidth - 4, panelHeight / 2,
+                           machine.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
+         new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass), 2,
+                      Minecraft.getMinecraft.fontRenderer.getStringWidth("Cybermass: " + machine.getRequiredCybermass),
+                      Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT,
+                      "Cybermass: " + machine.getRequiredCybermass)
+       )
 
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       if (super.onMouseClick(mouseX, mouseY, button)) {
@@ -71,15 +71,13 @@ object GuiMachineSelection {
 class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCyberBase) extends GuiBase(new ContainerMachineSelection(te)) {
   val container = this.inventorySlots.asInstanceOf[ContainerMachineSelection]
 
-  val thisgui = this
-  var lastSlotNum = -1
-
+  val thisgui     = this
   val selectionFlow =
     new GuiFlowLayout(GuiMachineSelection.xSelectionMin,
-      GuiMachineSelection.ySelectionMin,
-      GuiMachineSelection.SelectionWidth,
-      GuiMachineSelection.SelectionHeight
-    ) {
+                      GuiMachineSelection.ySelectionMin,
+                      GuiMachineSelection.SelectionWidth,
+                      GuiMachineSelection.SelectionHeight
+                     ) {
       def refresh() = {
         subElements.clear()
         val machines = CyberMachineRegistry.getMachinesThatFitIn(te.size, lastSlotNum)
@@ -89,22 +87,23 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
         layoutElements()
       }
     }
+  val pageLabel = new GuiLabel((GuiMachineSelection.WIDTH - 100) / 2,
+                               GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
+                               100, 10, "")
 
   xSize = GuiMachineSelection.WIDTH
   ySize = GuiMachineSelection.HEIGHT
-  val pageLabel = new GuiLabel((GuiMachineSelection.WIDTH - 100) / 2,
-    GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
-    100, 10, "")
+  val slotLabel                    = new GuiLabel(2,
+                                                  GuiMachineSelection.SelectionHeight - 20,
+                                                  100, 10, "")
 
   selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
+  var lastSlotNum = -1
   var selected: GuiMachineSelector = null
-    val slotLabel = new GuiLabel(2,
-                                 GuiMachineSelection.SelectionHeight - 20,
-                                 100, 10, "")
 
   refreshPageLabelText()
 
-//    refreshSlotLabelText()
+  //    refreshSlotLabelText()
 
   def selectMultiblock(machine: GuiMachineSelector) = {
     if (selected != null) selected.setSelected(false)
@@ -112,52 +111,52 @@ class GuiMachineSelection(player: EntityPlayer, inv: InventoryPlayer, te: TileCy
     selected = machine
   }
 
-//    private def refreshSlotLabelText() = {
-//      slotLabel.text = "Free Slots:" + container.slots + " of " + TileCyberBase.slotHeightMap(te.size)
-//    }
+  //    private def refreshSlotLabelText() = {
+  //      slotLabel.text = "Free Slots:" + container.slots + " of " + TileCyberBase.slotHeightMap(te.size)
+  //    }
 
   add(selectionFlow,
-    new GuiButton(GuiMachineSelection.xSelectionMin,
-      GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
-      10, 10, "^") {
-      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
-        selectionFlow.pageBackward()
-        true
-      } else false
+      new GuiButton(GuiMachineSelection.xSelectionMin,
+                    GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
+                    10, 10, "^") {
+        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
+          selectionFlow.pageBackward()
+          true
+        } else false
 
-      override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
-    },
-    pageLabel,
-//          slotLabel,
-    new GuiButton((GuiMachineSelection.WIDTH - 100) / 2,
-      GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 15,
-      100, 12, "Clear Selection") {
-      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
-        if (super.onMouseClick(mouseX, mouseY, button)) {
-          clearSelection()
+        override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
+      },
+      pageLabel,
+      //          slotLabel,
+      new GuiButton((GuiMachineSelection.WIDTH - 100) / 2,
+                    GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 15,
+                    100, 12, "Clear Selection") {
+        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
+          if (super.onMouseClick(mouseX, mouseY, button)) {
+            clearSelection()
+            true
+          } else false
+        }
+      },
+      new GuiButton(GuiMachineSelection.WIDTH - GuiMachineSelection.xSelectionMin - 10,
+                    GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
+                    10, 10, "v") {
+        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
+          selectionFlow.pageForward()
+          true
+        } else false
+
+        override def isDisabled: Boolean = selectionFlow.subElements.lastOption.map(_.shouldRender).getOrElse(true)
+      },
+      new GuiButton((GuiMachineSelection.WIDTH - 100) / 2,
+                    GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 30,
+                    100, 12, "Build Machine") {
+        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
+          buildMachine()
           true
         } else false
       }
-    },
-    new GuiButton(GuiMachineSelection.WIDTH - GuiMachineSelection.xSelectionMin - 10,
-      GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 4,
-      10, 10, "v") {
-      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
-        selectionFlow.pageForward()
-        true
-      } else false
-
-      override def isDisabled: Boolean = selectionFlow.subElements.lastOption.map(_.shouldRender).getOrElse(true)
-    },
-    new GuiButton((GuiMachineSelection.WIDTH - 100) / 2,
-      GuiMachineSelection.ySelectionMin + GuiMachineSelection.SelectionHeight + 30,
-      100, 12, "Build Machine") {
-      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
-        buildMachine()
-        true
-      } else false
-    }
-  )
+     )
 
   def buildMachine(): Unit = {
     if (selected != null) FemtoPacketHandler.INSTANCE.sendToServer(new MessageBuildMachine(te.xCoord, te.yCoord, te.zCoord, te.getWorldObj.provider.dimensionId, selected.machine.getName))

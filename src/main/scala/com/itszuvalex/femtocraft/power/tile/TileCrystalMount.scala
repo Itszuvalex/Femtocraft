@@ -1,8 +1,9 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.power.{IPowerCrystal, ICrystalMount, PowerManager}
+import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.power.node._
+import com.itszuvalex.femtocraft.power.{ICrystalMount, PowerManager}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.core.{BaseInventory, TileEntityBase}
@@ -30,15 +31,9 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   /**
     *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  override def getCrystalStack = getStackInSlot(0)
-
-  /**
-    *
     * @return Set of all locations that have pedestal connections.
     */
-  override def getPedestalDirections: Set[Loc4] = pedestalLocs
+  override def getPedestalLocations: Set[Loc4] = pedestalLocs
 
   /**
     *
@@ -73,35 +68,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   /**
     *
-    * @param parent IPowerNode that is being checked.
-    * @return True if this node is capable of having that node as a parent.
-    */
-  override def canAddParent(parent: IPowerNode): Boolean = getType match {
-    case IPowerNode.GENERATION_NODE => GenerationNode.canAddParent(parent)
-    case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
-    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
-    case _ => false
-  }
-
-  override def hasDescription: Boolean = true
-
-  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    slot == 0 && (item == null || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
-  }
-
-
-  override def markDirty(): Unit = {
-    super.markDirty()
-    setModified()
-    setUpdate()
-    getCrystalStack match {
-      case null => PowerManager.removeNode(this)
-      case _ => PowerManager.addNode(this)
-    }
-  }
-
-  /**
-    *
     * @return The type of PowerNode this is.
     */
   override def getType: String = getCrystalStack match {
@@ -116,6 +82,40 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
         case _ => null
       }
     case _ => null
+  }
+
+  /**
+    *
+    * @return Crystal ItemStack.  Null if no crystal.
+    */
+  override def getCrystalStack = getStackInSlot(0)
+
+  /**
+    *
+    * @param parent IPowerNode that is being checked.
+    * @return True if this node is capable of having that node as a parent.
+    */
+  override def canSetParent(parent: IPowerNode): Boolean = getType match {
+    case IPowerNode.GENERATION_NODE => GenerationNode.canAddParent(parent)
+    case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
+    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
+    case _ => false
+  }
+
+  override def hasDescription: Boolean = true
+
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
+    slot == 0 && (item == null || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
+  }
+
+  override def markDirty(): Unit = {
+    super.markDirty()
+    setModified()
+    setUpdate()
+    getCrystalStack match {
+      case null => PowerManager.removeNode(this)
+      case _ => PowerManager.addNode(this)
+    }
   }
 
   override def defaultInventory: BaseInventory = new BaseInventory(1)

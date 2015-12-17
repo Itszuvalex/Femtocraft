@@ -46,15 +46,9 @@ object ItemFrame {
 
 
 class ItemFrame extends Item with IFrameItem {
-  override def getFrameType(stack: ItemStack) = "Basic"
-
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
-
   override def setSelectedMultiblock(stack: ItemStack, name: String) = ItemFrame.setSelection(stack, name)
 
-
   override def renderID: Int = RenderIDs.framePreviewableID
-
 
   override def onItemRightClick(item: ItemStack, world: World, player: EntityPlayer): ItemStack = {
     if (player.isSneaking) {
@@ -65,7 +59,6 @@ class ItemFrame extends Item with IFrameItem {
       super.onItemRightClick(item, world, player)
   }
 
-
   override def addInformation(stack: ItemStack, player: EntityPlayer, tooltip: util.List[_], advanced: Boolean): Unit = {
     super.addInformation(stack, player, tooltip, advanced)
     val list = tooltip.asInstanceOf[util.List[String]]
@@ -73,6 +66,10 @@ class ItemFrame extends Item with IFrameItem {
     val selected = getSelectedMultiblock(stack)
     list.add("Selected: " + (if (selected == null || selected.isEmpty) "none" else selected))
   }
+
+  override def getFrameType(stack: ItemStack) = "Basic"
+
+  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)

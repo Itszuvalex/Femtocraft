@@ -36,6 +36,10 @@ object TileFrame {
 
   def getRenderMark(i: Int, j: Int, k: Int, renderInt: Int) = (renderInt & (1 << TileFrame.getSaveableIndentation(i, j, k))) > 0
 
+  def getSaveableIndentation(i: Int, j: Int, k: Int) = {
+    19 - (12 * i) - (4 * j) - k
+  }
+
   def setRenderMark(bool: Boolean, i: Int, j: Int, k: Int, marker: Int): Int = {
     val num = marker
     val i1 = 1 << getSaveableIndentation(i, j, k)
@@ -76,10 +80,6 @@ object TileFrame {
       case (_, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 14, 15)
       case _ => fullRender(false)
     }
-  }
-
-  def getSaveableIndentation(i: Int, j: Int, k: Int) = {
-    19 - (12 * i) - (4 * j) - k
   }
 
 }
@@ -141,8 +141,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     renderInt = TileFrame.setRenderMark(bool, i, j, k, renderInt)
   }
 
-  override def getMod: AnyRef = Femtocraft
-
   override def hasDescription: Boolean = isValidMultiBlock
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
@@ -176,7 +174,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     setRenderUpdate()
   }
 
-
   def onBlockBreak(): Unit = {
     if (getWorldObj.isRemote) return
 
@@ -202,7 +199,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     }
   }
 
-
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     if (hasGUI) {
       par5EntityPlayer.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
@@ -210,6 +206,8 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     }
     else false
   }
+
+  override def getMod: AnyRef = Femtocraft
 
   override def hasGUI: Boolean = isValidMultiBlock
 

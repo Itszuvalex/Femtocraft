@@ -1,7 +1,8 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.power.{IPowerCrystal, ICrystalMount, IPowerPedestal}
+import com.itszuvalex.femtocraft.power.item.IPowerCrystal
+import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal}
 import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -46,12 +47,6 @@ import net.minecraftforge.common.util.ForgeDirection
 
   /**
     *
-    * @return Location of the mount this is connected to.  UNKNOWN otherwise.
-    */
-  override def mountLoc: Loc4 = mountLocation
-
-  /**
-    *
     * @param amount Amount of power to store.
     * @param doStore Pass true to actually consume resources.  False simulates the store.
     * @return Amount of @amount successfully stored.
@@ -86,6 +81,12 @@ import net.minecraftforge.common.util.ForgeDirection
     }
     case _ => TilePowerPedestal.MAX_STORE
   }
+
+  /**
+    *
+    * @return Location of the mount this is connected to.  UNKNOWN otherwise.
+    */
+  override def mountLoc: Loc4 = mountLocation
 
   /**
     *

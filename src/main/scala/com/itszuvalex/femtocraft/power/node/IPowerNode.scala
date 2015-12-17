@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power.node
 
+import com.itszuvalex.femtocraft.graph.{IManyChildNode, ISingleParentNode}
 import com.itszuvalex.itszulib.api.core.Loc4
 
 /**
@@ -14,7 +15,7 @@ object IPowerNode {
   val DEFAULT_MAX_RADIUS    = 32f
 }
 
-trait IPowerNode {
+trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowerNode] {
 
   /**
     *
@@ -26,7 +27,7 @@ trait IPowerNode {
     *
     * @return The IPowerNode this has as its parent.  If this is of type 'Generation', this will be itself.
     */
-  def getParent: IPowerNode
+  override def getParent: IPowerNode
 
   /**
     *
@@ -40,14 +41,14 @@ trait IPowerNode {
     * @param parent IPowerNode that is being checked.
     * @return True if this node is capable of having that node as a parent.
     */
-  def canAddParent(parent: IPowerNode): Boolean
+  override def canSetParent(parent: IPowerNode): Boolean
 
   /**
     *
     * @param parent Parent being set.
     * @return True if parent is successfully set to input parent.
     */
-  def setParent(parent: IPowerNode): Boolean
+  override def setParent(parent: IPowerNode): Boolean
 
   /**
     *
@@ -59,7 +60,7 @@ trait IPowerNode {
     *
     * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
     */
-  def getChildren: Iterable[IPowerNode]
+  override def getChildren: scala.collection.Set[IPowerNode]
 
   /**
     *
@@ -74,21 +75,21 @@ trait IPowerNode {
     * @param child
     * @return True if child is capable of being a child of this node.
     */
-  def canAddChild(child: IPowerNode): Boolean
+  override def canAddChild(child: IPowerNode): Boolean
 
   /**
     *
     * @param child
     * @return True if child is successfully added.
     */
-  def addChild(child: IPowerNode): Boolean
+  override def addChild(child: IPowerNode): Boolean
 
   /**
     *
     * @param child
     * @return True if child was a child of this node, and was successfully removed.
     */
-  def removeChild(child: IPowerNode): Boolean
+  override def removeChild(child: IPowerNode): Boolean
 
   /**
     *

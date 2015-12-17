@@ -40,8 +40,6 @@ import scala.collection.Set
     setRenderUpdate()
   }
 
-  protected def hiveRadius = TileNaniteHiveSmall.HIVE_RADIUS
-
   override def getMod: AnyRef = Femtocraft
 
   override def getGuiID: Int = GuiIDs.NaniteHiveGuiID
@@ -53,6 +51,8 @@ import scala.collection.Set
     * @return Maximum distance children can be from this node, to connect.
     */
   override def childrenConnectionRadius = hiveRadius
+
+  protected def hiveRadius = TileNaniteHiveSmall.HIVE_RADIUS
 
   /**
     *

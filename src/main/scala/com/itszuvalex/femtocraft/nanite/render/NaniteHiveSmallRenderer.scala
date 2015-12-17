@@ -49,6 +49,9 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
       case _ =>
     }
 
+  def preRender() = {
+    Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveTexLocation)
+  }
 
   override def getRenderId: Int = RenderIDs.naniteHiveSmallID
 
@@ -68,9 +71,5 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
 
   override def renderWorldBlock(world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, modelId: Int, renderer: RenderBlocks): Boolean = {
     false
-  }
-
-  def preRender() = {
-    Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveTexLocation)
   }
 }

@@ -10,8 +10,6 @@ import scala.collection._
 object FrameMultiblockRegistry {
   private val frameMap = mutable.HashMap[String, IFrameMultiblock]()
 
-  def registerMultiblock(multi: IFrameMultiblock) = frameMap.put(multi.getName, multi)
-
   def getMultiblock(name: String) = frameMap.get(name)
 
   def getMultiblocksForFrameType(ftype: String) = frameMap.values.filter(_.getAllowedFrameTypes.contains(ftype))
@@ -21,4 +19,6 @@ object FrameMultiblockRegistry {
     registerMultiblock(new MultiblockCentrifuge)
     registerMultiblock(new MultiblockCrystallizationChamber)
   }
+
+  def registerMultiblock(multi: IFrameMultiblock) = frameMap.put(multi.getName, multi)
 }

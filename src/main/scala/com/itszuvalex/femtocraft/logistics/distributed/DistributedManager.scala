@@ -31,23 +31,6 @@ object DistributedManager {
     seekNewTasks(provider)
   }
 
-  /**
-    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
-    *
-    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
-    */
-  def onTaskEnd(task: ITask): Unit = {
-    val taskProvider = task.getProvider
-    val workerProviders = new mutable.HashSet[IWorkerProvider]()
-    task.getWorkers.foreach { worker =>
-      task.removeWorker(worker)
-      worker.setTask(null)
-      workerProviders += worker.getProvider
-                            }
-    refreshTaskStatus(taskProvider)
-    workerProviders.foreach(seekNewTasks(_))
-  }
-
   def seekNewTasks(provider: IWorkerProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
     var orderingFunc = taskOrderingFunction
     if (orderingFunc == null) {
@@ -86,6 +69,20 @@ object DistributedManager {
                              }
     refreshWorkerStatus(provider)
     taskProviders.foreach(refreshTaskStatus)
+  }
+
+  def refreshWorkerStatus(provider: IWorkerProvider) = {
+    if (provider.getProvidedWorkers.exists(_.getTask == null))
+      availableWorkersTracker.trackLocation(provider.getProviderLocation)
+    else
+      availableWorkersTracker.removeLocation(provider.getProviderLocation)
+  }
+
+  def refreshTaskStatus(provider: ITaskProvider) = {
+    if (provider.getActiveTasks.exists { task => task.getWorkers.size < task.getWorkerCap })
+      availableTasksTracker.trackLocation(provider.getProviderLocation)
+    else
+      availableTasksTracker.removeLocation(provider.getProviderLocation)
   }
 
   def seekNewWorkers(provider: ITaskProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
@@ -128,18 +125,21 @@ object DistributedManager {
     workerProviders.foreach(refreshWorkerStatus)
   }
 
-  def refreshWorkerStatus(provider: IWorkerProvider) = {
-    if (provider.getProvidedWorkers.exists(_.getTask == null))
-      availableWorkersTracker.trackLocation(provider.getProviderLocation)
-    else
-      availableWorkersTracker.removeLocation(provider.getProviderLocation)
-  }
-
-  def refreshTaskStatus(provider: ITaskProvider) = {
-    if (provider.getActiveTasks.exists { task => task.getWorkers.size < task.getWorkerCap })
-      availableTasksTracker.trackLocation(provider.getProviderLocation)
-    else
-      availableTasksTracker.removeLocation(provider.getProviderLocation)
+  /**
+    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
+    *
+    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
+    */
+  def onTaskEnd(task: ITask): Unit = {
+    val taskProvider = task.getProvider
+    val workerProviders = new mutable.HashSet[IWorkerProvider]()
+    task.getWorkers.foreach { worker =>
+      task.removeWorker(worker)
+      worker.setTask(null)
+      workerProviders += worker.getProvider
+                            }
+    refreshTaskStatus(taskProvider)
+    workerProviders.foreach(seekNewTasks(_))
   }
 
   def removeTaskProvider(provider: ITaskProvider) = {

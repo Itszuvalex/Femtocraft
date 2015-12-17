@@ -1,13 +1,9 @@
 package com.itszuvalex.femtocraft.cyber.machine
 
-import java.util.Random
-
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.cyber.ICyberMachine
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines}
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.util.InventoryUtils
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
@@ -19,6 +15,7 @@ import net.minecraftforge.fluids.FluidStack
 object MachineGraspingVines {
   val NAME = "Grasping Vines"
 }
+
 class MachineGraspingVines extends ICyberMachine {
   /**
     * @return Name of the machine
@@ -73,7 +70,7 @@ class MachineGraspingVines extends ICyberMachine {
           te.formMultiBlock(world, mx, my, mz)
         case _ =>
       }
-    }
+                                                 }
   }
 
   override def getRequiredCybermass: Int = 0
@@ -88,8 +85,8 @@ class MachineGraspingVines extends ICyberMachine {
   override def breakMachine(world: World, x: Int, y: Int, z: Int): Unit = {
     getTakenLocations(world, x, y, z).foreach { loc =>
       world.setBlockToAir(loc.x, loc.y, loc.z)
-    }
-//    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
+                                              }
+    //    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
 
   override def getRequiredBaseSize = 1

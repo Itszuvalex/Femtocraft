@@ -42,8 +42,6 @@ class MachineBioBeacon extends ICyberMachine {
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.bioBeaconID
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq()
-
   /**
     * Function for accepting fluid broadcasts.
     * @param fluid Fluid broadcasted
@@ -92,6 +90,8 @@ class MachineBioBeacon extends ICyberMachine {
                                               }
     getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
   }
+
+  override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq()
 
   override def getRequiredBaseSize = 1
 }

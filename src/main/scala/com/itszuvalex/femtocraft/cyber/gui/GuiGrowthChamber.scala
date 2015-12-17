@@ -18,17 +18,14 @@ object GuiGrowthChamber {
 
 class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileGrowthChamber) extends GuiBase(new ContainerGrowthChamber(player, inv, tile)) {
 
-  def frender = Minecraft.getMinecraft.fontRenderer
-
   val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth("Growth Chamber")) / 2, 7,
                                frender.getStringWidth("Growth Chamber"), frender.FONT_HEIGHT,
                                "Growth Chamber")
-
   val inputSlot = new GuiItemStack(7, 20)
-
   val outputSlots = {for (i <- 0 to 8) yield new GuiItemStack(79 + 18 * (i % 3), 20 + 18 * math.floor(i / 3d).toInt)}
-
   val waterTank = new GuiFluidTank(151, 10, this, tile, 3, FluidRegistry.WATER, true)
+
+  def frender = Minecraft.getMinecraft.fontRenderer
 
   {
     val elems = List(inputSlot, waterTank) ++ outputSlots

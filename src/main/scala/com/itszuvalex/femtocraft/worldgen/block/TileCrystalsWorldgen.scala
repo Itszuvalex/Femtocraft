@@ -39,11 +39,6 @@ class TileCrystalsWorldgen extends TileEntityBase with TileDescriptionPacket {
     writeColorData(compound)
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    writeColorData(compound)
-  }
-
   private def writeColorData(compound: NBTTagCompound) =
     compound(
               COLOR_COMPOUND_KEY ->
@@ -52,6 +47,11 @@ class TileCrystalsWorldgen extends TileEntityBase with TileDescriptionPacket {
                            COLOR_OFFSET_KEY -> colorOffsets
                          )
             )
+
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    writeColorData(compound)
+  }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
