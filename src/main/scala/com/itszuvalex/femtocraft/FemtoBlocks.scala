@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber, BlockFrame}
+import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
@@ -34,6 +35,7 @@ object FemtoBlocks {
   var blockMetabolicConverter    : Block = null
   var blockPhotosynthesisTower   : Block = null
   var blockSporeDistributor      : Block = null
+  var blockItemRepository        : Block = null
 
 
   var blockFrame                 : Block = null
@@ -119,6 +121,9 @@ object FemtoBlocks {
 
     blockNaniteHiveSmall = new BlockNaniteHiveSmall().setCreativeTab(Femtocraft.tab).setBlockName("blockNaniteHive_small")
     GameRegistry.registerBlock(blockNaniteHiveSmall, "blockNaniteHive_small")
+
+    blockItemRepository = new BlockItemRepository().setCreativeTab(Femtocraft.tab).setBlockName("blockItemRepository")
+    GameRegistry.registerBlock(blockItemRepository, "blockItemRepository")
 
     //tests
 

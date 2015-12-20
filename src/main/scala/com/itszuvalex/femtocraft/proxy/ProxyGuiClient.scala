@@ -5,6 +5,8 @@ import com.itszuvalex.femtocraft.cyber.gui.{GuiCyberBase, GuiGrowthChamber, GuiM
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.gui.{GuiArcFurnace, GuiFrame, GuiMultiblockSelection}
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
+import com.itszuvalex.femtocraft.logistics.gui.GuiItemRepository
+import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import net.minecraft.entity.player.EntityPlayer
@@ -23,6 +25,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new GuiArcFurnace(player, player.inventory, te)
       case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new GuiGrowthChamber(player, player.inventory, te)
+      case (GuiIDs.TileItemRepositoryGuiID, te:TileItemRepository) => new GuiItemRepository(player, player.inventory, te)
       case (_, _) => null
     }
   }

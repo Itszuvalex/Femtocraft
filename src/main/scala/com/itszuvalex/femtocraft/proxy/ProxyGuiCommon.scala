@@ -5,6 +5,8 @@ import com.itszuvalex.femtocraft.cyber.container.{ContainerCyberBase, ContainerG
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.container.{ContainerArcFurnace, ContainerFrame, ContainerMultiblockSelection}
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
+import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
+import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import cpw.mods.fml.common.network.IGuiHandler
@@ -24,6 +26,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)
+      case (GuiIDs.TileItemRepositoryGuiID, te:TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
       case (_, _) => null
     }
   }

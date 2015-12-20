@@ -23,6 +23,7 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.cyber.tile._
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber, TileFrame}
 import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
+import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
@@ -64,6 +65,7 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileMetabolicConverter], "TileMetabolicConverter")
     GameRegistry.registerTileEntity(classOf[TilePhotosynthesisTower], "TilePhotosynthesisTower")
     GameRegistry.registerTileEntity(classOf[TileSporeDistributor], "TileSporeDistributor")
+    GameRegistry.registerTileEntity(classOf[TileItemRepository], "TileItemRepository")
 
     GameRegistry.registerTileEntity(classOf[TileFrame], "TileFrame")
     GameRegistry.registerTileEntity(classOf[TileCyberMachineInProgress], "TileCyberMachineInProgress")
