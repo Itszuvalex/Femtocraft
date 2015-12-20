@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.nanite.Trait
+package com.itszuvalex.femtocraft.nanite.`trait`
 
 import com.itszuvalex.femtocraft.nanite.INaniteStrain
 import net.minecraft.item.ItemStack

@@ -43,7 +43,7 @@ class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile:
   val bufferTank1               = new GuiFluidTank(176, 21, this, tile, 1, 3, null, true)
   val buildButton               = new GuiButton(171, 94, 45, 20, "Build Machine") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int) = if (super.onMouseClick(mouseX, mouseY, button)) {
-      FemtoPacketHandler.INSTANCE.sendToServer(new MessageOpenGui(tile.info.x, tile.info.y, tile.info.z, tile.getWorldObj.provider.dimensionId, GuiIDs.CyberBaseBuildGuiID))
+      FemtoPacketHandler.INSTANCE.sendToServer(new MessageOpenGui(tile.info.x, tile.info.y, tile.info.z, tile.getWorldObj.provider.dimensionId, GuiIDs.TileCyberBaseBuildGuiID))
       true
     } else false
   }

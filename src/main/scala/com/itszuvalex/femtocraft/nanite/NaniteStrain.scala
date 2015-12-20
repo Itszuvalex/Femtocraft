@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.nanite
 
 import com.itszuvalex.femtocraft.nanite.Attribute.AttributeRegistry
-import com.itszuvalex.femtocraft.nanite.Trait.INaniteTrait
+import com.itszuvalex.femtocraft.nanite.`trait`.INaniteTrait
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 

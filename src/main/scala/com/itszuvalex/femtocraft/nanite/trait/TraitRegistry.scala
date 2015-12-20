@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.nanite.Trait
+package com.itszuvalex.femtocraft.nanite.`trait`
 
 import scala.collection.mutable
 

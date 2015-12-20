@@ -16,13 +16,13 @@ import net.minecraft.world.World
 class ProxyGuiClient extends ProxyGuiCommon {
   override def getClientGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(x, y, z)) match {
-      case (GuiIDs.FrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, player.getHeldItem)
-      case (GuiIDs.FrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
-      case (GuiIDs.CyberBaseGuiID, te: TileCyberBase) => new GuiCyberBase(player, player.inventory, te)
-      case (GuiIDs.CyberBaseBuildGuiID, te: TileCyberBase) => new GuiMachineSelection(player, player.inventory, te)
-      case (GuiIDs.NaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
-      case (GuiIDs.ArcFurnaceGuiID, te: TileArcFurnace) => new GuiArcFurnace(player, player.inventory, te)
-      case (GuiIDs.GrowthChamberGuiID, te: TileGrowthChamber) => new GuiGrowthChamber(player, player.inventory, te)
+      case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, player.getHeldItem)
+      case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
+      case (GuiIDs.TileCyberBaseGuiID, te: TileCyberBase) => new GuiCyberBase(player, player.inventory, te)
+      case (GuiIDs.TileCyberBaseBuildGuiID, te: TileCyberBase) => new GuiMachineSelection(player, player.inventory, te)
+      case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
+      case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new GuiArcFurnace(player, player.inventory, te)
+      case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new GuiGrowthChamber(player, player.inventory, te)
       case (_, _) => null
     }
   }

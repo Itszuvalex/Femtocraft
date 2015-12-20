@@ -17,13 +17,13 @@ import net.minecraft.world.World
 class ProxyGuiCommon extends IGuiHandler {
   override def getServerGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(x, y, z)) match {
-      case (GuiIDs.FrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
-      case (GuiIDs.FrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
-      case (GuiIDs.CyberBaseGuiID, te: TileCyberBase) => new ContainerCyberBase(player, player.inventory, te)
-      case (GuiIDs.CyberBaseBuildGuiID, te: TileCyberBase) => new ContainerMachineSelection(te)
-      case (GuiIDs.ArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
-      case (GuiIDs.NaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
-      case (GuiIDs.GrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)
+      case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
+      case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
+      case (GuiIDs.TileCyberBaseGuiID, te: TileCyberBase) => new ContainerCyberBase(player, player.inventory, te)
+      case (GuiIDs.TileCyberBaseBuildGuiID, te: TileCyberBase) => new ContainerMachineSelection(te)
+      case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
+      case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
+      case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)
       case (_, _) => null
     }
   }

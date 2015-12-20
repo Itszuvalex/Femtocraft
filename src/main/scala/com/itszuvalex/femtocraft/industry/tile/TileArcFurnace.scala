@@ -32,7 +32,7 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
 
   override def hasGUI = isValidMultiBlock
 
-  override def getGuiID = GuiIDs.ArcFurnaceGuiID
+  override def getGuiID = GuiIDs.TileArcFurnaceGuiID
 
   /**
     *

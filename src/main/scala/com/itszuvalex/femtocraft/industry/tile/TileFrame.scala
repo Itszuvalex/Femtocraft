@@ -211,7 +211,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def hasGUI: Boolean = isValidMultiBlock
 
-  override def getGuiID: Int = GuiIDs.FrameMultiblockGuiID
+  override def getGuiID: Int = GuiIDs.TileFrameMultiblockGuiID
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 

@@ -52,42 +52,41 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def getStackInSlot(i: Int) = inventory(i)
 
   override def decrStackSize(i: Int, amount: Int): ItemStack = {
+    var itemstack: ItemStack = null
     if (inventory(i) != null) {
-      var itemstack: ItemStack = null
       if (inventory(i).stackSize <= amount) {
         itemstack = inventory(i)
-        removeItemStack(inventory(i), i)
-        itemstack
+        removeItemStack(i)
       } else {
         itemstack = inventory(i).splitStack(amount)
         if (inventory(i).stackSize == 0) {
-          removeItemStack(inventory(i), i)
+          removeItemStack(i)
         }
-        itemstack
       }
-    } else {
-      null
     }
+    itemstack
   }
 
   override def getStackInSlotOnClosing(i: Int) = inventory(i)
 
   override def setInventorySlotContents(i: Int, itemstack: ItemStack) {
-    removeItemStack(inventory(i), i)
     addItemStack(itemstack, i)
   }
 
   override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
+    if(inventory(slot) != null)
+      removeItemStack(slot)
+
     inventory(slot) = itemStack
     inventoryCache.addItemStack(itemStack, slot)
   }
 
-  override def removeItemStack(itemStack: ItemStack, slot: Int): Unit = {
+  override def removeItemStack(slot: Int): Unit = {
     inventory(slot) = null
-    inventoryCache.removeItemStack(itemStack, slot)
+    inventoryCache.removeItemStack(slot)
   }
 
-  override def getInventoryName = "femto.BaseInventory.ImLazyAndDidntCodeThis"
+  override def getInventoryName = "femto.IndexedInventory"
 
   override def hasCustomInventoryName = false
 

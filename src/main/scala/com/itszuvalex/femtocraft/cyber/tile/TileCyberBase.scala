@@ -166,7 +166,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
 
   override def hasGUI: Boolean = isValidMultiBlock
 
-  override def getGuiID: Int = GuiIDs.CyberBaseGuiID
+  override def getGuiID: Int = GuiIDs.TileCyberBaseGuiID
 
   override def getMod: AnyRef = Femtocraft
 
@@ -277,12 +277,12 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       } else if (item.isItemEqual(invStack) && ItemStack.areItemStackTagsEqual(item, invStack)) {
         val fitAmount = indInventory.getInventoryStackLimit - invStack.stackSize
         if (item.stackSize <= fitAmount) {
-          indInventory.removeItemStack(invStack, id)
+          indInventory.removeItemStack(id)
           invStack.stackSize += item.stackSize
           indInventory.addItemStack(invStack, id)
           item.stackSize = 0
         } else {
-          indInventory.removeItemStack(invStack, id)
+          indInventory.removeItemStack(id)
           invStack.stackSize = indInventory.getInventoryStackLimit
           indInventory.addItemStack(invStack, id)
           item.stackSize -= fitAmount

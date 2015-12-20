@@ -15,8 +15,8 @@ trait TileMultiblockIndexedInventory extends TileEntityBase with TileIndexedInve
   override def addItemStack(itemStack: ItemStack, slot: Int): Unit =
     if (isController) super.addItemStack(itemStack, slot) else forwardToController[TileMultiblockIndexedInventory, Unit](_.addItemStack(itemStack, slot))
 
-  override def removeItemStack(itemStack: ItemStack, slot: Int): Unit =
-    if (isController) super.removeItemStack(itemStack, slot) else forwardToController[TileMultiblockIndexedInventory, Unit](_.removeItemStack(itemStack, slot))
+  override def removeItemStack(slot: Int): Unit =
+    if (isController) super.removeItemStack(slot) else forwardToController[TileMultiblockIndexedInventory, Unit](_.removeItemStack(slot))
 
   override def getSlotsByOreID(id: Int): Option[mutable.HashSet[Int]] =
     if (isController) super.getSlotsByOreID(id) else forwardToController[TileMultiblockIndexedInventory, Option[mutable.HashSet[Int]]](_.getSlotsByOreID(id))

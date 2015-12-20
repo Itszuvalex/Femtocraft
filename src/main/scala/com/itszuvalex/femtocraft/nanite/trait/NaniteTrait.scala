@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.nanite.Trait
+package com.itszuvalex.femtocraft.nanite.`trait`
 
 /**
   * Created by Christopher on 7/31/2015.

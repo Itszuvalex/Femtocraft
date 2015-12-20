@@ -46,7 +46,7 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
 
   override def hasGUI: Boolean = isValidMultiBlock
 
-  override def getGuiID: Int = GuiIDs.GrowthChamberGuiID
+  override def getGuiID: Int = GuiIDs.TileGrowthChamberGuiID
 
   def onBlockBreak(): Unit = {
     if (!isValidMultiBlock) return

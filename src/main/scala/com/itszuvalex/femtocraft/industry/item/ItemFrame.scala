@@ -52,7 +52,7 @@ class ItemFrame extends Item with IFrameItem {
 
   override def onItemRightClick(item: ItemStack, world: World, player: EntityPlayer): ItemStack = {
     if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
       item
     }
     else
@@ -74,7 +74,7 @@ class ItemFrame extends Item with IFrameItem {
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
       return true
     }
     val multiString = getSelectedMultiblock(itemStack)

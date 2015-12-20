@@ -21,8 +21,8 @@ trait NaniteNode extends TileEntity with INaniteNode {
 
   override def getHiveLoc = parentLoc
 
-  override def getHive = parentLoc.getTileEntity(force = true) match {
-    case Some(i) if i.isInstanceOf[INaniteHive] => i.asInstanceOf[INaniteHive]
+  override def getHive = if(getHiveLoc == null) null else getHiveLoc.getTileEntity(force = true) match {
+    case Some(i : INaniteHive) => i
     case _ => null
   }
 

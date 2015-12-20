@@ -20,8 +20,8 @@ trait TileIndexedInventory extends TileEntityBase with IIndexedInventory {
     setModified()
   }
 
-  override def removeItemStack(itemStack: ItemStack, slot: Int) = {
-    indInventory.removeItemStack(itemStack, slot)
+  override def removeItemStack(slot: Int) = {
+    indInventory.removeItemStack(slot)
     markDirty()
     setModified()
   }

@@ -4,18 +4,20 @@ package com.itszuvalex.femtocraft
   * Created by Christopher on 9/1/2015.
   */
 object GuiIDs {
-  val CrystalMountGuiID            = nextID
-  val ArcFurnaceGuiID              = nextID
-  val CentrifugeGuiID              = nextID
-  val CrystallizerGuiID            = nextID
-  val Cubic2DCraftingGuiID         = nextID
-  val Cubic3DCraftingGuiID         = nextID
-  val NaniteHiveGuiID              = nextID
-  val FrameMultiblockSelectorGuiID = nextID
-  val FrameMultiblockGuiID         = nextID
-  val CyberBaseGuiID               = nextID
-  val CyberBaseBuildGuiID          = nextID
-  val GrowthChamberGuiID           = nextID
+  val TileCrystalMountGuiID            = nextID
+  val TileArcFurnaceGuiID              = nextID
+  val TileCentrifugeGuiID              = nextID
+  val TileCrystallizerGuiID            = nextID
+  val TileCubic2DCraftingGuiID         = nextID
+  val TileCubic3DCraftingGuiID         = nextID
+  val TileNaniteHiveGuiID              = nextID
+  val TileFrameMultiblockSelectorGuiID = nextID
+  val TileFrameMultiblockGuiID         = nextID
+  val TileCyberBaseGuiID               = nextID
+  val TileCyberBaseBuildGuiID          = nextID
+  val TileGrowthChamberGuiID           = nextID
+  val TileItemRepositoryGuiID          = nextID
+
   private var n = 0
 
   private def nextID = {
