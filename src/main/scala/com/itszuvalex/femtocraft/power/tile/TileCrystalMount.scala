@@ -128,15 +128,18 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def getType: String = getCrystalStack match {
     case stack if stack != null =>
       stack.getItem match {
-        case item: IPowerCrystal =>
-          item.getType(stack) match {
-            case IPowerCrystal.TYPE_LARGE => IPowerNode.GENERATION_NODE
-            case null => null
-            case _ => IPowerNode.TRANSFER_NODE
-          }
+        case item: IPowerCrystal => getNodeTypeFromCrystalType(item.getType(stack))
         case _ => null
       }
     case _ => null
+  }
+
+  def getNodeTypeFromCrystalType(crystalType: String): String = {
+    crystalType match {
+      case IPowerCrystal.TYPE_LARGE => IPowerNode.GENERATION_NODE
+      case null => null
+      case _ => IPowerNode.TRANSFER_NODE
+    }
   }
 
   /**
@@ -172,9 +175,17 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   }
 
   override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
-    if (slot == 0 && inventory.getInventory(slot) != null) {
-      inventory.getInventory(slot) = null
-      markDirty()
+    item match {
+      case null =>
+      case _ => item.getItem match {
+        case i: IPowerCrystal =>
+          if (getNodeTypeFromCrystalType(i.getType(item)) != getType)
+            if (slot == 0 && inventory.getInventory(slot) != null) {
+              inventory.getInventory(slot) = null
+              markDirty()
+            }
+        case _ =>
+      }
     }
     super.setInventorySlotContents(slot, item)
   }

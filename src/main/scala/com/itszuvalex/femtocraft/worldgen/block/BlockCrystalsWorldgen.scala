@@ -9,7 +9,7 @@ import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
-import net.minecraft.item.ItemStack
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 
@@ -87,6 +87,10 @@ class BlockCrystalsWorldgen extends TileContainer(Material.glass) {
     }
     super.breakBlock(world, x, y, z, block, metadata)
   }
+
+  override def getItemDropped(p_149650_1_ : Int, p_149650_2_ : Random, p_149650_3_ : Int): Item = null
+
+  override def quantityDropped(p_149745_1_ : Random): Int = 0
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileCrystalsWorldgen
 }
