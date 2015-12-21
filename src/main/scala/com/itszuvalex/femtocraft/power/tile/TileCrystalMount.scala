@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.power.{ICrystalMount, PowerManager}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.core.{BaseInventory, TileEntityBase}
@@ -75,15 +75,15 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if(getWorldObj.isRemote) return
-    if(getCrystalStack != null)
+    if (getWorldObj.isRemote) return
+    if (getCrystalStack != null)
       PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if(getWorldObj.isRemote) return
-    if(getCrystalStack != null)
+    if (getWorldObj.isRemote) return
+    if (getCrystalStack != null)
       PowerManager.removeNode(this)
   }
 
@@ -96,6 +96,28 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     case IPowerNode.GENERATION_NODE => GenerationNode.canAddChild(child)
     case IPowerNode.TRANSFER_NODE => TransferNode.canAddChild(child)
     case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddChild(child)
+    case _ => false
+  }
+
+  /**
+    *
+    * @param child
+    * @return True if child is successfully added.
+    */
+  override def addChild(child: IPowerNode): Boolean = {
+    setUpdate()
+    super.addChild(child)
+  }
+
+  /**
+    *
+    * @param parent IPowerNode that is being checked.
+    * @return True if this node is capable of having that node as a parent.
+    */
+  override def canSetParent(parent: IPowerNode): Boolean = getType match {
+    case IPowerNode.GENERATION_NODE => GenerationNode.canAddParent(parent)
+    case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
+    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
     case _ => false
   }
 
@@ -123,35 +145,10 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def getCrystalStack = getStackInSlot(0)
 
-  /**
-    *
-    * @param parent IPowerNode that is being checked.
-    * @return True if this node is capable of having that node as a parent.
-    */
-  override def canSetParent(parent: IPowerNode): Boolean = getType match {
-    case IPowerNode.GENERATION_NODE => GenerationNode.canAddParent(parent)
-    case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
-    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
-    case _ => false
-  }
-
   override def hasDescription: Boolean = true
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
     slot == 0 && (item == null || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
-  }
-
-  override def markDirty(): Unit = {
-    super.markDirty()
-    if(getWorldObj.isRemote) return
-    setModified()
-    setUpdate()
-    getCrystalStack match {
-      case null =>
-        PowerManager.removeNode(this)
-        getChildren.foreach(_.setParent(null))
-      case _ => PowerManager.addNode(this)
-    }
   }
 
   override def defaultInventory: BaseInventory = new BaseInventory(1)
@@ -172,6 +169,30 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
     loadPowerConnectionInfo(compound)
     setRenderUpdate()
+  }
+
+  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
+    if (slot == 0 && inventory.getInventory(slot) != null) {
+      inventory.getInventory(slot) = null
+      markDirty()
+    }
+    super.setInventorySlotContents(slot, item)
+  }
+
+  override def markDirty(): Unit = {
+    super.markDirty()
+    if (getWorldObj.isRemote) return
+    setModified()
+    setUpdate()
+    getCrystalStack match {
+      case null =>
+        PowerManager.removeNode(this)
+        getChildren.foreach(_.setParent(null))
+        childrenLocs.clear()
+        Option(getParent).filter(_ != this).map(_.removeChild(this))
+        parentLoc = null
+      case _ => PowerManager.addNode(this)
+    }
   }
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
