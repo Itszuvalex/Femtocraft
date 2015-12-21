@@ -38,6 +38,17 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   /**
     *
+    * @return The color of this power node.  This is used for aesthetics.
+    */
+  override def getColor: Int = {
+    getCrystalStack match {
+      case null => super.getColor
+      case i => i.getItem.asInstanceOf[IPowerCrystal].getColor(i)
+    }
+  }
+
+  /**
+    *
     * @return Set of all locations that have pedestal connections.
     */
   override def getPedestalLocations: Set[Loc4] = pedestalLocs
@@ -136,7 +147,9 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setModified()
     setUpdate()
     getCrystalStack match {
-      case null => PowerManager.removeNode(this)
+      case null =>
+        PowerManager.removeNode(this)
+        getChildren.foreach(_.setParent(null))
       case _ => PowerManager.addNode(this)
     }
   }
@@ -151,11 +164,13 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       getCrystalStack.writeToNBT(co)
     }
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
+    savePowerConnectionInfo(compound)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
+    loadPowerConnectionInfo(compound)
     setRenderUpdate()
   }
 
@@ -167,6 +182,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
                            TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
                          )
             )
+    savePowerConnectionInfo(compound)
 
   }
 
@@ -176,6 +192,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       pedestalLocs.clear()
       pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
                                                           }
+    loadPowerConnectionInfo(compound)
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {

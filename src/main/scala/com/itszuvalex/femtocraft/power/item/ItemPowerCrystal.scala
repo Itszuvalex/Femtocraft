@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.power.item
 
+import java.util
+
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal._
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal._
@@ -8,9 +10,11 @@ import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.renderer.texture.IIconRegister
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.IIcon
 
+import scala.collection.JavaConversions._
 import scala.collection._
 
 /**
@@ -175,7 +179,7 @@ object ItemPowerCrystal {
 }
 
 class ItemPowerCrystal extends Item with IPowerCrystal {
-  override def getColorFromItemStack(stack: ItemStack, renderPass: Int): Int = if (renderPass > 0) super.getColorFromItemStack(stack, renderPass) else getColor(stack)
+  override def getColorFromItemStack(stack: ItemStack, renderPass: Int): Int = if (renderPass > 0) super.getColorFromItemStack(stack, renderPass) else ItemPowerCrystal.getColor(stack)
 
   /**
     *
@@ -196,14 +200,14 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
     * @param stack
     * @return Range to allow connections in.
     */
-  override def getRange(stack: ItemStack) = getRange(stack)
+  override def getRange(stack: ItemStack) = ItemPowerCrystal.getRange(stack)
 
   /**
     *
     * @param stack
     * @return Amount to multiply storage amount by.
     */
-  override def getStorageMultiplier(stack: ItemStack) = getStorageMultiplier(stack)
+  override def getStorageMultiplier(stack: ItemStack) = ItemPowerCrystal.getStorageMultiplier(stack)
 
   override def registerIcons(ir: IIconRegister): Unit = {
     addMapping(TYPE_SMALL, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_SMALL))
@@ -213,6 +217,8 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
 
   override def getIcon(stack: ItemStack, pass: Int): IIcon = getIconFromStack(stack)
 
+  override def getIconIndex(stack: ItemStack): IIcon = getIconFromStack(stack)
+
   private def getIconFromStack(stack: ItemStack): IIcon = {
     ItemPowerCrystal.getIcon(ItemPowerCrystal.getType(stack))
     .getOrElse(
@@ -220,14 +226,12 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
               )
   }
 
-  override def getIconIndex(stack: ItemStack): IIcon = getIconFromStack(stack)
-
   /**
     *
     * @param stack
     * @return Amount of power to generate per tick.
     */
-  override def getPassiveGen(stack: ItemStack) = getPassiveGen(stack)
+  override def getPassiveGen(stack: ItemStack) = ItemPowerCrystal.getPassiveGen(stack)
 
   override def getName(stack: ItemStack) = ItemPowerCrystal.getName(stack)
 
@@ -236,5 +240,15 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
     * @param stack
     * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
     */
-  override def getTransferRate(stack: ItemStack): Int = getTransferRate(stack)
+  override def getTransferRate(stack: ItemStack): Int = ItemPowerCrystal.getTransferRate(stack)
+
+  override def addInformation(stack: ItemStack, player: EntityPlayer, tooltipList: util.List[_], advTooltips: Boolean): Unit = {
+    super.addInformation(stack, player, tooltipList, advTooltips)
+    val tlist = tooltipList.asInstanceOf[java.util.List[String]]
+    tlist += "Crystal Type:" + getType(stack)
+    tlist += "Passive Gen:" + getPassiveGen(stack)
+    tlist += "Transfer Range:" + getRange(stack)
+    tlist += "Storage Multiplier:" + getStorageMultiplier(stack)
+    tlist += "Transfer Rate:" + getTransferRate(stack)
+  }
 }

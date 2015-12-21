@@ -35,8 +35,8 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
       case i: ICrystalMount =>
         Minecraft.getMinecraft.getTextureManager.bindTexture(crystalTexLocation)
         renderCrystalMountAt(i, renderX, renderY, renderZ, partialTicks, i.getPedestalLocations.contains(i.getNodeLoc.getOffset(ForgeDirection.UP)))
-        //        if (i.getCrystalStack != null)
-        renderPowerBeams(i, renderX, renderY, renderZ, partialTicks)
+        if (i.getCrystalStack != null)
+          renderPowerBeams(i, renderX, renderY, renderZ, partialTicks)
       case _ =>
     }
   }
@@ -44,7 +44,7 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
   def renderCrystalMountAt(tile: TileEntity with ICrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, hasTop: Boolean): Unit = {
     val color = new Color(tile.getColor)
     GL11.glPushMatrix()
-    //    GL11.glDisable(GL11.GL_LIGHTING)
+    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glTranslated(renderX + .5, renderY, renderZ + .5)
     //    GL11.glScaled(.01, .01, .01)
@@ -65,7 +65,7 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
     if (tile.getCrystalStack != null)
       crystalModel.renderPart(crystalName)
 
-    //    GL11.glEnable(GL11.GL_LIGHTING)
+    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 
