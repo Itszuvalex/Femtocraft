@@ -14,4 +14,10 @@ class BlockCrystalMount extends TileContainer(Material.iron) {
   setCreativeTab(Femtocraft.tab)
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileCrystalMount
+
+  override def renderAsNormalBlock(): Boolean = false
+
+  override def getRenderBlockPass: Int = 2
+
+  override def isOpaqueCube: Boolean = false
 }

@@ -9,8 +9,10 @@ import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.core.{BaseInventory, TileEntityBase}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.{Set, mutable}
@@ -26,6 +28,7 @@ object TileCrystalMount {
 
 class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
   private val pedestalLocs = mutable.HashSet[Loc4]()
+
 
   override def getMod: AnyRef = Femtocraft
 
@@ -154,5 +157,15 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
                          )
             )
     if (getType != null) PowerManager.removeNode(this)
+  }
+
+  override def getRenderBoundingBox: AxisAlignedBB = {
+    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+    AxisAlignedBB.getBoundingBox(center.x - childrenConnectionRadius,
+                                 center.y - childrenConnectionRadius,
+                                 center.z - childrenConnectionRadius,
+                                 center.x + childrenConnectionRadius,
+                                 center.y + childrenConnectionRadius,
+                                 center.z + childrenConnectionRadius)
   }
 }
