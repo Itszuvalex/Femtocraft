@@ -33,6 +33,7 @@ trait NaniteNode extends TileEntity with INaniteNode {
     else {
       parentLoc = hive.getHiveLoc
     }
+    NaniteManager.refreshParentlessStatus(this)
     true
   }
 

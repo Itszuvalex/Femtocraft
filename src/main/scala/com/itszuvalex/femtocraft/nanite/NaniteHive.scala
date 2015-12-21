@@ -51,7 +51,7 @@ trait NaniteHive extends TileEntity with INaniteHive {
   def saveChildrenInfo(compound: NBTTagCompound) =
     compound(NaniteHive.HIVE_COMPOUND_KEY ->
              NBTCompound(
-                          NaniteHive.NODE_CHILDREN_KEY -> NBTList(childrenNodeLocs.view.map(NBTCompound))
+                          NaniteHive.NODE_CHILDREN_KEY -> NBTList(childrenNodeLocs.map(NBTCompound))
                         )
             )
 
