@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.power.render
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
 import net.minecraftforge.common.util.ForgeDirection
@@ -16,8 +16,9 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object CrystalMountRenderer {
-  val crystalModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.obj")
-  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.png")
+  val crystalModelLocation = Resources.Model("crystal mount/crystal_mount.obj")
+  //  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.png")
+  val crystalTexLocation   = Resources.TexBlock("BlockItemRepository_side.png")
 
   val topName     = "Top"
   val bottomName  = "Bottom"
@@ -32,9 +33,10 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
   override def renderTileEntityAt(tile: TileEntity, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float): Unit = {
     tile match {
       case i: ICrystalMount =>
+        Minecraft.getMinecraft.getTextureManager.bindTexture(crystalTexLocation)
         renderCrystalMountAt(i, renderX, renderY, renderZ, partialTicks, i.getPedestalLocations.contains(i.getNodeLoc.getOffset(ForgeDirection.UP)))
-//        if (i.getCrystalStack != null)
-          renderPowerBeams(i, renderX, renderY, renderZ, partialTicks)
+        //        if (i.getCrystalStack != null)
+        renderPowerBeams(i, renderX, renderY, renderZ, partialTicks)
       case _ =>
     }
   }

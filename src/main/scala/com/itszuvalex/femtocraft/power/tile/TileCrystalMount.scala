@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.power.{ICrystalMount, PowerManager}
@@ -30,6 +30,10 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   private val pedestalLocs = mutable.HashSet[Loc4]()
 
 
+  override def hasGUI = true
+
+  override def getGuiID = GuiIDs.TileCrystalMountGuiID
+
   override def getMod: AnyRef = Femtocraft
 
   /**
@@ -56,6 +60,21 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @param loc Location to add as pedestal
     */
   override def addPedestal(loc: Loc4): Unit = pedestalLocs += loc
+
+  /* Tile Entity */
+  override def validate(): Unit = {
+    super.validate()
+    if(getWorldObj.isRemote) return
+    if(getCrystalStack != null)
+      PowerManager.addNode(this)
+  }
+
+  override def invalidate(): Unit = {
+    super.invalidate()
+    if(getWorldObj.isRemote) return
+    if(getCrystalStack != null)
+      PowerManager.removeNode(this)
+  }
 
   /**
     *
@@ -113,6 +132,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   override def markDirty(): Unit = {
     super.markDirty()
+    if(getWorldObj.isRemote) return
     setModified()
     setUpdate()
     getCrystalStack match {
@@ -128,7 +148,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     var co: NBTTagCompound = null
     if (getCrystalStack != null) {
       co = new NBTTagCompound
-      getCrystalStack.writeToNBT(compound)
+      getCrystalStack.writeToNBT(co)
     }
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
   }
@@ -141,22 +161,21 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
-    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
-      pedestalLocs.clear()
-      pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
-                                                          }
-    if (getType != null) PowerManager.addNode(this)
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
     compound(
               TileCrystalMount.MOUNT_COMPOUND ->
               NBTCompound(
                            TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
                          )
             )
-    if (getType != null) PowerManager.removeNode(this)
+
+  }
+
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
+      pedestalLocs.clear()
+      pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
+                                                          }
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {

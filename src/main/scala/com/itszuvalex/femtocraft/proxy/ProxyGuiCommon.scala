@@ -9,6 +9,8 @@ import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
+import com.itszuvalex.femtocraft.power.container.ContainerCrystalMount
+import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import cpw.mods.fml.common.network.IGuiHandler
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.world.World
@@ -26,7 +28,8 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)
-      case (GuiIDs.TileItemRepositoryGuiID, te:TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
+      case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
+      case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
       case (_, _) => null
     }
   }
