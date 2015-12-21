@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.entity.player.EntityPlayer
@@ -103,21 +104,11 @@ class ItemFrame extends Item with IFrameItem {
     if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
 
-    val xWidth = 2
-    val yHeight = 3
-    val zWidth = 2;
-    {
-      for {
-        i <- bx until (bx + xWidth)
-        j <- by until (by + yHeight)
-        k <- bz until (bz + zWidth)
-      } yield (i, j, k)
-    }.foreach { case (px, py, pz) =>
-      world.setBlock(px, py, pz, FemtoBlocks.blockFrame)
-      world.getTileEntity(px, py, pz) match {
+   locations.foreach {loc =>
+      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
+      world.getTileEntity(loc.x, loc.y, loc.z) match {
         case frame: TileFrame =>
-          frame.calculateRendering(xWidth, yHeight, zWidth, px - bx, py - by, pz - bz)
-          //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
+          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
           frame.formMultiBlock(world, bx, by, bz)
           frame.multiBlock = multiString
         case _ =>

@@ -96,7 +96,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   }
 
   def calculateRendering(connectedDirs: Array[ForgeDirection]): Unit = {
-
+    renderInt = TileFrame.fullRender(true)
   }
 
 
