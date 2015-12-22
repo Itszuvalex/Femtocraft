@@ -30,7 +30,6 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
     val color = new Color(crystal.color)
     this.bindTexture(CrystalRenderer.crystalTexLocation)
     GL11.glPushMatrix()
-    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glScaled(.01, .01, .01)
@@ -52,7 +51,6 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
       crystalModel.renderPart(name._1)
       GL11.glPopMatrix()
                                                                                }
-    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glColor4f(1f, 1f, 1f, 1f)
     tessellator.setColorRGBA(255, 255, 255, 0)
     GL11.glPopMatrix()

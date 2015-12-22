@@ -32,7 +32,6 @@ trait NodeCrystalRenderer extends TileEntitySpecialRenderer {
     val tessellator = Tessellator.instance
     val color = new Color(node.getColor)
     GL11.glPushMatrix()
-    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glScaled(.01, .01, .01)
@@ -52,7 +51,6 @@ trait NodeCrystalRenderer extends TileEntitySpecialRenderer {
       crystalModel.renderPart(name._1)
       GL11.glPopMatrix()
                                                                                }
-    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 }

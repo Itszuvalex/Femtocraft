@@ -18,7 +18,7 @@ import org.lwjgl.opengl.GL11
 object CrystalMountRenderer {
   val crystalModelLocation = Resources.Model("crystal mount/crystal_mount.obj")
   //  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.png")
-  val crystalTexLocation   = Resources.TexBlock("BlockItemRepository_side.png")
+  val crystalTexLocation   = Resources.Model("crystal mount/crystal_mount.png")
 
   val topName     = "Top"
   val bottomName  = "Bottom"
@@ -33,7 +33,6 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
   override def renderTileEntityAt(tile: TileEntity, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float): Unit = {
     tile match {
       case i: ICrystalMount =>
-        Minecraft.getMinecraft.getTextureManager.bindTexture(crystalTexLocation)
         renderCrystalMountAt(i, renderX, renderY, renderZ, partialTicks, i.getPedestalLocations.contains(i.getNodeLoc.getOffset(ForgeDirection.UP)))
         if (i.getCrystalStack != null)
           renderPowerBeams(i, renderX, renderY, renderZ, partialTicks)
@@ -42,12 +41,11 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
   }
 
   def renderCrystalMountAt(tile: TileEntity with ICrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, hasTop: Boolean): Unit = {
+    Minecraft.getMinecraft.getTextureManager.bindTexture(crystalTexLocation)
     val color = new Color(tile.getColor)
     GL11.glPushMatrix()
-    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glTranslated(renderX + .5, renderY, renderZ + .5)
-    //    GL11.glScaled(.01, .01, .01)
 
     GL11.glColor3f(1f, 1f, 1f)
 
@@ -65,7 +63,6 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
     if (tile.getCrystalStack != null)
       crystalModel.renderPart(crystalName)
 
-    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 
