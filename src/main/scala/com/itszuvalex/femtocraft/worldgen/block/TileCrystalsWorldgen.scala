@@ -31,11 +31,13 @@ class TileCrystalsWorldgen extends TileEntityBase with TileDescriptionPacket {
                                                          Random.nextInt(30).toByte).toInt)
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
     readColorData(compound)
     setRenderUpdate()
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
     writeColorData(compound)
   }
 

@@ -69,8 +69,8 @@ import net.minecraftforge.common.util.ForgeDirection
     * @return Amount of power capable of being stored.
     */
   override def getMax: Long = mountLoc match {
-    case loc if loc != null => loc.getTileEntity(false).orNull match {
-      case mount: ICrystalMount =>
+    case loc if loc != null => loc.getTileEntity(false) match {
+      case Some(mount: ICrystalMount) =>
         mount.getCrystalStack match {
           case stack if stack.getItem.isInstanceOf[IPowerCrystal] =>
             val cry = stack.getItem.asInstanceOf[IPowerCrystal]
@@ -99,6 +99,10 @@ import net.minecraftforge.common.util.ForgeDirection
 
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.writeToNBT(par1nbtTagCompound)
+    savePowerInfo(par1nbtTagCompound)
+  }
+
+  def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
     par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
                        NBTCompound(
                                     TilePowerPedestal.MOUNT_KEY -> mountLocation,
@@ -108,6 +112,10 @@ import net.minecraftforge.common.util.ForgeDirection
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.readFromNBT(par1nbtTagCompound)
+    loadPowerInfo(par1nbtTagCompound)
+  }
+
+  def loadPowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
     par1nbtTagCompound.NBTCompound(TilePowerPedestal.PEDESTAL_COMPOUND) { comp =>
       mountLocation = comp.NBTCompound(TilePowerPedestal.MOUNT_KEY)(Loc4(_))
       stored = comp.Long(TilePowerPedestal.STORED_KEY)

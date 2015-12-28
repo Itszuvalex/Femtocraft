@@ -4,7 +4,7 @@ import java.util
 import java.util.Collections
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import net.minecraft.client.Minecraft
+import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.client.event.RenderWorldEvent
 
@@ -18,6 +18,7 @@ import net.minecraftforge.client.event.RenderWorldEvent
   * This basically re-sorts the tileEntities list in a WorldRenderer before it renders, so that the TEs further away from the player get rendered first.
   * If you're worried about performance, (on my machine) this adds 50-100 microseconds to frame time, so it's negligible.
   */
+@SideOnly(Side.CLIENT)
 object TERenderSortingFix {
 
   @SubscribeEvent
@@ -25,7 +26,7 @@ object TERenderSortingFix {
     val field = event.renderer.getClass.getDeclaredField("tileEntities")
     field.setAccessible(true)
     val list = field.get(event.renderer).asInstanceOf[util.ArrayList[TileEntity]]
-    Collections.sort(list, new TEDistComparator(Minecraft.getMinecraft.renderViewEntity))
+    Collections.sort(list, TEDistComparator)
     field.set(event.renderer, list)
   }
 

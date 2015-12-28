@@ -31,6 +31,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
     this.bindTexture(CrystalRenderer.crystalTexLocation)
     GL11.glPushMatrix()
     GL11.glDisable(GL11.GL_CULL_FACE)
+    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glScaled(.01, .01, .01)
 
@@ -44,7 +45,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
 
       if (name._2 == 1) GL11.glRotated(f2 * name._2, 0, 1, 0)
 
-      val colorOffset: Color = new Color(crystal.colorOffsets {name._2})
+      val colorOffset: Color = new Color(crystal.colorOffsets(name._2))
 
       GL11.glColor4ub((color.red + colorOffset.red - 15).toByte, (color.green + colorOffset.green - 15).toByte, (color.blue + colorOffset.blue - 15).toByte, colorOffset.alpha)
 
@@ -53,6 +54,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
                                                                                }
     GL11.glColor4f(1f, 1f, 1f, 1f)
     tessellator.setColorRGBA(255, 255, 255, 0)
+    GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }
 }
