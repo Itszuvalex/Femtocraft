@@ -21,15 +21,16 @@ import scala.collection._
   * Created by Christopher on 8/26/2015.
   */
 object ItemPowerCrystal {
-  val TEXTURE_PREFIX   = "ItemCrystal"
-  val NBT_COMPOUND_KEY = "PowerCrystal"
-  val COLOR_KEY        = "Color"
-  val TYPE_KEY         = "Type"
-  val RANGE_KEY        = "Range"
-  val STORAGE_KEY      = "Storage"
-  val PASSIVE_GEN_KEY  = "Passive"
-  val TRANSFER_KEY     = "Transfer"
-  val NAME_KEY         = "Name"
+  val TEXTURE_PREFIX      = "ItemCrystal"
+  val NBT_COMPOUND_KEY    = "PowerCrystal"
+  val COLOR_KEY           = "Color"
+  val TYPE_KEY            = "Type"
+  val RANGE_KEY           = "Range"
+  val STORAGE_CURRENT_KEY = "Storage_Current"
+  val STORAGE_MAX_KEY     = "Storage_Max"
+  val PASSIVE_GEN_KEY     = "Passive"
+  val TRANSFER_KEY        = "Transfer"
+  val NAME_KEY            = "Name"
 
   val DEFAULT_ICON_TYPE = TYPE_LARGE
 
@@ -63,14 +64,6 @@ object ItemPowerCrystal {
     0
   }
 
-  def getStorageMultiplier(stack: ItemStack): Float = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Float(STORAGE_KEY)
-                                                         }
-    0
-  }
-
   def getPassiveGen(stack: ItemStack): Float = {
     if (stack != null)
       stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
@@ -97,15 +90,61 @@ object ItemPowerCrystal {
     ""
   }
 
+  def store(stack: ItemStack, amount: Long, doStore: Boolean): Long = {
+    var ret = 0L
+    if (stack != null) {
+      ret = Math.min(amount, getStorageMax(stack) - getStorageCurrent(stack))
+      if (doStore)
+        setStorageCurrent(stack, getStorageCurrent(stack) + ret)
+    }
+    ret
+  }
+
+  def getStorageMax(stack: ItemStack): Long = {
+    if (stack != null)
+      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+        return comp.Long(STORAGE_MAX_KEY)
+                                                         }
+    0
+  }
+
+  def consume(stack: ItemStack, amount: Long, doConsume: Boolean): Long = {
+    var ret = 0L
+    if (stack != null) {
+      ret = Math.min(amount, getStorageCurrent(stack))
+      if (doConsume)
+        setStorageCurrent(stack, getStorageCurrent(stack) - ret)
+    }
+    ret
+  }
+
+  def getStorageCurrent(stack: ItemStack): Long = {
+    if (stack != null)
+      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+        return comp.Long(STORAGE_CURRENT_KEY)
+                                                         }
+    0
+  }
+
+  def setStorageCurrent(stack: ItemStack, amount: Long): ItemStack = {
+    if (stack != null)
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
+                           NBTCompound(
+                                        STORAGE_CURRENT_KEY -> amount
+                                      )
+                          )
+    stack
+  }
+
   def initialize(stack: ItemStack,
                  name: String,
                  rtype: String,
                  color: Int,
                  range: Float,
-                 storage: Float,
+                 storage: Long,
                  passiveGen: Float,
                  transfer: Int) =
-    setName(setType(setColor(setRange(setStorageMultiplier(setPassiveGen(setTransferRate(stack, transfer), passiveGen), storage), range), color), rtype), name)
+    setName(setType(setColor(setRange(setStorageMax(setStorageCurrent(setPassiveGen(setTransferRate(stack, transfer), passiveGen), storage), storage), range), color), rtype), name)
 
   def setColor(stack: ItemStack, color: Int): ItemStack = {
     if (stack != null)
@@ -147,17 +186,6 @@ object ItemPowerCrystal {
     stack
   }
 
-  def setStorageMultiplier(stack: ItemStack, storage: Float): ItemStack = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-                           NBTCompound(
-                                        STORAGE_KEY -> storage
-                                      )
-                          )
-    stack
-
-  }
-
   def setPassiveGen(stack: ItemStack, passiveGen: Float): ItemStack = {
     if (stack != null)
       stack.forceTag.merge(NBT_COMPOUND_KEY ->
@@ -176,9 +204,26 @@ object ItemPowerCrystal {
                           )
     stack
   }
+
+  def setStorageMax(stack: ItemStack, amount: Long): ItemStack = {
+    if (stack != null)
+      stack.forceTag.merge(NBT_COMPOUND_KEY ->
+                           NBTCompound(
+                                        STORAGE_MAX_KEY -> amount
+                                      )
+                          )
+    stack
+  }
 }
 
 class ItemPowerCrystal extends Item with IPowerCrystal {
+  override def getDurabilityForDisplay(stack: ItemStack): Double = {
+    val max = ItemPowerCrystal.getStorageMax(stack)
+    if (max > 0)
+      ItemPowerCrystal.getStorageCurrent(stack) / max
+    else 0
+  }
+
   override def getColorFromItemStack(stack: ItemStack, renderPass: Int): Int = if (renderPass > 0) super.getColorFromItemStack(stack, renderPass) else ItemPowerCrystal.getColor(stack)
 
   /**
@@ -187,27 +232,6 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
     * @return Color of the crystal.
     */
   override def getColor(stack: ItemStack) = ItemPowerCrystal.getColor(stack)
-
-  /**
-    *
-    * @param stack
-    * @return Size of the crystal.
-    */
-  override def getType(stack: ItemStack) = ItemPowerCrystal.getType(stack)
-
-  /**
-    *
-    * @param stack
-    * @return Range to allow connections in.
-    */
-  override def getRange(stack: ItemStack) = ItemPowerCrystal.getRange(stack)
-
-  /**
-    *
-    * @param stack
-    * @return Amount to multiply storage amount by.
-    */
-  override def getStorageMultiplier(stack: ItemStack) = ItemPowerCrystal.getStorageMultiplier(stack)
 
   override def registerIcons(ir: IIconRegister): Unit = {
     addMapping(TYPE_SMALL, ir.registerIcon(Femtocraft.ID + ":" + TEXTURE_PREFIX + "_" + TYPE_SMALL))
@@ -226,14 +250,38 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
               )
   }
 
+  override def getName(stack: ItemStack) = ItemPowerCrystal.getName(stack)
+
+  override def addInformation(stack: ItemStack, player: EntityPlayer, tooltipList: util.List[_], advTooltips: Boolean): Unit = {
+    super.addInformation(stack, player, tooltipList, advTooltips)
+    val tlist = tooltipList.asInstanceOf[java.util.List[String]]
+    tlist += "Crystal Type:" + getType(stack)
+    tlist += "Passive Gen:" + getPassiveGen(stack)
+    tlist += "Transfer Range:" + getRange(stack)
+    tlist += "Transfer Rate:" + getTransferRate(stack)
+    tlist += "Power:" + getStorageCurrent(stack) + "/" + getStorageMax(stack)
+  }
+
+  /**
+    *
+    * @param stack
+    * @return Size of the crystal.
+    */
+  override def getType(stack: ItemStack) = ItemPowerCrystal.getType(stack)
+
+  /**
+    *
+    * @param stack
+    * @return Range to allow connections in.
+    */
+  override def getRange(stack: ItemStack) = ItemPowerCrystal.getRange(stack)
+
   /**
     *
     * @param stack
     * @return Amount of power to generate per tick.
     */
   override def getPassiveGen(stack: ItemStack) = ItemPowerCrystal.getPassiveGen(stack)
-
-  override def getName(stack: ItemStack) = ItemPowerCrystal.getName(stack)
 
   /**
     *
@@ -242,13 +290,33 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
     */
   override def getTransferRate(stack: ItemStack): Int = ItemPowerCrystal.getTransferRate(stack)
 
-  override def addInformation(stack: ItemStack, player: EntityPlayer, tooltipList: util.List[_], advTooltips: Boolean): Unit = {
-    super.addInformation(stack, player, tooltipList, advTooltips)
-    val tlist = tooltipList.asInstanceOf[java.util.List[String]]
-    tlist += "Crystal Type:" + getType(stack)
-    tlist += "Passive Gen:" + getPassiveGen(stack)
-    tlist += "Transfer Range:" + getRange(stack)
-    tlist += "Storage Multiplier:" + getStorageMultiplier(stack)
-    tlist += "Transfer Rate:" + getTransferRate(stack)
-  }
+  /**
+    *
+    * @param stack
+    * @return Maximum amount of power crystal can store.
+    */
+  override def getStorageMax(stack: ItemStack): Long = ItemPowerCrystal.getStorageMax(stack)
+
+  /**
+    *
+    * @param stack
+    * @return Current amount of power crystal is storing.
+    */
+  override def getStorageCurrent(stack: ItemStack): Long = ItemPowerCrystal.getStorageCurrent(stack)
+
+  /**
+    *
+    * @param amount Amount of power to attempt to consume.
+    * @param doConsume Pass true to actually consume resources.  False simulates the store.
+    * @return Amount of @amount successfully removed.
+    */
+  override def consume(stack: ItemStack, amount: Long, doConsume: Boolean): Long = ItemPowerCrystal.consume(stack, amount, doConsume)
+
+  /**
+    *
+    * @param amount Amount of power to store.
+    * @param doStore Pass true to actually consume resources.  False simulates the store.
+    * @return Amount of @amount successfully stored.
+    */
+  override def store(stack: ItemStack, amount: Long, doStore: Boolean): Long = ItemPowerCrystal.store(stack, amount, doStore)
 }

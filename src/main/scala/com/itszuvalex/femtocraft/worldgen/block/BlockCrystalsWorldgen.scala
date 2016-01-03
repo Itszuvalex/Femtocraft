@@ -27,8 +27,8 @@ object BlockCrystalsWorldgen {
   val DROP_RANGE_MAX        = 16f
   val DROP_PASSIVE_GEN_MIN  = 0f
   val DROP_PASSIVE_GEN_MAX  = 1f
-  val DROP_STORAGE_MULT_MIN = 1f
-  val DROP_STORAGE_MULT_MAX = 1.2f
+  val DROP_STORAGE_MAX_MIN = 1000L
+  val DROP_STORAGE_MAX_MAX = 5000L
   val DROP_TRANSFER_MIN     = 50
   val DROP_TRANSFER_MAX     = 500
 
@@ -77,7 +77,7 @@ class BlockCrystalsWorldgen extends TileContainer(Material.glass) {
           }
           val range = random.nextFloat() * (DROP_RANGE_MAX - DROP_RANGE_MIN) + DROP_RANGE_MIN
           val passiveGen = random.nextFloat() * (DROP_PASSIVE_GEN_MAX - DROP_PASSIVE_GEN_MIN) + DROP_PASSIVE_GEN_MIN
-          val storage = random.nextFloat() * (DROP_STORAGE_MULT_MAX - DROP_STORAGE_MULT_MIN) + DROP_STORAGE_MULT_MIN
+          val storage = (random.nextDouble() * (DROP_STORAGE_MAX_MAX - DROP_STORAGE_MAX_MIN)).toLong + DROP_STORAGE_MAX_MIN
           val transfer = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN) + DROP_TRANSFER_MIN
           val crystal = new ItemStack(FemtoItems.itemPowerCrystal, 1)
           InventoryUtils.dropItem(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, range, storage, passiveGen, transfer),
