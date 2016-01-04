@@ -58,7 +58,7 @@ class BlockCrystalsWorldgen extends TileContainer(Material.glass) {
       val rx = rand.nextFloat()
       val ry = rand.nextFloat()
       val rz = rand.nextFloat()
-      Femtocraft.proxy.spawnParticle(world, "nanites", x + rx, y + ry, z + rz, tile.color)
+      Femtocraft.proxy.spawnParticle(world, "power", x + rx, y + ry, z + rz, tile.color)
     case _ =>
   }
 

@@ -109,6 +109,20 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     super.addChild(child)
   }
 
+  override def serverUpdate(): Unit = {
+    super.serverUpdate()
+    getCrystalStack match {
+      case null =>
+      case stack =>
+        stack.getItem match {
+          case null =>
+          case crystal: IPowerCrystal =>
+            crystal.onTick(stack)
+          case _ =>
+        }
+    }
+  }
+
   /**
     *
     * @param parent IPowerNode that is being checked.
