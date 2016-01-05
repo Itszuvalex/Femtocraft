@@ -41,36 +41,20 @@ object Femtocraft {
     FemtoBlocks.preInit()
     FemtoItems.preInit()
     FemtoFluids.preInit()
+    FemtoRecipes.preInit()
 
     FemtoPacketHandler.preInit()
 
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
-
-    registerRecipes()
   }
 
-  def registerRecipes(): Unit = {
-    GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.wheat_seeds, 1),
-                                                            IndexedSeq(new ItemStack(Items.wheat_seeds, 2),
-                                                                       new ItemStack(Items.wheat, 1)
-                                                                      ),
-                                                            500,
-                                                            GrowthChamberRecipe.TYPE_TEXTURE,
-                                                            Array(Resources.Texture("recipes/wheat0.png"),
-                                                                  Resources.Texture("recipes/wheat1.png"),
-                                                                  Resources.Texture("recipes/wheat2.png"),
-                                                                  Resources.Texture("recipes/wheat3.png"),
-                                                                  Resources.Texture("recipes/wheat4.png"),
-                                                                  Resources.Texture("recipes/wheat5.png"),
-                                                                  Resources.Texture("recipes/wheat6.png"),
-                                                                  Resources.Texture("recipes/wheat7.png"))))
-  }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
     FemtoBlocks.init()
     FemtoItems.init()
     FemtoFluids.init()
+    FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     CyberMachineRegistry.init()
   }
@@ -79,6 +63,7 @@ object Femtocraft {
     FemtoBlocks.postInit()
     FemtoItems.postInit()
     FemtoFluids.postInit()
+    FemtoRecipes.postInit()
     CybermaterialRegistry.postInit()
     proxy.postInit()
   }

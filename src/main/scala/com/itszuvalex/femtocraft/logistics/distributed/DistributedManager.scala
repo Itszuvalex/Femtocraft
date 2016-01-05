@@ -19,6 +19,60 @@ object DistributedManager {
     seekNewWorkers(provider)
   }
 
+  def seekNewWorkers(provider: ITaskProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
+    var orderingFunc = taskOrderingFunction
+    if (orderingFunc == null) {
+      orderingFunc = { (a, b) =>
+        val aP = a.getPriority
+        val bP = b.getPriority
+        val aFill = a.getWorkers.size / a.getWorkerCap
+        val bFill = b.getWorkers.size / b.getWorkerCap
+        if (aP > bP) true
+        else if (aP == bP) {
+          if (aFill < bFill) true
+          else if (aFill == bFill) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
+          else false
+        }
+        else false
+      }
+    }
+
+    val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getProviderLocation, provider.getWorkerConnectionRadius)
+                           .flatMap(_.getTileEntity(false))
+                           .collect { case wp: IWorkerProvider => wp }
+                           .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
+                           .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
+                           .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
+    val availableTasks = provider.getActiveTasks.filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
+    val workerProviders = new mutable.HashSet[IWorkerProvider]()
+
+    availableWorkers.foreach { worker =>
+      availableTasks.collectFirst { case task: ITask if worker.canWorkTask(task) && task.getWorkers.size < task.getWorkerCap => task } match {
+        case Some(task) =>
+          worker.setTask(task)
+          task.addWorker(worker)
+          workerProviders += worker.getProvider
+        case None =>
+      }
+                             }
+    refreshTaskStatus(provider)
+    workerProviders.foreach(refreshWorkerStatus)
+  }
+
+  def refreshWorkerStatus(provider: IWorkerProvider) = {
+    if (provider.getProvidedWorkers.exists(_.getTask == null))
+      availableWorkersTracker.trackLocation(provider.getProviderLocation)
+    else
+      availableWorkersTracker.removeLocation(provider.getProviderLocation)
+  }
+
+  def refreshTaskStatus(provider: ITaskProvider) = {
+    if (provider.getActiveTasks.exists(task => task.getWorkers.size < task.getWorkerCap))
+      availableTasksTracker.trackLocation(provider.getProviderLocation)
+    else
+      availableTasksTracker.removeLocation(provider.getProviderLocation)
+  }
+
   def addWorkerProvider(provider: IWorkerProvider): Unit = {
     workerProviderTracker.trackLocation(provider.getProviderLocation)
     seekNewTasks(provider)
@@ -29,6 +83,23 @@ object DistributedManager {
     workerProviderTracker.trackLocation(provider.getProviderLocation)
     seekNewWorkers(provider)
     seekNewTasks(provider)
+  }
+
+  /**
+    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
+    *
+    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
+    */
+  def onTaskEnd(task: ITask): Unit = {
+    val taskProvider = task.getProvider
+    val workerProviders = new mutable.HashSet[IWorkerProvider]()
+    task.getWorkers.foreach { worker =>
+      task.removeWorker(worker)
+      worker.setTask(null)
+      workerProviders += worker.getProvider
+                            }
+    refreshTaskStatus(taskProvider)
+    workerProviders.foreach(seekNewTasks(_))
   }
 
   def seekNewTasks(provider: IWorkerProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
@@ -69,77 +140,6 @@ object DistributedManager {
                              }
     refreshWorkerStatus(provider)
     taskProviders.foreach(refreshTaskStatus)
-  }
-
-  def refreshWorkerStatus(provider: IWorkerProvider) = {
-    if (provider.getProvidedWorkers.exists(_.getTask == null))
-      availableWorkersTracker.trackLocation(provider.getProviderLocation)
-    else
-      availableWorkersTracker.removeLocation(provider.getProviderLocation)
-  }
-
-  def refreshTaskStatus(provider: ITaskProvider) = {
-    if (provider.getActiveTasks.exists { task => task.getWorkers.size < task.getWorkerCap })
-      availableTasksTracker.trackLocation(provider.getProviderLocation)
-    else
-      availableTasksTracker.removeLocation(provider.getProviderLocation)
-  }
-
-  def seekNewWorkers(provider: ITaskProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
-    var orderingFunc = taskOrderingFunction
-    if (orderingFunc == null) {
-      orderingFunc = { (a, b) =>
-        val aP = a.getPriority
-        val bP = b.getPriority
-        val aFill = a.getWorkers.size / a.getWorkerCap
-        val bFill = b.getWorkers.size / b.getWorkerCap
-        if (aP > bP) true
-        else if (aP == bP) {
-          if (aFill < bFill) true
-          else if (aFill == bFill) a.getProvider.getProviderLocation.distSqr(provider.getProviderLocation) < b.getProvider.getProviderLocation.distSqr(provider.getProviderLocation)
-          else false
-        }
-        else false
-      }
-    }
-
-    val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getProviderLocation, provider.getWorkerConnectionRadius)
-                           .flatMap(_.getTileEntity(false))
-                           .collect { case wp: IWorkerProvider => wp }
-                           .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
-                           .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
-                           .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
-    val availableTasks = provider.getActiveTasks.filter { task => task.getWorkers.size < task.getWorkerCap }.toList.sortWith(orderingFunc)
-    val workerProviders = new mutable.HashSet[IWorkerProvider]()
-
-    availableWorkers.foreach { worker =>
-      availableTasks.collectFirst { case task: ITask if worker.canWorkTask(task) && task.getWorkers.size < task.getWorkerCap => task } match {
-        case Some(task) =>
-          worker.setTask(task)
-          task.addWorker(worker)
-          workerProviders += worker.getProvider
-        case None =>
-      }
-                             }
-    refreshTaskStatus(provider)
-    workerProviders.foreach(refreshWorkerStatus)
-  }
-
-  /**
-    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
-    *
-    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
-    */
-  def onTaskEnd(task: ITask): Unit = {
-    val taskProvider = task.getProvider
-    val workerProviders = new mutable.HashSet[IWorkerProvider]()
-    task.getWorkers.foreach { worker =>
-      task.removeWorker(worker)
-      worker.setTask(null)
-      workerProviders += worker.getProvider
-                            }
-    refreshTaskStatus(taskProvider)
-    workerProviders.foreach(seekNewTasks(_))
   }
 
   def removeTaskProvider(provider: ITaskProvider) = {
