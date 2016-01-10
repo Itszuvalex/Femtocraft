@@ -23,7 +23,6 @@ package com.itszuvalex.femtocraft.particles
 import com.itszuvalex.femtocraft.Femtocraft
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.EntityFX
 import net.minecraft.client.particle.EntityFX.{interpPosX, interpPosY, interpPosZ}
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.util.ResourceLocation
@@ -36,22 +35,36 @@ object EntityFxNanites {
 }
 
 @SideOnly(Side.CLIENT)
-class EntityFxNanites(par1World: World, x: Double, y: Double, z: Double, scale: Float, red: Float, green: Float, blue: Float) extends
-EntityFX(par1World, x, y, z, 0.0D, 0.0D, 0.0D) {
+class EntityFxNanites(args: ParticleArgs) extends
+BaseEntityFx(args) {
+  loadFromArgs(args)
+
+  def this(par1World: World, x: Double, y: Double, z: Double, _scale: Float, _red: Float, _green: Float, _blue: Float) =
+    this(new ParticleArgs(
+                           dimension = par1World.provider.dimensionId,
+                           posX = x,
+                           posY = y,
+                           posZ = z,
+                           scale = _scale,
+                           red = _red,
+                           green = _green,
+                           blue = _blue
+                         )
+        )
 
   def this(par1World: World, x: Double, y: Double, z: Double, red: Float, green: Float, blue: Float) =
     this(par1World, x, y, z, 1.0F, red, green, blue)
 
-  {
-    this.motionX *= 0.10000000149011612D
-    this.motionY *= 0.10000000149011612D
-    this.motionZ *= 0.10000000149011612D
+  def loadFromArgs(args: ParticleArgs): Unit = {
+    this.motionX *= args.motionX
+    this.motionY *= args.motionY
+    this.motionZ *= args.motionZ
     this.particleTextureIndexX = 0
     this.particleTextureIndexY = 1
     val f4 = Math.random.toFloat * 0.4F + 0.6F
-    this.particleRed = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * red * f4
-    this.particleGreen = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * green * f4
-    this.particleBlue = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * blue * f4
+    this.particleRed = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * args.red * f4
+    this.particleGreen = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * args.green * f4
+    this.particleBlue = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * args.blue * f4
     this.particleMaxAge = 60
     this.noClip = false
   }
