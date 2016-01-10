@@ -124,6 +124,6 @@ class ProxyClient extends ProxyCommon {
   }
 
   override def registerEventHandlers(): Unit = {
-    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
+//    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
   }
 }
