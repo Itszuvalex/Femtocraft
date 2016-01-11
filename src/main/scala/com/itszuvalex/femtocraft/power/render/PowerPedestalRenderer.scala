@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.IPowerPedestal
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.client.model.AdvancedModelLoader
@@ -14,10 +15,10 @@ import org.lwjgl.opengl.GL11
 object PowerPedestalRenderer {
   val pedestalModelLocation = Resources.Model("power pedestal/power_pedestal.obj")
   //  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.png")
-  //  val crystalTexLocation   = Resources.Model("power pedestal/power_pedestal.png")
+  val pedestalTexLocation   = Resources.Model("power pedestal/power_pedestal.png")
 }
 
-class PowerPedestalRenderer extends TileEntitySpecialRenderer with PowerNodeBeamRenderer {
+class PowerPedestalRenderer extends TileEntitySpecialRenderer {
   val pedestalModel = AdvancedModelLoader.loadModel(PowerPedestalRenderer.pedestalModelLocation).asInstanceOf[WavefrontObject]
 
   override def renderTileEntityAt(tile: TileEntity, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float): Unit = {
@@ -29,7 +30,7 @@ class PowerPedestalRenderer extends TileEntitySpecialRenderer with PowerNodeBeam
   }
 
   def renderPedestalAt(tile: TileEntity with IPowerPedestal, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float): Unit = {
-    //    Minecraft.getMinecraft.getTextureManager.bindTexture(crystalTexLocation)
+    Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalTexLocation)
     //    val color = new Color(tile.mountLoc.getTileEntity(true) match {
     //                            case Some(i:ICrystalMount) => i.getColor
     //                            case _ => 0
