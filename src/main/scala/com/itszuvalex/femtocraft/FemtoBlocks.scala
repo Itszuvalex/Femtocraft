@@ -6,7 +6,7 @@ import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifug
 import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
 import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
-import com.itszuvalex.femtocraft.power.block.BlockCrystalMount
+import com.itszuvalex.femtocraft.power.block.{BlockCrystalMount, BlockPowerPedestal}
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
@@ -44,7 +44,8 @@ object FemtoBlocks {
   var blockCyberMachineInProgress: Block = null
 
   var blockNaniteHiveSmall: Block = null
-  var blockCrystalMount : Block = null
+  var blockCrystalMount   : Block = null
+  var blockPowerPedestal  : Block = null
 
   //Tests
 
@@ -129,6 +130,9 @@ object FemtoBlocks {
 
     blockCrystalMount = new BlockCrystalMount().setCreativeTab(Femtocraft.tab).setBlockName("blockCrystalMount")
     GameRegistry.registerBlock(blockCrystalMount, "blockCrystalMount")
+
+    blockPowerPedestal = new BlockPowerPedestal().setCreativeTab(Femtocraft.tab).setBlockName("blockPowerPedestal")
+    GameRegistry.registerBlock(blockPowerPedestal, "blockPowerPedestal")
 
     //tests
 

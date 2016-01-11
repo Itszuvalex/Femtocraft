@@ -32,9 +32,9 @@ import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
-import com.itszuvalex.femtocraft.power.render.{CrystalMountRenderer, DiffusionNodeRenderer, PowerNodeRenderer}
+import com.itszuvalex.femtocraft.power.render.{CrystalMountRenderer, DiffusionNodeRenderer, PowerNodeRenderer, PowerPedestalRenderer}
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
-import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
+import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal}
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
@@ -45,7 +45,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
-import net.minecraftforge.common.MinecraftForge
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
@@ -104,6 +103,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], naniveHiveRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], new CrystalMountRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], new PowerPedestalRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)
@@ -124,6 +124,6 @@ class ProxyClient extends ProxyCommon {
   }
 
   override def registerEventHandlers(): Unit = {
-//    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
+    //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
   }
 }
