@@ -12,6 +12,9 @@ import net.minecraft.item.Item
 object FemtoItems {
   var itemPowerCrystal: Item = null
 
+  var itemDumbDust: Item = null
+  var itemCracklingDust: Item = null
+
 
   var itemFrame   : Item = null
   var itemBaseSeed: Item = null
