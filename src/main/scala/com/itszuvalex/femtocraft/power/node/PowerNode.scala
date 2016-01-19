@@ -109,7 +109,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     loadPowerConnectionInfo(compound)
   }
 
-  def loadPowerConnectionInfo(compound: NBTTagCompound) = {
+  def loadPowerConnectionInfo(compound: NBTTagCompound) : Unit = {
     compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
       color = comp.Int(PowerNode.COLOR_KEY)
       parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
