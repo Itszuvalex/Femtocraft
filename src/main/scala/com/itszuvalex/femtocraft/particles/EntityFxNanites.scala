@@ -30,6 +30,7 @@ import net.minecraft.world.World
 import org.lwjgl.opengl.GL11._
 
 
+@SideOnly(Side.CLIENT)
 object EntityFxNanites {
   val particleLocation = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/particles/particles.png")
 }

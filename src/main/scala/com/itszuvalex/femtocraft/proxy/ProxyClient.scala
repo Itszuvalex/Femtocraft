@@ -20,7 +20,6 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.FemtoItems
 import com.itszuvalex.femtocraft.cyber.CyberMachineRendererRegistry
 import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesRenderer, GrowthChamberRenderer}
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
@@ -38,6 +37,7 @@ import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import cpw.mods.fml.client.registry.{ClientRegistry, RenderingRegistry}
@@ -45,9 +45,15 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
+import org.apache.logging.log4j.Level
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
+    if (!world.isRemote) {
+      Femtocraft.logger.log(Level.WARN, "Attempted to spawn particle of type \"" + name + "\" on a non-client world.")
+      return null
+    }
+
     val mc = Minecraft.getMinecraft
     val deltaX = mc.renderViewEntity.posX - x
     val deltaY = mc.renderViewEntity.posY - y
@@ -60,13 +66,13 @@ class ProxyClient extends ProxyCommon {
     val col = new Color(color)
 
     name match {
-      case "power" =>
+      case ProxyCommon.PARTICLE_POWER =>
         fx = new EntityFxPower(world, x, y, z,
                                (col.red.toInt & 255).toFloat / 255f,
                                (col.green.toInt & 255).toFloat / 255f,
                                (col.blue.toInt & 255).toFloat / 255f
                               )
-      case "nanites" =>
+      case ProxyCommon.PARTICLE_NANITE =>
         fx = new EntityFxNanites(world, x, y, z,
                                  (col.red.toInt & 255).toFloat / 255f,
                                  (col.green.toInt & 255).toFloat / 255f,

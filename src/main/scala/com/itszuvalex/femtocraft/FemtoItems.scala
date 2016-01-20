@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.cyber.item.ItemBaseSeed
+import com.itszuvalex.femtocraft.cyber.item.{ItemBaseSeed, ItemDumbDust}
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import cpw.mods.fml.common.registry.GameRegistry
@@ -12,7 +12,7 @@ import net.minecraft.item.Item
 object FemtoItems {
   var itemPowerCrystal: Item = null
 
-  var itemDumbDust: Item = null
+  var itemDumbDust     : Item = null
   var itemCracklingDust: Item = null
 
 
@@ -28,6 +28,12 @@ object FemtoItems {
 
     itemBaseSeed = new ItemBaseSeed().setCreativeTab(Femtocraft.tab)
     GameRegistry.registerItem(itemBaseSeed, "itemBaseSeed")
+
+    itemDumbDust = new ItemDumbDust().setTextureName(Femtocraft.ID + ":" + "dust_dumb").setUnlocalizedName("itemDumbDust")
+    GameRegistry.registerItem(itemDumbDust, "itemDumbDust")
+
+    itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setTextureName(Femtocraft.ID + ":" + "dust_crystal").setUnlocalizedName("itemCracklingDust")
+    GameRegistry.registerItem(itemCracklingDust, "itemCracklingDust")
   }
 
   def init(): Unit = {

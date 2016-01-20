@@ -26,11 +26,15 @@ import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorke
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
-import com.itszuvalex.femtocraft.power.tile.{TilePowerPedestal, TileCrystalMount}
+import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal}
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
-import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
+
+object ProxyCommon {
+  val PARTICLE_NANITE = "nanites"
+  val PARTICLE_POWER  = "power"
+}
 
 class ProxyCommon {
   def postInit(): Unit = {
@@ -84,7 +88,7 @@ class ProxyCommon {
   def registerEventHandlers(): Unit = {
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
     null
   }
 }
