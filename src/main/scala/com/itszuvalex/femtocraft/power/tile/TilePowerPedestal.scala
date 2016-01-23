@@ -23,19 +23,11 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
 
   override def getMod: AnyRef = Femtocraft
 
-  override def hasDescription: Boolean = false
+  override def hasDescription: Boolean = true
 
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.writeToNBT(par1nbtTagCompound)
     savePowerInfo(par1nbtTagCompound)
-  }
-
-  def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
-    par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
-                       NBTCompound(
-                                    TilePowerPedestal.MOUNT_KEY -> mountLocation
-                                  )
-                      )
   }
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
@@ -48,6 +40,25 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
       mountLocation = comp.NBTCompound(TilePowerPedestal.MOUNT_KEY)(Loc4(_))
       Unit
                                                                         }
+  }
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    savePowerInfo(compound)
+  }
+
+  def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
+    par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
+                       NBTCompound(
+                                    TilePowerPedestal.MOUNT_KEY -> mountLocation
+                                  )
+                      )
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    loadPowerInfo(compound)
+    setRenderUpdate()
   }
 
   def onBlockBreak() = {
@@ -66,7 +77,7 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
   override def mountLoc: Loc4 = mountLocation
 
   def onPostBlockPlaced(): Unit = {
-    if(getWorldObj.isRemote) return
+    if (getWorldObj.isRemote) return
     if (!checkAndAddMount(ForgeDirection.UP))
       checkAndAddMount(ForgeDirection.DOWN)
   }
@@ -95,6 +106,9 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
     *
     * @param loc Location of mount.
     */
-  override def setMount(loc: Loc4): Unit = mountLocation = loc
+  override def setMount(loc: Loc4): Unit = {
+    mountLocation = loc
+    setUpdate()
+  }
 
 }
