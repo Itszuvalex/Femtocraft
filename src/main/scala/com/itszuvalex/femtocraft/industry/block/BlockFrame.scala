@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.industry.block
 
+import java.util.Random
+
 import com.itszuvalex.femtocraft.FemtoItems
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.core.TileContainer
@@ -32,4 +34,24 @@ class BlockFrame extends TileContainer(Material.iron) {
   }
 
   override def getPickBlock(target: MovingObjectPosition, world: World, x: Int, y: Int, z: Int, player: EntityPlayer): ItemStack = new ItemStack(FemtoItems.itemFrame)
+
+  override def randomDisplayTick(world: World, x: Int, y: Int, z: Int, random: Random): Unit = {
+    world.getTileEntity(x, y, z) match {
+      case null =>
+      case i: TileFrame if i.isCurrentlyBuilding =>
+      /*
+      if (world.isRemote)
+        if (random.nextInt(3) == 1)
+          (0 until 1).foreach { _ =>
+            val px = x + random.nextFloat()
+            val py = y + random.nextFloat()
+            val pz = z + random.nextFloat()
+            val half = 255f / 2f
+            val color = new Color(0, (random.nextFloat() * half + half).toByte, (random.nextFloat() * half + half).toByte, (random.nextFloat() * half + half).toByte)
+            Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
+                              }
+                              */
+      case _ =>
+    }
+  }
 }

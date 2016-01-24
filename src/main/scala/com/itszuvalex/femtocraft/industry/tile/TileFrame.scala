@@ -7,6 +7,8 @@ import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileM
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
+import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
@@ -21,6 +23,7 @@ import scala.collection.mutable
   * Created by Christopher on 8/29/2015.
   */
 object TileFrame {
+  val BUILDING_KEY        = "Building"
   val RENDER_SETTINGS_KEY = "RenderSettings"
   val MULTIBLOCK_KEY      = "Multiblock"
   val PROGRESS_KEY        = "BuildProgress"
@@ -88,8 +91,12 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   var renderInt                                       = TileFrame.fullRender(true)
   var multiBlock           : String                   = null
   var progress             : Int                      = 0
-  var totalMachineBuildTime: Float                    = 500f
+  // # of seconds * 20tps
+  var totalMachineBuildTime: Int                      = 10 * 20
   var inProgressData       : mutable.Map[String, Any] = mutable.Map()
+  var isBuilding           : Boolean                  = false
+
+  var isModifyingInv: Boolean = false
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
@@ -117,21 +124,88 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    if (!isController) return
-    if (getWorldObj.getTotalWorldTime % (totalMachineBuildTime / 100) == 0 && progress < 100) {
-      progress += 1
-      setUpdate()
-    }
-    if (progress >= 100 && worldObj.getTotalWorldTime >= inProgressData.getOrElse("targetTime", 0f).asInstanceOf[Float]) {
-      FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-        case Some(multi) =>
-          TileFrame.shouldDrop = false
-          TileFrame.shouldFullyRemove = false
-          multi.formAtLocation(getWorldObj, xCoord, yCoord, zCoord)
-          TileFrame.shouldFullyRemove = true
-          TileFrame.shouldDrop = true
-        case _ =>
+    if (isController) {
+      if (isBuilding) {
+        progress += 1
+        if (progress >= totalMachineBuildTime) {
+          FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+            case Some(multi) =>
+              TileFrame.shouldDrop = false
+              TileFrame.shouldFullyRemove = false
+              multi.formAtLocation(getWorldObj, xCoord, yCoord, zCoord)
+              TileFrame.shouldFullyRemove = true
+              TileFrame.shouldDrop = true
+            case _ =>
+          }
+        }
       }
+    }
+  }
+
+  def isCurrentlyBuilding: Boolean = {
+    if (isController) isBuilding
+    else if (isValidMultiBlock) {
+      getWorldObj.getTileEntity(info.x, info.y, info.z) match {
+        case null => false
+        case i: TileFrame if i.isController => i.isBuilding
+        case _ => false
+      }
+    }
+    else false
+  }
+
+  def checkForRequiredItems(): Unit = {
+    FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+      case Some(multi) =>
+        val items = multi.getRequiredResources
+        //TODO: extract to generic "InventoryContainsItems" method in a util class somewhere.
+        val itemsAndSlots = items.view.zip(items.map(getSlotsByItemStack(_).getOrElse(Set[Int]()))).map { case (item, slots) =>
+          (item, slots.filter { slot =>
+            getStackInSlot(slot) match {
+              case null => false
+              case i if IDDamageWildCardNBTComparator.compare(item, i) == 0 => true
+              case _ => false
+            }
+                              })
+                                                                                                        }
+        if (itemsAndSlots.
+            forall { case (item, slots) =>
+              if (slots.isEmpty) false
+              else {
+                var needed = item.stackSize
+                slots.exists { slot =>
+                  val i = getStackInSlot(slot)
+                  needed -= i.stackSize
+                  needed <= 0
+                             }
+              }
+                   }) {
+          itemsAndSlots.foreach { case (item, slots) =>
+            var needed = item.stackSize
+            slots.exists { slot =>
+              val i = getStackInSlot(slot)
+              val amt = Math.min(needed, i.stackSize)
+              needed -= amt
+              i.stackSize -= amt
+              if (i.stackSize <= 0) {
+                isModifyingInv = true
+                setInventorySlotContents(slot, null)
+                isModifyingInv = false
+              }
+              needed <= 0
+                         }
+                                }
+          isModifyingInv = true
+          val random = new Random()
+          indInventory.getInventory.zipWithIndex.foreach { case (item, slot) =>
+            if (!worldObj.isRemote) InventoryUtils.dropItem(item, getWorldObj, xCoord, yCoord, zCoord, random)
+            indInventory.setInventorySlotContents(slot, null)
+                                                         }
+          isModifyingInv = false
+          isBuilding = true
+          setUpdate()
+        }
+      case _ =>
     }
   }
 
@@ -145,32 +219,37 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
-    compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
-    compound.setString(TileFrame.MULTIBLOCK_KEY, if (multiBlock != null) multiBlock else "")
-    compound.setInteger(TileFrame.PROGRESS_KEY, progress)
+    saveFrameInfo(compound)
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
-    renderInt = compound.getInteger(TileFrame.RENDER_SETTINGS_KEY)
-    multiBlock = compound.getString(TileFrame.MULTIBLOCK_KEY)
+    loadFrameInfo(compound)
+  }
+
+  def loadFrameInfo(compound: NBTTagCompound): Unit = {
+    renderInt = compound.Int(TileFrame.RENDER_SETTINGS_KEY)
+    multiBlock = compound.String(TileFrame.MULTIBLOCK_KEY)
     if (multiBlock == "") multiBlock = null
-    progress = compound.getInteger(TileFrame.PROGRESS_KEY)
+    progress = compound.Int(TileFrame.PROGRESS_KEY)
+    isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
+    saveFrameInfo(compound)
+  }
+
+  def saveFrameInfo(compound: NBTTagCompound): Unit = {
     compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
     compound.setString(TileFrame.MULTIBLOCK_KEY, if (multiBlock != null) multiBlock else "")
     compound.setInteger(TileFrame.PROGRESS_KEY, progress)
+    compound.setBoolean(TileFrame.BUILDING_KEY, isBuilding)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    renderInt = compound.getInteger(TileFrame.RENDER_SETTINGS_KEY)
-    multiBlock = compound.getString(TileFrame.MULTIBLOCK_KEY)
-    if (multiBlock == "") multiBlock = null
-    progress = compound.getInteger(TileFrame.PROGRESS_KEY)
+    loadFrameInfo(compound)
     setRenderUpdate()
   }
 
@@ -216,7 +295,11 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 
   override def decrStackSize(slot: Int, amt: Int): ItemStack =
-    if (isController) indInventory.decrStackSize(slot, amt) else forwardToController[TileFrame, ItemStack](_.decrStackSize(slot, amt))
+    if (isController) {
+      val ret = indInventory.decrStackSize(slot, amt)
+      markDirty()
+      ret
+    } else forwardToController[TileFrame, ItemStack](_.decrStackSize(slot, amt))
 
   override def closeInventory(): Unit =
     if (isController) indInventory.closeInventory() else forwardToController[TileFrame, Unit](_.closeInventory())
@@ -228,7 +311,10 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     if (isController) indInventory.getInventoryStackLimit else forwardToController[TileFrame, Int](_.getInventoryStackLimit)
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean =
-    if (isController) indInventory.isItemValidForSlot(slot, item) else forwardToController[TileFrame, Boolean](_.isItemValidForSlot(slot, item))
+    if (isController) {
+      if (isBuilding) false
+      else indInventory.isItemValidForSlot(slot, item)
+    } else forwardToController[TileFrame, Boolean](_.isItemValidForSlot(slot, item))
 
   override def getStackInSlotOnClosing(slot: Int): ItemStack =
     if (isController) indInventory.getStackInSlotOnClosing(slot) else forwardToController[TileFrame, ItemStack](_.getStackInSlotOnClosing(slot))
@@ -237,7 +323,10 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     if (isController) indInventory.openInventory() else forwardToController[TileFrame, Unit](_.openInventory())
 
   override def setInventorySlotContents(slot: Int, item: ItemStack): Unit =
-    if (isController) indInventory.setInventorySlotContents(slot, item) else forwardToController[TileFrame, Unit](_.setInventorySlotContents(slot, item))
+    if (isController) {
+      indInventory.setInventorySlotContents(slot, item)
+      markDirty()
+    } else forwardToController[TileFrame, Unit](_.setInventorySlotContents(slot, item))
 
   override def isUseableByPlayer(player: EntityPlayer): Boolean =
     if (isController) indInventory.isUseableByPlayer(player) else forwardToController[TileFrame, Boolean](_.isUseableByPlayer(player))
@@ -250,4 +339,10 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def getInventoryName: String =
     if (isController) indInventory.getInventoryName else forwardToController[TileFrame, String](_.getInventoryName)
+
+  override def markDirty(): Unit = {
+    super.markDirty()
+    if (!isModifyingInv)
+      checkForRequiredItems()
+  }
 }
