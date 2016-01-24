@@ -4,6 +4,7 @@ package com.itszuvalex.femtocraft.render
   * Created by Christopher on 8/26/2015.
   */
 object RenderIDs {
+
   // Previewable IDs
   var framePreviewableID = 0
   var seedPreviewableID  = 0
@@ -26,4 +27,5 @@ object RenderIDs {
 
   //Regular IDs
   var naniteHiveSmallID = 0
+  var powerPedestalID   = 0
 }
