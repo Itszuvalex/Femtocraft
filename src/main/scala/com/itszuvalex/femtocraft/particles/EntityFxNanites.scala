@@ -67,7 +67,7 @@ BaseEntityFx(args) {
     this.particleGreen = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * args.green * f4
     this.particleBlue = ((Math.random * 0.20000000298023224D).toFloat + 0.8F) * args.blue * f4
     this.particleMaxAge = 60
-    this.noClip = false
+    this.noClip = true
   }
 
   override def getFXLayer = 3

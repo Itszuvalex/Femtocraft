@@ -61,7 +61,7 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
     this.powerParticleScale = this.particleScale
     this.particleMaxAge = (8.0D / (Math.random * 0.8D + 0.2D)).toInt
     this.particleMaxAge = (this.particleMaxAge.toFloat * scale).toInt
-    this.noClip = false
+    this.noClip = true
   }
 
   override def getFXLayer = 3

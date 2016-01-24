@@ -2,9 +2,11 @@ package com.itszuvalex.femtocraft.industry.block
 
 import java.util.Random
 
-import com.itszuvalex.femtocraft.FemtoItems
+import com.itszuvalex.femtocraft.{Femtocraft, FemtoItems}
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
+import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.itszulib.core.TileContainer
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.entity.player.EntityPlayer
@@ -39,7 +41,6 @@ class BlockFrame extends TileContainer(Material.iron) {
     world.getTileEntity(x, y, z) match {
       case null =>
       case i: TileFrame if i.isCurrentlyBuilding =>
-      /*
       if (world.isRemote)
         if (random.nextInt(3) == 1)
           (0 until 1).foreach { _ =>
@@ -50,7 +51,6 @@ class BlockFrame extends TileContainer(Material.iron) {
             val color = new Color(0, (random.nextFloat() * half + half).toByte, (random.nextFloat() * half + half).toByte, (random.nextFloat() * half + half).toByte)
             Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
                               }
-                              */
       case _ =>
     }
   }

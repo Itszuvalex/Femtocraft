@@ -1,7 +1,11 @@
 package com.itszuvalex.femtocraft.cyber.item
 
+import java.util.Random
+
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
+import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.world.World
@@ -19,21 +23,21 @@ class ItemDumbDust extends Item {
         world.setBlock(x, y, z, rblock)
         world.setBlockMetadataWithNotify(x, y, z, rdamage, 3)
         itemStack.stackSize -= 1
-        /*        if (world.isRemote) {
-                  val random = new Random()
-                  (0 until 4).foreach { i =>
-                    val rbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
-                    val gbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
-                    val bbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
-                    val offx = random.nextFloat() - .5f
-                    val offy = random.nextFloat() - .5f
-                    val offz = random.nextFloat() - .5f
-                    val px = (x + player.posX) /2
-                    val py = (y + player.posY) /2
-                    val pz = (z + player.posZ) /2
-                    Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, px + offx, py + offy, pz + offz, new Color(255.toByte, rbyte, gbyte, bbyte).toInt)
-                                      }
-                } */
+        if (world.isRemote) {
+          val random = new Random()
+          (0 until 4).foreach { i =>
+            val rbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
+            val gbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
+            val bbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
+            val offx = random.nextFloat() - .5f
+            val offy = random.nextFloat() - .5f
+            val offz = random.nextFloat() - .5f
+            val px = (x + player.posX) / 2
+            val py = (y + player.posY) / 2
+            val pz = (z + player.posZ) / 2
+            Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, px + offx, py + offy, pz + offz, new Color(255.toByte, rbyte, gbyte, bbyte).toInt)
+                              }
+        }
         true
       case None => false
     }
