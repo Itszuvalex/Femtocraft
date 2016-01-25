@@ -142,6 +142,16 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     }
   }
 
+
+  override def clientUpdate(): Unit = {
+    super.clientUpdate()
+    if (isController) {
+      if (isBuilding) {
+        progress += 1
+      }
+    }
+  }
+
   def isCurrentlyBuilding: Boolean = {
     if (isController) isBuilding
     else if (isValidMultiBlock) {

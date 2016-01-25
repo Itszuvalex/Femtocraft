@@ -66,7 +66,7 @@ class PowerPedestalRenderer extends TileEntitySpecialRenderer with ISimpleBlockR
 
   override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {
     GL11.glPushMatrix()
-    GL11.glTranslated(0, 0, 0)
+    GL11.glTranslated(0, -.5, 0)
     renderPedestalAt(0)
     GL11.glPopMatrix()
   }

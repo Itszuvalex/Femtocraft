@@ -108,12 +108,16 @@ class ProxyClient extends ProxyCommon {
     RenderingRegistry.registerBlockHandler(RenderIDs.naniteHiveSmallID, naniveHiveRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], naniveHiveRenderer)
 
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], new CrystalMountRenderer)
 
     val powerPedestalRenderer = new PowerPedestalRenderer
     RenderIDs.powerPedestalID = RenderingRegistry.getNextAvailableRenderId
     RenderingRegistry.registerBlockHandler(RenderIDs.powerPedestalID, powerPedestalRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], powerPedestalRenderer)
+
+    val crystalMountRenderer = new CrystalMountRenderer
+    RenderIDs.crystalMountRenderID = RenderingRegistry.getNextAvailableRenderId
+    RenderingRegistry.registerBlockHandler(RenderIDs.crystalMountRenderID, crystalMountRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], crystalMountRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)

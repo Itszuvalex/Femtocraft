@@ -4,7 +4,8 @@ import java.util.Random
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.ICrystalMount
-import com.itszuvalex.femtocraft.power.tile.{TilePowerPedestal, TileCrystalMount}
+import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
+import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.block.Block
@@ -22,9 +23,9 @@ class BlockCrystalMount extends TileContainer(Material.iron) {
 
   override def renderAsNormalBlock(): Boolean = false
 
-  override def getRenderBlockPass: Int = 2
-
   override def isOpaqueCube: Boolean = false
+
+  override def getRenderType: Int = RenderIDs.crystalMountRenderID
 
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, metadata: Int): Unit = {
     world.getTileEntity(x, y, z) match {
@@ -49,10 +50,11 @@ class BlockCrystalMount extends TileContainer(Material.iron) {
       case _ =>
     }
   }
+
   override def onPostBlockPlaced(p_149714_1_ : World, p_149714_2_ : Int, p_149714_3_ : Int, p_149714_4_ : Int, p_149714_5_ : Int): Unit = {
     p_149714_1_.getTileEntity(p_149714_2_, p_149714_3_, p_149714_4_) match {
       case i: TileCrystalMount =>
-          i.onPostBlockPlaced()
+        i.onPostBlockPlaced()
       case _ =>
     }
     super.onPostBlockPlaced(p_149714_1_, p_149714_2_, p_149714_3_, p_149714_4_, p_149714_5_)
