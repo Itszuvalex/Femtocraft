@@ -40,9 +40,11 @@ import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
-import cpw.mods.fml.client.registry.{ClientRegistry, RenderingRegistry}
+import cpw.mods.fml.client.registry.{ClientRegistry, ISimpleBlockRenderingHandler, RenderingRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
 import org.apache.logging.log4j.Level
@@ -103,21 +105,9 @@ class ProxyClient extends ProxyCommon {
     RenderIDs.graspingVinesID = CyberMachineRendererRegistry.bindRenderer(graspingVinesRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGraspingVines], graspingVinesRenderer)
 
-    val naniveHiveRenderer = new NaniteHiveSmallRenderer
-    RenderIDs.naniteHiveSmallID = RenderingRegistry.getNextAvailableRenderId
-    RenderingRegistry.registerBlockHandler(RenderIDs.naniteHiveSmallID, naniveHiveRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], naniveHiveRenderer)
-
-
-    val powerPedestalRenderer = new PowerPedestalRenderer
-    RenderIDs.powerPedestalID = RenderingRegistry.getNextAvailableRenderId
-    RenderingRegistry.registerBlockHandler(RenderIDs.powerPedestalID, powerPedestalRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], powerPedestalRenderer)
-
-    val crystalMountRenderer = new CrystalMountRenderer
-    RenderIDs.crystalMountRenderID = RenderingRegistry.getNextAvailableRenderId
-    RenderingRegistry.registerBlockHandler(RenderIDs.crystalMountRenderID, crystalMountRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], crystalMountRenderer)
+    RenderIDs.naniteHiveSmallID = bindBlockAndTESR(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
+    RenderIDs.powerPedestalID = bindBlockAndTESR(classOf[TilePowerPedestal], new PowerPedestalRenderer)
+    RenderIDs.crystalMountRenderID = bindBlockAndTESR(classOf[TileCrystalMount], new CrystalMountRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)
@@ -135,6 +125,13 @@ class ProxyClient extends ProxyCommon {
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
+  }
+
+  def bindBlockAndTESR(clazz: Class[_ <: TileEntity], renderer: TileEntitySpecialRenderer with ISimpleBlockRenderingHandler): Int = {
+    val int = RenderingRegistry.getNextAvailableRenderId
+    RenderingRegistry.registerBlockHandler(int, renderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(clazz, renderer)
+    int
   }
 
   override def registerEventHandlers(): Unit = {
