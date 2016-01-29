@@ -45,6 +45,16 @@ trait IWorker {
   def getEfficiency(attribute: String): Double
 
   /**
+    *
+    * Used by the task to inform the worker of information
+    *
+    * @param key   String key
+    * @param value Value of string
+    *
+    */
+  def inform(key: String, value: Double)
+
+  /**
     * Called every tick by the IWorkerProvider.
     */
   def onTick(): Unit

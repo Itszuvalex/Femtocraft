@@ -12,6 +12,7 @@ object IPowerNode {
   val DIFFUSION_NODE        = "Diffusion"
   val DIFFUSION_TARGET_NODE = "Diffusion_Target"
   val DIRECT_NODE           = "Direct"
+  val LONE_NODE             = "Lone"
   val DEFAULT_MAX_RADIUS    = 32f
 }
 
@@ -132,7 +133,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
   /**
     *
     * @param amount Amount of power to consume.
-    * @param doUse True if actually change values, false to simulate.
+    * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   def usePower(amount: Long, doUse: Boolean): Long

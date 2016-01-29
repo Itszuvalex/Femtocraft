@@ -16,6 +16,8 @@ import scala.util.Random
   */
 object PowerNode {
   val POWER_COMPOUND_KEY = "FemtoPower"
+  val POWER_STORAGE_KEY  = "Storage"
+  //TODO: Fix this up
   val NODE_PARENT_KEY    = "Parent"
   val NODE_CHILDREN_KEY  = "Children"
   val COLOR_KEY          = "Color"
@@ -70,7 +72,18 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     savePowerConnectionInfo(compound)
+    savePowerStorageInfo(compound)
   }
+
+  def savePowerStorageInfo(compound: NBTTagCompound): Unit = {
+    compound(PowerNode.POWER_STORAGE_KEY -> getPowerCurrent)
+  }
+
+  /**
+    *
+    * @return Amount of power currently stored in this node.
+    */
+  override def getPowerCurrent: Long = powerCurrent
 
   def savePowerConnectionInfo(compound: NBTTagCompound) =
     compound(PowerNode.POWER_COMPOUND_KEY ->
@@ -107,9 +120,14 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     loadPowerConnectionInfo(compound)
+    loadPowerStorageInfo(compound)
   }
 
-  def loadPowerConnectionInfo(compound: NBTTagCompound) : Unit = {
+  def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {
+    powerCurrent = compound.Int(PowerNode.POWER_STORAGE_KEY)
+  }
+
+  def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
     compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
       color = comp.Int(PowerNode.COLOR_KEY)
       parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
@@ -203,7 +221,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   /**
     *
     * @param amount Amount of power to consume.
-    * @param doUse True if actually change values, false to simulate.
+    * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   override def usePower(amount: Long, doUse: Boolean): Long = {
@@ -212,12 +230,6 @@ trait PowerNode extends TileEntity with IPowerNode {
       powerCurrent -= min
     min
   }
-
-  /**
-    *
-    * @return Amount of power currently stored in this node.
-    */
-  override def getPowerCurrent: Long = powerCurrent
 
   /**
     *

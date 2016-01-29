@@ -48,7 +48,6 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
 
   override def hasDescription = false
 
-
   override def invalidate(): Unit = {
     super.invalidate()
     if (worldObj.isRemote) return
