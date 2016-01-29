@@ -31,9 +31,9 @@ import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
-import com.itszuvalex.femtocraft.power.render.{CrystalMountRenderer, DiffusionNodeRenderer, PowerNodeRenderer, PowerPedestalRenderer}
+import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
-import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal}
+import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal, TilePowerSink}
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
@@ -108,6 +108,7 @@ class ProxyClient extends ProxyCommon {
     RenderIDs.naniteHiveSmallID = bindBlockAndTESR(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
     RenderIDs.powerPedestalID = bindBlockAndTESR(classOf[TilePowerPedestal], new PowerPedestalRenderer)
     RenderIDs.crystalMountRenderID = bindBlockAndTESR(classOf[TileCrystalMount], new CrystalMountRenderer)
+    RenderIDs.powerSinkRendererID = bindBlockAndTESR(classOf[TilePowerSink], new PowerSinkRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)

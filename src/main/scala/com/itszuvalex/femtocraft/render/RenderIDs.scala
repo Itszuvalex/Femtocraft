@@ -30,4 +30,5 @@ object RenderIDs {
   var naniteHiveSmallID    = 0
   var powerPedestalID      = 0
   var crystalMountRenderID = 0
+  var powerSinkRendererID  = 0
 }
