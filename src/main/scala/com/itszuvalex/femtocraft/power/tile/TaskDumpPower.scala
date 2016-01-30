@@ -31,7 +31,8 @@ class TaskDumpPower(val owner: IPowerNode with ITaskProvider, private val taskTy
     workers.foreach { worker =>
       worker.inform(TaskDumpPower.INFORM_POWER_RATE, transferRate.toDouble)
       val powerToDump = worker.getEfficiency(TaskDumpPower.EFFICIENCY_POWER_TO_DUMP).toLong
-      val power = Math.min(powerToDump, transferRate)
+      var power = Math.min(powerToDump, transferRate)
+      power = Math.min(power, owner.getPowerMax - owner.getPowerCurrent)
       worker.inform(TaskDumpPower.INFORM_POWER_DRAINED, power.toDouble)
       owner.addPower(power, doFill = true)
       worker.onTick()
@@ -62,7 +63,7 @@ class TaskDumpPower(val owner: IPowerNode with ITaskProvider, private val taskTy
     *
     * @return Task priority.  Higher values are higher priority.
     */
-  override def getPriority = priority
+  override def getPriority = (owner.getPowerMax - owner.getPowerCurrent).toInt
 
   /**
     *

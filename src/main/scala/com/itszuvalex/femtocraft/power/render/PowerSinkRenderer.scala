@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.power.IPowerPedestal
 import com.itszuvalex.femtocraft.power.tile.TilePowerSink
 import com.itszuvalex.femtocraft.render.RenderIDs
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler
@@ -12,6 +13,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.model.AdvancedModelLoader
 import net.minecraftforge.client.model.obj.WavefrontObject
+import net.minecraftforge.common.util.ForgeDirection
 import org.lwjgl.opengl.GL11
 
 /**
@@ -36,7 +38,8 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer with ISimpleBlockRende
     val f2: Float = tile.getWorldObj.getTotalWorldTime.toFloat + partialTicks
     tile match {
       case sink: TilePowerSink =>
-        renderSink(flipped = false, f2)
+        val flipped = sink.getLoc.getOffset(ForgeDirection.UP).getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])
+        renderSink(flipped, f2)
       case _ =>
     }
     GL11.glPopMatrix()
@@ -47,22 +50,29 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer with ISimpleBlockRende
 
     GL11.glColor3f(1f, 1f, 1f)
 
+    if (flipped) {
+      GL11.glTranslated(0, .5, 0)
+      GL11.glRotated(180, 1, 0, 0)
+      GL11.glTranslated(0, -.5, 0)
+    }
+
+
     pedestalModel.renderPart(PowerSinkRenderer.PART_FRAME)
     pedestalModel.renderPart(PowerSinkRenderer.PART_SPHERE)
 
     GL11.glPushMatrix()
     GL11.glTranslated(0, .5, 0)
-    GL11.glRotatef(partialTicks, 1f, 0f, 0f)
+    GL11.glRotatef(partialTicks * 2, 1f, 0f, 0f)
     GL11.glTranslated(0, -.5, 0)
     pedestalModel.renderPart(PowerSinkRenderer.PART_TORUS_OUTER)
     GL11.glTranslated(0, .5, 0)
-    GL11.glRotatef(partialTicks, 0f, 0f, 1f)
+    GL11.glRotatef(partialTicks * 3, 0f, 0f, 1f)
     GL11.glTranslated(0, -.5, 0)
     pedestalModel.renderPart(PowerSinkRenderer.PART_TORUS_INNER)
     GL11.glPopMatrix()
   }
 
-  override def getRenderId: Int = RenderIDs.powerSinkRendererID
+  override def getRenderId: Int = RenderIDs.powerSinkID
 
   override def shouldRender3DInInventory(modelId: Int) = true
 

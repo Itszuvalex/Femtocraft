@@ -70,7 +70,7 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
       crystalModel.renderPart(crystalName)
   }
 
-  override def getRenderId: Int = RenderIDs.crystalMountRenderID
+  override def getRenderId: Int = RenderIDs.crystalMountID
 
   override def shouldRender3DInInventory(modelId: Int): Boolean = true
 

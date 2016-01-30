@@ -107,8 +107,11 @@ class ProxyClient extends ProxyCommon {
 
     RenderIDs.naniteHiveSmallID = bindBlockAndTESR(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
     RenderIDs.powerPedestalID = bindBlockAndTESR(classOf[TilePowerPedestal], new PowerPedestalRenderer)
-    RenderIDs.crystalMountRenderID = bindBlockAndTESR(classOf[TileCrystalMount], new CrystalMountRenderer)
-    RenderIDs.powerSinkRendererID = bindBlockAndTESR(classOf[TilePowerSink], new PowerSinkRenderer)
+    RenderIDs.crystalMountID = bindBlockAndTESR(classOf[TileCrystalMount], new CrystalMountRenderer)
+    RenderIDs.powerSinkID = bindBlockAndTESR(classOf[TilePowerSink], new PowerSinkRenderer)
+
+    RenderIDs.glowStickID = RenderingRegistry.getNextAvailableRenderId
+    RenderingRegistry.registerBlockHandler(RenderIDs.glowStickID, new GlowStickRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)

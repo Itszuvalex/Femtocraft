@@ -25,7 +25,7 @@ class BlockCrystalMount extends TileContainer(Material.iron) {
 
   override def isOpaqueCube: Boolean = false
 
-  override def getRenderType: Int = RenderIDs.crystalMountRenderID
+  override def getRenderType: Int = RenderIDs.crystalMountID
 
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, metadata: Int): Unit = {
     world.getTileEntity(x, y, z) match {

@@ -124,7 +124,7 @@ trait PowerNode extends TileEntity with IPowerNode {
   }
 
   def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {
-    powerCurrent = compound.Int(PowerNode.POWER_STORAGE_KEY)
+    powerCurrent = compound.Long(PowerNode.POWER_STORAGE_KEY)
   }
 
   def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {

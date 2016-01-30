@@ -18,7 +18,7 @@ class BlockPowerSink extends TileContainer(Material.iron) {
 
   override def isOpaqueCube: Boolean = false
 
-  override def getRenderType: Int = RenderIDs.powerSinkRendererID
+  override def getRenderType: Int = RenderIDs.powerSinkID
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TilePowerSink
 }

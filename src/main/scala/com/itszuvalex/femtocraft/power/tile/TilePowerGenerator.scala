@@ -23,11 +23,17 @@ object TilePowerGenerator {
 class TilePowerGenerator extends TileEntityBase with IPowerGenerator with PowerNode {
   val workerPowerDumper = new WorkerPowerDumper(this, TaskDumpPower.TASK_TYPE_DUMP_POWER)
   var isDumping         = false
+  var shouldRegister    = false
   powerMax = TilePowerGenerator.POWER_MAXIMUM
 
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
+
+    if (shouldRegister) {
+      shouldRegister = false
+      DistributedManager.addWorkerProvider(this)
+    }
 
     if (powerCurrent >= powerMax) {
       isDumping = true
@@ -76,8 +82,7 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator with PowerN
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     isDumping = compound.getBoolean(TilePowerGenerator.KEY_IS_DUMPING)
-    if (isDumping)
-      DistributedManager.addWorkerProvider(this)
+    shouldRegister = isDumping
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {

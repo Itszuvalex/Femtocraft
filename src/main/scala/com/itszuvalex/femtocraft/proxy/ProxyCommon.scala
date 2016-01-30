@@ -26,7 +26,7 @@ import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorke
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
-import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerGenerator, TilePowerPedestal, TilePowerSink}
+import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.world.World
@@ -76,6 +76,8 @@ class ProxyCommon {
 
     GameRegistry.registerTileEntity(classOf[TilePowerSink], "TilePowerSink")
     GameRegistry.registerTileEntity(classOf[TilePowerGenerator], "TilePowerGenerator")
+
+    GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 
     GameRegistry.registerTileEntity(classOf[TileFrame], "TileFrame")
     GameRegistry.registerTileEntity(classOf[TileCyberMachineInProgress], "TileCyberMachineInProgress")
