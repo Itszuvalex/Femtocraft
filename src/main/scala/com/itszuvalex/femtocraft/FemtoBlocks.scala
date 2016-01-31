@@ -4,7 +4,7 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber, BlockFrame}
 import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
-import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
+import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
 import com.itszuvalex.femtocraft.power.test._
@@ -54,7 +54,8 @@ object FemtoBlocks {
 
   //Tests
 
-  var testBlock: Block = null
+  var testBlock       : Block = null
+  var testNetworkBlock: Block = null
 
 
   var testDiffusionNode      : Block = null
@@ -154,6 +155,8 @@ object FemtoBlocks {
     testBlock = new BlockTest
     GameRegistry.registerBlock(testBlock, "testBlock")
 
+    testNetworkBlock = new BlockNetworkTest
+    GameRegistry.registerBlock(testNetworkBlock, "testNetworkBlock")
 
     testDiffusionNode = new BlockDiffusionNodeTest
     testDiffusionNode.setBlockName("testDiffusionNode")
