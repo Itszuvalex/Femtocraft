@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, IWorker}
-import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
@@ -18,13 +17,15 @@ object TilePowerGenerator {
   val POWER_MAXIMUM     = 2000L
   val POWER_GEN         = 20L
   val KEY_IS_DUMPING    = "Dumping"
+  val KEY_POWER_CURRENT = "CurrentPower"
 }
 
-class TilePowerGenerator extends TileEntityBase with IPowerGenerator with PowerNode {
+class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
   val workerPowerDumper = new WorkerPowerDumper(this, TaskDumpPower.TASK_TYPE_DUMP_POWER)
+  val powerMax          = TilePowerGenerator.POWER_MAXIMUM
   var isDumping         = false
   var shouldRegister    = false
-  powerMax = TilePowerGenerator.POWER_MAXIMUM
+  var powerCurrent      = 0L
 
 
   override def serverUpdate(): Unit = {
@@ -77,12 +78,14 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator with PowerN
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     compound.setBoolean(TilePowerGenerator.KEY_IS_DUMPING, isDumping)
+    compound.setLong(TilePowerGenerator.KEY_POWER_CURRENT, powerCurrent)
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     isDumping = compound.getBoolean(TilePowerGenerator.KEY_IS_DUMPING)
     shouldRegister = isDumping
+    powerCurrent = compound.getLong(TilePowerGenerator.KEY_POWER_CURRENT)
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
@@ -102,9 +105,21 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator with PowerN
     */
   override def getProvidedWorkers: Set[IWorker] = if (isDumping) Set(workerPowerDumper) else Set()
 
+  override def getCurrentPower = powerCurrent
+
   /**
     *
-    * @return The type of PowerNode this is.
+    * @param amt     Amount of power to drain
+    * @param doDrain False to simulate, true to actually remove power.
+    * @return Amount of amt that was successfully drained.
     */
-  override def getType = IPowerNode.LONE_NODE
+  override def drain(amt: Long, doDrain: Boolean): Long = {
+    val amtd = Math.min(amt, powerCurrent)
+    if (doDrain) {
+      powerCurrent -= amtd
+    }
+    amtd
+  }
+
+  override def getMaximumPower = powerMax
 }

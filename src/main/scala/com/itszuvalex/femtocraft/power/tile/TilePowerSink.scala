@@ -1,11 +1,12 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, ITaskProvider}
-import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask}
+import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.Set
 
@@ -13,14 +14,11 @@ import scala.collection.Set
   * Created by Christopher Harris (Itszuvalex) on 1/28/2016.
   */
 object TilePowerSink {
-  val POWER_MAX               = 10000L
   val POWER_CONNECTION_RADIUS = 16f
 }
 
-class TilePowerSink extends TileEntityBase with ITaskProvider with PowerNode {
+class TilePowerSink extends TileEntityBase with IPowerSink {
   val taskDumpPower = new TaskDumpPower(this, TaskDumpPower.TASK_TYPE_DUMP_POWER, 5L, 1, 0)
-
-  powerMax = TilePowerSink.POWER_MAX
 
   override def getMod: AnyRef = Femtocraft
 
@@ -39,12 +37,6 @@ class TilePowerSink extends TileEntityBase with ITaskProvider with PowerNode {
 
   override def hasDescription: Boolean = true
 
-  /**
-    *
-    * @return The type of PowerNode this is.
-    */
-  override def getType = IPowerNode.LONE_NODE
-
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
@@ -54,7 +46,7 @@ class TilePowerSink extends TileEntityBase with ITaskProvider with PowerNode {
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
-    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power = " + powerCurrent + "/" + powerMax)
+    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power = " + getCurrentPower + "/" + getMaximumPower)
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Tasks(" + getActiveTasks.size + "):")
     getActiveTasks.collect { case task: ITask =>
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap)
@@ -71,6 +63,21 @@ class TilePowerSink extends TileEntityBase with ITaskProvider with PowerNode {
     */
   override def getActiveTasks: Set[ITask] = Set(taskDumpPower)
 
+  override def getCurrentPower: Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerCurrent).getOrElse(0)
+
+  def getPedestal: Option[IPowerPedestal] = {
+    var loc = getLoc.getOffset(ForgeDirection.UP)
+    if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
+      loc = getLoc.getOffset(ForgeDirection.DOWN)
+      if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
+        loc = null
+      }
+    }
+    Option(loc).flatMap(_.getTileEntity(true)).collect { case i: IPowerPedestal => i }
+  }
+
+  override def getMaximumPower: Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerMax).getOrElse(0)
+
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
@@ -81,4 +88,13 @@ class TilePowerSink extends TileEntityBase with ITaskProvider with PowerNode {
     super.invalidate()
     DistributedManager.removeTaskProvider(this)
   }
+
+  /**
+    *
+    * @param amt      Amount to attempt to charge
+    * @param doCharge False to simulate, true to actually do
+    * @return Amount of amt used to actually charge.
+    */
+  override def charge(amt: Long, doCharge: Boolean): Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.addPower(amt, doCharge)).getOrElse(0)
+
 }

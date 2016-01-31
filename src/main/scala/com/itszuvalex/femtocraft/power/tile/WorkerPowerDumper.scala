@@ -1,12 +1,11 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.logistics.distributed.{ITask, IWorker}
-import com.itszuvalex.femtocraft.power.node.IPowerNode
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/28/2016.
   */
-class WorkerPowerDumper(val owner: IPowerNode with IPowerGenerator, private val taskType: String) extends IWorker {
+class WorkerPowerDumper(val owner: IPowerGenerator, private val taskType: String) extends IWorker {
   var task: ITask  = null
   var transferRate = 0L
 
@@ -32,7 +31,7 @@ class WorkerPowerDumper(val owner: IPowerNode with IPowerGenerator, private val 
     * Called every tick by the IWorkerProvider.
     */
   override def onTick(): Unit = {
-    if (owner.getPowerCurrent <= 0) {
+    if (owner.getCurrentPower <= 0) {
       owner.onDumpNoPower(this)
     }
   }
@@ -44,7 +43,7 @@ class WorkerPowerDumper(val owner: IPowerNode with IPowerGenerator, private val 
     */
   override def getEfficiency(attribute: String): Double = {
     attribute match {
-      case TaskDumpPower.EFFICIENCY_POWER_TO_DUMP => owner.getPowerCurrent.toDouble
+      case TaskDumpPower.EFFICIENCY_POWER_TO_DUMP => owner.getCurrentPower.toDouble
       case _ => 0.toDouble
     }
   }
@@ -67,7 +66,7 @@ class WorkerPowerDumper(val owner: IPowerNode with IPowerGenerator, private val 
   override def inform(key: String, value: Double): Unit = {
     key match {
       case TaskDumpPower.INFORM_POWER_RATE => transferRate = value.toLong
-      case TaskDumpPower.INFORM_POWER_DRAINED => owner.usePower(value.toLong, doUse = true)
+      case TaskDumpPower.INFORM_POWER_DRAINED => owner.drain(value.toLong, doDrain = true)
       case _ =>
     }
   }

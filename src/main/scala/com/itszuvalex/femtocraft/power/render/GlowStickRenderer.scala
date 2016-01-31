@@ -100,7 +100,6 @@ class GlowStickRenderer extends ISimpleBlockRenderingHandler {
     coloredModel.addQuad(west_color)
     coloredModel.addQuad(south_color)
     coloredModel.addQuad(east_color)
-
   }
 
   def renderGlowStick(x: Int, y: Int, z: Int, color: Int): Unit = {

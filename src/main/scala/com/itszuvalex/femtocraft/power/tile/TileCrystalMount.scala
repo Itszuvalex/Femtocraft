@@ -92,27 +92,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   /**
     *
-    * @return The type of PowerNode this is.
-    */
-  override def getType: String = getCrystalStack match {
-    case stack if stack != null =>
-      stack.getItem match {
-        case item: IPowerCrystal => getNodeTypeFromCrystalType(item.getType(stack))
-        case _ => null
-      }
-    case _ => null
-  }
-
-  def getNodeTypeFromCrystalType(crystalType: String): String = {
-    crystalType match {
-      case IPowerCrystal.TYPE_LARGE => IPowerNode.GENERATION_NODE
-      case null => null
-      case _ => IPowerNode.TRANSFER_NODE
-    }
-  }
-
-  /**
-    *
     * @param child
     * @return True if child is successfully added.
     */
@@ -154,10 +133,10 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def getPowerCurrent: Long = {
     getCrystalStack match {
+      case null => 0
       case stack => stack.getItem match {
         case crystal: IPowerCrystal =>
           crystal.getStorageCurrent(stack)
-        case _ => 0
       }
       case _ => 0
     }
@@ -171,14 +150,20 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def usePower(amount: Long, doUse: Boolean): Long = {
     getCrystalStack match {
+      case null => 0
       case stack => stack.getItem match {
         case crystal: IPowerCrystal =>
           crystal.consume(stack, amount, doUse)
         case _ => 0
       }
-      case _ => 0
     }
   }
+
+  /**
+    *
+    * @return Crystal ItemStack.  Null if no crystal.
+    */
+  override def getCrystalStack = getStackInSlot(0)
 
   /**
     *
@@ -190,6 +175,27 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
     case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
     case _ => false
+  }
+
+  /**
+    *
+    * @return The type of PowerNode this is.
+    */
+  override def getType: String = getCrystalStack match {
+    case stack if stack != null =>
+      stack.getItem match {
+        case item: IPowerCrystal => getNodeTypeFromCrystalType(item.getType(stack))
+        case _ => null
+      }
+    case _ => null
+  }
+
+  def getNodeTypeFromCrystalType(crystalType: String): String = {
+    crystalType match {
+      case IPowerCrystal.TYPE_LARGE => IPowerNode.GENERATION_NODE
+      case null => null
+      case _ => IPowerNode.TRANSFER_NODE
+    }
   }
 
   override def hasDescription: Boolean = true
@@ -211,12 +217,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     savePowerConnectionInfo(compound)
     savePedestalLocInfo(compound)
   }
-
-  /**
-    *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  override def getCrystalStack = getStackInSlot(0)
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
@@ -364,12 +364,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def addPower(amount: Long, doFill: Boolean): Long = {
     getCrystalStack match {
+      case null => 0
       case stack => stack.getItem match {
+        case null => 0
         case crystal: IPowerCrystal =>
           crystal.store(stack, amount, doFill)
-        case _ => 0
       }
-      case _ => 0
     }
   }
 
@@ -379,12 +379,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def setPower(amount: Long): Unit = {
     getCrystalStack match {
+      case null =>
       case stack => stack.getItem match {
+        case null =>
         case crystal: IPowerCrystal =>
           crystal.setStorageCurrent(stack, amount)
-        case _ =>
       }
-      case _ =>
     }
   }
 
@@ -394,12 +394,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def getPowerMax: Long = {
     getCrystalStack match {
+      case null => 0
       case stack => stack.getItem match {
+        case null => 0
         case crystal: IPowerCrystal =>
           crystal.getStorageMax(stack)
-        case _ => 0
       }
-      case _ => 0
     }
   }
 }

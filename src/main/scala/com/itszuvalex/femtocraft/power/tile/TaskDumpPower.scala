@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, ITaskProvider, IWorker}
-import com.itszuvalex.femtocraft.power.node.IPowerNode
+import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, IWorker}
 
 import scala.collection.Set
 
@@ -15,7 +14,7 @@ object TaskDumpPower {
   val INFORM_POWER_DRAINED     = "Drained"
 }
 
-class TaskDumpPower(val owner: IPowerNode with ITaskProvider, private val taskType: String, val transferRate: Long, private val workerCap: Int, private val priority: Int) extends ITask {
+class TaskDumpPower(val owner: IPowerSink, private val taskType: String, val transferRate: Long, private val workerCap: Int, private val priority: Int) extends ITask {
   val workers = new scala.collection.mutable.HashSet[IWorker]()
 
   /**
@@ -32,9 +31,9 @@ class TaskDumpPower(val owner: IPowerNode with ITaskProvider, private val taskTy
       worker.inform(TaskDumpPower.INFORM_POWER_RATE, transferRate.toDouble)
       val powerToDump = worker.getEfficiency(TaskDumpPower.EFFICIENCY_POWER_TO_DUMP).toLong
       var power = Math.min(powerToDump, transferRate)
-      power = Math.min(power, owner.getPowerMax - owner.getPowerCurrent)
+      power = Math.min(power, owner.getMaximumPower - owner.getCurrentPower)
       worker.inform(TaskDumpPower.INFORM_POWER_DRAINED, power.toDouble)
-      owner.addPower(power, doFill = true)
+      owner.charge(power, doCharge = true)
       worker.onTick()
                     }
 
@@ -63,7 +62,7 @@ class TaskDumpPower(val owner: IPowerNode with ITaskProvider, private val taskTy
     *
     * @return Task priority.  Higher values are higher priority.
     */
-  override def getPriority = (owner.getPowerMax - owner.getPowerCurrent).toInt
+  override def getPriority = (owner.getMaximumPower - owner.getCurrentPower).toInt
 
   /**
     *
