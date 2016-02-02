@@ -41,7 +41,7 @@ class OreNameFilterRule extends IItemFilterRule {
 
   private def updateRegexp() = {
     try {
-      regexp = Pattern.compile(oreName)
+      regexp = Pattern.compile(oreName.trim)
     }
     catch {
       case ignored: Throwable =>
