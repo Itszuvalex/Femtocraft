@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft
 
 
 import com.itszuvalex.femtocraft.cyber.block._
-import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber, BlockFrame}
+import com.itszuvalex.femtocraft.industry.block._
 import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
@@ -27,6 +27,7 @@ object FemtoBlocks {
   var blockArcFurnace            : Block = null
   var blockCrystallizationChamber: Block = null
   var blockCentrifuge            : Block = null
+  var blockFurnace               : Block = null
   var blockGrowthChamber         : Block = null
   var blockBioBeacon             : Block = null
   var blockCondensationArray     : Block = null
@@ -91,6 +92,9 @@ object FemtoBlocks {
 
     blockCentrifuge = new BlockCentrifuge().setCreativeTab(Femtocraft.tab).setBlockName("blockCentrifuge")
     GameRegistry.registerBlock(blockCentrifuge, "blockCentrifuge")
+
+    blockFurnace = new BlockFurnace().setCreativeTab(Femtocraft.tab).setBlockName("blockFurnace")
+    GameRegistry.registerBlock(blockFurnace, "blockFurnace")
 
     blockGrowthChamber = new BlockGrowthChamber().setBlockName("blockGrowthChamber")
     GameRegistry.registerBlock(blockGrowthChamber, "blockGrowthChamber")

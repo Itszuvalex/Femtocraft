@@ -43,8 +43,6 @@ class PowerPedestalRenderer extends TileEntitySpecialRenderer with ISimpleBlockR
     }
 
     GL11.glPopMatrix()
-
-    true
   }
 
   def renderPedestalAt(icolor: Int): Unit = {

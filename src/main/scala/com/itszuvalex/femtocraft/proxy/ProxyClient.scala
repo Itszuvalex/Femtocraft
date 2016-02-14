@@ -24,8 +24,8 @@ import com.itszuvalex.femtocraft.cyber.CyberMachineRendererRegistry
 import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesRenderer, GrowthChamberRenderer}
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
-import com.itszuvalex.femtocraft.industry.render.{ArcFurnaceRenderer, FrameItemRenderer, FrameRenderer}
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
+import com.itszuvalex.femtocraft.industry.render._
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileFurnace}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
@@ -92,10 +92,15 @@ class ProxyClient extends ProxyCommon {
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
     RenderIDs.seedPreviewableID = PreviewableRendererRegistry.bindRenderer(new CyberPreviewableRenderer)
+    RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
 
     val arcFurnaceRenderer = new ArcFurnaceRenderer
     RenderIDs.multiblockArcFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(arcFurnaceRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileArcFurnace], arcFurnaceRenderer)
+
+    val furnaceRenderer = new FurnaceRenderer
+    RenderIDs.multiblockFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(furnaceRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFurnace], furnaceRenderer)
 
     val growthChamberRenderer = new GrowthChamberRenderer
     RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)
@@ -123,6 +128,8 @@ class ProxyClient extends ProxyCommon {
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
+
+    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCyberBase], new CyberBaseRenderer)
 

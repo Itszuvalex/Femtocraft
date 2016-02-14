@@ -18,11 +18,15 @@ trait IFrameMultiblock {
 
   def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean
 
+  def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean
+
   def getTakenLocations(world: World, x: Int, y: Int, z: Int): scala.collection.Set[Loc4]
 
   def numFrames: Int
 
   def getRequiredResources: scala.collection.IndexedSeq[ItemStack]
+
+  def onMultiblockBroken(world: World, x: Int, y: Int, z: Int)
 
   @SideOnly(Side.CLIENT)
   def multiblockRenderID: Int
