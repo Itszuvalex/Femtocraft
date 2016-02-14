@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11
   */
 object FurnaceRenderer {
   val modelLoc   = Resources.Model("furnace/Furnace.obj")
-  val textureLoc = Resources.Model("default.png")
+  val textureLoc = Resources.Model("furnace/furnace.png")
 }
 
 class FurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblockRenderer {

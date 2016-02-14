@@ -21,22 +21,22 @@ object FemtoItems {
   var itemMultiblock: Item = null
 
   def preInit(): Unit = {
-    itemPowerCrystal = new ItemPowerCrystal().setCreativeTab(Femtocraft.tab)
+    itemPowerCrystal = new ItemPowerCrystal().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.PowerCrystal")
     GameRegistry.registerItem(itemPowerCrystal, "itemPowerCrystal")
 
-    itemFrame = new ItemFrame().setCreativeTab(Femtocraft.tab)
+    itemFrame = new ItemFrame().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.Frame")
     GameRegistry.registerItem(itemFrame, "itemFrameTest")
 
-    itemBaseSeed = new ItemBaseSeed().setCreativeTab(Femtocraft.tab)
+    itemBaseSeed = new ItemBaseSeed().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.seed")
     GameRegistry.registerItem(itemBaseSeed, "itemBaseSeed")
 
-    itemMultiblock = new ItemMultiblock().setCreativeTab(Femtocraft.tab)
+    itemMultiblock = new ItemMultiblock().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.multiblock")
     GameRegistry.registerItem(itemMultiblock, "itemMultiblock")
 
-    itemDumbDust = new ItemDumbDust().setTextureName(Femtocraft.ID + ":" + "dust_dumb").setUnlocalizedName("itemDumbDust")
+    itemDumbDust = new ItemDumbDust().setTextureName(Femtocraft.ID + ":" + "dust_dumb").setUnlocalizedName("item.dumbDust")
     GameRegistry.registerItem(itemDumbDust, "itemDumbDust")
 
-    itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setTextureName(Femtocraft.ID + ":" + "dust_crystal").setUnlocalizedName("itemCracklingDust")
+    itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setTextureName(Femtocraft.ID + ":" + "dust_crystal").setUnlocalizedName("item.cracklingDust")
     GameRegistry.registerItem(itemCracklingDust, "itemCracklingDust")
   }
 

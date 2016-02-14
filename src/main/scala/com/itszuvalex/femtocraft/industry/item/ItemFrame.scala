@@ -70,6 +70,8 @@ class ItemFrame extends Item with IFrameItem {
 
   override def getFrameType(stack: ItemStack) = "Basic"
 
+  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     if (player.isSneaking) {
@@ -112,9 +114,7 @@ class ItemFrame extends Item with IFrameItem {
         case _ =>
       }
                       }
-    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f)
+    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
     true
   }
-
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 }
