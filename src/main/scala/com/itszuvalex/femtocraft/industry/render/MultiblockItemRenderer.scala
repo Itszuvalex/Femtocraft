@@ -39,12 +39,12 @@ class MultiblockItemRenderer extends IItemRenderer {
                     val (bx, by, bz) = renderer.boundingBox
                     `type` match {
                       case ItemRenderType.INVENTORY =>
-                        renderer.renderAsItem(item, -1f / bx, -1f / (2f * by), -1f / bz)
+                        renderer.renderAsItem(item, 0, 1f / by, 0)
                       case ItemRenderType.ENTITY =>
                         GL11.glScaled(.5, .5, .5)
-                        renderer.renderAsItem(item, -bx / 2f, 0, -bz / 2f)
+                        renderer.renderAsItem(item, -bx / 2f, -1f / by, -bz / 2f)
                       case _ =>
-                        renderer.renderAsItem(item, 0, -1f / by, 0)
+                        renderer.renderAsItem(item, 0, 1f / by, 0)
                     }
                   case _ =>
                 }

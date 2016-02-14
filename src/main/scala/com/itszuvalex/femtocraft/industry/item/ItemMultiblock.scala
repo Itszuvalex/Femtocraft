@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.industry.item
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.IPreviewable
 import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.EntityPlayer
@@ -34,20 +33,11 @@ class ItemMultiblock extends Item with IPreviewable {
     else multi
   }
 
-  def getMultiblock(item: ItemStack): String = {
-    if (!item.hasTagCompound) null
-    else item.getTagCompound.getString(ItemMultiblock.MULTIBLOCK_KEY)
-  }
-
   @SideOnly(Side.CLIENT)
   override def renderID = RenderIDs.multiblockPreviewableID
 
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
-      return true
-    }
     val multiString = getMultiblock(itemStack)
     if (multiString == null || multiString.isEmpty) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
@@ -70,9 +60,7 @@ class ItemMultiblock extends Item with IPreviewable {
     val bz = z + dir.offsetZ
     if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
 
-    val locations = multi.getTakenLocations(world, bx, by, bz)
-    if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
+    if (!player.capabilities.isCreativeMode) itemStack.stackSize -= 1
 
     multi.formAtLocationFromItem(world, bx, by, bz, itemStack)
     world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
@@ -88,5 +76,10 @@ class ItemMultiblock extends Item with IPreviewable {
     //      }
     //              }
     true
+  }
+
+  def getMultiblock(item: ItemStack): String = {
+    if (!item.hasTagCompound) null
+    else item.getTagCompound.getString(ItemMultiblock.MULTIBLOCK_KEY)
   }
 }
