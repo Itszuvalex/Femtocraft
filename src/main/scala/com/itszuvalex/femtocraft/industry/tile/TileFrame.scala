@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.industry.tile
 
 import java.util.Random
 
+import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
@@ -275,7 +276,9 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
             multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
               getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
               if (TileFrame.shouldDrop) {
-                InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, random)
+                val itemStack = new ItemStack(FemtoItems.itemFrame)
+                ItemFrame.setSelection(itemStack, multiBlock)
+                InventoryUtils.dropItem(itemStack, getWorldObj, loc.x, loc.y, loc.z, random)
               }
                                                                                  }
             if (isBuilding && TileFrame.shouldDrop)

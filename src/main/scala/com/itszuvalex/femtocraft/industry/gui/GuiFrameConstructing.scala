@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.{GL12, GL11}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/18/2016.
@@ -42,9 +42,7 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
 
     drawTexturedModalRect(k + 12, l + 149, 0, 166, xProg, 5)
 
-    RenderHelper.enableStandardItemLighting()
-
-    val scaling = 8
+    val scaling = 7
 
     GL11.glPushMatrix()
     GL11.glTranslated(k + (panelWidth - 18 * scaling) / 2d, l + (panelHeight - 18 * scaling) / 2d, 0)
