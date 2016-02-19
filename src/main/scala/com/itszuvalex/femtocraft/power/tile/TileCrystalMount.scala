@@ -25,6 +25,7 @@ object TileCrystalMount {
   val MOUNT_COMPOUND = "Mount"
   val PEDESTALS_KEY  = "Pedestals"
   val CRYSTAL_KEY    = "Crystal"
+  val PEDESTAL_RANGE = 16f
 }
 
 class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
@@ -137,10 +138,16 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       case stack => stack.getItem match {
         case crystal: IPowerCrystal =>
           crystal.getStorageCurrent(stack)
+        case _ => 0
       }
-      case _ => 0
     }
   }
+
+  /**
+    *
+    * @return Crystal ItemStack.  Null if no crystal.
+    */
+  override def getCrystalStack = getStackInSlot(0)
 
   /**
     *
@@ -158,12 +165,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       }
     }
   }
-
-  /**
-    *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  override def getCrystalStack = getStackInSlot(0)
 
   /**
     *
@@ -218,6 +219,15 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     savePedestalLocInfo(compound)
   }
 
+  def savePedestalLocInfo(compound: NBTTagCompound): NBTTagCompound = {
+    compound(
+              TileCrystalMount.MOUNT_COMPOUND ->
+              NBTCompound(
+                           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
+                         )
+            )
+  }
+
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
@@ -258,28 +268,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     }
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    savePedestalLocInfo(compound)
-    savePowerConnectionInfo(compound)
-
-  }
-
-  def savePedestalLocInfo(compound: NBTTagCompound): NBTTagCompound = {
-    compound(
-              TileCrystalMount.MOUNT_COMPOUND ->
-              NBTCompound(
-                           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
-                         )
-            )
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadPedestalLocInfo(compound)
-    loadPowerConnectionInfo(compound)
-  }
-
   def loadPedestalLocInfo(compound: NBTTagCompound): Unit = {
     compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
       pedestalLocs.clear()
@@ -293,6 +281,19 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setRenderUpdate()
   }
 
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    savePedestalLocInfo(compound)
+    savePowerConnectionInfo(compound)
+
+  }
+
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadPedestalLocInfo(compound)
+    loadPowerConnectionInfo(compound)
+  }
+
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
     AxisAlignedBB.getBoundingBox(center.x - childrenConnectionRadius,
@@ -302,6 +303,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
                                  center.y + childrenConnectionRadius,
                                  center.z + childrenConnectionRadius)
   }
+
+  /**
+    *
+    * @return Maximum distance children can be from this node, to connect.
+    */
+  override def childrenConnectionRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
   override def onBlockBreak(): Unit = {
     pedestalLocs.flatMap(_.getTileEntity(true)).collect { case p: IPowerPedestal => p }.foreach(_.setMount(null))

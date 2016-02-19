@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.industry.multiblock
 
+import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
-import com.itszuvalex.femtocraft.industry.item.ItemMultiblock
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems}
+import com.itszuvalex.femtocraft.util.ItemUtils
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.IMultiBlockComponent
 import cpw.mods.fml.relauncher.{Side, SideOnly}
@@ -25,14 +25,6 @@ class MultiblockFurnace extends IFrameMultiblock {
   override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int) =
     getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
-  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
-                                                                                      for {
-                                                                                        bx <- 0 until 2
-                                                                                        by <- 0 until 3
-                                                                                        bz <- 0 until 2
-                                                                                      } yield Loc4(x + bx, y + by, z + bz, world.provider.dimensionId)
-                                                                                    }.toSet
-
   override def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean = {
     formAtLocation(world, x, y, z)
   }
@@ -46,6 +38,14 @@ class MultiblockFurnace extends IFrameMultiblock {
     else false
   }
 
+  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
+                                                                                      for {
+                                                                                        bx <- 0 until 2
+                                                                                        by <- 0 until 3
+                                                                                        bz <- 0 until 2
+                                                                                      } yield Loc4(x + bx, y + by, z + bz, world.provider.dimensionId)
+                                                                                    }.toSet
+
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockFurnaceID
 
@@ -56,22 +56,10 @@ class MultiblockFurnace extends IFrameMultiblock {
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
   override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = {
-    var drop = false
-    val itemStack = new ItemStack(FemtoItems.itemMultiblock)
-    itemStack match {
-      case null =>
-      case i =>
-        i.getItem match {
-          case item: ItemMultiblock =>
-            drop = true
-            item.setMultiblock(itemStack, getName)
-          case _ =>
-        }
-    }
+    val itemStack = ItemUtils.makeMultiblockItem(MultiblockFurnace.name)
     getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
-    if(drop)
+    if (itemStack != null)
       world.spawnEntityInWorld(new EntityItem(world, x, y, z, itemStack))
-
   }
 
   override def getName = MultiblockFurnace.name

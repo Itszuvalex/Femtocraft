@@ -90,6 +90,7 @@ object TileFrame {
 class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory {
   var renderInt                                       = TileFrame.fullRender(true)
   var multiBlock           : String                   = null
+  var renderProgress       : Int                      = 0
   var progress             : Int                      = 0
   // # of seconds * 20tps
   var totalMachineBuildTime: Int                      = 10 * 20
@@ -147,7 +148,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     super.clientUpdate()
     if (isController) {
       if (isBuilding) {
-        progress += 1
+        renderProgress += 1
       }
     }
   }
@@ -232,24 +233,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     saveFrameInfo(compound)
   }
 
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadFrameInfo(compound)
-  }
-
-  def loadFrameInfo(compound: NBTTagCompound): Unit = {
-    renderInt = compound.Int(TileFrame.RENDER_SETTINGS_KEY)
-    multiBlock = compound.String(TileFrame.MULTIBLOCK_KEY)
-    if (multiBlock == "") multiBlock = null
-    progress = compound.Int(TileFrame.PROGRESS_KEY)
-    isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
-  }
-
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    saveFrameInfo(compound)
-  }
-
   def saveFrameInfo(compound: NBTTagCompound): Unit = {
     compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
     compound.setString(TileFrame.MULTIBLOCK_KEY, if (multiBlock != null) multiBlock else "")
@@ -257,10 +240,28 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     compound.setBoolean(TileFrame.BUILDING_KEY, isBuilding)
   }
 
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadFrameInfo(compound)
+  }
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    saveFrameInfo(compound)
+  }
+
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     loadFrameInfo(compound)
     setRenderUpdate()
+  }
+
+  def loadFrameInfo(compound: NBTTagCompound): Unit = {
+    renderInt = compound.Int(TileFrame.RENDER_SETTINGS_KEY)
+    multiBlock = compound.String(TileFrame.MULTIBLOCK_KEY)
+    if (multiBlock == "") multiBlock = null
+    renderProgress = compound.Int(TileFrame.PROGRESS_KEY)
+    isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
   }
 
   def onBlockBreak(): Unit = {
@@ -277,6 +278,8 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
                 InventoryUtils.dropItem(new ItemStack(FemtoItems.itemFrame), getWorldObj, loc.x, loc.y, loc.z, random)
               }
                                                                                  }
+            if (isBuilding && TileFrame.shouldDrop)
+              multi.getRequiredResources.foreach(InventoryUtils.dropItem(_, getWorldObj, xCoord, yCoord, zCoord, random))
           case _ =>
         }
         indInventory.getInventory.foreach {InventoryUtils.dropItem(_, getWorldObj, xCoord, yCoord, zCoord, random)}
@@ -290,7 +293,11 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     if (hasGUI) {
-      par5EntityPlayer.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
+      getWorldObj.getTileEntity(info.x, info.y, info.z) match {
+        case null =>
+        case tile: TileFrame =>
+          par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorldObj, tile.xCoord, tile.yCoord, tile.zCoord)
+      }
       true
     }
     else false
@@ -300,7 +307,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def hasGUI: Boolean = isValidMultiBlock
 
-  override def getGuiID: Int = GuiIDs.TileFrameMultiblockGuiID
+  override def getGuiID: Int = if (isBuilding) GuiIDs.TileFrameConstructingGuiID else GuiIDs.TileFrameMultiblockGuiID
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 

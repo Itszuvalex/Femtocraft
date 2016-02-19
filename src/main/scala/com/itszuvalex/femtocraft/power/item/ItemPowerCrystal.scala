@@ -26,7 +26,6 @@ object ItemPowerCrystal {
   val NBT_COMPOUND_KEY    = "PowerCrystal"
   val COLOR_KEY           = "Color"
   val TYPE_KEY            = "Type"
-  val RANGE_KEY           = "Range"
   val STORAGE_CURRENT_KEY = "Storage_Current"
   val STORAGE_MAX_KEY     = "Storage_Max"
   val STORAGE_PARTIAL_KEY = "Storage_Partial"
@@ -62,7 +61,6 @@ object ItemPowerCrystal {
       case crystal: IPowerCrystal =>
         tlist += "Crystal Type:" + crystal.getType(stack)
         tlist += "Passive Gen:" + crystal.getPassiveGen(stack).formatted("%.2f")
-        tlist += "Transfer Range:" + crystal.getRange(stack).formatted("%.1f")
         tlist += "Transfer Rate:" + crystal.getTransferRate(stack)
         tlist += "Power:" + crystal.getStorageCurrent(stack) + "/" + crystal.getStorageMax(stack)
       //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
@@ -84,14 +82,6 @@ object ItemPowerCrystal {
     if (stack != null)
       stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
         return comp.Int(TRANSFER_KEY)
-                                                         }
-    0
-  }
-
-  def getRange(stack: ItemStack): Float = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Float(RANGE_KEY)
                                                          }
     0
   }
@@ -180,7 +170,6 @@ object ItemPowerCrystal {
                  name: String,
                  rtype: String,
                  color: Int,
-                 range: Float,
                  storage: Long,
                  passiveGen: Float,
                  transfer: Int) = {
@@ -193,7 +182,6 @@ object ItemPowerCrystal {
             crystal.setName(stack, name)
             crystal.setType(stack, rtype)
             crystal.setColor(stack, color)
-            crystal.setRange(stack, range)
             crystal.setStorageMax(stack, storage)
             crystal.setStorageCurrent(stack, storage / 2)
             crystal.setPassiveGen(stack, passiveGen)
@@ -237,15 +225,6 @@ object ItemPowerCrystal {
       stack.forceTag.merge(NBT_COMPOUND_KEY ->
                            NBTCompound(
                                         TYPE_KEY -> ctype
-                                      )
-                          )
-  }
-
-  def setRange(stack: ItemStack, range: Float): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-                           NBTCompound(
-                                        RANGE_KEY -> range
                                       )
                           )
   }
@@ -337,13 +316,6 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
   /**
     *
     * @param stack
-    * @return Range to allow connections in.
-    */
-  override def getRange(stack: ItemStack) = ItemPowerCrystal.getRange(stack)
-
-  /**
-    *
-    * @param stack
     * @return Amount of power to generate per tick.
     */
   override def getPassiveGen(stack: ItemStack) = ItemPowerCrystal.getPassiveGen(stack)
@@ -401,8 +373,6 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
   override def setPassiveGen(stack: ItemStack, passiveGen: Float) = ItemPowerCrystal.setPassiveGen(stack, passiveGen)
 
   override def setType(stack: ItemStack, ctype: String) = ItemPowerCrystal.setType(stack, ctype)
-
-  override def setRange(stack: ItemStack, range: Float) = ItemPowerCrystal.setRange(stack, range)
 
   override def setTransferRate(stack: ItemStack, rate: Int) = ItemPowerCrystal.setTransferRate(stack, rate)
 
