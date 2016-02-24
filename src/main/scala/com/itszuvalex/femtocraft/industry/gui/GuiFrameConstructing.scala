@@ -7,9 +7,8 @@ import com.itszuvalex.femtocraft.util.ItemUtils
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import org.lwjgl.opengl.{GL12, GL11}
+import org.lwjgl.opengl.GL11
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/18/2016.

@@ -65,17 +65,6 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
 
   override def getCurrentPower: Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerCurrent).getOrElse(0)
 
-  def getPedestal: Option[IPowerPedestal] = {
-    var loc = getLoc.getOffset(ForgeDirection.UP)
-    if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
-      loc = getLoc.getOffset(ForgeDirection.DOWN)
-      if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
-        loc = null
-      }
-    }
-    Option(loc).flatMap(_.getTileEntity(true)).collect { case i: IPowerPedestal => i }
-  }
-
   override def getMaximumPower: Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerMax).getOrElse(0)
 
   /* Tile Entity */
@@ -97,4 +86,22 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     */
   override def charge(amt: Long, doCharge: Boolean): Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.addPower(amt, doCharge)).getOrElse(0)
 
+  /**
+    *
+    * @param amt     Amount of power to drain
+    * @param doDrain False to simulate, true to actually remove power.
+    * @return Amount of amt that was successfully drained.
+    */
+  override def drain(amt: Long, doDrain: Boolean): Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.usePower(amt, doDrain)).getOrElse(0)
+
+  def getPedestal: Option[IPowerPedestal] = {
+    var loc = getLoc.getOffset(ForgeDirection.UP)
+    if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
+      loc = getLoc.getOffset(ForgeDirection.DOWN)
+      if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
+        loc = null
+      }
+    }
+    Option(loc).flatMap(_.getTileEntity(true)).collect { case i: IPowerPedestal => i }
+  }
 }

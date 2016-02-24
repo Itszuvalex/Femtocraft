@@ -40,9 +40,27 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
       isDumping = true
       DistributedManager.addWorkerProvider(this)
     } else if (!isDumping) {
-      powerCurrent += TilePowerGenerator.POWER_GEN
+      charge(TilePowerGenerator.POWER_GEN, doCharge = true)
     }
   }
+
+  /**
+    *
+    * @param amt      Amount to attempt to charge
+    * @param doCharge False to simulate, true to actually do
+    * @return Amount of amt used to actually charge.
+    */
+  override def charge(amt: Long, doCharge: Boolean): Long = {
+    val amtd = Math.min(amt, getMaximumPower - getCurrentPower)
+    if (doCharge) {
+      powerCurrent += amtd
+    }
+    amtd
+  }
+
+  override def getCurrentPower = powerCurrent
+
+  override def getMaximumPower = powerMax
 
   override def getMod = Femtocraft
 
@@ -68,12 +86,10 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     }
   }
 
-
   override def invalidate(): Unit = {
     super.invalidate()
     DistributedManager.removeWorkerProvider(this)
   }
-
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
@@ -105,8 +121,6 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     */
   override def getProvidedWorkers: Set[IWorker] = if (isDumping) Set(workerPowerDumper) else Set()
 
-  override def getCurrentPower = powerCurrent
-
   /**
     *
     * @param amt     Amount of power to drain
@@ -120,6 +134,4 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     }
     amtd
   }
-
-  override def getMaximumPower = powerMax
 }
