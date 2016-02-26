@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.item
 
-import com.itszuvalex.femtocraft.power.tile.ITilePower
+import com.itszuvalex.femtocraft.industry.tile.ITileAssemblyArray
 import net.minecraft.item.ItemStack
 
 /**
@@ -10,6 +10,6 @@ trait IItemAssembly {
 
   def getType(item: ItemStack): String
 
-  def onTick(item: ItemStack, tile: ITilePower): Unit
+  def onTick(item: ItemStack, tile: ITileAssemblyArray): Unit
 
 }
