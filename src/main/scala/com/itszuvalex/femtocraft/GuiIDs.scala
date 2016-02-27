@@ -9,6 +9,7 @@ object GuiIDs {
   val TileArcFurnaceGuiID              = nextID
   val TileCentrifugeGuiID              = nextID
   val TileCrystallizerGuiID            = nextID
+  val TileMaterialProcessorGuiID       = nextID
   val TileCubic2DCraftingGuiID         = nextID
   val TileCubic3DCraftingGuiID         = nextID
   val TileNaniteHiveGuiID              = nextID

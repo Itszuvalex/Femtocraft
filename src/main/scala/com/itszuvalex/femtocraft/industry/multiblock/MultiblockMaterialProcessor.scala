@@ -17,11 +17,11 @@ import scala.collection.Set
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/28/15.
   */
-object MultiblockFurnace {
-  val name = "Furnace"
+object MultiblockMaterialProcessor {
+  val name = "Material Processor"
 }
 
-class MultiblockFurnace extends IFrameMultiblock {
+class MultiblockMaterialProcessor extends IFrameMultiblock {
   override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int) =
     getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
@@ -31,7 +31,7 @@ class MultiblockFurnace extends IFrameMultiblock {
 
   override def formAtLocation(world: World, x: Int, y: Int, z: Int) = {
     val locations = getTakenLocations(world, x, y, z)
-    if (locations.forall(loc => world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFurnace))) {
+    if (locations.forall(loc => world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockMaterialProcessor))) {
       locations.flatMap(_.getTileEntity(true)).collect { case n: IMultiBlockComponent => n }.map(_.formMultiBlock(world, x, y, z))
       true
     }
@@ -56,11 +56,11 @@ class MultiblockFurnace extends IFrameMultiblock {
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
   override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = {
-    val itemStack = ItemUtils.makeMultiblockItem(MultiblockFurnace.name)
+    val itemStack = ItemUtils.makeMultiblockItem(MultiblockMaterialProcessor.name)
     getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
     if (itemStack != null)
       world.spawnEntityInWorld(new EntityItem(world, x, y, z, itemStack))
   }
 
-  override def getName = MultiblockFurnace.name
+  override def getName = MultiblockMaterialProcessor.name
 }

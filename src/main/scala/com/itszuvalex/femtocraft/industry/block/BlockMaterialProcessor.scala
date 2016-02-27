@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.industry.block
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
-import com.itszuvalex.femtocraft.industry.multiblock.MultiblockFurnace
-import com.itszuvalex.femtocraft.industry.tile.TileFurnace
+import com.itszuvalex.femtocraft.industry.multiblock.MultiblockMaterialProcessor
+import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor
 import com.itszuvalex.itszulib.core.TileContainer
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
@@ -12,12 +12,12 @@ import net.minecraft.world.World
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/28/15.
   */
-object BlockFurnace {
+object BlockMaterialProcessor {
   var breaking = false
 }
 
-class BlockFurnace extends TileContainer(Material.iron) {
-  override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileFurnace
+class BlockMaterialProcessor extends TileContainer(Material.iron) {
+  override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileMaterialProcessor
 
   override def isOpaqueCube: Boolean = false
 
@@ -26,19 +26,19 @@ class BlockFurnace extends TileContainer(Material.iron) {
   override def getRenderBlockPass: Int = -1
 
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, metadata: Int): Unit = {
-    if (!BlockFurnace.breaking) {
+    if (!BlockMaterialProcessor.breaking) {
       world.getTileEntity(x, y, z) match {
         case null =>
-        case furnace: TileFurnace if furnace.isController =>
-          BlockFurnace.breaking = true
-          FrameMultiblockRegistry.getMultiblock(MultiblockFurnace.name) match {
+        case processor: TileMaterialProcessor if processor.isController =>
+          BlockMaterialProcessor.breaking = true
+          FrameMultiblockRegistry.getMultiblock(MultiblockMaterialProcessor.name) match {
             case Some(multi) =>
               multi.onMultiblockBroken(world, x, y, z)
             case _ =>
           }
-          BlockFurnace.breaking = false
-        case furnace: TileFurnace if furnace.isValidMultiBlock =>
-          world.setBlockToAir(furnace.info.x, furnace.info.y, furnace.info.z)
+          BlockMaterialProcessor.breaking = false
+        case processor: TileMaterialProcessor if processor.isValidMultiBlock =>
+          world.setBlockToAir(processor.info.x, processor.info.y, processor.info.z)
         case _ =>
       }
     }

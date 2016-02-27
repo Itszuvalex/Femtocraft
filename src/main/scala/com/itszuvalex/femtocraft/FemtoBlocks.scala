@@ -27,7 +27,7 @@ object FemtoBlocks {
   var blockArcFurnace            : Block = null
   var blockCrystallizationChamber: Block = null
   var blockCentrifuge            : Block = null
-  var blockFurnace               : Block = null
+  var blockMaterialProcessor     : Block = null
   var blockGrowthChamber         : Block = null
   var blockBioBeacon             : Block = null
   var blockCondensationArray     : Block = null
@@ -93,8 +93,8 @@ object FemtoBlocks {
     blockCentrifuge = new BlockCentrifuge().setCreativeTab(Femtocraft.tab).setBlockName("blockCentrifuge")
     GameRegistry.registerBlock(blockCentrifuge, "blockCentrifuge")
 
-    blockFurnace = new BlockFurnace().setCreativeTab(Femtocraft.tab).setBlockName("blockFurnace")
-    GameRegistry.registerBlock(blockFurnace, "blockFurnace")
+    blockMaterialProcessor = new BlockMaterialProcessor().setCreativeTab(Femtocraft.tab).setBlockName("blockMaterialProcessor")
+    GameRegistry.registerBlock(blockMaterialProcessor, "blockMaterialProcessor")
 
     blockGrowthChamber = new BlockGrowthChamber().setBlockName("blockGrowthChamber")
     GameRegistry.registerBlock(blockGrowthChamber, "blockGrowthChamber")

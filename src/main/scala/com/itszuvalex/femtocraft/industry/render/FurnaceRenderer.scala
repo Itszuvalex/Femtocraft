@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
-import com.itszuvalex.femtocraft.industry.tile.{TileFurnace, TileArcFurnace, TileFrame}
+import com.itszuvalex.femtocraft.industry.tile.{TileMaterialProcessor, TileArcFurnace, TileFrame}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
@@ -24,7 +24,7 @@ class FurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblockRen
 
   override def renderTileEntityAt(tile : TileEntity, x : Double, y : Double, z : Double, partialTime : Float): Unit = {
     tile match {
-      case furnace: TileFurnace if furnace.isController =>
+      case furnace: TileMaterialProcessor if furnace.isController =>
         renderAtLocation(x, y, z)
       case _ =>
     }

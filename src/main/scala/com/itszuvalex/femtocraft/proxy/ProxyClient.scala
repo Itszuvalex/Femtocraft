@@ -25,7 +25,7 @@ import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesR
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.render._
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileFurnace}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileMaterialProcessor}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
@@ -100,7 +100,7 @@ class ProxyClient extends ProxyCommon {
 
     val furnaceRenderer = new FurnaceRenderer
     RenderIDs.multiblockFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(furnaceRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFurnace], furnaceRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileMaterialProcessor], furnaceRenderer)
 
     val growthChamberRenderer = new GrowthChamberRenderer
     RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)

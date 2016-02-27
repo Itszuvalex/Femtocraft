@@ -61,7 +61,7 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileArcFurnace], "TileArcFurnace")
     GameRegistry.registerTileEntity(classOf[TileCrystallizationChamber], "TileCrystallizationChamber")
     GameRegistry.registerTileEntity(classOf[TileCentrifuge], "TileCentrifuge")
-    GameRegistry.registerTileEntity(classOf[TileFurnace], "TileFurnace")
+    GameRegistry.registerTileEntity(classOf[TileMaterialProcessor], "TileMaterialProcessor")
     GameRegistry.registerTileEntity(classOf[TileGrowthChamber], "TileGrowthChamber")
     GameRegistry.registerTileEntity(classOf[TileBioBeacon], "TileBioBeacon")
     GameRegistry.registerTileEntity(classOf[TileCondensationArray], "TileCondensationArray")
