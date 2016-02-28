@@ -163,23 +163,6 @@ object TileMaterialProcessor {
 
   /**
     *
-    * @param slot (0 until getInputSlots)
-    * @return Itemstack in given input slot.
-    */
-  override def getInputItem(slot: Int): ItemStack = {
-    if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
-
-    indInventory.getStackInSlot(indexInputStart + slot)
-  }
-
-  /**
-    *
-    * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
-    */
-  override def getInputSlots = numInputSlots
-
-  /**
-    *
     * @param item Item to merge into slot.
     * @param slot (0 until getOutputSlots)
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
@@ -197,7 +180,7 @@ object TileMaterialProcessor {
         val room = slotItem.getMaxStackSize - slotItem.stackSize
         val amount = Math.min(room, item.stackSize)
         slotItem.stackSize += amount
-        if (amount <= room) {
+        if (room > 0 && amount <= room) {
           null
         }
         else {
@@ -262,6 +245,23 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param slot (0 until getInputSlots)
+    * @return Itemstack in given input slot.
+    */
+  override def getInputItem(slot: Int): ItemStack = {
+    if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
+
+    indInventory.getStackInSlot(indexInputStart + slot)
+  }
+
+  /**
+    *
+    * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
+    */
+  override def getInputSlots = numInputSlots
+
+  /**
+    *
     * @param assembly Assembly to insert into slot.  Should not be null.
     * @param slot     (0 until getAssemblySlots) to insert into.
     * @return True if slot is empty and assembly was valid, accepted, and placed in the slot.
@@ -317,20 +317,20 @@ object TileMaterialProcessor {
     if (item == null) return true
 
     slot match {
-      case input if slot >= indexInputStart && slot < indexInputStart + numInputSlots => true
-      case assembly if slot >= indexAssemblyStart && slot < indexOutputStart && item.getItem != null =>
+      case input if input >= indexInputStart && input < indexInputStart + numInputSlots => true
+      case assembly if assembly >= indexAssemblyStart && assembly < indexOutputStart && item.getItem != null =>
         item.getItem match {
           case assembly: IItemAssembly =>
             getSupportedAssemblyTypes.contains(assembly.getType(item))
           case _ => false
         }
-      case output if slot >= indexOutputStart && slot < indexOutputStart + numOutputSlots => true
-      case power if slot == indexPowerSlot && item.getItem != null =>
+      case output if output >= indexOutputStart && output < indexOutputStart + numOutputSlots => true
+      case power if power == indexPowerSlot && item.getItem != null =>
         item.getItem match {
-          case assembly: IPowerStorage => true
+          case storage: IPowerStorage => true
           case _ => false
         }
-      case nanite if slot == indexNaniteSlot && item.getItem != null =>
+      case nanite if nanite == indexNaniteSlot && item.getItem != null =>
         item.getItem match {
           case nanite: INaniteStrain => true
           case _ => false

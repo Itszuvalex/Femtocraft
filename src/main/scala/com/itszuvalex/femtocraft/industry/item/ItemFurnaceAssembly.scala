@@ -115,6 +115,8 @@ object ItemFurnaceAssembly {
 class ItemFurnaceAssembly extends Item with IItemAssembly {
   setCreativeTab(Femtocraft.tab)
 
+  setMaxDamage(1000)
+
   override def registerIcons(register: IIconRegister): Unit = {
     this.itemIcon = register.registerIcon("Femtocraft" + ":" + "ItemDissassemblyArray")
   }
@@ -122,7 +124,7 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
   override def addInformation(item: ItemStack, player: EntityPlayer, tooltip: util.List[_], advTooltip: Boolean): Unit = {
     var stringTooltip = tooltip.asInstanceOf[util.List[String]]
     if (getCurrentPowerProgress(item) > 0) {
-      stringTooltip += "Progress: " + getCurrentPowerProgress(item).formatted("%.2f")
+      stringTooltip += "Progress: " + (100d - ((item.getItemDamageForDisplay.toDouble / item.getMaxDamage.toDouble) * 100d)).formatted("%.1f") + "%"
     }
     getResultItem(item) match {
       case Some(res) =>
@@ -159,13 +161,15 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
       val power = PowerRequired * tile.getPowerMultiplier
       val powerThisTick = Math.min(power / time, power - getCurrentPowerProgress(item))
       val powerConsumed = tile.drain(powerThisTick, doDrain = true)
-      setCurrentPowerProgress(item, getCurrentPowerProgress(item) + powerConsumed)
+      val powerNext = getCurrentPowerProgress(item) + powerConsumed
+      setCurrentPowerProgress(item, powerNext)
+      item.setItemDamage(item.getMaxDamage - ((powerNext / power) * item.getMaxDamage).toInt)
       if (getCurrentPowerProgress(item) >= power) {
         getSmeltingItem(item) match {
           case None =>
             setSmeltingItem(item, null)
           case Some(smelt) =>
-            val ret = FurnaceRecipes.smelting().getSmeltingResult(smelt)
+            val ret = FurnaceRecipes.smelting().getSmeltingResult(smelt).copy()
             if ((0 until tile.getOutputSlots).forall(i => tile.addOrMergeOutputItem(ret, i) != null)) {
               setResultItem(item, ret)
               setSmeltingItem(item, null)

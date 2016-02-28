@@ -20,22 +20,22 @@ class ContainerMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, til
   private var lastPower = 0L
 
   //Input
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 0, 35, 8))
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 1, 53, 8))
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 2, 35, 26))
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 3, 53, 26))
+  addSlotToContainer(new FilteredSlot(tile, 0, 35, 8))
+  addSlotToContainer(new FilteredSlot(tile, 1, 53, 8))
+  addSlotToContainer(new FilteredSlot(tile, 2, 35, 26))
+  addSlotToContainer(new FilteredSlot(tile, 3, 53, 26))
   //Assemblies
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 4, 152, 45))
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 5, 152, 63))
+  addSlotToContainer(new FilteredSlot(tile, 4, 152, 45))
+  addSlotToContainer(new FilteredSlot(tile, 5, 152, 63))
   //Output
-  addSlotToContainer(new OutputSlot(tile.indInventory, 6, 35, 45))
-  addSlotToContainer(new OutputSlot(tile.indInventory, 7, 53, 45))
-  addSlotToContainer(new OutputSlot(tile.indInventory, 8, 35, 63))
-  addSlotToContainer(new OutputSlot(tile.indInventory, 9, 53, 63))
+  addSlotToContainer(new OutputSlot(tile, 6, 35, 45))
+  addSlotToContainer(new OutputSlot(tile, 7, 53, 45))
+  addSlotToContainer(new OutputSlot(tile, 8, 35, 63))
+  addSlotToContainer(new OutputSlot(tile, 9, 53, 63))
   //Power
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 10, 10, 64))
+  addSlotToContainer(new FilteredSlot(tile, 10, 10, 64))
   //Nanite
-  addSlotToContainer(new FilteredSlot(tile.indInventory, 11, 152, 8))
+  addSlotToContainer(new FilteredSlot(tile, 11, 152, 8))
 
   addPlayerInventorySlots(inv)
 
