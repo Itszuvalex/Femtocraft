@@ -12,14 +12,14 @@ trait IPowerStorage extends Item {
     * @param stack
     * @return Maximum amount of power crystal can store.
     */
-  def getStorageMax(stack: ItemStack): Long
+  def getStorageMax(stack: ItemStack): Double
 
   /**
     *
     * @param stack
     * @return Current amount of power crystal is storing.
     */
-  def getStorageCurrent(stack : ItemStack): Long
+  def getStorageCurrent(stack : ItemStack): Double
 
   /**
     *
@@ -27,7 +27,7 @@ trait IPowerStorage extends Item {
     * @param doStore Pass true to actually consume resources.  False simulates the store.
     * @return Amount of @amount successfully stored.
     */
-  def store(stack: ItemStack, amount: Long, doStore: Boolean): Long
+  def store(stack: ItemStack, amount: Double, doStore: Boolean): Double
 
   /**
     *
@@ -35,10 +35,10 @@ trait IPowerStorage extends Item {
     * @param doConsume Pass true to actually consume resources.  False simulates the store.
     * @return Amount of @amount successfully removed.
     */
-  def consume(stack: ItemStack, amount: Long, doConsume: Boolean): Long
+  def consume(stack: ItemStack, amount: Double, doConsume: Boolean): Double
 
-  def setStorageCurrent(stack: ItemStack, amount: Long): Unit
+  def setStorageCurrent(stack: ItemStack, amount: Double): Unit
 
-  def setStorageMax(stack: ItemStack, amount: Long): Unit
+  def setStorageMax(stack: ItemStack, amount: Double): Unit
 
 }

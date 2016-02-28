@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.{ItemBaseSeed, ItemDumbDust}
-import com.itszuvalex.femtocraft.industry.item.{ItemMultiblock, ItemFrame}
+import com.itszuvalex.femtocraft.industry.item.{ItemFrame, ItemFurnaceAssembly, ItemMultiblock}
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
@@ -15,9 +15,11 @@ object FemtoItems {
   var itemDumbDust     : Item = null
   var itemCracklingDust: Item = null
 
+  var itemFurnaceAssembly: Item = null
 
-  var itemFrame   : Item = null
-  var itemBaseSeed: Item = null
+
+  var itemFrame     : Item = null
+  var itemBaseSeed  : Item = null
   var itemMultiblock: Item = null
 
   def preInit(): Unit = {
@@ -38,6 +40,9 @@ object FemtoItems {
 
     itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setTextureName(Femtocraft.ID + ":" + "dust_crystal").setUnlocalizedName("item.cracklingDust")
     GameRegistry.registerItem(itemCracklingDust, "itemCracklingDust")
+
+    itemFurnaceAssembly = new ItemFurnaceAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.FurnaceAssembly")
+    GameRegistry.registerItem(itemFurnaceAssembly, "itemFurnaceAssembly")
   }
 
   def init(): Unit = {

@@ -112,8 +112,8 @@ object ItemPowerCrystal {
     ""
   }
 
-  def store(stack: ItemStack, amount: Long, doStore: Boolean): Long = {
-    var ret = 0L
+  def store(stack: ItemStack, amount: Double, doStore: Boolean): Double = {
+    var ret = 0d
     if (stack != null) {
       stack.getItem match {
         case null =>
@@ -127,10 +127,10 @@ object ItemPowerCrystal {
     ret
   }
 
-  def getStorageMax(stack: ItemStack): Long = {
+  def getStorageMax(stack: ItemStack): Double = {
     if (stack != null)
       stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Long(STORAGE_MAX_KEY)
+        return comp.Double(STORAGE_MAX_KEY)
                                                          }
     0
   }
@@ -143,8 +143,8 @@ object ItemPowerCrystal {
     0
   }
 
-  def consume(stack: ItemStack, amount: Long, doConsume: Boolean): Long = {
-    var ret = 0L
+  def consume(stack: ItemStack, amount: Double, doConsume: Boolean): Double = {
+    var ret = 0d
     if (stack != null) {
       stack.getItem match {
         case null =>
@@ -158,10 +158,10 @@ object ItemPowerCrystal {
     ret
   }
 
-  def getStorageCurrent(stack: ItemStack): Long = {
+  def getStorageCurrent(stack: ItemStack): Double = {
     if (stack != null)
       stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Long(STORAGE_CURRENT_KEY)
+        return comp.Double(STORAGE_CURRENT_KEY)
                                                          }
     0
   }
@@ -170,7 +170,7 @@ object ItemPowerCrystal {
                  name: String,
                  rtype: String,
                  color: Int,
-                 storage: Long,
+                 storage: Double,
                  passiveGen: Float,
                  transfer: Int) = {
     stack match {
@@ -193,7 +193,7 @@ object ItemPowerCrystal {
     stack
   }
 
-  def setStorageCurrent(stack: ItemStack, amount: Long): Unit = {
+  def setStorageCurrent(stack: ItemStack, amount: Double): Unit = {
     if (stack != null)
       stack.forceTag.merge(NBT_COMPOUND_KEY ->
                            NBTCompound(
@@ -246,7 +246,7 @@ object ItemPowerCrystal {
                           )
   }
 
-  def setStorageMax(stack: ItemStack, amount: Long): Unit = {
+  def setStorageMax(stack: ItemStack, amount: Double): Unit = {
     if (stack != null)
       stack.forceTag.merge(NBT_COMPOUND_KEY ->
                            NBTCompound(
@@ -347,7 +347,7 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
     * @param doConsume Pass true to actually consume resources.  False simulates the store.
     * @return Amount of @amount successfully removed.
     */
-  override def consume(stack: ItemStack, amount: Long, doConsume: Boolean) = ItemPowerCrystal.consume(stack, amount, doConsume)
+  override def consume(stack: ItemStack, amount: Double, doConsume: Boolean) = ItemPowerCrystal.consume(stack, amount, doConsume)
 
   /**
     *
@@ -355,9 +355,9 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
     * @param doStore Pass true to actually consume resources.  False simulates the store.
     * @return Amount of @amount successfully stored.
     */
-  override def store(stack: ItemStack, amount: Long, doStore: Boolean) = ItemPowerCrystal.store(stack, amount, doStore)
+  override def store(stack: ItemStack, amount: Double, doStore: Boolean) = ItemPowerCrystal.store(stack, amount, doStore)
 
-  override def setStorageCurrent(stack: ItemStack, amount: Long): Unit = {
+  override def setStorageCurrent(stack: ItemStack, amount: Double): Unit = {
     ItemPowerCrystal.setStorageCurrent(stack, amount)
     updateDamage(stack)
   }
@@ -365,7 +365,7 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
   def updateDamage(stack: ItemStack): Unit = {
     val max = ItemPowerCrystal.getStorageMax(stack)
     if (max > 0)
-      stack.setItemDamage(stack.getMaxDamage - ((ItemPowerCrystal.getStorageCurrent(stack).toDouble / max.toDouble) * stack.getMaxDamage).toInt)
+      stack.setItemDamage(stack.getMaxDamage - ((ItemPowerCrystal.getStorageCurrent(stack) / max) * stack.getMaxDamage).toInt)
   }
 
   override def setStoragePartial(stack: ItemStack, amount: Double) = ItemPowerCrystal.setStoragePartial(stack, amount)
@@ -380,7 +380,7 @@ class ItemPowerCrystal extends Item with IPowerCrystal {
 
   override def setColor(stack: ItemStack, color: Int) = ItemPowerCrystal.setColor(stack, color)
 
-  override def setStorageMax(stack: ItemStack, amount: Long): Unit = {
+  override def setStorageMax(stack: ItemStack, amount: Double): Unit = {
     ItemPowerCrystal.setStorageMax(stack, amount)
     updateDamage(stack)
   }

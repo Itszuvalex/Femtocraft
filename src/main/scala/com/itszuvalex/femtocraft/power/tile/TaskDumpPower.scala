@@ -31,7 +31,7 @@ class TaskDumpPower(val owner: IPowerSink, private val taskType: String, val tra
       worker.inform(TaskDumpPower.INFORM_POWER_RATE, transferRate.toDouble)
       val powerToDump = worker.getEfficiency(TaskDumpPower.EFFICIENCY_POWER_TO_DUMP).toLong
       var power = Math.min(powerToDump, transferRate)
-      power = Math.min(power, owner.getMaximumPower - owner.getCurrentPower)
+      power = Math.min(power, owner.getMaximumPower.toLong - owner.getCurrentPower.toLong)
       worker.inform(TaskDumpPower.INFORM_POWER_DRAINED, power.toDouble)
       owner.charge(power, doCharge = true)
       worker.onTick()

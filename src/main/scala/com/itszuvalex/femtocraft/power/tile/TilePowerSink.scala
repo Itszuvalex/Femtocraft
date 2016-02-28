@@ -63,9 +63,9 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     */
   override def getActiveTasks: Set[ITask] = Set(taskDumpPower)
 
-  override def getCurrentPower: Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerCurrent).getOrElse(0)
+  override def getCurrentPower: Double = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerCurrent).getOrElse(0)
 
-  override def getMaximumPower: Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerMax).getOrElse(0)
+  override def getMaximumPower: Double = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.getPowerMax).getOrElse(0)
 
   /* Tile Entity */
   override def validate(): Unit = {
@@ -84,7 +84,7 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     * @param doCharge False to simulate, true to actually do
     * @return Amount of amt used to actually charge.
     */
-  override def charge(amt: Long, doCharge: Boolean): Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.addPower(amt, doCharge)).getOrElse(0)
+  override def charge(amt: Double, doCharge: Boolean): Double = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.addPower(amt, doCharge)).getOrElse(0)
 
   /**
     *
@@ -92,7 +92,7 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     * @param doDrain False to simulate, true to actually remove power.
     * @return Amount of amt that was successfully drained.
     */
-  override def drain(amt: Long, doDrain: Boolean): Long = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.usePower(amt, doDrain)).getOrElse(0)
+  override def drain(amt: Double, doDrain: Boolean): Double = getPedestal.flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.usePower(amt, doDrain)).getOrElse(0)
 
   def getPedestal: Option[IPowerPedestal] = {
     var loc = getLoc.getOffset(ForgeDirection.UP)

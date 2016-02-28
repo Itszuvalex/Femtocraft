@@ -4,9 +4,9 @@ package com.itszuvalex.femtocraft.power.tile
   * Created by Christopher Harris (Itszuvalex) on 2/23/2016.
   */
 trait ITilePower {
-  def getCurrentPower: Long
+  def getCurrentPower: Double
 
-  def getMaximumPower: Long
+  def getMaximumPower: Double
 
   /**
     *
@@ -14,7 +14,7 @@ trait ITilePower {
     * @param doDrain False to simulate, true to actually remove power.
     * @return Amount of amt that was successfully drained.
     */
-  def drain(amt: Long, doDrain: Boolean): Long
+  def drain(amt: Double, doDrain: Boolean): Double
 
   /**
     *
@@ -22,5 +22,5 @@ trait ITilePower {
     * @param doCharge False to simulate, true to actually do
     * @return Amount of amt used to actually charge.
     */
-  def charge(amt: Long, doCharge: Boolean): Long
+  def charge(amt: Double, doCharge: Boolean): Double
 }

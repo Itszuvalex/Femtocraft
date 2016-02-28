@@ -108,13 +108,13 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     *
     * @return Amount of power currently stored in this node.
     */
-  def getPowerCurrent: Long
+  def getPowerCurrent: Double
 
   /**
     *
     * @return Amount of power capable of being stored in this node.
     */
-  def getPowerMax: Long
+  def getPowerMax: Double
 
   /**
     *
@@ -122,13 +122,13 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     * @param doFill True if actually change values, false to simulate.
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
-  def addPower(amount: Long, doFill: Boolean): Long
+  def addPower(amount: Double, doFill: Boolean): Double
 
   /**
     *
     * @param amount Set current stored power to the given value.
     */
-  def setPower(amount: Long)
+  def setPower(amount: Double)
 
   /**
     *
@@ -136,7 +136,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
-  def usePower(amount: Long, doUse: Boolean): Long
+  def usePower(amount: Double, doUse: Boolean): Double
 
   /**
     *

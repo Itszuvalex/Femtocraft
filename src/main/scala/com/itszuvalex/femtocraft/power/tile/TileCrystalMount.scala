@@ -132,7 +132,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     *
     * @return Amount of power currently stored in this node.
     */
-  override def getPowerCurrent: Long = {
+  override def getPowerCurrent: Double = {
     getCrystalStack match {
       case null => 0
       case stack => stack.getItem match {
@@ -155,7 +155,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
-  override def usePower(amount: Long, doUse: Boolean): Long = {
+  override def usePower(amount: Double, doUse: Boolean): Double = {
     getCrystalStack match {
       case null => 0
       case stack => stack.getItem match {
@@ -369,7 +369,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @param doFill True if actually change values, false to simulate.
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
-  override def addPower(amount: Long, doFill: Boolean): Long = {
+  override def addPower(amount: Double, doFill: Boolean): Double = {
     getCrystalStack match {
       case null => 0
       case stack => stack.getItem match {
@@ -384,7 +384,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     *
     * @param amount Set current stored power to the given value.
     */
-  override def setPower(amount: Long): Unit = {
+  override def setPower(amount: Double): Unit = {
     getCrystalStack match {
       case null =>
       case stack => stack.getItem match {
@@ -399,7 +399,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     *
     * @return Amount of power capable of being stored in this node.
     */
-  override def getPowerMax: Long = {
+  override def getPowerMax: Double = {
     getCrystalStack match {
       case null => 0
       case stack => stack.getItem match {

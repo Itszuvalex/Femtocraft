@@ -25,7 +25,7 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
   val powerMax          = TilePowerGenerator.POWER_MAXIMUM
   var isDumping         = false
   var shouldRegister    = false
-  var powerCurrent      = 0L
+  var powerCurrent      = 0d
 
 
   override def serverUpdate(): Unit = {
@@ -50,7 +50,7 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     * @param doCharge False to simulate, true to actually do
     * @return Amount of amt used to actually charge.
     */
-  override def charge(amt: Long, doCharge: Boolean): Long = {
+  override def charge(amt: Double, doCharge: Boolean): Double = {
     val amtd = Math.min(amt, getMaximumPower - getCurrentPower)
     if (doCharge) {
       powerCurrent += amtd
@@ -94,14 +94,14 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     compound.setBoolean(TilePowerGenerator.KEY_IS_DUMPING, isDumping)
-    compound.setLong(TilePowerGenerator.KEY_POWER_CURRENT, powerCurrent)
+    compound.setDouble(TilePowerGenerator.KEY_POWER_CURRENT, powerCurrent)
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     isDumping = compound.getBoolean(TilePowerGenerator.KEY_IS_DUMPING)
     shouldRegister = isDumping
-    powerCurrent = compound.getLong(TilePowerGenerator.KEY_POWER_CURRENT)
+    powerCurrent = compound.getDouble(TilePowerGenerator.KEY_POWER_CURRENT)
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
@@ -127,7 +127,7 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     * @param doDrain False to simulate, true to actually remove power.
     * @return Amount of amt that was successfully drained.
     */
-  override def drain(amt: Long, doDrain: Boolean): Long = {
+  override def drain(amt: Double, doDrain: Boolean): Double = {
     val amtd = Math.min(amt, powerCurrent)
     if (doDrain) {
       powerCurrent -= amtd

@@ -11,6 +11,18 @@ trait ITileAssemblyArray extends ITilePower {
 
   /**
     *
+    * @return Base Power usage * getPowerMultipler = actual power requirement.  Assemblies are responsible for calculating their power usage before draining power.
+    */
+  def getPowerMultiplier: Double
+
+  /**
+    *
+    * @return Base Time usage * getTimeMultiplier = actual time requirement.  Assemblies are responsible for calculating the time usage themselves.
+    */
+  def getTimeMultiplier: Double
+
+  /**
+    *
     * @return Set of support Assembly types
     */
   def getSupportedAssemblyTypes: Set[String]
@@ -23,7 +35,7 @@ trait ITileAssemblyArray extends ITilePower {
 
   /**
     * Number of assembly slots
-   */
+    */
   def getAssemblySlots: Int
 
   /**
@@ -36,7 +48,7 @@ trait ITileAssemblyArray extends ITilePower {
   /**
     *
     * @param assembly Assembly to insert into slot.  Should not be null.
-    * @param slot (0 until getAssemblySlots) to insert into.
+    * @param slot     (0 until getAssemblySlots) to insert into.
     * @return True if slot is empty and assembly was valid, accepted, and placed in the slot.
     */
   def addAssembly(assembly: ItemStack, slot: Int): Boolean
@@ -67,12 +79,12 @@ trait ITileAssemblyArray extends ITilePower {
     * @param slot (0 until getInputSlots)
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getInputItem(slot), or not enough space.
     */
-  def addOrMergeInputItem(item: ItemStack, slot: Int) : ItemStack
+  def addOrMergeInputItem(item: ItemStack, slot: Int): ItemStack
 
   /**
     *
     * @param slot (0 until getInputSlots)
-    * @param amt Amount of the item from said slot to remove.
+    * @param amt  Amount of the item from said slot to remove.
     * @return The itemstack consisting of getInputItem(slot) and of stack size Math.min(getInputItem(slot).stackSize, amt), or null if no item in slot.
     */
   def removeInputItem(slot: Int, amt: Int): ItemStack
@@ -96,12 +108,12 @@ trait ITileAssemblyArray extends ITilePower {
     * @param slot (0 until getOutputSlots)
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
     */
-  def addOrMergeOutputItem(item: ItemStack, slot: Int) : ItemStack
+  def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack
 
   /**
     *
     * @param slot (0 until getOutputSlots)
-    * @param amt Amount of item from said slot to remove.
+    * @param amt  Amount of item from said slot to remove.
     * @return The itemstack consisting of getOutputItem(slot) and of stack size Math.min(getOutputItem(slot).stackSize, amt), or null if no item in slot.
     */
   def removeOutputItem(slot: Int, amt: Int): ItemStack
