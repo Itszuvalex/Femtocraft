@@ -14,6 +14,7 @@ import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 
 object TileMaterialProcessor {
@@ -29,6 +30,8 @@ object TileMaterialProcessor {
   private val indexOutputStart   = numAssemblySlots + numInputSlots
   private val indexPowerSlot     = numInputSlots + numAssemblySlots + numOutputSlots
   private val indexNaniteSlot    = numInputSlots + numAssemblySlots + numOutputSlots + 1
+
+  private val INV_COMPOUND_TAG = "Inventory"
 }
 
 @Configurable class TileMaterialProcessor extends TileEntityBase
@@ -163,6 +166,23 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param slot (0 until getInputSlots)
+    * @return Itemstack in given input slot.
+    */
+  override def getInputItem(slot: Int): ItemStack = {
+    if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
+
+    indInventory.getStackInSlot(indexInputStart + slot)
+  }
+
+  /**
+    *
+    * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
+    */
+  override def getInputSlots = numInputSlots
+
+  /**
+    *
     * @param item Item to merge into slot.
     * @param slot (0 until getOutputSlots)
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
@@ -245,23 +265,6 @@ object TileMaterialProcessor {
 
   /**
     *
-    * @param slot (0 until getInputSlots)
-    * @return Itemstack in given input slot.
-    */
-  override def getInputItem(slot: Int): ItemStack = {
-    if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
-
-    indInventory.getStackInSlot(indexInputStart + slot)
-  }
-
-  /**
-    *
-    * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
-    */
-  override def getInputSlots = numInputSlots
-
-  /**
-    *
     * @param assembly Assembly to insert into slot.  Should not be null.
     * @param slot     (0 until getAssemblySlots) to insert into.
     * @return True if slot is empty and assembly was valid, accepted, and placed in the slot.
@@ -340,5 +343,15 @@ object TileMaterialProcessor {
   }
   else forwardToController[TileMaterialProcessor, Boolean](_.isItemValidForSlot(slot, item))
 
+  override def saveInfoToItemNBT(compound: NBTTagCompound): Unit = {
+    super.saveInfoToItemNBT(compound)
+    val inv = new NBTTagCompound
+    indInventory.saveToNBT(inv)
+    compound.setTag(INV_COMPOUND_TAG, inv)
+  }
 
+  override def loadInfoFromItemNBT(compound: NBTTagCompound): Unit = {
+    super.loadInfoFromItemNBT(compound)
+    indInventory.loadFromNBT(compound.getCompoundTag(INV_COMPOUND_TAG))
+  }
 }

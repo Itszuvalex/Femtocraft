@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.industry.multiblock
 
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
+import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.util.ItemUtils
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -10,6 +11,7 @@ import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.world.World
 
 import scala.collection.Set
@@ -26,7 +28,17 @@ class MultiblockMaterialProcessor extends IFrameMultiblock {
     getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
   override def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean = {
-    formAtLocation(world, x, y, z)
+    val ret = formAtLocation(world, x, y, z)
+    world.getTileEntity(x, y, z) match {
+      case null =>
+      case i: TileMaterialProcessor =>
+        world.getTileEntity(i.info.x, i.info.y, i.info.z) match {
+          case null =>
+          case controller: TileMaterialProcessor =>
+            controller.loadInfoFromItemNBT(item.getTagCompound)
+        }
+    }
+    ret
   }
 
   override def formAtLocation(world: World, x: Int, y: Int, z: Int) = {
@@ -57,6 +69,18 @@ class MultiblockMaterialProcessor extends IFrameMultiblock {
 
   override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = {
     val itemStack = ItemUtils.makeMultiblockItem(MultiblockMaterialProcessor.name)
+    world.getTileEntity(x, y, z) match {
+      case null =>
+      case i: TileMaterialProcessor =>
+        world.getTileEntity(i.info.x, i.info.y, i.info.z) match {
+          case null =>
+          case controller: TileMaterialProcessor =>
+            if (!itemStack.hasTagCompound)
+              itemStack.setTagCompound(new NBTTagCompound)
+            controller.saveInfoToItemNBT(itemStack.getTagCompound)
+        }
+      case _ =>
+    }
     getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
     if (itemStack != null)
       world.spawnEntityInWorld(new EntityItem(world, x, y, z, itemStack))
