@@ -82,6 +82,27 @@ trait ITileAssemblyArray extends ITilePower {
   def addOrMergeInputItem(item: ItemStack, slot: Int): ItemStack
 
   /**
+    * Attempts to add an item into any input slots, prioritizing merging, then open slots.
+    *
+    * @param item Item to merge into slot.
+    * @return Remaining ItemStack from item
+    */
+  def addInputItem(item: ItemStack): ItemStack = {
+    var ret = item
+    //Merge first
+    (0 until getInputSlots).filter(getInputItem(_) != null).exists { inputSlot =>
+      ret = addOrMergeInputItem(item, inputSlot)
+      ret == null
+                                                                   }
+    //Fill empty
+    (0 until getInputSlots).filter(getInputItem(_) == null).exists { inputSlot =>
+      ret = addOrMergeInputItem(item, inputSlot)
+      ret == null
+                                                                   }
+    ret
+  }
+
+  /**
     *
     * @param slot (0 until getInputSlots)
     * @param amt  Amount of the item from said slot to remove.
@@ -109,6 +130,27 @@ trait ITileAssemblyArray extends ITilePower {
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
     */
   def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack
+
+  /**
+    * Attempts to add an item into any output slots, prioritizing merging, then open slots.
+    *
+    * @param item Item to merge into slot.
+    * @return Remaining ItemStack from item
+    */
+  def addOutputItem(item: ItemStack): ItemStack = {
+    var ret = item
+    //Merge first
+    (0 until getOutputSlots).filter(getOutputItem(_) != null).exists { outputSlot =>
+      ret = addOrMergeOutputItem(item, outputSlot)
+      ret == null
+                                                                     }
+    //Fill empty
+    (0 until getOutputSlots).filter(getOutputItem(_) == null).exists { outputSlot =>
+      ret = addOrMergeOutputItem(item, outputSlot)
+      ret == null
+                                                                     }
+    ret
+  }
 
   /**
     *

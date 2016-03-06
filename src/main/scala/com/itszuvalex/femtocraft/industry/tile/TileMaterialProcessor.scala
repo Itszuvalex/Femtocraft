@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.industry.item.IItemAssembly
+import com.itszuvalex.femtocraft.industry.item.{IItemAssembly, ItemFurnaceAssembly, ItemGrinderAssembly}
 import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor._
 import com.itszuvalex.femtocraft.logistics.IItemLogisticsNetwork
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory, TileMultiblockIndexedInventoryWithIInventory}
@@ -18,7 +18,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
 
 object TileMaterialProcessor {
-  val acceptedAssemblyTypes = Set("Furnace", "Crusher")
+  val acceptedAssemblyTypes = Set(ItemFurnaceAssembly.AssemblyType, ItemGrinderAssembly.AssemblyType)
   val numInputSlots         = 4
   val numOutputSlots        = 4
   val numAssemblySlots      = 2
@@ -133,6 +133,23 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param slot (0 until getOutputSlots)
+    * @return Itemstack in given slot.
+    */
+  override def getOutputItem(slot: Int): ItemStack = {
+    if (slot < 0 || slot >= getOutputSlots) throw new IllegalArgumentException()
+
+    indInventory.getStackInSlot(indexOutputStart + slot)
+  }
+
+  /**
+    *
+    * @return Number of slots that are accessible for given IItemAssemblies to output to.
+    */
+  override def getOutputSlots = numOutputSlots
+
+  /**
+    *
     * @param item Item to merge into slot.
     * @param slot (0 until getInputSlots)
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getInputItem(slot), or not enough space.
@@ -150,12 +167,19 @@ object TileMaterialProcessor {
         val room = slotItem.getMaxStackSize - slotItem.stackSize
         val amount = Math.min(room, item.stackSize)
         slotItem.stackSize += amount
-        if (amount <= room) {
-          null
+        if (room > 0 && amount <= room) {
+          item.stackSize -= amount
+          if (item.stackSize == 0)
+            null
+          else
+            item
         }
         else {
           item.stackSize -= amount
-          item
+          if (item.stackSize == 0)
+            null
+          else
+            item
         }
       }
       else {
@@ -189,6 +213,7 @@ object TileMaterialProcessor {
     */
   override def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack = {
     if (item == null) return null
+    if(item.stackSize == 0) return null
 
     val slotItem = getOutputItem(slot)
     if (slotItem == null) {
@@ -201,11 +226,18 @@ object TileMaterialProcessor {
         val amount = Math.min(room, item.stackSize)
         slotItem.stackSize += amount
         if (room > 0 && amount <= room) {
-          null
+          item.stackSize -= amount
+          if (item.stackSize == 0)
+            null
+          else
+            item
         }
         else {
           item.stackSize -= amount
-          item
+          if (item.stackSize == 0)
+            null
+          else
+            item
         }
       }
       else {
@@ -213,23 +245,6 @@ object TileMaterialProcessor {
       }
     }
   }
-
-  /**
-    *
-    * @param slot (0 until getOutputSlots)
-    * @return Itemstack in given slot.
-    */
-  override def getOutputItem(slot: Int): ItemStack = {
-    if (slot < 0 || slot >= getOutputSlots) throw new IllegalArgumentException()
-
-    indInventory.getStackInSlot(indexOutputStart + slot)
-  }
-
-  /**
-    *
-    * @return Number of slots that are accessible for given IItemAssemblies to output to.
-    */
-  override def getOutputSlots = numOutputSlots
 
   /**
     *

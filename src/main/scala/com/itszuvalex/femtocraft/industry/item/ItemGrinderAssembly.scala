@@ -3,21 +3,18 @@ package com.itszuvalex.femtocraft.industry.item
 import java.util
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.industry.item.ItemFurnaceAssembly._
+import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
+import com.itszuvalex.femtocraft.industry.item.ItemGrinderAssembly._
 import com.itszuvalex.femtocraft.industry.tile.ITileAssemblyArray
 import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.JavaConversions._
 
-/**
-  * Created by Christopher Harris (Itszuvalex) on 2/27/2016.
-  */
-object ItemFurnaceAssembly {
-  val AssemblyType = "Furnace"
+object ItemGrinderAssembly {
+  val AssemblyType = "Grinder"
 
   /**
     * Ticks required = 20 tps * 10s
@@ -29,42 +26,24 @@ object ItemFurnaceAssembly {
     */
   val PowerRequired = TicksRequired * 10
 
-  private val FURNACE_COMPOUND_KEY        = "FurnaceAssembly"
-  private val SMELTING_STACK_COMPOUND_KEY = "SmeltingItem"
+  private val GRINDER_COMPOUND_KEY        = "GrinderAssembly"
+  private val SMELTING_STACK_COMPOUND_KEY = "GrindingStack"
   private val RESULT_STACK_COMPOUND_KEY   = "ResultStack"
   private val POWER_PROGRESS_KEY          = "Progress"
 
   def isWorking(item: ItemStack): Boolean = {
     if (item == null) return false
 
-    getResultItemCompound(item).isDefined || getSmeltingItemCompound(item).isDefined
+    getResultItemCompound(item).isDefined || getGrindingItemCompound(item).isDefined
   }
 
-  def getResultItemCompound(item: ItemStack) = getFurnaceCompound(item) match {
+  def getGrindingItem(item: ItemStack): Option[ItemStack] = getGrindingItemCompound(item) match {
     case Some(comp) =>
-      if (comp.hasKey(RESULT_STACK_COMPOUND_KEY)) {
-        Option(comp.getCompoundTag(RESULT_STACK_COMPOUND_KEY))
-      }
-      else None
+      Option(ItemStack.loadItemStackFromNBT(comp))
     case None => None
   }
 
-  def getFurnaceCompound(item: ItemStack, force: Boolean = false): Option[NBTTagCompound] = Option(item).flatMap { item =>
-    if (force) {
-      if (item.getTagCompound == null) {
-        item.setTagCompound(new NBTTagCompound)
-      }
-    }
-    Option(item.getTagCompound)
-
-                                                                                                                 }.map { comp =>
-    if (force && !comp.hasKey(FURNACE_COMPOUND_KEY)) {
-      comp.setTag(FURNACE_COMPOUND_KEY, new NBTTagCompound)
-    }
-    comp.getCompoundTag(FURNACE_COMPOUND_KEY)
-                                                                                                                       }
-
-  def getSmeltingItemCompound(item: ItemStack): Option[NBTTagCompound] = getFurnaceCompound(item) match {
+  def getGrindingItemCompound(item: ItemStack): Option[NBTTagCompound] = getGrinderCompound(item) match {
     case Some(comp) =>
       if (comp.hasKey(SMELTING_STACK_COMPOUND_KEY)) {
         Option(comp.getCompoundTag(SMELTING_STACK_COMPOUND_KEY))
@@ -73,13 +52,7 @@ object ItemFurnaceAssembly {
     case None => None
   }
 
-  def getSmeltingItem(item: ItemStack): Option[ItemStack] = getSmeltingItemCompound(item) match {
-    case Some(comp) =>
-      Option(ItemStack.loadItemStackFromNBT(comp))
-    case None => None
-  }
-
-  def setSmeltingItem(item: ItemStack, smelting: ItemStack): Unit = getFurnaceCompound(item, force = true).foreach { compound =>
+  def setGrindingItem(item: ItemStack, smelting: ItemStack): Unit = getGrinderCompound(item, force = true).foreach { compound =>
     if (smelting == null) {
       compound.removeTag(SMELTING_STACK_COMPOUND_KEY)
     }
@@ -96,7 +69,16 @@ object ItemFurnaceAssembly {
     case None => None
   }
 
-  def setResultItem(item: ItemStack, result: ItemStack): Unit = getFurnaceCompound(item, force = true).foreach { compound =>
+  def getResultItemCompound(item: ItemStack) = getGrinderCompound(item) match {
+    case Some(comp) =>
+      if (comp.hasKey(RESULT_STACK_COMPOUND_KEY)) {
+        Option(comp.getCompoundTag(RESULT_STACK_COMPOUND_KEY))
+      }
+      else None
+    case None => None
+  }
+
+  def setResultItem(item: ItemStack, result: ItemStack): Unit = getGrinderCompound(item, force = true).foreach { compound =>
     if (result == null) {
       compound.removeTag(RESULT_STACK_COMPOUND_KEY)
     }
@@ -107,18 +89,33 @@ object ItemFurnaceAssembly {
     }
                                                                                                                }
 
-  def getCurrentPowerProgress(item: ItemStack): Double = getFurnaceCompound(item).map(_.getDouble(POWER_PROGRESS_KEY)).getOrElse(0)
+  def getCurrentPowerProgress(item: ItemStack): Double = getGrinderCompound(item).map(_.getDouble(POWER_PROGRESS_KEY)).getOrElse(0)
 
-  def setCurrentPowerProgress(item: ItemStack, progress: Double): Unit = getFurnaceCompound(item, force = true).foreach(_.setDouble(POWER_PROGRESS_KEY, progress))
+  def setCurrentPowerProgress(item: ItemStack, progress: Double): Unit = getGrinderCompound(item, force = true).foreach(_.setDouble(POWER_PROGRESS_KEY, progress))
+
+  def getGrinderCompound(item: ItemStack, force: Boolean = false): Option[NBTTagCompound] = Option(item).flatMap { item =>
+    if (force) {
+      if (item.getTagCompound == null) {
+        item.setTagCompound(new NBTTagCompound)
+      }
+    }
+    Option(item.getTagCompound)
+
+                                                                                                                 }.map { comp =>
+    if (force && !comp.hasKey(GRINDER_COMPOUND_KEY)) {
+      comp.setTag(GRINDER_COMPOUND_KEY, new NBTTagCompound)
+    }
+    comp.getCompoundTag(GRINDER_COMPOUND_KEY)
+                                                                                                                       }
 }
 
-class ItemFurnaceAssembly extends Item with IItemAssembly {
+class ItemGrinderAssembly extends Item with IItemAssembly {
   setCreativeTab(Femtocraft.tab)
 
   setMaxDamage(1000)
 
   override def registerIcons(register: IIconRegister): Unit = {
-    this.itemIcon = register.registerIcon("Femtocraft" + ":" + "ItemDissassemblyArray")
+    this.itemIcon = register.registerIcon("Femtocraft" + ":" + "ItemKineticPulverizer")
   }
 
   override def addInformation(item: ItemStack, player: EntityPlayer, tooltip: util.List[_], advTooltip: Boolean): Unit = {
@@ -131,9 +128,9 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
         stringTooltip += "Result Item: " + res.getDisplayName
       case None =>
     }
-    getSmeltingItem(item) match {
+    getGrindingItem(item) match {
       case Some(res) =>
-        stringTooltip += "Smelting Item: " + res.getDisplayName
+        stringTooltip += "Grinding Item: " + res.getDisplayName
       case None =>
     }
   }
@@ -145,8 +142,7 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
       val resultC = getResultItemCompound(item)
       if (resultC.isDefined) {
         getResultItem(item) match {
-          case Some(res) =>
-            setResultItem(item, tile.addOutputItem(res))
+          case Some(res) => setResultItem(item, tile.addOutputItem(res))
           case None => setResultItem(item, null)
         }
         return
@@ -160,27 +156,33 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
       setCurrentPowerProgress(item, powerNext)
       item.setItemDamage(item.getMaxDamage - ((powerNext / power) * item.getMaxDamage).toInt)
       if (getCurrentPowerProgress(item) >= power) {
-        getSmeltingItem(item) match {
+        getGrindingItem(item) match {
           case None =>
-            clearSmeltingItem(item)
-          case Some(smelt) =>
-            val ret = tile.addOutputItem(FurnaceRecipes.smelting().getSmeltingResult(smelt).copy())
-            if (ret != null) {
-              setResultItem(item, ret)
-              setSmeltingItem(item, null)
-              setCurrentPowerProgress(item, 0)
+            clearGrindingItem(item)
+          case Some(grind) =>
+            val retOrig = DustRecipeRegistry.getDust(grind).orNull
+            if (retOrig == null) {
+              clearGrindingItem(item)
             }
             else {
-              clearSmeltingItem(item)
+              val ret = tile.addOutputItem(retOrig.copy())
+              if (ret != null) {
+                setResultItem(item, ret)
+                setGrindingItem(item, null)
+                setCurrentPowerProgress(item, 0)
+              }
+              else {
+                clearGrindingItem(item)
+              }
             }
         }
       }
     } else {
-      (0 until tile.getInputSlots).map(i => (i, tile.getInputItem(i))).filter { case (i, it) => it != null }.exists { case (i, it) => Option(FurnaceRecipes.smelting().getSmeltingResult(it)) match {
+      (0 until tile.getInputSlots).map(i => (i, tile.getInputItem(i))).filter { case (i, it) => it != null }.exists { case (i, it) => DustRecipeRegistry.getDust(it) match {
         case Some(stack) =>
           val ite = it.copy()
           ite.stackSize = 1
-          setSmeltingItem(item, ite)
+          setGrindingItem(item, ite)
           tile.removeInputItem(i, 1)
           true
         case None =>
@@ -190,9 +192,9 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
     }
   }
 
-  def clearSmeltingItem(item: ItemStack): Unit = {
+  def clearGrindingItem(item: ItemStack): Unit = {
     setResultItem(item, null)
-    setSmeltingItem(item, null)
+    setGrindingItem(item, null)
     setCurrentPowerProgress(item, 0)
   }
 }

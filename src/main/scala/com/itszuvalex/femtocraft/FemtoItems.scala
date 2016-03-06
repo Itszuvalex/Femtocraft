@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.{ItemBaseSeed, ItemDumbDust}
-import com.itszuvalex.femtocraft.industry.item.{ItemFrame, ItemFurnaceAssembly, ItemMultiblock}
+import com.itszuvalex.femtocraft.industry.item.{ItemFrame, ItemFurnaceAssembly, ItemGrinderAssembly, ItemMultiblock}
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
@@ -16,7 +16,7 @@ object FemtoItems {
   var itemCracklingDust: Item = null
 
   var itemFurnaceAssembly: Item = null
-
+  var itemGrinderAssembly: Item = null
 
   var itemFrame     : Item = null
   var itemBaseSeed  : Item = null
@@ -43,6 +43,9 @@ object FemtoItems {
 
     itemFurnaceAssembly = new ItemFurnaceAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.FurnaceAssembly")
     GameRegistry.registerItem(itemFurnaceAssembly, "itemFurnaceAssembly")
+
+    itemGrinderAssembly = new ItemGrinderAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.GrinderAssembly")
+    GameRegistry.registerItem(itemGrinderAssembly, "itemGrinderAssembly")
   }
 
   def init(): Unit = {
