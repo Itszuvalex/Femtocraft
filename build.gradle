@@ -17,7 +17,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.maiflai.scalatest" version "0.6-5-g9065d91"
+    id "com.github.maiflai.scalatest" version "0.11"
 }
 
 dependencies {
