@@ -120,8 +120,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   def distributePower(item: ItemStack, crystal: IPowerCrystal): Unit = {
     val rate = crystal.getTransferRate(item)
     var amount = Math.min(getPowerCurrent, rate)
-    val children = Random.shuffle(childrenLocs.flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.toList)
-    children.zipWithIndex.reverse.foreach { case (tile, i) =>
+    //TODO:  This is crap.  Needs to be replaced. Probably with Femto 1 algorithm.
+    // Why?  Imagine 10 connections, only 1 has power.  This will be completely random on giving between
+    // 1/10, 1/9, 1/8....1/1  * transferRate power to that one node.  It will give more power to the node the later in this random
+    // list that it is found.  If found first, it gives the least power.
+    val connections = Random.shuffle((childrenLocs + parentLoc).view.filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.toList)
+    connections.zipWithIndex.reverse.foreach { case (tile, i) =>
       val p = tile.addPower(amount / (i + 1), doFill = true)
       usePower(p, doUse = true)
       amount -= p

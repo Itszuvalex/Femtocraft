@@ -13,7 +13,7 @@ object IPowerNode {
   val DIFFUSION_TARGET_NODE = "Diffusion_Target"
   val DIRECT_NODE           = "Direct"
   val LONE_NODE             = "Lone"
-  val DEFAULT_MAX_RADIUS    = 32f
+  val DEFAULT_MAX_RADIUS    = 8f
 }
 
 trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowerNode] {
