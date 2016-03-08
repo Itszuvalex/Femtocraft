@@ -194,6 +194,8 @@ object ItemPowerCrystal {
   }
 
   def setStorageCurrent(stack: ItemStack, amount: Double): Unit = {
+    if (amount != amount) //amount is NaN
+      return
     if (stack != null)
       stack.forceTag.merge(NBT_COMPOUND_KEY ->
                            NBTCompound(

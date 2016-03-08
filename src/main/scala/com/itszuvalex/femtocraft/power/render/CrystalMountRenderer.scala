@@ -41,7 +41,7 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with ISimpleBlockRe
       case i: ICrystalMount =>
         renderCrystalMountAt(i, renderX, renderY, renderZ, partialTicks, i.getPedestalLocations.contains(i.getNodeLoc.getOffset(ForgeDirection.UP)))
         if (i.getCrystalStack != null)
-          i.getChildrenLocs.flatMap(_.getTileEntity(false)).collect { case i: IPowerNode => i }.
+          i.getChildrenLocs.map(loc => tile.getWorldObj.getTileEntity(loc.x, loc.y, loc.z)).collect { case i: IPowerNode => i }.
           foreach { t =>
             t.getType match {
               case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(i, renderX, renderY, renderZ, partialTicks, i.getNodeLoc)

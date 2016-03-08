@@ -26,9 +26,11 @@ class BlockMaterialProcessor extends TileContainer(Material.iron) {
   override def getRenderBlockPass: Int = -1
 
   override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, metadata: Int): Unit = {
+    //Gets entered
     if (!BlockMaterialProcessor.breaking) {
       world.getTileEntity(x, y, z) match {
         case null =>
+        //If not above
         case processor: TileMaterialProcessor if processor.isController =>
           BlockMaterialProcessor.breaking = true
           FrameMultiblockRegistry.getMultiblock(MultiblockMaterialProcessor.name) match {
@@ -37,11 +39,18 @@ class BlockMaterialProcessor extends TileContainer(Material.iron) {
             case _ =>
           }
           BlockMaterialProcessor.breaking = false
+        //Break the controller block to trigger above
         case processor: TileMaterialProcessor if processor.isValidMultiBlock =>
           world.setBlockToAir(processor.info.x, processor.info.y, processor.info.z)
         case _ =>
       }
     }
-    super.breakBlock(world, x, y, z, block, metadata)
+    else {
+      world.getTileEntity(x, y, z) match {
+        case null =>
+        case tile: TileMaterialProcessor => tile.onBlockBreak()
+      }
+      super.breakBlock(world, x, y, z, block, metadata)
+    }
   }
 }

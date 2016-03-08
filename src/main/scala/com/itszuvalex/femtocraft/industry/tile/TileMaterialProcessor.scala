@@ -6,7 +6,7 @@ import com.itszuvalex.femtocraft.logistics.IItemLogisticsNetwork
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory, TileMultiblockIndexedInventoryWithIInventory}
 import com.itszuvalex.femtocraft.nanite.INaniteStrain
 import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.femtocraft.power.item.IPowerStorage
+import com.itszuvalex.femtocraft.power.item.{IPowerCrystal, IPowerStorage}
 import com.itszuvalex.femtocraft.power.node.{DiffusionTargetNode, IPowerNode, PowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
@@ -60,6 +60,15 @@ object TileMaterialProcessor {
         case _ =>
       }
                                                                                  }
+    indInventory.getStackInSlot(indexPowerSlot) match {
+      case null =>
+      case stack =>
+        stack.getItem match {
+          case null =>
+          case crystal: IPowerCrystal =>
+            crystal.onTick(stack)
+        }
+    }
   }
 
   override def getMaximumPower: Double = getPowerMax

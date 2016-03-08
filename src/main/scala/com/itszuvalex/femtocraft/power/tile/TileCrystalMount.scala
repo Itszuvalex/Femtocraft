@@ -24,7 +24,7 @@ object TileCrystalMount {
   val MOUNT_COMPOUND = "Mount"
   val PEDESTALS_KEY  = "Pedestals"
   val CRYSTAL_KEY    = "Crystal"
-  val PEDESTAL_RANGE = 16f
+  val PEDESTAL_RANGE = 8f
 }
 
 class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
@@ -115,17 +115,22 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   def distributePower(item: ItemStack, crystal: IPowerCrystal): Unit = {
     val rate = crystal.getTransferRate(item)
     val amount = Math.min(getPowerCurrent, rate)
+    def isNaN(x: Double) = x != x
+    if (amount < 0d || isNaN(amount)) return
     //TODO:  This is crap.  Needs to be replaced. Probably with Femto 1 algorithm.
     // Why?  Imagine 10 connections, only 1 has power.  This will be completely random on giving between
     // 1/10, 1/9, 1/8....1/1  * transferRate power to that one node.  It will give more power to the node the later in this random
     // list that it is found.  If found first, it gives the least power.
-    val connections = (childrenLocs + parentLoc).view.filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.filter(_.getPowerMax > 0).filter(tile => tile.getPowerCurrent / tile.getPowerMax < (getPowerCurrent / getPowerMax - .01d))
-    val totalPerc = connections.foldLeft(0d)((t, tile) => t + tile.getPowerCurrent / tile.getPowerMax)
-    connections.foreach { tile =>
-      val perc = tile.getPowerCurrent / tile.getPowerMax
-      val amt = amount * perc / totalPerc
-      usePower(tile.addPower(amt, doFill = true), doUse = true)
-                        }
+    val connections = (childrenLocs + parentLoc).filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.filter(tile => (tile.getPowerMax > 0d) && ((tile.getPowerCurrent / tile.getPowerMax) < (getPowerCurrent / getPowerMax)))
+    val filPerc = connections.map(node => (node, node.getPowerCurrent / node.getPowerMax)).filter { case (node, miss) => miss > 0d && !isNaN(miss) }
+    val difPerc = filPerc.map { case (node, fil) => (node, (getPowerCurrent / getPowerMax) - fil) }
+    val totalDifPerc = difPerc.foldLeft(0d) { case (t, (_, dif)) => t + dif }
+    if (totalDifPerc > 0d && !isNaN(totalDifPerc))
+      difPerc.foreach { case (tile, perc) =>
+        val amt = amount * (perc / totalDifPerc)
+        if (amt > 0d && !isNaN(amt))
+          usePower(tile.addPower(amt, doFill = true), doUse = true)
+                      }
   }
 
   /**
@@ -172,27 +177,13 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean = parent != null &&
-                                                           Set(IPowerNode.CRYSTAL_MOUNT).contains(parent.getType)
+                                                           Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType)
 
   /**
     *
     * @return The type of PowerNode this is.
     */
-  override def getType: String = getCrystalStack match {
-    case stack if stack != null =>
-      stack.getItem match {
-        case item: IPowerCrystal => getNodeTypeFromCrystalType(item.getType(stack))
-        case _ => null
-      }
-    case _ => null
-  }
-
-  def getNodeTypeFromCrystalType(crystalType: String): String = {
-    crystalType match {
-      case null => null
-      case _ => IPowerNode.CRYSTAL_MOUNT
-    }
-  }
+  override def getType: String = IPowerNode.CRYSTAL_MOUNT
 
   override def hasDescription: Boolean = true
 
@@ -236,11 +227,10 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       case null =>
       case _ => item.getItem match {
         case i: IPowerCrystal =>
-          if (getNodeTypeFromCrystalType(i.getType(item)) != getType)
-            if (slot == 0 && inventory.getInventory(slot) != null) {
-              inventory.getInventory(slot) = null
-              markDirty()
-            }
+          if (slot == 0 && inventory.getInventory(slot) != null) {
+            inventory.getInventory(slot) = null
+            markDirty()
+          }
         case _ =>
       }
     }

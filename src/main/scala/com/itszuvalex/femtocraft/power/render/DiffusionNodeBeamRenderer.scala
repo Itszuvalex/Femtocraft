@@ -18,7 +18,7 @@ object DiffusionNodeBeamRenderer extends PowerBeamRenderer {
 
   def renderDiffuseBeams(node: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTime: Float) = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(DiffusionNodeBeamRenderer.beamColorLocation)
-    this.renderBeamsToAllChildren(x, y, z, partialTime, node, DiffusionNodeBeamRenderer.BEAM_WIDTH, new Color(node.getColor).setAlpha(64.toByte))
+    renderBeamsToAllChildren(x, y, z, partialTime, node, DiffusionNodeBeamRenderer.BEAM_WIDTH, new Color(node.getColor).setAlpha(64.toByte))
   }
 
   def renderBeamToChild(node: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTime: Float, child: Loc4): Unit = {
