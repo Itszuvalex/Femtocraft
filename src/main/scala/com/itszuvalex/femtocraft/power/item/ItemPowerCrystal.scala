@@ -62,7 +62,7 @@ object ItemPowerCrystal {
         tlist += "Crystal Type:" + crystal.getType(stack)
         tlist += "Passive Gen:" + crystal.getPassiveGen(stack).formatted("%.2f")
         tlist += "Transfer Rate:" + crystal.getTransferRate(stack)
-        tlist += "Power:" + crystal.getStorageCurrent(stack) + "/" + crystal.getStorageMax(stack)
+        tlist += "Power:" + crystal.getStorageCurrent(stack).formatted("%.0f") + "/" + crystal.getStorageMax(stack).formatted("%.0f")
       //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
       case _ =>
     }
