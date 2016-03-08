@@ -11,11 +11,11 @@ object PowerNodeRenderer {
   val RENDER_RADIUS = PowerNodeBeamRenderer.RENDER_RADIUS
 }
 
-class PowerNodeRenderer extends PowerNodeBeamRenderer with NodeCrystalRenderer {
+class PowerNodeRenderer extends NodeCrystalRenderer {
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = tile match {
     case node: IPowerNode =>
       renderNode(node, x, y, z, partialTime)
-      renderPowerBeams(node, x, y, z, partialTime)
+      PowerNodeBeamRenderer.renderPowerBeams(node, x, y, z, partialTime)
     case _ =>
   }
 }

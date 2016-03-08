@@ -5,7 +5,6 @@ import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.MathHelper
 import org.lwjgl.opengl.GL11
@@ -14,7 +13,13 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
   */
 
-trait PowerBeamRenderer extends TileEntitySpecialRenderer {
+object PowerBeamRenderer {
+
+  def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with IPowerNode, beamWidth: Float, color: Color, child: Loc4): Unit = {
+    beamRenderSetup()
+    renderBeamToLocation(x, y, z, node, color, partialTime, child, beamWidth)
+    beamRenderTeardown()
+  }
 
   def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with IPowerNode, beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
@@ -55,5 +60,17 @@ trait PowerBeamRenderer extends TileEntitySpecialRenderer {
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+
   }
+}
+
+trait PowerBeamRenderer {
+  def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with IPowerNode, beamWidth: Float, color: Color, child: Loc4): Unit =
+    PowerBeamRenderer.renderBeamToChild(x, y, z, partialTime, node, beamWidth, color, child)
+
+  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with IPowerNode, beamWidth: Float, color: Color): Unit =
+    PowerBeamRenderer.renderBeamsToAllChildren(x, y, z, partialTime, node, beamWidth, color)
+
+  def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with IPowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit =
+    PowerBeamRenderer.renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
 }

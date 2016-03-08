@@ -16,7 +16,6 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.{Set, mutable}
-import scala.util.Random
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/27/15.
@@ -84,12 +83,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @param child
     * @return True if child is capable of being a child of this node.
     */
-  override def canAddChild(child: IPowerNode): Boolean = getType match {
-    case IPowerNode.GENERATION_NODE => GenerationNode.canAddChild(child)
-    case IPowerNode.TRANSFER_NODE => TransferNode.canAddChild(child)
-    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddChild(child)
-    case _ => false
-  }
+  override def canAddChild(child: IPowerNode): Boolean =
+    child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType)
 
   /**
     *
@@ -119,17 +114,18 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   def distributePower(item: ItemStack, crystal: IPowerCrystal): Unit = {
     val rate = crystal.getTransferRate(item)
-    var amount = Math.min(getPowerCurrent, rate)
+    val amount = Math.min(getPowerCurrent, rate)
     //TODO:  This is crap.  Needs to be replaced. Probably with Femto 1 algorithm.
     // Why?  Imagine 10 connections, only 1 has power.  This will be completely random on giving between
     // 1/10, 1/9, 1/8....1/1  * transferRate power to that one node.  It will give more power to the node the later in this random
     // list that it is found.  If found first, it gives the least power.
-    val connections = Random.shuffle((childrenLocs + parentLoc).view.filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.toList)
-    connections.zipWithIndex.reverse.foreach { case (tile, i) =>
-      val p = tile.addPower(amount / (i + 1), doFill = true)
-      usePower(p, doUse = true)
-      amount -= p
-                                          }
+    val connections = (childrenLocs + parentLoc).view.filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.filter(_.getPowerMax > 0).filter(tile => tile.getPowerCurrent / tile.getPowerMax < (getPowerCurrent / getPowerMax - .01d))
+    val totalPerc = connections.foldLeft(0d)((t, tile) => t + tile.getPowerCurrent / tile.getPowerMax)
+    connections.foreach { tile =>
+      val perc = tile.getPowerCurrent / tile.getPowerMax
+      val amt = amount * perc / totalPerc
+      usePower(tile.addPower(amt, doFill = true), doUse = true)
+                        }
   }
 
   /**
@@ -175,12 +171,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @param parent IPowerNode that is being checked.
     * @return True if this node is capable of having that node as a parent.
     */
-  override def canSetParent(parent: IPowerNode): Boolean = getType match {
-    case IPowerNode.GENERATION_NODE => GenerationNode.canAddParent(parent)
-    case IPowerNode.TRANSFER_NODE => TransferNode.canAddParent(parent)
-    case IPowerNode.DIFFUSION_NODE => DiffusionNode.canAddParent(parent)
-    case _ => false
-  }
+  override def canSetParent(parent: IPowerNode): Boolean = parent != null &&
+                                                           Set(IPowerNode.CRYSTAL_MOUNT).contains(parent.getType)
 
   /**
     *
@@ -197,9 +189,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   def getNodeTypeFromCrystalType(crystalType: String): String = {
     crystalType match {
-      case IPowerCrystal.TYPE_LARGE => IPowerNode.GENERATION_NODE
       case null => null
-      case _ => IPowerNode.TRANSFER_NODE
+      case _ => IPowerNode.CRYSTAL_MOUNT
     }
   }
 

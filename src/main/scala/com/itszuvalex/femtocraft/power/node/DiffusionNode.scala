@@ -7,7 +7,7 @@ import com.itszuvalex.itszulib.api.core.Configurable
   */
 @Configurable
 object DiffusionNode {
-  @Configurable val PARENT_WHITELIST = Array(IPowerNode.GENERATION_NODE, IPowerNode.TRANSFER_NODE)
+  @Configurable val PARENT_WHITELIST = Array(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE)
   @Configurable val CHILD_WHITELIST  = Array(IPowerNode.DIFFUSION_TARGET_NODE)
 
   def canAddParent(parent: IPowerNode) = DiffusionNode.PARENT_WHITELIST.contains(parent.getType)

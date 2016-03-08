@@ -7,7 +7,7 @@ import com.itszuvalex.itszulib.api.core.Loc4
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object IPowerNode {
-  val GENERATION_NODE       = "Generation"
+  val CRYSTAL_MOUNT         = "Mount"
   val TRANSFER_NODE         = "Transfer"
   val DIFFUSION_NODE        = "Diffusion"
   val DIFFUSION_TARGET_NODE = "Diffusion_Target"

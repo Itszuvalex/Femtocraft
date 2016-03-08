@@ -81,7 +81,13 @@ class MultiblockMaterialProcessor extends IFrameMultiblock {
         }
       case _ =>
     }
-    getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
+    getTakenLocations(world, x, y, z).foreach { loc =>
+      world.getTileEntity(x, y, z) match {
+        case null =>
+        case i: TileMaterialProcessor => i.onBlockBreak()
+      }
+      world.setBlockToAir(loc.x, loc.y, loc.z)
+                                              }
     if (itemStack != null)
       world.spawnEntityInWorld(new EntityItem(world, x, y, z, itemStack))
   }

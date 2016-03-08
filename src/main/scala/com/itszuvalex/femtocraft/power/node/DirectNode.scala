@@ -7,7 +7,7 @@ import com.itszuvalex.itszulib.api.core.Configurable
   */
 @Configurable
 object DirectNode {
-  @Configurable val PARENT_WHITELIST = Array(IPowerNode.GENERATION_NODE, IPowerNode.TRANSFER_NODE)
+  @Configurable val PARENT_WHITELIST = Array(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE)
 
   def canAddChild(child: IPowerNode) = false
 

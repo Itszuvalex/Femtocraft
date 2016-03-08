@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.ICrystalMount
+import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.util.Color
@@ -32,7 +33,7 @@ object CrystalMountRenderer {
   val crystalName = "Crystal"
 }
 
-class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamRenderer with ISimpleBlockRenderingHandler {
+class CrystalMountRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler {
   val crystalModel = AdvancedModelLoader.loadModel(crystalModelLocation).asInstanceOf[WavefrontObject]
 
   override def renderTileEntityAt(tile: TileEntity, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float): Unit = {
@@ -40,7 +41,14 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer with PowerNodeBeamR
       case i: ICrystalMount =>
         renderCrystalMountAt(i, renderX, renderY, renderZ, partialTicks, i.getPedestalLocations.contains(i.getNodeLoc.getOffset(ForgeDirection.UP)))
         if (i.getCrystalStack != null)
-          renderPowerBeams(i, renderX, renderY, renderZ, partialTicks)
+          i.getChildrenLocs.flatMap(_.getTileEntity(false)).collect { case i: IPowerNode => i }.
+          foreach { t =>
+            t.getType match {
+              case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(i, renderX, renderY, renderZ, partialTicks, i.getNodeLoc)
+              case IPowerNode.DIFFUSION_TARGET_NODE => DiffusionNodeBeamRenderer.renderBeamToChild(i, renderX, renderY, renderZ, partialTicks, i.getNodeLoc)
+              case _ =>
+            }
+                  }
       case _ =>
     }
   }

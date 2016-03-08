@@ -26,7 +26,7 @@ object NaniteHiveSmallRenderer {
   val hiveColorTexLocation = Resources.Model("nanite hive small/nanite hive small color.png")
 }
 
-class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler with DiffusionNodeBeamRenderer {
+class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler {
   val model = AdvancedModelLoader.loadModel(NaniteHiveSmallRenderer.hiveModelLocation).asInstanceOf[WavefrontObject]
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit =
@@ -45,7 +45,7 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
         GL11.glColor4ub(((color.red.toInt & 255) * shift).toByte, ((color.green & 255) * shift).toByte, ((color.blue & 255) * shift).toByte, 255.toByte)
         model.renderPart("Sphere001")
         GL11.glPopMatrix()
-        renderDiffuseBeams(node, x, y, z, partialTime)
+        DiffusionNodeBeamRenderer.renderDiffuseBeams(node, x, y, z, partialTime)
       case _ =>
     }
 

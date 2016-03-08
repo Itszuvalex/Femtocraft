@@ -5,8 +5,9 @@ import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor._
 import com.itszuvalex.femtocraft.logistics.IItemLogisticsNetwork
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory, TileMultiblockIndexedInventoryWithIInventory}
 import com.itszuvalex.femtocraft.nanite.INaniteStrain
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.item.IPowerStorage
-import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.power.node.{DiffusionTargetNode, IPowerNode, PowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -16,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.World
 
 object TileMaterialProcessor {
   val acceptedAssemblyTypes = Set(ItemFurnaceAssembly.AssemblyType, ItemGrinderAssembly.AssemblyType)
@@ -40,26 +42,28 @@ object TileMaterialProcessor {
                                                   with PowerNode
                                                   with MultiBlockComponent
                                                   with ITileAssemblyArray {
-  this.powerMax = TileMaterialProcessor.powerMax
-
   override def hasDescription: Boolean = true
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(numInputSlots + numOutputSlots + numAssemblySlots + 2)
 
+  override def onBlockBreak() = {
+    if (isController) {
+      super.onBlockBreak()
+    }
+  }
 
   override def serverUpdate(): Unit = {
-    setPower(getMaximumPower)
-
-    (0 until getAssemblySlots).flatMap(i => Option(getAssembly(i))).foreach { item =>
+    (0 until getAssemblySlots).view.flatMap(i => Option(getAssembly(i))).foreach { item =>
       item.getItem match {
         case assembly: IItemAssembly =>
           assembly.onTick(item, this)
         case _ =>
       }
-                                                                            }
+                                                                                 }
   }
 
   override def getMaximumPower: Double = getPowerMax
+
 
   /**
     *
@@ -90,6 +94,27 @@ object TileMaterialProcessor {
   override def hasGUI = isValidMultiBlock
 
   override def getGuiID = GuiIDs.TileMaterialProcessorGuiID
+
+  /**
+    *
+    * @param child
+    * @return True if child is capable of being a child of this node.
+    */
+  override def canAddChild(child: IPowerNode): Boolean = DiffusionTargetNode.canAddChild(child)
+
+  /**
+    *
+    * @param parent IPowerNode that is being checked.
+    * @return True if this node is capable of having that node as a parent.
+    */
+  override def canSetParent(parent: IPowerNode): Boolean = super.canSetParent(parent) && DiffusionTargetNode.canAddParent(parent)
+
+  /**
+    *
+    * @param child
+    * @return True if child is successfully added.
+    */
+  override def addChild(child: IPowerNode): Boolean = false
 
   /**
     *
@@ -213,7 +238,7 @@ object TileMaterialProcessor {
     */
   override def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack = {
     if (item == null) return null
-    if(item.stackSize == 0) return null
+    if (item.stackSize == 0) return null
 
     val slotItem = getOutputItem(slot)
     if (slotItem == null) {
@@ -297,6 +322,110 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param amount Amount of power to add.
+    * @param doFill True if actually change values, false to simulate.
+    * @return Amount of power used out of @amount to fill the internal storage of this Tile.
+    */
+  override def addPower(amount: Double, doFill: Boolean): Double = {
+    getStackInSlot(indexPowerSlot) match {
+      case null =>
+        getParentLoc match {
+          case null => 0
+          case loc =>
+            loc.getTileEntity() match {
+              case None => 0
+              case Some(power: IPowerNode) =>
+                power.addPower(amount, doFill)
+            }
+        }
+      case item =>
+        item.getItem match {
+          case null => 0
+          case power: IPowerStorage =>
+            power.store(item, amount, doFill)
+        }
+    }
+  }
+
+  /**
+    *
+    * @param amount Amount of power to consume.
+    * @param doUse  True if actually change values, false to simulate.
+    * @return Amount of power consumed out of @amount from the internal storage of this Tile.
+    */
+  override def usePower(amount: Double, doUse: Boolean): Double = {
+    getStackInSlot(indexPowerSlot) match {
+      case null =>
+        getParentLoc match {
+          case null => 0
+          case loc =>
+            loc.getTileEntity() match {
+              case None => 0
+              case Some(power: IPowerNode) =>
+                power.usePower(amount, doUse)
+            }
+        }
+      case item =>
+        item.getItem match {
+          case null => 0
+          case power: IPowerStorage =>
+            power.consume(item, amount, doUse)
+        }
+    }
+  }
+
+  /**
+    *
+    * @return Amount of power currently stored in this node.
+    */
+  override def getPowerCurrent: Double = {
+    getStackInSlot(indexPowerSlot) match {
+      case null =>
+        getParentLoc match {
+          case null => 0
+          case loc =>
+            loc.getTileEntity() match {
+              case None => 0
+              case Some(power: IPowerNode) =>
+                power.getPowerCurrent
+            }
+        }
+      case item =>
+        item.getItem match {
+          case null => 0
+          case power: IPowerStorage =>
+            power.getStorageCurrent(item)
+        }
+    }
+  }
+
+  /**
+    *
+    * @return Amount of power capable of being stored in this node.
+    */
+  override def getPowerMax: Double = {
+    getStackInSlot(indexPowerSlot) match {
+      case null =>
+        getParentLoc match {
+          case null => 0
+          case loc =>
+            loc.getTileEntity() match {
+              case None => 0
+              case Some(power: IPowerNode) =>
+                power.getPowerMax
+            }
+        }
+      case item =>
+        item.getItem match {
+          case null => 0
+          case power: IPowerStorage =>
+            power.getStorageMax(item)
+        }
+    }
+  }
+
+  /**
+    *
     * @return IItemLogisticsNetwork connection, or null if no logistics supported.
     */
   override def getItemLogisticsNetwork: IItemLogisticsNetwork = null
@@ -369,4 +498,16 @@ object TileMaterialProcessor {
     super.loadInfoFromItemNBT(compound)
     indInventory.loadFromNBT(compound.getCompoundTag(INV_COMPOUND_TAG))
   }
+
+  override def formMultiBlock(world: World, x: Int, y: Int, z: Int): Boolean = {
+    val ret = super.formMultiBlock(world, x, y, z)
+    if (isController) PowerManager.addNode(this)
+    ret
+  }
+
+  override def validate(): Unit = {
+    super.validate()
+    if (!worldObj.isRemote && isController) PowerManager.addNode(this)
+  }
+
 }

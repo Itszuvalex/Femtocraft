@@ -4,8 +4,9 @@ import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import cpw.mods.fml.common.registry.GameRegistry
-import net.minecraft.init.Items
+import net.minecraft.init.{Blocks, Items}
 import net.minecraft.item.ItemStack
+import net.minecraftforge.oredict.ShapedOreRecipe
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/5/16.
@@ -23,7 +24,9 @@ object FemtoRecipes {
   }
 
   def registerVanillaRecipes() = {
-    GameRegistry.addShapedRecipe(new ItemStack(FemtoItems.itemFrame), Array("CIC", "I I", "CIC", 'C', FemtoBlocks.blockCyberweave, 'I', Items.iron_ingot): _*)
+    GameRegistry.addShapedRecipe(new ItemStack(FemtoItems.itemFrame, 4), Array("CIC", "I I", "CIC", 'C', FemtoBlocks.blockCyberweave, 'I', Items.iron_ingot): _*)
+    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemFurnaceAssembly), Array[Any](" C ", "CFC", "III", 'C', "cyberweave", 'F', Blocks.furnace, 'I', "ingotIron").box: _*))
+    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemGrinderAssembly), Array[Any](" C ", "CPC", "III", 'C', "cyberweave", 'P', Blocks.piston, 'I', "ingotIron").box: _*))
   }
 
   def registerGrowthChamberRecipes(): Unit = {
@@ -55,4 +58,5 @@ object FemtoRecipes {
   implicit class boxedArray(array: Array[Any]) {
     def box: Array[Object] = array
   }
+
 }

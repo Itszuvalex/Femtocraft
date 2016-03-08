@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.industry.item.{ItemFrame, ItemFurnaceAssembly, 
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
+import net.minecraftforge.oredict.OreDictionary
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
@@ -25,6 +26,7 @@ object FemtoItems {
   def preInit(): Unit = {
     itemPowerCrystal = new ItemPowerCrystal().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.PowerCrystal")
     GameRegistry.registerItem(itemPowerCrystal, "itemPowerCrystal")
+    OreDictionary.registerOre("itemCrystal", itemPowerCrystal)
 
     itemFrame = new ItemFrame().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.Frame")
     GameRegistry.registerItem(itemFrame, "itemFrameTest")
@@ -43,9 +45,11 @@ object FemtoItems {
 
     itemFurnaceAssembly = new ItemFurnaceAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.FurnaceAssembly")
     GameRegistry.registerItem(itemFurnaceAssembly, "itemFurnaceAssembly")
+    OreDictionary.registerOre("assemblyFurnace", itemFurnaceAssembly)
 
     itemGrinderAssembly = new ItemGrinderAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.GrinderAssembly")
     GameRegistry.registerItem(itemGrinderAssembly, "itemGrinderAssembly")
+    OreDictionary.registerOre("assemblyGrinder", itemFurnaceAssembly)
   }
 
   def init(): Unit = {
