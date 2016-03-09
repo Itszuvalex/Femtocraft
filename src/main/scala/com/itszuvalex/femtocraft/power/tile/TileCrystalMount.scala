@@ -127,7 +127,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     val totalDifPerc = difPerc.foldLeft(0d) { case (t, (_, dif)) => t + dif }
     if (totalDifPerc > 0d && !isNaN(totalDifPerc))
       difPerc.foreach { case (tile, perc) =>
-        val amt = amount * (perc / totalDifPerc)
+        val amt = Math.min(amount * (perc / totalDifPerc), tile.getPowerMax * perc)
         if (amt > 0d && !isNaN(amt))
           usePower(tile.addPower(amt, doFill = true), doUse = true)
                       }
@@ -150,12 +150,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   /**
     *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  override def getCrystalStack = getStackInSlot(0)
-
-  /**
-    *
     * @param amount Amount of power to consume.
     * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
@@ -167,6 +161,21 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
         case crystal: IPowerCrystal =>
           crystal.consume(stack, amount, doUse)
         case _ => 0
+      }
+    }
+  }
+
+  /**
+    *
+    * @return Amount of power capable of being stored in this node.
+    */
+  override def getPowerMax: Double = {
+    getCrystalStack match {
+      case null => 0
+      case stack => stack.getItem match {
+        case null => 0
+        case crystal: IPowerCrystal =>
+          crystal.getStorageMax(stack)
       }
     }
   }
@@ -203,15 +212,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
     savePowerConnectionInfo(compound)
     savePedestalLocInfo(compound)
-  }
-
-  def savePedestalLocInfo(compound: NBTTagCompound): NBTTagCompound = {
-    compound(
-              TileCrystalMount.MOUNT_COMPOUND ->
-              NBTCompound(
-                           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
-                         )
-            )
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
@@ -253,6 +253,27 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     }
   }
 
+  override def writeToNBT(compound: NBTTagCompound): Unit = {
+    super.writeToNBT(compound)
+    savePedestalLocInfo(compound)
+    savePowerConnectionInfo(compound)
+  }
+
+  def savePedestalLocInfo(compound: NBTTagCompound): NBTTagCompound = {
+    compound(
+              TileCrystalMount.MOUNT_COMPOUND ->
+              NBTCompound(
+                           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
+                         )
+            )
+  }
+
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    loadPedestalLocInfo(compound)
+    loadPowerConnectionInfo(compound)
+  }
+
   def loadPedestalLocInfo(compound: NBTTagCompound): Unit = {
     compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
       pedestalLocs.clear()
@@ -264,19 +285,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
     super.loadPowerConnectionInfo(compound)
     setRenderUpdate()
-  }
-
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    savePedestalLocInfo(compound)
-    savePowerConnectionInfo(compound)
-
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadPedestalLocInfo(compound)
-    loadPowerConnectionInfo(compound)
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {
@@ -382,16 +390,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   /**
     *
-    * @return Amount of power capable of being stored in this node.
+    * @return Crystal ItemStack.  Null if no crystal.
     */
-  override def getPowerMax: Double = {
-    getCrystalStack match {
-      case null => 0
-      case stack => stack.getItem match {
-        case null => 0
-        case crystal: IPowerCrystal =>
-          crystal.getStorageMax(stack)
-      }
-    }
-  }
+  override def getCrystalStack = getStackInSlot(0)
 }
