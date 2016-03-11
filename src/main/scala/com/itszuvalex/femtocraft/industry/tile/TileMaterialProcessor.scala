@@ -71,7 +71,7 @@ object TileMaterialProcessor {
     }
   }
 
-  override def getMaximumPower: Double = getPowerMax
+  override def getMaximumPower: Double = if (isController) getPowerMax else forwardToController[ITileAssemblyArray, Double](_.getMaximumPower)
 
 
   /**
@@ -80,15 +80,18 @@ object TileMaterialProcessor {
     * @return IItemAssembly in the given slot.
     */
   override def getAssembly(slot: Int): ItemStack = {
-    if (slot < 0 || slot >= getAssemblySlots) throw new IllegalArgumentException()
+    if (isController) {
+      if (slot < 0 || slot >= getAssemblySlots) throw new IllegalArgumentException()
 
-    indInventory.getStackInSlot(indexAssemblyStart + slot)
+      indInventory.getStackInSlot(indexAssemblyStart + slot)
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.getAssembly(slot))
   }
 
   /**
     * Number of assembly slots
     */
-  override def getAssemblySlots = numAssemblySlots
+  override def getAssemblySlots = if (isController) numAssemblySlots else forwardToController[ITileAssemblyArray, Int](_.getAssemblySlots)
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
     if (hasGUI) {
@@ -129,7 +132,7 @@ object TileMaterialProcessor {
     *
     * @return The type of PowerNode this is.
     */
-  override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
+  override def getType: String = if (isController) IPowerNode.DIFFUSION_TARGET_NODE else forwardToController[IPowerNode, String](_.getType)
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     if (isController) {
@@ -142,7 +145,7 @@ object TileMaterialProcessor {
     *
     * @return Set of support Assembly types
     */
-  override def getSupportedAssemblyTypes = acceptedAssemblyTypes
+  override def getSupportedAssemblyTypes = if (isController) acceptedAssemblyTypes else forwardToController[ITileAssemblyArray, Set[String]](_.getSupportedAssemblyTypes)
 
   /**
     *
@@ -151,18 +154,21 @@ object TileMaterialProcessor {
     * @return The itemstack consisting of getOutputItem(slot) and of stack size Math.min(getOutputItem(slot).stackSize, amt), or null if no item in slot.
     */
   override def removeOutputItem(slot: Int, amt: Int): ItemStack = {
-    val item = getOutputItem(slot)
-    if (item != null) {
-      val remove = Math.min(item.stackSize, amt)
-      item.stackSize -= remove
-      if (item.stackSize == 0) {
-        indInventory.setInventorySlotContents(indexOutputStart + slot, null)
+    if (isController) {
+      val item = getOutputItem(slot)
+      if (item != null) {
+        val remove = Math.min(item.stackSize, amt)
+        item.stackSize -= remove
+        if (item.stackSize == 0) {
+          indInventory.setInventorySlotContents(indexOutputStart + slot, null)
+        }
+        val ret = item.copy()
+        ret.stackSize = remove
+        ret
       }
-      val ret = item.copy()
-      ret.stackSize = remove
-      ret
+      else null
     }
-    else null
+    else forwardToController[ITileAssemblyArray, ItemStack](_.removeOutputItem(slot, amt))
   }
 
   /**
@@ -171,16 +177,19 @@ object TileMaterialProcessor {
     * @return Itemstack in given slot.
     */
   override def getOutputItem(slot: Int): ItemStack = {
-    if (slot < 0 || slot >= getOutputSlots) throw new IllegalArgumentException()
+    if (isController) {
+      if (slot < 0 || slot >= getOutputSlots) throw new IllegalArgumentException()
 
-    indInventory.getStackInSlot(indexOutputStart + slot)
+      indInventory.getStackInSlot(indexOutputStart + slot)
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.getOutputItem(slot))
   }
 
   /**
     *
     * @return Number of slots that are accessible for given IItemAssemblies to output to.
     */
-  override def getOutputSlots = numOutputSlots
+  override def getOutputSlots = if (isController) numOutputSlots else forwardToController[ITileAssemblyArray, Int](_.getOutputSlots)
 
   /**
     *
@@ -189,37 +198,40 @@ object TileMaterialProcessor {
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getInputItem(slot), or not enough space.
     */
   override def addOrMergeInputItem(item: ItemStack, slot: Int): ItemStack = {
-    if (item == null) return null
+    if (isController) {
+      if (item == null) return null
 
-    val slotItem = getInputItem(slot)
-    if (slotItem == null) {
-      indInventory.setInventorySlotContents(indexInputStart + slot, slotItem)
-      null
-    }
-    else {
-      if (IDDamageWildCardNBTComparator.compare(item, slotItem) == 0) {
-        val room = slotItem.getMaxStackSize - slotItem.stackSize
-        val amount = Math.min(room, item.stackSize)
-        slotItem.stackSize += amount
-        if (room > 0 && amount <= room) {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
-            null
-          else
-            item
-        }
-        else {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
-            null
-          else
-            item
-        }
+      val slotItem = getInputItem(slot)
+      if (slotItem == null) {
+        indInventory.setInventorySlotContents(indexInputStart + slot, slotItem)
+        null
       }
       else {
-        item
+        if (IDDamageWildCardNBTComparator.compare(item, slotItem) == 0) {
+          val room = slotItem.getMaxStackSize - slotItem.stackSize
+          val amount = Math.min(room, item.stackSize)
+          slotItem.stackSize += amount
+          if (room > 0 && amount <= room) {
+            item.stackSize -= amount
+            if (item.stackSize == 0)
+              null
+            else
+              item
+          }
+          else {
+            item.stackSize -= amount
+            if (item.stackSize == 0)
+              null
+            else
+              item
+          }
+        }
+        else {
+          item
+        }
       }
     }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.addOrMergeInputItem(item, slot))
   }
 
   /**
@@ -228,16 +240,19 @@ object TileMaterialProcessor {
     * @return Itemstack in given input slot.
     */
   override def getInputItem(slot: Int): ItemStack = {
-    if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
+    if (isController) {
+      if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
 
-    indInventory.getStackInSlot(indexInputStart + slot)
+      indInventory.getStackInSlot(indexInputStart + slot)
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.getInputItem(slot))
   }
 
   /**
     *
     * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
     */
-  override def getInputSlots = numInputSlots
+  override def getInputSlots = if (isController) numInputSlots else forwardToController[ITileAssemblyArray, Int](_.getInputSlots)
 
   /**
     *
@@ -246,38 +261,41 @@ object TileMaterialProcessor {
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
     */
   override def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack = {
-    if (item == null) return null
-    if (item.stackSize == 0) return null
+    if (isController) {
+      if (item == null) return null
+      if (item.stackSize == 0) return null
 
-    val slotItem = getOutputItem(slot)
-    if (slotItem == null) {
-      indInventory.setInventorySlotContents(indexOutputStart + slot, item)
-      null
-    }
-    else {
-      if (IDDamageWildCardNBTComparator.compare(item, slotItem) == 0) {
-        val room = slotItem.getMaxStackSize - slotItem.stackSize
-        val amount = Math.min(room, item.stackSize)
-        slotItem.stackSize += amount
-        if (room > 0 && amount <= room) {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
-            null
-          else
-            item
-        }
-        else {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
-            null
-          else
-            item
-        }
+      val slotItem = getOutputItem(slot)
+      if (slotItem == null) {
+        indInventory.setInventorySlotContents(indexOutputStart + slot, item)
+        null
       }
       else {
-        item
+        if (IDDamageWildCardNBTComparator.compare(item, slotItem) == 0) {
+          val room = slotItem.getMaxStackSize - slotItem.stackSize
+          val amount = Math.min(room, item.stackSize)
+          slotItem.stackSize += amount
+          if (room > 0 && amount <= room) {
+            item.stackSize -= amount
+            if (item.stackSize == 0)
+              null
+            else
+              item
+          }
+          else {
+            item.stackSize -= amount
+            if (item.stackSize == 0)
+              null
+            else
+              item
+          }
+        }
+        else {
+          item
+        }
       }
     }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.addOrMergeOutputItem(item, slot))
   }
 
   /**
@@ -286,9 +304,12 @@ object TileMaterialProcessor {
     * @return The assembly item stack in given and now empty slot, or null if failed to remove assembly.  (somehow?)
     */
   override def removeAssembly(slot: Int): ItemStack = {
-    val assembly = getAssembly(slot)
-    indInventory.setInventorySlotContents(indexAssemblyStart + slot, null)
-    assembly
+    if (isController) {
+      val assembly = getAssembly(slot)
+      indInventory.setInventorySlotContents(indexAssemblyStart + slot, null)
+      assembly
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.removeAssembly(slot))
   }
 
   /**
@@ -298,18 +319,21 @@ object TileMaterialProcessor {
     * @return The itemstack consisting of getInputItem(slot) and of stack size Math.min(getInputItem(slot).stackSize, amt), or null if no item in slot.
     */
   override def removeInputItem(slot: Int, amt: Int): ItemStack = {
-    val item = getInputItem(slot)
-    if (item != null) {
-      val remove = Math.min(item.stackSize, amt)
-      item.stackSize -= remove
-      if (item.stackSize == 0) {
-        indInventory.setInventorySlotContents(indexInputStart + slot, null)
+    if (isController) {
+      val item = getInputItem(slot)
+      if (item != null) {
+        val remove = Math.min(item.stackSize, amt)
+        item.stackSize -= remove
+        if (item.stackSize == 0) {
+          indInventory.setInventorySlotContents(indexInputStart + slot, null)
+        }
+        val ret = item.copy()
+        ret.stackSize = remove
+        ret
       }
-      val ret = item.copy()
-      ret.stackSize = remove
-      ret
+      else null
     }
-    else null
+    else forwardToController[ITileAssemblyArray, ItemStack](_.removeInputItem(slot, amt))
   }
 
   /**
@@ -319,14 +343,17 @@ object TileMaterialProcessor {
     * @return True if slot is empty and assembly was valid, accepted, and placed in the slot.
     */
   override def addAssembly(assembly: ItemStack, slot: Int): Boolean = {
-    val current = getAssembly(slot)
-    if (current == null) {
-      indInventory.setInventorySlotContents(indexAssemblyStart + slot, assembly)
-      true
+    if (isController) {
+      val current = getAssembly(slot)
+      if (current == null) {
+        indInventory.setInventorySlotContents(indexAssemblyStart + slot, assembly)
+        true
+      }
+      else {
+        false
+      }
     }
-    else {
-      false
-    }
+    else forwardToController[ITileAssemblyArray, Boolean](_.addAssembly(assembly, slot))
   }
 
   /**
@@ -336,24 +363,27 @@ object TileMaterialProcessor {
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
   override def addPower(amount: Double, doFill: Boolean): Double = {
-    getStackInSlot(indexPowerSlot) match {
-      case null =>
-        getParentLoc match {
-          case null => 0
-          case loc =>
-            loc.getTileEntity() match {
-              case None => 0
-              case Some(power: IPowerNode) =>
-                power.addPower(amount, doFill)
-            }
-        }
-      case item =>
-        item.getItem match {
-          case null => 0
-          case power: IPowerStorage =>
-            power.store(item, amount, doFill)
-        }
+    if (isController) {
+      getStackInSlot(indexPowerSlot) match {
+        case null =>
+          getParentLoc match {
+            case null => 0
+            case loc =>
+              loc.getTileEntity() match {
+                case None => 0
+                case Some(power: IPowerNode) =>
+                  power.addPower(amount, doFill)
+              }
+          }
+        case item =>
+          item.getItem match {
+            case null => 0
+            case power: IPowerStorage =>
+              power.store(item, amount, doFill)
+          }
+      }
     }
+    else forwardToController[PowerNode, Double](_.addPower(amount, doFill))
   }
 
   /**
@@ -363,24 +393,27 @@ object TileMaterialProcessor {
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   override def usePower(amount: Double, doUse: Boolean): Double = {
-    getStackInSlot(indexPowerSlot) match {
-      case null =>
-        getParentLoc match {
-          case null => 0
-          case loc =>
-            loc.getTileEntity() match {
-              case None => 0
-              case Some(power: IPowerNode) =>
-                power.usePower(amount, doUse)
-            }
-        }
-      case item =>
-        item.getItem match {
-          case null => 0
-          case power: IPowerStorage =>
-            power.consume(item, amount, doUse)
-        }
+    if (isController) {
+      getStackInSlot(indexPowerSlot) match {
+        case null =>
+          getParentLoc match {
+            case null => 0
+            case loc =>
+              loc.getTileEntity() match {
+                case None => 0
+                case Some(power: IPowerNode) =>
+                  power.usePower(amount, doUse)
+              }
+          }
+        case item =>
+          item.getItem match {
+            case null => 0
+            case power: IPowerStorage =>
+              power.consume(item, amount, doUse)
+          }
+      }
     }
+    else forwardToController[PowerNode, Double](_.usePower(amount, doUse))
   }
 
   /**
@@ -388,24 +421,27 @@ object TileMaterialProcessor {
     * @return Amount of power currently stored in this node.
     */
   override def getPowerCurrent: Double = {
-    getStackInSlot(indexPowerSlot) match {
-      case null =>
-        getParentLoc match {
-          case null => 0
-          case loc =>
-            loc.getTileEntity() match {
-              case None => 0
-              case Some(power: IPowerNode) =>
-                power.getPowerCurrent
-            }
-        }
-      case item =>
-        item.getItem match {
-          case null => 0
-          case power: IPowerStorage =>
-            power.getStorageCurrent(item)
-        }
+    if (isController) {
+      getStackInSlot(indexPowerSlot) match {
+        case null =>
+          getParentLoc match {
+            case null => 0
+            case loc =>
+              loc.getTileEntity() match {
+                case None => 0
+                case Some(power: IPowerNode) =>
+                  power.getPowerCurrent
+              }
+          }
+        case item =>
+          item.getItem match {
+            case null => 0
+            case power: IPowerStorage =>
+              power.getStorageCurrent(item)
+          }
+      }
     }
+    else forwardToController[PowerNode, Double](_.getPowerCurrent)
   }
 
   /**
@@ -413,31 +449,36 @@ object TileMaterialProcessor {
     * @return Amount of power capable of being stored in this node.
     */
   override def getPowerMax: Double = {
-    getStackInSlot(indexPowerSlot) match {
-      case null =>
-        getParentLoc match {
-          case null => 0
-          case loc =>
-            loc.getTileEntity() match {
-              case None => 0
-              case Some(power: IPowerNode) =>
-                power.getPowerMax
-            }
-        }
-      case item =>
-        item.getItem match {
-          case null => 0
-          case power: IPowerStorage =>
-            power.getStorageMax(item)
-        }
+    if (isController) {
+      getStackInSlot(indexPowerSlot) match {
+        case null =>
+          getParentLoc match {
+            case null => 0
+            case loc =>
+              loc.getTileEntity() match {
+                case None => 0
+                case Some(power: IPowerNode) =>
+                  power.getPowerMax
+              }
+          }
+        case item =>
+          item.getItem match {
+            case null => 0
+            case power: IPowerStorage =>
+              power.getStorageMax(item)
+          }
+      }
     }
+    else forwardToController[PowerNode, Double](_.getPowerMax)
   }
 
   /**
     *
     * @return IItemLogisticsNetwork connection, or null if no logistics supported.
     */
-  override def getItemLogisticsNetwork: IItemLogisticsNetwork = null
+  override def getItemLogisticsNetwork: IItemLogisticsNetwork = if (isController)
+    null
+  else forwardToController[ITileAssemblyArray, IItemLogisticsNetwork](_.getItemLogisticsNetwork)
 
   /**
     *
@@ -445,7 +486,8 @@ object TileMaterialProcessor {
     * @param doCharge False to simulate, true to actually do
     * @return Amount of amt used to actually charge.
     */
-  override def charge(amt: Double, doCharge: Boolean): Double = addPower(amt, doCharge)
+  override def charge(amt: Double, doCharge: Boolean): Double = if (isController) addPower(amt, doCharge)
+  else forwardToController[ITileAssemblyArray, Double](_.charge(amt, doCharge))
 
   /**
     *
@@ -453,21 +495,25 @@ object TileMaterialProcessor {
     * @param doDrain False to simulate, true to actually remove power.
     * @return Amount of amt that was successfully drained.
     */
-  override def drain(amt: Double, doDrain: Boolean): Double = usePower(amt, doDrain)
+  override def drain(amt: Double, doDrain: Boolean): Double = if (isController) usePower(amt, doDrain)
+  else forwardToController[ITileAssemblyArray, Double](_.drain(amt, doDrain))
 
-  override def getCurrentPower: Double = getPowerCurrent
+  override def getCurrentPower: Double = if (isController) getPowerCurrent
+  else forwardToController[ITileAssemblyArray, Double](_.getCurrentPower)
 
   /**
     *
     * @return Base Power usage * getPowerMultipler = actual power requirement.  Assemblies are responsible for calculating their power usage before draining power.
     */
-  override def getPowerMultiplier: Double = 1
+  override def getPowerMultiplier: Double = if (isController) 1
+  else forwardToController[ITileAssemblyArray, Double](_.getPowerMultiplier)
 
   /**
     *
     * @return Base Time usage * getTimeMultiplier = actual time requirement.  Assemblies are responsible for calculating the time usage themselves.
     */
-  override def getTimeMultiplier: Double = 1
+  override def getTimeMultiplier: Double = if (isController) 1
+  else forwardToController[ITileAssemblyArray, Double](_.getTimeMultiplier)
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = if (isController) {
     if (item == null) return true
@@ -494,7 +540,7 @@ object TileMaterialProcessor {
       case _ => false
     }
   }
-  else forwardToController[TileMaterialProcessor, Boolean](_.isItemValidForSlot(slot, item))
+  else forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.isItemValidForSlot(slot, item))
 
   override def saveInfoToItemNBT(compound: NBTTagCompound): Unit = {
     super.saveInfoToItemNBT(compound)
