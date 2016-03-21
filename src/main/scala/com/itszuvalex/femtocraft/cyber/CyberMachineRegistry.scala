@@ -10,13 +10,11 @@ import scala.collection.mutable
 object CyberMachineRegistry {
   private val machineMap = mutable.HashMap[String, ICyberMachine]()
 
-  def registerMachine(machine: ICyberMachine) = machineMap.put(machine.getName, machine)
-
   def getMachine(name: String) = machineMap.get(name)
 
-  def getMachinesForSize(size: Int) = machineMap.values.filter(_.getRequiredBaseSize == size)
-
   def getMachinesThatFitIn(size: Int, remainingSlots: Int) = getMachinesForSize(size).filter(_.getRequiredSlots <= remainingSlots)
+
+  def getMachinesForSize(size: Int) = machineMap.values.filter(_.getRequiredBaseSize == size)
 
   def init(): Unit = {
     registerMachine(new MachineGrowthChamber)
@@ -29,4 +27,6 @@ object CyberMachineRegistry {
     registerMachine(new MachinePhotosynthesisTower)
     registerMachine(new MachineSporeDistributor)
   }
+
+  def registerMachine(machine: ICyberMachine) = machineMap.put(machine.getName, machine)
 }

@@ -22,8 +22,6 @@ object ContainerCyberBase {
 class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileCyberBase) extends ContainerInv[TileCyberBase](player, tile, 0, 0) {
   val bufferSlotSize = tile.size + 1
 
-  var slots = bufferSlotSize
-
   for (i <- 0 until 9) addSlotToContainer(new Slot(tile, i, 89 + 18 * (i % 3), 37 + 18 * (i / 3)))
   for (i <- 0 until math.pow(bufferSlotSize, 2).toInt) addSlotToContainer(new Slot(tile, i + 9, 8 + 18 * (i % bufferSlotSize), 19 + 18 * (i / bufferSlotSize)))
 
@@ -32,15 +30,12 @@ class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileC
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
     crafters.foreach { case crafter: ICrafting =>
-      if (tile.remainingSlots != slots) crafter.sendProgressBarUpdate(this, 0, tile.remainingSlots)
-      slots = tile.remainingSlots
                      }
   }
 
   override def updateProgressBar(id: Int, value: Int): Unit = {
     super.updateProgressBar(id, value)
     id match {
-      case 0 => slots = value
       case _ =>
     }
   }

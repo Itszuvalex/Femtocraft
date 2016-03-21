@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.entity.player.EntityPlayer
@@ -46,25 +47,18 @@ object ItemFrame {
 
 
 class ItemFrame extends Item with IFrameItem {
-  override def getFrameType(stack: ItemStack) = "Basic"
-
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
-
   override def setSelectedMultiblock(stack: ItemStack, name: String) = ItemFrame.setSelection(stack, name)
-
 
   override def renderID: Int = RenderIDs.framePreviewableID
 
-
   override def onItemRightClick(item: ItemStack, world: World, player: EntityPlayer): ItemStack = {
     if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
       item
     }
     else
       super.onItemRightClick(item, world, player)
   }
-
 
   override def addInformation(stack: ItemStack, player: EntityPlayer, tooltip: util.List[_], advanced: Boolean): Unit = {
     super.addInformation(stack, player, tooltip, advanced)
@@ -74,10 +68,14 @@ class ItemFrame extends Item with IFrameItem {
     list.add("Selected: " + (if (selected == null || selected.isEmpty) "none" else selected))
   }
 
+  override def getFrameType(stack: ItemStack) = "Basic"
+
+  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+
   override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.FrameMultiblockSelectorGuiID, world, 0, 0, 0)
+      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
       return true
     }
     val multiString = getSelectedMultiblock(itemStack)
@@ -106,26 +104,17 @@ class ItemFrame extends Item with IFrameItem {
     if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
 
-    val xWidth = 2
-    val yHeight = 3
-    val zWidth = 2;
-    {
-      for {
-        i <- bx until (bx + xWidth)
-        j <- by until (by + yHeight)
-        k <- bz until (bz + zWidth)
-      } yield (i, j, k)
-    }.foreach { case (px, py, pz) =>
-      world.setBlock(px, py, pz, FemtoBlocks.blockFrame)
-      world.getTileEntity(px, py, pz) match {
+    locations.foreach { loc =>
+      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
+      world.getTileEntity(loc.x, loc.y, loc.z) match {
         case frame: TileFrame =>
-          frame.calculateRendering(xWidth, yHeight, zWidth, px - bx, py - by, pz - bz)
-          //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
+          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
           frame.formMultiBlock(world, bx, by, bz)
           frame.multiBlock = multiString
         case _ =>
       }
-              }
+                      }
+    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
     true
   }
 }

@@ -27,7 +27,8 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
     OreDictionary.getOreIDs(itemStack).foreach(oresMap.getOrElseUpdate(_, new mutable.HashSet[Int]()) += slot)
   }
 
-  override def removeItemStack(itemStack: ItemStack, slot: Int): Unit = {
+  override def removeItemStack(slot: Int): Unit = {
+    val itemStack = inventory.getStackInSlot(slot)
     if (itemStack == null) return
     rebuildCacheIfNecessary()
     val id = itemStack.itemID

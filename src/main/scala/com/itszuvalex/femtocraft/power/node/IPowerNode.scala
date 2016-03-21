@@ -1,20 +1,22 @@
 package com.itszuvalex.femtocraft.power.node
 
+import com.itszuvalex.femtocraft.graph.{IManyChildNode, ISingleParentNode}
 import com.itszuvalex.itszulib.api.core.Loc4
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object IPowerNode {
-  val GENERATION_NODE       = "Generation"
+  val CRYSTAL_MOUNT         = "Mount"
   val TRANSFER_NODE         = "Transfer"
   val DIFFUSION_NODE        = "Diffusion"
   val DIFFUSION_TARGET_NODE = "Diffusion_Target"
   val DIRECT_NODE           = "Direct"
-  val DEFAULT_MAX_RADIUS    = 32f
+  val LONE_NODE             = "Lone"
+  val DEFAULT_MAX_RADIUS    = 8f
 }
 
-trait IPowerNode {
+trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowerNode] {
 
   /**
     *
@@ -26,7 +28,7 @@ trait IPowerNode {
     *
     * @return The IPowerNode this has as its parent.  If this is of type 'Generation', this will be itself.
     */
-  def getParent: IPowerNode
+  override def getParent: IPowerNode
 
   /**
     *
@@ -40,14 +42,14 @@ trait IPowerNode {
     * @param parent IPowerNode that is being checked.
     * @return True if this node is capable of having that node as a parent.
     */
-  def canAddParent(parent: IPowerNode): Boolean
+  override def canSetParent(parent: IPowerNode): Boolean
 
   /**
     *
     * @param parent Parent being set.
     * @return True if parent is successfully set to input parent.
     */
-  def setParent(parent: IPowerNode): Boolean
+  override def setParent(parent: IPowerNode): Boolean
 
   /**
     *
@@ -59,7 +61,7 @@ trait IPowerNode {
     *
     * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
     */
-  def getChildren: Iterable[IPowerNode]
+  override def getChildren: scala.collection.Set[IPowerNode]
 
   /**
     *
@@ -74,21 +76,21 @@ trait IPowerNode {
     * @param child
     * @return True if child is capable of being a child of this node.
     */
-  def canAddChild(child: IPowerNode): Boolean
+  override def canAddChild(child: IPowerNode): Boolean
 
   /**
     *
     * @param child
     * @return True if child is successfully added.
     */
-  def addChild(child: IPowerNode): Boolean
+  override def addChild(child: IPowerNode): Boolean
 
   /**
     *
     * @param child
     * @return True if child was a child of this node, and was successfully removed.
     */
-  def removeChild(child: IPowerNode): Boolean
+  override def removeChild(child: IPowerNode): Boolean
 
   /**
     *
@@ -106,13 +108,13 @@ trait IPowerNode {
     *
     * @return Amount of power currently stored in this node.
     */
-  def getPowerCurrent: Long
+  def getPowerCurrent: Double
 
   /**
     *
     * @return Amount of power capable of being stored in this node.
     */
-  def getPowerMax: Long
+  def getPowerMax: Double
 
   /**
     *
@@ -120,21 +122,21 @@ trait IPowerNode {
     * @param doFill True if actually change values, false to simulate.
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
-  def addPower(amount: Long, doFill: Boolean): Long
+  def addPower(amount: Double, doFill: Boolean): Double
 
   /**
     *
     * @param amount Set current stored power to the given value.
     */
-  def setPower(amount: Long)
+  def setPower(amount: Double)
 
   /**
     *
     * @param amount Amount of power to consume.
-    * @param doUse True if actually change values, false to simulate.
+    * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
-  def usePower(amount: Long, doUse: Boolean): Long
+  def usePower(amount: Double, doUse: Boolean): Double
 
   /**
     *

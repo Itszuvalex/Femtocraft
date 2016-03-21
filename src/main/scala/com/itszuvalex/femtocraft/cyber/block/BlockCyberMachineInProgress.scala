@@ -5,7 +5,6 @@ import com.itszuvalex.itszulib.core.TileContainer
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.World
 
 /**

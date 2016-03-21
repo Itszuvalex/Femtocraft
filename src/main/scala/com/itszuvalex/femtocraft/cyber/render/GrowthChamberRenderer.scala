@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
+import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.femtocraft.cyber.{ICyberMachineRenderer, IRecipeRenderer}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
@@ -140,8 +140,8 @@ class GrowthChamberRenderer extends TileEntitySpecialRenderer with ICyberMachine
     * @param z zPos to render at
     * @param partialTime Partial tick time
     * @param progressPercentage Controller TileCyberBase of the machine.
-    *        Store any data that should persist between render calls in `baseController.inProgressData`.
-    *        If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.
+    *                           Store any data that should persist between render calls in `baseController.inProgressData`.
+    *                           If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.
     */
   override def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, progressPercentage: Float): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)

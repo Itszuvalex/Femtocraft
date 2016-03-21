@@ -26,7 +26,7 @@ object NaniteHiveSmallRenderer {
   val hiveColorTexLocation = Resources.Model("nanite hive small/nanite hive small color.png")
 }
 
-class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler with DiffusionNodeBeamRenderer {
+class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler {
   val model = AdvancedModelLoader.loadModel(NaniteHiveSmallRenderer.hiveModelLocation).asInstanceOf[WavefrontObject]
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit =
@@ -45,10 +45,13 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
         GL11.glColor4ub(((color.red.toInt & 255) * shift).toByte, ((color.green & 255) * shift).toByte, ((color.blue & 255) * shift).toByte, 255.toByte)
         model.renderPart("Sphere001")
         GL11.glPopMatrix()
-        renderDiffuseBeams(node, x, y, z, partialTime)
+        DiffusionNodeBeamRenderer.renderDiffuseBeams(node, x, y, z, partialTime)
       case _ =>
     }
 
+  def preRender() = {
+    Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveTexLocation)
+  }
 
   override def getRenderId: Int = RenderIDs.naniteHiveSmallID
 
@@ -56,7 +59,7 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
 
   override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {
     GL11.glPushMatrix()
-    GL11.glTranslated(.5, 0, .5)
+    GL11.glTranslated(.5, -.1, .5)
     GL11.glColor4f(1, 1, 1, 1)
     preRender()
     model.renderAll()
@@ -68,9 +71,5 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer with ISimpleBloc
 
   override def renderWorldBlock(world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, modelId: Int, renderer: RenderBlocks): Boolean = {
     false
-  }
-
-  def preRender() = {
-    Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveTexLocation)
   }
 }

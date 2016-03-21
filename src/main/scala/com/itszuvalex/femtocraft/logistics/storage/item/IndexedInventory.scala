@@ -37,8 +37,8 @@ import scala.collection.Set
   * @param size Utility class for storing and saving/loading ItemStack[]s with ease.
   */
 class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with NBTSerializable {
-  @Saveable private var inventory      = new Array[ItemStack](size)
   private lazy      val inventoryCache = new IndexedInventoryCache(this)
+  @Saveable private var inventory      = new Array[ItemStack](size)
 
   def this() = this(0)
 
@@ -52,32 +52,41 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def getStackInSlot(i: Int) = inventory(i)
 
   override def decrStackSize(i: Int, amount: Int): ItemStack = {
+    var itemstack: ItemStack = null
     if (inventory(i) != null) {
-      var itemstack: ItemStack = null
       if (inventory(i).stackSize <= amount) {
         itemstack = inventory(i)
-        removeItemStack(inventory(i), i)
-        itemstack
+        removeItemStack(i)
       } else {
         itemstack = inventory(i).splitStack(amount)
         if (inventory(i).stackSize == 0) {
-          removeItemStack(inventory(i), i)
+          removeItemStack(i)
         }
-        itemstack
       }
-    } else {
-      null
     }
+    itemstack
   }
 
   override def getStackInSlotOnClosing(i: Int) = inventory(i)
 
   override def setInventorySlotContents(i: Int, itemstack: ItemStack) {
-    removeItemStack(inventory(i), i)
     addItemStack(itemstack, i)
   }
 
-  override def getInventoryName = "femto.BaseInventory.ImLazyAndDidntCodeThis"
+  override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
+    if(inventory(slot) != null)
+      removeItemStack(slot)
+
+    inventory(slot) = itemStack
+    inventoryCache.addItemStack(itemStack, slot)
+  }
+
+  override def removeItemStack(slot: Int): Unit = {
+    inventory(slot) = null
+    inventoryCache.removeItemStack(slot)
+  }
+
+  override def getInventoryName = "femto.IndexedInventory"
 
   override def hasCustomInventoryName = false
 
@@ -115,17 +124,9 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
     invalidateCache()
   }
 
+  override def invalidateCache() = inventoryCache.invalidateCache()
+
   def getComparatorInputOverride = Container.calcRedstoneFromInventory(this)
-
-  override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
-    inventory(slot) = itemStack
-    inventoryCache.addItemStack(itemStack, slot)
-  }
-
-  override def removeItemStack(itemStack: ItemStack, slot: Int): Unit = {
-    inventory(slot) = null
-    inventoryCache.removeItemStack(itemStack, slot)
-  }
 
   override def getSlotsByOreID(id: Int) = inventoryCache.getSlotsByOreID(id)
 
@@ -140,8 +141,6 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def rebuildCache() = inventoryCache.rebuildCache()
 
   override def getSlotsByItemID(id: Int) = inventoryCache.getSlotsByItemID(id)
-
-  override def invalidateCache() = inventoryCache.invalidateCache()
 
   override def isCacheValid = inventoryCache.isCacheValid
 

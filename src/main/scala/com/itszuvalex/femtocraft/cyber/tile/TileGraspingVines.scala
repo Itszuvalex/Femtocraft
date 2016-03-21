@@ -5,17 +5,15 @@ import java.util.UUID
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.machine.MachineGraspingVines
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
-import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
+import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileFluidTank
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
@@ -26,11 +24,9 @@ import scala.collection.mutable
 object TileGraspingVines {
   @Configurable
   val DEFAULT_GRAB_RADIUS = 8f
-  val grabbedHashSet = new mutable.HashSet[UUID]()
+  val grabbedHashSet      = new mutable.HashSet[UUID]()
 
   val COMPOUND_IDLIST_KEY = "IDList"
-  val BASE_POS_KEY = "BasePos"
-  val INDEX_KEY = "Index"
 }
 
 /**
@@ -38,12 +34,10 @@ object TileGraspingVines {
   */
 @Configurable
 class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
-  var machineIndex: Int = -1
-  var basePos: Loc4 = null
   var velocityAddition: Float = .2f
-  var grabRadius: Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
-  var entitySet = new mutable.HashSet[Entity]()
-  var clientSet = mutable.HashSet[Int]()
+  var grabRadius      : Float = TileGraspingVines.DEFAULT_GRAB_RADIUS
+  var entitySet               = new mutable.HashSet[Entity]()
+  var clientSet               = mutable.HashSet[Int]()
 
   override def serverUpdate(): Unit = {
     findAndGrabEntities(grabRadius)
@@ -52,15 +46,15 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   def findAndGrabEntities(radius: Float): Unit = {
     getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
-      yCoord + .5f - radius,
-      zCoord + .5f - radius,
-      xCoord + .5f + radius,
-      yCoord + .5f + radius,
-      zCoord + .5f + radius))
-      .asInstanceOf[java.util.List[Entity]]
-      .view
-      .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) <= radius * radius }
-      .foreach(grabEntity)
+                                                                                    yCoord + 1f - radius,
+                                                                                    zCoord + .5f - radius,
+                                                                                    xCoord + .5f + radius,
+                                                                                    yCoord + 1f + radius,
+                                                                                    zCoord + .5f + radius))
+    .asInstanceOf[java.util.List[Entity]]
+    .view
+    .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + 1d, zCoord + .5d) <= radius * radius }
+    .foreach(grabEntity)
   }
 
   def grabEntity(entity: Entity): Boolean = {
@@ -96,7 +90,12 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
         }
       }
       toRemove.foreach(removeEntity)
-    }
+                       }
+  }
+
+  override def invalidate(): Unit = {
+    super.invalidate()
+    grabbedSet.foreach(removeEntity)
   }
 
   def removeEntity(entity: Entity): Boolean = {
@@ -118,11 +117,6 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     entitySet
   }
 
-  override def invalidate(): Unit = {
-    super.invalidate()
-    grabbedSet.foreach(removeEntity)
-  }
-
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     compound.IntArray(TileGraspingVines.COMPOUND_IDLIST_KEY) match {
@@ -134,38 +128,22 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     }
   }
 
-
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     compound(TileGraspingVines.COMPOUND_IDLIST_KEY -> grabbedSet.map(_.getEntityId).toArray)
   }
 
-  def onBlockBreak(): Unit = {
+  override def onBlockBreak(): Unit = {
     if (!isController) {
       worldObj.setBlockToAir(info.x, info.y, info.z)
       return
     }
+    if (worldObj.isRemote) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>
         te.breakMachinesUpwardsFromSlot(machineIndex)
       case _ =>
     }
-  }
-
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    compound.NBTCompound(TileGraspingVines.BASE_POS_KEY) { compound =>
-      basePos = Loc4(compound)
-      machineIndex = compound.Int(TileGraspingVines.INDEX_KEY)
-      Unit
-    }
-  }
-
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    compound(TileGraspingVines.BASE_POS_KEY -> NBTCompound(basePos),
-      TileGraspingVines.INDEX_KEY -> machineIndex)
   }
 
   override def getMod: AnyRef = Femtocraft
@@ -181,13 +159,13 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
   override def hasDescription: Boolean = true
 
   override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+    val center = Vector3(xCoord + .5f, yCoord + 1f, zCoord + .5f)
     AxisAlignedBB.getBoundingBox(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-      center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
+                                 center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+                                 center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
   }
 
   override def getCyberMachine = MachineGraspingVines.NAME

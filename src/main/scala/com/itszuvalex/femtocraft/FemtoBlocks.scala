@@ -2,13 +2,16 @@ package com.itszuvalex.femtocraft
 
 
 import com.itszuvalex.femtocraft.cyber.block._
-import com.itszuvalex.femtocraft.industry.block.{BlockArcFurnace, BlockCentrifuge, BlockCrystallizationChamber, BlockFrame}
-import com.itszuvalex.femtocraft.logistics.test.{BlockTaskProviderTest, BlockWorkerProviderTest}
+import com.itszuvalex.femtocraft.industry.block._
+import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
+import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
+import com.itszuvalex.femtocraft.power.block._
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
+import net.minecraftforge.oredict.OreDictionary
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
@@ -25,6 +28,7 @@ object FemtoBlocks {
   var blockArcFurnace            : Block = null
   var blockCrystallizationChamber: Block = null
   var blockCentrifuge            : Block = null
+  var blockMaterialProcessor     : Block = null
   var blockGrowthChamber         : Block = null
   var blockBioBeacon             : Block = null
   var blockCondensationArray     : Block = null
@@ -34,6 +38,7 @@ object FemtoBlocks {
   var blockMetabolicConverter    : Block = null
   var blockPhotosynthesisTower   : Block = null
   var blockSporeDistributor      : Block = null
+  var blockItemRepository        : Block = null
 
 
   var blockFrame                 : Block = null
@@ -41,10 +46,18 @@ object FemtoBlocks {
   var blockCyberMachineInProgress: Block = null
 
   var blockNaniteHiveSmall: Block = null
+  var blockCrystalMount   : Block = null
+  var blockPowerPedestal  : Block = null
+
+  var blockPowerSink     : Block = null
+  var blockPowerGenerator: Block = null
+
+  var blockGlowStick: Block = null
 
   //Tests
 
-  var testBlock: Block = null
+  var testBlock       : Block = null
+  var testNetworkBlock: Block = null
 
 
   var testDiffusionNode      : Block = null
@@ -60,14 +73,15 @@ object FemtoBlocks {
   def preInit(): Unit = {
     blockCyberweave = new BlockCyberweave().setCreativeTab(Femtocraft.tab).setBlockName("blockCyberweave")
     GameRegistry.registerBlock(blockCyberweave, "blockCyberweave")
+    OreDictionary.registerOre("cyberweave", blockCyberweave)
 
     blockCyberwood = new BlockCyberwood().setCreativeTab(Femtocraft.tab).setBlockName("blockCyberwood")
     GameRegistry.registerBlock(blockCyberwood, "blockCyberwood")
+    OreDictionary.registerOre("logWood", blockCyberwood)
 
     blockCyberleaf = new BlockCyberleaf().setCreativeTab(Femtocraft.tab).setBlockName("blockCyberleaf")
     GameRegistry.registerBlock(blockCyberleaf, "blockCyberleaf")
-
-
+    OreDictionary.registerOre("treeLeaves", blockCyberleaf)
 
     blockCrystals = new BlockCrystalsWorldgen().setCreativeTab(Femtocraft.tab).setBlockName("crystalCluster")
     GameRegistry.registerBlock(blockCrystals, "crystalCluster")
@@ -80,6 +94,9 @@ object FemtoBlocks {
 
     blockCentrifuge = new BlockCentrifuge().setCreativeTab(Femtocraft.tab).setBlockName("blockCentrifuge")
     GameRegistry.registerBlock(blockCentrifuge, "blockCentrifuge")
+
+    blockMaterialProcessor = new BlockMaterialProcessor().setCreativeTab(Femtocraft.tab).setBlockName("blockMaterialProcessor")
+    GameRegistry.registerBlock(blockMaterialProcessor, "blockMaterialProcessor")
 
     blockGrowthChamber = new BlockGrowthChamber().setBlockName("blockGrowthChamber")
     GameRegistry.registerBlock(blockGrowthChamber, "blockGrowthChamber")
@@ -120,11 +137,32 @@ object FemtoBlocks {
     blockNaniteHiveSmall = new BlockNaniteHiveSmall().setCreativeTab(Femtocraft.tab).setBlockName("blockNaniteHive_small")
     GameRegistry.registerBlock(blockNaniteHiveSmall, "blockNaniteHive_small")
 
+    blockItemRepository = new BlockItemRepository().setCreativeTab(Femtocraft.tab).setBlockName("blockItemRepository")
+    GameRegistry.registerBlock(blockItemRepository, "blockItemRepository")
+
+    blockCrystalMount = new BlockCrystalMount().setCreativeTab(Femtocraft.tab).setBlockName("blockCrystalMount")
+    GameRegistry.registerBlock(blockCrystalMount, "blockCrystalMount")
+
+    blockPowerPedestal = new BlockPowerPedestal().setCreativeTab(Femtocraft.tab).setBlockName("blockPowerPedestal")
+    GameRegistry.registerBlock(blockPowerPedestal, "blockPowerPedestal")
+
+    blockPowerSink = new BlockPowerSink().setCreativeTab(Femtocraft.tab).setBlockName("blockPowerSink")
+    GameRegistry.registerBlock(blockPowerSink, "blockPowerSink")
+
+    blockPowerGenerator = new BlockPowerGenerator().setCreativeTab(Femtocraft.tab).setBlockName("blockPowerGenerator")
+    GameRegistry.registerBlock(blockPowerGenerator, "blockPowerGenerator")
+
+
+    blockGlowStick = new BlockGlowStick().setCreativeTab(Femtocraft.tab).setBlockName("blockGlowStick")
+    GameRegistry.registerBlock(blockGlowStick, "blockGlowStick")
+
     //tests
 
     testBlock = new BlockTest
     GameRegistry.registerBlock(testBlock, "testBlock")
 
+    testNetworkBlock = new BlockNetworkTest
+    GameRegistry.registerBlock(testNetworkBlock, "testNetworkBlock")
 
     testDiffusionNode = new BlockDiffusionNodeTest
     testDiffusionNode.setBlockName("testDiffusionNode")

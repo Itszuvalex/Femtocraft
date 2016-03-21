@@ -1,11 +1,11 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
-import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CybermaterialRegistry, GrowthChamberRegistry}
+import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CybermaterialRegistry}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
+import com.itszuvalex.itszulib.implicits.IDImplicits._
 import cpw.mods.fml.common.Mod.EventHandler
 import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import cpw.mods.fml.common.network.NetworkRegistry
@@ -14,7 +14,9 @@ import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Items
 import net.minecraft.item.{Item, ItemStack}
-import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.{Level, LogManager}
+
+import scala.collection.mutable
 
 /**
   * Created by Christopher on 4/5/2015.
@@ -27,36 +29,34 @@ object Femtocraft {
   final val blocks  = FemtoBlocks
   final val items   = FemtoItems
   final val fluids  = FemtoFluids
-
+  val tab                      = new CreativeTabs(Femtocraft.ID) {
+    override def getTabIconItem: Item = Items.nether_star
+  }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
-  var proxy: ProxyCommon = null
-
+  var proxy   : ProxyCommon    = null
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
   var guiProxy: ProxyGuiCommon = null
-
-  val tab = new CreativeTabs(Femtocraft.ID) {
-    override def getTabIconItem: Item = Items.nether_star
-  }
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     FemtoBlocks.preInit()
     FemtoItems.preInit()
     FemtoFluids.preInit()
+    FemtoRecipes.preInit()
 
     FemtoPacketHandler.preInit()
 
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
-
-    registerRecipes()
   }
+
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
     FemtoBlocks.init()
     FemtoItems.init()
     FemtoFluids.init()
+    FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     CyberMachineRegistry.init()
   }
@@ -65,24 +65,8 @@ object Femtocraft {
     FemtoBlocks.postInit()
     FemtoItems.postInit()
     FemtoFluids.postInit()
+    FemtoRecipes.postInit()
     CybermaterialRegistry.postInit()
     proxy.postInit()
-  }
-
-  def registerRecipes(): Unit = {
-    GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.wheat_seeds, 1),
-                                                            IndexedSeq(new ItemStack(Items.wheat_seeds, 2),
-                                                                       new ItemStack(Items.wheat, 1)
-                                                                      ),
-                                                            500,
-                                                            GrowthChamberRecipe.TYPE_TEXTURE,
-                                                            Array(Resources.Texture("recipes/wheat0.png"),
-                                                                  Resources.Texture("recipes/wheat1.png"),
-                                                                  Resources.Texture("recipes/wheat2.png"),
-                                                                  Resources.Texture("recipes/wheat3.png"),
-                                                                  Resources.Texture("recipes/wheat4.png"),
-                                                                  Resources.Texture("recipes/wheat5.png"),
-                                                                  Resources.Texture("recipes/wheat6.png"),
-                                                                  Resources.Texture("recipes/wheat7.png"))))
   }
 }

@@ -15,24 +15,24 @@ object NaniteAttribute {
   val ATTRIBUTE_COMPOUND_TAG = "Attributes"
   val ATTRIBUTE_BONUS_TAG    = "Bonus"
 
-  def getAttributesTag(item: ItemStack) = NaniteStrain.getNaniteTag(item).map(_.getCompoundTag(ATTRIBUTE_COMPOUND_TAG))
+  def getAttributeBonusLevel(item: ItemStack, attribute: String) = getAttributeTag(item, attribute).map(_.getInteger(ATTRIBUTE_BONUS_TAG))
 
   def getAttributeTag(item: ItemStack, attribute: String) = getAttributesTag(item).map(_.getCompoundTag(attribute))
 
-  def getAttributeBonusLevel(item: ItemStack, attribute: String) = getAttributeTag(item, attribute).map(_.getInteger(ATTRIBUTE_BONUS_TAG))
+  def getAttributesTag(item: ItemStack) = NaniteStrain.getNaniteTag(item).map(_.getCompoundTag(ATTRIBUTE_COMPOUND_TAG))
 
   def setAttributeBonusLevel(item: ItemStack, attribute: String, level: Int) = getAttributeTag(item, attribute).foreach(_.setInteger(ATTRIBUTE_BONUS_TAG, level))
 }
 
 @Configurable
 class NaniteAttribute(val name: String) extends INaniteAttribute {
-  override def getName = name
-
   override def getAttributeModified(item: ItemStack, strain: INaniteStrain): Float = getAttributeBase(item, strain) * (1f + BONUS_LEVEL_MODIFIER * getAttributeBonusLevel(item, getName).getOrElse(0))
 
-  override def getMaxBonus = MAX_BONUS_LEVELS
+  override def getName = name
 
   override def getAttributeBase(item: ItemStack, strain: INaniteStrain) = 1f
+
+  override def getMaxBonus = MAX_BONUS_LEVELS
 
   override def getAttributeBonus(item: ItemStack, strain: INaniteStrain) = BONUS_LEVEL_MODIFIER
 }

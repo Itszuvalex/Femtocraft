@@ -25,13 +25,13 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     }
   }
 
-  override def getMod = Femtocraft
-
   /**
     *
     * @return Set of tasks hosted by the provider.
     */
   override def getActiveTasks = tasks
+
+  override def getMod = Femtocraft
 
   /**
     *
@@ -47,7 +47,6 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   override def getWorkerConnectionRadius = 30f
 
   override def hasDescription = false
-
 
   override def invalidate(): Unit = {
     super.invalidate()
@@ -80,10 +79,10 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   }
 
   class TestTask(val provider: TileTaskProviderTest) extends ITask {
-    var progressF        = 0.0
-    var progress         = 0
     val progressToFinish = 20
     val workers          = new mutable.HashSet[IWorker]()
+    var progressF        = 0.0
+    var progress         = 0
 
     /**
       *

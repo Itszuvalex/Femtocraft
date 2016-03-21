@@ -44,9 +44,9 @@ object CubicCraftingRegistry {
     recipeInputMap.put((recipe.inputItems, recipe.inputFluid), recipe)
   }
 
-  def findMatchingRecipe(input: (Array[Array[ItemStack]], FluidStack)): Option[CubicCraftingRecipe] = recipeInputMap.get(input)
-
   def findMatchingRecipe(inputItems: Array[Array[ItemStack]], inputFluids: FluidStack): Option[CubicCraftingRecipe] = findMatchingRecipe((inputItems, inputFluids))
+
+  def findMatchingRecipe(input: (Array[Array[ItemStack]], FluidStack)): Option[CubicCraftingRecipe] = recipeInputMap.get(input)
 
   def getAllRecipes = recipeInputMap.values
 }

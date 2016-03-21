@@ -7,7 +7,7 @@ import com.itszuvalex.itszulib.api.core.Configurable
   */
 @Configurable
 object DirectNode {
-  @Configurable val PARENT_WHITELIST = Array(IPowerNode.GENERATION_NODE, IPowerNode.TRANSFER_NODE)
+  @Configurable val PARENT_WHITELIST = Array(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE)
 
   def canAddChild(child: IPowerNode) = false
 
@@ -28,13 +28,13 @@ trait DirectNode extends PowerNode {
     * @param parent IPowerNode that is being checked.
     * @return True if this node is capable of having that node as a parent.
     */
-  override def canAddParent(parent: IPowerNode) = super.canAddParent(parent) && DirectNode.canAddParent(parent)
+  override def canSetParent(parent: IPowerNode) = super.canSetParent(parent) && DirectNode.canAddParent(parent)
 
   /**
     *
     * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
     */
-  override def getChildren: Iterable[IPowerNode] = null
+  override def getChildren = null
 
   /**
     *

@@ -9,9 +9,9 @@ import net.minecraftforge.common.DimensionManager
   * Created by Alex on 15.10.2015.
   */
 class MessageBuildMachine(var x: Int, var y: Int, var z: Int, var dim: Int, var machine: String) extends IMessage with IMessageHandler[MessageBuildMachine, IMessage] {
-  def this() = this(0, 0, 0, 0, null)
-
   lazy val worldObj = DimensionManager.getWorld(dim)
+
+  def this() = this(0, 0, 0, 0, null)
 
   override def toBytes(buf: ByteBuf): Unit = {
     buf.writeInt(x)

@@ -30,10 +30,6 @@ object CybermaterialRegistry {
     itemMap.put((item, damage), (massType, amount))
   }
 
-  def registerBlockReplacement(block: Block, damage: Int, replaceBlock: Block, replaceDamage: Int) = {
-    blockTypeToReplacement.put((block, damage), (replaceBlock, replaceDamage))
-  }
-
   def getReplacement(block: Block, damage: Int) = blockTypeToReplacement.get((block, damage))
 
   def getBlocksOfType(massType: String) = blockMassTypeMap.get(massType)
@@ -43,7 +39,6 @@ object CybermaterialRegistry {
   def getTypeFromBlock(block: Block, damage: Int) = blockMap.get((block, damage))
 
   def getTypeFromItem(item: Item, damage: Int) = itemMap.get((item, damage))
-
 
   def postInit(): Unit = {
     OreDictionary.getOres("logWood")
@@ -58,6 +53,10 @@ object CybermaterialRegistry {
     (0 until 16).foreach(registerBlockReplacement(Blocks.stone, _, FemtoBlocks.blockCyberweave, 0))
     (0 until 16).foreach(registerBlockReplacement(Blocks.grass, _, FemtoBlocks.blockCyberweave, 0))
     (0 until 16).foreach(registerBlockReplacement(Blocks.dirt, _, FemtoBlocks.blockCyberweave, 0))
+  }
+
+  def registerBlockReplacement(block: Block, damage: Int, replaceBlock: Block, replaceDamage: Int) = {
+    blockTypeToReplacement.put((block, damage), (replaceBlock, replaceDamage))
   }
 
 }

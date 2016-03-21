@@ -15,6 +15,21 @@ object NaniteManager {
     findNodes(hive)
   }
 
+  def findNodes(hive: INaniteHive) = {
+    val loc = hive.getHiveLoc
+    parentlessNodeTracker.getLocationsInRange(loc, hive.connectionRadius).view
+    .filterNot(_ == loc)
+    .flatMap(_.getTileEntity(force = false))
+    .collect { case node: INaniteNode => node }
+    .filter(_.getHiveLoc == null)
+    .filter { node => node.getNodeLoc.distSqr(loc) < (node.hiveConnectionRadius * node.hiveConnectionRadius) }
+    .filter(node => node.canSetHive(hive) && hive.addNode(node))
+    .foreach(node =>
+               if (hive.addNode(node) && node.setHive(hive))
+                 refreshParentlessStatus(node)
+            )
+  }
+
   def removeHive(hive: INaniteHive) = {
     hiveTracker.removeLocation(hive.getHiveLoc)
   }
@@ -25,10 +40,6 @@ object NaniteManager {
       findParent(node)
     }
     refreshParentlessStatus(node)
-  }
-
-  def removeNode(node: INaniteNode) = {
-    parentlessNodeTracker.removeLocation(node.getNodeLoc)
   }
 
   def refreshParentlessStatus(node: INaniteNode) =
@@ -51,19 +62,8 @@ object NaniteManager {
     .exists(pnode => pnode._1.addNode(node) && node.setHive(pnode._1))
   }
 
-  def findNodes(hive: INaniteHive) = {
-    val loc = hive.getHiveLoc
-    parentlessNodeTracker.getLocationsInRange(loc, hive.connectionRadius).view
-    .filterNot(_ == loc)
-    .flatMap(_.getTileEntity(force = false))
-    .collect { case node: INaniteNode => node }
-    .filter(_.getHiveLoc == null)
-    .filter { node => node.getNodeLoc.distSqr(loc) < (node.hiveConnectionRadius * node.hiveConnectionRadius) }
-    .filter(node => node.canSetHive(hive) && hive.addNode(node))
-    .foreach(node =>
-               if (hive.addNode(node) && node.setHive(hive))
-                 refreshParentlessStatus(node)
-            )
+  def removeNode(node: INaniteNode) = {
+    parentlessNodeTracker.removeLocation(node.getNodeLoc)
   }
 
   def clear() = {

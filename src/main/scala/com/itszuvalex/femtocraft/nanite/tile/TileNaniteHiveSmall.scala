@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.nanite.tile
 
 import com.itszuvalex.femtocraft.logistics.distributed.{IWorker, IWorkerProvider}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileIndexedInventory}
-import com.itszuvalex.femtocraft.nanite.NaniteHive
+import com.itszuvalex.femtocraft.nanite.{NaniteManager, NaniteHive}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{DiffusionNode, IPowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -40,11 +40,9 @@ import scala.collection.Set
     setRenderUpdate()
   }
 
-  protected def hiveRadius = TileNaniteHiveSmall.HIVE_RADIUS
-
   override def getMod: AnyRef = Femtocraft
 
-  override def getGuiID: Int = GuiIDs.NaniteHiveGuiID
+  override def getGuiID: Int = GuiIDs.TileNaniteHiveGuiID
 
   override def hasGUI: Boolean = true
 
@@ -53,6 +51,8 @@ import scala.collection.Set
     * @return Maximum distance children can be from this node, to connect.
     */
   override def childrenConnectionRadius = hiveRadius
+
+  protected def hiveRadius = TileNaniteHiveSmall.HIVE_RADIUS
 
   /**
     *
@@ -94,12 +94,18 @@ import scala.collection.Set
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if (!worldObj.isRemote) PowerManager.addNode(this)
+    if (!worldObj.isRemote) {
+      PowerManager.addNode(this)
+      NaniteManager.addHive(this)
+    }
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (!worldObj.isRemote) PowerManager.removeNode(this)
+    if (!worldObj.isRemote) {
+      PowerManager.removeNode(this)
+      NaniteManager.removeHive(this)
+    }
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {
@@ -163,7 +169,10 @@ import scala.collection.Set
 
   override def openInventory(): Unit = indInventory.openInventory()
 
-  override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit = indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_)
+  override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit = {
+    markDirty()
+    indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_)
+  }
 
   override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUseableByPlayer(p_70300_1_)
 
