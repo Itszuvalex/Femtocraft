@@ -48,7 +48,7 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
 
   override def getGuiID: Int = GuiIDs.TileGrowthChamberGuiID
 
-  def onBlockBreak(): Unit = {
+  override def onBlockBreak(): Unit = {
     if (!isValidMultiBlock) return
     basePos.getTileEntity() match {
       case Some(te: TileCyberBase) =>

@@ -12,8 +12,6 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
   * Created by Christopher on 11/21/2015.
   */
 class TilePhotosynthesisTower extends TileEntityBase with CyberMachineMultiblock with TileMultiblockIndexedInventory with TileFluidTank {
-  def onBlockBreak() = {}
-
   override def getMod: AnyRef = Femtocraft
 
   override def defaultTank: FluidTank = new FluidTank(1000)

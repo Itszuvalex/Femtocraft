@@ -25,7 +25,7 @@ GuiBase(new ContainerArcFurnace(player, inv, tile)) {
 
   override def drawScreen(par1: Int, par2: Int, par3: Float) {
     super.drawScreen(par1, par2, par3)
-    val text = StringUtil.formatPowerString(tile.getPowerCurrent, tile.getPowerMax)
+    val text = StringUtil.formatPowerString(tile.getPowerCurrent.toLong, tile.getPowerMax.toLong)
     if (isPointInRegion(18, 12, 16, 60, par1, par2)) {
       drawCreativeTabHoveringText(text, par1, par2)
     }

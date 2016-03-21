@@ -38,6 +38,11 @@ class MultiblockArcFurnace extends IFrameMultiblock {
 
   override def getName = "Arc Furnace"
 
+
+  override def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean = {
+    formAtLocation(world, x, y, z)
+  }
+
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockArcFurnaceID
 
@@ -50,4 +55,5 @@ class MultiblockArcFurnace extends IFrameMultiblock {
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
+  override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
 }

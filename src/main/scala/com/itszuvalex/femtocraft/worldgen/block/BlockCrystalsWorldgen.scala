@@ -23,8 +23,6 @@ object BlockCrystalsWorldgen {
   val DROP_SMALL_WEIGHT     = 10
   val DROP_MEDIUM_WEIGHT    = 5
   val DROP_LARGE_WEIGHT     = 2
-  val DROP_RANGE_MIN        = 5f
-  val DROP_RANGE_MAX        = 16f
   val DROP_PASSIVE_GEN_MIN  = 0f
   val DROP_PASSIVE_GEN_MAX  = 1f
   val DROP_STORAGE_MAX_MIN = 1000L
@@ -75,12 +73,11 @@ class BlockCrystalsWorldgen extends TileContainer(Material.glass) {
             case t if t < DROP_MEDIUM_WEIGHT + DROP_SMALL_WEIGHT => IPowerCrystal.TYPE_MEDIUM
             case _ => IPowerCrystal.TYPE_LARGE
           }
-          val range = random.nextFloat() * (DROP_RANGE_MAX - DROP_RANGE_MIN) + DROP_RANGE_MIN
           val passiveGen = random.nextFloat() * (DROP_PASSIVE_GEN_MAX - DROP_PASSIVE_GEN_MIN) + DROP_PASSIVE_GEN_MIN
           val storage = (random.nextDouble() * (DROP_STORAGE_MAX_MAX - DROP_STORAGE_MAX_MIN)).toLong + DROP_STORAGE_MAX_MIN
           val transfer = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN) + DROP_TRANSFER_MIN
           val crystal = new ItemStack(FemtoItems.itemPowerCrystal, 1)
-          InventoryUtils.dropItem(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, range, storage, passiveGen, transfer),
+          InventoryUtils.dropItem(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer),
                                   world, x, y, z, random)
                                                                                                     }
       case _ =>

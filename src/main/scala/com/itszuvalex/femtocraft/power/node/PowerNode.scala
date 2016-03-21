@@ -2,11 +2,11 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntity
 
 import scala.collection._
 import scala.util.Random
@@ -16,23 +16,25 @@ import scala.util.Random
   */
 object PowerNode {
   val POWER_COMPOUND_KEY = "FemtoPower"
+  val POWER_STORAGE_KEY  = "Storage"
+  //TODO: Fix this up
   val NODE_PARENT_KEY    = "Parent"
   val NODE_CHILDREN_KEY  = "Children"
   val COLOR_KEY          = "Color"
 }
 
 
-trait PowerNode extends TileEntity with IPowerNode {
-  val childrenLocs       = mutable.HashSet[Loc4]()
-  var parentLoc   : Loc4 = null
-  var powerCurrent: Long = 0
-  var powerMax    : Long = 0
-  var color              = Color(255.toByte,
-                                 (Random.nextInt(125) + 130).toByte,
-                                 (Random.nextInt(125) + 130).toByte,
-                                 (Random.nextInt(125) + 130).toByte).toInt
+trait PowerNode extends TileEntityBase with IPowerNode {
+  val childrenLocs         = mutable.HashSet[Loc4]()
+  var parentLoc   : Loc4   = null
+  var powerCurrent: Double = 0
+  var powerMax    : Double = 0
+  var color                = Color(255.toByte,
+                                   (Random.nextInt(125) + 130).toByte,
+                                   (Random.nextInt(125) + 130).toByte,
+                                   (Random.nextInt(125) + 130).toByte).toInt
 
-  def onBlockBreak() = {
+  override def onBlockBreak() = {
     PowerManager.removeNode(this)
     val parent = getParent
     if (parent != null && parent != this) parent.removeChild(this)
@@ -70,7 +72,18 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
     savePowerConnectionInfo(compound)
+    savePowerStorageInfo(compound)
   }
+
+  def savePowerStorageInfo(compound: NBTTagCompound): Unit = {
+    compound(PowerNode.POWER_STORAGE_KEY -> getPowerCurrent)
+  }
+
+  /**
+    *
+    * @return Amount of power currently stored in this node.
+    */
+  override def getPowerCurrent: Double = powerCurrent
 
   def savePowerConnectionInfo(compound: NBTTagCompound) =
     compound(PowerNode.POWER_COMPOUND_KEY ->
@@ -107,9 +120,14 @@ trait PowerNode extends TileEntity with IPowerNode {
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     loadPowerConnectionInfo(compound)
+    loadPowerStorageInfo(compound)
   }
 
-  def loadPowerConnectionInfo(compound: NBTTagCompound) = {
+  def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {
+    powerCurrent = compound.Double(PowerNode.POWER_STORAGE_KEY)
+  }
+
+  def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
     compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
       color = comp.Int(PowerNode.COLOR_KEY)
       parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
@@ -165,7 +183,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     *
     * @return Amount of power capable of being stored in this node.
     */
-  override def getPowerMax: Long = powerMax
+  override def getPowerMax: Double = powerMax
 
   /**
     *
@@ -192,7 +210,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     *
     * @param amount Set current stored power to the given value.
     */
-  override def setPower(amount: Long): Unit = powerCurrent = amount
+  override def setPower(amount: Double): Unit = powerCurrent = amount
 
   /**
     *
@@ -203,21 +221,15 @@ trait PowerNode extends TileEntity with IPowerNode {
   /**
     *
     * @param amount Amount of power to consume.
-    * @param doUse True if actually change values, false to simulate.
+    * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
-  override def usePower(amount: Long, doUse: Boolean): Long = {
+  override def usePower(amount: Double, doUse: Boolean): Double = {
     val min = Math.min(amount, powerCurrent)
     if (doUse)
       powerCurrent -= min
     min
   }
-
-  /**
-    *
-    * @return Amount of power currently stored in this node.
-    */
-  override def getPowerCurrent: Long = powerCurrent
 
   /**
     *
@@ -231,7 +243,7 @@ trait PowerNode extends TileEntity with IPowerNode {
     * @param doFill True if actually change values, false to simulate.
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
-  override def addPower(amount: Long, doFill: Boolean): Long = {
+  override def addPower(amount: Double, doFill: Boolean): Double = {
     val min = Math.min(amount, powerMax - powerCurrent)
     if (doFill)
       powerCurrent += min

@@ -47,23 +47,23 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
       }
                      }
     lastCookTime = 0 /*inventory.furnaceCookTime*/
-    lastPower = inventory.getPowerCurrent
+    lastPower = inventory.getPowerCurrent.toLong
   }
 
   def updatePower(par1ICrafting: ICrafting): Unit = {
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent & 0xFFFFFFFFL).toInt)
+    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
+    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
   }
 
   @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {
     case ContainerArcFurnace.COOK_INDEX =>
     case ContainerArcFurnace.POWER_BIG_INDEX =>
       inventory.setPower(
-                          (par2.toLong << 32) | (inventory.getPowerCurrent & 0x00000000FFFFFFFFL)
+                          (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
                         )
     case ContainerArcFurnace.POWER_SMALL_INDEX =>
       inventory.setPower(
-                          (inventory.getPowerCurrent & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
+                          (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
                         )
     case _ =>
   }

@@ -104,7 +104,7 @@ class ItemFrame extends Item with IFrameItem {
     if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
     else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
 
-   locations.foreach {loc =>
+    locations.foreach { loc =>
       world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
       world.getTileEntity(loc.x, loc.y, loc.z) match {
         case frame: TileFrame =>
@@ -113,7 +113,8 @@ class ItemFrame extends Item with IFrameItem {
           frame.multiBlock = multiString
         case _ =>
       }
-              }
+                      }
+    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
     true
   }
 }

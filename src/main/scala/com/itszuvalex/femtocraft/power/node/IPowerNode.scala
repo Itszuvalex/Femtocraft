@@ -7,12 +7,13 @@ import com.itszuvalex.itszulib.api.core.Loc4
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object IPowerNode {
-  val GENERATION_NODE       = "Generation"
+  val CRYSTAL_MOUNT         = "Mount"
   val TRANSFER_NODE         = "Transfer"
   val DIFFUSION_NODE        = "Diffusion"
   val DIFFUSION_TARGET_NODE = "Diffusion_Target"
   val DIRECT_NODE           = "Direct"
-  val DEFAULT_MAX_RADIUS    = 32f
+  val LONE_NODE             = "Lone"
+  val DEFAULT_MAX_RADIUS    = 8f
 }
 
 trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowerNode] {
@@ -107,13 +108,13 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     *
     * @return Amount of power currently stored in this node.
     */
-  def getPowerCurrent: Long
+  def getPowerCurrent: Double
 
   /**
     *
     * @return Amount of power capable of being stored in this node.
     */
-  def getPowerMax: Long
+  def getPowerMax: Double
 
   /**
     *
@@ -121,21 +122,21 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     * @param doFill True if actually change values, false to simulate.
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
-  def addPower(amount: Long, doFill: Boolean): Long
+  def addPower(amount: Double, doFill: Boolean): Double
 
   /**
     *
     * @param amount Set current stored power to the given value.
     */
-  def setPower(amount: Long)
+  def setPower(amount: Double)
 
   /**
     *
     * @param amount Amount of power to consume.
-    * @param doUse True if actually change values, false to simulate.
+    * @param doUse  True if actually change values, false to simulate.
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
-  def usePower(amount: Long, doUse: Boolean): Long
+  def usePower(amount: Double, doUse: Boolean): Double
 
   /**
     *

@@ -133,7 +133,7 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     compound(TileGraspingVines.COMPOUND_IDLIST_KEY -> grabbedSet.map(_.getEntityId).toArray)
   }
 
-  def onBlockBreak(): Unit = {
+  override def onBlockBreak(): Unit = {
     if (!isController) {
       worldObj.setBlockToAir(info.x, info.y, info.z)
       return

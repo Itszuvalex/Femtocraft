@@ -178,7 +178,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     TileCyberBase.baseHeightMap(size)
   }
 
-  def onBlockBreak(): Unit = {
+  override def onBlockBreak(): Unit = {
     if (worldObj.isRemote) return
     if (isController) {
       //      TileCyberBase.getSlotLocations(size, xCoord, yCoord, zCoord, worldObj.provider.dimensionId).foreach { loc =>

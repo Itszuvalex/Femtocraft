@@ -21,16 +21,20 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.cyber.tile._
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileCentrifuge, TileCrystallizationChamber, TileFrame}
-import com.itszuvalex.femtocraft.logistics.test.{TileTaskProviderTest, TileWorkerProviderTest}
+import com.itszuvalex.femtocraft.industry.tile._
+import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
-import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
+import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import cpw.mods.fml.common.registry.GameRegistry
-import net.minecraft.client.particle.EntityFX
 import net.minecraft.world.World
+
+object ProxyCommon {
+  val PARTICLE_NANITE = "nanites"
+  val PARTICLE_POWER  = "power"
+}
 
 class ProxyCommon {
   def postInit(): Unit = {
@@ -57,6 +61,7 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileArcFurnace], "TileArcFurnace")
     GameRegistry.registerTileEntity(classOf[TileCrystallizationChamber], "TileCrystallizationChamber")
     GameRegistry.registerTileEntity(classOf[TileCentrifuge], "TileCentrifuge")
+    GameRegistry.registerTileEntity(classOf[TileMaterialProcessor], "TileMaterialProcessor")
     GameRegistry.registerTileEntity(classOf[TileGrowthChamber], "TileGrowthChamber")
     GameRegistry.registerTileEntity(classOf[TileBioBeacon], "TileBioBeacon")
     GameRegistry.registerTileEntity(classOf[TileCondensationArray], "TileCondensationArray")
@@ -68,9 +73,17 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileSporeDistributor], "TileSporeDistributor")
     GameRegistry.registerTileEntity(classOf[TileItemRepository], "TileItemRepository")
     GameRegistry.registerTileEntity(classOf[TileCrystalMount], "TileCrystalMount")
+    GameRegistry.registerTileEntity(classOf[TilePowerPedestal], "TilePowerPedestal")
+
+    GameRegistry.registerTileEntity(classOf[TilePowerSink], "TilePowerSink")
+    GameRegistry.registerTileEntity(classOf[TilePowerGenerator], "TilePowerGenerator")
+
+    GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 
     GameRegistry.registerTileEntity(classOf[TileFrame], "TileFrame")
     GameRegistry.registerTileEntity(classOf[TileCyberMachineInProgress], "TileCyberMachineInProgress")
+
+    GameRegistry.registerTileEntity(classOf[TileNetworkTest], "TileNetworkTest")
 
     GameRegistry.registerTileEntity(classOf[TileNaniteHiveSmall], "TileNaniteHive")
 
@@ -83,7 +96,7 @@ class ProxyCommon {
   def registerEventHandlers(): Unit = {
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): EntityFX = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
     null
   }
 }

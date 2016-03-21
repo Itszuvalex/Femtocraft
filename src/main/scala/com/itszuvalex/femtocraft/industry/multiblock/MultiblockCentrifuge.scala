@@ -27,6 +27,11 @@ class MultiblockCentrifuge extends IFrameMultiblock {
 
   override def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean = getTakenLocations(world, x, y, z).forall(loc => world.setBlock(x, y, z, FemtoBlocks.blockCentrifuge))
 
+
+  override def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean = {
+    formAtLocation(world, x, y, z)
+  }
+
   override def getName = "Centrifuge"
 
   @SideOnly(Side.CLIENT)
@@ -38,4 +43,5 @@ class MultiblockCentrifuge extends IFrameMultiblock {
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
+  override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
 }

@@ -158,6 +158,16 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
       * @return The provider offering up this worker.
       */
     override def getProvider = provider
+
+    /**
+      *
+      * Used by the task to inform the worker of information
+      *
+      * @param key   String key
+      * @param value Value of string
+      *
+      */
+    override def inform(key: String, value: Double): Unit = {}
   }
 
 }

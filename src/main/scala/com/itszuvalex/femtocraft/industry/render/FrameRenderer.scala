@@ -17,8 +17,8 @@ object FrameRenderer {
   lazy val frameModel = AdvancedModelLoader.loadModel(FrameRenderer.frameModelLocation).asInstanceOf[WavefrontObject]
   val frameModelLocation = Resources.Model("frame/Frame.obj")
   val frameTexLocation   = Resources.Model("frame/frame.png")
-  val sidemap1 = Array("N", "E", "S", "W")
-  val sidemap2 = Array("NW", "NE", "SE", "SW")
+  val sidemap1           = Array("N", "E", "S", "W")
+  val sidemap2           = Array("NW", "NE", "SE", "SW")
 
   def renderFrameAt(x: Double, y: Double, z: Double, partialTime: Float, marks: Set[(Int, Int, Int)]): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(frameTexLocation)
@@ -62,7 +62,7 @@ class FrameRenderer extends TileEntitySpecialRenderer {
                                                             } yield (a, b, c)
                                                           }.toSet
                                    )
-        if (frame.progress > 0 && frame.isController) {
+        if (frame.renderProgress > 0 && frame.isController) {
           FrameMultiblockRegistry.getMultiblock(frame.multiBlock) match {
             case Some(mb) =>
               FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {

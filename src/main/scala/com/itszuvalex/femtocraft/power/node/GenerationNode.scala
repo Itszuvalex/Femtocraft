@@ -21,7 +21,7 @@ trait GenerationNode extends PowerNode {
     *
     * @return The type of PowerNode this is.
     */
-  override def getType = IPowerNode.GENERATION_NODE
+  override def getType = IPowerNode.TRANSFER_NODE
 
   /**
     *
