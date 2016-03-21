@@ -2,11 +2,11 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntity
 
 import scala.collection._
 import scala.util.Random
@@ -24,7 +24,7 @@ object PowerNode {
 }
 
 
-trait PowerNode extends TileEntity with IPowerNode {
+trait PowerNode extends TileEntityBase with IPowerNode {
   val childrenLocs         = mutable.HashSet[Loc4]()
   var parentLoc   : Loc4   = null
   var powerCurrent: Double = 0
@@ -34,7 +34,7 @@ trait PowerNode extends TileEntity with IPowerNode {
                                    (Random.nextInt(125) + 130).toByte,
                                    (Random.nextInt(125) + 130).toByte).toInt
 
-  def onBlockBreak() = {
+  override def onBlockBreak() = {
     PowerManager.removeNode(this)
     val parent = getParent
     if (parent != null && parent != this) parent.removeChild(this)

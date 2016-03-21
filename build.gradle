@@ -1,5 +1,12 @@
 buildscript {
     repositories {
+        maven {
+            url 'http://artifactory.itszuvalex.com/plugins-release'
+            credentials {
+                username = System.getenv("ARTIFACTORY_USER")
+                password = System.getenv("ARTIFACTORY_PASS")
+            }
+        }
         mavenCentral()
         maven {
             name = "forge"
@@ -12,12 +19,27 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        classpath group: 'com.layer', name: 'gradle-git-repo-plugin', version: '2.0.2'
+        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
     }
 }
 
 plugins {
     id "com.github.maiflai.scalatest" version "0.11"
+}
+allprojects{
+    repositories {
+        maven {
+            url 'http://artifactory.itszuvalex.com/plugins-release'
+            credentials {
+                username = System.getenv("ARTIFACTORY_USER")
+                password = System.getenv("ARTIFACTORY_PASS")
+            }
+        }
+        maven {
+            url 'http://artifactory.itszuvalex.com/ItszuLib'
+        }
+    }
 }
 
 dependencies {
@@ -29,13 +51,9 @@ dependencies {
 apply plugin: 'scala'
 apply plugin: 'forge'
 apply plugin: 'maven-publish'
-apply plugin: 'git-repo'
+apply plugin: 'com.jfrog.artifactory'
 
 repositories {
-    github("Itszuvalex", "ItszuLib-Release", "master", "releases")
-//    maven {
-//        url "https://github.com/Itszuvalex/ItszuLib-Release/raw/master/releases/com/itszuvalex/itszulib/ItszuLib"
-//    }
 }
 
 project.ext {
@@ -47,19 +65,27 @@ project.ext {
 
 version = "${project.ext.mcVersion}-${project.ext.massive}.${project.ext.major}.${project.minor}"
 
-if (System.getenv().CIRCLE_BUILD_NUM != null) {
-    version += "-${System.getenv().CIRCLE_BUILD_NUM}"
+if (System.getenv().CI_BUILD_ID != null) {
+    version += "-${System.getenv().CI_BUILD_ID}"
 } else {
     version += "-local"
 }
 
-if (System.getenv().CIRCLE_BRANCH != null && !System.getenv().CIRCLE_BRANCH.equalsIgnoreCase("master")) {
+if (System.getenv().CI_BUILD_REF_NAME != null && !System.getenv().CI_BUILD_REF_NAME.equalsIgnoreCase("master")) {
     version += "-dev"
 }
 
+compileJava {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
 compileScala {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
+}
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.useAnt = false
 }
 
 group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -73,31 +99,19 @@ minecraft {
     replace '@MAJOR@', project.major
     replace '@MINOR@', project.minor
     replace '@MC_VERSION@', version
-    if (System.getenv("CIRCLE_BUILD_NUM") != null) {
-        replace '@BUILD_NUMBER@', System.getenv("CIRCLE_BUILD_NUM")
+    if (System.getenv("CI_BUILD_ID") != null) {
+        replace '@BUILD_NUMBER@', System.getenv("CI_BUILD_ID")
     } else {
         replace '@BUILD_NUMBER@', 0
     }
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-80-dev"
-    compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "deobf"
-    compile group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: "src"
+    def name = "${project.mcVersion}-0.1.0-6"
+    compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'deobf')
+    compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'src')
 
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+    compile 'org.scala-lang:scala-library:2.11.8'
 }
 
 
@@ -201,11 +215,6 @@ build.dependsOn apiJar
 
 publish.dependsOn assemble
 
-gitPublishConfig {
-    org = "itszuvalex"
-    repo = "femtocraft-release"
-}
-
 publishing {
 
     publications {
@@ -249,11 +258,38 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
+}
+
+artifactory {
+    contextUrl = "http://artifactory.itszuvalex.com"
+    publish {
+        repository {
+            repoKey = 'Femtocraft'
+            username = System.getenv("ARTIFACTORY_USER")
+            password = System.getenv("ARTIFACTORY_PASS")
+            maven = true
+
+        }
+        defaults {
+            publications ('mod', 'api', 'src', 'deobf', 'scalaDoc')
+        }
+    }
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+            username = System.getenv("ARTIFACTORY_USER")
+            password = System.getenv("ARTIFACTORY_PASS")
+            maven = true
+
         }
     }
 }
 
-idea { module { inheritOutputDirs = true } }
+idea {
+    project {
+        languageLevel = '1.7'
+    }
+    module {
+        inheritOutputDirs = true
+    }
+}

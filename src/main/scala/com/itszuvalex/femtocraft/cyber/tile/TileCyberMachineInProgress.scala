@@ -83,7 +83,7 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
 
   override def getCyberMachine = machineInProgress
 
-  def onBlockBreak(): Unit = {
+  override def onBlockBreak(): Unit = {
     if (!isController) {
       worldObj.getTileEntity(info.x, info.y, info.z) match {
         case cont: TileCyberMachineInProgress =>

@@ -5,8 +5,9 @@ import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal, PowerManager}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.storage.ArrayItemStorage
+import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
-import com.itszuvalex.itszulib.core.{BaseInventory, TileEntityBase}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
@@ -200,7 +201,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     slot == 0 && (item == null || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
   }
 
-  override def defaultInventory: BaseInventory = new BaseInventory(1)
+  override def defaultStorage: ArrayItemStorage = new ArrayItemStorage(1)
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
@@ -222,20 +223,20 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setRenderUpdate()
   }
 
-  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
-    item match {
-      case null =>
-      case _ => item.getItem match {
-        case i: IPowerCrystal =>
-          if (slot == 0 && inventory.getInventory(slot) != null) {
-            inventory.getInventory(slot) = null
-            markDirty()
-          }
-        case _ =>
-      }
-    }
-    super.setInventorySlotContents(slot, item)
-  }
+  //  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
+  //    item match {
+  //      case null =>
+  //      case _ => item.getItem match {
+  //        case i: IPowerCrystal =>
+  //          if (slot == 0 && inventory.getInventory(slot) != null) {
+  //            inventory.getInventory(slot) = null
+  //            markDirty()
+  //          }
+  //        case _ =>
+  //      }
+  //    }
+  //    super.setInventorySlotContents(slot, item)
+  //  }
 
   override def markDirty(): Unit = {
     super.markDirty()
@@ -252,6 +253,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       case _ => PowerManager.addNode(this)
     }
   }
+
+  /**
+    *
+    * @return Crystal ItemStack.  Null if no crystal.
+    */
+  override def getCrystalStack = getStackInSlot(0)
 
   override def writeToNBT(compound: NBTTagCompound): Unit = {
     super.writeToNBT(compound)
@@ -387,10 +394,4 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       }
     }
   }
-
-  /**
-    *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  override def getCrystalStack = getStackInSlot(0)
 }

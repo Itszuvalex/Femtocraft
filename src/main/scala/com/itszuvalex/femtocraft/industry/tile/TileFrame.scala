@@ -265,7 +265,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
   }
 
-  def onBlockBreak(): Unit = {
+  override def onBlockBreak(): Unit = {
     if (getWorldObj.isRemote) return
 
     if (TileFrame.shouldFullyRemove) {

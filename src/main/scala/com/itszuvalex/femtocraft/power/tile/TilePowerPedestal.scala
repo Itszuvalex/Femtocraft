@@ -61,7 +61,7 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
     setRenderUpdate()
   }
 
-  def onBlockBreak() = {
+  override def onBlockBreak() = {
     if (mountLoc != null)
       mountLoc.getTileEntity(true) match {
         case Some(m: ICrystalMount) =>
