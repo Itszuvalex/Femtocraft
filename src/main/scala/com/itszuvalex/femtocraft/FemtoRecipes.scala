@@ -3,9 +3,9 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.cyber.GrowthChamberRegistry
 import com.itszuvalex.femtocraft.cyber.recipe.GrowthChamberRecipe
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
-import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.init.{Blocks, Items}
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.oredict.ShapedOreRecipe
 
 /**
@@ -24,15 +24,15 @@ object FemtoRecipes {
   }
 
   def registerVanillaRecipes() = {
-    GameRegistry.addShapedRecipe(new ItemStack(FemtoItems.itemFrame, 4), Array("CIC", "I I", "CIC", 'C', FemtoBlocks.blockCyberweave, 'I', Items.iron_ingot): _*)
-    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemFurnaceAssembly), Array[Any](" C ", "CFC", "III", 'C', "cyberweave", 'F', Blocks.furnace, 'I', "ingotIron").box: _*))
-    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemGrinderAssembly), Array[Any](" C ", "CPC", "III", 'C', "cyberweave", 'P', Blocks.piston, 'I', "ingotIron").box: _*))
+    GameRegistry.addShapedRecipe(new ItemStack(FemtoItems.itemFrame, 4), Array("CIC", "I I", "CIC", 'C', FemtoBlocks.blockCyberweave, 'I', Items.IRON_INGOT): _*)
+    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemFurnaceAssembly), Array[Any](" C ", "CFC", "III", 'C', "cyberweave", 'F', Blocks.FURNACE, 'I', "ingotIron").box: _*))
+    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemGrinderAssembly), Array[Any](" C ", "CPC", "III", 'C', "cyberweave", 'P', Blocks.PISTON, 'I', "ingotIron").box: _*))
   }
 
   def registerGrowthChamberRecipes(): Unit = {
-    GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.wheat_seeds, 1),
-                                                            IndexedSeq(new ItemStack(Items.wheat_seeds, 2),
-                                                                       new ItemStack(Items.wheat, 1)
+    GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.WHEAT_SEEDS, 1),
+                                                            IndexedSeq(new ItemStack(Items.WHEAT_SEEDS, 2),
+                                                                       new ItemStack(Items.WHEAT, 1)
                                                                       ),
                                                             500,
                                                             GrowthChamberRecipe.TYPE_TEXTURE,

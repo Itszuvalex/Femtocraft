@@ -6,14 +6,14 @@ import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import com.itszuvalex.itszulib.implicits.IDImplicits._
-import cpw.mods.fml.common.Mod.EventHandler
-import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
-import cpw.mods.fml.common.network.NetworkRegistry
-import cpw.mods.fml.common.registry.GameRegistry
-import cpw.mods.fml.common.{Mod, SidedProxy}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.init.Items
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraftforge.fml.common.Mod.EventHandler
+import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
+import net.minecraftforge.fml.common.network.NetworkRegistry
+import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.fml.common.{Mod, SidedProxy}
 import org.apache.logging.log4j.{Level, LogManager}
 
 import scala.collection.mutable
@@ -30,7 +30,7 @@ object Femtocraft {
   final val items   = FemtoItems
   final val fluids  = FemtoFluids
   val tab                      = new CreativeTabs(Femtocraft.ID) {
-    override def getTabIconItem: Item = Items.nether_star
+    override def getTabIconItem: Item = Items.NETHER_STAR
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")

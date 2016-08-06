@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.cyber.item.{ItemBaseSeed, ItemDumbDust}
 import com.itszuvalex.femtocraft.industry.item.{ItemFrame, ItemFurnaceAssembly, ItemGrinderAssembly, ItemMultiblock}
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
-import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.item.Item
+import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.oredict.OreDictionary
 
 /**

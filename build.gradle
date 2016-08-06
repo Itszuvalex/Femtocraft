@@ -3,7 +3,7 @@ buildscript {
         maven {
             url 'http://artifactory.itszuvalex.com/plugins-release'
         }
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
         //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
     }
@@ -22,6 +22,7 @@ buildscript {
 
 plugins {
     id "com.github.maiflai.scalatest" version "0.11"
+    id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 allprojects{
     repositories {
@@ -45,7 +46,7 @@ dependencies {
 }
 
 apply plugin: 'scala'
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory'
 
@@ -56,7 +57,7 @@ project.ext {
     massive = "0"
     major = "1"
     minor = "0"
-    mcVersion = "1.7.10"
+    mcVersion = "1.10.2"
 }
 
 version = "${project.ext.mcVersion}-${project.ext.massive}.${project.ext.major}.${project.minor}"
@@ -80,8 +81,9 @@ group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide
 archivesBaseName = "femtocraft"
 
 minecraft {
-    version = "${project.ext.mcVersion}-10.13.4.1448-${project.ext.mcVersion}"
-    runDir = "eclipse"
+    version = "${project.ext.mcVersion}-12.18.1.2011"
+    runDir = "run"
+    mappings = "snapshot_20160518"
 // replacing stuff in the source
     replace '@MASSIVE@', project.massive
     replace '@MAJOR@', project.major
@@ -95,7 +97,7 @@ minecraft {
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-7"
+    def name = "${project.mcVersion}-0.1.0-31-dev"
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'deobf')
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'src')
 
