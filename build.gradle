@@ -2,10 +2,6 @@ buildscript {
     repositories {
         maven {
             url 'http://artifactory.itszuvalex.com/plugins-release'
-            credentials {
-                username = System.getenv("ARTIFACTORY_USER")
-                password = System.getenv("ARTIFACTORY_PASS")
-            }
         }
         mavenCentral()
         maven {
@@ -78,14 +74,6 @@ if (System.getenv().CI_BUILD_REF_NAME != null && !System.getenv().CI_BUILD_REF_N
 compileJava {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
-}
-compileScala {
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
-}
-
-tasks.withType(ScalaCompile) {
-    scalaCompileOptions.useAnt = false
 }
 
 group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
