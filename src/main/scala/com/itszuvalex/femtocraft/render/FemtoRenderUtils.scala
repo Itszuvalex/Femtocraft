@@ -1,7 +1,8 @@
 package com.itszuvalex.femtocraft.render
 
+import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.Vector3
-import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import org.lwjgl.opengl.GL11
 
 /**
@@ -21,18 +22,17 @@ object FemtoRenderUtils {
     val pos3 = end - (upVector * width)
     val pos4 = end + (upVector * width)
 
-    val tes = Tessellator.instance
-    tes.startDrawingQuads()
-    GL11.glColor4ub(red.toByte, green.toByte, blue.toByte, alpha.toByte)
-    tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
-    tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
-    tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMax, vMax)
-    tes.addVertexWithUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
-    //    tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMin, vMin)
-    //    tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
-    //    tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMax, vMax)
-    //    tes.addVertexWithUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
-    tes.draw()
+    drawBlock(DefaultVertexFormats.POSITION_TEX) {
+                                                   GL11.glColor4ub(red.toByte, green.toByte, blue.toByte, alpha.toByte)
+                                                   addVertexUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
+                                                   addVertexUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
+                                                   addVertexUV(pos4.x, pos4.y, pos4.z, uMax, vMax)
+                                                   addVertexUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
+                                                   //    tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMin, vMin)
+                                                   //    tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
+                                                   //    tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMax, vMax)
+                                                   //    tes.addVertexWithUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
+                                                 }
   }
 
 }

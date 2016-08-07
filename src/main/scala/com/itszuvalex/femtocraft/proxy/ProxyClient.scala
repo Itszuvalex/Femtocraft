@@ -40,13 +40,14 @@ import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
-import cpw.mods.fml.client.registry.{ClientRegistry, ISimpleBlockRenderingHandler, RenderingRegistry}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.MinecraftForgeClient
+import net.minecraftforge.client.model.obj.OBJLoader
+import net.minecraftforge.fml.client.registry.{ClientRegistry, RenderingRegistry}
 import org.apache.logging.log4j.Level
 
 class ProxyClient extends ProxyCommon {
@@ -88,6 +89,8 @@ class ProxyClient extends ProxyCommon {
 
   override def registerRendering() {
     super.registerRendering()
+
+    OBJLoader.INSTANCE.addDomain(Femtocraft.ID.toLowerCase)
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)

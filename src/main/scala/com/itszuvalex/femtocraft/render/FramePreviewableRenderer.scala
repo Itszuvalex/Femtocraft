@@ -2,9 +2,9 @@ package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, IFrameItem}
 import com.itszuvalex.itszulib.api.IPreviewableRenderer
-import cpw.mods.fml.relauncher.{Side, SideOnly}
+import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.item.ItemStack
-import net.minecraft.world.World
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
   * Created by Christopher on 8/26/2015.
@@ -13,7 +13,7 @@ import net.minecraft.world.World
 class FramePreviewableRenderer extends IPreviewableRenderer {
   lazy val generic = new GenericFrameMultiblockRenderer
 
-  override def renderAtLocation(stack: ItemStack, world: World, x: Int, y: Int, z: Int, rx: Double, ry: Double, rz: Double): Unit = {
+  override def renderAtLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
     stack.getItem match {
       case frame: IFrameItem =>
         frame.getSelectedMultiblock(stack) match {
@@ -21,10 +21,10 @@ class FramePreviewableRenderer extends IPreviewableRenderer {
             FrameMultiblockRegistry.getMultiblock(multi) match {
               case Some(mb) =>
                 FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
-                  case Some(renderer) => renderer.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
+                  case Some(renderer) => renderer.previewRenderAtWorldLocation(stack, loc, rx, ry, rz)
                   case None =>
                     generic.multi = mb
-                    generic.previewRenderAtWorldLocation(stack, world, x, y, z, rx, ry, rz)
+                    generic.previewRenderAtWorldLocation(stack, loc, rx, ry, rz)
                 }
               case None =>
             }

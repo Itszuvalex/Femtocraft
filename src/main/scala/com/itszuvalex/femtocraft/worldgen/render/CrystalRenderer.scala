@@ -6,9 +6,10 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{MathHelper, ResourceLocation}
-import net.minecraftforge.client.model.AdvancedModelLoader
-import net.minecraftforge.client.model.obj.WavefrontObject
+import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.MathHelper
+import net.minecraftforge.client.model.ModelLoaderRegistry
+import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -20,13 +21,13 @@ object CrystalRenderer {
 }
 
 class CrystalRenderer extends TileEntitySpecialRenderer {
-  val crystalModel = AdvancedModelLoader.loadModel(CrystalRenderer.crystalModelLocation).asInstanceOf[WavefrontObject]
+  val crystalModel = ModelLoaderRegistry.getModelOrMissing(CrystalRenderer.crystalModelLocation).asInstanceOf[OBJModel]
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     if (!tile.isInstanceOf[TileCrystalsWorldgen]) return
 
     val crystal = tile.asInstanceOf[TileCrystalsWorldgen]
-    val tessellator = Tessellator.instance
+    val tessellator = Tessellator.getInstance()
     val color = new Color(crystal.color)
     this.bindTexture(CrystalRenderer.crystalTexLocation)
     GL11.glPushMatrix()
@@ -35,7 +36,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
     GL11.glTranslated(x + .5, y, z + .5)
     GL11.glScaled(.01, .01, .01)
 
-    val f2: Float = crystal.getWorldObj.getTotalWorldTime.toFloat + partialTime
+    val f2: Float = crystal.getWorld.getTotalWorldTime.toFloat + partialTime
     (1 to 10).map(num => ("Gengon0" + (if (num < 10) "0") + num, num)).foreach { name =>
       val offset = (name._2 * 97) % 10
       val dir = if (name._2 % 2 == 0) -1 else 1
@@ -49,11 +50,10 @@ class CrystalRenderer extends TileEntitySpecialRenderer {
 
       GL11.glColor4ub((color.red + colorOffset.red - 15).toByte, (color.green + colorOffset.green - 15).toByte, (color.blue + colorOffset.blue - 15).toByte, colorOffset.alpha)
 
-      crystalModel.renderPart(name._1)
+      crystalModel.getMatLib.renderPart(name._1)
       GL11.glPopMatrix()
                                                                                }
     GL11.glColor4f(1f, 1f, 1f, 1f)
-    tessellator.setColorRGBA(255, 255, 255, 0)
     GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glPopMatrix()
   }

@@ -5,10 +5,12 @@ import java.util.Random
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
+import com.itszuvalex.itszulib.api.core
 import com.itszuvalex.itszulib.api.core.Configurable
-import cpw.mods.fml.common.IWorldGenerator
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraft.world.chunk.IChunkProvider
+import net.minecraft.world.chunk.{IChunkGenerator, IChunkProvider}
+import net.minecraftforge.fml.common.IWorldGenerator
 
 /**
   * Created by Christopher on 8/27/2015.
@@ -45,16 +47,16 @@ import net.minecraft.world.chunk.IChunkProvider
 }
 
 
-@Configurable class FemtocraftOreGenerator extends IWorldGenerator {
+@core.Configurable class FemtocraftOreGenerator extends IWorldGenerator {
 
 
-  override def generate(random: Random, chunkX: Int, chunkZ: Int, world: World, chunkGenerator: IChunkProvider, chunkProvider: IChunkProvider): Unit = {
+  override def generate(random: Random, chunkX: Int, chunkZ: Int, world: World, chunkGenerator: IChunkGenerator, chunkProvider: IChunkProvider): Unit = {
     if (random.nextFloat > CHANCE_PER_CHUNK) return
 
     val x = chunkX * 16 + random.nextInt(16)
     var y = random.nextInt(Y_MAX - Y_MIN) + Y_MIN
     val z = chunkZ * 16 + random.nextInt(16)
-    while (world.isAirBlock(x, y, z)) y -= 1
+    while (world.isAirBlock(new BlockPos(x, y, z))) y -= 1
     var distMin = 0
     var distMax = 0
     var crystMin = 0
@@ -89,14 +91,14 @@ import net.minecraft.world.chunk.IChunkProvider
       } yield (lx, ly, lz)
     }
     .filter { case (lx, ly, lz) => ((x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)) < (dist * dist) }
-    .filterNot { case (ax, ay, az) => world.isAirBlock(ax, ay, az) }
+    .filterNot { case (ax, ay, az) => world.isAirBlock(new BlockPos(ax, ay, az)) }
     .foreach { case (lx, ly, lz) =>
-      val block = world.getBlock(lx, ly, lz)
-      val damage = world.getBlockMetadata(lx, ly, lz)
-      CybermaterialRegistry.getReplacement(block, damage) match {
-        case Some((rblock, rdamage)) =>
-          world.setBlock(lx, ly, lz, rblock)
-          world.setBlockMetadataWithNotify(lx, ly, lz, rdamage, 3)
+      val state = world.getBlockState(new BlockPos(lx, ly, lz))
+      val block = state.getBlock
+      val meta = block.getMetaFromState(state)
+      CybermaterialRegistry.getReplacement(block, meta) match {
+        case Some((rblock, rmeta)) =>
+          world.setBlockState(new BlockPos(lx, ly, lz), rblock.getStateFromMeta(rmeta), 3)
         case None =>
       }
              }
@@ -106,7 +108,7 @@ import net.minecraft.world.chunk.IChunkProvider
       val cx = x + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
       val cy = y + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
       val cz = z + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
-      world.setBlock(cx, cy, cz, FemtoBlocks.blockCrystals)
+      world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
                             }
   }
 }

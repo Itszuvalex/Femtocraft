@@ -37,10 +37,10 @@ object FemtoItems {
     itemMultiblock = new ItemMultiblock().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.multiblock")
     GameRegistry.registerItem(itemMultiblock, "itemMultiblock")
 
-    itemDumbDust = new ItemDumbDust().setTextureName(Femtocraft.ID + ":" + "dust_dumb").setUnlocalizedName("item.dumbDust")
+    itemDumbDust = new ItemDumbDust().setUnlocalizedName("item.dumbDust")
     GameRegistry.registerItem(itemDumbDust, "itemDumbDust")
 
-    itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setTextureName(Femtocraft.ID + ":" + "dust_crystal").setUnlocalizedName("item.cracklingDust")
+    itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.cracklingDust")
     GameRegistry.registerItem(itemCracklingDust, "itemCracklingDust")
 
     itemFurnaceAssembly = new ItemFurnaceAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.FurnaceAssembly")

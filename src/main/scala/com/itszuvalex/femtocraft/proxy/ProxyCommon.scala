@@ -28,8 +28,8 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
-import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.world.World
+import net.minecraftforge.fml.common.registry.GameRegistry
 
 object ProxyCommon {
   val PARTICLE_NANITE = "nanites"
