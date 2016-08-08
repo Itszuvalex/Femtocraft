@@ -2,9 +2,9 @@ package com.itszuvalex.femtocraft.render
 
 import java.util.Comparator
 
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntity
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
   * Created by Alex on 08.11.2015.
@@ -18,11 +18,11 @@ object TEDistComparator extends Comparator[TileEntity] {
   }
 
   def distSqr(te: TileEntity): Double = {
-    val dx = math.abs(entity.posX - te.xCoord.toDouble)
-    val dy = math.abs(entity.posY - te.yCoord.toDouble)
-    val dz = math.abs(entity.posZ - te.zCoord.toDouble)
+    val dx = math.abs(entity.posX - te.getPos.getX.toDouble)
+    val dy = math.abs(entity.posY - te.getPos.getY.toDouble)
+    val dz = math.abs(entity.posZ - te.getPos.getZ.toDouble)
     dx * dx + dy * dy + dz * dz
   }
 
-  def entity = Minecraft.getMinecraft.renderViewEntity
+  def entity = Minecraft.getMinecraft.getRenderViewEntity
 }

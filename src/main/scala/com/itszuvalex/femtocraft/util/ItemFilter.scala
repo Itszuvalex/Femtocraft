@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.util
 
-import com.itszuvalex.itszulib.api.core.NBTSerializable
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.common.util.INBTSerializable
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -18,7 +18,7 @@ object ItemFilter {
   val FILTER_DATA_KEY     = "FilterData"
 }
 
-class ItemFilter extends IItemFilter with NBTSerializable {
+class ItemFilter extends IItemFilter with INBTSerializable[NBTTagCompound] {
   private val filters = new ArrayBuffer[IItemFilterRule]()
 
   override def filterItem(item: ItemStack): Boolean = getFilterRules.forall(_.itemMatches(item))
@@ -29,17 +29,16 @@ class ItemFilter extends IItemFilter with NBTSerializable {
 
   def removeFilter(filter: IItemFilterRule) = filters -= filter
 
-  override def saveToNBT(compound: NBTTagCompound): Unit = {
-    compound(ItemFilter.FILTER_COMPOUND_KEY ->
-             NBTCompound(ItemFilter.FILTER_RULES_KEY -> NBTList(filters.map { filter =>
-               NBTCompound(ItemFilter.FILTER_TYPE_KEY -> filter.ruleType,
-                           ItemFilter.FILTER_DATA_KEY -> NBTCompound(filter))
-                                                                            }))
-            )
-
+  override def serializeNBT(): NBTTagCompound = {
+    NBTCompound(ItemFilter.FILTER_COMPOUND_KEY ->
+                NBTCompound(ItemFilter.FILTER_RULES_KEY -> NBTList(filters.map { filter =>
+                  NBTCompound(ItemFilter.FILTER_TYPE_KEY -> filter.ruleType,
+                              ItemFilter.FILTER_DATA_KEY -> NBTCompound(filter))
+                                                                               }))
+               )
   }
 
-  override def loadFromNBT(compound: NBTTagCompound): Unit = {
+  override def deserializeNBT(compound: NBTTagCompound): Unit = {
     compound.NBTCompound(ItemFilter.FILTER_COMPOUND_KEY) { comp =>
       filters.clear()
       filters ++= comp.NBTList(ItemFilter.FILTER_RULES_KEY).flatMap { filterMeta =>
@@ -49,7 +48,7 @@ class ItemFilter extends IItemFilter with NBTSerializable {
           case Some(clazz) =>
             try {
               val instance = clazz.newInstance()
-              filterMeta.NBTCompound(ItemFilter.FILTER_DATA_KEY) { comp => instance.loadFromNBT(comp); Unit }
+              filterMeta.NBTCompound(ItemFilter.FILTER_DATA_KEY) { comp => instance.deserializeNBT(comp); Unit }
               Some(instance)
             }
             catch {

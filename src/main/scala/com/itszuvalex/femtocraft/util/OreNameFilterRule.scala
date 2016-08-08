@@ -74,12 +74,15 @@ class OreNameFilterRule extends IItemFilterRule {
 
   override def ruleType = OreNameFilterRule.filterType
 
-  override def loadFromNBT(compound: NBTTagCompound): Unit = {
-    oreName = compound.getString(OreNameFilterRule.ORE_NAME_KEY)
+
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    oreName = nbt.getString(OreNameFilterRule.ORE_NAME_KEY)
     updateRegexp()
   }
 
-  override def saveToNBT(compound: NBTTagCompound): Unit = {
+  override def serializeNBT(): NBTTagCompound = {
+    val compound = new NBTTagCompound
     compound.setString(OreNameFilterRule.ORE_NAME_KEY, oreName)
+    compound
   }
 }

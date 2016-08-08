@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.util
 
 import com.itszuvalex.itszulib.implicits.IDImplicits._
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.item.ItemStack
@@ -61,7 +62,7 @@ class ItemStackFilterRule extends IItemFilterRule {
 
   override def ruleType = ItemStackFilterRule.filterType
 
-  override def loadFromNBT(compound: NBTTagCompound): Unit = {
+  override def deserializeNBT(compound: NBTTagCompound): Unit = {
     setDamageSensitive(compound.Bool(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY))
     setNBTSensitive(compound.Bool(ItemStackFilterRule.NBT_SENSITIVE_KEY))
     compound.NBTCompound(ItemStackFilterRule.STACK_KEY) { comp => stack = ItemStack.loadItemStackFromNBT(comp)
@@ -69,15 +70,15 @@ class ItemStackFilterRule extends IItemFilterRule {
                                                         }
   }
 
-  override def saveToNBT(compound: NBTTagCompound): Unit = {
-    compound(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY -> isDamageSensitive,
-             ItemStackFilterRule.NBT_SENSITIVE_KEY -> isNBTSensitive,
-             ItemStackFilterRule.STACK_KEY -> {
-               val comp = new NBTTagCompound
-               stack.writeToNBT(comp)
-               comp
-             }
-            )
+  override def serializeNBT(): NBTTagCompound = {
+    NBTCompound(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY -> isDamageSensitive,
+                ItemStackFilterRule.NBT_SENSITIVE_KEY -> isNBTSensitive,
+                ItemStackFilterRule.STACK_KEY -> {
+                  val comp = new NBTTagCompound
+                  stack.writeToNBT(comp)
+                  comp
+                }
+               )
   }
 
   def isDamageSensitive = damageSensitive
