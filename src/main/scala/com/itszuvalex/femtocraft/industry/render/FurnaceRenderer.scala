@@ -8,8 +8,6 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -21,7 +19,7 @@ object FurnaceRenderer {
 }
 
 class FurnaceRenderer extends TileEntitySpecialRenderer[TileArcFurnace] with IFrameMultiblockRenderer {
-  val model = ModelLoaderRegistry.getModelOrMissing(FurnaceRenderer.modelLoc).asInstanceOf[OBJModel]
+  val model = LoadObj(FurnaceRenderer.modelLoc)
 
   override def renderTileEntityAt(te: TileArcFurnace, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     if (te.isController)

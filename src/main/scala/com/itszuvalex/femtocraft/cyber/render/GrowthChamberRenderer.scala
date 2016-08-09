@@ -8,15 +8,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
   * Created by Alex on 01.10.2015.
   */
 object GrowthChamberRenderer {
-  val model   = ModelLoaderRegistry.getModelOrMissing(Resources.Model("growth chamber/Growth Chamber.obj")).asInstanceOf[OBJModel]
+  val model   = LoadObj(Resources.Model("growth chamber/Growth Chamber.obj"))
   val texture = Resources.Model("growth chamber/Growth Chamber Template.png")
   //val testTex = Resources.Model("growth chamber/test.png")
 }

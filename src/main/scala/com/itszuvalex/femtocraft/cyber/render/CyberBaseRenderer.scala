@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.ModelLoaderRegistry
 import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
@@ -22,9 +21,9 @@ object CyberBaseRenderer {
   val largeBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 3x3.obj")
   val largeBaseTexLoc  : ResourceLocation = Resources.Model("cyber base/Base 3x3 Template.png")
 
-  val smallBaseModel = ModelLoaderRegistry.getModelOrMissing(smallBaseModelLoc).asInstanceOf[OBJModel]
-  val medBaseModel   = ModelLoaderRegistry.getModelOrMissing(medBaseModelLoc).asInstanceOf[OBJModel]
-  val largeBaseModel = ModelLoaderRegistry.getModelOrMissing(largeBaseModelLoc).asInstanceOf[OBJModel]
+  val smallBaseModel = LoadObj(smallBaseModelLoc)
+  val medBaseModel   = LoadObj(medBaseModelLoc)
+  val largeBaseModel = LoadObj(largeBaseModelLoc)
 
   def renderBase(tile: TileCyberBase, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     GL11.glPushMatrix()

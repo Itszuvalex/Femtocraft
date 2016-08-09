@@ -57,9 +57,10 @@ class TileCrystalsWorldgen extends TileEntityBase with TileDescriptionPacket {
         )
     )
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     writeColorData(compound)
+    compound
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {

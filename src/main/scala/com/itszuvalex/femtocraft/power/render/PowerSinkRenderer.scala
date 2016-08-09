@@ -8,8 +8,6 @@ import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -26,7 +24,7 @@ object PowerSinkRenderer {
 }
 
 class PowerSinkRenderer extends TileEntitySpecialRenderer[TilePowerSink] {
-  val pedestalModel = ModelLoaderRegistry.getModelOrMissing(PowerSinkRenderer.modelLocation).asInstanceOf[OBJModel]
+  val pedestalModel = LoadObj(PowerSinkRenderer.modelLocation)
 
   override def renderTileEntityAt(te: TilePowerSink, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     GL11.glPushMatrix()

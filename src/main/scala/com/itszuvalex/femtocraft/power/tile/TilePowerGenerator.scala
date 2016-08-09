@@ -93,10 +93,11 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     DistributedManager.removeWorkerProvider(this)
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     compound.setBoolean(TilePowerGenerator.KEY_IS_DUMPING, isDumping)
     compound.setDouble(TilePowerGenerator.KEY_POWER_CURRENT, powerCurrent)
+    compound
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {

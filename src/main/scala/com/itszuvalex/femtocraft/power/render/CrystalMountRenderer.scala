@@ -11,8 +11,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -31,7 +29,7 @@ object CrystalMountRenderer {
 }
 
 class CrystalMountRenderer extends TileEntitySpecialRenderer[TileCrystalMount] {
-  val crystalModel = ModelLoaderRegistry.getModelOrMissing(crystalModelLocation).asInstanceOf[OBJModel]
+  val crystalModel = LoadObj(crystalModelLocation)
 
   override def renderTileEntityAt(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     renderCrystalMountAt(te, x, y, z, partialTicks, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)))

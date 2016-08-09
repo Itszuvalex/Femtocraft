@@ -9,8 +9,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.util.math.MathHelper
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -23,7 +21,7 @@ object NaniteHiveSmallRenderer {
 }
 
 class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer[TileNaniteHiveSmall] {
-  val model = ModelLoaderRegistry.getModelOrMissing(NaniteHiveSmallRenderer.hiveModelLocation).asInstanceOf[OBJModel]
+  val model = LoadObj(NaniteHiveSmallRenderer.hiveModelLocation)
 
   override def renderTileEntityFast(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, buffer: VertexBuffer): Unit = {
     GL11.glPushMatrix()

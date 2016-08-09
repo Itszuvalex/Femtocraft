@@ -8,8 +8,6 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.MathHelper
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -21,7 +19,7 @@ object CrystalRenderer {
 }
 
 class CrystalRenderer extends TileEntitySpecialRenderer[TileCrystalsWorldgen] {
-  val crystalModel = ModelLoaderRegistry.getModelOrMissing(CrystalRenderer.crystalModelLocation).asInstanceOf[OBJModel]
+  val crystalModel = LoadObj(CrystalRenderer.crystalModelLocation)
 
 
   override def renderTileEntityAt(crystal: TileCrystalsWorldgen, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {

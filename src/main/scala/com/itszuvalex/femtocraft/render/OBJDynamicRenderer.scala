@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.render
 import com.itszuvalex.itszulib.render.RenderUtils._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.model.ModelLoaderRegistry
 import net.minecraftforge.client.model.obj.OBJModel
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
@@ -14,12 +16,22 @@ import scala.collection.JavaConversions._
 @SideOnly(Side.CLIENT)
 object OBJDynamicRenderer {
 
+  def LoadObj(loc: ResourceLocation): OBJModel = {
+    val model = ModelLoaderRegistry.getModelOrMissing(loc)
+    if (!model.isInstanceOf[OBJModel]) null
+    else model.asInstanceOf[OBJModel]
+  }
+
   implicit class OBjRender(model: OBJModel) {
     def render(bindTextures: Boolean = true): Unit = {
+      if (model == null) return
+
       renderGroups(model.getMatLib.getGroups.map(_._1).toSet, bindTextures)
     }
 
     def renderGroups(groups: Set[String], bindTextures: Boolean = true): Unit = {
+      if (model == null) return
+
       val matLib = model.getMatLib
       val rgroups = matLib.getGroups.filter(g => groups.contains(g._1)).values.view
       drawBlock(DefaultVertexFormats.POSITION_TEX_NORMAL) {

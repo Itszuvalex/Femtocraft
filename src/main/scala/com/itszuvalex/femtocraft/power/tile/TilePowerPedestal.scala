@@ -25,9 +25,10 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
 
   override def hasDescription: Boolean = true
 
-  override def writeToNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
+  override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(par1nbtTagCompound)
     savePowerInfo(par1nbtTagCompound)
+    par1nbtTagCompound
   }
 
   def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {

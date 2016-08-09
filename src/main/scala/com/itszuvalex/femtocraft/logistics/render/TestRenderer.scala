@@ -5,8 +5,6 @@ import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -18,7 +16,7 @@ object TestRenderer {
 }
 
 class TestRenderer extends TileEntitySpecialRenderer[TileEntity] {
-  val testModel = ModelLoaderRegistry.getModelOrMissing(TestRenderer.testModelLocation).asInstanceOf[OBJModel]
+  val testModel = LoadObj(TestRenderer.testModelLocation)
 
   override def renderTileEntityAt(te: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     this.bindTexture(TestRenderer.testTexLocation)

@@ -8,8 +8,6 @@ import com.itszuvalex.itszulib.render.RenderUtils
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -23,7 +21,7 @@ object PowerPedestalRenderer {
 }
 
 class PowerPedestalRenderer extends TileEntitySpecialRenderer[TilePowerPedestal] {
-  val pedestalModel = ModelLoaderRegistry.getModelOrMissing(PowerPedestalRenderer.pedestalModelLocation).asInstanceOf[OBJModel]
+  val pedestalModel = LoadObj(PowerPedestalRenderer.pedestalModelLocation)
 
   override def renderTileEntityAt(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     GL11.glPushMatrix()

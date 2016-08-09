@@ -9,8 +9,6 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.MathHelper
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -22,7 +20,7 @@ object NodeCrystalRenderer {
 }
 
 trait NodeCrystalRenderer[T <: TileEntity with IPowerNode] extends TileEntitySpecialRenderer[T] {
-  val crystalModel = ModelLoaderRegistry.getModelOrMissing(NodeCrystalRenderer.crystalModelLocation).asInstanceOf[OBJModel]
+  val crystalModel = LoadObj(NodeCrystalRenderer.crystalModelLocation)
 
   def renderNode(node: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTime: Float) = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(NodeCrystalRenderer.crystalTexLocation)

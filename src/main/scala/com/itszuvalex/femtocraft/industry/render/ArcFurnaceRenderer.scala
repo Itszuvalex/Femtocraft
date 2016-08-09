@@ -8,8 +8,6 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -24,7 +22,7 @@ object ArcFurnaceRenderer {
 
 
 class ArcFurnaceRenderer extends TileEntitySpecialRenderer[TileArcFurnace] with IFrameMultiblockRenderer {
-  val model = ModelLoaderRegistry.getModelOrMissing(ArcFurnaceRenderer.modelLoc).asInstanceOf[OBJModel]
+  val model = LoadObj(ArcFurnaceRenderer.modelLoc)
 
   override def renderTileEntityAt(te: TileArcFurnace, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     if (te.isController)
@@ -43,7 +41,7 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer[TileArcFurnace] with 
     GL11.glTranslated(rx + 1, ry, rz + 1)
     GL11.glColor3f(1, 1, 1)
     Minecraft.getMinecraft.getTextureManager.bindTexture(ArcFurnaceRenderer.textureLoc)
-    model.render(false)
+    if (model != null) model.render(false)
     GL11.glPopMatrix()
   }
 

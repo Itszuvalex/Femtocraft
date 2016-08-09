@@ -6,15 +6,13 @@ import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultibl
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraftforge.client.model.ModelLoaderRegistry
-import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
   * Created by Alex on 05.09.2015.
   */
 object FrameRenderer {
-  lazy val frameModel = ModelLoaderRegistry.getModelOrMissing(FrameRenderer.frameModelLocation).asInstanceOf[OBJModel]
+  lazy val frameModel = LoadObj(FrameRenderer.frameModelLocation)
   val frameModelLocation = Resources.Model("frame/Frame.obj")
   val frameTexLocation   = Resources.Model("frame/frame.png")
   val sidemap1           = Array("N", "E", "S", "W")
