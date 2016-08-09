@@ -16,7 +16,11 @@ object Resources {
 
   def Particle(name: String) = Texture("particles/" + name)
 
-  def Model(name: String) = Femtocraft("models/block/" + name)
+  def CustomModelBlock(name: String) = Femtocraft("block/" + name)
+
+  def CustomModelBlockTex(name: String) = Femtocraft("models/block/" + name)
+
+  def ModelItem(name: String) = Femtocraft("item/" + name)
 
   def Femtocraft(loc: String) = new ResourceLocation(com.itszuvalex.femtocraft.Femtocraft.ID.toLowerCase, loc)
 }

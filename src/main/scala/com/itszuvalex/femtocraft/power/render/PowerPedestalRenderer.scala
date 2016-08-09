@@ -14,10 +14,10 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object PowerPedestalRenderer {
-  val pedestalModelLocation      = Resources.Model("power pedestal/power_pedestal_2x.obj")
+  val pedestalModelLocation      = Resources.CustomModelBlock("power pedestal/power_pedestal_2x.obj")
   //  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.png")
-  val pedestalTexLocation        = Resources.Model("power pedestal/power_pedestal_2x.png")
-  val pedestalColoredTexLocation = Resources.Model("power pedestal/power_pedestal_2x_colored.png")
+  val pedestalTexLocation        = Resources.CustomModelBlockTex("power pedestal/power_pedestal_2x.png")
+  val pedestalColoredTexLocation = Resources.CustomModelBlockTex("power pedestal/power_pedestal_2x_colored.png")
 }
 
 class PowerPedestalRenderer extends TileEntitySpecialRenderer[TilePowerPedestal] {
@@ -29,8 +29,8 @@ class PowerPedestalRenderer extends TileEntitySpecialRenderer[TilePowerPedestal]
 
       val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
         case Some(a: ICrystalMount) => new Color(a.getColor)
-        case _ => new Color(0, 255.toByte, 255.toByte, 255.toByte)
-      }).getOrElse(new Color(0, 0, 0, 0))
+        case _ => Color(0.toByte, 255.toByte, 255.toByte, 255.toByte)
+      }).getOrElse(Color(0, 0, 0, 0))
       renderPedestalAt(color.toInt)
     }
 

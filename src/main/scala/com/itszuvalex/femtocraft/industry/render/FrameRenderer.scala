@@ -13,8 +13,8 @@ import org.lwjgl.opengl.GL11
   */
 object FrameRenderer {
   lazy val frameModel = LoadObj(FrameRenderer.frameModelLocation)
-  val frameModelLocation = Resources.Model("frame/Frame.obj")
-  val frameTexLocation   = Resources.Model("frame/frame.png")
+  val frameModelLocation = Resources.CustomModelBlock("frame/Frame.obj")
+  val frameTexLocation   = Resources.CustomModelBlockTex("frame/frame.png")
   val sidemap1           = Array("N", "E", "S", "W")
   val sidemap2           = Array("NW", "NE", "SE", "SW")
 

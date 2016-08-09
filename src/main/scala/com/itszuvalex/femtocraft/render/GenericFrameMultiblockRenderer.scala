@@ -25,30 +25,27 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     * @param rz    Z Render location
     */
   override def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
-    RenderUtils.drawBlock() {
-      GL11.glDisable(GL11.GL_CULL_FACE)
-      GL11.glEnable(GL11.GL_BLEND)
-      //                              if (multi.canPlaceAtLocation(world, x, y, z)) {
-      //                                Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
-      //                              }
-      //                              else {
-      //                                Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
-      //                              }
-      multi.getTakenLocations(loc).toList.sortWith { case (a1, a2) =>
-        a1.distSqr((rx + loc.x).toInt,
+    GL11.glDisable(GL11.GL_CULL_FACE)
+    GL11.glEnable(GL11.GL_BLEND)
+    //                              if (multi.canPlaceAtLocation(world, x, y, z)) {
+    //                                Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
+    //                              }
+    //                              else {
+    //                                Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
+    //                              }
+    multi.getTakenLocations(loc).toList.sortWith { case (a1, a2) =>
+      a1.distSqr((rx + loc.x).toInt,
+        (ry + loc.y).toInt,
+        (rz + loc.z).toInt) <
+        a2.distSqr((rx + loc.x).toInt,
           (ry + loc.y).toInt,
-          (rz + loc.z).toInt) <
-          a2.distSqr((rx + loc.x).toInt,
-            (ry + loc.y).toInt,
-            (rz + loc.z).toInt)
-      }
-        .foreach { loc =>
-          RenderUtils.renderCube(rx.toFloat + (loc.x - loc.x), ry.toFloat + (loc.y - loc.y), rz.toFloat + (loc.z - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
-        }
+          (rz + loc.z).toInt)
     }
+      .foreach { loc =>
+        RenderUtils.renderCube(rx.toFloat + (loc.x - loc.x), ry.toFloat + (loc.y - loc.y), rz.toFloat + (loc.z - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+      }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
-
   }
 
 

@@ -14,8 +14,8 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 1/28/2016.
   */
 object PowerSinkRenderer {
-  val modelLocation = Resources.Model("power sink/power_sink.obj")
-  val texLocation   = Resources.Model("power sink/power_sink.png")
+  val modelLocation = Resources.CustomModelBlock("power sink/power_sink.obj")
+  val texLocation   = Resources.CustomModelBlockTex("power sink/power_sink.png")
 
   val PART_FRAME       = "Frame"
   val PART_SPHERE      = "Sphere"
@@ -46,7 +46,6 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer[TilePowerSink] {
       GL11.glRotated(180, 1, 0, 0)
       GL11.glTranslated(0, -.5, 0)
     }
-
 
     pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_FRAME))
     pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_SPHERE))

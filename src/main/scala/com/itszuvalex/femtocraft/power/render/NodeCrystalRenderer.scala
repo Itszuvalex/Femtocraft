@@ -1,13 +1,12 @@
 package com.itszuvalex.femtocraft.power.render
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
 
@@ -15,8 +14,8 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
   */
 object NodeCrystalRenderer {
-  val crystalModelLocation = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals.obj")
-  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals Texture 64x64.png")
+  val crystalModelLocation = Resources.CustomModelBlock("crystal cluster/Crystals.obj")
+  val crystalTexLocation   = Resources.CustomModelBlockTex("crystal cluster/Crystals Texture 64x64.png")
 }
 
 trait NodeCrystalRenderer[T <: TileEntity with IPowerNode] extends TileEntitySpecialRenderer[T] {

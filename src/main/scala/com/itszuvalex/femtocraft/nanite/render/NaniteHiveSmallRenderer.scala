@@ -6,7 +6,6 @@ import com.itszuvalex.femtocraft.power.render.DiffusionNodeBeamRenderer
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
@@ -15,15 +14,15 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 8/29/2015.
   */
 object NaniteHiveSmallRenderer {
-  val hiveModelLocation    = Resources.Model("nanite hive small/Nanite Hive Small.obj")
-  val hiveTexLocation      = Resources.Model("nanite hive small/nanite hive small.png")
-  val hiveColorTexLocation = Resources.Model("nanite hive small/nanite hive small color.png")
+  val hiveModelLocation    = Resources.CustomModelBlock("nanite hive small/Nanite Hive Small.obj")
+  val hiveTexLocation      = Resources.CustomModelBlockTex("nanite hive small/nanite hive small.png")
+  val hiveColorTexLocation = Resources.CustomModelBlockTex("nanite hive small/nanite hive small color.png")
 }
 
 class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer[TileNaniteHiveSmall] {
   val model = LoadObj(NaniteHiveSmallRenderer.hiveModelLocation)
 
-  override def renderTileEntityFast(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, buffer: VertexBuffer): Unit = {
+  override def renderTileEntityAt(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     GL11.glPushMatrix()
     GL11.glTranslated(x + .5, y, z + .5)
     preRender()

@@ -23,13 +23,13 @@ object OBJDynamicRenderer {
   }
 
   implicit class OBjRender(model: OBJModel) {
-    def render(bindTextures: Boolean = true): Unit = {
+    def render(bindTextures: Boolean = false): Unit = {
       if (model == null) return
 
       renderGroups(model.getMatLib.getGroups.map(_._1).toSet, bindTextures)
     }
 
-    def renderGroups(groups: Set[String], bindTextures: Boolean = true): Unit = {
+    def renderGroups(groups: Set[String], bindTextures: Boolean = false): Unit = {
       if (model == null) return
 
       val matLib = model.getMatLib
@@ -47,7 +47,7 @@ object OBJDynamicRenderer {
             val verts = face.getVertices
             verts.foreach { vert =>
               addVertexUVNormal(vert.getPos3.getX, vert.getPos3.getY, vert.getPos3.getZ,
-                vert.getTextureCoordinate.u, vert.getTextureCoordinate.v,
+                vert.getTextureCoordinate.u, 1d-vert.getTextureCoordinate.v,
                 normal.x, normal.y, normal.z)
             }
           }

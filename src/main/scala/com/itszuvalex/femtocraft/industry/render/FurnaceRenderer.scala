@@ -14,8 +14,8 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 2/13/2016.
   */
 object FurnaceRenderer {
-  val modelLoc   = Resources.Model("furnace/Furnace.obj")
-  val textureLoc = Resources.Model("furnace/furnace.png")
+  val modelLoc   = Resources.CustomModelBlock("furnace/Furnace.obj")
+  val textureLoc = Resources.CustomModelBlockTex("furnace/furnace.png")
 }
 
 class FurnaceRenderer extends TileEntitySpecialRenderer[TileArcFurnace] with IFrameMultiblockRenderer {

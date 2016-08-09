@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.render.RenderUtils
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
@@ -17,9 +18,9 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object CrystalMountRenderer {
-  val crystalModelLocation = Resources.Model("crystal mount/crystal_mount.obj")
+  val crystalModelLocation = Resources.CustomModelBlock("crystal mount/crystal_mount.obj")
   //  val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal mount/crystal_mount.png")
-  val crystalTexLocation   = Resources.Model("crystal mount/crystal_mount.png")
+  val crystalTexLocation   = Resources.CustomModelBlockTex("crystal mount/crystal_mount.png")
 
   val topName     = "Top"
   val bottomName  = "Bottom"
@@ -45,8 +46,9 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer[TileCrystalMount] {
 
     def renderCrystalMountAt(tile: TileEntity with ICrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, hasTop: Boolean): Unit = {
       GL11.glPushMatrix()
-      GL11.glTranslated(renderX + .5, renderY, renderZ + .5)
-      renderCrystalMount(tile.getWorld.getTotalWorldTime.toFloat + partialTicks, hasTop, tile.getCrystalStack != null, new Color(tile.getColor))
+      RenderUtils.translationBlock(renderX + .5, renderY, renderZ + .5) {
+        renderCrystalMount(tile.getWorld.getTotalWorldTime.toFloat + partialTicks, hasTop, tile.getCrystalStack != null, new Color(tile.getColor))
+      }
       GL11.glPopMatrix()
     }
 
