@@ -27,6 +27,7 @@ trait IWorker {
   /**
     *
     * @param task Task to be assigned to.
+    *
     * @return True if this worker can work upon the task, false otherwise.
     */
   def canWorkTask(task: ITask): Boolean
@@ -40,6 +41,7 @@ trait IWorker {
   /**
     *
     * @param attribute Attribute to ask about.
+    *
     * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
     */
   def getEfficiency(attribute: String): Double

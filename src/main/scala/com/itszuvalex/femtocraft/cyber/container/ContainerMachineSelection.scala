@@ -17,7 +17,7 @@ class ContainerMachineSelection(val tile: TileCyberBase) extends ContainerBase {
     super.detectAndSendChanges()
     listeners.foreach { crafter: IContainerListener =>
       if (tile.remainingSlots != slots) sendUpdateToListener(this, crafter, 0, tile.remainingSlots)
-                      }
+    }
     slots = tile.remainingSlots
   }
 

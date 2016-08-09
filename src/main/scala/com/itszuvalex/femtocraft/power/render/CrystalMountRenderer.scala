@@ -37,13 +37,13 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer[TileCrystalMount] {
     renderCrystalMountAt(te, x, y, z, partialTicks, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)))
     if (te.getCrystalStack != null)
       te.getChildrenLocs.map(loc => loc.getTileEntity().orNull).collect { case i: IPowerNode => i }.
-      foreach { t =>
-        t.getType match {
-          case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
-          case IPowerNode.DIFFUSION_TARGET_NODE => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
-          case _ =>
+        foreach { t =>
+          t.getType match {
+            case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
+            case IPowerNode.DIFFUSION_TARGET_NODE => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
+            case _ =>
+          }
         }
-              }
 
     def renderCrystalMountAt(tile: TileEntity with ICrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, hasTop: Boolean): Unit = {
       GL11.glPushMatrix()
@@ -79,3 +79,4 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer[TileCrystalMount] {
     //
     //  override def renderWorldBlock(world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, modelId: Int, renderer: RenderBlocks): Boolean = false
   }
+}

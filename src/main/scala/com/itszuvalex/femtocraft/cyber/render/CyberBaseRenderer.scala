@@ -2,12 +2,13 @@ package com.itszuvalex.femtocraft.cyber.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
+import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.AdvancedModelLoader
-import net.minecraftforge.client.model.obj.WavefrontObject
+import net.minecraftforge.client.model.ModelLoaderRegistry
+import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -21,13 +22,13 @@ object CyberBaseRenderer {
   val largeBaseModelLoc: ResourceLocation = Resources.Model("cyber base/Base 3x3.obj")
   val largeBaseTexLoc  : ResourceLocation = Resources.Model("cyber base/Base 3x3 Template.png")
 
-  val smallBaseModel = AdvancedModelLoader.loadModel(smallBaseModelLoc).asInstanceOf[WavefrontObject]
-  val medBaseModel   = AdvancedModelLoader.loadModel(medBaseModelLoc).asInstanceOf[WavefrontObject]
-  val largeBaseModel = AdvancedModelLoader.loadModel(largeBaseModelLoc).asInstanceOf[WavefrontObject]
+  val smallBaseModel = ModelLoaderRegistry.getModelOrMissing(smallBaseModelLoc).asInstanceOf[OBJModel]
+  val medBaseModel   = ModelLoaderRegistry.getModelOrMissing(medBaseModelLoc).asInstanceOf[OBJModel]
+  val largeBaseModel = ModelLoaderRegistry.getModelOrMissing(largeBaseModelLoc).asInstanceOf[OBJModel]
 
   def renderBase(tile: TileCyberBase, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
     GL11.glPushMatrix()
-    var model: WavefrontObject = null
+    var model: OBJModel = null
     tile.size match {
       case 1 =>
         model = smallBaseModel
@@ -47,31 +48,28 @@ object CyberBaseRenderer {
     GL11.glDisable(GL11.GL_BLEND)
     GL11.glColor4f(1f, 1f, 1f, 1f)
 
-    model.renderAll()
+    model.render(false)
 
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glPopMatrix()
   }
 }
 
-class CyberBaseRenderer extends TileEntitySpecialRenderer {
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
-    tile match {
-      case base: TileCyberBase =>
-        if (!base.isController) return
-        CyberBaseRenderer.renderBase(base, x, y, z, partialTime)
-      //        if (base.currentlyBuildingMachine > -1 && base.currentMachineBuildProgress > 0) {
-      //          CyberMachineRegistry.getMachine(base.machines(base.currentlyBuildingMachine)) match {
-      //            case Some(machine) =>
-      //              CyberMachineRendererRegistry.getRenderer(machine.multiblockRenderID) match {
-      //                case Some(render) =>
-      //                  render.renderInProgressAt(x, y + TileCyberBase.baseHeightMap(base.size) + base.machineSlotMap(base.currentlyBuildingMachine), z, partialTime, base)
-      //                case _ =>
-      //              }
-      //            case _ =>
-      //          }
-      //        }
-      case _ =>
-    }
+class CyberBaseRenderer extends TileEntitySpecialRenderer[TileCyberBase] {
+
+  override def renderTileEntityFast(te: TileCyberBase, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, buffer: VertexBuffer): Unit = {
+    if (!te.isController) return
+    CyberBaseRenderer.renderBase(te, x, y, z, partialTicks)
+    //        if (base.currentlyBuildingMachine > -1 && base.currentMachineBuildProgress > 0) {
+    //          CyberMachineRegistry.getMachine(base.machines(base.currentlyBuildingMachine)) match {
+    //            case Some(machine) =>
+    //              CyberMachineRendererRegistry.getRenderer(machine.multiblockRenderID) match {
+    //                case Some(render) =>
+    //                  render.renderInProgressAt(x, y + TileCyberBase.baseHeightMap(base.size) + base.machineSlotMap(base.currentlyBuildingMachine), z, partialTime, base)
+    //                case _ =>
+    //              }
+    //            case _ =>
+    //          }
+    //        }
   }
 }

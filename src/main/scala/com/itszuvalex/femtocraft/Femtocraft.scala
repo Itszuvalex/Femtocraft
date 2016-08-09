@@ -30,10 +30,10 @@ object Femtocraft {
     override def getTabIconItem: Item = Items.NETHER_STAR
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
-              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
+    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy   : ProxyCommon    = null
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
-              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
+    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
   var guiProxy: ProxyGuiCommon = null
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {

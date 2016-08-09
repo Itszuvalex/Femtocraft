@@ -32,6 +32,7 @@ abstract class Job {
   /**
     *
     * @param power Amount of power available to be used for this tick.
+    *
     * @return Amount of power used this tick.
     */
   def tick(power: Double): Double

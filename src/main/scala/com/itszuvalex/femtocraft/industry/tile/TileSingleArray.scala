@@ -34,6 +34,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     *
     * @param slot (0 until getOutputSlots)
     * @param amt  Amount of item from said slot to remove.
+    *
     * @return The itemstack consisting of getOutputItem(slot) and of stack size Math.min(getOutputItem(slot).stackSize, amt), or null if no item in slot.
     */
   override def removeOutputItem(slot: Int, amt: Int): ItemStack = {
@@ -53,8 +54,17 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
 
   /**
     *
+    * @param slot (0 until getOutputSlots)
+    *
+    * @return Itemstack in given slot.
+    */
+  override def getOutputItem(slot: Int): ItemStack = ???
+
+  /**
+    *
     * @param item Item to merge into slot.
     * @param slot (0 until getInputSlots)
+    *
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getInputItem(slot), or not enough space.
     */
   override def addOrMergeInputItem(item: ItemStack, slot: Int): ItemStack = {
@@ -93,8 +103,17 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
 
   /**
     *
+    * @param slot (0 until getInputSlots)
+    *
+    * @return Itemstack in given input slot.
+    */
+  override def getInputItem(slot: Int): ItemStack = ???
+
+  /**
+    *
     * @param item Item to merge into slot.
     * @param slot (0 until getOutputSlots)
+    *
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
     */
   override def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack = {
@@ -141,6 +160,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
   /**
     *
     * @param slot (0 until getAssemblySlots) to remove from.
+    *
     * @return The assembly item stack in given and now empty slot, or null if failed to remove assembly.  (somehow?)
     */
   override def removeAssembly(slot: Int): ItemStack = ???
@@ -160,23 +180,10 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     *
     * @param slot (0 until getInputSlots)
     * @param amt  Amount of the item from said slot to remove.
+    *
     * @return The itemstack consisting of getInputItem(slot) and of stack size Math.min(getInputItem(slot).stackSize, amt), or null if no item in slot.
     */
   override def removeInputItem(slot: Int, amt: Int): ItemStack = ???
-
-  /**
-    *
-    * @param slot (0 until getInputSlots)
-    * @return Itemstack in given input slot.
-    */
-  override def getInputItem(slot: Int): ItemStack = ???
-
-  /**
-    *
-    * @param slot (0 until getOutputSlots)
-    * @return Itemstack in given slot.
-    */
-  override def getOutputItem(slot: Int): ItemStack = ???
 
   /**
     *
@@ -188,6 +195,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     *
     * @param assembly Assembly to insert into slot.  Should not be null.
     * @param slot     (0 until getAssemblySlots) to insert into.
+    *
     * @return True if slot is empty and assembly was valid, accepted, and placed in the slot.
     */
   override def addAssembly(assembly: ItemStack, slot: Int): Boolean = ???
@@ -195,6 +203,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
   /**
     *
     * @param slot (0 until getAssemblySlots)
+    *
     * @return IItemAssembly in the given slot.
     */
   override def getAssembly(slot: Int): ItemStack = ???
@@ -225,6 +234,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     *
     * @param amt      Amount to attempt to charge
     * @param doCharge False to simulate, true to actually do
+    *
     * @return Amount of amt used to actually charge.
     */
   override def charge(amt: Double, doCharge: Boolean): Double = ???
@@ -233,6 +243,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     *
     * @param amt     Amount of power to drain
     * @param doDrain False to simulate, true to actually remove power.
+    *
     * @return Amount of amt that was successfully drained.
     */
   override def drain(amt: Double, doDrain: Boolean): Double = ???

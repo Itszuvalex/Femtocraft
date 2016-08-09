@@ -19,6 +19,7 @@ object PowerManager {
   /**
     * Attempts to add node to the IPowerNode mapping.  If the node has no parent location, PowerManager will attempt to find a parent for it.  If one is not found,
     * it will add the node to its parentless list, and will then try to find a parent for it every time a new node is added.
+    *
     * @param node Node to be added.
     */
   def addNode(node: IPowerNode): Unit = {
@@ -29,11 +30,11 @@ object PowerManager {
     }
     /* Try and add new node as parent to as many parentless nodes as possible. */
     getIPowerNodesInRange(parentlessTracker, node, node.childrenConnectionRadius).view
-    .filter { case (cnode, _) => cnode.canSetParent(node) && node.canAddChild(cnode) }
-    .foreach { case (cnode, _) =>
-      if (cnode.setParent(node) && node.addChild(cnode))
-        parentlessTracker.removeLocation(cnode.getNodeLoc)
-             }
+      .filter { case (cnode, _) => cnode.canSetParent(node) && node.canAddChild(cnode) }
+      .foreach { case (cnode, _) =>
+        if (cnode.setParent(node) && node.addChild(cnode))
+          parentlessTracker.removeLocation(cnode.getNodeLoc)
+      }
 
     /* Actually track the node */
     nodeTracker.trackLocation(loc)
@@ -48,27 +49,27 @@ object PowerManager {
     else parentlessTracker.removeLocation(node.getNodeLoc)
   }
 
+  def removeNode(node: IPowerNode): Unit = {
+    nodeTracker.removeLocation(node.getNodeLoc)
+    parentlessTracker.removeLocation(node.getNodeLoc)
+  }
+
   private def findParent(node: IPowerNode) = {
     getIPowerNodesInRange(nodeTracker, node, node.parentConnectionRadius)
-    .filter { case (cnode, _) => cnode.canAddChild(node) && node.canSetParent(cnode) }
-    .toList.sortWith(_._2 < _._2)
-    .exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1))
+      .filter { case (cnode, _) => cnode.canAddChild(node) && node.canSetParent(cnode) }
+      .toList.sortWith(_._2 < _._2)
+      .exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1))
   }
 
   private def getIPowerNodesInRange(tracker: LocationTracker, node: IPowerNode, radius: Float): Iterable[(TileEntity with IPowerNode, Double)] = {
     val loc = node.getNodeLoc
     tracker.getLocationsInRange(loc, radius).view
-    .filterNot(_ == node.getNodeLoc)
-    .flatMap(_.getTileEntity(force = false))
-    .collect { case cnode: IPowerNode => cnode }
-    .map(cnode => (cnode, cnode.getNodeLoc.distSqr(loc)))
-    .filter(pair => (pair._2 <= (pair._1.parentConnectionRadius * pair._1.parentConnectionRadius)) &&
-                    (pair._2 <= (node.childrenConnectionRadius * node.childrenConnectionRadius)))
-  }
-
-  def removeNode(node: IPowerNode): Unit = {
-    nodeTracker.removeLocation(node.getNodeLoc)
-    parentlessTracker.removeLocation(node.getNodeLoc)
+      .filterNot(_ == node.getNodeLoc)
+      .flatMap(_.getTileEntity(force = false))
+      .collect { case cnode: IPowerNode => cnode }
+      .map(cnode => (cnode, cnode.getNodeLoc.distSqr(loc)))
+      .filter(pair => (pair._2 <= (pair._1.parentConnectionRadius * pair._1.parentConnectionRadius)) &&
+        (pair._2 <= (node.childrenConnectionRadius * node.childrenConnectionRadius)))
   }
 
 

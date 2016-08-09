@@ -3,18 +3,18 @@ package com.itszuvalex.femtocraft.industry.render
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
+import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraft.tileentity.TileEntity
-import net.minecraftforge.client.model.AdvancedModelLoader
-import net.minecraftforge.client.model.obj.WavefrontObject
+import net.minecraftforge.client.model.ModelLoaderRegistry
+import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
   * Created by Alex on 05.09.2015.
   */
 object FrameRenderer {
-  lazy val frameModel = AdvancedModelLoader.loadModel(FrameRenderer.frameModelLocation).asInstanceOf[WavefrontObject]
+  lazy val frameModel = ModelLoaderRegistry.getModelOrMissing(FrameRenderer.frameModelLocation).asInstanceOf[OBJModel]
   val frameModelLocation = Resources.Model("frame/Frame.obj")
   val frameTexLocation   = Resources.Model("frame/frame.png")
   val sidemap1           = Array("N", "E", "S", "W")
@@ -30,16 +30,16 @@ object FrameRenderer {
     GL11.glColor4f(1f, 1f, 1f, 1f)
 
     marks.foreach { case (a, b, c) =>
-      frameModel.renderPart(
-                             ((a, b, c) match {
-                               case (_, 0, _) => "T"
-                               case (0, 2, _) => "B"
-                               case (1, 1, _) => "B"
-                               case _ => ""
-                             })
-                             + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
-                           )
-                  }
+      frameModel.renderGroups(Set(
+        ((a, b, c) match {
+          case (_, 0, _) => "T"
+          case (0, 2, _) => "B"
+          case (1, 1, _) => "B"
+          case _ => ""
+        })
+          + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
+      ), bindTextures = false)
+    }
 
     GL11.glEnable(GL11.GL_BLEND)
     //    GL11.glEnable(GL11.GL_LIGHTING)
@@ -48,34 +48,30 @@ object FrameRenderer {
 
 }
 
-class FrameRenderer extends TileEntitySpecialRenderer {
+class FrameRenderer extends TileEntitySpecialRenderer[TileFrame] {
 
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit =
-    tile match {
-      case frame: TileFrame =>
-        FrameRenderer.renderFrameAt(x, y, z, partialTime, {
-                                                            for {
-                                                              a <- 0 to 1
-                                                              b <- 0 to (2 - a)
-                                                              c <- 0 to 3
-                                                              if frame.getRenderMark(a, b, c)
-                                                            } yield (a, b, c)
-                                                          }.toSet
-                                   )
-        if (frame.renderProgress > 0 && frame.isController) {
-          FrameMultiblockRegistry.getMultiblock(frame.multiBlock) match {
-            case Some(mb) =>
-              FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
-                case Some(render) =>
-                  render.renderInProgressAt(x, y, z, partialTime, frame)
-                case _ =>
-              }
+  override def renderTileEntityAt(te: TileFrame, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    FrameRenderer.renderFrameAt(x, y, z, partialTicks, {
+      for {
+        a <- 0 to 1
+        b <- 0 to (2 - a)
+        c <- 0 to 3
+        if te.getRenderMark(a, b, c)
+      } yield (a, b, c)
+    }.toSet
+    )
+    if (te.renderProgress > 0 && te.isController) {
+      FrameMultiblockRegistry.getMultiblock(te.multiBlock) match {
+        case Some(mb) =>
+          FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
+            case Some(render) =>
+              render.renderInProgressAt(x, y, z, partialTicks, te)
             case _ =>
           }
-        }
-
-      case _ =>
+        case _ =>
+      }
     }
+  }
 
 
 }

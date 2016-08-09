@@ -29,18 +29,18 @@ object GuiMultiblockSelection {
     var isSelected = false
 
     add(
-         new GuiLabel(2, 2,
-                      panelWidth - 40, panelHeight / 2, multi.getName
-                     ),
-         new GuiFlowLayout(2, panelHeight - 20, panelWidth - 4, panelHeight / 2,
-                           multi.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
-         new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
-                      (panelHeight - Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT) / 2,
-                      Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
-                      Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT,
-                      multi.numFrames.toString),
-         new GuiItemStack(panelWidth - 20, (panelHeight - 18) / 2, new ItemStack(FemtoItems.itemFrame), false)
-       )
+      new GuiLabel(2, 2,
+        panelWidth - 40, panelHeight / 2, multi.getName
+      ),
+      new GuiFlowLayout(2, panelHeight - 20, panelWidth - 4, panelHeight / 2,
+        multi.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
+      new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
+        (panelHeight - Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT) / 2,
+        Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
+        Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT,
+        multi.numFrames.toString),
+      new GuiItemStack(panelWidth - 20, (panelHeight - 18) / 2, new ItemStack(FemtoItems.itemFrame), false)
+    )
 
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       if (super.onMouseClick(mouseX, mouseY, button)) {
@@ -75,27 +75,27 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
   ySize = GuiMultiblockSelection.HEIGHT
   val selectionFlow =
     new GuiFlowLayout(GuiMultiblockSelection.xSelectionMin,
-                      GuiMultiblockSelection.ySelectionMin,
-                      GuiMultiblockSelection.SelectionWidth,
-                      GuiMultiblockSelection.SelectionHeight,
-                      (stack match {
-                        case null => null
-                        case is => is.getItem match {
-                          case null => null
-                          case frame: IFrameItem =>
-                            val multis = FrameMultiblockRegistry.getMultiblocksForFrameType(frame.getFrameType(is))
-                            val selectors = multis.map(new GuiMultiblockSelector(this, _))
-                            selectors.find(_.multi.getName.equalsIgnoreCase(frame.getSelectedMultiblock(is))) match {
-                              case Some(g) => selectMultiblock(g)
-                              case None => clearSelection()
-                            }
-                            selectors.toSeq
-                        }
-                      }): _*
-                     )
+      GuiMultiblockSelection.ySelectionMin,
+      GuiMultiblockSelection.SelectionWidth,
+      GuiMultiblockSelection.SelectionHeight,
+      (stack match {
+        case null => null
+        case is => is.getItem match {
+          case null => null
+          case frame: IFrameItem =>
+            val multis = FrameMultiblockRegistry.getMultiblocksForFrameType(frame.getFrameType(is))
+            val selectors = multis.map(new GuiMultiblockSelector(this, _))
+            selectors.find(_.multi.getName.equalsIgnoreCase(frame.getSelectedMultiblock(is))) match {
+              case Some(g) => selectMultiblock(g)
+              case None => clearSelection()
+            }
+            selectors.toSeq
+        }
+      }): _*
+    )
   val pageLabel     = new GuiLabel((GuiMultiblockSelection.WIDTH - 100) / 2,
-                                   GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
-                                   100, 10, "")
+    GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
+    100, 10, "")
   selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
   var selected: GuiMultiblockSelector = null
   refreshPageLabelText()
@@ -115,38 +115,38 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
   }
 
   add(selectionFlow,
-      new GuiButton(GuiMultiblockSelection.xSelectionMin,
-                    GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
-                    10, 10, "^") {
-        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
-          selectionFlow.pageBackward()
+    new GuiButton(GuiMultiblockSelection.xSelectionMin,
+      GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
+      10, 10, "^") {
+      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
+        selectionFlow.pageBackward()
+        true
+      } else false
+
+      override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
+    },
+    pageLabel,
+    new GuiButton((GuiMultiblockSelection.WIDTH - 100) / 2,
+      GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 15,
+      100, 12, "Clear Selection") {
+      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
+        if (super.onMouseClick(mouseX, mouseY, button)) {
+          clearSelection()
           true
         } else false
-
-        override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
-      },
-      pageLabel,
-      new GuiButton((GuiMultiblockSelection.WIDTH - 100) / 2,
-                    GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 15,
-                    100, 12, "Clear Selection") {
-        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
-          if (super.onMouseClick(mouseX, mouseY, button)) {
-            clearSelection()
-            true
-          } else false
-        }
-      },
-      new GuiButton(GuiMultiblockSelection.WIDTH - GuiMultiblockSelection.xSelectionMin - 10,
-                    GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
-                    10, 10, "v") {
-        override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
-          selectionFlow.pageForward()
-          true
-        } else false
-
-        override def isDisabled: Boolean = selectionFlow.subElements.lastOption.map(_.shouldRender).getOrElse(true)
       }
-     )
+    },
+    new GuiButton(GuiMultiblockSelection.WIDTH - GuiMultiblockSelection.xSelectionMin - 10,
+      GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
+      10, 10, "v") {
+      override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = if (super.onMouseClick(mouseX, mouseY, button)) {
+        selectionFlow.pageForward()
+        true
+      } else false
+
+      override def isDisabled: Boolean = selectionFlow.subElements.lastOption.map(_.shouldRender).getOrElse(true)
+    }
+  )
 
   def clearSelection() = {
     if (selected != null) selected.setSelected(false)

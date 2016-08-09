@@ -57,6 +57,7 @@ trait ICyberMachine {
     *
     * @param item Item broadcasted
     * @param loc  Location
+    *
     * @return Remaining items
     */
   def receiveItemBroadcast(item: ItemStack, loc: Loc4): ItemStack
@@ -66,6 +67,7 @@ trait ICyberMachine {
     *
     * @param fluid Fluid broadcasted
     * @param loc   Location
+    *
     * @return Remaining fluid
     */
   def receiveFluidBroadcast(fluid: FluidStack, loc: Loc4): FluidStack

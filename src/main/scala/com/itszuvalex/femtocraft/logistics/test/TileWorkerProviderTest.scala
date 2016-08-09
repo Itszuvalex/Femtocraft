@@ -11,7 +11,8 @@ import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.AxisAlignedBB
 
 import scala.collection._
 
@@ -23,7 +24,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   workers += new TestWorker(this)
   val connections = new mutable.HashSet[Loc4]()
 
-  override def updateEntity(): Unit = {
+  override def update(): Unit = {
     if (worldObj.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
   }
@@ -44,13 +45,13 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   override def getProviderLocation = getLoc
 
   override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
-    AxisAlignedBB.getBoundingBox(center.x - 30,
-                                 center.y - 30,
-                                 center.z - 30,
-                                 center.x + 30,
-                                 center.y + 30,
-                                 center.z + 30)
+    val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
+    new AxisAlignedBB(center.x - 30,
+      center.y - 30,
+      center.z - 30,
+      center.x + 30,
+      center.y + 30,
+      center.z + 30)
   }
 
   override def invalidate(): Unit = {
@@ -74,10 +75,10 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   def saveConnectionInfo(compound: NBTTagCompound) =
     compound("connections" ->
-             NBTCompound(
-                          "tagList" -> NBTList(getConnections.map(NBTCompound))
-                        )
-            )
+      NBTCompound(
+        "tagList" -> NBTList(getConnections.map(NBTCompound))
+      )
+    )
 
   override def getConnections: Set[Loc4] = {
     if (worldObj.isRemote) connections
@@ -96,15 +97,15 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     compound.NBTCompound("connections") { comp =>
       connections.clear()
       connections ++= comp.NBTList("tagList").map(Loc4(_))
-                                        }
+    }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
-                               }
+    }
     ret
   }
 
@@ -120,6 +121,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     /**
       *
       * @param task Task to be assigned to.
+      *
       * @return True if this worker can work upon the task, false otherwise.
       */
     override def canWorkTask(task: ITask) = true
@@ -149,6 +151,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     /**
       *
       * @param attribute Attribute to ask about.
+      *
       * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
       */
     override def getEfficiency(attribute: String) = 1d

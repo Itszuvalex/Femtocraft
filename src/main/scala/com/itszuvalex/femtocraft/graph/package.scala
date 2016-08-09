@@ -23,10 +23,10 @@ package com.itszuvalex.femtocraft
   * There are 2 main reasons for the distinct separation:
   *
   * 1. Clear caller responsibilities.
-  *       Parents are responsible for informing children of their new parentage.
+  * Parents are responsible for informing children of their new parentage.
   *
   * 2. Method naming conflicts
-  *       Allow for classes to inherit both a parent and child trait without having conflicting method names.
+  * Allow for classes to inherit both a parent and child trait without having conflicting method names.
   *
   * Bi-directional (or, alternatively, non-directional) graphs are easily enforced if you have full control over both Nodes.
   * Simply mirror parent and child addition/subtraction.

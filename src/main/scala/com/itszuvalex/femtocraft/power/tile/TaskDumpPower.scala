@@ -35,7 +35,7 @@ class TaskDumpPower(val owner: IPowerSink, private val taskType: String, val tra
       worker.inform(TaskDumpPower.INFORM_POWER_DRAINED, power.toDouble)
       owner.charge(power, doCharge = true)
       worker.onTick()
-                    }
+    }
 
   }
 
@@ -67,6 +67,7 @@ class TaskDumpPower(val owner: IPowerSink, private val taskType: String, val tra
   /**
     *
     * @param worker Worker to add.
+    *
     * @return True if worker successfully assigned, false otherwise (incompatible type, storage is full.)
     */
   override def addWorker(worker: IWorker): Boolean = if (workers.size >= getWorkerCap) false

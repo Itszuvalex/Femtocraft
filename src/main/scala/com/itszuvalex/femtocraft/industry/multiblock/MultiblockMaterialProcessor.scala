@@ -7,12 +7,11 @@ import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.util.ItemUtils
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.IMultiBlockComponent
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.world.World
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.Set
 
@@ -24,67 +23,68 @@ object MultiblockMaterialProcessor {
 }
 
 class MultiblockMaterialProcessor extends IFrameMultiblock {
-  override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int) =
-    getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
 
-  override def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean = {
-    val ret = formAtLocation(world, x, y, z)
-    world.getTileEntity(x, y, z) match {
-      case null =>
-      case i: TileMaterialProcessor =>
-        world.getTileEntity(i.info.x, i.info.y, i.info.z) match {
-          case null =>
-          case controller: TileMaterialProcessor =>
+
+  override def canPlaceAtLocation(loc: Loc4): Boolean =
+    getTakenLocations(loc).forall(l => l.getWorld.get.isAirBlock(l.getPos) || l.getWorld.get.getBlockState(l.getPos).getBlock.isReplaceable(l.getWorld.get, l.getPos))
+
+  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = {
+    val ret = formAtLocation(loc)
+    loc.getTileEntity() match {
+      case None =>
+      case Some(i: TileMaterialProcessor) =>
+        i.info.cLoc.getTileEntity() match {
+          case None =>
+          case Some(controller: TileMaterialProcessor) =>
             controller.loadInfoFromItemNBT(item.getTagCompound)
         }
     }
     ret
   }
 
-  override def formAtLocation(world: World, x: Int, y: Int, z: Int) = {
-    val locations = getTakenLocations(world, x, y, z)
-    if (locations.forall(loc => world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockMaterialProcessor))) {
-      locations.flatMap(_.getTileEntity(true)).collect { case n: IMultiBlockComponent => n }.map(_.formMultiBlock(world, x, y, z))
+  override def formAtLocation(loc: Loc4): Boolean = {
+    val locations = getTakenLocations(loc)
+    if (locations.forall(l => l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockMaterialProcessor.getDefaultState))) {
+      locations.flatMap(_.getTileEntity(true)).collect { case n: IMultiBlockComponent => n }.map(_.formMultiBlock(loc))
       true
     }
     else false
   }
-
-  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
-                                                                                      for {
-                                                                                        bx <- 0 until 2
-                                                                                        by <- 0 until 3
-                                                                                        bz <- 0 until 2
-                                                                                      } yield Loc4(x + bx, y + by, z + bz, world.provider.dimensionId)
-                                                                                    }.toSet
 
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockFurnaceID
 
   override def numFrames = 2 * 3 * 2
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = Array(new ItemStack(Blocks.cobblestone, 24))
+  override def getRequiredResources: IndexedSeq[ItemStack] = Array(new ItemStack(Blocks.COBBLESTONE, 24))
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
-  override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = {
+  override def onMultiblockBroken(loc: Loc4): Unit = {
     val itemStack = ItemUtils.makeMultiblockItem(MultiblockMaterialProcessor.name)
-    world.getTileEntity(x, y, z) match {
-      case null =>
-      case i: TileMaterialProcessor =>
-        world.getTileEntity(i.info.x, i.info.y, i.info.z) match {
-          case null =>
-          case controller: TileMaterialProcessor =>
+    loc.getTileEntity() match {
+      case Some(i: TileMaterialProcessor) =>
+        i.info.cLoc.getTileEntity() match {
+          case None =>
+          case Some(controller: TileMaterialProcessor) =>
             if (!itemStack.hasTagCompound)
               itemStack.setTagCompound(new NBTTagCompound)
             controller.saveInfoToItemNBT(itemStack.getTagCompound)
         }
-      case _ =>
+      case None =>
     }
-    getTakenLocations(world, x, y, z).foreach(loc => world.setBlockToAir(loc.x, loc.y, loc.z))
+    getTakenLocations(loc).foreach(l => l.getWorld.get.setBlockToAir(l.getPos))
     if (itemStack != null)
-      world.spawnEntityInWorld(new EntityItem(world, x, y, z, itemStack))
+      loc.getWorld.get.spawnEntityInWorld(new EntityItem(loc.getWorld.get, loc.x, loc.y, loc.z, itemStack))
   }
+
+  override def getTakenLocations(loc: Loc4): Set[Loc4] = {
+    for {
+      bx <- 0 until 2
+      by <- 0 until 3
+      bz <- 0 until 2
+    } yield Loc4(loc.x + bx, loc.y + by, loc.z + bz, loc.dim)
+  }.toSet
 
   override def getName = MultiblockMaterialProcessor.name
 }

@@ -6,11 +6,11 @@ package com.itszuvalex.femtocraft.cyber
 trait IRecipeRenderer {
 
   /**
-    * @param x Position of the bottom center of the rendering area.
-    * @param y See above
-    * @param z See above
+    * @param x            Position of the bottom center of the rendering area.
+    * @param y            See above
+    * @param z            See above
     * @param partialTicks Partial tick time
-    * @param progress Progress percent of the current crafting process
+    * @param progress     Progress percent of the current crafting process
     */
   def renderAtCenterLocation(x: Double, y: Double, z: Double, partialTicks: Float, progress: Int)
 

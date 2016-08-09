@@ -3,10 +3,8 @@ package com.itszuvalex.femtocraft.cyber.container
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
 import com.itszuvalex.itszulib.container.ContainerInv
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.{ICrafting, Slot}
+import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-
-import scala.collection.JavaConversions._
 
 /**
   * Created by Itszuvalex on 1.12.2015

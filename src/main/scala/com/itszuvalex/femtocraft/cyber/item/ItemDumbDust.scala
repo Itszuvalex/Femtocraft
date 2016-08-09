@@ -8,6 +8,8 @@ import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumActionResult, EnumFacing, EnumHand}
 import net.minecraft.world.World
 
 /**
@@ -16,14 +18,13 @@ import net.minecraft.world.World
 class ItemDumbDust extends Item {
   setCreativeTab(Femtocraft.tab)
 
-  override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    if (world.isAirBlock(x, y, z)) return false
-    CybermaterialRegistry.getReplacement(world.getBlock(x, y, z), world.getBlockMetadata(x, y, z)) match {
+  override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    if (worldIn.isAirBlock(pos)) return EnumActionResult.FAIL
+    CybermaterialRegistry.getReplacement(worldIn.getBlockState(pos).getBlock, worldIn.getBlockState(pos).getBlock.getMetaFromState(worldIn.getBlockState(pos))) match {
       case Some((rblock, rdamage)) =>
-        world.setBlock(x, y, z, rblock)
-        world.setBlockMetadataWithNotify(x, y, z, rdamage, 3)
-        itemStack.stackSize -= 1
-        if (world.isRemote) {
+        worldIn.setBlockState(pos, rblock.getStateFromMeta(rdamage))
+        stack.stackSize -= 1
+        if (worldIn.isRemote) {
           val random = new Random()
           (0 until 4).foreach { i =>
             val rbyte = (255f / 2f * random.nextFloat() + 255f / 2f).toByte
@@ -32,14 +33,14 @@ class ItemDumbDust extends Item {
             val offx = random.nextFloat() - .5f
             val offy = random.nextFloat() - .5f
             val offz = random.nextFloat() - .5f
-            val px = (x + player.posX) / 2
-            val py = (y + player.posY) / 2
-            val pz = (z + player.posZ) / 2
-            Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, px + offx, py + offy, pz + offz, new Color(255.toByte, rbyte, gbyte, bbyte).toInt)
-                              }
+            val px = (pos.getX + playerIn.posX) / 2
+            val py = (pos.getY + playerIn.posY) / 2
+            val pz = (pos.getZ + playerIn.posZ) / 2
+            Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_NANITE, px + offx, py + offy, pz + offz, new Color(255.toByte, rbyte, gbyte, bbyte).toInt)
+          }
         }
-        true
-      case None => false
+        EnumActionResult.SUCCESS
+      case None => EnumActionResult.FAIL
     }
   }
 }

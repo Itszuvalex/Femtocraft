@@ -31,10 +31,10 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer[TilePowerSink] {
   override def renderTileEntityAt(te: TilePowerSink, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     GL11.glPushMatrix()
     RenderUtils.translationBlock(x + .5, y, z + .5) {
-                                                      val f2: Float = te.getWorld.getTotalWorldTime.toFloat + partialTicks
-                                                      val flipped = te.getLoc.getOffset(EnumFacing.UP).getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])
-                                                      renderSink(flipped, f2)
-                                                    }
+      val f2: Float = te.getWorld.getTotalWorldTime.toFloat + partialTicks
+      val flipped = te.getLoc.getOffset(EnumFacing.UP).getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])
+      renderSink(flipped, f2)
+    }
     GL11.glPopMatrix()
   }
 
@@ -55,12 +55,12 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer[TilePowerSink] {
 
     GL11.glPushMatrix()
     RenderUtils.translationBlock(0, .5, 0) {
-                                             GL11.glRotatef(partialTicks * 2, 1f, 0f, 0f)
-                                           }
+      GL11.glRotatef(partialTicks * 2, 1f, 0f, 0f)
+    }
     pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_TORUS_OUTER))
     RenderUtils.translationBlock(0, .5, 0) {
-                                             GL11.glRotatef(partialTicks * 3, 0f, 0f, 1f)
-                                           }
+      GL11.glRotatef(partialTicks * 3, 0f, 0f, 1f)
+    }
     pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_TORUS_INNER))
     GL11.glPopMatrix()
   }

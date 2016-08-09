@@ -19,6 +19,18 @@ object DistributedManager {
     seekNewWorkers(provider)
   }
 
+  def addWorkerProvider(provider: IWorkerProvider): Unit = {
+    workerProviderTracker.trackLocation(provider.getProviderLocation)
+    seekNewTasks(provider)
+  }
+
+  def addDualProvider(provider: ITaskProvider with IWorkerProvider): Unit = {
+    taskProviderTracker.trackLocation(provider.getProviderLocation)
+    workerProviderTracker.trackLocation(provider.getProviderLocation)
+    seekNewWorkers(provider)
+    seekNewTasks(provider)
+  }
+
   def seekNewWorkers(provider: ITaskProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
     var orderingFunc = taskOrderingFunction
     if (orderingFunc == null) {
@@ -38,11 +50,11 @@ object DistributedManager {
     }
 
     val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getProviderLocation, provider.getWorkerConnectionRadius)
-                           .flatMap(_.getTileEntity(false))
-                           .collect { case wp: IWorkerProvider => wp }
-                           .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
-                           .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
-                           .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
+      .flatMap(_.getTileEntity(false))
+      .collect { case wp: IWorkerProvider => wp }
+      .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
+      .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
+      .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
     val availableTasks = provider.getActiveTasks.filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
     val workerProviders = new mutable.HashSet[IWorkerProvider]()
 
@@ -54,7 +66,7 @@ object DistributedManager {
           workerProviders += worker.getProvider
         case None =>
       }
-                             }
+    }
     refreshTaskStatus(provider)
     workerProviders.foreach(refreshWorkerStatus)
   }
@@ -71,35 +83,6 @@ object DistributedManager {
       availableTasksTracker.trackLocation(provider.getProviderLocation)
     else
       availableTasksTracker.removeLocation(provider.getProviderLocation)
-  }
-
-  def addWorkerProvider(provider: IWorkerProvider): Unit = {
-    workerProviderTracker.trackLocation(provider.getProviderLocation)
-    seekNewTasks(provider)
-  }
-
-  def addDualProvider(provider: ITaskProvider with IWorkerProvider): Unit = {
-    taskProviderTracker.trackLocation(provider.getProviderLocation)
-    workerProviderTracker.trackLocation(provider.getProviderLocation)
-    seekNewWorkers(provider)
-    seekNewTasks(provider)
-  }
-
-  /**
-    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
-    *
-    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
-    */
-  def onTaskEnd(task: ITask): Unit = {
-    val taskProvider = task.getProvider
-    val workerProviders = new mutable.HashSet[IWorkerProvider]()
-    task.getWorkers.foreach { worker =>
-      task.removeWorker(worker)
-      worker.setTask(null)
-      workerProviders += worker.getProvider
-                            }
-    refreshTaskStatus(taskProvider)
-    workerProviders.foreach(seekNewTasks(_))
   }
 
   def seekNewTasks(provider: IWorkerProvider, taskOrderingFunction: (ITask, ITask) => Boolean = null) = {
@@ -121,11 +104,11 @@ object DistributedManager {
     }
 
     val availableTasks = availableTasksTracker.getLocationsInRange(provider.getProviderLocation, provider.getTaskConnectionRadius)
-                         .flatMap(_.getTileEntity(false))
-                         .collect { case tp: ITaskProvider => tp }
-                         .filter(tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < (tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius))
-                         .flatMap(_.getActiveTasks)
-                         .filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
+      .flatMap(_.getTileEntity(false))
+      .collect { case tp: ITaskProvider => tp }
+      .filter(tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < (tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius))
+      .flatMap(_.getActiveTasks)
+      .filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
     val availableWorkers = provider.getProvidedWorkers.filter(_.getTask == null)
     val taskProviders = new mutable.HashSet[ITaskProvider]()
 
@@ -137,9 +120,26 @@ object DistributedManager {
           taskProviders += task.getProvider
         case None =>
       }
-                             }
+    }
     refreshWorkerStatus(provider)
     taskProviders.foreach(refreshTaskStatus)
+  }
+
+  /**
+    * Call this whenever a task is 'ended', either through completion or cancellation.  If the TaskProvider is being unloaded, favor removeTaskProvider.
+    *
+    * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
+    */
+  def onTaskEnd(task: ITask): Unit = {
+    val taskProvider = task.getProvider
+    val workerProviders = new mutable.HashSet[IWorkerProvider]()
+    task.getWorkers.foreach { worker =>
+      task.removeWorker(worker)
+      worker.setTask(null)
+      workerProviders += worker.getProvider
+    }
+    refreshTaskStatus(taskProvider)
+    workerProviders.foreach(seekNewTasks(_))
   }
 
   def removeTaskProvider(provider: ITaskProvider) = {
@@ -149,8 +149,8 @@ object DistributedManager {
         workerProviders += worker.getProvider
         task.removeWorker(worker)
         worker.setTask(null)
-                              }
-                                    }
+      }
+    }
     taskProviderTracker.removeLocation(provider.getProviderLocation)
     availableTasksTracker.removeLocation(provider.getProviderLocation)
     workerProviders.foreach(seekNewTasks(_))
@@ -166,7 +166,7 @@ object DistributedManager {
           worker.setTask(null)
         case _ =>
       }
-                                        }
+    }
     workerProviderTracker.removeLocation(provider.getProviderLocation)
     availableWorkersTracker.removeLocation(provider.getProviderLocation)
     taskProviders.foreach(seekNewWorkers(_))

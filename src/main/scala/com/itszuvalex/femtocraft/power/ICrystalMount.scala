@@ -18,6 +18,7 @@ trait ICrystalMount extends IPowerNode {
   /**
     *
     * @param loc Location of pedestal to connect with.
+    *
     * @return True if this block can accept a pedestal connection from this location.
     */
   def canAcceptPedestal(loc: Loc4): Boolean

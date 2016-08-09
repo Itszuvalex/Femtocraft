@@ -19,6 +19,7 @@ trait DirectNode extends PowerNode {
   /**
     *
     * @param child
+    *
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode) = DirectNode.canAddChild(child)
@@ -26,6 +27,7 @@ trait DirectNode extends PowerNode {
   /**
     *
     * @param parent IPowerNode that is being checked.
+    *
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode) = super.canSetParent(parent) && DirectNode.canAddParent(parent)

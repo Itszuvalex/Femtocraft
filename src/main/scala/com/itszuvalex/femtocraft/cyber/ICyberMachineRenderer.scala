@@ -10,10 +10,10 @@ trait ICyberMachineRenderer {
   /**
     * Render function for machine in-progress rendering.
     *
-    * @param x xPos to render at
-    * @param y yPos to render at
-    * @param z zPos to render at
-    * @param partialTime Partial tick time
+    * @param x                  xPos to render at
+    * @param y                  yPos to render at
+    * @param z                  zPos to render at
+    * @param partialTime        Partial tick time
     * @param progressPercentage Controller TileCyberBase of the machine.
     *                           Store any data that should persist between render calls in `baseController.inProgressData`.
     *                           If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.

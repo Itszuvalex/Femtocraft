@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.nanite.tile
 
 import com.itszuvalex.femtocraft.logistics.distributed.{IWorker, IWorkerProvider}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileIndexedInventory}
-import com.itszuvalex.femtocraft.nanite.{NaniteManager, NaniteHive}
+import com.itszuvalex.femtocraft.nanite.{NaniteHive, NaniteManager}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{DiffusionNode, IPowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -15,7 +15,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.math.AxisAlignedBB
 
 import scala.collection.Set
 
@@ -109,18 +109,19 @@ import scala.collection.Set
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
-    AxisAlignedBB.getBoundingBox(center.x - hiveRadius,
-                                 center.y - hiveRadius,
-                                 center.z - hiveRadius,
-                                 center.x + hiveRadius,
-                                 center.y + hiveRadius,
-                                 center.z + hiveRadius)
+    val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
+    new AxisAlignedBB(center.x - hiveRadius,
+      center.y - hiveRadius,
+      center.z - hiveRadius,
+      center.x + hiveRadius,
+      center.y + hiveRadius,
+      center.z + hiveRadius)
   }
 
   /**
     *
     * @param child
+    *
     * @return True if child was a child of this node, and was successfully removed.
     */
   override def removeChild(child: IPowerNode): Boolean = {
@@ -133,6 +134,7 @@ import scala.collection.Set
   /**
     *
     * @param child
+    *
     * @return True if child is successfully added.
     */
   override def addChild(child: IPowerNode): Boolean = {
@@ -144,6 +146,7 @@ import scala.collection.Set
   /**
     *
     * @param parent Parent being set.
+    *
     * @return True if parent is successfully set to input parent.
     */
   override def setParent(parent: IPowerNode): Boolean = {
@@ -152,7 +155,7 @@ import scala.collection.Set
     ret
   }
 
-  override def closeInventory(): Unit = indInventory.closeInventory()
+  override def closeInventory(player: EntityPlayer): Unit = indInventory.closeInventory(player)
 
   override def decrStackSize(p_70298_1_ : Int, p_70298_2_ : Int): ItemStack = {
     markDirty()
@@ -165,9 +168,8 @@ import scala.collection.Set
 
   override def isItemValidForSlot(p_94041_1_ : Int, p_94041_2_ : ItemStack): Boolean = indInventory.isItemValidForSlot(p_94041_1_, p_94041_2_)
 
-  override def getStackInSlotOnClosing(p_70304_1_ : Int): ItemStack = indInventory.getStackInSlotOnClosing(p_70304_1_)
 
-  override def openInventory(): Unit = indInventory.openInventory()
+  override def openInventory(player: EntityPlayer): Unit = indInventory.openInventory(player)
 
   override def setInventorySlotContents(p_70299_1_ : Int, p_70299_2_ : ItemStack): Unit = {
     markDirty()
@@ -178,7 +180,17 @@ import scala.collection.Set
 
   override def getStackInSlot(p_70301_1_ : Int): ItemStack = indInventory.getStackInSlot(p_70301_1_)
 
-  override def hasCustomInventoryName: Boolean = indInventory.hasCustomInventoryName
+  override def clear(): Unit = indInventory.clear()
 
-  override def getInventoryName: String = indInventory.getInventoryName
+  override def getFieldCount: Int = indInventory.getFieldCount
+
+  override def getField(id: Int): Int = indInventory.getField(id)
+
+  override def removeStackFromSlot(index: Int): ItemStack = indInventory.removeStackFromSlot(index)
+
+  override def setField(id: Int, value: Int): Unit = indInventory.setField(id, value)
+
+  override def getName: String = indInventory.getName
+
+  override def hasCustomName: Boolean = indInventory.hasCustomName
 }

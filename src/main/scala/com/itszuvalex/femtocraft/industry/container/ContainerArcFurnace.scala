@@ -34,6 +34,11 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
     updatePower(listener)
   }
 
+  def updatePower(par1ICrafting: IContainerListener): Unit = {
+    sendUpdateToListener(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
+    sendUpdateToListener(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
+  }
+
   /**
     * Looks for changes made in the container, sends them to every listener.
     */
@@ -46,26 +51,21 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
       if (lastPower != inventory.getPowerCurrent) {
         updatePower(icrafting)
       }
-                      }
+    }
     lastCookTime = 0 /*inventory.furnaceCookTime*/
     lastPower = inventory.getPowerCurrent.toLong
-  }
-
-  def updatePower(par1ICrafting: IContainerListener): Unit = {
-    sendUpdateToListener(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
-    sendUpdateToListener(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
   }
 
   @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {
     case ContainerArcFurnace.COOK_INDEX =>
     case ContainerArcFurnace.POWER_BIG_INDEX =>
       inventory.setPower(
-                          (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
-                        )
+        (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
+      )
     case ContainerArcFurnace.POWER_SMALL_INDEX =>
       inventory.setPower(
-                          (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
-                        )
+        (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
+      )
     case _ =>
   }
 

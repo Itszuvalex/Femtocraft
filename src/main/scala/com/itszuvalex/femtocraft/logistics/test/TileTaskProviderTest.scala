@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.logistics.distributed._
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.EnumFacing
 
 import scala.collection._
 
@@ -14,7 +15,7 @@ import scala.collection._
 class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   val tasks = new mutable.HashSet[ITask]()
 
-  override def updateEntity(): Unit = {
+  override def update(): Unit = {
     if (worldObj.isRemote) return
 
     getActiveTasks.foreach(_.onTick())
@@ -61,7 +62,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   }
 
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Tasks(" + tasks.size + "):")
@@ -69,8 +70,8 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap + "   progress:" + task.progress + "-" + task.progressToFinish)
       task.getWorkers.foreach { worker =>
         PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "       Worker:" + worker.getProvider.getProviderLocation)
-                              }
-                  }
+      }
+    }
     ret
   }
 
@@ -87,6 +88,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     /**
       *
       * @param worker Worker to add.
+      *
       * @return True if worker successfully assigned, false otherwise (incompatible type, storage is full.)
       */
     override def addWorker(worker: IWorker): Boolean = {

@@ -20,9 +20,9 @@ class BlockCyberweave extends Block(Material.IRON) {
       case EnumPlantType.Plains => true
       case EnumPlantType.Beach =>
         world.getBlockState(pos.east()).getMaterial == Material.WATER ||
-        world.getBlockState(pos.west()).getMaterial == Material.WATER ||
-        world.getBlockState(pos.north()).getMaterial == Material.WATER ||
-        world.getBlockState(pos.south()).getMaterial == Material.WATER
+          world.getBlockState(pos.west()).getMaterial == Material.WATER ||
+          world.getBlockState(pos.north()).getMaterial == Material.WATER ||
+          world.getBlockState(pos.south()).getMaterial == Material.WATER
       case _ => false
     }
   }

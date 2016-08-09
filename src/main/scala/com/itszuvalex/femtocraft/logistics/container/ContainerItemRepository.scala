@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.logistics.container
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository._
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.itszulib.container.ContainerInv
-import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
+import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -21,9 +21,9 @@ object ContainerItemRepository {
 class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0) {
 
   (0 until TileItemRepository.INVENTORY_SIZE).
-  foreach { i =>
-    addSlotToContainer(new Slot(te, i, inventoryStartX + (i % 9) * 18, inventoryStartY + (i / 9) * 18))
-          }
+    foreach { i =>
+      addSlotToContainer(new Slot(te, i, inventoryStartX + (i % 9) * 18, inventoryStartY + (i / 9) * 18))
+    }
 
   addPlayerInventorySlots(parPlayer.inventory, playerInventoryStartX, playerInventoryStartY)
 

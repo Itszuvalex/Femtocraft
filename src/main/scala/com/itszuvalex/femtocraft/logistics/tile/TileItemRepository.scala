@@ -42,8 +42,6 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
     indInventory.decrStackSize(i, amount)
   }
 
-  override def getStackInSlotOnClosing(i: Int): ItemStack = indInventory.getStackInSlotOnClosing(i)
-
   override def setInventorySlotContents(i: Int, itemstack: ItemStack): Unit = {
     setModified()
     indInventory.setInventorySlotContents(i, itemstack)
@@ -74,19 +72,30 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
     }
   }
 
-  override def getInventoryName: String = indInventory.getInventoryName
 
-  override def hasCustomInventoryName: Boolean = indInventory.hasCustomInventoryName
+  override def closeInventory(player: EntityPlayer): Unit = indInventory.closeInventory(player)
+
+  override def clear(): Unit = indInventory.clear()
+
+  override def openInventory(player: EntityPlayer): Unit = indInventory.openInventory(player)
+
+  override def getFieldCount: Int = indInventory.getFieldCount
+
+  override def getField(id: Int): Int = indInventory.getField(id)
+
+  override def removeStackFromSlot(index: Int): ItemStack = indInventory.removeStackFromSlot(index)
+
+  override def setField(id: Int, value: Int): Unit = indInventory.setField(id, value)
+
+  override def getName: String = indInventory.getName
+
+  override def hasCustomName: Boolean = indInventory.hasCustomName
 
   override def getInventoryStackLimit: Int = indInventory.getInventoryStackLimit
 
   override def markDirty(): Unit = indInventory.markDirty()
 
   override def isUseableByPlayer(entityplayer: EntityPlayer): Boolean = indInventory.isUseableByPlayer(entityplayer)
-
-  override def openInventory(): Unit = indInventory.openInventory()
-
-  override def closeInventory(): Unit = indInventory.closeInventory()
 
   override def isItemValidForSlot(i: Int, itemstack: ItemStack): Boolean = indInventory.isItemValidForSlot(i, itemstack)
 

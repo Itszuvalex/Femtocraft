@@ -42,13 +42,13 @@ object CybermaterialRegistry {
 
   def postInit(): Unit = {
     OreDictionary.getOres("logWood")
-    .foreach { stack =>
-      (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberwood, 0))
-             }
+      .foreach { stack =>
+        (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberwood, 0))
+      }
     OreDictionary.getOres("treeLeaves").
-    foreach { stack =>
-      (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberleaf, 0))
-            }
+      foreach { stack =>
+        (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberleaf, 0))
+      }
 
     (0 until 16).foreach(registerBlockReplacement(Blocks.STONE, _, FemtoBlocks.blockCyberweave, 0))
     (0 until 16).foreach(registerBlockReplacement(Blocks.GRASS, _, FemtoBlocks.blockCyberweave, 0))

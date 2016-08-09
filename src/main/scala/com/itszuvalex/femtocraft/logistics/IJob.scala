@@ -2,14 +2,16 @@ package com.itszuvalex.femtocraft.logistics
 
 import java.util.UUID
 
-import com.itszuvalex.itszulib.api.core.{Loc4, NBTSerializable}
+import com.itszuvalex.itszulib.api.core.Loc4
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.common.util.INBTSerializable
 
 import scala.collection._
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/1/2016.
   */
-trait IJob[Runner <: IJobRunner[_, _]] extends NBTSerializable {
+trait IJob[Runner <: IJobRunner[_, _]] extends INBTSerializable[NBTTagCompound] {
 
   def jobType: String
 

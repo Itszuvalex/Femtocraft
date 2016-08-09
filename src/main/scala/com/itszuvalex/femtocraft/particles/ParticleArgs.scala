@@ -7,24 +7,24 @@ import net.minecraftforge.common.DimensionManager
   * Created by Christopher Harris (Itszuvalex) on 1/6/16.
   */
 class ParticleArgs(
-                    var dimension: Int = 0,
-                    var posX: Double = 0D,
-                    var posY: Double = 0D,
-                    var posZ: Double = 0D,
-                    var scale: Float = 1f,
-                    var motionX: Float = 0f,
-                    var motionY: Float = 0f,
-                    var motionZ: Float = 0f,
-                    var accelX: Float = 0f,
-                    var accelY: Float = 0f,
-                    var accelZ: Float = 0f,
-                    var alpha: Float = 0f,
-                    var red: Float = 1f,
-                    var green: Float = 1f,
-                    var blue: Float = 1f,
-                    var age: Int = 60,
-                    var noClip: Boolean = true
-                  ) {
+  var dimension: Int = 0,
+  var posX: Double = 0D,
+  var posY: Double = 0D,
+  var posZ: Double = 0D,
+  var scale: Float = 1f,
+  var motionX: Float = 0f,
+  var motionY: Float = 0f,
+  var motionZ: Float = 0f,
+  var accelX: Float = 0f,
+  var accelY: Float = 0f,
+  var accelZ: Float = 0f,
+  var alpha: Float = 0f,
+  var red: Float = 1f,
+  var green: Float = 1f,
+  var blue: Float = 1f,
+  var age: Int = 60,
+  var noClip: Boolean = true
+) {
 
   def this(buf: ByteBuf) = {
     this()

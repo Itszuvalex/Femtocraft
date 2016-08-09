@@ -11,8 +11,9 @@ object PowerUtils {
 
   /**
     *
-    * @param loc Location to search for
+    * @param loc              Location to search for
     * @param zigguratPieceLoc Location of any piece of the Ziggurat
+    *
     * @return True if loc contains a IPowerZigguratBlock and it is in the same Ziggurat as the ZigguratPieceLoc, false otherwise.
     */
   def isLocInZiggurat(loc: Loc4, zigguratPieceLoc: Loc4): Boolean = {
@@ -26,19 +27,20 @@ object PowerUtils {
     * function returns false when passed the child location and the to-be-parent's location. The only exception is if the root
     * node is setting the parent of itself to itself.
     *
-    * @param loc location to search for
+    * @param loc         location to search for
     * @param zigguratLoc Location containing an IPowerZigguratComponent
+    *
     * @return True if location is the location of any parents of the block in zigguratLoc
     */
   @tailrec
   def isLocInZigguratParentChain(loc: Loc4, zigguratLoc: Loc4): Boolean =
-    if (loc == null) false
-    else
-      loc.getTileEntity(true) match {
-        case _ if loc == zigguratLoc => true
-        case Some(tile: IPowerZigguratComponent) => isLocInZigguratParentChain(loc, tile.getParent)
-        case _ => false
-      }
+  if (loc == null) false
+  else
+    loc.getTileEntity(true) match {
+      case _ if loc == zigguratLoc => true
+      case Some(tile: IPowerZigguratComponent) => isLocInZigguratParentChain(loc, tile.getParent)
+      case _ => false
+    }
 
   /**
     * Non-tail-optimized recursive depth-first search for loc, by looking at all children of zigguratLoc.
@@ -48,6 +50,7 @@ object PowerUtils {
     *
     * @param loc
     * @param zigguratLoc
+    *
     * @return
     */
   def isLocInZigguratChildChain(loc: Loc4, zigguratLoc: Loc4): Boolean = {
@@ -62,6 +65,7 @@ object PowerUtils {
   /**
     *
     * @param loc Loc containing any hooked up IPowerZiggurat block.
+    *
     * @return Loc of the root node, or null if initial Loc doesn't contain an IPowerZigguratBlock implementer.
     */
   def getZigguratRootLoc(loc: Loc4): Loc4 = getZigguratRootHelper(loc, null)

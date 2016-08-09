@@ -177,20 +177,20 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
               case i if IDDamageWildCardNBTComparator.compare(item, i) == 0 => true
               case _ => false
             }
-                              })
-                                                                                                        }
+          })
+        }
         if (itemsAndSlots.
-            forall { case (item, slots) =>
-              if (slots.isEmpty) false
-              else {
-                var needed = item.stackSize
-                slots.exists { slot =>
-                  val i = getStackInSlot(slot)
-                  needed -= i.stackSize
-                  needed <= 0
-                             }
+          forall { case (item, slots) =>
+            if (slots.isEmpty) false
+            else {
+              var needed = item.stackSize
+              slots.exists { slot =>
+                val i = getStackInSlot(slot)
+                needed -= i.stackSize
+                needed <= 0
               }
-                   }) {
+            }
+          }) {
           itemsAndSlots.foreach { case (item, slots) =>
             var needed = item.stackSize
             slots.exists { slot =>
@@ -204,14 +204,14 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
                 isModifyingInv = false
               }
               needed <= 0
-                         }
-                                }
+            }
+          }
           isModifyingInv = true
           val random = new Random()
           indInventory.getInventory.zipWithIndex.foreach { case (item, slot) =>
             if (!worldObj.isRemote) InventoryUtils.dropItem(item, getLoc, random)
             indInventory.setInventorySlotContents(slot, null)
-                                                         }
+          }
           isModifyingInv = false
           isBuilding = true
           setUpdate()
@@ -228,9 +228,10 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def hasDescription: Boolean = isValidMultiBlock
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     saveFrameInfo(compound)
+    compound
   }
 
   def saveFrameInfo(compound: NBTTagCompound): Unit = {
@@ -245,6 +246,14 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     loadFrameInfo(compound)
   }
 
+  def loadFrameInfo(compound: NBTTagCompound): Unit = {
+    renderInt = compound.Int(TileFrame.RENDER_SETTINGS_KEY)
+    multiBlock = compound.String(TileFrame.MULTIBLOCK_KEY)
+    if (multiBlock == "") multiBlock = null
+    renderProgress = compound.Int(TileFrame.PROGRESS_KEY)
+    isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
+  }
+
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     saveFrameInfo(compound)
@@ -254,14 +263,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     super.handleDescriptionNBT(compound)
     loadFrameInfo(compound)
     setRenderUpdate()
-  }
-
-  def loadFrameInfo(compound: NBTTagCompound): Unit = {
-    renderInt = compound.Int(TileFrame.RENDER_SETTINGS_KEY)
-    multiBlock = compound.String(TileFrame.MULTIBLOCK_KEY)
-    if (multiBlock == "") multiBlock = null
-    renderProgress = compound.Int(TileFrame.PROGRESS_KEY)
-    isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
   }
 
   override def onBlockBreak(): Unit = {
@@ -279,7 +280,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
                 ItemFrame.setSelection(itemStack, multiBlock)
                 InventoryUtils.dropItem(itemStack, getLoc, random)
               }
-                                                    }
+            }
             if (isBuilding && TileFrame.shouldDrop)
               multi.getRequiredResources.foreach(InventoryUtils.dropItem(_, getLoc, random))
           case _ =>
@@ -376,8 +377,9 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def removeStackFromSlot(index: Int): ItemStack =
     if (isController) {
-      indInventory.getStackInSlot(index)
+      val ret = indInventory.getStackInSlot(index)
       indInventory.setInventorySlotContents(index, null)
+      ret
     } else forwardToController[TileFrame, ItemStack](_.removeStackFromSlot(index))
 
   override def setField(id: Int, value: Int): Unit =

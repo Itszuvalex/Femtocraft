@@ -16,6 +16,7 @@ trait IPowerPedestal {
   /**
     *
     * @param loc Location to accept mount connection at.
+    *
     * @return True if mount can be added to this location.
     */
   def canSetMount(loc: Loc4): Boolean

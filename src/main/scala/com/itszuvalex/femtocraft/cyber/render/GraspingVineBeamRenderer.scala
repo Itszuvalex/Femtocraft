@@ -7,18 +7,19 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.entity.Entity
+import net.minecraft.tileentity.TileEntity
 import org.lwjgl.opengl.GL11
 
 /**
   * Created by Christopher on 11/22/2015.
   */
-trait GraspingVineBeamRenderer extends TileEntitySpecialRenderer {
+trait GraspingVineBeamRenderer[T <: TileEntity] extends TileEntitySpecialRenderer[T] {
 
   def renderBeamsToEntities(x: Double, y: Double, z: Double, partialTime: Float, node: TileGraspingVines, entities: Set[Entity], beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
     entities.foreach { entity =>
       renderBeamToEntity(x, y, z, node, entity, color, partialTime, beamWidth)
-                     }
+    }
     beamRenderTeardown()
   }
 
@@ -41,8 +42,8 @@ trait GraspingVineBeamRenderer extends TileEntitySpecialRenderer {
     val yMin: Double = 0.0D
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
     FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff, beamWidth,
-                              xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-                              color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
+      xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+      color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
 
   def beamRenderTeardown(): Unit = {

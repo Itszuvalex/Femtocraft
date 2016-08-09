@@ -27,12 +27,4 @@ object RenderIDs {
   var metabolicConverterID    = 0
   var photosynthesisTowerID   = 0
   var sporeDistributorID      = 0
-
-  //Regular IDs
-  var naniteHiveSmallID = 0
-  var powerPedestalID   = 0
-  var crystalMountID    = 0
-  var powerSinkID       = 0
-
-  var glowStickID = 0
 }

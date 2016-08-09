@@ -7,7 +7,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Christopher on 8/27/2015.
@@ -30,6 +30,14 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
     savePowerInfo(par1nbtTagCompound)
   }
 
+  def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
+    par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
+      NBTCompound(
+        TilePowerPedestal.MOUNT_KEY -> mountLocation
+      )
+    )
+  }
+
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.readFromNBT(par1nbtTagCompound)
     loadPowerInfo(par1nbtTagCompound)
@@ -39,20 +47,12 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
     par1nbtTagCompound.NBTCompound(TilePowerPedestal.PEDESTAL_COMPOUND) { comp =>
       mountLocation = comp.NBTCompound(TilePowerPedestal.MOUNT_KEY)(Loc4(_))
       Unit
-                                                                        }
+    }
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     savePowerInfo(compound)
-  }
-
-  def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
-    par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
-                       NBTCompound(
-                                    TilePowerPedestal.MOUNT_KEY -> mountLocation
-                                  )
-                      )
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
@@ -77,12 +77,12 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
   override def mountLoc: Loc4 = mountLocation
 
   def onPostBlockPlaced(): Unit = {
-    if (getWorldObj.isRemote) return
-    if (!checkAndAddMount(ForgeDirection.UP))
-      checkAndAddMount(ForgeDirection.DOWN)
+    if (getWorld.isRemote) return
+    if (!checkAndAddMount(EnumFacing.UP))
+      checkAndAddMount(EnumFacing.DOWN)
   }
 
-  def checkAndAddMount(dir: ForgeDirection): Boolean = {
+  def checkAndAddMount(dir: EnumFacing): Boolean = {
     getLoc.getOffset(dir).getTileEntity(true) match {
       case Some(i: ICrystalMount) =>
         if (i.canAcceptPedestal(getLoc) && canSetMount(getLoc.getOffset(dir))) {
@@ -98,9 +98,10 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
   /**
     *
     * @param loc Location to accept mount connection at.
+    *
     * @return True if mount can be added to this location.
     */
-  override def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(ForgeDirection.UP) == loc || getLoc.getOffset(ForgeDirection.DOWN) == loc
+  override def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(EnumFacing.UP) == loc || getLoc.getOffset(EnumFacing.DOWN) == loc
 
   /**
     *

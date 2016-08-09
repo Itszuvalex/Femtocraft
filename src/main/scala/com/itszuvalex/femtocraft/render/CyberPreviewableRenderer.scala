@@ -34,37 +34,37 @@ class CyberPreviewableRenderer extends IPreviewableRenderer {
     val baseLocations = ItemBaseSeed.getBaseLocations(stack, x, loc4.y, z, loc4.getWorld.get.provider.getDimension)
     val slotLocations = ItemBaseSeed.getSlotLocations(stack, x, loc4.y, z, loc4.getWorld.get.provider.getDimension)
     RenderUtils.drawBlock() {
-                              GL11.glDisable(GL11.GL_CULL_FACE)
-                              GL11.glEnable(GL11.GL_BLEND)
-                              //                              if (TileCyberBase.areAllPlaceable(baseLocations) &&
-                              //                                  TileCyberBase.arePartsAtYPlaceable(slotLocations, loc.y + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))
-                              //                              )
-                              //                                Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
-                              //                              else Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
-                              baseLocations.toList.sortWith { case (a1, a2) =>
-                                a1.distSqr((rx + x).toInt,
-                                           (_ry + loc4.y).toInt,
-                                           (rz + z).toInt) <
-                                a2.distSqr((rx + x).toInt,
-                                           (_ry + loc4.y).toInt,
-                                           (rz + z).toInt)
-                                                            }
-                              .foreach { loc =>
-                                RenderUtils.renderCube(rx.toFloat + (loc.x - x), _ry.toFloat + (loc.y - loc4.y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
-                                       }
-                              //                              if (TileCyberBase.areAllPlaceable(slotLocations)) Tessellator.instance.setColorRGBA_F(0, .75f, 1, .5f) else Tessellator.instance.setColorRGBA_F(.75f, 0, 1, .5f)
-                              slotLocations.toList.sortWith { case (a1, a2) =>
-                                a1.distSqr((rx + x).toInt,
-                                           (_ry + loc4.y).toInt,
-                                           (rz + z).toInt) <
-                                a2.distSqr((rx + x).toInt,
-                                           (_ry + loc4.y).toInt,
-                                           (rz + z).toInt)
-                                                            }
-                              .foreach { loc =>
-                                RenderUtils.renderCube(rx.toFloat + (loc.x - x), _ry.toFloat + (loc.y - loc4.y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
-                                       }
-                            }
+      GL11.glDisable(GL11.GL_CULL_FACE)
+      GL11.glEnable(GL11.GL_BLEND)
+      //                              if (TileCyberBase.areAllPlaceable(baseLocations) &&
+      //                                  TileCyberBase.arePartsAtYPlaceable(slotLocations, loc.y + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))
+      //                              )
+      //                                Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
+      //                              else Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
+      baseLocations.toList.sortWith { case (a1, a2) =>
+        a1.distSqr((rx + x).toInt,
+          (_ry + loc4.y).toInt,
+          (rz + z).toInt) <
+          a2.distSqr((rx + x).toInt,
+            (_ry + loc4.y).toInt,
+            (rz + z).toInt)
+      }
+        .foreach { loc =>
+          RenderUtils.renderCube(rx.toFloat + (loc.x - x), _ry.toFloat + (loc.y - loc4.y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+        }
+      //                              if (TileCyberBase.areAllPlaceable(slotLocations)) Tessellator.instance.setColorRGBA_F(0, .75f, 1, .5f) else Tessellator.instance.setColorRGBA_F(.75f, 0, 1, .5f)
+      slotLocations.toList.sortWith { case (a1, a2) =>
+        a1.distSqr((rx + x).toInt,
+          (_ry + loc4.y).toInt,
+          (rz + z).toInt) <
+          a2.distSqr((rx + x).toInt,
+            (_ry + loc4.y).toInt,
+            (rz + z).toInt)
+      }
+        .foreach { loc =>
+          RenderUtils.renderCube(rx.toFloat + (loc.x - x), _ry.toFloat + (loc.y - loc4.y), rz.toFloat + (loc.z - z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+        }
+    }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
   }

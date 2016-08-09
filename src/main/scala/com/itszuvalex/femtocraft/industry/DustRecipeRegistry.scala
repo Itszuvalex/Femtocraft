@@ -58,11 +58,11 @@ object DustRecipeRegistry {
         val prev = oreOreToDustMap.get(dust)
         oreOreToDustMap(dust) = (prev.exists(_._1), true)
       }
-                                      }
+    }
 
     oreOreToDustMap.foreach { case (ore, (bore, bdust)) =>
       Femtocraft.logger.log(Level.INFO, "Found Ore:\t%s\t\t(Ore=%b, Dust=%b)".format(ore, bore, bdust))
-                            }
+    }
     validOres ++= oreOreToDustMap.collect { case (ore, found) if found._1 && found._2 => ore }
     validOres.foreach { ore => Femtocraft.logger.log(Level.INFO, "Registered ore->dust mapping for Ore:\t%s".format(ore)) }
   }
@@ -76,7 +76,7 @@ object DustRecipeRegistry {
           ret.stackSize = oreDustNum.getOrElse(ore, defaultDust)
           return Some(ret)
       }
-                                                                        }
+    }
     None
   }
 
@@ -108,7 +108,7 @@ object DustRecipeRegistry {
           return Some("dust" + og)
         }
       }
-                                                                        }
+    }
     None
   }
 

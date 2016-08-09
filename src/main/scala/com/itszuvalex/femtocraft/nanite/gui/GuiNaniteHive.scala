@@ -5,10 +5,10 @@ import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.util.Color
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.util.{ResourceLocation, StatCollector}
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
 /**
@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL11
 }
 
 @SideOnly(Side.CLIENT) class GuiNaniteHive(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteHiveSmall) extends
-GuiBase(new ContainerNaniteHive(player, inv, tile)) {
+  GuiBase(new ContainerNaniteHive(player, inv, tile)) {
   xSize = GuiNaniteHive.WIDTH
   ySize = GuiNaniteHive.HEIGHT
 
@@ -31,7 +31,7 @@ GuiBase(new ContainerNaniteHive(player, inv, tile)) {
   protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
     val s = "Small Nanite Hive"
     fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
-    fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 30, ySize - 96 + 4, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
+    fontRendererObj.drawString("container.inventory", 30, ySize - 96 + 4, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
   }
 
   /**

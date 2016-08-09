@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.logistics.render
 
 import com.itszuvalex.femtocraft.Femtocraft
-import net.minecraft.client.renderer.Tessellator
+import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.AdvancedModelLoader
-import net.minecraftforge.client.model.obj.WavefrontObject
+import net.minecraftforge.client.model.ModelLoaderRegistry
+import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -17,11 +17,10 @@ object TestRenderer {
   val testTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "")
 }
 
-class TestRenderer extends TileEntitySpecialRenderer {
-  val testModel = AdvancedModelLoader.loadModel(TestRenderer.testModelLocation).asInstanceOf[WavefrontObject]
+class TestRenderer extends TileEntitySpecialRenderer[TileEntity] {
+  val testModel = ModelLoaderRegistry.getModelOrMissing(TestRenderer.testModelLocation).asInstanceOf[OBJModel]
 
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
-    val tesselator = Tessellator.instance
+  override def renderTileEntityAt(te: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     this.bindTexture(TestRenderer.testTexLocation)
     GL11.glPushMatrix()
     GL11.glDisable(GL11.GL_LIGHTING)
@@ -33,7 +32,7 @@ class TestRenderer extends TileEntitySpecialRenderer {
     // Toggleable comment block: first line: /* = commented, //* = uncommented
     //*start toggleable comment block
     GL11.glPushMatrix()
-    testModel.renderAll()
+    testModel.render()
     GL11.glPopMatrix()
     //end toggleable comment block*/
 

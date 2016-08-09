@@ -2,13 +2,14 @@ package com.itszuvalex.femtocraft.logistics
 
 import java.util.UUID
 
-import com.itszuvalex.itszulib.api.core.NBTSerializable
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.common.util.INBTSerializable
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/1/2016.
   */
 
-trait IJobQueue[Job <: IJob[_]] extends NBTSerializable {
+trait IJobQueue[Job <: IJob[_]] extends INBTSerializable[NBTTagCompound] {
 
   def jobs: scala.collection.mutable.ListBuffer[Job]
 

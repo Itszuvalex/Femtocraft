@@ -26,6 +26,7 @@ trait TransferNode extends PowerNode {
   /**
     *
     * @param parent IPowerNode that is being checked.
+    *
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode) = super.canSetParent(parent) && TransferNode.canAddParent(parent)
@@ -33,6 +34,7 @@ trait TransferNode extends PowerNode {
   /**
     *
     * @param child
+    *
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode) = super.canAddChild(child) && TransferNode.canAddChild(child)

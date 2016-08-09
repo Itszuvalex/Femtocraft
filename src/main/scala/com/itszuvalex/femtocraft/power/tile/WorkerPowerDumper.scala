@@ -39,6 +39,7 @@ class WorkerPowerDumper(val owner: IPowerGenerator, private val taskType: String
   /**
     *
     * @param attribute Attribute to ask about.
+    *
     * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
     */
   override def getEfficiency(attribute: String): Double = {
@@ -51,6 +52,7 @@ class WorkerPowerDumper(val owner: IPowerGenerator, private val taskType: String
   /**
     *
     * @param task Task to be assigned to.
+    *
     * @return True if this worker can work upon the task, false otherwise.
     */
   override def canWorkTask(task: ITask): Boolean = task.getTaskType.equalsIgnoreCase(taskType)

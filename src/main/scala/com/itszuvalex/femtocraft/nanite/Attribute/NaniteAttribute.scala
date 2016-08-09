@@ -17,11 +17,11 @@ object NaniteAttribute {
 
   def getAttributeBonusLevel(item: ItemStack, attribute: String) = getAttributeTag(item, attribute).map(_.getInteger(ATTRIBUTE_BONUS_TAG))
 
+  def setAttributeBonusLevel(item: ItemStack, attribute: String, level: Int) = getAttributeTag(item, attribute).foreach(_.setInteger(ATTRIBUTE_BONUS_TAG, level))
+
   def getAttributeTag(item: ItemStack, attribute: String) = getAttributesTag(item).map(_.getCompoundTag(attribute))
 
   def getAttributesTag(item: ItemStack) = NaniteStrain.getNaniteTag(item).map(_.getCompoundTag(ATTRIBUTE_COMPOUND_TAG))
-
-  def setAttributeBonusLevel(item: ItemStack, attribute: String, level: Int) = getAttributeTag(item, attribute).foreach(_.setInteger(ATTRIBUTE_BONUS_TAG, level))
 }
 
 @Configurable

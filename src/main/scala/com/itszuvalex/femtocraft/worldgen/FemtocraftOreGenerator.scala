@@ -5,7 +5,6 @@ import java.util.Random
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
-import com.itszuvalex.itszulib.api.core
 import com.itszuvalex.itszulib.api.core.Configurable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -47,7 +46,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
 }
 
 
-@core.Configurable class FemtocraftOreGenerator extends IWorldGenerator {
+@Configurable class FemtocraftOreGenerator extends IWorldGenerator {
 
 
   override def generate(random: Random, chunkX: Int, chunkZ: Int, world: World, chunkGenerator: IChunkGenerator, chunkProvider: IChunkProvider): Unit = {
@@ -90,18 +89,18 @@ import net.minecraftforge.fml.common.IWorldGenerator
         lz <- (z - dist) to (z + dist)
       } yield (lx, ly, lz)
     }
-    .filter { case (lx, ly, lz) => ((x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)) < (dist * dist) }
-    .filterNot { case (ax, ay, az) => world.isAirBlock(new BlockPos(ax, ay, az)) }
-    .foreach { case (lx, ly, lz) =>
-      val state = world.getBlockState(new BlockPos(lx, ly, lz))
-      val block = state.getBlock
-      val meta = block.getMetaFromState(state)
-      CybermaterialRegistry.getReplacement(block, meta) match {
-        case Some((rblock, rmeta)) =>
-          world.setBlockState(new BlockPos(lx, ly, lz), rblock.getStateFromMeta(rmeta), 3)
-        case None =>
+      .filter { case (lx, ly, lz) => ((x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)) < (dist * dist) }
+      .filterNot { case (ax, ay, az) => world.isAirBlock(new BlockPos(ax, ay, az)) }
+      .foreach { case (lx, ly, lz) =>
+        val state = world.getBlockState(new BlockPos(lx, ly, lz))
+        val block = state.getBlock
+        val meta = block.getMetaFromState(state)
+        CybermaterialRegistry.getReplacement(block, meta) match {
+          case Some((rblock, rmeta)) =>
+            world.setBlockState(new BlockPos(lx, ly, lz), rblock.getStateFromMeta(rmeta), 3)
+          case None =>
+        }
       }
-             }
 
     //Sprinkle in crystals
     (0 until cryst).foreach { n =>
@@ -109,6 +108,6 @@ import net.minecraftforge.fml.common.IWorldGenerator
       val cy = y + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
       val cz = z + random.nextInt(2 * CRYSTAL_SPAWN_DIST_MAX) - CRYSTAL_SPAWN_DIST_MAX
       world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
-                            }
+    }
   }
 }

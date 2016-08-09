@@ -35,8 +35,8 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
         case Some(machine) =>
           finished = true
           machine.formAtBaseAndIndex(worldObj, basePos.getTileEntity(true).get.asInstanceOf[TileCyberBase], machineIndex)
-          machine.getTakenLocations(worldObj, xCoord, yCoord, zCoord).flatMap(_.getTileEntity(true)).collect { case m: ICyberMachineMultiblock => m }.
-          foreach(_.setIndexInBase(getIndexInBase))
+          machine.getTakenLocations(getLoc).flatMap(_.getTileEntity(true)).collect { case m: ICyberMachineMultiblock => m }.
+            foreach(_.setIndexInBase(getIndexInBase))
         case _ =>
       }
     }
@@ -47,46 +47,47 @@ class TileCyberMachineInProgress extends TileEntityBase with CyberMachineMultibl
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     compound.NBTCompound(COMPOUND_KEY) {
-                                         comp =>
-                                           machineInProgress = comp.String(MACHINE_KEY)
-                                           buildTime = comp.Int(BUILD_TIME_KEY)
-                                           Unit
-                                       }
+      comp =>
+        machineInProgress = comp.String(MACHINE_KEY)
+        buildTime = comp.Int(BUILD_TIME_KEY)
+        Unit
+    }
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     compound(COMPOUND_KEY ->
-             NBTCompound(
-                          MACHINE_KEY -> machineInProgress,
-                          BUILD_TIME_KEY -> buildTime))
+      NBTCompound(
+        MACHINE_KEY -> machineInProgress,
+        BUILD_TIME_KEY -> buildTime))
+    compound
   }
 
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     compound.NBTCompound(COMPOUND_KEY) {
-                                         comp =>
-                                           machineInProgress = comp.String(MACHINE_KEY)
-                                           buildTime = comp.Int(BUILD_TIME_KEY)
-                                           Unit
-                                       }
+      comp =>
+        machineInProgress = comp.String(MACHINE_KEY)
+        buildTime = comp.Int(BUILD_TIME_KEY)
+        Unit
+    }
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     compound(COMPOUND_KEY ->
-             NBTCompound(
-                          MACHINE_KEY -> machineInProgress,
-                          BUILD_TIME_KEY -> buildTime))
+      NBTCompound(
+        MACHINE_KEY -> machineInProgress,
+        BUILD_TIME_KEY -> buildTime))
   }
 
   override def getCyberMachine = machineInProgress
 
   override def onBlockBreak(): Unit = {
     if (!isController) {
-      worldObj.getTileEntity(info.x, info.y, info.z) match {
-        case cont: TileCyberMachineInProgress =>
+      info.cLoc.getTileEntity() match {
+        case Some(cont: TileCyberMachineInProgress) =>
           cont.onBlockBreak()
         case _ =>
       }

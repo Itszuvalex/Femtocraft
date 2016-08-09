@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.worldgen.render
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.util.Color
@@ -10,8 +11,6 @@ import net.minecraft.util.math.MathHelper
 import net.minecraftforge.client.model.ModelLoaderRegistry
 import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
-
-import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
@@ -32,24 +31,24 @@ class CrystalRenderer extends TileEntitySpecialRenderer[TileCrystalsWorldgen] {
     GL11.glDisable(GL11.GL_LIGHTING)
 
     translationBlock(x + .5, y, z + .5) {
-                                          GL11.glScaled(.01, .01, .01)
+      GL11.glScaled(.01, .01, .01)
 
-                                          val f2: Float = crystal.getWorld.getTotalWorldTime.toFloat + partialTicks
-                                          (1 to 10).map(num => ("Gengon0" + (if (num < 10) "0") + num, num)).foreach { name =>
-                                            val offset = (name._2 * 97) % 10
-                                            val dir = if (name._2 % 2 == 0) -1 else 1
-                                            val height = MathHelper.sin((f2 + offset + x + y + z).toFloat * .1f) * 4f * dir
-                                            translationBlock(0, height, 0) {
+      val f2: Float = crystal.getWorld.getTotalWorldTime.toFloat + partialTicks
+      (1 to 10).map(num => ("Gengon0" + (if (num < 10) "0") + num, num)).foreach { name =>
+        val offset = (name._2 * 97) % 10
+        val dir = if (name._2 % 2 == 0) -1 else 1
+        val height = MathHelper.sin((f2 + offset + x + y + z).toFloat * .1f) * 4f * dir
+        translationBlock(0, height, 0) {
 
-                                                                             if (name._2 == 1) GL11.glRotated(f2 * name._2, 0, 1, 0)
+          if (name._2 == 1) GL11.glRotated(f2 * name._2, 0, 1, 0)
 
-                                                                             val colorOffset: Color = new Color(crystal.colorOffsets(name._2))
+          val colorOffset: Color = new Color(crystal.colorOffsets(name._2))
 
-                                                                             GL11.glColor4ub((color.red + colorOffset.red - 15).toByte, (color.green + colorOffset.green - 15).toByte, (color.blue + colorOffset.blue - 15).toByte, colorOffset.alpha)
-                                                                             crystalModel.renderGroups(Set(name._1), bindTextures = false)
-                                                                           }
-                                                                                                                     }
-                                        }
+          GL11.glColor4ub((color.red + colorOffset.red - 15).toByte, (color.green + colorOffset.green - 15).toByte, (color.blue + colorOffset.blue - 15).toByte, colorOffset.alpha)
+          crystalModel.renderGroups(Set(name._1), bindTextures = false)
+        }
+      }
+    }
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glEnable(GL11.GL_LIGHTING)
   }

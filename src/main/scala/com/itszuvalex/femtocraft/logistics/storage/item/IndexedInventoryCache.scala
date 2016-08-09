@@ -36,13 +36,13 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
       set -= slot
       if (set.isEmpty)
         idMap.remove(id)
-                      }
+    }
     OreDictionary.getOreIDs(itemStack).foreach { oid => oresMap.get(oid).map { set =>
       set -= slot
       if (set.isEmpty)
         oresMap.remove(oid)
-                                                                             }
-                                               }
+    }
+    }
   }
 
   override def getSlotsByItemID(id: Int): Option[mutable.HashSet[Int]] = {

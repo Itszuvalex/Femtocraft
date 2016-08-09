@@ -29,12 +29,12 @@ class PowerPedestalRenderer extends TileEntitySpecialRenderer[TilePowerPedestal]
     GL11.glPushMatrix()
     RenderUtils.translationBlock(x + .5, y, z + .5) {
 
-                                                      val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
-                                                                                            case Some(a: ICrystalMount) => new Color(a.getColor)
-                                                                                            case _ => new Color(0, 255.toByte, 255.toByte, 255.toByte)
-                                                                                          }).getOrElse(new Color(0, 0, 0, 0))
-                                                      renderPedestalAt(color.toInt)
-                                                    }
+      val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
+        case Some(a: ICrystalMount) => new Color(a.getColor)
+        case _ => new Color(0, 255.toByte, 255.toByte, 255.toByte)
+      }).getOrElse(new Color(0, 0, 0, 0))
+      renderPedestalAt(color.toInt)
+    }
 
     GL11.glPopMatrix()
 

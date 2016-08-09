@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.item
 
-import net.minecraft.item.{ItemStack, Item}
+import net.minecraft.item.{Item, ItemStack}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/18/2016.
@@ -10,6 +10,7 @@ trait IPowerStorage extends Item {
   /**
     *
     * @param stack
+    *
     * @return Maximum amount of power crystal can store.
     */
   def getStorageMax(stack: ItemStack): Double
@@ -17,22 +18,25 @@ trait IPowerStorage extends Item {
   /**
     *
     * @param stack
+    *
     * @return Current amount of power crystal is storing.
     */
-  def getStorageCurrent(stack : ItemStack): Double
+  def getStorageCurrent(stack: ItemStack): Double
 
   /**
     *
-    * @param amount Amount of power to store.
+    * @param amount  Amount of power to store.
     * @param doStore Pass true to actually consume resources.  False simulates the store.
+    *
     * @return Amount of @amount successfully stored.
     */
   def store(stack: ItemStack, amount: Double, doStore: Boolean): Double
 
   /**
     *
-    * @param amount Amount of power to attempt to consume.
+    * @param amount    Amount of power to attempt to consume.
     * @param doConsume Pass true to actually consume resources.  False simulates the store.
+    *
     * @return Amount of @amount successfully removed.
     */
   def consume(stack: ItemStack, amount: Double, doConsume: Boolean): Double

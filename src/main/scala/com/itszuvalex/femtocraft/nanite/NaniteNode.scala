@@ -19,12 +19,13 @@ trait NaniteNode extends TileEntity with INaniteNode {
 
   override def canSetHive(hive: INaniteHive): Boolean = true
 
-  override def getHiveLoc = parentLoc
-
-  override def getHive = if(getHiveLoc == null) null else getHiveLoc.getTileEntity(force = true) match {
-    case Some(i : INaniteHive) => i
+  override def getHive = if (getHiveLoc == null) null
+  else getHiveLoc.getTileEntity(force = true) match {
+    case Some(i: INaniteHive) => i
     case _ => null
   }
+
+  override def getHiveLoc = parentLoc
 
   override def setHive(hive: INaniteHive) = {
     if (hive == null) {
@@ -39,17 +40,18 @@ trait NaniteNode extends TileEntity with INaniteNode {
 
   override def getNodeLoc = new Loc4(this)
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     saveParentInfo(compound)
+    compound
   }
 
   def saveParentInfo(compound: NBTTagCompound) =
     compound(NaniteNode.NODE_COMPOUND_KEY ->
-             NBTCompound(
-                          NaniteNode.NODE_PARENT_KEY -> parentLoc
-                        )
-            )
+      NBTCompound(
+        NaniteNode.NODE_PARENT_KEY -> parentLoc
+      )
+    )
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
@@ -60,5 +62,5 @@ trait NaniteNode extends TileEntity with INaniteNode {
     compound.NBTCompound(NaniteNode.NODE_COMPOUND_KEY) { comp =>
       parentLoc = comp.NBTCompound(NaniteNode.NODE_PARENT_KEY)(Loc4(_))
       Unit
-                                                       }
+    }
 }

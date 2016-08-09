@@ -30,9 +30,9 @@ trait PowerNode extends TileEntityBase with IPowerNode {
   var powerCurrent: Double = 0
   var powerMax    : Double = 0
   var color                = Color(255.toByte,
-                                   (Random.nextInt(125) + 130).toByte,
-                                   (Random.nextInt(125) + 130).toByte,
-                                   (Random.nextInt(125) + 130).toByte).toInt
+    (Random.nextInt(125) + 130).toByte,
+    (Random.nextInt(125) + 130).toByte,
+    (Random.nextInt(125) + 130).toByte).toInt
 
   override def onBlockBreak() = {
     PowerManager.removeNode(this)
@@ -66,13 +66,14 @@ trait PowerNode extends TileEntityBase with IPowerNode {
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (!getWorldObj.isRemote) PowerManager.removeNode(this)
+    if (!getWorld.isRemote) PowerManager.removeNode(this)
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     savePowerConnectionInfo(compound)
     savePowerStorageInfo(compound)
+    compound
   }
 
   def savePowerStorageInfo(compound: NBTTagCompound): Unit = {
@@ -87,12 +88,12 @@ trait PowerNode extends TileEntityBase with IPowerNode {
 
   def savePowerConnectionInfo(compound: NBTTagCompound) =
     compound(PowerNode.POWER_COMPOUND_KEY ->
-             NBTCompound(
-                          PowerNode.NODE_PARENT_KEY -> getParentLoc,
-                          PowerNode.NODE_CHILDREN_KEY -> NBTList(getChildrenLocs.view.map(NBTCompound)),
-                          PowerNode.COLOR_KEY -> getColor
-                        )
-            )
+      NBTCompound(
+        PowerNode.NODE_PARENT_KEY -> getParentLoc,
+        PowerNode.NODE_CHILDREN_KEY -> NBTList(getChildrenLocs.view.map(NBTCompound)),
+        PowerNode.COLOR_KEY -> getColor
+      )
+    )
 
   /* IPowerNode */
 
@@ -133,12 +134,13 @@ trait PowerNode extends TileEntityBase with IPowerNode {
       parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
       childrenLocs.clear()
       childrenLocs ++= comp.NBTList(PowerNode.NODE_CHILDREN_KEY).map(Loc4(_))
-                                                       }
+    }
   }
 
   /**
     *
     * @param child
+    *
     * @return True if child is successfully added.
     */
   override def addChild(child: IPowerNode): Boolean = {
@@ -150,6 +152,7 @@ trait PowerNode extends TileEntityBase with IPowerNode {
   /**
     *
     * @param child
+    *
     * @return True if child was a child of this node, and was successfully removed.
     */
   override def removeChild(child: IPowerNode): Boolean = {
@@ -164,6 +167,7 @@ trait PowerNode extends TileEntityBase with IPowerNode {
   /**
     *
     * @param child
+    *
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode): Boolean = {
@@ -173,6 +177,7 @@ trait PowerNode extends TileEntityBase with IPowerNode {
   /**
     *
     * @param parent IPowerNode that is being checked.
+    *
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean = {
@@ -194,6 +199,7 @@ trait PowerNode extends TileEntityBase with IPowerNode {
   /**
     *
     * @param parent Parent being set.
+    *
     * @return True if parent is successfully set to input parent.
     */
   override def setParent(parent: IPowerNode): Boolean = {
@@ -222,6 +228,7 @@ trait PowerNode extends TileEntityBase with IPowerNode {
     *
     * @param amount Amount of power to consume.
     * @param doUse  True if actually change values, false to simulate.
+    *
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   override def usePower(amount: Double, doUse: Boolean): Double = {
@@ -241,6 +248,7 @@ trait PowerNode extends TileEntityBase with IPowerNode {
     *
     * @param amount Amount of power to add.
     * @param doFill True if actually change values, false to simulate.
+    *
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
   override def addPower(amount: Double, doFill: Boolean): Double = {

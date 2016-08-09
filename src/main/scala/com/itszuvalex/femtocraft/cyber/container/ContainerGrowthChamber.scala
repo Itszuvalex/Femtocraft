@@ -33,7 +33,7 @@ class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: Til
       prevProgress = te.progress
       if (te.tank.getFluidAmount != prevWaterAmt) crafter.sendProgressBarUpdate(this, 1, te.tank.getFluidAmount)
       prevWaterAmt = te.tank.getFluidAmount
-                      }
+    }
   }
 
   override def updateProgressBar(id: Int, value: Int): Unit = {

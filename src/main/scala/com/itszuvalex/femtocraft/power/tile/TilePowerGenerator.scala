@@ -6,6 +6,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 
 import scala.collection.Set
 
@@ -48,6 +49,7 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     *
     * @param amt      Amount to attempt to charge
     * @param doCharge False to simulate, true to actually do
+    *
     * @return Amount of amt used to actually charge.
     */
   override def charge(amt: Double, doCharge: Boolean): Double = {
@@ -104,14 +106,14 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     powerCurrent = compound.getDouble(TilePowerGenerator.KEY_POWER_CURRENT)
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power = " + powerCurrent + "/" + powerMax)
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
-                               }
+    }
     ret
   }
 
@@ -125,6 +127,7 @@ class TilePowerGenerator extends TileEntityBase with IPowerGenerator {
     *
     * @param amt     Amount of power to drain
     * @param doDrain False to simulate, true to actually remove power.
+    *
     * @return Amount of amt that was successfully drained.
     */
   override def drain(amt: Double, doDrain: Boolean): Double = {

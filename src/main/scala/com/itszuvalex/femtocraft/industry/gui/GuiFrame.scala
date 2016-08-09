@@ -20,11 +20,11 @@ object GuiFrame {
 class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrame(player, inv, tile)) {
 
   val nameLabel     = new GuiLabel((panelWidth - fontRendererObj.getStringWidth(tile.multiBlock)) / 2, 7,
-                                   fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
-                                   tile.multiBlock)
+    fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
+    tile.multiBlock)
   val requiredLabel = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Required")) / 2, 9 + fontRendererObj.FONT_HEIGHT,
-                                   fontRendererObj.getStringWidth("Required"), fontRendererObj.FONT_HEIGHT,
-                                   "Required")
+    fontRendererObj.getStringWidth("Required"), fontRendererObj.FONT_HEIGHT,
+    "Required")
   val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
   val reqItems      = multiblock match {
     case Some(m) =>
@@ -41,8 +41,8 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
     val elements = List(nameLabel, requiredLabel, layout) ++ itemSlots
 
     add(
-         elements: _*
-       )
+      elements: _*
+    )
   }
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {

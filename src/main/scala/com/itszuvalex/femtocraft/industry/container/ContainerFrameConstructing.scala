@@ -28,7 +28,7 @@ class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, til
         }
 
         lastProgress = tile.progress
-                        }
+      }
     }
   }
 

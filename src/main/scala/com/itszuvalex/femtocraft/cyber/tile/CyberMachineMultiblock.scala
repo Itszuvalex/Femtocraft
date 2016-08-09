@@ -38,18 +38,19 @@ trait CyberMachineMultiblock extends TileEntityBase with MultiBlockComponent wit
     compound.NBTCompound(CyberMachineMultiblock.BASE_POS_KEY) { comp =>
       basePos = Loc4(comp)
       Unit
-                                                              }
+    }
     machineIndex = compound.Int(CyberMachineMultiblock.INDEX_KEY)
   }
 
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     writeBaseAndIndexToCompound(compound)
+    compound
   }
 
   def writeBaseAndIndexToCompound(compound: NBTTagCompound): Unit = {
     compound(CyberMachineMultiblock.BASE_POS_KEY -> NBTCompound(basePos),
-             CyberMachineMultiblock.INDEX_KEY -> machineIndex)
+      CyberMachineMultiblock.INDEX_KEY -> machineIndex)
   }
 }
 

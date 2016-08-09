@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.cyber.gui
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.cyber.container.ContainerGrowthChamber
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiFluidTank, GuiItemStack, GuiLabel}
+import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraftforge.fluids.FluidRegistry
@@ -18,17 +18,13 @@ object GuiGrowthChamber {
 
 class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileGrowthChamber) extends GuiBase(new ContainerGrowthChamber(player, inv, tile)) {
 
-  val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth("Growth Chamber")) / 2, 7,
-                               frender.getStringWidth("Growth Chamber"), frender.FONT_HEIGHT,
-                               "Growth Chamber")
-  val inputSlot = new GuiItemStack(7, 20)
-  val outputSlots = {for (i <- 0 to 8) yield new GuiItemStack(79 + 18 * (i % 3), 20 + 18 * math.floor(i / 3d).toInt)}
-  val waterTank = new GuiFluidTank(151, 10, this, tile, 3, FluidRegistry.WATER, true)
-
-  def frender = Minecraft.getMinecraft.fontRenderer
-
-  {
-    val elems = List(inputSlot, waterTank) ++ outputSlots
+  val nameLabel               = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Growth Chamber")) / 2, 7,
+    fontRendererObj.getStringWidth("Growth Chamber"), fontRendererObj.FONT_HEIGHT,
+    "Growth Chamber")
+  val inputSlot               = new GuiItemStack(7, 20)
+  val outputSlots             = {for (i <- 0 to 8) yield new GuiItemStack(79 + 18 * (i % 3), 20 + 18 * math.floor(i / 3d).toInt)}
+  val waterTank: GuiFluidTank = new GuiFluidTank(151, 10, this, tile, 3, FluidRegistry.WATER, true) {
+    val elems: List[GuiPanel] = List(inputSlot, waterTank) ++ outputSlots
     elems.foreach(gui => gui.setShouldRender(false))
     add(elems: _*)
   }

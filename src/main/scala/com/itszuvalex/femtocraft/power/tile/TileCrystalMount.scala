@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal, PowerManager}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.storage.ArrayItemStorage
+import com.itszuvalex.itszulib.api.storage.ItemStorageArray
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -13,8 +13,8 @@ import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.AxisAlignedBB
 
 import scala.collection.{Set, mutable}
 
@@ -67,29 +67,37 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   /* Tile Entity */
   override def validate(): Unit = {
     super.validate()
-    if (getWorldObj.isRemote) return
+    if (getWorld.isRemote) return
     if (getCrystalStack != null)
       PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (getWorldObj.isRemote) return
+    if (getWorld.isRemote) return
     if (getCrystalStack != null)
       PowerManager.removeNode(this)
   }
 
   /**
     *
-    * @param child
-    * @return True if child is capable of being a child of this node.
+    * @return Crystal ItemStack.  Null if no crystal.
     */
-  override def canAddChild(child: IPowerNode): Boolean =
-    child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType)
+  override def getCrystalStack = getStackInSlot(0)
 
   /**
     *
     * @param child
+    *
+    * @return True if child is capable of being a child of this node.
+    */
+  override def canAddChild(child: IPowerNode): Boolean =
+  child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType)
+
+  /**
+    *
+    * @param child
+    *
     * @return True if child is successfully added.
     */
   override def addChild(child: IPowerNode): Boolean = {
@@ -131,7 +139,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
         val amt = Math.min(amount * (perc / totalDifPerc), tile.getPowerMax * perc)
         if (amt > 0d && !isNaN(amt))
           usePower(tile.addPower(amt, doFill = true), doUse = true)
-                      }
+      }
   }
 
   /**
@@ -153,6 +161,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     *
     * @param amount Amount of power to consume.
     * @param doUse  True if actually change values, false to simulate.
+    *
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   override def usePower(amount: Double, doUse: Boolean): Double = {
@@ -184,10 +193,11 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   /**
     *
     * @param parent IPowerNode that is being checked.
+    *
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean = parent != null &&
-                                                           Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType)
+    Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType)
 
   /**
     *
@@ -201,7 +211,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     slot == 0 && (item == null || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
   }
 
-  override def defaultStorage: ArrayItemStorage = new ArrayItemStorage(1)
+  override def defaultStorage: ItemStorageArray = new ItemStorageArray(1)
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
@@ -213,14 +223,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
     savePowerConnectionInfo(compound)
     savePedestalLocInfo(compound)
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
-    loadPowerConnectionInfo(compound)
-    loadPedestalLocInfo(compound)
-    setRenderUpdate()
   }
 
   //  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
@@ -238,9 +240,30 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   //    super.setInventorySlotContents(slot, item)
   //  }
 
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
+    loadPowerConnectionInfo(compound)
+    loadPedestalLocInfo(compound)
+    setRenderUpdate()
+  }
+
+  def loadPedestalLocInfo(compound: NBTTagCompound): Unit = {
+    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
+      pedestalLocs.clear()
+      pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
+    }
+    setRenderUpdate()
+  }
+
+  override def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
+    super.loadPowerConnectionInfo(compound)
+    setRenderUpdate()
+  }
+
   override def markDirty(): Unit = {
     super.markDirty()
-    if (getWorldObj.isRemote) return
+    if (getWorld.isRemote) return
     setModified()
     setUpdate()
     getCrystalStack match {
@@ -254,25 +277,20 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     }
   }
 
-  /**
-    *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  override def getCrystalStack = getStackInSlot(0)
-
-  override def writeToNBT(compound: NBTTagCompound): Unit = {
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     savePedestalLocInfo(compound)
     savePowerConnectionInfo(compound)
+    compound
   }
 
   def savePedestalLocInfo(compound: NBTTagCompound): NBTTagCompound = {
     compound(
-              TileCrystalMount.MOUNT_COMPOUND ->
-              NBTCompound(
-                           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
-                         )
-            )
+      TileCrystalMount.MOUNT_COMPOUND ->
+        NBTCompound(
+          TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
+        )
+    )
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
@@ -281,27 +299,14 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     loadPowerConnectionInfo(compound)
   }
 
-  def loadPedestalLocInfo(compound: NBTTagCompound): Unit = {
-    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
-      pedestalLocs.clear()
-      pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
-                                                          }
-    setRenderUpdate()
-  }
-
-  override def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
-    super.loadPowerConnectionInfo(compound)
-    setRenderUpdate()
-  }
-
   override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
-    AxisAlignedBB.getBoundingBox(center.x - childrenConnectionRadius,
-                                 center.y - childrenConnectionRadius,
-                                 center.z - childrenConnectionRadius,
-                                 center.x + childrenConnectionRadius,
-                                 center.y + childrenConnectionRadius,
-                                 center.z + childrenConnectionRadius)
+    val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
+    new AxisAlignedBB(center.x - childrenConnectionRadius,
+      center.y - childrenConnectionRadius,
+      center.z - childrenConnectionRadius,
+      center.x + childrenConnectionRadius,
+      center.y + childrenConnectionRadius,
+      center.z + childrenConnectionRadius)
   }
 
   /**
@@ -316,12 +321,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   }
 
   def onPostBlockPlaced(): Unit = {
-    if (getWorldObj.isRemote) return
-    checkAndAddPedestal(ForgeDirection.UP)
-    checkAndAddPedestal(ForgeDirection.DOWN)
+    if (getWorld.isRemote) return
+    checkAndAddPedestal(EnumFacing.UP)
+    checkAndAddPedestal(EnumFacing.DOWN)
   }
 
-  def checkAndAddPedestal(dir: ForgeDirection) = {
+  def checkAndAddPedestal(dir: EnumFacing) = {
     getLoc.getOffset(dir).getTileEntity(true) match {
       case Some(i: IPowerPedestal) =>
         if (i.mountLoc == null && i.canSetMount(getLoc) && canAcceptPedestal(getLoc.getOffset(dir))) {
@@ -345,16 +350,18 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   /**
     *
     * @param loc Location of pedestal to connect with.
+    *
     * @return True if this block can accept a pedestal connection from this location.
     */
   override def canAcceptPedestal(loc: Loc4): Boolean = {
-    getLoc.getOffset(ForgeDirection.UP) == loc ||
-    getLoc.getOffset(ForgeDirection.DOWN) == loc
+    getLoc.getOffset(EnumFacing.UP) == loc ||
+      getLoc.getOffset(EnumFacing.DOWN) == loc
   }
 
   /**
     *
     * @param child
+    *
     * @return True if child was a child of this node, and was successfully removed.
     */
   override def removeChild(child: IPowerNode): Boolean = {
@@ -367,6 +374,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     *
     * @param amount Amount of power to add.
     * @param doFill True if actually change values, false to simulate.
+    *
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
   override def addPower(amount: Double, doFill: Boolean): Double = {
@@ -394,4 +402,10 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       }
     }
   }
+
+  override def getFieldCount: Int = inventory.getFieldCount
+
+  override def getField(id: Int): Int = inventory.getField(id)
+
+  override def setField(id: Int, value: Int): Unit = inventory.setField(id, value)
 }

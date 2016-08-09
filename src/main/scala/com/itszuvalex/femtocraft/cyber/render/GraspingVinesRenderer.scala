@@ -7,7 +7,6 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
 import org.lwjgl.opengl.GL11
 
 /**
@@ -21,25 +20,23 @@ object GraspingVinesRenderer {
   val vineColoredTexture = Resources.Texture("vine_beam_colored.png")
 }
 
-class GraspingVinesRenderer extends TileEntitySpecialRenderer with ICyberMachineRenderer with GraspingVineBeamRenderer {
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
-    tile match {
-      case t: TileGraspingVines if t.isController =>
-        //        Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
-        GL11.glPushMatrix()
-        GL11.glDisable(GL11.GL_LIGHTING)
-        GL11.glDisable(GL11.GL_CULL_FACE)
-        GL11.glTranslated(x, y, z)
-        GL11.glColor4f(1f, 1f, 1f, 1f)
+class GraspingVinesRenderer extends TileEntitySpecialRenderer[TileGraspingVines] with ICyberMachineRenderer with GraspingVineBeamRenderer[TileGraspingVines] {
+  override def renderTileEntityAt(te: TileGraspingVines, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    if (te.isController) {
+      //        Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+      GL11.glPushMatrix()
+      GL11.glDisable(GL11.GL_LIGHTING)
+      GL11.glDisable(GL11.GL_CULL_FACE)
+      GL11.glTranslated(x, y, z)
+      GL11.glColor4f(1f, 1f, 1f, 1f)
 
-        GL11.glPopMatrix()
+      GL11.glPopMatrix()
 
-        Minecraft.getMinecraft.getTextureManager.bindTexture(GraspingVinesRenderer.vineTexture)
-        renderBeamsToEntities(x, y, z, partialTime, t, t.grabbedSet.toSet, .1f, new Color(255.toByte, 200.toByte, 255.toByte, 200.toByte))
+      Minecraft.getMinecraft.getTextureManager.bindTexture(GraspingVinesRenderer.vineTexture)
+      renderBeamsToEntities(x, y, z, partialTicks, te, te.grabbedSet.toSet, .1f, new Color(255.toByte, 200.toByte, 255.toByte, 200.toByte))
 
-        Minecraft.getMinecraft.getTextureManager.bindTexture(GraspingVinesRenderer.vineColoredTexture)
-        renderBeamsToEntities(x, y, z, partialTime, t, t.grabbedSet.toSet, .1f, new Color(255.toByte, 0.toByte, 255.toByte, 0.toByte))
-      case _ =>
+      Minecraft.getMinecraft.getTextureManager.bindTexture(GraspingVinesRenderer.vineColoredTexture)
+      renderBeamsToEntities(x, y, z, partialTicks, te, te.grabbedSet.toSet, .1f, new Color(255.toByte, 0.toByte, 255.toByte, 0.toByte))
     }
   }
 
@@ -63,10 +60,10 @@ class GraspingVinesRenderer extends TileEntitySpecialRenderer with ICyberMachine
   /**
     * Render function for machine in-progress rendering.
     *
-    * @param x xPos to render at
-    * @param y yPos to render at
-    * @param z zPos to render at
-    * @param partialTime Partial tick time
+    * @param x                  xPos to render at
+    * @param y                  yPos to render at
+    * @param z                  zPos to render at
+    * @param partialTime        Partial tick time
     * @param progressPercentage Controller TileCyberBase of the machine.
     *                           Store any data that should persist between render calls in `baseController.inProgressData`.
     *                           If there is a float named `targetTime` in there, after reaching 100% progress it will wait for that point in time to pass before it places the machine.

@@ -21,7 +21,7 @@ object NodeCrystalRenderer {
   val crystalTexLocation   = new ResourceLocation(Femtocraft.ID + ":" + "models/crystal cluster/Crystals Texture 64x64.png")
 }
 
-trait NodeCrystalRenderer extends TileEntitySpecialRenderer[TileEntity with IPowerNode] {
+trait NodeCrystalRenderer[T <: TileEntity with IPowerNode] extends TileEntitySpecialRenderer[T] {
   val crystalModel = ModelLoaderRegistry.getModelOrMissing(NodeCrystalRenderer.crystalModelLocation).asInstanceOf[OBJModel]
 
   def renderNode(node: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTime: Float) = {
@@ -50,7 +50,7 @@ trait NodeCrystalRenderer extends TileEntitySpecialRenderer[TileEntity with IPow
 
       crystalModel.renderGroups(Set(name._1), bindTextures = false)
       GL11.glPopMatrix()
-                                                                               }
+    }
     GL11.glPopMatrix()
   }
 }

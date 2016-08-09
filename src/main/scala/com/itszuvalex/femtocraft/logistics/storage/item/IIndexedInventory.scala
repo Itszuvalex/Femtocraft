@@ -27,7 +27,7 @@ trait IIndexedInventory {
     * This updates the internal slot references and performs OreDictionary and ItemID lookups.
     *
     * @param itemStack Itemstack to set slot contents to.
-    * @param slot Index of slot
+    * @param slot      Index of slot
     */
   def addItemStack(itemStack: ItemStack, slot: Int): Unit
 
@@ -46,6 +46,7 @@ trait IIndexedInventory {
     * Aka. this maps directly to getSlotsByItemID(itemStack.itemID)
     *
     * @param itemStack
+    *
     * @return
     */
   def getSlotsByItemStack(itemStack: ItemStack): Option[mutable.HashSet[Int]]
@@ -56,6 +57,7 @@ trait IIndexedInventory {
     * This maps directly to getSlotsByOreID(OreDictionary.getOreID(name))
     *
     * @param name OreName
+    *
     * @return
     */
   def getSlotsByOreName(name: String): Option[mutable.HashSet[Int]]

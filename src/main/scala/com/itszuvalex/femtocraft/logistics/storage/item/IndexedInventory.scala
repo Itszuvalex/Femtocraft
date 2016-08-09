@@ -22,13 +22,15 @@ package com.itszuvalex.femtocraft.logistics.storage.item
 
 import java.util
 
-import com.itszuvalex.itszulib.api.core.{NBTSerializable, Saveable}
+import com.itszuvalex.itszulib.api.core.Saveable
 import com.itszuvalex.itszulib.util.DataUtils
 import com.itszuvalex.itszulib.util.DataUtils.EnumSaveType
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.{Container, IInventory}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.text.{ITextComponent, TextComponentString}
+import net.minecraftforge.common.util.INBTSerializable
 
 import scala.collection.Set
 
@@ -36,7 +38,7 @@ import scala.collection.Set
   *
   * @param size Utility class for storing and saving/loading ItemStack[]s with ease.
   */
-class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with NBTSerializable {
+class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with INBTSerializable[NBTTagCompound] {
   private lazy      val inventoryCache = new IndexedInventoryCache(this)
   @Saveable private var inventory      = new Array[ItemStack](size)
 
@@ -48,8 +50,6 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   def getInventory: Array[ItemStack] = inventory
 
   override def getSizeInventory = inventory.length
-
-  override def getStackInSlot(i: Int) = inventory(i)
 
   override def decrStackSize(i: Int, amount: Int): ItemStack = {
     var itemstack: ItemStack = null
@@ -67,14 +67,58 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
     itemstack
   }
 
-  override def getStackInSlotOnClosing(i: Int) = inventory(i)
+  override def getName: String = "femto.IndexedInventory"
+
+  override def hasCustomName: Boolean = false
+
+  override def getInventoryStackLimit = 64
+
+  override def markDirty() {
+  }
+
+  override def isUseableByPlayer(entityplayer: EntityPlayer) = true
+
+  override def closeInventory(player: EntityPlayer): Unit = {}
+
+  override def openInventory(player: EntityPlayer): Unit = {}
+
+  override def isItemValidForSlot(i: Int, itemstack: ItemStack): Boolean = true
+
+  override def serializeNBT(): NBTTagCompound = {
+    val compound = new NBTTagCompound
+    DataUtils
+      .saveObjectToNBT(compound, this, EnumSaveType.WORLD)
+    compound
+  }
+
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    DataUtils.loadObjectFromNBT(nbt, this, EnumSaveType.WORLD)
+    invalidateCache()
+  }
+
+  override def clear(): Unit = {
+    inventory.indices.foreach(inventory(_) = null)
+    invalidateCache()
+  }
+
+  override def getFieldCount: Int = 0
+
+  override def getField(id: Int): Int = 0
+
+  override def removeStackFromSlot(index: Int): ItemStack = {
+    val slot = getStackInSlot(index)
+    setInventorySlotContents(index, null)
+    slot
+  }
+
+  override def getStackInSlot(i: Int) = inventory(i)
 
   override def setInventorySlotContents(i: Int, itemstack: ItemStack) {
     addItemStack(itemstack, i)
   }
 
   override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
-    if(inventory(slot) != null)
+    if (inventory(slot) != null)
       removeItemStack(slot)
 
     inventory(slot) = itemStack
@@ -86,32 +130,9 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
     inventoryCache.removeItemStack(slot)
   }
 
-  override def getInventoryName = "femto.IndexedInventory"
+  override def setField(id: Int, value: Int): Unit = {}
 
-  override def hasCustomInventoryName = false
-
-  override def getInventoryStackLimit = 64
-
-  override def markDirty() {
-  }
-
-  override def isUseableByPlayer(entityplayer: EntityPlayer) = true
-
-  override def openInventory() {
-  }
-
-  override def closeInventory() {
-  }
-
-  override def isItemValidForSlot(i: Int, itemstack: ItemStack): Boolean = true
-
-  override def saveToNBT(compound: NBTTagCompound) = DataUtils
-                                                     .saveObjectToNBT(compound, this, EnumSaveType.WORLD)
-
-  override def loadFromNBT(compound: NBTTagCompound) = {
-    DataUtils.loadObjectFromNBT(compound, this, EnumSaveType.WORLD)
-    invalidateCache()
-  }
+  override def getDisplayName: ITextComponent = new TextComponentString("")
 
   /**
     * Changes size of the inventory to be equal to size.  Keeps current inventory from slots 0 -> (size-1), and will

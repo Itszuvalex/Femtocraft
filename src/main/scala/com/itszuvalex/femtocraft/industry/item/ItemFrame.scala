@@ -2,21 +2,17 @@ package com.itszuvalex.femtocraft.industry.item
 
 import java.util
 
-import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.{ActionResult, EnumActionResult, EnumFacing, EnumHand}
 import net.minecraft.world.World
-import net.minecraftforge.common.util.ForgeDirection
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/30/15.
@@ -30,7 +26,7 @@ object ItemFrame {
       if (stack.getTagCompound == null) return null
       stack.getTagCompound.NBTCompound(FRAME_COMPOUND) { comp =>
         return comp.String(SELECTION_TAG)
-                                                       }
+      }
     }
     null
   }
@@ -39,10 +35,10 @@ object ItemFrame {
     if (stack != null) {
       if (stack.getTagCompound == null) stack.setTagCompound(new NBTTagCompound())
       stack.getTagCompound()(
-                              FRAME_COMPOUND -> NBTCompound(
-                                                             SELECTION_TAG -> name
-                                                           )
-                            )
+        FRAME_COMPOUND -> NBTCompound(
+          SELECTION_TAG -> name
+        )
+      )
     }
   }
 }
@@ -72,8 +68,6 @@ class ItemFrame extends Item with IFrameItem {
   }
 
   override def getFrameType(stack: ItemStack) = "Basic"
-
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 
   override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
     if (stack == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
@@ -120,4 +114,6 @@ class ItemFrame extends Item with IFrameItem {
     //    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
     EnumActionResult.SUCCESS
   }
+
+  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 }

@@ -5,7 +5,6 @@ import java.util
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.item.ItemFurnaceAssembly._
 import com.itszuvalex.femtocraft.industry.tile.ITileAssemblyArray
-import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.item.{Item, ItemStack}
@@ -49,21 +48,6 @@ object ItemFurnaceAssembly {
     case None => None
   }
 
-  def getFurnaceCompound(item: ItemStack, force: Boolean = false): Option[NBTTagCompound] = Option(item).flatMap { item =>
-    if (force) {
-      if (item.getTagCompound == null) {
-        item.setTagCompound(new NBTTagCompound)
-      }
-    }
-    Option(item.getTagCompound)
-
-                                                                                                                 }.map { comp =>
-    if (force && !comp.hasKey(FURNACE_COMPOUND_KEY)) {
-      comp.setTag(FURNACE_COMPOUND_KEY, new NBTTagCompound)
-    }
-    comp.getCompoundTag(FURNACE_COMPOUND_KEY)
-                                                                                                                       }
-
   def getSmeltingItemCompound(item: ItemStack): Option[NBTTagCompound] = getFurnaceCompound(item) match {
     case Some(comp) =>
       if (comp.hasKey(SMELTING_STACK_COMPOUND_KEY)) {
@@ -88,7 +72,22 @@ object ItemFurnaceAssembly {
       smelting.writeToNBT(c)
       compound.setTag(SMELTING_STACK_COMPOUND_KEY, c)
     }
-                                                                                                                   }
+  }
+
+  def getFurnaceCompound(item: ItemStack, force: Boolean = false): Option[NBTTagCompound] = Option(item).flatMap { item =>
+    if (force) {
+      if (item.getTagCompound == null) {
+        item.setTagCompound(new NBTTagCompound)
+      }
+    }
+    Option(item.getTagCompound)
+
+  }.map { comp =>
+    if (force && !comp.hasKey(FURNACE_COMPOUND_KEY)) {
+      comp.setTag(FURNACE_COMPOUND_KEY, new NBTTagCompound)
+    }
+    comp.getCompoundTag(FURNACE_COMPOUND_KEY)
+  }
 
   def getResultItem(item: ItemStack): Option[ItemStack] = getResultItemCompound(item) match {
     case Some(comp) =>
@@ -105,7 +104,7 @@ object ItemFurnaceAssembly {
       result.writeToNBT(c)
       compound.setTag(RESULT_STACK_COMPOUND_KEY, c)
     }
-                                                                                                               }
+  }
 
   def getCurrentPowerProgress(item: ItemStack): Double = getFurnaceCompound(item).map(_.getDouble(POWER_PROGRESS_KEY)).getOrElse(0)
 
@@ -182,7 +181,7 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
         case None =>
           false
       }
-                                                                                                                    }
+      }
     }
   }
 

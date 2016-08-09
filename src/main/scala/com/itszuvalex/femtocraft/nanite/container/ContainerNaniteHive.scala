@@ -2,10 +2,10 @@ package com.itszuvalex.femtocraft.nanite.container
 
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.itszulib.container.ContainerInv
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.{ICrafting, Slot}
+import net.minecraft.inventory.{IContainerListener, Slot}
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.JavaConversions._
 
@@ -34,15 +34,15 @@ class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
   addSlotToContainer(new Slot(tile, 29, 205, 57))
   addPlayerInventorySlots(inv, 33, 84)
 
-  override def addCraftingToCrafters(par1ICrafting: ICrafting) {
-    super.addCraftingToCrafters(par1ICrafting)
+  override def addListener(par1ICrafting: IContainerListener) {
+    super.addListener(par1ICrafting)
 
     updatePower(par1ICrafting)
   }
 
-  def updatePower(par1ICrafting: ICrafting): Unit = {
-    sendUpdateToCrafter(this, par1ICrafting, ContainerNaniteHive.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
-    sendUpdateToCrafter(this, par1ICrafting, ContainerNaniteHive.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
+  def updatePower(par1ICrafting: IContainerListener): Unit = {
+    sendUpdateToListener(this, par1ICrafting, ContainerNaniteHive.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
+    sendUpdateToListener(this, par1ICrafting, ContainerNaniteHive.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
   }
 
   /**
@@ -50,11 +50,11 @@ class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
     */
   override def detectAndSendChanges() {
     super.detectAndSendChanges()
-    crafters.foreach { case icrafting: ICrafting =>
+    listeners.foreach { icrafting: IContainerListener =>
       if (lastPower != inventory.getPowerCurrent.toLong) {
         updatePower(icrafting)
       }
-                     }
+    }
     lastPower = inventory.getPowerCurrent.toLong
   }
 
@@ -62,12 +62,12 @@ class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
   @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {
     case ContainerNaniteHive.POWER_BIG_INDEX =>
       inventory.setPower(
-                          (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
-                        )
+        (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
+      )
     case ContainerNaniteHive.POWER_SMALL_INDEX =>
       inventory.setPower(
-                          (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
-                        )
+        (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
+      )
     case _ =>
   }
 

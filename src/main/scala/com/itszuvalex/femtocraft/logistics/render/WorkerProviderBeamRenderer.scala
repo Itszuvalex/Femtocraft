@@ -7,8 +7,8 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{MathHelper, ResourceLocation}
+import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
 
 /**
@@ -22,29 +22,25 @@ object WorkerProviderBeamRenderer {
 }
 
 
-class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer {
+class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer[TileWorkerProviderTest] {
 
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = {
-    tile match {
-      case node: TileWorkerProviderTest =>
-        this.bindTexture(WorkerProviderBeamRenderer.beamOuterLocation)
-        renderBeamsToAllChildren(x, y, z, partialTime, node, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
-        this.bindTexture(WorkerProviderBeamRenderer.beamColorLocation)
-        renderBeamsToAllChildren(x, y, z, partialTime, node, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
-      case _ =>
-    }
+  override def renderTileEntityAt(te: TileWorkerProviderTest, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    this.bindTexture(WorkerProviderBeamRenderer.beamOuterLocation)
+    renderBeamsToAllChildren(x, y, z, partialTicks, te, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
+    this.bindTexture(WorkerProviderBeamRenderer.beamColorLocation)
+    renderBeamsToAllChildren(x, y, z, partialTicks, te, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
   }
 
   def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileWorkerProviderTest, beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
     node.getConnections.foreach { loc =>
       renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
-                                }
+    }
     beamRenderTeardown()
   }
 
   def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileWorkerProviderTest, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit = {
-    val f2: Float = node.getWorldObj.getTotalWorldTime.toFloat + partialTime
+    val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
     val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
     val nloc = node.getProviderLocation
     val diff = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)
@@ -55,8 +51,8 @@ class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer {
     val yMin: Double = (-1.0F + f3).toDouble % 1
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
     FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
-                              xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-                              color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
+      xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+      color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
 
   def beamRenderTeardown(): Unit = {

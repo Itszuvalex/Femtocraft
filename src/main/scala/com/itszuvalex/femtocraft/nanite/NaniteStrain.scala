@@ -19,7 +19,7 @@ object NaniteStrain {
       val amount = level * XP_PER_LEVEL_MULT
       total += amount
       total
-                         }.toArray
+    }.toArray
   }
   val MAX_ATTRIBUTE_BONUS             = 5
   val NANITE_STRAIN_DATA_COMPOUND_TAG = "NaniteStrain"
@@ -33,8 +33,8 @@ object NaniteStrain {
 
   def getNaniteTag(item: ItemStack): Option[NBTTagCompound] = {
     if (item == null) return None
-    if (item.stackTagCompound == null || item.stackTagCompound.hasNoTags) return None
-    Option(item.stackTagCompound.getCompoundTag(NANITE_STRAIN_DATA_COMPOUND_TAG))
+    if (item.getTagCompound == null || item.getTagCompound.hasNoTags) return None
+    Option(item.getTagCompound.getCompoundTag(NANITE_STRAIN_DATA_COMPOUND_TAG))
   }
 
   def setNanite(item: ItemStack, nanite: String) = getNaniteTag(item).foreach(_.setString(NANITE_TAG, nanite))
@@ -43,25 +43,25 @@ object NaniteStrain {
 
   def setLevel(item: ItemStack, level: Int) = getExperienceTag(item).foreach(_.setInteger(LEVEL_TAG, level))
 
-  def getExperienceTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG))
-
   def getExperience(item: ItemStack) = getExperienceTag(item).map(_.getInteger(EXPERIENCE_CURRENT_TAG)).getOrElse(0)
+
+  def getExperienceTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(EXPERIENCE_COMPOUND_TAG))
 
   def setExperience(item: ItemStack, exp: Int) = getExperienceTag(item).foreach(_.setInteger(EXPERIENCE_CURRENT_TAG, exp))
 
-  def getTraits(item: ItemStack, traitType: String) = getTraitsTag(item).map(_.getCompoundTag(traitType)).map(_.func_150296_c().asInstanceOf[java.util.Set[String]]).get
+  def getTraits(item: ItemStack, traitType: String) = getTraitsTag(item).map(_.getCompoundTag(traitType)).map(_.getKeySet.asInstanceOf[java.util.Set[String]]).get
 
   def getTraitsTag(item: ItemStack) = getNaniteTag(item).map(_.getCompoundTag(TRAITS_COMPOUND_TAG))
 
   def getTraits(item: ItemStack) = getTraitsTag(item).map { traitsCompound =>
-    traitsCompound.func_150296_c().asInstanceOf[java.util.Set[String]].map(traitsCompound.getCompoundTag).flatMap(_.func_150296_c().asInstanceOf[java.util.Set[String]])
-                                                          }.orNull
+    traitsCompound.getKeySet.map(traitsCompound.getCompoundTag).flatMap(_.getKeySet())
+  }.orNull
 
   def addTrait(item: ItemStack, naniteTrait: INaniteTrait): Unit = addTrait(item, naniteTrait.getName, naniteTrait.getClassification)
 
   def addTrait(item: ItemStack, naniteTrait: String, classification: String): Unit = {
     getTraitsTag(item).foreach { traits => {if (traits.hasKey(classification)) {traits.getCompoundTag(classification)} else {val compound = new NBTTagCompound; traits.setTag(TRAITS_COMPOUND_TAG, compound); compound}}.setTag(naniteTrait, new NBTTagCompound)
-                               }
+    }
   }
 
   def removeTrait(item: ItemStack, naniteTrait: INaniteTrait): Unit = removeTrait(item, naniteTrait.getName, naniteTrait.getClassification)

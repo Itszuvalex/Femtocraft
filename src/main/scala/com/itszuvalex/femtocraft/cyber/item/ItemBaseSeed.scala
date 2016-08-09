@@ -9,12 +9,13 @@ import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{ActionResult, EnumActionResult, EnumFacing, EnumHand}
 import net.minecraft.world.World
-import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.fluids.FluidTank
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
   * Created by Alex on 26.09.2015.
@@ -24,8 +25,10 @@ object ItemBaseSeed {
 
   /**
     * Tool for simple and correct creation of an ItemBaseSeed stack.
+    *
     * @param stackSize Desired stack size
-    * @param baseSize Desired size number (1, 2 or 3)
+    * @param baseSize  Desired size number (1, 2 or 3)
+    *
     * @return An ItemBaseSeed stack with the specified properties, null if invalid baseSize
     */
   def createStack(stackSize: Int, baseSize: Int): ItemStack = {
@@ -43,13 +46,14 @@ object ItemBaseSeed {
     if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return
     if (value < 1 || value > 3) return
     if (stack != null) {
-      if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound(SIZE_TAG -> value)
+      if (stack.getTagCompound == null) stack.setTagCompound(NBTCompound(SIZE_TAG -> value))
       else stack.getTagCompound.setInteger(SIZE_TAG, value)
     }
   }
 
   /**
     * @param stack Stack of ItemBaseSeed
+    *
     * @return Descriptive string for the size number of stack
     */
   def getSizeString(stack: ItemStack): String = {
@@ -63,21 +67,11 @@ object ItemBaseSeed {
 
   /**
     * @param stack Stack of ItemBaseSeed
-    * @return Size number of the stack (1, 2 or 3), 0 if not an ItemBaseSeed stack
-    */
-  def getSize(stack: ItemStack): Int = {
-    if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return 0
-    if (stack.getTagCompound == null) stack.stackTagCompound = NBTCompound(SIZE_TAG -> 1)
-    if (stack.getTagCompound.Int(ItemBaseSeed.SIZE_TAG) < 1 || stack.getTagCompound.Int(SIZE_TAG) > 3) stack.getTagCompound.setInteger(SIZE_TAG, 1)
-    stack.getTagCompound.Int(SIZE_TAG)
-  }
-
-  /**
-    * @param stack Stack of ItemBaseSeed
-    * @param x X coord of lower-north-west corner
-    * @param y Y coord of lower-north-west-corner
-    * @param z Z coord of lower-north-west corner
-    * @param dim Dimension id of the machine
+    * @param x     X coord of lower-north-west corner
+    * @param y     Y coord of lower-north-west-corner
+    * @param z     Z coord of lower-north-west corner
+    * @param dim   Dimension id of the machine
+    *
     * @return Set of locations that are occupied by the base that would be planted with stack
     */
   def getBaseLocations(stack: ItemStack, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
@@ -87,10 +81,23 @@ object ItemBaseSeed {
 
   /**
     * @param stack Stack of ItemBaseSeed
-    * @param x X coord of lower-north-west corner
-    * @param y Y coord of lower-north-west-corner
-    * @param z Z coord of lower-north-west corner
-    * @param dim Dimension id of the machine
+    *
+    * @return Size number of the stack (1, 2 or 3), 0 if not an ItemBaseSeed stack
+    */
+  def getSize(stack: ItemStack): Int = {
+    if (!stack.getItem.isInstanceOf[ItemBaseSeed]) return 0
+    if (stack.getTagCompound == null) stack.setTagCompound(NBTCompound(SIZE_TAG -> 1))
+    if (stack.getTagCompound.Int(ItemBaseSeed.SIZE_TAG) < 1 || stack.getTagCompound.Int(SIZE_TAG) > 3) stack.getTagCompound.setInteger(SIZE_TAG, 1)
+    stack.getTagCompound.Int(SIZE_TAG)
+  }
+
+  /**
+    * @param stack Stack of ItemBaseSeed
+    * @param x     X coord of lower-north-west corner
+    * @param y     Y coord of lower-north-west-corner
+    * @param z     Z coord of lower-north-west corner
+    * @param dim   Dimension id of the machine
+    *
     * @return Set of locations that are occupied by the machine slots of the base that would be planted with stack
     */
   def getSlotLocations(stack: ItemStack, x: Int, y: Int, z: Int, dim: Int): Set[Loc4] = {
@@ -104,13 +111,13 @@ class ItemBaseSeed extends Item with IPreviewable {
   @SideOnly(Side.CLIENT)
   override def renderID: Int = RenderIDs.seedPreviewableID
 
-  override def addInformation(stack: ItemStack, player: EntityPlayer, tooltip: util.List[_], advanced: Boolean): Unit = {
-    super.addInformation(stack, player, tooltip, advanced)
+  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
+    super.addInformation(stack, playerIn, tooltip, advanced)
     val list = tooltip.asInstanceOf[util.List[String]]
     list.add("Size: " + ItemBaseSeed.getSizeString(stack))
   }
 
-  override def onItemRightClick(stack: ItemStack, world: World, player: EntityPlayer): ItemStack = {
+  override def onItemRightClick(stack: ItemStack, worldIn: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (player.isSneaking) {
       ItemBaseSeed.setSize(stack, ItemBaseSeed.getSize(stack) match {
         case 1 => 2
@@ -118,27 +125,27 @@ class ItemBaseSeed extends Item with IPreviewable {
         case 3 => 1
         case _ => 1
       }
-                          )
+      )
     }
-    stack
+    new ActionResult(EnumActionResult.SUCCESS, stack)
   }
 
-  override def onItemUse(stack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    if (player.isSneaking) return false
-    var dir = ForgeDirection.getOrientation(side)
-    if (world.getBlock(x, y, z).isReplaceable(world, x, y, z)) dir = ForgeDirection.UNKNOWN
-    var bx = x + dir.offsetX
-    var by = y + dir.offsetY
-    var bz = z + dir.offsetZ
+  override def onItemUse(stack: ItemStack, player: EntityPlayer, world: World, pos: BlockPos, hand: EnumHand, side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    if (player.isSneaking) return EnumActionResult.FAIL
+    var dir = EnumFacing.values()(side.getIndex)
+    //    if (world.getBlockState(pos).getBlock.isReplaceable(world, pos)) dir = EnumFacing.UNKNOWN
+    var bx = pos.getX + dir.getFrontOffsetX
+    var by = pos.getY + dir.getFrontOffsetY
+    var bz = pos.getZ + dir.getFrontOffsetZ
     if (ItemBaseSeed.getSize(stack) == 3) {bx -= 1; bz -= 1}
-    val locs = TileCyberBase.getBaseLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId)
-    if (!TileCyberBase.areAllPlaceable(locs)) return false
-    if (!TileCyberBase.arePartsAtYPlaceable(TileCyberBase.getSlotLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.dimensionId),
-                                            by + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))) return false
+    val locs = TileCyberBase.getBaseLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.getDimension)
+    if (!TileCyberBase.areAllPlaceable(locs)) return EnumActionResult.FAIL
+    if (!TileCyberBase.arePartsAtYPlaceable(TileCyberBase.getSlotLocations(ItemBaseSeed.getSize(stack), bx, by, bz, world.provider.getDimension),
+      by + TileCyberBase.baseHeightMap(ItemBaseSeed.getSize(stack)))) return EnumActionResult.FAIL
     locs.foreach { loc =>
-      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockCyberBase)
-      world.getTileEntity(loc.x, loc.y, loc.z) match {
-        case te: TileCyberBase =>
+      world.setBlockState(loc.getPos, FemtoBlocks.blockCyberBase.getDefaultState)
+      loc.getTileEntity() match {
+        case Some(te: TileCyberBase) =>
           te.size = ItemBaseSeed.getSize(stack)
           te.indInventory.setInventorySize(math.pow(te.size + 1, 2).toInt + 9)
           te.size match {
@@ -146,11 +153,10 @@ class ItemBaseSeed extends Item with IPreviewable {
             case 2 => te.tanks = Array(new FluidTank(2000), new FluidTank(4000))
             case 3 => te.tanks = Array(new FluidTank(2000), new FluidTank(4000), new FluidTank(4000))
           }
-          te.formMultiBlock(world, bx, by, bz)
+          te.formMultiBlock(new Loc4(world, new BlockPos(bx, by, bz)))
         case _ =>
       }
-                 }
-    true
+    }
+    EnumActionResult.SUCCESS
   }
-
 }

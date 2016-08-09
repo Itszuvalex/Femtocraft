@@ -39,6 +39,35 @@ class OreNameFilterRule extends IItemFilterRule {
     updateRegexp()
   }
 
+  override def itemMatches(item: ItemStack) = {
+    if (!hasValidRegexp) false
+    else OreDictionary.getOreIDs(item).map(OreDictionary.getOreName).exists(regexp.matcher(_).matches())
+  }
+
+  def hasValidRegexp = regexp != null
+
+  def getAllItemStacksMatching = {
+    if (!hasValidRegexp) ArrayBuffer[ItemStack]()
+    else getAllOreNamesMatching.flatMap(OreDictionary.getOres(_).asScala).toBuffer
+  }
+
+  def getAllOreNamesMatching = {
+    if (!hasValidRegexp) ArrayBuffer[String]().toArray
+    else OreDictionary.getOreNames.filter(regexp.matcher(_).matches())
+  }
+
+  def getALlItemStackMatchingOrganizedByOreName = {
+    if (!hasValidRegexp) Map[String, scala.collection.mutable.Buffer[ItemStack]]()
+    else getAllOreNamesMatching.map(name => name -> OreDictionary.getOres(name).asScala)(collection.breakOut): Map[String, scala.collection.mutable.Buffer[ItemStack]]
+  }
+
+  override def ruleType = OreNameFilterRule.filterType
+
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    oreName = nbt.getString(OreNameFilterRule.ORE_NAME_KEY)
+    updateRegexp()
+  }
+
   private def updateRegexp() = {
     try {
       regexp = Pattern.compile(oreName.trim)
@@ -48,36 +77,6 @@ class OreNameFilterRule extends IItemFilterRule {
         ignored.printStackTrace()
         regexp = null
     }
-  }
-
-  override def itemMatches(item: ItemStack) = {
-    if (!hasValidRegexp) false
-    else OreDictionary.getOreIDs(item).map(OreDictionary.getOreName).exists(regexp.matcher(_).matches())
-  }
-
-  def getAllItemStacksMatching = {
-    if (!hasValidRegexp) ArrayBuffer[ItemStack]()
-    else getAllOreNamesMatching.flatMap(OreDictionary.getOres(_).asScala).toBuffer
-  }
-
-  def getALlItemStackMatchingOrganizedByOreName = {
-    if (!hasValidRegexp) Map[String, scala.collection.mutable.Buffer[ItemStack]]()
-    else getAllOreNamesMatching.map(name => name -> OreDictionary.getOres(name).asScala)(collection.breakOut): Map[String, scala.collection.mutable.Buffer[ItemStack]]
-  }
-
-  def getAllOreNamesMatching = {
-    if (!hasValidRegexp) ArrayBuffer[String]().toArray
-    else OreDictionary.getOreNames.filter(regexp.matcher(_).matches())
-  }
-
-  def hasValidRegexp = regexp != null
-
-  override def ruleType = OreNameFilterRule.filterType
-
-
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    oreName = nbt.getString(OreNameFilterRule.ORE_NAME_KEY)
-    updateRegexp()
   }
 
   override def serializeNBT(): NBTTagCompound = {

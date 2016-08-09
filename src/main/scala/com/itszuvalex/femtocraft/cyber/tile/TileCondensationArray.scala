@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.cyber.machine.MachineCondensationArray
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileFluidTank
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
 /**
@@ -16,9 +16,9 @@ class TileCondensationArray extends TileEntityBase with CyberMachineMultiblock w
 
   override def defaultTank: FluidTank = new FluidTank(1000)
 
-  override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
+  override def canFill(from: EnumFacing, fluid: Fluid): Boolean = false
 
-  override def canDrain(from: ForgeDirection, fluid: Fluid): Boolean = false
+  override def canDrain(from: EnumFacing, fluid: Fluid): Boolean = false
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(0)
 

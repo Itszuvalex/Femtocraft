@@ -36,7 +36,7 @@ class BlockFrame extends TileContainer(Material.IRON) {
               val half = 255f / 2f
               val color = new Color(0, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte)
               Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
-                                }
+            }
       case _ =>
     }
   }

@@ -23,6 +23,7 @@ trait IPowerCrystal extends Item with IPowerStorage {
   /**
     *
     * @param stack
+    *
     * @return Color of the crystal.
     */
   def getColor(stack: ItemStack): Int
@@ -30,6 +31,7 @@ trait IPowerCrystal extends Item with IPowerStorage {
   /**
     *
     * @param stack
+    *
     * @return Amount of power to generate per tick.
     */
   def getPassiveGen(stack: ItemStack): Double
@@ -37,6 +39,7 @@ trait IPowerCrystal extends Item with IPowerStorage {
   /**
     *
     * @param stack
+    *
     * @return Amount of power in crystal that is less than current storage.  Used for passive trickle charging.
     */
   def getStoragePartial(stack: ItemStack): Double
@@ -44,6 +47,7 @@ trait IPowerCrystal extends Item with IPowerStorage {
   /**
     *
     * @param stack
+    *
     * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
     */
   def getTransferRate(stack: ItemStack): Int
@@ -51,6 +55,7 @@ trait IPowerCrystal extends Item with IPowerStorage {
   /**
     *
     * @param stack
+    *
     * @return Size of the crystal.
     */
   def getType(stack: ItemStack): String

@@ -6,7 +6,7 @@ import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
 
 import scala.collection.Set
 
@@ -43,7 +43,7 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     taskDumpPower.onTick()
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Power = " + getCurrentPower + "/" + getMaximumPower)
@@ -52,8 +52,8 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap)
       task.getWorkers.foreach { worker =>
         PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "       Worker:" + worker.getProvider.getProviderLocation)
-                              }
-                           }
+      }
+    }
     ret
   }
 
@@ -66,6 +66,17 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
   override def getCurrentPower: Double = getPedestal.filterNot(_.mountLoc == null).flatMap(_.mountLoc.getTileEntity(true)).filterNot(_ == null).collect { case i: ICrystalMount => i }.map(_.getPowerCurrent).getOrElse(0)
 
   override def getMaximumPower: Double = getPedestal.filterNot(_.mountLoc == null).flatMap(_.mountLoc.getTileEntity(true)).filterNot(_ == null).collect { case i: ICrystalMount => i }.map(_.getPowerMax).getOrElse(0)
+
+  def getPedestal: Option[IPowerPedestal] = {
+    var loc = getLoc.getOffset(EnumFacing.UP)
+    if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
+      loc = getLoc.getOffset(EnumFacing.DOWN)
+      if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
+        loc = null
+      }
+    }
+    Option(loc).flatMap(_.getTileEntity(true)).collect { case i: IPowerPedestal => i }
+  }
 
   /* Tile Entity */
   override def validate(): Unit = {
@@ -82,6 +93,7 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     *
     * @param amt      Amount to attempt to charge
     * @param doCharge False to simulate, true to actually do
+    *
     * @return Amount of amt used to actually charge.
     */
   override def charge(amt: Double, doCharge: Boolean): Double = getPedestal.filterNot(_.mountLoc == null).flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.addPower(amt, doCharge)).getOrElse(0)
@@ -90,18 +102,8 @@ class TilePowerSink extends TileEntityBase with IPowerSink {
     *
     * @param amt     Amount of power to drain
     * @param doDrain False to simulate, true to actually remove power.
+    *
     * @return Amount of amt that was successfully drained.
     */
   override def drain(amt: Double, doDrain: Boolean): Double = getPedestal.filterNot(_.mountLoc == null).flatMap(_.mountLoc.getTileEntity(true)).collect { case i: ICrystalMount => i }.map(_.usePower(amt, doDrain)).getOrElse(0)
-
-  def getPedestal: Option[IPowerPedestal] = {
-    var loc = getLoc.getOffset(ForgeDirection.UP)
-    if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
-      loc = getLoc.getOffset(ForgeDirection.DOWN)
-      if (!loc.getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])) {
-        loc = null
-      }
-    }
-    Option(loc).flatMap(_.getTileEntity(true)).collect { case i: IPowerPedestal => i }
-  }
 }

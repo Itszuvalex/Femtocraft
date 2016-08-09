@@ -44,6 +44,7 @@ trait ITask {
   /**
     *
     * @param worker Worker to add.
+    *
     * @return True if worker successfully assigned, false otherwise (incompatible type, storage is full.)
     */
   def addWorker(worker: IWorker): Boolean

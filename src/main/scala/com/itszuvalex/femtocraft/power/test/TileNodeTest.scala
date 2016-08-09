@@ -8,6 +8,7 @@ import com.itszuvalex.itszulib.core.traits.tile.TileDescriptionPacket
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/4/15.
@@ -18,6 +19,7 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescr
   /**
     *
     * @param child
+    *
     * @return True if child was a child of this node, and was successfully removed.
     */
   override def removeChild(child: IPowerNode): Boolean = {
@@ -30,6 +32,7 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescr
   /**
     *
     * @param child
+    *
     * @return True if child is successfully added.
     */
   override def addChild(child: IPowerNode): Boolean = {
@@ -41,6 +44,7 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescr
   /**
     *
     * @param parent Parent being set.
+    *
     * @return True if parent is successfully set to input parent.
     */
   override def setParent(parent: IPowerNode): Boolean = {
@@ -49,7 +53,7 @@ abstract class TileNodeTest extends TileEntityBase with PowerNode with TileDescr
     ret
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
     if (worldObj.isRemote) return ret
     val loc = getNodeLoc

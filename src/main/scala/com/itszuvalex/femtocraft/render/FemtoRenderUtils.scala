@@ -11,9 +11,9 @@ import org.lwjgl.opengl.GL11
 object FemtoRenderUtils {
 
   def drawBeam(start: Vector3,
-               end: Vector3,
-               width: Float,
-               uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1, red: Int = 255, green: Int = 255, blue: Int = 255, alpha: Int = 0): Unit = {
+    end: Vector3,
+    width: Float,
+    uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1, red: Int = 255, green: Int = 255, blue: Int = 255, alpha: Int = 0): Unit = {
     val rightVector = (end - start).normalize()
     val center = ((end - start) / 2) + start
     val upVector = (center - Vector3(0, 0, 0)).cross(rightVector).normalize()
@@ -23,16 +23,16 @@ object FemtoRenderUtils {
     val pos4 = end + (upVector * width)
 
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
-                                                   GL11.glColor4ub(red.toByte, green.toByte, blue.toByte, alpha.toByte)
-                                                   addVertexUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
-                                                   addVertexUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
-                                                   addVertexUV(pos4.x, pos4.y, pos4.z, uMax, vMax)
-                                                   addVertexUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
-                                                   //    tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMin, vMin)
-                                                   //    tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
-                                                   //    tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMax, vMax)
-                                                   //    tes.addVertexWithUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
-                                                 }
+      GL11.glColor4ub(red.toByte, green.toByte, blue.toByte, alpha.toByte)
+      addVertexUV(pos2.x, pos2.y, pos2.z, uMin, vMin)
+      addVertexUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
+      addVertexUV(pos4.x, pos4.y, pos4.z, uMax, vMax)
+      addVertexUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
+      //    tes.addVertexWithUV(pos4.x, pos4.y, pos4.z, uMin, vMin)
+      //    tes.addVertexWithUV(pos3.x, pos3.y, pos3.z, uMin, vMax)
+      //    tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMax, vMax)
+      //    tes.addVertexWithUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
+    }
   }
 
 }

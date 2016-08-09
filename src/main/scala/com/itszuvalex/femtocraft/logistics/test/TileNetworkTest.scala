@@ -5,7 +5,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/30/2016.
@@ -28,11 +28,11 @@ class TileNetworkTest extends TileEntityBase with TileNetworkNode[TileNetworkTes
     super.serverUpdate()
     if (seek) {
       seek = false
-      val locs = ForgeDirection.VALID_DIRECTIONS.map(getLoc.getOffset(_))
-      ForgeDirection.VALID_DIRECTIONS.map(getLoc.getOffset(_)).flatMap(_.getTileEntity(false)).collect { case i: TileNetworkTest => i }.
-      foreach { i =>
-        getNetwork.addConnection(getLoc, i.getLoc)
-              }
+      val locs = EnumFacing.VALUES.map(getLoc.getOffset(_))
+      EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getTileEntity(false)).collect { case i: TileNetworkTest => i }.
+        foreach { i =>
+          getNetwork.addConnection(getLoc, i.getLoc)
+        }
     }
   }
 
@@ -48,7 +48,7 @@ class TileNetworkTest extends TileEntityBase with TileNetworkNode[TileNetworkTes
     ManagerTestNetwork.tracker.removeLocation(getLoc)
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     super.onSideActivate(par5EntityPlayer, side)
     if (!worldObj.isRemote)
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Network ID:" + getNetwork.id)

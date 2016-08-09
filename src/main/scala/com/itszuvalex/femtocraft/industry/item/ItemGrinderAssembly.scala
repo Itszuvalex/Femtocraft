@@ -6,7 +6,6 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.item.ItemGrinderAssembly._
 import com.itszuvalex.femtocraft.industry.tile.ITileAssemblyArray
-import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -61,7 +60,7 @@ object ItemGrinderAssembly {
       smelting.writeToNBT(c)
       compound.setTag(SMELTING_STACK_COMPOUND_KEY, c)
     }
-                                                                                                                   }
+  }
 
   def getResultItem(item: ItemStack): Option[ItemStack] = getResultItemCompound(item) match {
     case Some(comp) =>
@@ -78,6 +77,21 @@ object ItemGrinderAssembly {
     case None => None
   }
 
+  def getGrinderCompound(item: ItemStack, force: Boolean = false): Option[NBTTagCompound] = Option(item).flatMap { item =>
+    if (force) {
+      if (item.getTagCompound == null) {
+        item.setTagCompound(new NBTTagCompound)
+      }
+    }
+    Option(item.getTagCompound)
+
+  }.map { comp =>
+    if (force && !comp.hasKey(GRINDER_COMPOUND_KEY)) {
+      comp.setTag(GRINDER_COMPOUND_KEY, new NBTTagCompound)
+    }
+    comp.getCompoundTag(GRINDER_COMPOUND_KEY)
+  }
+
   def setResultItem(item: ItemStack, result: ItemStack): Unit = getGrinderCompound(item, force = true).foreach { compound =>
     if (result == null) {
       compound.removeTag(RESULT_STACK_COMPOUND_KEY)
@@ -87,26 +101,11 @@ object ItemGrinderAssembly {
       result.writeToNBT(c)
       compound.setTag(RESULT_STACK_COMPOUND_KEY, c)
     }
-                                                                                                               }
+  }
 
   def getCurrentPowerProgress(item: ItemStack): Double = getGrinderCompound(item).map(_.getDouble(POWER_PROGRESS_KEY)).getOrElse(0)
 
   def setCurrentPowerProgress(item: ItemStack, progress: Double): Unit = getGrinderCompound(item, force = true).foreach(_.setDouble(POWER_PROGRESS_KEY, progress))
-
-  def getGrinderCompound(item: ItemStack, force: Boolean = false): Option[NBTTagCompound] = Option(item).flatMap { item =>
-    if (force) {
-      if (item.getTagCompound == null) {
-        item.setTagCompound(new NBTTagCompound)
-      }
-    }
-    Option(item.getTagCompound)
-
-                                                                                                                 }.map { comp =>
-    if (force && !comp.hasKey(GRINDER_COMPOUND_KEY)) {
-      comp.setTag(GRINDER_COMPOUND_KEY, new NBTTagCompound)
-    }
-    comp.getCompoundTag(GRINDER_COMPOUND_KEY)
-                                                                                                                       }
 }
 
 class ItemGrinderAssembly extends Item with IItemAssembly {
@@ -184,7 +183,7 @@ class ItemGrinderAssembly extends Item with IItemAssembly {
         case None =>
           false
       }
-                                                                                                                    }
+      }
     }
   }
 

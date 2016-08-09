@@ -13,8 +13,8 @@ import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
 import scala.collection.JavaConversions._
@@ -45,16 +45,16 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
   }
 
   def findAndGrabEntities(radius: Float): Unit = {
-    getWorldObj.getEntitiesWithinAABB(classOf[Entity], AxisAlignedBB.getBoundingBox(xCoord + .5f - radius,
-                                                                                    yCoord + 1f - radius,
-                                                                                    zCoord + .5f - radius,
-                                                                                    xCoord + .5f + radius,
-                                                                                    yCoord + 1f + radius,
-                                                                                    zCoord + .5f + radius))
-    .asInstanceOf[java.util.List[Entity]]
-    .view
-    .filter { entity => entity.getDistanceSq(xCoord + .5d, yCoord + 1d, zCoord + .5d) <= radius * radius }
-    .foreach(grabEntity)
+    getWorld.getEntitiesWithinAABB(classOf[Entity], new AxisAlignedBB(getPos.getX + .5f - radius,
+      getPos.getY + 1f - radius,
+      getPos.getZ + .5f - radius,
+      getPos.getX + .5f + radius,
+      getPos.getY + 1f + radius,
+      getPos.getZ + .5f + radius))
+      .asInstanceOf[java.util.List[Entity]]
+      .view
+      .filter { entity => entity.getDistanceSq(getPos.getX + .5d, getPos.getY + 1d, getPos.getZ + .5d) <= radius * radius }
+      .foreach(grabEntity)
   }
 
   def grabEntity(entity: Entity): Boolean = {
@@ -67,8 +67,8 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
     }
   }
 
-  override def updateEntity(): Unit = {
-    super.updateEntity()
+  override def update(): Unit = {
+    super.update()
     pullEntities()
   }
 
@@ -79,23 +79,18 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
         toRemove += entity
       else {
         entity match {
-          case p if p.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) > (grabRadius * grabRadius) =>
+          case p if p.getDistanceSq(getPos.getX + .5d, getPos.getY + .5d, getPos.getZ + .5d) > (grabRadius * grabRadius) =>
             toRemove += p
           case p: EntityPlayer if p.capabilities.isCreativeMode =>
           case _ =>
-            val targetPos = Vector3(xCoord + .5f, yCoord + .5f, zCoord + .5f)
+            val targetPos = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
             val entityPos = Vector3(entity.posX, entity.posY, entity.posZ)
             val vel = (targetPos - entityPos).normalize() * velocityAddition
             entity.addVelocity(vel.x, vel.y, vel.z)
         }
       }
       toRemove.foreach(removeEntity)
-                       }
-  }
-
-  override def invalidate(): Unit = {
-    super.invalidate()
-    grabbedSet.foreach(removeEntity)
+    }
   }
 
   def removeEntity(entity: Entity): Boolean = {
@@ -108,13 +103,18 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
   }
 
   def grabbedSet: mutable.HashSet[Entity] = {
-    if (getWorldObj.isRemote) {
+    if (getWorld.isRemote) {
       //Find entities based on ids passed by server.  Cache the found entities so we don't keep looking them up from the worldObj every call.
-      val entities = clientSet.flatMap(id => Option(getWorldObj.getEntityByID(id)))
+      val entities = clientSet.flatMap(id => Option(getWorld.getEntityByID(id)))
       clientSet --= entities.map(_.getEntityId)
       entitySet ++= entities
     }
     entitySet
+  }
+
+  override def invalidate(): Unit = {
+    super.invalidate()
+    grabbedSet.foreach(removeEntity)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
@@ -135,7 +135,7 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   override def onBlockBreak(): Unit = {
     if (!isController) {
-      worldObj.setBlockToAir(info.x, info.y, info.z)
+      worldObj.setBlockToAir(info.cLoc.getPos)
       return
     }
     if (worldObj.isRemote) return
@@ -150,22 +150,22 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   override def defaultTank: FluidTank = new FluidTank(1000)
 
-  override def canFill(from: ForgeDirection, fluid: Fluid): Boolean = false
+  override def canFill(from: EnumFacing, fluid: Fluid): Boolean = false
 
-  override def canDrain(from: ForgeDirection, fluid: Fluid): Boolean = false
+  override def canDrain(from: EnumFacing, fluid: Fluid): Boolean = false
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 
   override def hasDescription: Boolean = true
 
   override def getRenderBoundingBox: AxisAlignedBB = {
-    val center = Vector3(xCoord + .5f, yCoord + 1f, zCoord + .5f)
-    AxisAlignedBB.getBoundingBox(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
-                                 center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
+    val center = Vector3(getPos.getX + .5f, getPos.getY + 1f, getPos.getZ + .5f)
+    new AxisAlignedBB(center.x - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.y - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.z - TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.x + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.y + TileGraspingVines.DEFAULT_GRAB_RADIUS,
+      center.z + TileGraspingVines.DEFAULT_GRAB_RADIUS)
   }
 
   override def getCyberMachine = MachineGraspingVines.NAME

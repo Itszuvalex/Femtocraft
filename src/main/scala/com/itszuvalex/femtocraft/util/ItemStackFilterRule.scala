@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.util
 
 import com.itszuvalex.itszulib.implicits.IDImplicits._
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -67,21 +67,8 @@ class ItemStackFilterRule extends IItemFilterRule {
     setNBTSensitive(compound.Bool(ItemStackFilterRule.NBT_SENSITIVE_KEY))
     compound.NBTCompound(ItemStackFilterRule.STACK_KEY) { comp => stack = ItemStack.loadItemStackFromNBT(comp)
       Unit
-                                                        }
+    }
   }
-
-  override def serializeNBT(): NBTTagCompound = {
-    NBTCompound(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY -> isDamageSensitive,
-                ItemStackFilterRule.NBT_SENSITIVE_KEY -> isNBTSensitive,
-                ItemStackFilterRule.STACK_KEY -> {
-                  val comp = new NBTTagCompound
-                  stack.writeToNBT(comp)
-                  comp
-                }
-               )
-  }
-
-  def isDamageSensitive = damageSensitive
 
   def setDamageSensitive(sensitive: Boolean) = {
     damageSensitive = sensitive
@@ -89,11 +76,24 @@ class ItemStackFilterRule extends IItemFilterRule {
       setNBTSensitive(false)
   }
 
-  def isNBTSensitive = nbtSensitive
-
   def setNBTSensitive(sensitive: Boolean) = {
     nbtSensitive = sensitive
     if (isNBTSensitive)
       damageSensitive = true
   }
+
+  override def serializeNBT(): NBTTagCompound = {
+    NBTCompound(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY -> isDamageSensitive,
+      ItemStackFilterRule.NBT_SENSITIVE_KEY -> isNBTSensitive,
+      ItemStackFilterRule.STACK_KEY -> {
+        val comp = new NBTTagCompound
+        stack.writeToNBT(comp)
+        comp
+      }
+    )
+  }
+
+  def isDamageSensitive = damageSensitive
+
+  def isNBTSensitive = nbtSensitive
 }

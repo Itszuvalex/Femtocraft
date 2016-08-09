@@ -75,7 +75,7 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
           val transfer = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN) + DROP_TRANSFER_MIN
           val crystal = new ItemStack(FemtoItems.itemPowerCrystal, 1)
           InventoryUtils.dropItem(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer), new Loc4(world, pos), random)
-                                                                                                    }
+        }
       case _ =>
     }
     super.breakBlock(world, pos, state)

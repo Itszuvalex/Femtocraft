@@ -40,6 +40,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
   /**
     *
     * @param parent IPowerNode that is being checked.
+    *
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean
@@ -47,6 +48,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
   /**
     *
     * @param parent Parent being set.
+    *
     * @return True if parent is successfully set to input parent.
     */
   override def setParent(parent: IPowerNode): Boolean
@@ -74,6 +76,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
   /**
     *
     * @param child
+    *
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode): Boolean
@@ -81,6 +84,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
   /**
     *
     * @param child
+    *
     * @return True if child is successfully added.
     */
   override def addChild(child: IPowerNode): Boolean
@@ -88,6 +92,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
   /**
     *
     * @param child
+    *
     * @return True if child was a child of this node, and was successfully removed.
     */
   override def removeChild(child: IPowerNode): Boolean
@@ -120,6 +125,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     *
     * @param amount Amount of power to add.
     * @param doFill True if actually change values, false to simulate.
+    *
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
   def addPower(amount: Double, doFill: Boolean): Double
@@ -134,6 +140,7 @@ trait IPowerNode extends ISingleParentNode[IPowerNode] with IManyChildNode[IPowe
     *
     * @param amount Amount of power to consume.
     * @param doUse  True if actually change values, false to simulate.
+    *
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   def usePower(amount: Double, doUse: Boolean): Double

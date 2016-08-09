@@ -31,19 +31,19 @@ object FemtoRecipes {
 
   def registerGrowthChamberRecipes(): Unit = {
     GrowthChamberRegistry.addRecipe(new GrowthChamberRecipe(new ItemStack(Items.WHEAT_SEEDS, 1),
-                                                            IndexedSeq(new ItemStack(Items.WHEAT_SEEDS, 2),
-                                                                       new ItemStack(Items.WHEAT, 1)
-                                                                      ),
-                                                            500,
-                                                            GrowthChamberRecipe.TYPE_TEXTURE,
-                                                            Array(Resources.Texture("recipes/wheat0.png"),
-                                                                  Resources.Texture("recipes/wheat1.png"),
-                                                                  Resources.Texture("recipes/wheat2.png"),
-                                                                  Resources.Texture("recipes/wheat3.png"),
-                                                                  Resources.Texture("recipes/wheat4.png"),
-                                                                  Resources.Texture("recipes/wheat5.png"),
-                                                                  Resources.Texture("recipes/wheat6.png"),
-                                                                  Resources.Texture("recipes/wheat7.png"))))
+      IndexedSeq(new ItemStack(Items.WHEAT_SEEDS, 2),
+        new ItemStack(Items.WHEAT, 1)
+      ),
+      500,
+      GrowthChamberRecipe.TYPE_TEXTURE,
+      Array(Resources.Texture("recipes/wheat0.png"),
+        Resources.Texture("recipes/wheat1.png"),
+        Resources.Texture("recipes/wheat2.png"),
+        Resources.Texture("recipes/wheat3.png"),
+        Resources.Texture("recipes/wheat4.png"),
+        Resources.Texture("recipes/wheat5.png"),
+        Resources.Texture("recipes/wheat6.png"),
+        Resources.Texture("recipes/wheat7.png"))))
     DustRecipeRegistry.preInit()
   }
 

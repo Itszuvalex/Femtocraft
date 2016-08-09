@@ -18,6 +18,10 @@ class MultiblockArcFurnace extends IFrameMultiblock {
   override def canPlaceAtLocation(loc: Loc4): Boolean =
     getTakenLocations(loc).forall(l => l.getWorld.get.isAirBlock(l.getPos) || l.getWorld.get.getBlockState(l.getPos).getBlock.isReplaceable(l.getWorld.get, l.getPos))
 
+  override def getName = "Arc Furnace"
+
+  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = formAtLocation(loc)
+
   override def formAtLocation(loc: Loc4): Boolean = {
     val locations = getTakenLocations(loc)
     if (locations.forall(l => l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockArcFurnace.getDefaultState))) {
@@ -28,17 +32,12 @@ class MultiblockArcFurnace extends IFrameMultiblock {
   }
 
   override def getTakenLocations(loc: Loc4): Set[Loc4] = {
-                                                           for {
-                                                             bx <- 0 until 2
-                                                             by <- 0 until 3
-                                                             bz <- 0 until 2
-                                                           } yield Loc4(loc.x + bx, loc.y + by, loc.z + bz, loc.dim)
-                                                         }.toSet
-
-  override def getName = "Arc Furnace"
-
-  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = formAtLocation(loc)
-
+    for {
+      bx <- 0 until 2
+      by <- 0 until 3
+      bz <- 0 until 2
+    } yield Loc4(loc.x + bx, loc.y + by, loc.z + bz, loc.dim)
+  }.toSet
 
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = RenderIDs.multiblockArcFurnaceID
@@ -46,9 +45,9 @@ class MultiblockArcFurnace extends IFrameMultiblock {
   override def numFrames = 2 * 3 * 2
 
   override def getRequiredResources: IndexedSeq[ItemStack] = Array(new ItemStack(FemtoBlocks.blockCyberweave, 20),
-                                                                   new ItemStack(Items.IRON_INGOT, 32),
-                                                                   new ItemStack(Items.GOLD_INGOT, 4),
-                                                                   new ItemStack(Items.REDSTONE, 18))
+    new ItemStack(Items.IRON_INGOT, 32),
+    new ItemStack(Items.GOLD_INGOT, 4),
+    new ItemStack(Items.REDSTONE, 18))
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 

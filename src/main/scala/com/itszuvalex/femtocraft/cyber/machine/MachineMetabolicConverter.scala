@@ -7,10 +7,11 @@ import com.itszuvalex.femtocraft.cyber.ICyberMachine
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileMetabolicConverter}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.util.InventoryUtils
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
   * Created by Christopher on 11/21/2015.
@@ -29,65 +30,63 @@ class MachineMetabolicConverter extends ICyberMachine {
 
   /**
     * Function for accepting item broadcasts.
+    *
     * @param item Item broadcasted
-    * @param world World of the machine
-    * @param x Controller X
-    * @param y Controller Y
-    * @param z Controller Z
+    * @param loc  Location
+    *
     * @return Remaining items
     */
-  override def receiveItemBroadcast(item: ItemStack, world: World, x: Int, y: Int, z: Int): ItemStack = ???
+  override def receiveItemBroadcast(item: ItemStack, loc: Loc4): ItemStack = ???
 
   @SideOnly(Side.CLIENT)
   override def multiblockRenderID: Int = ???
 
   /**
     * Function for accepting fluid broadcasts.
+    *
     * @param fluid Fluid broadcasted
-    * @param world World of the machine
-    * @param x Controller X
-    * @param y Controller Y
-    * @param z Controller Z
+    * @param loc   Location
+    *
     * @return Remaining fluid
     */
-  override def receiveFluidBroadcast(fluid: FluidStack, world: World, x: Int, y: Int, z: Int): FluidStack = ???
+  override def receiveFluidBroadcast(fluid: FluidStack, loc: Loc4): FluidStack = ???
 
   /**
     * This function should place all machine blocks and make them a multiblock.
-    * @param world World of the machine
+    *
+    * @param world          World of the machine
     * @param baseController The controller TileEntity of the base.
-    * @param machineIndex The index of the machine on this base, 0 being the lowest machine
+    * @param machineIndex   The index of the machine on this base, 0 being the lowest machine
     */
   override def formAtBaseAndIndex(world: World, baseController: TileCyberBase, machineIndex: Int): Unit = {
-    val mx = baseController.xCoord
+    val mx = baseController.getPos.getX
     val my = baseController.yFromSlot(machineIndex)
-    val mz = baseController.zCoord
-    getTakenLocations(world, mx, my, mz).foreach { loc =>
-      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockMetabolicConverter)
-      world.getTileEntity(loc.x, loc.y, loc.z) match {
-        case te: TileMetabolicConverter =>
+    val mz = baseController.getPos.getZ
+    val controllerLoc = new Loc4(world, new BlockPos(mx, my, mz))
+    getTakenLocations(controllerLoc).foreach { loc =>
+      world.setBlockState(loc.getPos, FemtoBlocks.blockMetabolicConverter.getDefaultState)
+      loc.getTileEntity() match {
+        case Some(te: TileMetabolicConverter) =>
           te.machineIndex = machineIndex
           te.basePos = new Loc4(baseController)
-          te.formMultiBlock(world, mx, my, mz)
+          te.formMultiBlock(controllerLoc)
         case _ =>
       }
-                                                 }
+    }
   }
 
   override def getRequiredCybermass: Int = 0
 
   /**
     * This should destroy the machine completely with all that needs to be done afterwards (drop items etc.).
-    * @param world World of the machine
-    * @param x Controller X
-    * @param y Controller Y
-    * @param z Controller Z
+    *
+    * @param loc Location
     */
-  override def breakMachine(world: World, x: Int, y: Int, z: Int): Unit = {
-    getTakenLocations(world, x, y, z).foreach { loc =>
-      world.setBlockToAir(loc.x, loc.y, loc.z)
-                                              }
-    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, world, x, y, z, new Random()))
+  override def breakMachine(loc: Loc4): Unit = {
+    getTakenLocations(loc).foreach { l =>
+      l.getWorld.get.setBlockToAir(l.getPos)
+    }
+    getRequiredResources.foreach(stack => InventoryUtils.dropItem(stack, loc, new Random()))
   }
 
   override def getRequiredResources: IndexedSeq[ItemStack] = IndexedSeq()

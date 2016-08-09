@@ -21,14 +21,6 @@ object PowerBeamRenderer {
     beamRenderTeardown()
   }
 
-  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with IPowerNode, beamWidth: Float, color: Color): Unit = {
-    beamRenderSetup()
-    node.getChildrenLocs.foreach { loc =>
-      renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
-                                 }
-    beamRenderTeardown()
-  }
-
   def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with IPowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit = {
     val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
     val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
@@ -41,8 +33,8 @@ object PowerBeamRenderer {
     val yMin: Double = (-1.0F + f3).toDouble % 1
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
     FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset, beamWidth,
-                              xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-                              color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
+      xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+      color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
 
   def beamRenderTeardown(): Unit = {
@@ -60,6 +52,14 @@ object PowerBeamRenderer {
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+  }
+
+  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with IPowerNode, beamWidth: Float, color: Color): Unit = {
+    beamRenderSetup()
+    node.getChildrenLocs.foreach { loc =>
+      renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
+    }
+    beamRenderTeardown()
   }
 }
 

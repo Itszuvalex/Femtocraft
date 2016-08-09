@@ -23,15 +23,15 @@ object CubicCraftingRegistry {
       (o1._1 zip o2._1).foreach { pair =>
         if (pair._1.length < pair._2.length) return -1
         if (pair._1.length > pair._2.length) return 1
-                                }
+      }
       (o1._1 zip o2._1).foreach { pair =>
         (pair._1 zip pair._2).foreach { items =>
           IDDamageWildCardNBTComparator.compare(items._1, items._2) match {
             case 0 =>
             case r => return r
           }
-                                      }
-                                }
+        }
+      }
       IDNBTComparator.compare(o1._2, o2._2)
     }
   }).asScala

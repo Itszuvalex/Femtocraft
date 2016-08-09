@@ -9,15 +9,15 @@ import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.item.{IPowerCrystal, IPowerStorage}
 import com.itszuvalex.femtocraft.power.node.{DiffusionTargetNode, IPowerNode, PowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.core.Configurable
+import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.world.World
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.AxisAlignedBB
 
 object TileMaterialProcessor {
   val acceptedAssemblyTypes = Set(ItemFurnaceAssembly.AssemblyType, ItemGrinderAssembly.AssemblyType)
@@ -37,11 +37,11 @@ object TileMaterialProcessor {
 }
 
 @Configurable class TileMaterialProcessor extends TileEntityBase
-                                                  with TileMultiblockIndexedInventory
-                                                  with TileMultiblockIndexedInventoryWithIInventory
-                                                  with PowerNode
-                                                  with MultiBlockComponent
-                                                  with ITileAssemblyArray {
+  with TileMultiblockIndexedInventory
+  with TileMultiblockIndexedInventoryWithIInventory
+  with PowerNode
+  with MultiBlockComponent
+  with ITileAssemblyArray {
   override def hasDescription: Boolean = true
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(numInputSlots + numOutputSlots + numAssemblySlots + 2)
@@ -59,7 +59,7 @@ object TileMaterialProcessor {
           assembly.onTick(item, this)
         case _ =>
       }
-                                                                                 }
+    }
     indInventory.getStackInSlot(indexPowerSlot) match {
       case null =>
       case stack =>
@@ -73,29 +73,37 @@ object TileMaterialProcessor {
 
   override def getMaximumPower: Double = if (isController) getPowerMax else forwardToController[ITileAssemblyArray, Double](_.getMaximumPower)
 
-
   /**
     *
-    * @param slot (0 until getAssemblySlots)
-    * @return IItemAssembly in the given slot.
+    * @return Amount of power capable of being stored in this node.
     */
-  override def getAssembly(slot: Int): ItemStack = {
+  override def getPowerMax: Double = {
     if (isController) {
-      if (slot < 0 || slot >= getAssemblySlots) throw new IllegalArgumentException()
-
-      indInventory.getStackInSlot(indexAssemblyStart + slot)
+      getStackInSlot(indexPowerSlot) match {
+        case null =>
+          getParentLoc match {
+            case null => 0
+            case loc =>
+              loc.getTileEntity() match {
+                case None => 0
+                case Some(power: IPowerNode) =>
+                  power.getPowerMax
+              }
+          }
+        case item =>
+          item.getItem match {
+            case null => 0
+            case power: IPowerStorage =>
+              power.getStorageMax(item)
+          }
+      }
     }
-    else forwardToController[ITileAssemblyArray, ItemStack](_.getAssembly(slot))
+    else forwardToController[PowerNode, Double](_.getPowerMax)
   }
 
-  /**
-    * Number of assembly slots
-    */
-  override def getAssemblySlots = if (isController) numAssemblySlots else forwardToController[ITileAssemblyArray, Int](_.getAssemblySlots)
-
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) {
-      par5EntityPlayer.openGui(getMod, getGuiID, worldObj, info.x, info.y, info.z)
+      par5EntityPlayer.openGui(getMod, getGuiID, worldObj, info.cLoc.x, info.cLoc.y, info.cLoc.z)
       return true
     }
     false
@@ -110,6 +118,7 @@ object TileMaterialProcessor {
   /**
     *
     * @param child
+    *
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode): Boolean = DiffusionTargetNode.canAddChild(child)
@@ -117,6 +126,7 @@ object TileMaterialProcessor {
   /**
     *
     * @param parent IPowerNode that is being checked.
+    *
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean = super.canSetParent(parent) && DiffusionTargetNode.canAddParent(parent)
@@ -124,6 +134,7 @@ object TileMaterialProcessor {
   /**
     *
     * @param child
+    *
     * @return True if child is successfully added.
     */
   override def addChild(child: IPowerNode): Boolean = false
@@ -136,21 +147,16 @@ object TileMaterialProcessor {
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     if (isController) {
-      AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 2, yCoord + 3, zCoord + 2)
+      new AxisAlignedBB(getPos, getPos.add(2, 3, 2))
     }
     else super.getRenderBoundingBox
   }
 
   /**
     *
-    * @return Set of support Assembly types
-    */
-  override def getSupportedAssemblyTypes = if (isController) acceptedAssemblyTypes else forwardToController[ITileAssemblyArray, Set[String]](_.getSupportedAssemblyTypes)
-
-  /**
-    *
     * @param slot (0 until getOutputSlots)
     * @param amt  Amount of item from said slot to remove.
+    *
     * @return The itemstack consisting of getOutputItem(slot) and of stack size Math.min(getOutputItem(slot).stackSize, amt), or null if no item in slot.
     */
   override def removeOutputItem(slot: Int, amt: Int): ItemStack = {
@@ -173,28 +179,9 @@ object TileMaterialProcessor {
 
   /**
     *
-    * @param slot (0 until getOutputSlots)
-    * @return Itemstack in given slot.
-    */
-  override def getOutputItem(slot: Int): ItemStack = {
-    if (isController) {
-      if (slot < 0 || slot >= getOutputSlots) throw new IllegalArgumentException()
-
-      indInventory.getStackInSlot(indexOutputStart + slot)
-    }
-    else forwardToController[ITileAssemblyArray, ItemStack](_.getOutputItem(slot))
-  }
-
-  /**
-    *
-    * @return Number of slots that are accessible for given IItemAssemblies to output to.
-    */
-  override def getOutputSlots = if (isController) numOutputSlots else forwardToController[ITileAssemblyArray, Int](_.getOutputSlots)
-
-  /**
-    *
     * @param item Item to merge into slot.
     * @param slot (0 until getInputSlots)
+    *
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getInputItem(slot), or not enough space.
     */
   override def addOrMergeInputItem(item: ItemStack, slot: Int): ItemStack = {
@@ -236,28 +223,9 @@ object TileMaterialProcessor {
 
   /**
     *
-    * @param slot (0 until getInputSlots)
-    * @return Itemstack in given input slot.
-    */
-  override def getInputItem(slot: Int): ItemStack = {
-    if (isController) {
-      if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
-
-      indInventory.getStackInSlot(indexInputStart + slot)
-    }
-    else forwardToController[ITileAssemblyArray, ItemStack](_.getInputItem(slot))
-  }
-
-  /**
-    *
-    * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
-    */
-  override def getInputSlots = if (isController) numInputSlots else forwardToController[ITileAssemblyArray, Int](_.getInputSlots)
-
-  /**
-    *
     * @param item Item to merge into slot.
     * @param slot (0 until getOutputSlots)
+    *
     * @return Remainder of item after the add or merge.  Should only be non-null if item doesn't match getOutputItem(slot), or not enough space.
     */
   override def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack = {
@@ -300,7 +268,29 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param slot (0 until getOutputSlots)
+    *
+    * @return Itemstack in given slot.
+    */
+  override def getOutputItem(slot: Int): ItemStack = {
+    if (isController) {
+      if (slot < 0 || slot >= getOutputSlots) throw new IllegalArgumentException()
+
+      indInventory.getStackInSlot(indexOutputStart + slot)
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.getOutputItem(slot))
+  }
+
+  /**
+    *
+    * @return Number of slots that are accessible for given IItemAssemblies to output to.
+    */
+  override def getOutputSlots = if (isController) numOutputSlots else forwardToController[ITileAssemblyArray, Int](_.getOutputSlots)
+
+  /**
+    *
     * @param slot (0 until getAssemblySlots) to remove from.
+    *
     * @return The assembly item stack in given and now empty slot, or null if failed to remove assembly.  (somehow?)
     */
   override def removeAssembly(slot: Int): ItemStack = {
@@ -314,8 +304,29 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param slot (0 until getAssemblySlots)
+    *
+    * @return IItemAssembly in the given slot.
+    */
+  override def getAssembly(slot: Int): ItemStack = {
+    if (isController) {
+      if (slot < 0 || slot >= getAssemblySlots) throw new IllegalArgumentException()
+
+      indInventory.getStackInSlot(indexAssemblyStart + slot)
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.getAssembly(slot))
+  }
+
+  /**
+    * Number of assembly slots
+    */
+  override def getAssemblySlots = if (isController) numAssemblySlots else forwardToController[ITileAssemblyArray, Int](_.getAssemblySlots)
+
+  /**
+    *
     * @param slot (0 until getInputSlots)
     * @param amt  Amount of the item from said slot to remove.
+    *
     * @return The itemstack consisting of getInputItem(slot) and of stack size Math.min(getInputItem(slot).stackSize, amt), or null if no item in slot.
     */
   override def removeInputItem(slot: Int, amt: Int): ItemStack = {
@@ -338,8 +349,30 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param slot (0 until getInputSlots)
+    *
+    * @return Itemstack in given input slot.
+    */
+  override def getInputItem(slot: Int): ItemStack = {
+    if (isController) {
+      if (slot < 0 || slot >= getInputSlots) throw new IllegalArgumentException()
+
+      indInventory.getStackInSlot(indexInputStart + slot)
+    }
+    else forwardToController[ITileAssemblyArray, ItemStack](_.getInputItem(slot))
+  }
+
+  /**
+    *
+    * @return Number of slots that are accessible for given IItemAssemblies to withdraw from.
+    */
+  override def getInputSlots = if (isController) numInputSlots else forwardToController[ITileAssemblyArray, Int](_.getInputSlots)
+
+  /**
+    *
     * @param assembly Assembly to insert into slot.  Should not be null.
     * @param slot     (0 until getAssemblySlots) to insert into.
+    *
     * @return True if slot is empty and assembly was valid, accepted, and placed in the slot.
     */
   override def addAssembly(assembly: ItemStack, slot: Int): Boolean = {
@@ -358,8 +391,27 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @return IItemLogisticsNetwork connection, or null if no logistics supported.
+    */
+  override def getItemLogisticsNetwork: IItemLogisticsNetwork = if (isController)
+    null
+  else forwardToController[ITileAssemblyArray, IItemLogisticsNetwork](_.getItemLogisticsNetwork)
+
+  /**
+    *
+    * @param amt      Amount to attempt to charge
+    * @param doCharge False to simulate, true to actually do
+    *
+    * @return Amount of amt used to actually charge.
+    */
+  override def charge(amt: Double, doCharge: Boolean): Double = if (isController) addPower(amt, doCharge)
+  else forwardToController[ITileAssemblyArray, Double](_.charge(amt, doCharge))
+
+  /**
+    *
     * @param amount Amount of power to add.
     * @param doFill True if actually change values, false to simulate.
+    *
     * @return Amount of power used out of @amount to fill the internal storage of this Tile.
     */
   override def addPower(amount: Double, doFill: Boolean): Double = {
@@ -388,8 +440,19 @@ object TileMaterialProcessor {
 
   /**
     *
+    * @param amt     Amount of power to drain
+    * @param doDrain False to simulate, true to actually remove power.
+    *
+    * @return Amount of amt that was successfully drained.
+    */
+  override def drain(amt: Double, doDrain: Boolean): Double = if (isController) usePower(amt, doDrain)
+  else forwardToController[ITileAssemblyArray, Double](_.drain(amt, doDrain))
+
+  /**
+    *
     * @param amount Amount of power to consume.
     * @param doUse  True if actually change values, false to simulate.
+    *
     * @return Amount of power consumed out of @amount from the internal storage of this Tile.
     */
   override def usePower(amount: Double, doUse: Boolean): Double = {
@@ -415,6 +478,9 @@ object TileMaterialProcessor {
     }
     else forwardToController[PowerNode, Double](_.usePower(amount, doUse))
   }
+
+  override def getCurrentPower: Double = if (isController) getPowerCurrent
+  else forwardToController[ITileAssemblyArray, Double](_.getCurrentPower)
 
   /**
     *
@@ -443,63 +509,6 @@ object TileMaterialProcessor {
     }
     else forwardToController[PowerNode, Double](_.getPowerCurrent)
   }
-
-  /**
-    *
-    * @return Amount of power capable of being stored in this node.
-    */
-  override def getPowerMax: Double = {
-    if (isController) {
-      getStackInSlot(indexPowerSlot) match {
-        case null =>
-          getParentLoc match {
-            case null => 0
-            case loc =>
-              loc.getTileEntity() match {
-                case None => 0
-                case Some(power: IPowerNode) =>
-                  power.getPowerMax
-              }
-          }
-        case item =>
-          item.getItem match {
-            case null => 0
-            case power: IPowerStorage =>
-              power.getStorageMax(item)
-          }
-      }
-    }
-    else forwardToController[PowerNode, Double](_.getPowerMax)
-  }
-
-  /**
-    *
-    * @return IItemLogisticsNetwork connection, or null if no logistics supported.
-    */
-  override def getItemLogisticsNetwork: IItemLogisticsNetwork = if (isController)
-    null
-  else forwardToController[ITileAssemblyArray, IItemLogisticsNetwork](_.getItemLogisticsNetwork)
-
-  /**
-    *
-    * @param amt      Amount to attempt to charge
-    * @param doCharge False to simulate, true to actually do
-    * @return Amount of amt used to actually charge.
-    */
-  override def charge(amt: Double, doCharge: Boolean): Double = if (isController) addPower(amt, doCharge)
-  else forwardToController[ITileAssemblyArray, Double](_.charge(amt, doCharge))
-
-  /**
-    *
-    * @param amt     Amount of power to drain
-    * @param doDrain False to simulate, true to actually remove power.
-    * @return Amount of amt that was successfully drained.
-    */
-  override def drain(amt: Double, doDrain: Boolean): Double = if (isController) usePower(amt, doDrain)
-  else forwardToController[ITileAssemblyArray, Double](_.drain(amt, doDrain))
-
-  override def getCurrentPower: Double = if (isController) getPowerCurrent
-  else forwardToController[ITileAssemblyArray, Double](_.getCurrentPower)
 
   /**
     *
@@ -542,20 +551,24 @@ object TileMaterialProcessor {
   }
   else forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.isItemValidForSlot(slot, item))
 
+  /**
+    *
+    * @return Set of support Assembly types
+    */
+  override def getSupportedAssemblyTypes = if (isController) acceptedAssemblyTypes else forwardToController[ITileAssemblyArray, Set[String]](_.getSupportedAssemblyTypes)
+
   override def saveInfoToItemNBT(compound: NBTTagCompound): Unit = {
     super.saveInfoToItemNBT(compound)
-    val inv = new NBTTagCompound
-    indInventory.saveToNBT(inv)
-    compound.setTag(INV_COMPOUND_TAG, inv)
+    compound.setTag(INV_COMPOUND_TAG, indInventory.serializeNBT())
   }
 
   override def loadInfoFromItemNBT(compound: NBTTagCompound): Unit = {
     super.loadInfoFromItemNBT(compound)
-    indInventory.loadFromNBT(compound.getCompoundTag(INV_COMPOUND_TAG))
+    indInventory.deserializeNBT(compound.getCompoundTag(INV_COMPOUND_TAG))
   }
 
-  override def formMultiBlock(world: World, x: Int, y: Int, z: Int): Boolean = {
-    val ret = super.formMultiBlock(world, x, y, z)
+  override def formMultiBlock(loc: Loc4): Boolean = {
+    val ret = super.formMultiBlock(loc)
     if (isController) PowerManager.addNode(this)
     ret
   }

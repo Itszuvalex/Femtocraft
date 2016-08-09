@@ -31,11 +31,11 @@ class ItemFilter extends IItemFilter with INBTSerializable[NBTTagCompound] {
 
   override def serializeNBT(): NBTTagCompound = {
     NBTCompound(ItemFilter.FILTER_COMPOUND_KEY ->
-                NBTCompound(ItemFilter.FILTER_RULES_KEY -> NBTList(filters.map { filter =>
-                  NBTCompound(ItemFilter.FILTER_TYPE_KEY -> filter.ruleType,
-                              ItemFilter.FILTER_DATA_KEY -> NBTCompound(filter))
-                                                                               }))
-               )
+      NBTCompound(ItemFilter.FILTER_RULES_KEY -> NBTList(filters.map { filter =>
+        NBTCompound(ItemFilter.FILTER_TYPE_KEY -> filter.ruleType,
+          ItemFilter.FILTER_DATA_KEY -> NBTCompound(filter))
+      }))
+    )
   }
 
   override def deserializeNBT(compound: NBTTagCompound): Unit = {
@@ -57,7 +57,7 @@ class ItemFilter extends IItemFilter with INBTSerializable[NBTTagCompound] {
                 None
             }
         }
-                                                                    }
-                                                         }
+      }
+    }
   }
 }

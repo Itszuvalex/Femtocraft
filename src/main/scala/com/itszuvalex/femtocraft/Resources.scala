@@ -8,11 +8,11 @@ import net.minecraft.util.ResourceLocation
 object Resources {
   def TexBlock(name: String) = Texture("blocks/" + name)
 
+  def Texture(name: String) = Femtocraft("textures/" + name)
+
   def TexGui(name: String) = Texture("guis/" + name)
 
   def TexItem(name: String) = Texture("items/" + name)
-
-  def Texture(name: String) = Femtocraft("textures/" + name)
 
   def Particle(name: String) = Texture("particles/" + name)
 

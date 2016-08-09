@@ -12,10 +12,10 @@ import net.minecraft.item.ItemStack
 trait TileMultiblockIndexedInventoryWithIInventory extends TileEntityBase with IInventory {
   self: MultiBlockComponent with TileMultiblockIndexedInventory =>
 
-  override def closeInventory(): Unit =
-    if (isController) indInventory.closeInventory()
+  override def closeInventory(player: EntityPlayer): Unit =
+    if (isController) indInventory.closeInventory(player)
     else
-      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Unit](_.closeInventory())
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Unit](_.closeInventory(player))
 
   override def decrStackSize(slot: Int, amount: Int): ItemStack =
     if (isController) indInventory.decrStackSize(slot, amount)
@@ -37,15 +37,10 @@ trait TileMultiblockIndexedInventoryWithIInventory extends TileEntityBase with I
     else
       forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.isItemValidForSlot(slot, item))
 
-  override def getStackInSlotOnClosing(slot: Int): ItemStack =
-    if (isController) indInventory.getStackInSlotOnClosing(slot)
+  override def openInventory(player: EntityPlayer): Unit =
+    if (isController) indInventory.openInventory(player)
     else
-      forwardToController[TileMultiblockIndexedInventoryWithIInventory, ItemStack](_.getStackInSlotOnClosing(slot))
-
-  override def openInventory(): Unit =
-    if (isController) indInventory.openInventory()
-    else
-      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Unit](_.openInventory())
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Unit](_.openInventory(player))
 
   override def setInventorySlotContents(slot: Int, item: ItemStack): Unit =
     if (isController) indInventory.setInventorySlotContents(slot, item)
@@ -67,13 +62,43 @@ trait TileMultiblockIndexedInventoryWithIInventory extends TileEntityBase with I
     else
       forwardToController[TileMultiblockIndexedInventoryWithIInventory, ItemStack](_.getStackInSlot(slot))
 
-  override def hasCustomInventoryName: Boolean =
-    if (isController) indInventory.hasCustomInventoryName
+  override def clear(): Unit =
+    if (isController) indInventory.clear()
     else
-      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.hasCustomInventoryName())
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory](_.clear())
 
-  override def getInventoryName: String =
-    if (isController) indInventory.getInventoryName
+  override def getFieldCount: Int =
+    if (isController) indInventory.getFieldCount
     else
-      forwardToController[TileMultiblockIndexedInventoryWithIInventory, String](_.getInventoryName())
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Int](_.getFieldCount)
+
+  override def getField(id: Int): Int =
+    if (isController) indInventory.getField(id)
+    else
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Int](_.getField(id))
+
+  override def removeStackFromSlot(index: Int): ItemStack =
+    if (isController) indInventory.removeStackFromSlot(index)
+    else
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, ItemStack](_.removeStackFromSlot(index))
+
+  override def setField(id: Int, value: Int): Unit =
+    if (isController) indInventory.setField(id, value)
+    else
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory](_.setField(id, value))
+
+  override def getName: String =
+    if (isController) indInventory.getName
+    else
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, String](_.getName)
+
+  override def hasCustomName: Boolean =
+    if (isController) indInventory.hasCustomName
+    else
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.hasCustomName)
+
+  override def hasDescription: Boolean =
+    if (isController) hasDescription
+    else
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.hasDescription)
 }

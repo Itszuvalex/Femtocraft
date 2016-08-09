@@ -54,7 +54,7 @@ class ContainerMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, til
       if (lastPower != inventory.getPowerCurrent) {
         updatePower(icrafting)
       }
-                      }
+    }
     lastPower = inventory.getPowerCurrent.toLong
   }
 
@@ -66,12 +66,12 @@ class ContainerMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, til
   @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {
     case ContainerMaterialProcessor.POWER_BIG_INDEX =>
       inventory.setPower(
-                          (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
-                        )
+        (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
+      )
     case ContainerMaterialProcessor.POWER_SMALL_INDEX =>
       inventory.setPower(
-                          (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
-                        )
+        (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
+      )
     case _ =>
   }
 

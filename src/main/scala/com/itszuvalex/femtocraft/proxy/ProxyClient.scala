@@ -20,35 +20,27 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.cyber.CyberMachineRendererRegistry
 import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesRenderer, GrowthChamberRenderer}
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.render._
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileMaterialProcessor}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
-import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal, TilePowerSink}
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
-import com.itszuvalex.itszulib.util.Color
-import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.EntityFX
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
-import net.minecraftforge.client.MinecraftForgeClient
 import net.minecraftforge.client.model.obj.OBJLoader
-import net.minecraftforge.fml.client.registry.{ClientRegistry, RenderingRegistry}
-import org.apache.logging.log4j.Level
+import net.minecraftforge.fml.client.registry.ClientRegistry
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
@@ -102,9 +94,9 @@ class ProxyClient extends ProxyCommon {
     RenderIDs.multiblockArcFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(arcFurnaceRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileArcFurnace], arcFurnaceRenderer)
 
-    val furnaceRenderer = new FurnaceRenderer
-    RenderIDs.multiblockFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(furnaceRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileMaterialProcessor], furnaceRenderer)
+    //    val furnaceRenderer = new FurnaceRenderer
+    //    RenderIDs.multiblockFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(furnaceRenderer)
+    //    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileMaterialProcessor], furnaceRenderer)
 
     val growthChamberRenderer = new GrowthChamberRenderer
     RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)
@@ -114,39 +106,32 @@ class ProxyClient extends ProxyCommon {
     RenderIDs.graspingVinesID = CyberMachineRendererRegistry.bindRenderer(graspingVinesRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGraspingVines], graspingVinesRenderer)
 
-    RenderIDs.naniteHiveSmallID = bindBlockAndTESR(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
-    RenderIDs.powerPedestalID = bindBlockAndTESR(classOf[TilePowerPedestal], new PowerPedestalRenderer)
-    RenderIDs.crystalMountID = bindBlockAndTESR(classOf[TileCrystalMount], new CrystalMountRenderer)
-    RenderIDs.powerSinkID = bindBlockAndTESR(classOf[TilePowerSink], new PowerSinkRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], new PowerPedestalRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], new CrystalMountRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerSink], new PowerSinkRenderer)
 
-//    RenderIDs.glowStickID = RenderingRegistry.getNextAvailableRenderId
-//    RenderingRegistry.registerBlockHandler(RenderIDs.glowStickID, new GlowStickRenderer)
+    //    RenderIDs.glowStickID = RenderingRegistry.getNextAvailableRenderId
+    //    RenderingRegistry.registerBlockHandler(RenderIDs.glowStickID, new GlowStickRenderer)
 
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGenerationNodeTest], new PowerNodeRenderer[TileGenerationNodeTest])
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDiffusionNodeTest], new DiffusionNodeRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTransferNodeTest], new PowerNodeRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTransferNodeTest], new PowerNodeRenderer[TileTransferNodeTest])
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileWorkerProviderTest], new WorkerProviderBeamRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalsWorldgen], new CrystalRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
-    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
+    //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 
-    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
+    //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCyberBase], new CyberBaseRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
-  }
-
-  def bindBlockAndTESR(clazz: Class[_ <: TileEntity], renderer: TileEntitySpecialRenderer with ISimpleBlockRenderingHandler): Int = {
-    val int = RenderingRegistry.getNextAvailableRenderId
-    RenderingRegistry.registerBlockHandler(int, renderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(clazz, renderer)
-    int
   }
 
   override def registerEventHandlers(): Unit = {

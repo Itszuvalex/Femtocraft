@@ -2,13 +2,14 @@ package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
-import com.itszuvalex.femtocraft.industry.tile.{TileMaterialProcessor, TileArcFurnace, TileFrame}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame}
+import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.world.World
-import net.minecraftforge.client.model.AdvancedModelLoader
+import net.minecraftforge.client.model.ModelLoaderRegistry
+import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -19,38 +20,26 @@ object FurnaceRenderer {
   val textureLoc = Resources.Model("furnace/furnace.png")
 }
 
-class FurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblockRenderer {
-  val model = AdvancedModelLoader.loadModel(FurnaceRenderer.modelLoc)
+class FurnaceRenderer extends TileEntitySpecialRenderer[TileArcFurnace] with IFrameMultiblockRenderer {
+  val model = ModelLoaderRegistry.getModelOrMissing(FurnaceRenderer.modelLoc).asInstanceOf[OBJModel]
 
-  override def renderTileEntityAt(tile : TileEntity, x : Double, y : Double, z : Double, partialTime : Float): Unit = {
-    tile match {
-      case furnace: TileMaterialProcessor if furnace.isController =>
-        renderAtLocation(x, y, z)
-      case _ =>
-    }
+  override def renderTileEntityAt(te: TileArcFurnace, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    if (te.isController)
+      renderAtLocation(x, y, z)
   }
 
   /**
     * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
     *
     * @param stack ItemStack of IPreviewable Item
-    * @param world World
-    * @param x     X Location
-    * @param y     Y Location
-    * @param z     Z Location
+    * @param loc
     * @param rx    X Render location
     * @param ry    Y Render location
     * @param rz    Z Render location
     */
-  override def previewRenderAtWorldLocation(stack: ItemStack, world: World, x: Int, y: Int, z: Int, rx: Double, ry: Double, rz: Double): Unit = {
+  override def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
     renderAtLocation(rx, ry, rz)
   }
-
-  /**
-    *
-    * @return Bounding box for rendering.  (X, Y, Z) (Length, Height, Width)
-    */
-  override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
   /**
     * Coordinates to render at.  This is for things like generic menu rendering, etc.
@@ -64,9 +53,15 @@ class FurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblockRen
     GL11.glTranslated(rx + 1, ry, rz + 1)
     GL11.glColor3f(1, 1, 1)
     Minecraft.getMinecraft.getTextureManager.bindTexture(FurnaceRenderer.textureLoc)
-    model.renderAll()
+    model.render(false)
     GL11.glPopMatrix()
   }
+
+  /**
+    *
+    * @return Bounding box for rendering.  (X, Y, Z) (Length, Height, Width)
+    */
+  override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
   /**
     * Render function for machine in-progress rendering.
@@ -95,9 +90,9 @@ class FurnaceRenderer extends TileEntitySpecialRenderer with IFrameMultiblockRen
     GL11.glPushMatrix()
     GL11.glTranslated(rx + 1, ry, rz + 1)
     GL11.glColor3f(1, 1, 1)
-    GL11.glScalef(1f/3f, 1f/3f, 1f/3f)
+    GL11.glScalef(1f / 3f, 1f / 3f, 1f / 3f)
     Minecraft.getMinecraft.getTextureManager.bindTexture(FurnaceRenderer.textureLoc)
-    model.renderAll()
+    model.render(false)
     GL11.glPopMatrix()
   }
 }

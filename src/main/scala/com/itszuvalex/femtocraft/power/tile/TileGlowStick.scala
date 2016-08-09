@@ -12,9 +12,9 @@ import scala.util.Random
   */
 class TileGlowStick extends TileEntityBase {
   var color: Int = Color(255.toByte,
-                         (Random.nextInt(125) + 130).toByte,
-                         (Random.nextInt(125) + 130).toByte,
-                         (Random.nextInt(125) + 130).toByte).toInt
+    (Random.nextInt(125) + 130).toByte,
+    (Random.nextInt(125) + 130).toByte,
+    (Random.nextInt(125) + 130).toByte).toInt
 
   override def getMod = Femtocraft
 
