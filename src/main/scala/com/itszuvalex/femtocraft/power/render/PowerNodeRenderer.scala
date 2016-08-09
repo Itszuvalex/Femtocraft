@@ -12,10 +12,9 @@ object PowerNodeRenderer {
 }
 
 class PowerNodeRenderer extends NodeCrystalRenderer {
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTime: Float): Unit = tile match {
-    case node: IPowerNode =>
-      renderNode(node, x, y, z, partialTime)
-      PowerNodeBeamRenderer.renderPowerBeams(node, x, y, z, partialTime)
-    case _ =>
+
+  override def renderTileEntityAt(te: TileEntity with IPowerNode, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    renderNode(te, x, y, z, partialTicks)
+    PowerNodeBeamRenderer.renderPowerBeams(te, x, y, z, partialTicks)
   }
 }

@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.network.messages
 
 import com.itszuvalex.femtocraft.Femtocraft
-import cpw.mods.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
-import cpw.mods.fml.relauncher.Side
 import io.netty.buffer.ByteBuf
 import net.minecraftforge.common.DimensionManager
+import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
+import net.minecraftforge.fml.relauncher.Side
 
 /**
   * Created by Christopher on 12/12/2015.

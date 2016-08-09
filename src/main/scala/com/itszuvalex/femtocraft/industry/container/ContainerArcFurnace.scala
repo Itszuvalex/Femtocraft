@@ -3,10 +3,10 @@ package com.itszuvalex.femtocraft.industry.container
 import com.itszuvalex.femtocraft.industry.ArcFurnaceRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.itszulib.container.ContainerInv
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.{ICrafting, Slot}
+import net.minecraft.inventory.{IContainerListener, Slot}
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.JavaConversions._
 
@@ -26,11 +26,12 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
   addSlotToContainer(new Slot(tile.indInventory, 0, 0, 0))
   addPlayerInventorySlots(inv)
 
-  override def addCraftingToCrafters(par1ICrafting: ICrafting) {
-    super.addCraftingToCrafters(par1ICrafting)
 
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.COOK_INDEX, 0 /*inventory.furnaceCookTime*/)
-    updatePower(par1ICrafting)
+  override def addListener(listener: IContainerListener): Unit = {
+    super.addListener(listener)
+
+    sendUpdateToListener(this, listener, ContainerArcFurnace.COOK_INDEX, 0 /*inventory.furnaceCookTime*/)
+    updatePower(listener)
   }
 
   /**
@@ -38,21 +39,21 @@ class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: Tile
     */
   override def detectAndSendChanges() {
     super.detectAndSendChanges()
-    crafters.foreach { case icrafting: ICrafting =>
+    listeners.foreach { case icrafting: IContainerListener =>
       if (lastCookTime != 0 /*inventory.furnaceCookTime*/ ) {
-        sendUpdateToCrafter(this, icrafting, ContainerArcFurnace.COOK_INDEX, 0 /*inventory.furnaceCookTime*/)
+        sendUpdateToListener(this, icrafting, ContainerArcFurnace.COOK_INDEX, 0 /*inventory.furnaceCookTime*/)
       }
       if (lastPower != inventory.getPowerCurrent) {
         updatePower(icrafting)
       }
-                     }
+                      }
     lastCookTime = 0 /*inventory.furnaceCookTime*/
     lastPower = inventory.getPowerCurrent.toLong
   }
 
-  def updatePower(par1ICrafting: ICrafting): Unit = {
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
-    sendUpdateToCrafter(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
+  def updatePower(par1ICrafting: IContainerListener): Unit = {
+    sendUpdateToListener(this, par1ICrafting, ContainerArcFurnace.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
+    sendUpdateToListener(this, par1ICrafting, ContainerArcFurnace.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
   }
 
   @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {

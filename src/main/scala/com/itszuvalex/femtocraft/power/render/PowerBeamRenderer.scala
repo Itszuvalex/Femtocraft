@@ -6,7 +6,7 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.MathHelper
+import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
 
 /**
@@ -30,7 +30,7 @@ object PowerBeamRenderer {
   }
 
   def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with IPowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit = {
-    val f2: Float = node.getWorldObj.getTotalWorldTime.toFloat + partialTime
+    val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
     val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
     val nloc = node.getNodeLoc
     val diff = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)

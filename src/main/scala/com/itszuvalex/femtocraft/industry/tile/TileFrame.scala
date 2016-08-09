@@ -15,8 +15,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.AxisAlignedBB
 
 import scala.collection.mutable
 
@@ -104,7 +104,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
   }
 
-  def calculateRendering(connectedDirs: Array[ForgeDirection]): Unit = {
+  def calculateRendering(connectedDirs: Array[EnumFacing]): Unit = {
     renderInt = TileFrame.fullRender(true)
   }
 
@@ -115,7 +115,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
         case Some(m) =>
           FrameMultiblockRendererRegistry.getRenderer(m.multiblockRenderID) match {
             case Some(r) =>
-              return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + r.boundingBox._1, yCoord + r.boundingBox._2, zCoord + r.boundingBox._3)
+              return new AxisAlignedBB(getPos, getPos.add(r.boundingBox._1, r.boundingBox._2, r.boundingBox._3))
             case _ =>
           }
         case _ =>
@@ -134,7 +134,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
             case Some(multi) =>
               TileFrame.shouldDrop = false
               TileFrame.shouldFullyRemove = false
-              multi.formAtLocation(getWorldObj, xCoord, yCoord, zCoord)
+              multi.formAtLocation(getLoc)
               TileFrame.shouldFullyRemove = true
               TileFrame.shouldDrop = true
             case _ =>
@@ -157,9 +157,8 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   def isCurrentlyBuilding: Boolean = {
     if (isController) isBuilding
     else if (isValidMultiBlock) {
-      getWorldObj.getTileEntity(info.x, info.y, info.z) match {
-        case null => false
-        case i: TileFrame if i.isController => i.isBuilding
+      info.cLoc.getTileEntity() match {
+        case Some(i: TileFrame) if i.isController => i.isBuilding
         case _ => false
       }
     }
@@ -210,7 +209,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           isModifyingInv = true
           val random = new Random()
           indInventory.getInventory.zipWithIndex.foreach { case (item, slot) =>
-            if (!worldObj.isRemote) InventoryUtils.dropItem(item, getWorldObj, xCoord, yCoord, zCoord, random)
+            if (!worldObj.isRemote) InventoryUtils.dropItem(item, getLoc, random)
             indInventory.setInventorySlotContents(slot, null)
                                                          }
           isModifyingInv = false
@@ -266,40 +265,41 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   }
 
   override def onBlockBreak(): Unit = {
-    if (getWorldObj.isRemote) return
+    if (getWorld.isRemote) return
 
     if (TileFrame.shouldFullyRemove) {
       if (isController) {
         val random = new Random
         FrameMultiblockRegistry.getMultiblock(multiBlock) match {
           case Some(multi) =>
-            multi.getTakenLocations(getWorldObj, info.x, info.y, info.z).foreach { loc =>
-              getWorldObj.setBlockToAir(loc.x, loc.y, loc.z)
+            multi.getTakenLocations(getLoc).foreach { loc =>
+              getWorld.setBlockToAir(getPos)
               if (TileFrame.shouldDrop) {
                 val itemStack = new ItemStack(FemtoItems.itemFrame)
                 ItemFrame.setSelection(itemStack, multiBlock)
-                InventoryUtils.dropItem(itemStack, getWorldObj, loc.x, loc.y, loc.z, random)
+                InventoryUtils.dropItem(itemStack, getLoc, random)
               }
-                                                                                 }
+                                                    }
             if (isBuilding && TileFrame.shouldDrop)
-              multi.getRequiredResources.foreach(InventoryUtils.dropItem(_, getWorldObj, xCoord, yCoord, zCoord, random))
+              multi.getRequiredResources.foreach(InventoryUtils.dropItem(_, getLoc, random))
           case _ =>
         }
-        indInventory.getInventory.foreach {InventoryUtils.dropItem(_, getWorldObj, xCoord, yCoord, zCoord, random)}
+        indInventory.getInventory.foreach {InventoryUtils.dropItem(_, getLoc, random)}
       }
-      else getWorldObj.getTileEntity(info.x, info.y, info.z) match {
-        case frame: TileFrame => getWorldObj.setBlockToAir(info.x, info.y, info.z)
+      else info.cLoc.getTileEntity() match {
+        case Some(frame: TileFrame) => worldObj.setBlockToAir(getPos)
         case _ =>
       }
     }
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: Int): Boolean = {
+
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) {
-      getWorldObj.getTileEntity(info.x, info.y, info.z) match {
-        case null =>
-        case tile: TileFrame =>
-          par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorldObj, tile.xCoord, tile.yCoord, tile.zCoord)
+      info.cLoc.getTileEntity() match {
+        case Some(tile: TileFrame) =>
+          par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
+        case _ =>
       }
       true
     }
@@ -321,8 +321,9 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
       ret
     } else forwardToController[TileFrame, ItemStack](_.decrStackSize(slot, amt))
 
-  override def closeInventory(): Unit =
-    if (isController) indInventory.closeInventory() else forwardToController[TileFrame, Unit](_.closeInventory())
+
+  override def closeInventory(player: EntityPlayer): Unit =
+    if (isController) indInventory.closeInventory(player) else forwardToController[TileFrame, Unit](_.closeInventory(player))
 
   override def getSizeInventory: Int =
     if (isController) indInventory.getSizeInventory else forwardToController[TileFrame, Int](_.getSizeInventory)
@@ -336,11 +337,9 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
       else indInventory.isItemValidForSlot(slot, item)
     } else forwardToController[TileFrame, Boolean](_.isItemValidForSlot(slot, item))
 
-  override def getStackInSlotOnClosing(slot: Int): ItemStack =
-    if (isController) indInventory.getStackInSlotOnClosing(slot) else forwardToController[TileFrame, ItemStack](_.getStackInSlotOnClosing(slot))
 
-  override def openInventory(): Unit =
-    if (isController) indInventory.openInventory() else forwardToController[TileFrame, Unit](_.openInventory())
+  override def openInventory(player: EntityPlayer): Unit =
+    if (isController) indInventory.openInventory(player) else forwardToController[TileFrame, Unit](_.openInventory(player))
 
   override def setInventorySlotContents(slot: Int, item: ItemStack): Unit =
     if (isController) {
@@ -354,15 +353,33 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   override def getStackInSlot(slot: Int): ItemStack =
     if (isController) indInventory.getStackInSlot(slot) else forwardToController[TileFrame, ItemStack](_.getStackInSlot(slot))
 
-  override def hasCustomInventoryName: Boolean =
-    if (isController) indInventory.hasCustomInventoryName else forwardToController[TileFrame, Boolean](_.hasCustomInventoryName)
+  override def hasCustomName: Boolean =
+    if (isController) indInventory.hasCustomName else forwardToController[TileFrame, Boolean](_.hasCustomName)
 
-  override def getInventoryName: String =
-    if (isController) indInventory.getInventoryName else forwardToController[TileFrame, String](_.getInventoryName)
+  override def getName: String =
+    if (isController) indInventory.getName else forwardToController[TileFrame, String](_.getName)
 
   override def markDirty(): Unit = {
     super.markDirty()
     if (!isModifyingInv)
       checkForRequiredItems()
   }
+
+  override def clear(): Unit =
+    if (isController) indInventory.clear() else forwardToController[TileFrame](_.clear())
+
+  override def getFieldCount: Int =
+    if (isController) 0 else forwardToController[TileFrame, Int](_.getFieldCount)
+
+  override def getField(id: Int): Int =
+    if (isController) 0 else forwardToController[TileFrame, Int](_.getField(id))
+
+  override def removeStackFromSlot(index: Int): ItemStack =
+    if (isController) {
+      indInventory.getStackInSlot(index)
+      indInventory.setInventorySlotContents(index, null)
+    } else forwardToController[TileFrame, ItemStack](_.removeStackFromSlot(index))
+
+  override def setField(id: Int, value: Int): Unit =
+    if (isController) {} else forwardToController[TileFrame](_.setField(id, value))
 }

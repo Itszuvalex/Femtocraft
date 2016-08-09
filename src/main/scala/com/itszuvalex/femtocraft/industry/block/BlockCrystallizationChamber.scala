@@ -9,6 +9,6 @@ import net.minecraft.world.World
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/28/15.
   */
-class BlockCrystallizationChamber extends TileContainer(Material.iron) {
+class BlockCrystallizationChamber extends TileContainer(Material.IRON) {
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileCrystallizationChamber
 }

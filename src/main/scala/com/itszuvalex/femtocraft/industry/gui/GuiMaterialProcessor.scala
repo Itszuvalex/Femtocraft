@@ -5,9 +5,9 @@ import com.itszuvalex.femtocraft.industry.container.ContainerMaterialProcessor
 import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor
 import com.itszuvalex.femtocraft.util.StringUtil
 import com.itszuvalex.itszulib.gui.GuiBase
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
 object GuiMaterialProcessor {

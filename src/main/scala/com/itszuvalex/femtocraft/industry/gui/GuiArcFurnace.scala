@@ -6,10 +6,9 @@ import com.itszuvalex.femtocraft.industry.tile.TileArcFurnace
 import com.itszuvalex.femtocraft.util.StringUtil
 import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.util.Color
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.util.StatCollector
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
 /**
@@ -20,7 +19,7 @@ import org.lwjgl.opengl.GL11
 }
 
 @SideOnly(Side.CLIENT) class GuiArcFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileArcFurnace) extends
-GuiBase(new ContainerArcFurnace(player, inv, tile)) {
+  GuiBase(new ContainerArcFurnace(player, inv, tile)) {
 
 
   override def drawScreen(par1: Int, par2: Int, par3: Float) {
@@ -37,7 +36,7 @@ GuiBase(new ContainerArcFurnace(player, inv, tile)) {
   protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
     val s = "Micro-Furnace"
     fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
-    fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 96 + 2, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
+    fontRendererObj.drawString("container.inventory", 8, ySize - 96 + 2, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
   }
 
   /**

@@ -114,21 +114,17 @@ class ItemGrinderAssembly extends Item with IItemAssembly {
 
   setMaxDamage(1000)
 
-  override def registerIcons(register: IIconRegister): Unit = {
-    this.itemIcon = register.registerIcon("Femtocraft" + ":" + "ItemKineticPulverizer")
-  }
-
-  override def addInformation(item: ItemStack, player: EntityPlayer, tooltip: util.List[_], advTooltip: Boolean): Unit = {
+  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
     var stringTooltip = tooltip.asInstanceOf[util.List[String]]
-    if (getCurrentPowerProgress(item) > 0) {
-      stringTooltip += "Progress: " + (100d - ((item.getItemDamageForDisplay.toDouble / item.getMaxDamage.toDouble) * 100d)).formatted("%.1f") + "%"
+    if (getCurrentPowerProgress(stack) > 0) {
+      stringTooltip += "Progress: " + (100d - ((stack.getItemDamage.toDouble / stack.getMaxDamage.toDouble) * 100d)).formatted("%.1f") + "%"
     }
-    getResultItem(item) match {
+    getResultItem(stack) match {
       case Some(res) =>
         stringTooltip += "Result Item: " + res.getDisplayName
       case None =>
     }
-    getGrindingItem(item) match {
+    getGrindingItem(stack) match {
       case Some(res) =>
         stringTooltip += "Grinding Item: " + res.getDisplayName
       case None =>

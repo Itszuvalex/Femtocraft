@@ -27,7 +27,7 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
   add(nameLabel, constructingLabel)
 
   def frender: FontRenderer = {
-    Minecraft.getMinecraft.fontRenderer
+    Minecraft.getMinecraft.fontRendererObj
   }
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {

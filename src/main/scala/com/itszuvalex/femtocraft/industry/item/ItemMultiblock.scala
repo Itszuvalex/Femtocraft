@@ -3,13 +3,15 @@ package com.itszuvalex.femtocraft.industry.item
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.IPreviewable
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.{EnumActionResult, EnumFacing, EnumHand}
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/13/2016.
@@ -36,34 +38,34 @@ class ItemMultiblock extends Item with IPreviewable {
   @SideOnly(Side.CLIENT)
   override def renderID = RenderIDs.multiblockPreviewableID
 
-  override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    val multiString = getMultiblock(itemStack)
-    if (multiString == null || multiString.isEmpty) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+  override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    if (stack == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    val multiString = getMultiblock(stack)
+    if (multiString == null || multiString.isEmpty) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
-    if (multi == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    if (multi == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
 
-    var hitSide = side
-    val block = world.getBlock(x, y, z)
+    var hitSide = facing
+    val block = worldIn.getBlockState(pos).getBlock
 
-    var dir = ForgeDirection.UNKNOWN
-    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
-      hitSide = 1
-    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush
-               && !block.isReplaceable(world, x, y, z)) {
-      dir = ForgeDirection.getOrientation(hitSide)
-    }
-
-    val bx = x + dir.offsetX
-    val by = y + dir.offsetY
-    val bz = z + dir.offsetZ
-    if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-
-    if (!player.capabilities.isCreativeMode) itemStack.stackSize -= 1
-
-    multi.formAtLocationFromItem(world, bx, by, bz, itemStack)
-    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
+    //    var dir = ForgeDirection.UNKNOWN
+    //    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
+    //      hitSide = 1
+    //    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush
+    //               && !block.isReplaceable(world, x, y, z)) {
+    //      dir = ForgeDirection.getOrientation(hitSide)
+    //    }
+    //
+    //    val bx = x + dir.offsetX
+    //    val by = y + dir.offsetY
+    //    val bz = z + dir.offsetZ
+    //    if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    //
+    //    if (!player.capabilities.isCreativeMode) itemStack.stackSize -= 1
+    //
+    //    multi.formAtLocationFromItem(world, bx, by, bz, itemStack)
+    //    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
 
     //   locations.foreach {loc =>
     //      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
@@ -75,7 +77,7 @@ class ItemMultiblock extends Item with IPreviewable {
     //        case _ =>
     //      }
     //              }
-    true
+    EnumActionResult.SUCCESS
   }
 
   def getMultiblock(item: ItemStack): String = {

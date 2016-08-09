@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.cyber.container
 import com.itszuvalex.femtocraft.cyber.tile.TileCyberBase
 import com.itszuvalex.itszulib.container.ContainerBase
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.inventory.ICrafting
+import net.minecraft.inventory.IContainerListener
 
 import scala.collection.JavaConversions._
 
@@ -15,9 +15,9 @@ class ContainerMachineSelection(val tile: TileCyberBase) extends ContainerBase {
 
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
-    crafters.foreach { case crafter: ICrafting =>
-      if (tile.remainingSlots != slots) sendUpdateToCrafter(this, crafter, 0, tile.remainingSlots)
-                     }
+    listeners.foreach { crafter: IContainerListener =>
+      if (tile.remainingSlots != slots) sendUpdateToListener(this, crafter, 0, tile.remainingSlots)
+                      }
     slots = tile.remainingSlots
   }
 

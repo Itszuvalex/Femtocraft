@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.industry.container
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.container.ContainerBase
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.ICrafting
+import net.minecraft.inventory.IContainerListener
 
 import scala.collection.JavaConversions._
 
@@ -22,13 +22,13 @@ class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, til
       player.closeScreen()
     }
     else {
-      crafters.foreach { case crafter: ICrafting =>
+      listeners.foreach { crafter: IContainerListener =>
         if (tile.progress != lastProgress) {
-          sendUpdateToCrafter(this, crafter, 0, tile.progress)
+          sendUpdateToListener(this, crafter, 0, tile.progress)
         }
 
         lastProgress = tile.progress
-                       }
+                        }
     }
   }
 

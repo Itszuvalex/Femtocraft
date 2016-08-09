@@ -27,12 +27,6 @@ class ContainerCyberBase(player: EntityPlayer, inv: InventoryPlayer, tile: TileC
 
   addPlayerInventorySlots(inv, 8, 95)
 
-  override def detectAndSendChanges(): Unit = {
-    super.detectAndSendChanges()
-    crafters.foreach { case crafter: ICrafting =>
-                     }
-  }
-
   override def updateProgressBar(id: Int, value: Int): Unit = {
     super.updateProgressBar(id, value)
     id match {

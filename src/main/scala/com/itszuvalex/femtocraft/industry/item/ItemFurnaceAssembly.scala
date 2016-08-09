@@ -117,21 +117,17 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
 
   setMaxDamage(1000)
 
-  override def registerIcons(register: IIconRegister): Unit = {
-    this.itemIcon = register.registerIcon("Femtocraft" + ":" + "ItemDissassemblyArray")
-  }
-
-  override def addInformation(item: ItemStack, player: EntityPlayer, tooltip: util.List[_], advTooltip: Boolean): Unit = {
+  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
     var stringTooltip = tooltip.asInstanceOf[util.List[String]]
-    if (getCurrentPowerProgress(item) > 0) {
-      stringTooltip += "Progress: " + (100d - ((item.getItemDamageForDisplay.toDouble / item.getMaxDamage.toDouble) * 100d)).formatted("%.1f") + "%"
+    if (getCurrentPowerProgress(stack) > 0) {
+      stringTooltip += "Progress: " + (100d - ((stack.getItemDamage.toDouble / stack.getMaxDamage.toDouble) * 100d)).formatted("%.1f") + "%"
     }
-    getResultItem(item) match {
+    getResultItem(stack) match {
       case Some(res) =>
         stringTooltip += "Result Item: " + res.getDisplayName
       case None =>
     }
-    getSmeltingItem(item) match {
+    getSmeltingItem(stack) match {
       case Some(res) =>
         stringTooltip += "Smelting Item: " + res.getDisplayName
       case None =>
@@ -164,7 +160,7 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
           case None =>
             clearSmeltingItem(item)
           case Some(smelt) =>
-            val ret = tile.addOutputItem(FurnaceRecipes.smelting().getSmeltingResult(smelt).copy())
+            val ret = tile.addOutputItem(FurnaceRecipes.instance().getSmeltingResult(smelt).copy())
             if (ret != null) {
               setResultItem(item, ret)
               setSmeltingItem(item, null)
@@ -176,7 +172,7 @@ class ItemFurnaceAssembly extends Item with IItemAssembly {
         }
       }
     } else {
-      (0 until tile.getInputSlots).map(i => (i, tile.getInputItem(i))).filter { case (i, it) => it != null }.exists { case (i, it) => Option(FurnaceRecipes.smelting().getSmeltingResult(it)) match {
+      (0 until tile.getInputSlots).map(i => (i, tile.getInputItem(i))).filter { case (i, it) => it != null }.exists { case (i, it) => Option(FurnaceRecipes.instance().getSmeltingResult(it)) match {
         case Some(stack) =>
           val ite = it.copy()
           ite.stackSize = 1

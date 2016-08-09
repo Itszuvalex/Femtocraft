@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.cyber
 
-import cpw.mods.fml.relauncher.{Side, SideOnly}
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.mutable
 

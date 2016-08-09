@@ -34,10 +34,10 @@ object GuiMultiblockSelection {
                      ),
          new GuiFlowLayout(2, panelHeight - 20, panelWidth - 4, panelHeight / 2,
                            multi.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
-         new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRenderer.getStringWidth(multi.numFrames.toString),
-                      (panelHeight - Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT) / 2,
-                      Minecraft.getMinecraft.fontRenderer.getStringWidth(multi.numFrames.toString),
-                      Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT,
+         new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
+                      (panelHeight - Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT) / 2,
+                      Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
+                      Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT,
                       multi.numFrames.toString),
          new GuiItemStack(panelWidth - 20, (panelHeight - 18) / 2, new ItemStack(FemtoItems.itemFrame), false)
        )
@@ -73,7 +73,7 @@ object GuiMultiblockSelection {
 class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends GuiBase(new ContainerMultiblockSelection) {
   xSize = GuiMultiblockSelection.WIDTH
   ySize = GuiMultiblockSelection.HEIGHT
-  val selectionFlow                   =
+  val selectionFlow =
     new GuiFlowLayout(GuiMultiblockSelection.xSelectionMin,
                       GuiMultiblockSelection.ySelectionMin,
                       GuiMultiblockSelection.SelectionWidth,
@@ -93,9 +93,9 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                         }
                       }): _*
                      )
-  val pageLabel = new GuiLabel((GuiMultiblockSelection.WIDTH - 100) / 2,
-                               GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
-                               100, 10, "")
+  val pageLabel     = new GuiLabel((GuiMultiblockSelection.WIDTH - 100) / 2,
+                                   GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
+                                   100, 10, "")
   selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
   var selected: GuiMultiblockSelector = null
   refreshPageLabelText()

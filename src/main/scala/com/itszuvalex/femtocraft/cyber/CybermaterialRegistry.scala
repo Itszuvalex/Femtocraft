@@ -50,9 +50,9 @@ object CybermaterialRegistry {
       (0 until 16).foreach(registerBlockReplacement(Block.getBlockFromItem(stack.getItem), _, FemtoBlocks.blockCyberleaf, 0))
             }
 
-    (0 until 16).foreach(registerBlockReplacement(Blocks.stone, _, FemtoBlocks.blockCyberweave, 0))
-    (0 until 16).foreach(registerBlockReplacement(Blocks.grass, _, FemtoBlocks.blockCyberweave, 0))
-    (0 until 16).foreach(registerBlockReplacement(Blocks.dirt, _, FemtoBlocks.blockCyberweave, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.STONE, _, FemtoBlocks.blockCyberweave, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.GRASS, _, FemtoBlocks.blockCyberweave, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.DIRT, _, FemtoBlocks.blockCyberweave, 0))
   }
 
   def registerBlockReplacement(block: Block, damage: Int, replaceBlock: Block, replaceDamage: Int) = {

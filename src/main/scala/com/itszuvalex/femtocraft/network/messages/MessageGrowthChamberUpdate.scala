@@ -1,35 +1,33 @@
 package com.itszuvalex.femtocraft.network.messages
 
 import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
-import cpw.mods.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
+import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.network.messages.MessageBase
 import io.netty.buffer.ByteBuf
-import net.minecraftforge.common.DimensionManager
+import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
 
 /**
   * Created by Alex on 06.11.2015.
   */
-class MessageGrowthChamberUpdate(var x: Int, var y: Int, var z: Int, var dim: Int, var progressTicks: Int) extends IMessage with IMessageHandler[MessageGrowthChamberUpdate, IMessage] {
-  def this() = this(0, 0, 0, 0, 0)
+class MessageGrowthChamberUpdate(var loc: Loc4, var progressTicks: Int) extends MessageBase[MessageGrowthChamberUpdate, IMessage] {
+  def this() = this(Loc4(0, 0, 0, 0), 0)
 
   override def toBytes(buf: ByteBuf): Unit = {
-    buf.writeInt(x)
-    buf.writeShort(y)
-    buf.writeInt(z)
-    buf.writeInt(dim)
+    buf.writeInt(loc.x)
+    buf.writeShort(loc.y)
+    buf.writeInt(loc.z)
+    buf.writeInt(loc.dim)
     buf.writeInt(progressTicks)
   }
 
   override def fromBytes(buf: ByteBuf): Unit = {
-    x = buf.readInt()
-    y = buf.readShort()
-    z = buf.readInt
-    dim = buf.readInt
+    loc = Loc4(buf.readInt(), buf.readShort(), buf.readInt(), buf.readInt())
     progressTicks = buf.readInt()
   }
 
   override def onMessage(message: MessageGrowthChamberUpdate, ctx: MessageContext): IMessage = {
-    DimensionManager.getWorld(dim).getTileEntity(x, y, z) match {
-      case te: TileGrowthChamber =>
+    message.loc.getTileEntity() match {
+      case Some(te: TileGrowthChamber) =>
         te.progressTicks = message.progressTicks
         if (te.currentRecipe != null) te.progress = math.floor((te.progressTicks * 100) / te.currentRecipe.ticks.toDouble).toInt
       case _ =>

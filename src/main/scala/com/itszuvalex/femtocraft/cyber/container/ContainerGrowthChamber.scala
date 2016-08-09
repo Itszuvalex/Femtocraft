@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.cyber.tile.TileGrowthChamber
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.gui.OutputSlot
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.{ICrafting, Slot}
+import net.minecraft.inventory.{IContainerListener, Slot}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fluids.{FluidRegistry, FluidStack}
 
@@ -28,12 +28,12 @@ class ContainerGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, te: Til
 
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
-    crafters.foreach { case crafter: ICrafting =>
-      if (te.progress != prevProgress) crafter.sendProgressBarUpdate(this, 0, te.progress);
+    listeners.foreach { crafter: IContainerListener =>
+      if (te.progress != prevProgress) crafter.sendProgressBarUpdate(this, 0, te.progress)
       prevProgress = te.progress
-      if (te.tank.getFluidAmount != prevWaterAmt) crafter.sendProgressBarUpdate(this, 1, te.tank.getFluidAmount);
+      if (te.tank.getFluidAmount != prevWaterAmt) crafter.sendProgressBarUpdate(this, 1, te.tank.getFluidAmount)
       prevWaterAmt = te.tank.getFluidAmount
-                     }
+                      }
   }
 
   override def updateProgressBar(id: Int, value: Int): Unit = {

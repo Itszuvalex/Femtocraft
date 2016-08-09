@@ -3,17 +3,13 @@ package com.itszuvalex.femtocraft.power.render
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.IPowerPedestal
 import com.itszuvalex.femtocraft.power.tile.TilePowerSink
-import com.itszuvalex.femtocraft.render.RenderIDs
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler
-import net.minecraft.block.Block
+import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.RenderBlocks
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.world.IBlockAccess
-import net.minecraftforge.client.model.AdvancedModelLoader
-import net.minecraftforge.client.model.obj.WavefrontObject
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.client.model.ModelLoaderRegistry
+import net.minecraftforge.client.model.obj.OBJModel
 import org.lwjgl.opengl.GL11
 
 /**
@@ -29,19 +25,16 @@ object PowerSinkRenderer {
   val PART_TORUS_OUTER = "OuterTorus"
 }
 
-class PowerSinkRenderer extends TileEntitySpecialRenderer with ISimpleBlockRenderingHandler {
-  val pedestalModel = AdvancedModelLoader.loadModel(PowerSinkRenderer.modelLocation).asInstanceOf[WavefrontObject]
+class PowerSinkRenderer extends TileEntitySpecialRenderer[TilePowerSink] {
+  val pedestalModel = ModelLoaderRegistry.getModelOrMissing(PowerSinkRenderer.modelLocation).asInstanceOf[OBJModel]
 
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+  override def renderTileEntityAt(te: TilePowerSink, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     GL11.glPushMatrix()
-    GL11.glTranslated(x + .5, y, z + .5)
-    val f2: Float = tile.getWorldObj.getTotalWorldTime.toFloat + partialTicks
-    tile match {
-      case sink: TilePowerSink =>
-        val flipped = sink.getLoc.getOffset(ForgeDirection.UP).getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])
-        renderSink(flipped, f2)
-      case _ =>
-    }
+    RenderUtils.translationBlock(x + .5, y, z + .5) {
+                                                      val f2: Float = te.getWorld.getTotalWorldTime.toFloat + partialTicks
+                                                      val flipped = te.getLoc.getOffset(EnumFacing.UP).getTileEntity(true).exists(_.isInstanceOf[IPowerPedestal])
+                                                      renderSink(flipped, f2)
+                                                    }
     GL11.glPopMatrix()
   }
 
@@ -57,33 +50,29 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer with ISimpleBlockRende
     }
 
 
-    pedestalModel.renderPart(PowerSinkRenderer.PART_FRAME)
-    pedestalModel.renderPart(PowerSinkRenderer.PART_SPHERE)
+    pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_FRAME))
+    pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_SPHERE))
 
     GL11.glPushMatrix()
-    GL11.glTranslated(0, .5, 0)
-    GL11.glRotatef(partialTicks * 2, 1f, 0f, 0f)
-    GL11.glTranslated(0, -.5, 0)
-    pedestalModel.renderPart(PowerSinkRenderer.PART_TORUS_OUTER)
-    GL11.glTranslated(0, .5, 0)
-    GL11.glRotatef(partialTicks * 3, 0f, 0f, 1f)
-    GL11.glTranslated(0, -.5, 0)
-    pedestalModel.renderPart(PowerSinkRenderer.PART_TORUS_INNER)
+    RenderUtils.translationBlock(0, .5, 0) {
+                                             GL11.glRotatef(partialTicks * 2, 1f, 0f, 0f)
+                                           }
+    pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_TORUS_OUTER))
+    RenderUtils.translationBlock(0, .5, 0) {
+                                             GL11.glRotatef(partialTicks * 3, 0f, 0f, 1f)
+                                           }
+    pedestalModel.renderGroups(Set(PowerSinkRenderer.PART_TORUS_INNER))
     GL11.glPopMatrix()
   }
 
-  override def getRenderId: Int = RenderIDs.powerSinkID
+  //  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {
+  //    GL11.glPushMatrix()
+  //    GL11.glTranslated(0, -.5, 0)
+  //    renderSink(flipped = false, 0)
+  //    GL11.glPopMatrix()
+  //  }
 
-  override def shouldRender3DInInventory(modelId: Int) = true
-
-  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {
-    GL11.glPushMatrix()
-    GL11.glTranslated(0, -.5, 0)
-    renderSink(flipped = false, 0)
-    GL11.glPopMatrix()
-  }
-
-  override def renderWorldBlock(world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, modelId: Int, renderer: RenderBlocks): Boolean = {
-    false
-  }
+  //  override def renderWorldBlock(world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, modelId: Int, renderer: RenderBlocks): Boolean = {
+  //    false
+  //  }
 }

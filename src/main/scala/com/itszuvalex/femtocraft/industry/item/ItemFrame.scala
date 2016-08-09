@@ -13,6 +13,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{ActionResult, EnumActionResult, EnumFacing, EnumHand}
 import net.minecraft.world.World
 import net.minecraftforge.common.util.ForgeDirection
 
@@ -35,7 +37,7 @@ object ItemFrame {
 
   def setSelection(stack: ItemStack, name: String) = {
     if (stack != null) {
-      if (stack.getTagCompound == null) stack.stackTagCompound = new NBTTagCompound()
+      if (stack.getTagCompound == null) stack.setTagCompound(new NBTTagCompound())
       stack.getTagCompound()(
                               FRAME_COMPOUND -> NBTCompound(
                                                              SELECTION_TAG -> name
@@ -51,17 +53,18 @@ class ItemFrame extends Item with IFrameItem {
 
   override def renderID: Int = RenderIDs.framePreviewableID
 
-  override def onItemRightClick(item: ItemStack, world: World, player: EntityPlayer): ItemStack = {
-    if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
-      item
+
+  override def onItemRightClick(itemStackIn: ItemStack, worldIn: World, playerIn: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
+    if (playerIn.isSneaking) {
+      playerIn.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, worldIn, 0, 0, 0)
+      new ActionResult(EnumActionResult.SUCCESS, itemStackIn)
     }
     else
-      super.onItemRightClick(item, world, player)
+      super.onItemRightClick(itemStackIn, worldIn, playerIn, hand)
   }
 
-  override def addInformation(stack: ItemStack, player: EntityPlayer, tooltip: util.List[_], advanced: Boolean): Unit = {
-    super.addInformation(stack, player, tooltip, advanced)
+  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
+    super.addInformation(stack, playerIn, tooltip, advanced)
     val list = tooltip.asInstanceOf[util.List[String]]
     list.add("Frame: " + getFrameType(stack))
     val selected = getSelectedMultiblock(stack)
@@ -72,49 +75,49 @@ class ItemFrame extends Item with IFrameItem {
 
   override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 
-  override def onItemUse(itemStack: ItemStack, player: EntityPlayer, world: World, x: Int, y: Int, z: Int, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    if (itemStack == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    if (player.isSneaking) {
-      player.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, world, 0, 0, 0)
-      return true
+  override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    if (stack == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    if (playerIn.isSneaking) {
+      playerIn.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, worldIn, 0, 0, 0)
+      return EnumActionResult.SUCCESS
     }
-    val multiString = getSelectedMultiblock(itemStack)
-    if (multiString == null || multiString.isEmpty) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    val multiString = getSelectedMultiblock(stack)
+    if (multiString == null || multiString.isEmpty) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
-    if (multi == null) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    if (multi == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
 
-    var hitSide = side
-    val block = world.getBlock(x, y, z)
+    var hitSide = facing
+    val block = worldIn.getBlockState(pos).getBlock
 
-    var dir = ForgeDirection.UNKNOWN
-    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
-      hitSide = 1
-    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush
-               && !block.isReplaceable(world, x, y, z)) {
-      dir = ForgeDirection.getOrientation(hitSide)
-    }
-
-    val bx = x + dir.offsetX
-    val by = y + dir.offsetY
-    val bz = z + dir.offsetZ
-    if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-
-    val locations = multi.getTakenLocations(world, bx, by, bz)
-    if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
-
-    locations.foreach { loc =>
-      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
-      world.getTileEntity(loc.x, loc.y, loc.z) match {
-        case frame: TileFrame =>
-          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
-          frame.formMultiBlock(world, bx, by, bz)
-          frame.multiBlock = multiString
-        case _ =>
-      }
-                      }
-    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
-    true
+    //    var dir = ForgeDirection.UNKNOWN
+    //    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
+    //      hitSide = 1
+    //    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush
+    //               && !block.isReplaceable(world, x, y, z)) {
+    //      dir = ForgeDirection.getOrientation(hitSide)
+    //    }
+    //
+    //    val bx = x + dir.offsetX
+    //    val by = y + dir.offsetY
+    //    val bz = z + dir.offsetZ
+    //    if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    //
+    //    val locations = multi.getTakenLocations(world, bx, by, bz)
+    //    if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
+    //    else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
+    //
+    //    locations.foreach { loc =>
+    //      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
+    //      world.getTileEntity(loc.x, loc.y, loc.z) match {
+    //        case frame: TileFrame =>
+    //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
+    //          frame.formMultiBlock(world, bx, by, bz)
+    //          frame.multiBlock = multiString
+    //        case _ =>
+    //      }
+    //                      }
+    //    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
+    EnumActionResult.SUCCESS
   }
 }

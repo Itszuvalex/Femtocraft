@@ -1,12 +1,11 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.{Femtocraft, Resources}
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
@@ -20,11 +19,11 @@ object GuiFrame {
 
 class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrame(player, inv, tile)) {
 
-  val nameLabel = new GuiLabel((panelWidth - frender.getStringWidth(tile.multiBlock)) / 2, 7,
-                               frender.getStringWidth(tile.multiBlock), frender.FONT_HEIGHT,
-                               tile.multiBlock)
-  val requiredLabel = new GuiLabel((panelWidth - frender.getStringWidth("Required")) / 2, 9 + frender.FONT_HEIGHT,
-                                   frender.getStringWidth("Required"), frender.FONT_HEIGHT,
+  val nameLabel     = new GuiLabel((panelWidth - fontRendererObj.getStringWidth(tile.multiBlock)) / 2, 7,
+                                   fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
+                                   tile.multiBlock)
+  val requiredLabel = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Required")) / 2, 9 + fontRendererObj.FONT_HEIGHT,
+                                   fontRendererObj.getStringWidth("Required"), fontRendererObj.FONT_HEIGHT,
                                    "Required")
   val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
   val reqItems      = multiblock match {
@@ -32,13 +31,9 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
       m.getRequiredResources.map(new GuiItemStack(0, 0, _, false))
     case None => Seq[GuiElement]()
   }
-  val layout        = new GuiFlowLayout(7, 11 + frender.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
-  val itemSlots =
+  val layout        = new GuiFlowLayout(7, 11 + fontRendererObj.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
+  val itemSlots     =
     (0 until 9).map(i => new GuiItemStack(7 + 18 * i, 61, null)).toSeq
-
-  def frender: FontRenderer = {
-    Minecraft.getMinecraft.fontRenderer
-  }
 
   itemSlots.foreach(_.setShouldRender(false))
 

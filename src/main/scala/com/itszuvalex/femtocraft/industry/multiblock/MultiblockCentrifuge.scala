@@ -4,9 +4,8 @@ import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.ItemStack
-import net.minecraft.world.World
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.Set
 
@@ -14,23 +13,22 @@ import scala.collection.Set
   * Created by Christopher Harris (Itszuvalex) on 8/28/15.
   */
 class MultiblockCentrifuge extends IFrameMultiblock {
-  override def canPlaceAtLocation(world: World, x: Int, y: Int, z: Int): Boolean =
-    getTakenLocations(world, x, y, z).forall(loc => world.isAirBlock(loc.x, loc.y, loc.z) || world.getBlock(loc.x, loc.y, loc.z).isReplaceable(world, loc.x, loc.y, loc.z))
-
-  override def getTakenLocations(world: World, x: Int, y: Int, z: Int): Set[Loc4] = {
-                                                                                      for {
-                                                                                        lx <- -1 to 1
-                                                                                        ly <- 0 until 5
-                                                                                        lz <- -1 to 1
-                                                                                      } yield Loc4(x + lx, y + ly, z + lz, world.provider.dimensionId)
-                                                                                    }.toSet
-
-  override def formAtLocation(world: World, x: Int, y: Int, z: Int): Boolean = getTakenLocations(world, x, y, z).forall(loc => world.setBlock(x, y, z, FemtoBlocks.blockCentrifuge))
 
 
-  override def formAtLocationFromItem(world: World, x: Int, y: Int, z: Int, item: ItemStack): Boolean = {
-    formAtLocation(world, x, y, z)
-  }
+  override def canPlaceAtLocation(loc: Loc4): Boolean =
+    getTakenLocations(loc).forall(l => l.getWorld.get.isAirBlock(loc.getPos) || l.getWorld.get.getBlockState(l.getPos).getBlock.isReplaceable(l.getWorld.get, l.getPos))
+
+  override def getTakenLocations(loc: Loc4): Set[Loc4] = {
+                                                           for {
+                                                             lx <- -1 to 1
+                                                             ly <- 0 until 5
+                                                             lz <- -1 to 1
+                                                           } yield Loc4(loc.x + lx, loc.y + ly, loc.z + lz, loc.dim)
+                                                         }.toSet
+
+  override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall(l => l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockCentrifuge.getDefaultState))
+
+  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = formAtLocation(loc)
 
   override def getName = "Centrifuge"
 
@@ -43,5 +41,5 @@ class MultiblockCentrifuge extends IFrameMultiblock {
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic", "Cyber")
 
-  override def onMultiblockBroken(world: World, x: Int, y: Int, z: Int): Unit = getTakenLocations(world, x, y, z).foreach { loc => world.setBlockToAir(loc.x, loc.y, loc.z) }
+  override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach { l => l.getWorld.get.setBlockToAir(l.getPos) }
 }

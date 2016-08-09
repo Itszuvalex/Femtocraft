@@ -6,8 +6,8 @@ import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
-import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.fluids.{Fluid, FluidTank}
 
 /**
@@ -26,9 +26,9 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
 
   override def defaultTank: FluidTank = new FluidTank(TileArcFurnace.FLUID_TANK_SIZE)
 
-  override def canFill(from: ForgeDirection, fluid: Fluid) = false
+  override def canFill(from: EnumFacing, fluid: Fluid) = false
 
-  override def canDrain(from: ForgeDirection, fluid: Fluid) = isValidMultiBlock
+  override def canDrain(from: EnumFacing, fluid: Fluid) = isValidMultiBlock
 
   override def hasGUI = isValidMultiBlock
 
@@ -42,7 +42,7 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     if (isController) {
-      AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + 2, yCoord + 3, zCoord + 2)
+      new AxisAlignedBB(getPos, getPos.add(2, 3, 2))
     }
     else super.getRenderBoundingBox
   }
