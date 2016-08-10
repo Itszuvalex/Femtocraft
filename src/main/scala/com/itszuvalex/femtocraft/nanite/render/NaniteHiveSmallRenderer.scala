@@ -24,6 +24,7 @@ class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer[TileNaniteHiveSm
 
   override def renderTileEntityAt(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     GL11.glPushMatrix()
+    GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glTranslated(x + .5, y, z + .5)
     preRender()
     model.renderGroups(Set("Box001"))

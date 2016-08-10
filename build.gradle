@@ -97,13 +97,12 @@ minecraft {
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-31-dev"
+    def name = "${project.mcVersion}-0.1.0-35-dev"
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'deobf')
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'src')
 
     compile 'org.scala-lang:scala-library:2.11.8'
 }
-
 
 sourceSets {
     main {

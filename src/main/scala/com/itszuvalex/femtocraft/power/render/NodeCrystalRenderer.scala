@@ -45,7 +45,7 @@ trait NodeCrystalRenderer[T <: TileEntity with IPowerNode] extends TileEntitySpe
 
       if (name._2 == 1) GL11.glRotated(f2 * name._2, 0, 1, 0)
 
-      crystalModel.renderGroups(Set(name._1), bindTextures = false)
+      crystalModel.renderGroups(Set(name._1))
       GL11.glPopMatrix()
     }
     GL11.glPopMatrix()

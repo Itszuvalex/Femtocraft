@@ -41,7 +41,7 @@ class PowerPedestalRenderer extends TileEntitySpecialRenderer[TilePowerPedestal]
   def renderPedestalAt(icolor: Int): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalTexLocation)
 
-    GL11.glColor3f(1f, 1f, 1f)
+    GL11.glColor4f(1f, 1f, 1f, 1f)
 
     pedestalModel.render()
 

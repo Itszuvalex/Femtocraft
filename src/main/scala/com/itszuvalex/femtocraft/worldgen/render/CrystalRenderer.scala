@@ -26,6 +26,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer[TileCrystalsWorldgen] {
     this.bindTexture(CrystalRenderer.crystalTexLocation)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_LIGHTING)
+    GL11.glPushMatrix()
 
     translationBlock(x + .5, y, z + .5) {
       GL11.glScaled(.01, .01, .01)
@@ -46,6 +47,7 @@ class CrystalRenderer extends TileEntitySpecialRenderer[TileCrystalsWorldgen] {
         }
       }
     }
+    GL11.glPopMatrix() // Stop leaking scaling change, idiot!
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glEnable(GL11.GL_LIGHTING)
   }

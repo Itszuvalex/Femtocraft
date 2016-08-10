@@ -39,7 +39,7 @@ class PowerSinkRenderer extends TileEntitySpecialRenderer[TilePowerSink] {
   def renderSink(flipped: Boolean, partialTicks: Float): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerSinkRenderer.texLocation)
 
-    GL11.glColor3f(1f, 1f, 1f)
+    GL11.glColor4f(1f, 1f, 1f, 1f)
 
     if (flipped) {
       GL11.glTranslated(0, .5, 0)
