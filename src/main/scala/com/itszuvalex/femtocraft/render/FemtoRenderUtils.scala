@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.Vector3
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import org.lwjgl.opengl.GL11
 
@@ -16,7 +17,9 @@ object FemtoRenderUtils {
     uMin: Float = 0, uMax: Float = 1, vMin: Float = 0, vMax: Float = 1, red: Int = 255, green: Int = 255, blue: Int = 255, alpha: Int = 0): Unit = {
     val rightVector = (end - start).normalize()
     val center = ((end - start) / 2) + start
-    val upVector = (center - Vector3(0, 0, 0)).cross(rightVector).normalize()
+    //    val cameraVec = Minecraft.getMinecraft.getRenderViewEntity.getPositionVector
+    val eyes = Minecraft.getMinecraft.getRenderViewEntity.getEyeHeight
+    val upVector = (center - Vector3(0, eyes, 0)).cross(rightVector).normalize()
     val pos1 = start + (upVector * width)
     val pos2 = start - (upVector * width)
     val pos3 = end - (upVector * width)
