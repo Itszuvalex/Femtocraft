@@ -32,3 +32,4 @@ eclipse/
 !/build.gradle.token
 !/ReplaceToken.sh
 !/gradle/wrapper/
+!ModelFile_UV_Halver.py

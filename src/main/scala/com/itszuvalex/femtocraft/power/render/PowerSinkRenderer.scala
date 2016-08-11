@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 1/28/2016.
   */
 object PowerSinkRenderer {
-  val modelLocation = Resources.CustomModelBlock("power sink/power_sink.obj")
+  val modelLocation = Resources.CustomModelBlock("power sink/power_sink_f.obj")
   val texLocation   = Resources.CustomModelBlockTex("power sink/power_sink.png")
 
   val PART_FRAME       = "Frame"
