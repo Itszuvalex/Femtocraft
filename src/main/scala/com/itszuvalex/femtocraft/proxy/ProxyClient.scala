@@ -38,7 +38,9 @@ import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
+import net.minecraft.item.Item
 import net.minecraft.world.World
+import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.obj.OBJLoader
 import net.minecraftforge.fml.client.registry.ClientRegistry
 
@@ -84,6 +86,8 @@ class ProxyClient extends ProxyCommon {
     super.registerRendering()
 
     OBJLoader.INSTANCE.addDomain(Femtocraft.ID.toLowerCase)
+
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalMount), 0, classOf[TileCrystalMount])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
