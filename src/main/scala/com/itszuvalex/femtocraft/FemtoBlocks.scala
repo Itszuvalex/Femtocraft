@@ -114,7 +114,9 @@ object FemtoBlocks {
   }
 
   def init(): Unit = {
-
+    blockCyberweave.registerModel()
+    blockCyberleaf.registerModel()
+    blockCyberwood.registerModel()
   }
 
   def postInit(): Unit = {
@@ -124,7 +126,7 @@ object FemtoBlocks {
   def registerBlock[T <: Block](block: T, name: String): T = {
     block.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase, name).setUnlocalizedName(name)
     GameRegistry.register(block)
-    GameRegistry.register(new ItemBlock(block).setRegistryName(block.getRegistryName))
+    GameRegistry.register(new ItemBlock(block).setRegistryName(block.getRegistryName).setUnlocalizedName(name))
     block
   }
 
@@ -132,6 +134,10 @@ object FemtoBlocks {
     def registerOre(name: String): T = {
       OreDictionary.registerOre(name, block)
       block
+    }
+
+    def registerModel() = {
+      Femtocraft.proxy.onRegisterBlock(block, block.getUnlocalizedName.substring(5))
     }
   }
 

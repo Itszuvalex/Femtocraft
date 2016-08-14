@@ -38,6 +38,9 @@ import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
+import net.minecraft.block.Block
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.item.Item
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
@@ -140,5 +143,13 @@ class ProxyClient extends ProxyCommon {
 
   override def registerEventHandlers(): Unit = {
     //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
+  }
+
+  override def onRegisterItem[T <: Item](item: T, name: String): Unit = {
+    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(item, 0, new ModelResourceLocation(Femtocraft.ID.toLowerCase() + ":" + name, "inventory"))
+  }
+
+  override def onRegisterBlock[T <: Block](block: T, name: String): Unit = {
+    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(Femtocraft.ID.toLowerCase() + ":" + name, "inventory"))
   }
 }

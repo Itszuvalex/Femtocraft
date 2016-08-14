@@ -28,6 +28,8 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
+import net.minecraft.block.Block
+import net.minecraft.item.Item
 import net.minecraft.world.World
 import net.minecraftforge.fml.common.registry.GameRegistry
 
@@ -98,5 +100,12 @@ class ProxyCommon {
 
   def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
     null
+  }
+
+  def onRegisterItem[T <: Item](item: T, name: String): Unit = {
+  }
+
+  def onRegisterBlock[T <: Block](block: T, name: String): Unit = {
+
   }
 }

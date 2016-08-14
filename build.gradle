@@ -275,9 +275,6 @@ artifactory {
 }
 
 idea {
-    project {
-        languageLevel = '1.7'
-    }
     module {
         inheritOutputDirs = true
     }

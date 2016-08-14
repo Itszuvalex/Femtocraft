@@ -24,40 +24,42 @@ object FemtoItems {
   var itemMultiblock: Item = null
 
   def preInit(): Unit = {
-    itemPowerCrystal = new ItemPowerCrystal().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.PowerCrystal")
-    GameRegistry.registerItem(itemPowerCrystal, "itemPowerCrystal")
-    OreDictionary.registerOre("itemCrystal", itemPowerCrystal)
-
-    itemFrame = new ItemFrame().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.Frame")
-    GameRegistry.registerItem(itemFrame, "itemFrameTest")
-
-    itemBaseSeed = new ItemBaseSeed().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.seed")
-    GameRegistry.registerItem(itemBaseSeed, "itemBaseSeed")
-
-    itemMultiblock = new ItemMultiblock().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.multiblock")
-    GameRegistry.registerItem(itemMultiblock, "itemMultiblock")
-
-    itemDumbDust = new ItemDumbDust().setUnlocalizedName("item.dumbDust")
-    GameRegistry.registerItem(itemDumbDust, "itemDumbDust")
-
-    itemCracklingDust = new Item().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.cracklingDust")
-    GameRegistry.registerItem(itemCracklingDust, "itemCracklingDust")
-
-    itemFurnaceAssembly = new ItemFurnaceAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.FurnaceAssembly")
-    GameRegistry.registerItem(itemFurnaceAssembly, "itemFurnaceAssembly")
-    OreDictionary.registerOre("assemblyFurnace", itemFurnaceAssembly)
-
-    itemGrinderAssembly = new ItemGrinderAssembly().setCreativeTab(Femtocraft.tab).setUnlocalizedName("item.GrinderAssembly")
-    GameRegistry.registerItem(itemGrinderAssembly, "itemGrinderAssembly")
-    OreDictionary.registerOre("assemblyGrinder", itemFurnaceAssembly)
+    itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
+    itemFrame = registerItem(new ItemFrame(), "itemFrame")
+    itemBaseSeed = registerItem(new ItemBaseSeed(), "itemBaseSeed")
+    itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
+    itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
+    itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
+    itemFurnaceAssembly = registerItem(new ItemFurnaceAssembly(), "itemFurnaceAssembly").registerOre("assemblyFurnace")
+    itemGrinderAssembly = registerItem(new ItemGrinderAssembly(), "itemGrinderAssembly").registerOre("assemblyGrinder")
   }
 
   def init(): Unit = {
-
+    itemPowerCrystal.registerModel()
+    itemDumbDust.registerModel()
+    itemCracklingDust.registerModel()
   }
 
   def postInit(): Unit = {
 
+  }
+
+
+  def registerItem[T <: Item](item: T, name: String): T = {
+    item.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase(), name).setUnlocalizedName(name)
+    GameRegistry.register(item)
+    item
+  }
+
+  implicit class ItemHelpers[T <: Item](item: T) {
+    def registerOre(name: String): T = {
+      OreDictionary.registerOre(name, item)
+      item
+    }
+
+    def registerModel() = {
+      Femtocraft.proxy.onRegisterItem(item, item.getUnlocalizedName.substring(5))
+    }
   }
 
 }
