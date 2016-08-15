@@ -13,7 +13,6 @@ import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.EnumBlockRenderType
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
@@ -42,10 +41,6 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
-
-  override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.ENTITYBLOCK_ANIMATED
-
-
   override def isNormalCube(state: IBlockState): Boolean = false
 
   override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit =
@@ -57,7 +52,6 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
         Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_POWER, pos.getX + rx, pos.getY + ry, pos.getZ + rz, tile.color)
       case _ =>
     }
-
 
   override def breakBlock(world: World, pos: BlockPos, state: IBlockState): Unit = {
     world.getTileEntity(pos) match {

@@ -4,10 +4,9 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.femtocraft.power.tile.TilePowerPedestal
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
-import com.itszuvalex.itszulib.render.RenderUtils
+import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import org.lwjgl.opengl.GL11
 
 /**
@@ -20,35 +19,38 @@ object PowerPedestalRenderer {
   val pedestalColoredTexLocation = Resources.CustomModelBlockTex("power pedestal/power_pedestal_2x_colored.png")
 }
 
-class PowerPedestalRenderer extends TileEntitySpecialRenderer[TilePowerPedestal] {
+class PowerPedestalRenderer extends TileEntityCombinedRenderer[TilePowerPedestal] {
   val pedestalModel = LoadObj(PowerPedestalRenderer.pedestalModelLocation)
 
-  override def renderTileEntityAt(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
+    renderPedestalAt(x, y, z, Color(0, 0, 0, 0))
+  }
+
+  override def renderTileEntityInWorld(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+    val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
+      case Some(a: ICrystalMount) => new Color(a.getColor)
+      case _ => Color(0.toByte, 255.toByte, 255.toByte, 255.toByte)
+    }).getOrElse(Color(0, 0, 0, 0))
+    renderPedestalAt(x, y, z, color)
+  }
+
+  def renderPedestalAt(x: Double, y: Double, z: Double, color: Color): Unit = {
     GL11.glPushMatrix()
     RenderUtils.translationBlock(x + .5, y, z + .5) {
+      Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalTexLocation)
 
-      val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
-        case Some(a: ICrystalMount) => new Color(a.getColor)
-        case _ => Color(0.toByte, 255.toByte, 255.toByte, 255.toByte)
-      }).getOrElse(Color(0, 0, 0, 0))
-      renderPedestalAt(color.toInt)
+      GL11.glColor3f(1f, 1f, 1f)
+
+      pedestalModel.render()
+
+      GL11.glColor3ub(color.red, color.green, color.blue)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalColoredTexLocation)
+      pedestalModel.render()
     }
 
     GL11.glPopMatrix()
-
-  }
-
-  def renderPedestalAt(icolor: Int): Unit = {
-    Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalTexLocation)
-
-    GL11.glColor4f(1f, 1f, 1f, 1f)
-
-    pedestalModel.render()
-
-    val color = new Color(icolor)
-    GL11.glColor3ub(color.red, color.green, color.blue)
-    Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalColoredTexLocation)
-    pedestalModel.render()
   }
 
   //  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {

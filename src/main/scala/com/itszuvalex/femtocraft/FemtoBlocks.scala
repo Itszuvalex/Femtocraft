@@ -119,6 +119,12 @@ object FemtoBlocks {
     blockCyberweave.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
+    blockCrystalMount.registerModel()
+    blockPowerPedestal.registerModel()
+    blockNaniteHiveSmall.registerModel()
+    blockPowerSink.registerModel()
+    blockCrystals.registerModel()
+    blockNanoFurnace.registerModel()
   }
 
   def postInit(): Unit = {

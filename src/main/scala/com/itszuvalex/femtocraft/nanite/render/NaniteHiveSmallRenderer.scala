@@ -4,9 +4,9 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.render.DiffusionNodeBeamRenderer
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
 
@@ -19,25 +19,33 @@ object NaniteHiveSmallRenderer {
   val hiveColorTexLocation = Resources.CustomModelBlockTex("nanite hive small/nanite hive small color.png")
 }
 
-class NaniteHiveSmallRenderer extends TileEntitySpecialRenderer[TileNaniteHiveSmall] {
+class NaniteHiveSmallRenderer extends TileEntityCombinedRenderer[TileNaniteHiveSmall] {
   val model = LoadObj(NaniteHiveSmallRenderer.hiveModelLocation)
 
-  override def renderTileEntityAt(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
+    renderAtLocWithColor(x, y, z, partialTicks, destroyStage, 0, Color(0, 0, 0, 0))
+  }
+
+  override def renderTileEntityInWorld(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+    renderAtLocWithColor(x, y, z, partialTicks, destroyStage, te.getWorld.getTotalWorldTime.toFloat, new Color(te.getColor))
+    DiffusionNodeBeamRenderer.renderDiffuseBeams(te, x, y, z, partialTicks)
+  }
+
+  private def renderAtLocWithColor(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, time: Float, color: Color): Unit = {
     GL11.glPushMatrix()
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glTranslated(x + .5, y, z + .5)
     preRender()
     model.renderGroups(Set("Box001"))
-    val time = te.getWorld.getTotalWorldTime.toFloat
     GL11.glRotatef(time + partialTicks, 0, 1, 0)
     model.renderGroups(Set("Sphere001"))
     Minecraft.getMinecraft.getTextureManager.bindTexture(NaniteHiveSmallRenderer.hiveColorTexLocation)
-    val color = new Color(te.getColor)
     val shift = Math.abs(MathHelper.sin(time * .03f) * .5f) + .5f
     GL11.glColor4ub(((color.red.toInt & 255) * shift).toByte, ((color.green & 255) * shift).toByte, ((color.blue & 255) * shift).toByte, 255.toByte)
     model.renderGroups(Set("Sphere001"))
     GL11.glPopMatrix()
-    DiffusionNodeBeamRenderer.renderDiffuseBeams(te, x, y, z, partialTicks)
   }
 
   def preRender() = {

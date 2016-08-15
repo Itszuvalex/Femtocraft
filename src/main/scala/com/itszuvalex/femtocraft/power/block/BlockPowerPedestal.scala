@@ -20,8 +20,6 @@ class BlockPowerPedestal extends TileContainer(Material.IRON) {
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TilePowerPedestal
 
-  override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.ENTITYBLOCK_ANIMATED
-
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
