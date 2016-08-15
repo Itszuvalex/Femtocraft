@@ -82,6 +82,7 @@ class ProxyCommon {
 
     GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 
+    GameRegistry.registerTileEntity(classOf[TileNanoFurnace], "TileNanoFurnace")
     GameRegistry.registerTileEntity(classOf[TileFrame], "TileFrame")
     GameRegistry.registerTileEntity(classOf[TileCyberMachineInProgress], "TileCyberMachineInProgress")
 

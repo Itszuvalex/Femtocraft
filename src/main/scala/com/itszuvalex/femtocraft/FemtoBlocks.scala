@@ -19,56 +19,57 @@ import net.minecraftforge.oredict.OreDictionary
   */
 object FemtoBlocks {
   //Cyber
-  var blockCyberweave: Block = null
-  var blockCyberwood : Block = null
-  var blockCyberleaf : Block = null
+  var blockCyberweave: Block = _
+  var blockCyberwood : Block = _
+  var blockCyberleaf : Block = _
 
-  var blockCrystals: Block = null
-
-
-  var blockArcFurnace            : Block = null
-  var blockCrystallizationChamber: Block = null
-  var blockCentrifuge            : Block = null
-  var blockMaterialProcessor     : Block = null
-  var blockGrowthChamber         : Block = null
-  var blockBioBeacon             : Block = null
-  var blockCondensationArray     : Block = null
-  var blockCybermatDisintegrator : Block = null
-  var blockGraspingVines         : Block = null
-  var blockLashingVines          : Block = null
-  var blockMetabolicConverter    : Block = null
-  var blockPhotosynthesisTower   : Block = null
-  var blockSporeDistributor      : Block = null
-  var blockItemRepository        : Block = null
+  var blockCrystals: Block = _
 
 
-  var blockFrame                 : Block = null
-  var blockCyberBase             : Block = null
-  var blockCyberMachineInProgress: Block = null
+  var blockArcFurnace            : Block = _
+  var blockCrystallizationChamber: Block = _
+  var blockCentrifuge            : Block = _
+  var blockMaterialProcessor     : Block = _
+  var blockGrowthChamber         : Block = _
+  var blockBioBeacon             : Block = _
+  var blockCondensationArray     : Block = _
+  var blockCybermatDisintegrator : Block = _
+  var blockGraspingVines         : Block = _
+  var blockLashingVines          : Block = _
+  var blockMetabolicConverter    : Block = _
+  var blockPhotosynthesisTower   : Block = _
+  var blockSporeDistributor      : Block = _
+  var blockItemRepository        : Block = _
+  var blockNanoFurnace           : Block = _
 
-  var blockNaniteHiveSmall: Block = null
-  var blockCrystalMount   : Block = null
-  var blockPowerPedestal  : Block = null
 
-  var blockPowerSink     : Block = null
-  var blockPowerGenerator: Block = null
+  var blockFrame                 : Block = _
+  var blockCyberBase             : Block = _
+  var blockCyberMachineInProgress: Block = _
 
-  var blockGlowStick: Block = null
+  var blockNaniteHiveSmall: Block = _
+  var blockCrystalMount   : Block = _
+  var blockPowerPedestal  : Block = _
+
+  var blockPowerSink     : Block = _
+  var blockPowerGenerator: Block = _
+
+  var blockGlowStick: Block = _
 
   //Tests
 
-  var testBlock       : Block = null
-  var testNetworkBlock: Block = null
+  var testBlock       : Block = _
+  var testNetworkBlock: Block = _
 
 
-  var testDiffusionNode      : Block = null
-  var testDiffusionTargetNode: Block = null
-  var testDirectNode         : Block = null
-  var testGenerationNode     : Block = null
-  var testTransferNode       : Block = null
+  var testDiffusionNode      : Block = _
+  var testDiffusionTargetNode: Block = _
+  var testDirectNode         : Block = _
+  var testGenerationNode     : Block = _
+  var testTransferNode       : Block = _
 
-  var testTaskProvider  : Block = null
-  var testWorkerProvider: Block = null
+  var testTaskProvider  : Block = _
+  var testWorkerProvider: Block = _
 
 
   def preInit(): Unit = {
@@ -89,6 +90,7 @@ object FemtoBlocks {
     blockMetabolicConverter = registerBlock(new BlockMetabolicConverter(), "blockMetabolicConverter")
     blockPhotosynthesisTower = registerBlock(new BlockPhotosynthesisTower(), "blockPhotosynthesisTower")
     blockSporeDistributor = registerBlock(new BlockSporeDistributor(), "blockSporeDistributor")
+    blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockFrame = registerBlock(new BlockFrame(), "blockFrame")
     blockCyberBase = registerBlock(new BlockCyberBase(), "blockCyberBase")
     blockCyberMachineInProgress = registerBlock(new BlockCyberMachineInProgress(), "blockInProgressMachine").setBlockUnbreakable().setResistance(Float.MaxValue / 3f)
