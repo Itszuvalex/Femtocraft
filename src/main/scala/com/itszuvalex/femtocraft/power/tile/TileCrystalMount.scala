@@ -92,7 +92,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode): Boolean =
-  child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType)
+  child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType) && (child.getNodeLoc != parentLoc)
 
   /**
     *
@@ -197,7 +197,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean = parent != null &&
-    Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType)
+    Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType) && !childrenLocs.contains(parent.getNodeLoc)
 
   /**
     *
