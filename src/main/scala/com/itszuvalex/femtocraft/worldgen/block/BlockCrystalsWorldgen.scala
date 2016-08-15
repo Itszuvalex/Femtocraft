@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.worldgen.block
 import java.util.Random
 
 import com.itszuvalex.femtocraft.power.item.{IPowerCrystal, ItemPowerCrystal}
+import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen._
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -53,7 +54,7 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
         val rx = rand.nextFloat()
         val ry = rand.nextFloat()
         val rz = rand.nextFloat()
-        Femtocraft.proxy.spawnParticle(worldIn, "power", pos.getX + rx, pos.getY + ry, pos.getZ + rz, tile.color)
+        Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_POWER, pos.getX + rx, pos.getY + ry, pos.getZ + rz, tile.color)
       case _ =>
     }
 

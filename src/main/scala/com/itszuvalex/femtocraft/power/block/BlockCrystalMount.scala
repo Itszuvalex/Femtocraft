@@ -5,6 +5,7 @@ import java.util.Random
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
+import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
 import net.minecraft.block.material.Material
@@ -33,12 +34,12 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
   override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit = {
     worldIn.getTileEntity(pos) match {
       case mount: ICrystalMount =>
-      //        if (mount.getCrystalStack != null)
-      //          Femtocraft.proxy.spawnParticle(p_149734_1_, "power",
-      //            p_149734_2_ + .5 + (p_149734_5_.nextDouble() * .2 - .1),
-      //            p_149734_3_ + .5 + (p_149734_5_.nextDouble() * .2 - .1),
-      //            p_149734_4_ + .5 + (p_149734_5_.nextDouble() * .2 - .1),
-      //            mount.getColor)
+        if (mount.getCrystalStack != null)
+          Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_POWER,
+            pos.getX + .5 + (rand.nextDouble() * .2 - .1),
+            pos.getY + .5 + (rand.nextDouble() * .2 - .1),
+            pos.getZ + .5 + (rand.nextDouble() * .2 - .1),
+            mount.getColor)
       case _ =>
     }
   }

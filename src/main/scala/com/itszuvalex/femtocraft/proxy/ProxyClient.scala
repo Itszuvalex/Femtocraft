@@ -31,6 +31,7 @@ import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
+import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal, TilePowerSink}
@@ -38,51 +39,53 @@ import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
+import net.minecraft.client.particle.Particle
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.item.Item
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.obj.OBJLoader
 import net.minecraftforge.fml.client.registry.ClientRegistry
+import org.apache.logging.log4j.Level
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
-    //    if (!world.isRemote) {
-    //      Femtocraft.logger.log(Level.WARN, "Attempted to spawn particle of type \"" + name + "\" on a non-client world.")
-    //      return null
-    //    }
-    //
-    //    val mc = Minecraft.getMinecraft
-    //    val deltaX = mc.renderViewEntity.posX - x
-    //    val deltaY = mc.renderViewEntity.posY - y
-    //    val deltaZ = mc.renderViewEntity.posZ - z
-    //    val renderDistance = 16D
-    //    var fx: EntityFX = null
-    //    if ((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) > (renderDistance * renderDistance)) {
-    //      return null
-    //    }
-    //    val col = new Color(color)
-    //
-    //    name match {
-    //      case ProxyCommon.PARTICLE_POWER =>
-    //        fx = new EntityFxPower(world, x, y, z,
-    //                               (col.red.toInt & 255).toFloat / 255f,
-    //                               (col.green.toInt & 255).toFloat / 255f,
-    //                               (col.blue.toInt & 255).toFloat / 255f
-    //                              )
-    //      case ProxyCommon.PARTICLE_NANITE =>
-    //        fx = new EntityFxNanites(world, x, y, z,
-    //                                 (col.red.toInt & 255).toFloat / 255f,
-    //                                 (col.green.toInt & 255).toFloat / 255f,
-    //                                 (col.blue.toInt & 255).toFloat / 255f)
-    //      case _ =>
-    //        return null
-    //    }
-    //    mc.effectRenderer.addEffect(fx)
-    //    fx
-    null
+    if (!world.isRemote) {
+      Femtocraft.logger.log(Level.WARN, "Attempted to spawn particle of type \"" + name + "\" on a non-client world.")
+      return null
+    }
+
+    val mc = Minecraft.getMinecraft
+    val deltaX = mc.getRenderViewEntity.posX - x
+    val deltaY = mc.getRenderViewEntity.posY - y
+    val deltaZ = mc.getRenderViewEntity.posZ - z
+    val renderDistance = 16D
+    var fx: Particle = null
+    if ((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) > (renderDistance * renderDistance)) {
+      return null
+    }
+    val col = new Color(color)
+
+    name match {
+      case ProxyCommon.PARTICLE_POWER =>
+        fx = new EntityFxPower(world, x, y, z,
+          (col.red.toInt & 255).toFloat / 255f,
+          (col.green.toInt & 255).toFloat / 255f,
+          (col.blue.toInt & 255).toFloat / 255f
+        )
+      case ProxyCommon.PARTICLE_NANITE =>
+        fx = new EntityFxNanites(world, x, y, z,
+          (col.red.toInt & 255).toFloat / 255f,
+          (col.green.toInt & 255).toFloat / 255f,
+          (col.blue.toInt & 255).toFloat / 255f)
+      case _ =>
+        return null
+    }
+    mc.effectRenderer.addEffect(fx)
+    fx
   }
 
   override def registerRendering() {
