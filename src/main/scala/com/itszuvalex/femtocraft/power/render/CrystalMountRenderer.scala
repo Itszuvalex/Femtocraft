@@ -34,7 +34,13 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer[TileCrystalMount] {
 
   override def renderTileEntityAt(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     renderCrystalMountAt(te, x, y, z, partialTicks, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)))
-    if (te.getCrystalStack != null)
+    if (te.getCrystalStack != null) {
+      if (te.getParent != null) {
+        te.getParent.getType match {
+          case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, te.getParent.getNodeLoc)
+          case _ =>
+        }
+      }
       te.getChildrenLocs.map(loc => loc.getTileEntity().orNull).collect { case i: IPowerNode => i }.
         foreach { t =>
           t.getType match {
@@ -43,7 +49,8 @@ class CrystalMountRenderer extends TileEntitySpecialRenderer[TileCrystalMount] {
             case _ =>
           }
         }
-
+    }
+    
     def renderCrystalMountAt(tile: TileEntity with ICrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, hasTop: Boolean): Unit = {
       GL11.glPushMatrix()
       RenderUtils.translationBlock(renderX + .5, renderY, renderZ + .5) {
