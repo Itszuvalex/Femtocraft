@@ -199,6 +199,19 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def canSetParent(parent: IPowerNode): Boolean = parent != null &&
     Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType) && !childrenLocs.contains(parent.getNodeLoc)
 
+
+  /**
+    *
+    * @param parent Parent being set.
+    *
+    * @return True if parent is successfully set to input parent.
+    */
+  override def setParent(parent: IPowerNode): Boolean = {
+    val ret = super.setParent(parent)
+    setUpdate()
+    ret
+  }
+
   /**
     *
     * @return The type of PowerNode this is.
