@@ -22,9 +22,9 @@ object PowerPedestalRenderer {
 class PowerPedestalRenderer extends TileEntityCombinedRenderer[TilePowerPedestal] {
   val pedestalModel = LoadObj(PowerPedestalRenderer.pedestalModelLocation)
 
-  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
-    renderPedestalAt(x, y, z, Color(0, 0, 0, 0))
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
+    renderPedestalAt(x, y, z, Color(0, 255.toByte, 255.toByte, 255.toByte))
   }
 
   override def renderTileEntityInWorld(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {

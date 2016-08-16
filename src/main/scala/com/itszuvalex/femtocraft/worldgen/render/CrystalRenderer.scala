@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.client.Minecraft
 import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
 
@@ -21,9 +22,9 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
   val crystalModel = LoadObj(CrystalRenderer.crystalModelLocation)
 
 
-  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
-    renderCrystalAt(x, y, z, partialTicks, 0, Color(0, 255.toByte, 255.toByte, 255.toByte), Array.fill(11)(0))
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
+    renderCrystalAt(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), Color(0, 255.toByte, 255.toByte, 255.toByte), Array.fill(11)(Color(255.toByte, 0, 0, 0).toInt))
   }
 
   override def renderTileEntityInWorld(te: TileCrystalsWorldgen, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
@@ -59,5 +60,6 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
     GL11.glPopMatrix() // Stop leaking scaling change, idiot!
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glEnable(GL11.GL_LIGHTING)
+    GL11.glEnable(GL11.GL_CULL_FACE)
   }
 }

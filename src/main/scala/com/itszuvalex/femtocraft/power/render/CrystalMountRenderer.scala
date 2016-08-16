@@ -29,9 +29,9 @@ object CrystalMountRenderer {
 class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] {
   val crystalModel = LoadObj(crystalModelLocation)
 
-  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
-    renderCrystalMountAt(x, y, z, partialTicks, 0f, false, false, Color(0, 0, 0, 0))
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
+    renderCrystalMountAt(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), false, false, Color(0, 0, 0, 0))
   }
 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {

@@ -25,9 +25,9 @@ object PowerSinkRenderer {
 class PowerSinkRenderer extends TileEntityCombinedRenderer[TilePowerSink] {
   val pedestalModel = LoadObj(PowerSinkRenderer.modelLocation)
 
-  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
-    renderSink(x, y, z, false, partialTicks)
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
+    renderSink(x, y, z, false, Minecraft.getMinecraft.getRenderPartialTicks + Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f))
   }
 
   override def renderTileEntityInWorld(te: TilePowerSink, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {

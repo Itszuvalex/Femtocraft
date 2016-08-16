@@ -22,9 +22,9 @@ object NaniteHiveSmallRenderer {
 class NaniteHiveSmallRenderer extends TileEntityCombinedRenderer[TileNaniteHiveSmall] {
   val model = LoadObj(NaniteHiveSmallRenderer.hiveModelLocation)
 
-  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityAsItem(x, y, z, partialTicks, destroyStage)
-    renderAtLocWithColor(x, y, z, partialTicks, destroyStage, 0, Color(0, 0, 0, 0))
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
+    renderAtLocWithColor(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, 0, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), Color(0, 255.toByte, 255.toByte, 255.toByte))
   }
 
   override def renderTileEntityInWorld(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
