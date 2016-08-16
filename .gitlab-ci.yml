@@ -10,9 +10,10 @@ full_build:
     - develop
   script:
     - rm -rf build/libs/*
-    - gradle setupCIWorkspace
-    - gradle build
-    - gradle artifactoryPublish
+    - chmod +x ./gradlew
+    - ./gradlew setupCIWorkspace
+    - ./gradlew build
+    - ./gradlew artifactoryPublish
   cache:
     untracked: true
     key: "$CI_BUILD_NAME"
