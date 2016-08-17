@@ -14,10 +14,10 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 9/19/2015.
   */
 object ArcFurnaceRenderer {
-  val modelLoc         = Resources.CustomModelBlock("arc furnace/Arc Furnace.obj")
-  val textureLoc       = Resources.CustomModelBlockTex("arc furnace/Arc Furnace Template.png")
-  //  val inProgressModel  = AdvancedModelLoader.loadModel(Resources.Model("_in-progress/arc furnace/Arc Furnace In-Progress.obj")).asInstanceOf[WavefrontObject]
-  val inProgressTexLoc = Resources.CustomModelBlockTex("_in-progress/arc furnace/Arc Furnace In-Progress.png")
+  val modelLoc           = Resources.CustomModelBlock("arc furnace/Arc Furnace.obj")
+  val textureLoc         = Resources.CustomModelBlockTex("arc furnace/Arc Furnace Template.png")
+  val inProgressModelLoc = Resources.CustomModelBlock("arc furnace/Arc Furnace In-Progress.obj")
+  val inProgressTexLoc   = Resources.CustomModelBlockTex("arc furnace/Arc Furnace In-Progress.png")
 }
 
 
@@ -46,33 +46,35 @@ class ArcFurnaceRenderer extends TileEntitySpecialRenderer[TileArcFurnace] with 
   }
 
   override def renderInProgressAt(x: Double, y: Double, z: Double, partialTime: Float, frame: TileFrame): Unit = {
-    //
-    //    Minecraft.getMinecraft.getTextureManager.bindTexture(ArcFurnaceRenderer.inProgressTexLoc)
-    //
-    //    GL11.glPushMatrix()
-    //    GL11.glTranslated(x + 1, y, z + 1)
-    //        GL11.glDisable(GL11.GL_LIGHTING)
-    //    GL11.glEnable(GL11.GL_BLEND)
-    //    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    //    GL11.glColor4f(1f, 1f, 1f, 1f)
-    //
-    //    val timePerPart = frame.totalMachineBuildTime / ArcFurnaceRenderer.inProgressModel.groupObjects.size()
-    //    val currentPart = math.ceil(frame.progress / ArcFurnaceRenderer.inProgressModel.groupObjects.size().toDouble).toInt
-    //
-    //    if (currentPart > 1) {
-    //      for (i <- 1 until currentPart) {
-    //        ArcFurnaceRenderer.inProgressModel.renderPart("Stage" + (if (i < 10) "0" else "") + i)
-    //      }
-    //    }
-    //    val time = frame.getWorldObj.getTotalWorldTime + partialTime
-    //    if (currentPart != frame.inProgressData.getOrElseUpdate("lastPart", 0)) {
-    //      frame.inProgressData("targetTime") = time + timePerPart
-    //      frame.inProgressData("lastPart") = currentPart
-    //    }
-    //    GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - (256 / math.min(16f, timePerPart)) * math.min(math.min(16f, timePerPart), frame.inProgressData.getOrElseUpdate("targetTime", 0f).asInstanceOf[Float] - time)).toByte)
-    //    ArcFurnaceRenderer.inProgressModel.renderPart("Stage" + (if (currentPart < 10) "0" else "") + currentPart)
-    //        GL11.glEnable(GL11.GL_LIGHTING)
-    //    GL11.glPopMatrix()
+
+    val inProgressModel = LoadObj(ArcFurnaceRenderer.inProgressModelLoc)
+
+    Minecraft.getMinecraft.getTextureManager.bindTexture(ArcFurnaceRenderer.inProgressTexLoc)
+
+        GL11.glPushMatrix()
+        GL11.glTranslated(x + 1, y, z + 1)
+        GL11.glDisable(GL11.GL_LIGHTING)
+        GL11.glEnable(GL11.GL_BLEND)
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GL11.glColor4f(1f, 1f, 1f, 1f)
+
+        val timePerPart = frame.totalMachineBuildTime / inProgressModel.getMatLib.getGroups.size()
+        val currentPart = math.ceil(frame.progress / inProgressModel.getMatLib.getGroups.size().toDouble).toInt
+
+        if (currentPart > 1) {
+          for (i <- 1 until currentPart) {
+            inProgressModel.renderGroups(Set("Stage" + (if (i < 10) "0" else "") + i))
+          }
+        }
+        val time = frame.getWorld.getTotalWorldTime + partialTime
+        if (currentPart != frame.inProgressData.getOrElseUpdate("lastPart", 0)) {
+          frame.inProgressData("targetTime") = time + timePerPart
+          frame.inProgressData("lastPart") = currentPart
+        }
+        GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, (256 - (256 / math.min(16f, timePerPart)) * math.min(math.min(16f, timePerPart), frame.inProgressData.getOrElseUpdate("targetTime", 0f).asInstanceOf[Float] - time)).toByte)
+        inProgressModel.renderGroups(Set("Stage" + (if (currentPart < 10) "0" else "") + currentPart))
+        GL11.glEnable(GL11.GL_LIGHTING)
+        GL11.glPopMatrix()
   }
 
   /**

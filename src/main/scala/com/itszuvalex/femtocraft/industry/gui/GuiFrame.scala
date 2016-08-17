@@ -19,6 +19,8 @@ object GuiFrame {
 
 class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrame(player, inv, tile)) {
 
+  fontRendererObj = Minecraft.getMinecraft.fontRendererObj
+
   val nameLabel     = new GuiLabel((panelWidth - fontRendererObj.getStringWidth(tile.multiBlock)) / 2, 7,
     fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
     tile.multiBlock)

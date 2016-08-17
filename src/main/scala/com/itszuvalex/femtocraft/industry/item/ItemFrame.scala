@@ -2,16 +2,21 @@ package com.itszuvalex.femtocraft.industry.item
 
 import java.util
 
+import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import net.minecraft.block.BlockSnow
+import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{ActionResult, EnumActionResult, EnumFacing, EnumHand}
+import net.minecraft.util._
 import net.minecraft.world.World
 
 /**
@@ -80,38 +85,34 @@ class ItemFrame extends Item with IFrameItem {
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
     if (multi == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
-
-    var hitSide = facing
     val block = worldIn.getBlockState(pos).getBlock
 
-    //    var dir = ForgeDirection.UNKNOWN
-    //    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
-    //      hitSide = 1
-    //    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush
-    //               && !block.isReplaceable(world, x, y, z)) {
-    //      dir = ForgeDirection.getOrientation(hitSide)
-    //    }
-    //
-    //    val bx = x + dir.offsetX
-    //    val by = y + dir.offsetY
-    //    val bz = z + dir.offsetZ
-    //    if (!multi.canPlaceAtLocation(world, bx, by, bz)) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    //
-    //    val locations = multi.getTakenLocations(world, bx, by, bz)
-    //    if (!player.capabilities.isCreativeMode && itemStack.stackSize < multi.numFrames) return super.onItemUse(itemStack, player, world, x, y, z, side, hitX, hitY, hitZ)
-    //    else if (!player.capabilities.isCreativeMode) itemStack.stackSize -= multi.numFrames
-    //
-    //    locations.foreach { loc =>
-    //      world.setBlock(loc.x, loc.y, loc.z, FemtoBlocks.blockFrame)
-    //      world.getTileEntity(loc.x, loc.y, loc.z) match {
-    //        case frame: TileFrame =>
-    //          frame.calculateRendering(ForgeDirection.VALID_DIRECTIONS.filter(dir => locations.contains(Loc4(bx, by, bz, world.provider.dimensionId).getOffset(dir))))
-    //          frame.formMultiBlock(world, bx, by, bz)
-    //          frame.multiBlock = multiString
-    //        case _ =>
-    //      }
-    //                      }
-    //    world.playSoundEffect(bx, by, bz, "dig.stone", 1f, 1f / 5f)
+        var dir: EnumFacing = null
+        if (block == Blocks.SNOW_LAYER && (worldIn.getBlockState(pos).getValue(BlockSnow.LAYERS).toInt & 7) < 1) {
+          dir = EnumFacing.UP
+        } else if (block != Blocks.VINE && block != Blocks.TALLGRASS && block != Blocks.DEADBUSH
+                   && !block.isReplaceable(worldIn, pos)) {
+          dir = facing
+        }
+
+        val bpos = pos.offset(dir)
+        if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+
+        val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
+        if (!playerIn.capabilities.isCreativeMode && stack.stackSize < multi.numFrames) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+        else if (!playerIn.capabilities.isCreativeMode) stack.stackSize -= multi.numFrames
+
+        locations.foreach { loc =>
+          worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)
+          worldIn.getTileEntity(loc.getPos) match {
+            case frame: TileFrame =>
+              frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
+              frame.formMultiBlock(new Loc4(worldIn, bpos))
+              frame.multiBlock = multiString
+            case _ =>
+          }
+                          }
+        worldIn.playSound(null, bpos, SoundEvent.REGISTRY.getObject(new ResourceLocation("block.stone.break")), SoundCategory.BLOCKS, 1f, 1f / 5f)
     EnumActionResult.SUCCESS
   }
 
