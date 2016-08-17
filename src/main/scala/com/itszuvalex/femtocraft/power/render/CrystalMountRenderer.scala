@@ -9,6 +9,7 @@ import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumFacing
+import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
 
 /**
@@ -36,19 +37,21 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
-    renderCrystalMountAt(x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null, new Color(te.getColor))
+    if (MinecraftForgeClient.getRenderPass == 0)
+      renderCrystalMountAt(x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null, new Color(te.getColor))
+
     if (te.getCrystalStack != null) {
       if (te.getParent != null) {
         te.getParent.getType match {
-          case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, te.getParent.getNodeLoc)
+          case IPowerNode.CRYSTAL_MOUNT if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, te.getParent.getNodeLoc)
           case _ =>
         }
       }
       te.getChildrenLocs.map(loc => loc.getTileEntity().orNull).collect { case i: IPowerNode => i }.
         foreach { t =>
           t.getType match {
-            case IPowerNode.CRYSTAL_MOUNT => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
-            case IPowerNode.DIFFUSION_TARGET_NODE => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
+            case IPowerNode.CRYSTAL_MOUNT if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
+            case IPowerNode.DIFFUSION_TARGET_NODE if MinecraftForgeClient.getRenderPass == 1 => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
             case _ =>
           }
         }

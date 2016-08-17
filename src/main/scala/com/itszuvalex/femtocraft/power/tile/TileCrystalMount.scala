@@ -38,6 +38,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   override def getMod: AnyRef = Femtocraft
 
+  override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
+
   /**
     *
     * @return The color of this power node.  This is used for aesthetics.

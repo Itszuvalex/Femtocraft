@@ -27,12 +27,12 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
   override def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glEnable(GL11.GL_BLEND)
-    //                              if (multi.canPlaceAtLocation(world, x, y, z)) {
-    //                                Tessellator.instance.setColorRGBA_F(0, 1, 0, .5f)
-    //                              }
-    //                              else {
-    //                                Tessellator.instance.setColorRGBA_F(1, 0, 0, .5f)
-    //                              }
+    if (multi.canPlaceAtLocation(loc)) {
+      GL11.glColor4f(0, 1, 0, .5f)
+    }
+    else {
+      GL11.glColor4f(1, 0, 0, .5f)
+    }
     multi.getTakenLocations(loc).toList.sortWith { case (a1, a2) =>
       a1.distSqr((rx + loc.x).toInt,
         (ry + loc.y).toInt,
