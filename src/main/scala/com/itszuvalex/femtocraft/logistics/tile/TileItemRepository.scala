@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.logistics.storage.item.{IIndexedInventory, IndexedInventory}
-import com.itszuvalex.femtocraft.nanite.NaniteNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Saveable
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -108,6 +107,4 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
   override def getContainedIDs: collection.Set[Int] = indInventory.getContainedIDs
 
   override def hasDescription: Boolean = false
-
-  override def hiveConnectionRadius: Float = TileItemRepository.HIVE_CONNECTION_RADIUS
 }

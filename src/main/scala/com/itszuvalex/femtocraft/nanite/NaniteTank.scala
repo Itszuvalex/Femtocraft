@@ -36,7 +36,7 @@ class NaniteTank(private val vol: Int) extends INBTSerializable[NBTTagCompound] 
       val stack = nanites(index)
       val lowest = Math.min(vol, stack.volume)
       if (doDrain) {
-        stack.volume -= lowest
+        stack.vol -= lowest
         if (stack.volume <= 0)
           nanites(index) = null
       }

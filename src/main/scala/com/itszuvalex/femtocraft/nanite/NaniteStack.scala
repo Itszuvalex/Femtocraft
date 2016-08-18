@@ -13,9 +13,9 @@ object NaniteStack {
   val STRAIN_KEY = "strain"
   val VOL_KEY    = "vol"
 
-  def apply(nbt: NBTTagCompound) = loadFromNBT(nbt)
+  def apply(nbt: NBTTagCompound): NaniteStack = loadFromNBT(nbt)
 
-  def loadFromNBT(nbt: NBTTagCompound) = {
+  def loadFromNBT(nbt: NBTTagCompound): NaniteStack = {
     val ret = NaniteStack(null, 0)
     ret.deserializeNBT(nbt)
     ret
