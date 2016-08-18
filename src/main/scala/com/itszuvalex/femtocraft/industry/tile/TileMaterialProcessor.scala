@@ -4,7 +4,6 @@ import com.itszuvalex.femtocraft.industry.item.{IItemAssembly, ItemFurnaceAssemb
 import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor._
 import com.itszuvalex.femtocraft.logistics.IItemLogisticsNetwork
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory, TileMultiblockIndexedInventoryWithIInventory}
-import com.itszuvalex.femtocraft.nanite.INaniteStrain
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.item.{IPowerCrystal, IPowerStorage}
 import com.itszuvalex.femtocraft.power.node.{DiffusionTargetNode, IPowerNode, PowerNode}
@@ -539,11 +538,6 @@ object TileMaterialProcessor {
       case power if power == indexPowerSlot && item.getItem != null =>
         item.getItem match {
           case storage: IPowerStorage => true
-          case _ => false
-        }
-      case nanite if nanite == indexNaniteSlot && item.getItem != null =>
-        item.getItem match {
-          case nanite: INaniteStrain => true
           case _ => false
         }
       case _ => false

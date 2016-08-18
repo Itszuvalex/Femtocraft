@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.logistics.storage.item.{IIndexedInventory, IndexedInventory}
-import com.itszuvalex.femtocraft.nanite.{NaniteManager, NaniteNode}
+import com.itszuvalex.femtocraft.nanite.NaniteNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Saveable
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -19,7 +19,7 @@ object TileItemRepository {
   val HIVE_CONNECTION_RADIUS = 32f
 }
 
-class TileItemRepository extends TileEntityBase with IIndexedInventory with IInventory with NaniteNode {
+class TileItemRepository extends TileEntityBase with IIndexedInventory with IInventory {
   @Saveable val indInventory: IndexedInventory = new IndexedInventory(TileItemRepository.INVENTORY_SIZE)
 
   override def getMod = Femtocraft
@@ -56,22 +56,6 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
     setModified()
     indInventory.removeItemStack(slot)
   }
-
-
-  override def invalidate(): Unit = {
-    super.invalidate()
-    if (!worldObj.isRemote) {
-      NaniteManager.removeNode(this)
-    }
-  }
-
-  override def validate(): Unit = {
-    super.validate()
-    if (!worldObj.isRemote) {
-      NaniteManager.addNode(this)
-    }
-  }
-
 
   override def closeInventory(player: EntityPlayer): Unit = indInventory.closeInventory(player)
 

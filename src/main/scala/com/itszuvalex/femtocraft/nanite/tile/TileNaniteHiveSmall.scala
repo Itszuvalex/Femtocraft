@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.nanite.tile
 
 import com.itszuvalex.femtocraft.logistics.distributed.{IWorker, IWorkerProvider}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileIndexedInventory}
-import com.itszuvalex.femtocraft.nanite.{NaniteHive, NaniteManager}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{DiffusionNode, IPowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -27,7 +26,7 @@ import scala.collection.Set
                 val INVENTORY_SIZE = 30
 }
 
-@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with NaniteHive with IWorkerProvider with TileDescriptionPacket with IInventory {
+@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with DiffusionNode with IWorkerProvider with TileDescriptionPacket with IInventory {
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
@@ -60,8 +59,6 @@ import scala.collection.Set
     *         (distance/16)&#94;2
     */
   override def getTaskConnectionRadius = hiveRadius
-
-  override def connectionRadius = hiveRadius
 
   /**
     *
@@ -96,7 +93,6 @@ import scala.collection.Set
     super.validate()
     if (!worldObj.isRemote) {
       PowerManager.addNode(this)
-      NaniteManager.addHive(this)
     }
   }
 
@@ -104,7 +100,6 @@ import scala.collection.Set
     super.invalidate()
     if (!worldObj.isRemote) {
       PowerManager.removeNode(this)
-      NaniteManager.removeHive(this)
     }
   }
 
