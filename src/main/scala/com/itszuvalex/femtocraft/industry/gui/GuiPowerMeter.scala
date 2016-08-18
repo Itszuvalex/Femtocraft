@@ -12,29 +12,31 @@ import scala.collection.mutable.ListBuffer
   * Created by Alex on 18.08.2016.
   */
 object GuiPowerMeter {
-  val DEFAULT_RAISED_COLOR     = Color(255.toByte, 64, 64, 64).toInt
-  val DEFAULT_LOWERED_COLOR    = Color(255.toByte, 15, 15, 15).toInt
-  val DEFAULT_BACKGROUND_COLOR = Color(255.toByte, 40, 40, 40).toInt
-  val DEFAULT_ACCENT_COLOR     = Color(255.toByte, 0, 0, 255.toByte)
-
-  def colorMult(color: Int, factor: Double): Int = {
-    val clr = new Color(color)
-    clr.setRed(math.round(clr.red * factor).toByte)
-    clr.setGreen(math.round(clr.green * factor).toByte)
-    clr.setBlue(math.round(clr.blue * factor).toByte)
-    clr.toInt
-  }
+  val DEFAULT_RAISED_COLOR        = Color(255.toByte, 64, 64, 64).toInt
+  val DEFAULT_LOWERED_COLOR       = Color(255.toByte, 15, 15, 15).toInt
+  val DEFAULT_BACKGROUND_COLOR    = Color(255.toByte, 40, 40, 40).toInt
+  val DEFAULT_ACCENT_COLOR        = Color(255.toByte, 0, 0, 255.toByte).toInt
+  val DEFAULT_OUTER_RAISED_COLOR  = Color(255.toByte, 102, 102, 102).toInt
+  val DEFAULT_OUTER_LOWERED_COLOR = Color(255.toByte, 64, 64, 64).toInt
+  val DEFAULT_INNER_BASE_COLOR    = Color(255.toByte, 128.toByte, 128.toByte, 128.toByte).toInt
+  val DEFAULT_LIGHT_BASE_COLOR    = Color(255.toByte, 30, 30, 30).toInt
 
   def colorBlend(color1: Int, color2: Int): Int = {
-    val clr1 = new Color(color1)
-    val clr2 = new Color(color2)
-    val alpha = clr1.alpha + clr2.alpha
-    val mfact1 = clr1.alpha.toDouble / alpha.toDouble
-    val mfact2 = clr2.alpha.toDouble / alpha.toDouble
-    val red = math.round(clr1.red * mfact1 + clr2.red * mfact2).toByte
-    val green = math.round(clr1.green * mfact1 + clr2.green * mfact2).toByte
-    val blue = math.round(clr1.blue * mfact1 + clr2.blue * mfact2).toByte
-    Color(math.max(alpha, 255).toByte, red, green, blue).toInt
+    val inAlpha1 = (color1 & 0xFF000000) >>> 24
+    val inRed1 = (color1 & 0xFF0000) >>> 16
+    val inGreen1 = (color1 & 0xFF00) >>> 8
+    val inBlue1 = color1 & 0xFF
+    val inAlpha2 = (color2 & 0xFF000000) >>> 24
+    val inRed2 = (color2 & 0xFF0000) >>> 16
+    val inGreen2 = (color2 & 0xFF00) >>> 8
+    val inBlue2 = color2 & 0xFF
+
+    val outAlpha = math.min(inAlpha1 + inAlpha2, 255)
+    val outRed = math.min(math.round(inRed1 * (inAlpha1 / 255d) + inRed2 * (1 - (inAlpha1 / 255d))), 255).toInt
+    val outGreen = math.min(math.round(inGreen1 * (inAlpha1 / 255d) + inGreen2 * (1 - (inAlpha1 / 255d))), 255).toInt
+    val outBlue = math.min(math.round(inBlue1 * (inAlpha1 / 255d) + inBlue2 * (1 - (inAlpha1 / 255d))), 255).toInt
+
+    (outAlpha << 24) + (outRed << 16) + (outGreen << 8) + outBlue
   }
 
   def colorModAlpha(color: Int, alpha: Byte): Int = {
@@ -89,38 +91,33 @@ class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var ba
   def drawSegments(screenX: Int, screenY: Int): Unit = {
     val powerFrac = battery.storage / battery.maxStorage
     for (i <- 0d.to(.9d, .1d)) {
-      if (powerFrac > i) drawSegment(screenX, screenY + 45 - math.round(50 * i).toInt, math.max(10 * (powerFrac - i), 1))
+      drawSegment(screenX, screenY + 45 - math.round(50 * i).toInt, math.max(math.min(10 * (powerFrac - i), 1), 0))
     }
   }
 
   def drawSegment(screenX: Int, screenY: Int, strength: Double): Unit = {
-    val colorOuter = Color(255.toByte, 64, 64, 64).toInt
-    val colorInner = Color(255.toByte, 128.toByte, 128.toByte, 128.toByte).toInt
-    val colorOuterAccent = colorMult(colorAccent, .25)
-    val colorInner1 = colorBlend(colorModAlpha(colorAccent, math.round(210 * strength).toByte), colorInner)
-    val colorInner2 = colorBlend(colorModAlpha(colorAccent, math.round(150 * strength).toByte), colorInner)
-    val colorInner3 = colorBlend(colorModAlpha(colorAccent, math.round(100 * strength).toByte), colorInner)
-    val colorInner4 = colorBlend(colorModAlpha(colorAccent, math.round(50 * strength).toByte), colorInner)
-    val colorInner5 = colorBlend(colorModAlpha(colorAccent, math.round(25 * strength).toByte), colorInner)
-
-    //Corners
-    Gui.drawRect(screenX, screenY, screenX + 1, screenY + 1, colorOuterAccent)
-    Gui.drawRect(screenX, screenY + 4, screenX + 1, screenY + 5, colorOuterAccent)
-    Gui.drawRect(screenX + 15, screenY, screenX + 16, screenY + 1, colorOuterAccent)
-    Gui.drawRect(screenX + 15, screenY + 4, screenX + 16, screenY + 5, colorOuterAccent)
+    val colorOuterRaised = DEFAULT_OUTER_RAISED_COLOR
+    val colorOuterLowered = DEFAULT_OUTER_LOWERED_COLOR
+    val colorInnerBase = DEFAULT_INNER_BASE_COLOR
+    val colorLightBase = DEFAULT_LIGHT_BASE_COLOR
+    val colorInner1 = colorBlend(colorModAlpha(colorAccent, math.round(230 * math.sqrt(strength)).toByte), colorLightBase)
+    val colorInner2 = colorBlend(colorModAlpha(colorAccent, math.round(150 * strength).toByte), colorInnerBase)
+    val colorInner3 = colorBlend(colorModAlpha(colorAccent, math.round(100 * strength).toByte), colorInnerBase)
+    val colorInner4 = colorBlend(colorModAlpha(colorAccent, math.round(50 * strength).toByte), colorInnerBase)
+    val colorInner5 = colorBlend(colorModAlpha(colorAccent, math.round(25 * strength).toByte), colorInnerBase)
 
     //Sides
-    Gui.drawRect(screenX, screenY + 1, screenX + 1, screenY + 4, colorOuter)
-    Gui.drawRect(screenX + 1, screenY, screenX + 15, screenY + 1, colorOuter)
-    Gui.drawRect(screenX + 1, screenY + 4, screenX + 15, screenY + 5, colorOuter)
-    Gui.drawRect(screenX + 15, screenY + 1, screenX + 16, screenY + 4, colorOuter)
+    Gui.drawRect(screenX, screenY + 1, screenX + 1, screenY + 4, colorOuterRaised)
+    Gui.drawRect(screenX, screenY, screenX + 16, screenY + 1, colorOuterRaised)
+    Gui.drawRect(screenX, screenY + 4, screenX + 16, screenY + 5, colorOuterLowered)
+    Gui.drawRect(screenX + 15, screenY + 1, screenX + 16, screenY + 4, colorOuterLowered)
 
     //Center
     Gui.drawRect(screenX + 6, screenY + 2, screenX + 10, screenY + 3, colorInner1)
 
     Gui.drawRect(screenX + 6, screenY + 1, screenX + 10, screenY + 2, colorInner2)
-    Gui.drawRect(screenX + 4, screenY + 3, screenX + 6, screenY + 4, colorInner2)
-    Gui.drawRect(screenX + 6, screenY + 2, screenX + 10, screenY + 3, colorInner2)
+    Gui.drawRect(screenX + 6, screenY + 3, screenX + 10, screenY + 4, colorInner2)
+    Gui.drawRect(screenX + 4, screenY + 2, screenX + 6, screenY + 3, colorInner2)
     Gui.drawRect(screenX + 10, screenY + 2, screenX + 12, screenY + 3, colorInner2)
 
     Gui.drawRect(screenX + 4, screenY + 1, screenX + 6, screenY + 2, colorInner3)
