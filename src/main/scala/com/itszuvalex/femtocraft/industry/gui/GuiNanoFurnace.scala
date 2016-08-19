@@ -1,20 +1,19 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.cyber.gui.GuiGrowthChamber
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
-import com.itszuvalex.itszulib.gui.{GuiItemStack, GuiLabel, GuiBase}
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.{InventoryPlayer, EntityPlayer}
+import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
 
 /**
   * Created by Alex on 18.08.2016.
   */
 object GuiNanoFurnace {
-  val texture = Resources.TexGui("GuiNanoFurnace.png")
+  val texture      = Resources.TexGui("GuiNanoFurnace.png")
   val colorTexture = Resources.TexGui("GuiNanoFurnaceColor.png")
 }
 
@@ -25,10 +24,10 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   ySize = 161
 
   //TODO: Make actual "machine color"
-  var color = Color(255.toByte, 64, 255.toByte, 255.toByte)
+  var color = new Color(Option(tile.getParent).map(_.getColor).getOrElse(tile.getColor)) //Color(255.toByte, 64, 255.toByte, 255.toByte)
 
-  val nameLabel = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
-  val inputSlot = new GuiItemStack(44, 23)
+  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
+  val inputSlot  = new GuiItemStack(44, 23)
   val outputSlot = new GuiItemStack(85, 23)
   val powerMeter = new GuiPowerMeter(6, 22, tile.getBattery, color.toInt)
 

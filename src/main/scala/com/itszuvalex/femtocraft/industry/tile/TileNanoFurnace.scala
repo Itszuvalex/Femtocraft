@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.IItemStack
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.util.Task
@@ -49,7 +49,8 @@ object TileNanoFurnace {
 }
 
 class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
-  private val task: SmeltTask = new SmeltTask(null)
+  private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
+  powerMax = 4000
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
@@ -84,28 +85,33 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   }
 
   override def serverUpdate(): Unit = {
-    if (task.stack != null) {
-      task.progress += 1
+    if (task.stack == null || task.stack.isEmpty) {
+      val item = storage(0)
+      if (!item.isEmpty) {
+        val ins = storage.split(0, 1)
+        task.reset()
+        task.stack = ins
+      }
     }
     else {
-      if (task.completed(1d)) {
-        val itm = getStackInSlot(0)
-        if (itm == null) return
-        val item = itm.copy()
-        item.stackSize = 1
-        val resultItem = FurnaceRecipes.instance().getSmeltingResult(item)
-        val outItem = getStackInSlot(1)
-        if (resultItem != null && outItem.isItemEqual(resultItem) && ItemStack.areItemStackTagsEqual(outItem, resultItem)
-            && outItem.stackSize < getInventoryStackLimit()) {
+      usePower(task.contribute(Math.min(task.powerPerTick(0, 0), getPowerCurrent), 0, 0), doUse = true)
+      if (task.completed(0)) {
+        val item = task.stack
+        if (item == null || item.isEmpty) {
+          task.reset()
           task.stack = null
-          decrStackSize(0, 1)
-          if (getStackInSlot(0).stackSize == 0) setInventorySlotContents(0, null)
-          outItem.stackSize += 1
-          setInventorySlotContents(1, outItem)
+          return
         }
-      }
-      else {
-        usePower(task.contribute(Math.min(task.powerPerTick(1d, 1d), getPowerCurrent), 1d, 1d), doUse = true)
+        val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
+        if (resultItem == null) {
+          task.reset()
+          task.stack = null
+          return
+        }
+        // Will clear the stack once we successfully insert the result item
+        task.stack = storage.insert(1, Converter.IItemStackFromItemStack(resultItem.copy()))
+        if (task.stack == null || task.stack.isEmpty)
+          task.reset()
       }
     }
   }
@@ -113,6 +119,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   def setProgress(progress: Double): Unit = {
     task.progress = progress
   }
+
   def getProgress = task.progress
 
 

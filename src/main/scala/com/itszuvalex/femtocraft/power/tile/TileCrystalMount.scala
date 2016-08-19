@@ -133,7 +133,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     // 1/10, 1/9, 1/8....1/1  * transferRate power to that one node.  It will give more power to the node the later in this random
     // list that it is found.  If found first, it gives the least power.
     val connections = (childrenLocs + parentLoc).filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.filter(tile => (tile.getPowerMax > 0d) && ((tile.getPowerCurrent / tile.getPowerMax) < (getPowerCurrent / getPowerMax)))
-    val filPerc = connections.map(node => (node, node.getPowerCurrent / node.getPowerMax)).filter { case (node, miss) => miss > 0d && !isNaN(miss) }
+    val filPerc = connections.map(node => (node, node.getPowerCurrent / node.getPowerMax)).filter { case (node, miss) => miss >= 0d && !isNaN(miss) }
     val difPerc = filPerc.map { case (node, fil) => (node, (getPowerCurrent / getPowerMax) - fil) }
     val totalDifPerc = difPerc.foldLeft(0d) { case (t, (_, dif)) => t + dif }
     if (totalDifPerc > 0d && !isNaN(totalDifPerc))
