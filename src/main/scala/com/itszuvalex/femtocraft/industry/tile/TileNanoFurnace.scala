@@ -28,21 +28,32 @@ object TileNanoFurnace {
   val TASK_NBT = "Task"
 
   object SmeltTask {
-    val SMELTING_STACK_NBT = "Smelt"
+    val SMELTING_STACK_NBT   = "Smelt"
+    val SMELTING_SMELTED_NBT = "Smelted"
   }
 
   class SmeltTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
+    var smelted = false
+
     override def deserializeNBT(t: NBTTagCompound): Unit = {
       super.deserializeNBT(t)
       if (t.hasKey(SMELTING_STACK_NBT))
         stack = IItemStack.createFromNBT(t.getCompoundTag(SMELTING_STACK_NBT))
+      smelted = t.getBoolean(SMELTING_SMELTED_NBT)
     }
 
     override def serializeNBT(): NBTTagCompound = {
       val ret = super.serializeNBT()
       if (stack != null)
         ret.setTag(SMELTING_STACK_NBT, stack.serializeNBT())
+      ret.setBoolean(SMELTING_SMELTED_NBT, smelted)
       ret
+    }
+
+    override def reset(): Unit = {
+      super.reset()
+      stack = IItemStack.Empty
+      smelted = false
     }
   }
 
@@ -99,17 +110,25 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
         val item = task.stack
         if (item == null || item.isEmpty) {
           task.reset()
-          task.stack = null
           return
         }
-        val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
-        if (resultItem == null) {
-          task.reset()
-          task.stack = null
-          return
+
+        var insertItem = task.stack
+        if (!task.smelted) {
+          val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
+          if (resultItem == null) {
+            task.reset()
+            return
+          }
+          else {
+            insertItem = Converter.IItemStackFromItemStack(resultItem)
+          }
+
+          task.smelted = true
         }
-        // Will clear the stack once we successfully insert the result item
-        task.stack = storage.insert(1, Converter.IItemStackFromItemStack(resultItem.copy()))
+
+        // Will clear the stack once we successfully insert the result item or set stack to the finished result
+        task.stack = storage.insert(1, insertItem)
         if (task.stack == null || task.stack.isEmpty)
           task.reset()
       }
@@ -122,6 +141,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
 
   def getProgress = task.progress
 
+  def getProgressMax = task.adjustedMax(0)
 
   /* Tile Entity */
   override def validate(): Unit = {

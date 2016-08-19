@@ -50,7 +50,8 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
 
     Minecraft.getMinecraft.getTextureManager.bindTexture(GuiNanoFurnace.texture)
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-    drawTexturedModalRect(k + 67, k + 26 + 3, 183, 3, 13, /* PROGRESS */ 10)
+    val prog = (tile.getProgress / tile.getProgressMax * 13).toInt
+    drawTexturedModalRect(k + 67, l + 26 + 13 - prog, 183, 13 - prog, 13, prog)
 
     GL11.glScaled(.5, .5, .5)
     nameLabel.render(2 * (anchorX + nameLabel.anchorX), 2 * (anchorY + nameLabel.anchorY), mouseX - anchorX - nameLabel.anchorX, mouseY - anchorY - nameLabel.anchorY, partialTicks)
