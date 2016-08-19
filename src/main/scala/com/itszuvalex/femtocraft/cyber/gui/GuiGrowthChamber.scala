@@ -18,6 +18,8 @@ object GuiGrowthChamber {
 
 class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileGrowthChamber) extends GuiBase(new ContainerGrowthChamber(player, inv, tile)) {
 
+  fontRendererObj = Minecraft.getMinecraft.fontRendererObj
+
   val nameLabel               = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Growth Chamber")) / 2, 7,
     fontRendererObj.getStringWidth("Growth Chamber"), fontRendererObj.FONT_HEIGHT,
     "Growth Chamber")

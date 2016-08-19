@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -256,5 +257,25 @@ trait PowerNode extends TileEntityBase with IPowerNode {
     if (doFill)
       powerCurrent += min
     min
+  }
+
+  def getBattery: IBattery = new IBattery {
+    override def maxStorage: Double = powerMax
+
+    override def clear(): Unit = {}
+
+    override def copy(): IBattery = null
+
+    override def writeToNBT(nbt: NBTTagCompound): Unit = writeToNBT(nbt)
+
+    override def maxStorage_=(max: Double): Unit = {}
+
+    override def storage_=(amt: Double): Unit = {}
+
+    override def storage: Double = powerCurrent
+
+    override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
+
+    override def serializeNBT(): NBTTagCompound = null
   }
 }

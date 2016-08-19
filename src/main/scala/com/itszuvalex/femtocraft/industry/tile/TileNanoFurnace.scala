@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.{GuiIDs, Femtocraft}
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
 import com.itszuvalex.femtocraft.power.PowerManager
@@ -10,7 +10,11 @@ import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.util.Task
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
+import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Chris on 8/14/2016.
@@ -59,24 +63,57 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
 
   override def hasDescription: Boolean = true
 
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
+    if (slot == 0) FurnaceRecipes.instance().getSmeltingResult(item) != null
+    else false
+  }
+
+  override def hasGUI = true
+
+  override def getGuiID = GuiIDs.TileFurnaceGuiID
+
   /**
     *
     * @return The type of PowerNode this is.
     */
   override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
 
+  override def onSideActivate(player: EntityPlayer, side: EnumFacing): Boolean = {
+    if (hasGUI) player.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
+    hasGUI
+  }
+
   override def serverUpdate(): Unit = {
     if (task.stack != null) {
-
+      task.progress += 1
     }
     else {
       if (task.completed(1d)) {
+        val itm = getStackInSlot(0)
+        if (itm == null) return
+        val item = itm.copy()
+        item.stackSize = 1
+        val resultItem = FurnaceRecipes.instance().getSmeltingResult(item)
+        val outItem = getStackInSlot(1)
+        if (resultItem != null && outItem.isItemEqual(resultItem) && ItemStack.areItemStackTagsEqual(outItem, resultItem)
+            && outItem.stackSize < getInventoryStackLimit()) {
+          task.stack = null
+          decrStackSize(0, 1)
+          if (getStackInSlot(0).stackSize == 0) setInventorySlotContents(0, null)
+          outItem.stackSize += 1
+          setInventorySlotContents(1, outItem)
+        }
       }
       else {
         usePower(task.contribute(Math.min(task.powerPerTick(1d, 1d), getPowerCurrent), 1d, 1d), doUse = true)
       }
     }
   }
+
+  def setProgress(progress: Double): Unit = {
+    task.progress = progress
+  }
+  def getProgress = task.progress
 
 
   /* Tile Entity */
