@@ -13,7 +13,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
-import net.minecraft.world.World
+import net.minecraft.world.{IBlockAccess, World}
 
 /**
   * Created by Christopher on 8/27/2015.
@@ -22,6 +22,10 @@ class BlockFrame extends TileContainer(Material.IRON) {
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileFrame()
 
   override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack = new ItemStack(FemtoItems.itemFrame)
+
+  override def isOpaqueCube(state: IBlockState): Boolean = false
+
+  override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
 
   override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit = {
     worldIn.getTileEntity(pos) match {
