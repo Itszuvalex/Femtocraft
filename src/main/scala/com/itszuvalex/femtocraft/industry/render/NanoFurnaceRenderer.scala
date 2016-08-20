@@ -5,7 +5,6 @@ import com.itszuvalex.femtocraft.{Femtocraft, Resources}
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import com.itszuvalex.itszulib.render.TileEntityRenderCube
 import com.itszuvalex.itszulib.util.Color
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
@@ -27,12 +26,15 @@ class NanoFurnaceRenderer extends TileEntityRenderCube[TileNanoFurnace](Femtocra
     pass = 1
     color = Option(te).map(_.getParent).flatMap(Option(_)).map(parent => new Color(parent.getColor)).getOrElse(Color(0, 255.toByte, 255.toByte, 255.toByte))
     super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage)
-    GlStateManager.enableLighting()
   }
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     facing = EnumFacing.SOUTH
     super.renderTileEntityAsItem(x, y, z, partialTicks)
+  }
+
+  override def renderTileEntityInWorld(te: TileNanoFurnace, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
   }
 
   override def preFaceRender(facing: EnumFacing): Unit = {
@@ -44,8 +46,6 @@ class NanoFurnaceRenderer extends TileEntityRenderCube[TileNanoFurnace](Femtocra
     }
     else {
       GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
-      GlStateManager.disableLighting()
-      GlStateManager
       facing match {
         case EnumFacing.NORTH => bindTexture(frontColorTex)
         case _ => bindTexture(colorTex)
