@@ -121,7 +121,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
             return
           }
           else {
-            insertItem = Converter.IItemStackFromItemStack(resultItem)
+            insertItem = Converter.IItemStackFromItemStack(resultItem.copy())
           }
 
           task.smelted = true
