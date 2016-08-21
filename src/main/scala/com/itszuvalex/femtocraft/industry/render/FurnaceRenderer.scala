@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 2/13/2016.
   */
 object FurnaceRenderer {
-  val modelLoc   = Resources.CustomModelBlock("furnace/Furnace.obj")
+  val modelLoc   = Resources.CustomModelBlock("furnace/Furnace_f.obj")
   val textureLoc = Resources.CustomModelBlockTex("furnace/furnace.png")
 }
 

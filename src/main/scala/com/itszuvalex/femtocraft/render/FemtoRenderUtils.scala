@@ -4,6 +4,10 @@ import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
+import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 import org.lwjgl.opengl.GL11
 
 /**
@@ -36,6 +40,31 @@ object FemtoRenderUtils {
       //    tes.addVertexWithUV(pos2.x, pos2.y, pos2.z, uMax, vMax)
       //    tes.addVertexWithUV(pos1.x, pos1.y, pos1.z, uMax, vMin)
     }
+  }
+
+  def disableLightMaps(): Unit = {
+    GL11.glDisable(GL11.GL_LIGHTING)
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f)
+  }
+
+  def enableLightMap(world: World, pos: BlockPos): Unit = {
+    GL11.glEnable(GL11.GL_LIGHTING)
+    RenderHelper.enableStandardItemLighting()
+    val i = world.getCombinedLight(pos, 0)
+    setLightmapTexCoords(i)
+  }
+
+  private def setLightmapTexCoords(i: Int): Unit = {
+    val j = i % 65536
+    val k = i / 65536
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j, k)
+  }
+
+  def enableLightMap(te: TileEntity): Unit = {
+    GL11.glEnable(GL11.GL_LIGHTING)
+    RenderHelper.enableStandardItemLighting()
+    val i = Option(te).map(_.getWorld.getCombinedLight(te.getPos, 0)).getOrElse(15 << 20 | 15 << 4)
+    setLightmapTexCoords(i)
   }
 
 }

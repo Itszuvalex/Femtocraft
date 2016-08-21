@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
+import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import com.itszuvalex.itszulib.render.TileEntityRenderCube
@@ -26,6 +27,7 @@ class NanoFurnaceRenderer extends TileEntityRenderCube[TileNanoFurnace](Femtocra
     pass = 1
     color = Option(te).map(_.getParent).flatMap(Option(_)).map(parent => new Color(parent.getColor)).getOrElse(Color(0, 255.toByte, 255.toByte, 255.toByte))
     super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage)
+    FemtoRenderUtils.enableLightMap(te)
   }
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
@@ -46,6 +48,7 @@ class NanoFurnaceRenderer extends TileEntityRenderCube[TileNanoFurnace](Femtocra
     }
     else {
       GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
+      FemtoRenderUtils.disableLightMaps()
       facing match {
         case EnumFacing.NORTH => bindTexture(frontColorTex)
         case _ => bindTexture(colorTex)
