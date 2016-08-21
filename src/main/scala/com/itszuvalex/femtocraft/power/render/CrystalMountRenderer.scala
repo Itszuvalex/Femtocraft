@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.node.IPowerNode
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
+import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
@@ -32,13 +33,13 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     super.renderTileEntityAsItem(x, y, z, partialTicks)
-    renderCrystalMountAt(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), false, false, Color(0, 0, 0, 0))
+    renderCrystalMountAt(null, x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), false, false, Color(0, 0, 0, 0))
   }
 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
     if (MinecraftForgeClient.getRenderPass == 0)
-      renderCrystalMountAt(x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null, new Color(te.getColor))
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null, new Color(te.getColor))
 
     if (te.getCrystalStack != null) {
       if (te.getParent != null) {
@@ -58,15 +59,15 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
     }
   }
 
-  def renderCrystalMountAt(renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, time: Float, hasTop: Boolean, hasCrystal: Boolean, color: Color): Unit = {
+  def renderCrystalMountAt(tile: TileCrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, time: Float, hasTop: Boolean, hasCrystal: Boolean, color: Color): Unit = {
     GL11.glPushMatrix()
     RenderUtils.translationBlock(renderX + .5, renderY, renderZ + .5) {
-      renderCrystalMount(time + partialTicks, hasTop, hasCrystal, color)
+      renderCrystalMount(tile, time + partialTicks, hasTop, hasCrystal, color)
     }
     GL11.glPopMatrix()
   }
 
-  def renderCrystalMount(rot: Float, hasTop: Boolean, hasCrystal: Boolean, color: Color): Unit = {
+  def renderCrystalMount(tile: TileCrystalMount, rot: Float, hasTop: Boolean, hasCrystal: Boolean, color: Color): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(crystalTexLocation)
     GL11.glColor3f(1f, 1f, 1f)
 
@@ -80,8 +81,10 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
 
     GL11.glColor4ub(color.red, color.green, color.blue, 220.toByte)
 
+    FemtoRenderUtils.disableLightMaps()
     if (hasCrystal)
       crystalModel.renderGroups(Set(crystalName))
+    FemtoRenderUtils.enableLightMap(tile)
   }
 
   //  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {
