@@ -34,7 +34,7 @@ object PlayerNaniteCapabilitiesOverlay {
 class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
-  def naniteCapabilities = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+  lazy val naniteCapabilities = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
 
   @SubscribeEvent
   def renderOverlay(event: RenderGameOverlayEvent): Unit = {
