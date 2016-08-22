@@ -42,6 +42,7 @@ class PlayerNaniteCapabilitiesOverlay {
       return
 
     val res = event.getResolution
+    //TODO: Stop at certain scale depending on display res, like all other guis do
     val factor = mc.gameSettings.guiScale match {
       case 0 => 1
       case s => s
@@ -66,6 +67,7 @@ class PlayerNaniteCapabilitiesOverlay {
 
     mc.renderEngine.bindTexture(textureFillLoc)
 
+    //TODO: Ignores fixed gui scale
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
       addVertexUV(x, y + texHeight, 0f, 0f, 1f)
       addVertexUV(x + texWidth, y + texHeight, 0f, 1f, 1f)
@@ -73,6 +75,7 @@ class PlayerNaniteCapabilitiesOverlay {
       addVertexUV(x, y + texHeight - fillHeight, 0f, 0f, v)
     }
 
+    //TODO: Doesn't work with fixed gui scale
     val scale = 3d
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
     mc.fontRendererObj.drawSplitString(naniteCapabilities.tank.volumeFilled + "/" + naniteCapabilities.tank.volume + " nMols", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
