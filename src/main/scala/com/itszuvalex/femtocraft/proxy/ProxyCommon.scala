@@ -25,12 +25,14 @@ import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
+import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.world.World
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.registry.GameRegistry
 
 object ProxyCommon {
@@ -97,6 +99,7 @@ class ProxyCommon {
   }
 
   def registerEventHandlers(): Unit = {
+    MinecraftForge.EVENT_BUS.register(new PlayerEventHandler)
   }
 
   def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {

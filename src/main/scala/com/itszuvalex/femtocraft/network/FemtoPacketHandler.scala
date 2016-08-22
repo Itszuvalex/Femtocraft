@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.network
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.network.messages.{MessageBuildMachine, MessageGrowthChamberUpdate, MessageMultiblockSelection, MessageOpenGui}
+import com.itszuvalex.femtocraft.network.messages._
 import com.itszuvalex.itszulib.network.PacketHandler
 import net.minecraftforge.fml.relauncher.Side
 
@@ -14,5 +14,6 @@ object FemtoPacketHandler extends PacketHandler(Femtocraft.ID.toLowerCase) {
     register(classOf[MessageBuildMachine], Side.SERVER)
     register(classOf[MessageGrowthChamberUpdate], Side.CLIENT)
     register(classOf[MessageOpenGui], Side.SERVER)
+    register(classOf[MessageNaniteCapabilities], Side.CLIENT)
   }
 }

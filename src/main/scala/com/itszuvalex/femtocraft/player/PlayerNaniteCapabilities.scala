@@ -2,7 +2,9 @@ package com.itszuvalex.femtocraft.player
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.nanite.NaniteTank
-import net.minecraft.entity.player.EntityPlayer
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
+import com.itszuvalex.femtocraft.network.messages.MessageNaniteCapabilities
+import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.{EnumFacing, ResourceLocation}
 import net.minecraftforge.common.MinecraftForge
@@ -42,12 +44,17 @@ object PlayerNaniteCapabilities {
 
   @SubscribeEvent
   def attachCapability(event: AttachCapabilitiesEvent.Entity): Unit = {
-    if (event.getEntity.isInstanceOf[EntityPlayer])
-      event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapabilities())
+    event.getEntity match {
+      case player: EntityPlayer =>
+        event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapabilities(player))
+      case _ =>
+    }
   }
 }
 
-class PlayerNaniteCapabilities extends IPlayerNaniteCapabilities with ICapabilitySerializable[NBTTagCompound] {
+class PlayerNaniteCapabilities(player: EntityPlayer) extends IPlayerNaniteCapabilities with ICapabilitySerializable[NBTTagCompound] {
+  def this() = this(null)
+
   val _tank = new NaniteTank(PlayerNaniteCapabilities.tankVolume)
 
   override def tank = _tank
@@ -70,4 +77,13 @@ class PlayerNaniteCapabilities extends IPlayerNaniteCapabilities with ICapabilit
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == PlayerNaniteCapabilities.NANITE_CAPABILITY
+
+  def sync() = {
+    player match {
+      case null =>
+      case pmp: EntityPlayerMP =>
+        FemtoPacketHandler.INSTANCE.sendTo(new MessageNaniteCapabilities(this), pmp)
+      case _ =>
+    }
+  }
 }

@@ -32,6 +32,7 @@ import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
+import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
 import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.test.{TileDiffusionNodeTest, TileGenerationNodeTest, TileTransferNodeTest}
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal, TilePowerSink}
@@ -48,6 +49,7 @@ import net.minecraft.item.Item
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.obj.OBJLoader
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.client.registry.ClientRegistry
 import org.apache.logging.log4j.Level
 
@@ -153,7 +155,9 @@ class ProxyClient extends ProxyCommon {
   }
 
   override def registerEventHandlers(): Unit = {
+    super.registerEventHandlers()
     //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
+    MinecraftForge.EVENT_BUS.register(new PlayerNaniteCapabilitiesOverlay)
   }
 
   override def onRegisterItem[T <: Item](item: T, name: String): Unit = {

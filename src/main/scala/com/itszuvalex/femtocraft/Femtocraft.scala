@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CybermaterialRegistry}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
+import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilities
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
@@ -41,6 +42,7 @@ object Femtocraft {
     FemtoItems.preInit()
     FemtoFluids.preInit()
     FemtoRecipes.preInit()
+    NaniteRegistry.preInit()
 
     FemtoPacketHandler.preInit()
 
