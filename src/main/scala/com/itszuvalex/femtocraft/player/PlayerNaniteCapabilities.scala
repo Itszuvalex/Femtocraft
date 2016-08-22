@@ -55,7 +55,7 @@ object PlayerNaniteCapabilities {
 class PlayerNaniteCapabilities(player: EntityPlayer) extends IPlayerNaniteCapabilities with ICapabilitySerializable[NBTTagCompound] {
   def this() = this(null)
 
-  val _tank = new NaniteTank(PlayerNaniteCapabilities.tankVolume)
+  private val _tank = new NaniteTank(PlayerNaniteCapabilities.tankVolume)
 
   override def tank = _tank
 
@@ -78,7 +78,7 @@ class PlayerNaniteCapabilities(player: EntityPlayer) extends IPlayerNaniteCapabi
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == PlayerNaniteCapabilities.NANITE_CAPABILITY
 
-  def sync() = {
+  override def sync() = {
     player match {
       case null =>
       case pmp: EntityPlayerMP =>

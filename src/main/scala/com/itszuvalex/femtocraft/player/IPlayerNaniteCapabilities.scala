@@ -8,4 +8,6 @@ import com.itszuvalex.femtocraft.nanite.NaniteTank
 trait IPlayerNaniteCapabilities {
   def tank: NaniteTank
 
+  def sync()
+
 }

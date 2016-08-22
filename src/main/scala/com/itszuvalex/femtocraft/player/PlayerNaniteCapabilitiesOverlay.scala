@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.player
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay._
 import com.itszuvalex.itszulib.render.RenderUtils._
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.EnumFacing
@@ -70,9 +71,13 @@ class PlayerNaniteCapabilitiesOverlay {
       addVertexUV(x + texWidth, y + textureFillTopOffset + fillHeight, 0f, 1f, v)
       addVertexUV(x, y + textureFillTopOffset + fillHeight, 0f, 0f, v)
     }
+
+    GL11.glScaled(.5, .5, .5)
+    mc.fontRendererObj.drawSplitString(naniteCapabilities.tank.volumeFilled + "/" + naniteCapabilities.tank.volume + " nMols", 2 * x, 2 * (y + texHeight + 2).toInt, 2 * texWidth, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    GL11.glScaled(2, 2, 2)
   }
 
-  private def HeightVFromFillPercent(fillAmt: Float) : (Int, Float) = {
+  private def HeightVFromFillPercent(fillAmt: Float): (Int, Float) = {
     val fillHeight = ((texHeight - textureFillBotOffset - textureFillTopOffset) * fillAmt).toInt
 
     (fillHeight, (textureFillBotOffset + textureFillTopOffset + fillHeight).toFloat / texHeight.toFloat)

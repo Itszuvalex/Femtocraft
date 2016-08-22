@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block._
 import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
-import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
+import com.itszuvalex.femtocraft.nanite.block.{BlockNaniteExtractor, BlockNaniteHiveSmall}
 import com.itszuvalex.femtocraft.power.block._
 import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
@@ -50,6 +50,8 @@ object FemtoBlocks {
   var blockNaniteHiveSmall: Block = _
   var blockCrystalMount   : Block = _
   var blockPowerPedestal  : Block = _
+
+  var blockNaniteExtractor: Block = _
 
   var blockPowerSink     : Block = _
   var blockPowerGenerator: Block = _
@@ -98,6 +100,7 @@ object FemtoBlocks {
     blockItemRepository = registerBlock(new BlockItemRepository(), "blockItemRepository")
     blockCrystalMount = registerBlock(new BlockCrystalMount(), "blockCrystalMount")
     blockPowerPedestal = registerBlock(new BlockPowerPedestal(), "blockPowerPedestal")
+    blockNaniteExtractor = registerBlock(new BlockNaniteExtractor, "blockNaniteExtractor")
     blockPowerSink = registerBlock(new BlockPowerSink(), "blockPowerSink")
     blockPowerGenerator = registerBlock(new BlockPowerGenerator(), "blockPowerGenerator")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")

@@ -15,7 +15,7 @@ class PlayerEventHandler {
     if (event.getWorld.isRemote) return
 
     event.getEntity match {
-      case player: EntityPlayer => player.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH).asInstanceOf[PlayerNaniteCapabilities].sync()
+      case player: EntityPlayer => player.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
       case _ =>
     }
   }

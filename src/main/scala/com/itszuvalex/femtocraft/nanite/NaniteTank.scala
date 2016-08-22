@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by Chris on 8/18/2016.
   */
-class NaniteTank(private val vol: Int) extends INBTSerializable[NBTTagCompound] {
+class NaniteTank(private var vol: Int) extends INBTSerializable[NBTTagCompound] {
   private val nanites = ArrayBuffer[NaniteStack]()
 
   def volume = vol
@@ -20,6 +20,10 @@ class NaniteTank(private val vol: Int) extends INBTSerializable[NBTTagCompound] 
   def canDrain(nanite: INanite, vol: Int): Boolean = nanites.exists(_.nanite == nanite)
 
   def canFill(nanite: INanite, vol: Int): Boolean = true
+
+  def containsNanite(nanite: INanite): Boolean = findStack(nanite).isDefined
+
+  def volForNanite(nanite: INanite): Int = findStack(nanite).map(ind => nanites(ind).vol).getOrElse(0)
 
   /**
     *
@@ -73,7 +77,10 @@ class NaniteTank(private val vol: Int) extends INBTSerializable[NBTTagCompound] 
       storageStack.vol += lowest
     }
 
-    NaniteStack(stack.nanite, stack.volume - lowest)
+    if (stack.volume - lowest <= 0)
+      null
+    else
+      NaniteStack(stack.nanite, stack.volume - lowest)
   }
 
   private def findStack(nanite: INanite): Option[Int] = {
@@ -86,15 +93,22 @@ class NaniteTank(private val vol: Int) extends INBTSerializable[NBTTagCompound] 
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     nanites.clear()
-    nanites.indices.foreach { i =>
+    vol = nbt.getInteger("vol")
+    val size = nbt.getInteger("size")
+    nanites.sizeHint(size)
+    (0 until size).forall { i =>
       if (nbt.hasKey(i.toString)) {
-        nanites(i) = NaniteStack.loadFromNBT(nbt.getCompoundTag(i.toString))
+        nanites += NaniteStack.loadFromNBT(nbt.getCompoundTag(i.toString))
+        true
       }
+      else false
     }
   }
 
   override def serializeNBT(): NBTTagCompound = {
     val nbt = new NBTTagCompound()
+    nbt.setInteger("vol", vol)
+    nbt.setInteger("size", nanites.size)
     nanites.zipWithIndex.view.filterNot { case (a, b) => a == null }.foreach { case (a, b) =>
       nbt.setTag(b.toString, a.serializeNBT())
     }
