@@ -3,10 +3,10 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.cyber.{CyberMachineRegistry, CybermaterialRegistry}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
+import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilities
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
@@ -27,7 +27,7 @@ object Femtocraft {
   final val items   = FemtoItems
   final val fluids  = FemtoFluids
   val tab                      = new CreativeTabs(Femtocraft.ID) {
-    override def getTabIconItem: Item = Items.NETHER_STAR
+    override def getTabIconItem: Item = Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall)
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
     serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
@@ -46,6 +46,7 @@ object Femtocraft {
 
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
+    PlayerNaniteCapabilities.register()
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
