@@ -32,8 +32,9 @@ object PlayerNaniteCapabilitiesOverlay {
 
 @relauncher.SideOnly(Side.CLIENT)
 class PlayerNaniteCapabilitiesOverlay {
-  lazy val mc                 = Minecraft.getMinecraft
-  lazy val naniteCapabilities = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+  lazy val mc = Minecraft.getMinecraft
+
+  def naniteCapabilities = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
 
   @SubscribeEvent
   def renderOverlay(event: RenderGameOverlayEvent): Unit = {
@@ -61,25 +62,26 @@ class PlayerNaniteCapabilitiesOverlay {
       addVertexUV(x + xOffset, y, 0f, 0f, 0f)
     }
 
-    val (fillHeight, v) = HeightVFromFillPercent(naniteCapabilities.tank.volume.toFloat / naniteCapabilities.tank.volumeFilled.toFloat)
+    val (fillHeight, v) = HeightVFromFillPercent(naniteCapabilities.tank.volumeFilled.toFloat / naniteCapabilities.tank.volume.toFloat)
 
     mc.renderEngine.bindTexture(textureFillLoc)
 
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
       addVertexUV(x, y + texHeight, 0f, 0f, 1f)
       addVertexUV(x + texWidth, y + texHeight, 0f, 1f, 1f)
-      addVertexUV(x + texWidth, y + textureFillTopOffset + fillHeight, 0f, 1f, v)
-      addVertexUV(x, y + textureFillTopOffset + fillHeight, 0f, 0f, v)
+      addVertexUV(x + texWidth, y + texHeight - fillHeight, 0f, 1f, v)
+      addVertexUV(x, y + texHeight - fillHeight, 0f, 0f, v)
     }
 
-    GL11.glScaled(.5, .5, .5)
-    mc.fontRendererObj.drawSplitString(naniteCapabilities.tank.volumeFilled + "/" + naniteCapabilities.tank.volume + " nMols", 2 * x, 2 * (y + texHeight + 2).toInt, 2 * texWidth, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
-    GL11.glScaled(2, 2, 2)
+    val scale = 3d
+    GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
+    mc.fontRendererObj.drawSplitString(naniteCapabilities.tank.volumeFilled + "/" + naniteCapabilities.tank.volume + " nMols", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    GL11.glScaled(scale, scale, scale)
   }
 
   private def HeightVFromFillPercent(fillAmt: Float): (Int, Float) = {
-    val fillHeight = ((texHeight - textureFillBotOffset - textureFillTopOffset) * fillAmt).toInt
+    val fillHeight = ((texHeight - textureFillTopOffset - textureFillBotOffset) * fillAmt).toInt + textureFillTopOffset
 
-    (fillHeight, (textureFillBotOffset + textureFillTopOffset + fillHeight).toFloat / texHeight.toFloat)
+    (fillHeight, 1 - fillHeight.toFloat / texHeight.toFloat)
   }
 }
