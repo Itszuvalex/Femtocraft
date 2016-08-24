@@ -128,6 +128,7 @@ object FemtoBlocks {
     blockPowerSink.registerModel()
     blockCrystals.registerModel()
     blockNanoFurnace.registerModel()
+    blockNaniteExtractor.registerModel()
   }
 
   def postInit(): Unit = {

@@ -6,6 +6,7 @@ import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType
@@ -34,7 +35,17 @@ object PlayerNaniteCapabilitiesOverlay {
 class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
-  lazy val naniteCapabilities = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+  var naniteCapabilities: IPlayerNaniteCapabilities = _
+  var player            : EntityPlayer              = null
+
+  def capabilities: IPlayerNaniteCapabilities = {
+    if (player != Minecraft.getMinecraft.thePlayer) {
+      val caps = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+      if (caps != naniteCapabilities)
+        naniteCapabilities = caps
+    }
+    naniteCapabilities
+  }
 
   @SubscribeEvent
   def renderOverlay(event: RenderGameOverlayEvent.Post): Unit = {
@@ -63,7 +74,7 @@ class PlayerNaniteCapabilitiesOverlay {
       addVertexUV(x + xOffset, y, 0f, 0f, 0f)
     }
 
-    val (fillHeight, v) = HeightVFromFillPercent(naniteCapabilities.tank.volumeFilled.toFloat / naniteCapabilities.tank.volume.toFloat)
+    val (fillHeight, v) = HeightVFromFillPercent(capabilities.tank.volumeFilled.toFloat / capabilities.tank.volume.toFloat)
 
     mc.renderEngine.bindTexture(textureFillLoc)
 
@@ -78,7 +89,7 @@ class PlayerNaniteCapabilitiesOverlay {
     //TODO: Doesn't work with fixed gui scale
     val scale = 3d
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
-    mc.fontRendererObj.drawSplitString(naniteCapabilities.tank.volumeFilled + "/" + naniteCapabilities.tank.volume + " nMols", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " nMols", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     GL11.glScaled(scale, scale, scale)
   }
 
