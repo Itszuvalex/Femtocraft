@@ -89,7 +89,7 @@ class PlayerNaniteCapabilitiesOverlay {
     //TODO: Doesn't work with fixed gui scale
     val scale = 3d
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
-    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " nMols", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     GL11.glScaled(scale, scale, scale)
   }
 

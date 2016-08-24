@@ -100,7 +100,7 @@ object FemtoBlocks {
     blockItemRepository = registerBlock(new BlockItemRepository(), "blockItemRepository")
     blockCrystalMount = registerBlock(new BlockCrystalMount(), "blockCrystalMount")
     blockPowerPedestal = registerBlock(new BlockPowerPedestal(), "blockPowerPedestal")
-    blockNaniteExtractor = registerBlock(new BlockNaniteExtractor, "blockNaniteExtractor")
+    blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
     blockPowerSink = registerBlock(new BlockPowerSink(), "blockPowerSink")
     blockPowerGenerator = registerBlock(new BlockPowerGenerator(), "blockPowerGenerator")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
