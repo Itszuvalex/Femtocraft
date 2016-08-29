@@ -53,7 +53,6 @@ class PlayerNaniteCapabilitiesOverlay {
       return
 
     val res = event.getResolution
-    //TODO: Stop at certain scale depending on display res, like all other guis do
     val factor = mc.gameSettings.guiScale match {
       case 0 => 1
       case s => s
@@ -68,28 +67,26 @@ class PlayerNaniteCapabilitiesOverlay {
     mc.renderEngine.bindTexture(textureLoc)
 
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
-      addVertexUV(x + xOffset, y + texHeight * factor, 0f, 0f, 1f)
-      addVertexUV(x + xOffset + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
-      addVertexUV(x + xOffset + texWidth * factor, y, 0f, 1f, 0f)
-      addVertexUV(x + xOffset, y, 0f, 0f, 0f)
-    }
+                                                   addVertexUV(x + xOffset, y + texHeight * factor, 0f, 0f, 1f)
+                                                   addVertexUV(x + xOffset + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
+                                                   addVertexUV(x + xOffset + texWidth * factor, y, 0f, 1f, 0f)
+                                                   addVertexUV(x + xOffset, y, 0f, 0f, 0f)
+                                                 }
 
     val (fillHeight, v) = HeightVFromFillPercent(capabilities.tank.volumeFilled.toFloat / capabilities.tank.volume.toFloat)
 
     mc.renderEngine.bindTexture(textureFillLoc)
 
-    //TODO: Ignores fixed gui scale
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
-      addVertexUV(x, y + texHeight, 0f, 0f, 1f)
-      addVertexUV(x + texWidth, y + texHeight, 0f, 1f, 1f)
-      addVertexUV(x + texWidth, y + texHeight - fillHeight, 0f, 1f, v)
-      addVertexUV(x, y + texHeight - fillHeight, 0f, 0f, v)
-    }
+                                                   addVertexUV(x, y + texHeight * factor, 0f, 0f, 1f)
+                                                   addVertexUV(x + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
+                                                   addVertexUV(x + texWidth * factor, y + (texHeight - fillHeight) * factor, 0f, 1f, v)
+                                                   addVertexUV(x, y + (texHeight - fillHeight) * factor, 0f, 0f, v)
+                                                 }
 
-    //TODO: Doesn't work with fixed gui scale
     val scale = 3d
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
-    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * x).toInt, (scale * (y + texHeight + 2).toInt).toInt, (scale * texWidth).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * x).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     GL11.glScaled(scale, scale, scale)
   }
 

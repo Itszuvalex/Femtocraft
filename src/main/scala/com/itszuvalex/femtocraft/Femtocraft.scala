@@ -32,10 +32,10 @@ object Femtocraft {
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
     serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
-  var proxy   : ProxyCommon    = null
+  var proxy   : ProxyCommon    = _
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
     serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
-  var guiProxy: ProxyGuiCommon = null
+  var guiProxy: ProxyGuiCommon = _
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     FemtoBlocks.preInit()
