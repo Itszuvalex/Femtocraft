@@ -58,10 +58,10 @@ class PlayerNaniteCapabilitiesOverlay {
   def updateOffset() = {
     val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
     timeSinceLastChange match {
-      case a if a <= msToReveal /*&& xOffset > 0 /* For incremental updates */*/ => xOffset = xOffsetEnd - (xOffsetEnd.toFloat * timeSinceLastChange.toFloat / msToReveal.toFloat).toInt
-      case a if a <= (msToShow + msToReveal) => /* stay displayed */
+      case a if a <= msToReveal /*&& xOffset > 0 /* For incremental updates */*/ => xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceLastChange.toFloat / msToReveal.toFloat).toInt)
+      case a if a <= (msToShow + msToReveal) => xOffset = 0
       case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
-      case _ =>
+      case _ => xOffset = xOffsetEnd
     }
   }
 
@@ -113,6 +113,7 @@ class PlayerNaniteCapabilitiesOverlay {
     val scale = 3d
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
     mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRendererObj.drawSplitString(capabilities.tank.nMols + " nMols", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2 + mc.fontRendererObj.FONT_HEIGHT) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     GL11.glScaled(scale, scale, scale)
   }
 
