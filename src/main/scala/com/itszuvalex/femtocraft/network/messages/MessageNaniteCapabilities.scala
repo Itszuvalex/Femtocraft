@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.network.messages
 
-import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilities
+import com.itszuvalex.femtocraft.player.{PlayerNaniteCapabilities, PlayerNaniteCapabilitiesOverlay}
 import com.itszuvalex.itszulib.network.messages.MessageUpdateNBT
 import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumFacing
@@ -18,6 +18,7 @@ class MessageNaniteCapabilities(cap: PlayerNaniteCapabilities) extends MessageUp
 
     val cap = player.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH).asInstanceOf[PlayerNaniteCapabilities]
     cap.deserializeNBT(message.nbt)
+    PlayerNaniteCapabilitiesOverlay.timeOfLastInteract = System.currentTimeMillis
     null
   }
 }

@@ -28,7 +28,15 @@ object PlayerNaniteCapabilitiesOverlay {
   val textureFillBotOffset = 2
   val textureFillTopOffset = 2
 
-  val xOffset = 0
+  var xOffset    = 0
+  val xOffsetEnd = texWidth
+
+  var timeOfLastInteract = System.currentTimeMillis
+  val msToShow           = 2000
+  val msToReveal         = 500
+  val msToHide           = 750
+
+  var alwaysShow = false
 }
 
 @relauncher.SideOnly(Side.CLIENT)
@@ -36,7 +44,7 @@ class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
   var naniteCapabilities: IPlayerNaniteCapabilities = _
-  var player            : EntityPlayer              = null
+  var player            : EntityPlayer              = _
 
   def capabilities: IPlayerNaniteCapabilities = {
     if (player != Minecraft.getMinecraft.thePlayer) {
@@ -45,6 +53,16 @@ class PlayerNaniteCapabilitiesOverlay {
         naniteCapabilities = caps
     }
     naniteCapabilities
+  }
+
+  def updateOffset() = {
+    val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
+    timeSinceLastChange match {
+      case a if a <= msToReveal /*&& xOffset > 0 /* For incremental updates */*/ => xOffset = xOffsetEnd - (xOffsetEnd.toFloat * timeSinceLastChange.toFloat / msToReveal.toFloat).toInt
+      case a if a <= (msToShow + msToReveal) => /* stay displayed */
+      case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
+      case _ =>
+    }
   }
 
   @SubscribeEvent
@@ -61,32 +79,40 @@ class PlayerNaniteCapabilitiesOverlay {
     val x = res.getScaledWidth - texWidth * factor
     val y = (res.getScaledHeight - texHeight * factor) / 2f
 
+    if (!alwaysShow) {
+      updateOffset()
+
+      if (xOffset == xOffsetEnd) {
+        return
+      }
+    }
+
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glDisable(GL11.GL_LIGHTING)
 
     mc.renderEngine.bindTexture(textureLoc)
 
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
-                                                   addVertexUV(x + xOffset, y + texHeight * factor, 0f, 0f, 1f)
-                                                   addVertexUV(x + xOffset + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
-                                                   addVertexUV(x + xOffset + texWidth * factor, y, 0f, 1f, 0f)
-                                                   addVertexUV(x + xOffset, y, 0f, 0f, 0f)
-                                                 }
+      addVertexUV(x + xOffset, y + texHeight * factor, 0f, 0f, 1f)
+      addVertexUV(x + xOffset + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
+      addVertexUV(x + xOffset + texWidth * factor, y, 0f, 1f, 0f)
+      addVertexUV(x + xOffset, y, 0f, 0f, 0f)
+    }
 
     val (fillHeight, v) = HeightVFromFillPercent(capabilities.tank.volumeFilled.toFloat / capabilities.tank.volume.toFloat)
 
     mc.renderEngine.bindTexture(textureFillLoc)
 
     drawBlock(DefaultVertexFormats.POSITION_TEX) {
-                                                   addVertexUV(x, y + texHeight * factor, 0f, 0f, 1f)
-                                                   addVertexUV(x + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
-                                                   addVertexUV(x + texWidth * factor, y + (texHeight - fillHeight) * factor, 0f, 1f, v)
-                                                   addVertexUV(x, y + (texHeight - fillHeight) * factor, 0f, 0f, v)
-                                                 }
+      addVertexUV(x + xOffset, y + texHeight * factor, 0f, 0f, 1f)
+      addVertexUV(x + xOffset + texWidth * factor, y + texHeight * factor, 0f, 1f, 1f)
+      addVertexUV(x + xOffset + texWidth * factor, y + (texHeight - fillHeight) * factor, 0f, 1f, v)
+      addVertexUV(x + xOffset, y + (texHeight - fillHeight) * factor, 0f, 0f, v)
+    }
 
     val scale = 3d
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
-    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * x).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     GL11.glScaled(scale, scale, scale)
   }
 
