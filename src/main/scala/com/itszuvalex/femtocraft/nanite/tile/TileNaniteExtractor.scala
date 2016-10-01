@@ -11,10 +11,8 @@ import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.util.Task
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
 
 
 object TileNaniteExtractor {
@@ -55,6 +53,8 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerNo
   private val storageTank: NaniteTank  = new NaniteTank(50)
   powerMax = 4000
 
+  def getStorageTank = storageTank
+
   override def defaultStorage: IItemStorage = new ItemStorageArray(1)
 
   override def getFieldCount: Int = 0
@@ -73,18 +73,13 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerNo
 
   override def hasGUI = true
 
-  override def getGuiID = GuiIDs.TileFurnaceGuiID
+  override def getGuiID = GuiIDs.TileNaniteExtractorID
 
   /**
     *
     * @return The type of PowerNode this is.
     */
   override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
-
-  override def onSideActivate(player: EntityPlayer, side: EnumFacing): Boolean = {
-    if (hasGUI) player.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
-    hasGUI
-  }
 
   override def serverUpdate(): Unit = {
     if (task.stack == null) {

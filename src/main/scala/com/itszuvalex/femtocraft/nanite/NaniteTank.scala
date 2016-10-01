@@ -25,6 +25,8 @@ class NaniteTank(private var vol: Int) extends INBTSerializable[NBTTagCompound] 
 
   def volForNanite(nanite: INanite): Int = findStack(nanite).map(ind => nanites(ind).vol).getOrElse(0)
 
+  def nanitesInTank = nanites.map(_.nanite)
+
   /**
     *
     * @param nanite  Nanite to drain
@@ -42,7 +44,7 @@ class NaniteTank(private var vol: Int) extends INBTSerializable[NBTTagCompound] 
       if (doDrain) {
         stack.vol -= lowest
         if (stack.volume <= 0)
-          nanites(index) = null
+          nanites.remove(index)
       }
       NaniteStack(nanite, lowest)
     }.orNull

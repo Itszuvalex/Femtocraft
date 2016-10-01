@@ -4,11 +4,11 @@ import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.cyber.container.{ContainerCyberBase, ContainerGrowthChamber, ContainerMachineSelection}
 import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.container._
-import com.itszuvalex.femtocraft.industry.tile.{TileNanoFurnace, TileArcFurnace, TileFrame, TileMaterialProcessor}
+import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileMaterialProcessor, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
+import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalMount
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import net.minecraft.entity.player.EntityPlayer
@@ -34,6 +34,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te)
+      case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te)
       case (_, _) => null
     }
   }
