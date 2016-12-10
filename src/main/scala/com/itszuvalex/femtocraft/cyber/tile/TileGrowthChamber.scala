@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.{EnumFacing, ResourceLocation}
+import net.minecraftforge.fluids.capability.IFluidTankProperties
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, FluidTank}
 
 /**
@@ -82,7 +83,7 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
     if (progress == 100) {
       if (outputItems(false)) {
         updateRecipeOnStackDecr = false
-        indInventory.decrStackSize(0, currentRecipe.input.stackSize)
+        indInventory.decrStackSize(0, currentRecipe.input.func_190916_E())
         updateRecipeOnStackDecr = true
         outputItems(true)
         indInventory.markDirty()
@@ -99,9 +100,9 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
       val remItem = item.copy()
       val minI = if (GrowthChamberRegistry.findMatchingRecipe(item).isDefined) 0 else 1
       for (i <- minI to 9) {
-        if (remItem.stackSize > 0) remItem.stackSize -= putItemStack(i, remItem.copy(), doOut)
+        if (remItem.func_190916_E() > 0) remItem.func_190920_e(remItem.func_190916_E() - putItemStack(i, remItem.copy(), doOut))
       }
-      remItem.stackSize == 0
+      remItem.func_190916_E() == 0
     }
   }
 
@@ -110,11 +111,11 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
     if (curStack == null) {
       if (doPut) indInventory.setInventorySlotContents(id, stack)
       if (doPut) indInventory.markDirty()
-      stack.stackSize
+      stack.func_190916_E()
     } else if (curStack.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(curStack, stack)) {
-      val amt = math.min(stack.stackSize, math.min(stack.getMaxStackSize, indInventory.getInventoryStackLimit) - curStack.stackSize)
+      val amt = math.min(stack.func_190916_E(), math.min(stack.getMaxStackSize, indInventory.getInventoryStackLimit) - curStack.func_190916_E())
       if (doPut && amt > 0) {
-        curStack.stackSize += amt
+        curStack.func_190920_e(curStack.func_190916_E() + amt)
         indInventory.setInventorySlotContents(id, curStack)
       }
       amt
@@ -262,35 +263,35 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
 
   override def defaultTank: FluidTank = new FluidTank(5000)
 
-  override def fill(from: EnumFacing, resource: FluidStack, doFill: Boolean): Int = {
+  override def fill(resource: FluidStack, doFill: Boolean): Int = {
     if (resource == null) 0
     else if (resource.getFluid != FluidRegistry.WATER) 0
     else {
-      val amt = super.fill(from, resource, doFill)
+      val amt = super.fill(resource, doFill)
       //todo: pull out packets
       if (doFill) FemtoPacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.cLoc.x, info.cLoc.y, info.cLoc.z, if (tank.getFluid == null) null else FluidRegistry.getFluidName(tank.getFluid), tank.getFluidAmount), worldObj.provider.getDimension)
       amt
     }
   }
 
-  override def drain(from: EnumFacing, maxDrain: Int, doDrain: Boolean): FluidStack = {
-    val stack = super.drain(from, maxDrain, doDrain)
+  override def drain(maxDrain: Int, doDrain: Boolean): FluidStack = {
+    val stack = super.drain(maxDrain, doDrain)
     //todo: pull out packets
     if (doDrain) FemtoPacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.cLoc.x, info.cLoc.y, info.cLoc.z, if (tank.getFluid == null) null else FluidRegistry.getFluidName(tank.getFluid), tank.getFluidAmount), worldObj.provider.getDimension)
     stack
   }
 
-  override def drain(from: EnumFacing, resource: FluidStack, doDrain: Boolean): FluidStack = {
+  override def drain(resource: FluidStack, doDrain: Boolean): FluidStack = {
     if (resource == null || !resource.isFluidEqual(tank.getFluid)) return null
-    val stack = super.drain(from, resource, doDrain)
+    val stack = super.drain(resource, doDrain)
     //todo: pull out packets
     if (doDrain) FemtoPacketHandler.INSTANCE.sendToDimension(new MessageFluidTankUpdate(info.cLoc.x, info.cLoc.y, info.cLoc.z, if (tank.getFluid == null) null else FluidRegistry.getFluidName(tank.getFluid), tank.getFluidAmount), worldObj.provider.getDimension)
     stack
   }
 
-  override def canFill(from: EnumFacing, fluid: Fluid): Boolean = false
+  def canFill(from: EnumFacing, fluid: Fluid): Boolean = false
 
-  override def canDrain(from: EnumFacing, fluid: Fluid): Boolean = false
+  def canDrain(from: EnumFacing, fluid: Fluid): Boolean = false
 
   override def formMultiBlock(loc: Loc4): Boolean = {
     setModified()

@@ -40,13 +40,13 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
   override def removeOutputItem(slot: Int, amt: Int): ItemStack = {
     val item = getOutputItem(slot)
     if (item != null) {
-      val remove = Math.min(item.stackSize, amt)
-      item.stackSize -= remove
-      if (item.stackSize == 0) {
+      val remove = Math.min(item.func_190916_E, amt)
+      item.func_190920_e(item.func_190916_E() - remove)
+      if (item.func_190916_E == 0) {
         indInventory.setInventorySlotContents(indexOutput + slot, null)
       }
       val ret = item.copy()
-      ret.stackSize = remove
+      ret.func_190920_e(remove)
       ret
     }
     else null

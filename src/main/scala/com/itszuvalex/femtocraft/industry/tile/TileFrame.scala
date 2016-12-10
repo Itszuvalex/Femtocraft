@@ -183,22 +183,22 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           forall { case (item, slots) =>
             if (slots.isEmpty) false
             else {
-              var needed = item.stackSize
+              var needed = item.func_190916_E
               slots.exists { slot =>
                 val i = getStackInSlot(slot)
-                needed -= i.stackSize
+                needed -= i.func_190916_E
                 needed <= 0
               }
             }
           }) {
           itemsAndSlots.foreach { case (item, slots) =>
-            var needed = item.stackSize
+            var needed = item.func_190916_E
             slots.exists { slot =>
               val i = getStackInSlot(slot)
-              val amt = Math.min(needed, i.stackSize)
+              val amt = Math.min(needed, i.func_190916_E)
               needed -= amt
-              i.stackSize -= amt
-              if (i.stackSize <= 0) {
+              i.func_190920_e(i.func_190916_E() - amt)
+              if (i.func_190916_E <= 0) {
                 isModifyingInv = true
                 setInventorySlotContents(slot, null)
                 isModifyingInv = false

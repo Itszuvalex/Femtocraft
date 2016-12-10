@@ -93,7 +93,7 @@ class MachineGrowthChamber extends ICyberMachine {
   override def receiveFluidBroadcast(fluid: FluidStack, loc: Loc4): FluidStack = {
     loc.getTileEntity() match {
       case Some(tile: TileGrowthChamber) =>
-        val filledAmt = tile.fill(EnumFacing.DOWN, fluid, true)
+        val filledAmt = tile.fill(fluid, true)
         fluid.amount -= filledAmt
         if (fluid.amount == 0) null else fluid
       case None =>

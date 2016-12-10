@@ -282,23 +282,23 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
       val invStack = indInventory.getStackInSlot(id)
       if (invStack == null) {
         indInventory.addItemStack(item, id)
-        item.stackSize = 0
+        item.func_190920_e(0)
       } else if (item.isItemEqual(invStack) && ItemStack.areItemStackTagsEqual(item, invStack)) {
-        val fitAmount = indInventory.getInventoryStackLimit - invStack.stackSize
-        if (item.stackSize <= fitAmount) {
+        val fitAmount = indInventory.getInventoryStackLimit - invStack.func_190916_E()
+        if (item.func_190916_E() <= fitAmount) {
           indInventory.removeItemStack(id)
-          invStack.stackSize += item.stackSize
+          invStack.func_190920_e(invStack.func_190916_E() + item.func_190916_E())
           indInventory.addItemStack(invStack, id)
-          item.stackSize = 0
+          item.func_190920_e(0)
         } else {
           indInventory.removeItemStack(id)
-          invStack.stackSize = indInventory.getInventoryStackLimit
+          invStack.func_190920_e(indInventory.getInventoryStackLimit)
           indInventory.addItemStack(invStack, id)
-          item.stackSize -= fitAmount
+          item.func_190920_e(item.func_190916_E() - fitAmount)
         }
       }
     }
-    if (item.stackSize == 0) null else item
+    if (item.func_190916_E() == 0) null else item
   }
 
   /**
@@ -310,7 +310,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     */
   def putFluid(fluid: FluidStack): FluidStack = {
     if (!isController) return forwardToController[TileCyberBase, FluidStack](_.putFluid(fluid))
-    fluid.amount -= fill(EnumFacing.DOWN, fluid, true)
+    fluid.amount -= fill(fluid, true)
     if (fluid.amount == 0) null else fluid
   }
 
@@ -431,11 +431,11 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   override def defaultTanks: Array[FluidTank] = Array(new FluidTank(2000), new FluidTank(2000))
 
   // Disabled UP because blocks directly on top of the base (that aren't machines) are generally forbidden.
-  override def canFill(from: EnumFacing, fluid: Fluid): Boolean = from != EnumFacing.UP
+  def canFill(from: EnumFacing, fluid: Fluid): Boolean = from != EnumFacing.UP
 
-  override def canDrain(from: EnumFacing, fluid: Fluid): Boolean = from != EnumFacing.UP
+  def canDrain(from: EnumFacing, fluid: Fluid): Boolean = from != EnumFacing.UP
 
-  override def fill(from: EnumFacing, fluid: FluidStack, doFill: Boolean): Int = {
+  override def fill(fluid: FluidStack, doFill: Boolean): Int = {
     var filled = 0
     setUpdateTanks()
     if (fluid.getFluid == FemtoFluids.cybermass) {
@@ -451,7 +451,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     filled
   }
 
-  override def drain(from: EnumFacing, maxDrain: Int, doDrain: Boolean): FluidStack = {
+  override def drain(maxDrain: Int, doDrain: Boolean): FluidStack = {
     setUpdateTanks()
     if (size == 3) {
       val ret = tanks(2).drain(maxDrain, false)
@@ -461,7 +461,7 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
     tanks(1).drain(maxDrain, doDrain)
   }
 
-  override def drain(from: EnumFacing, resource: FluidStack, doDrain: Boolean): FluidStack = {
+  override def drain(resource: FluidStack, doDrain: Boolean): FluidStack = {
     var t2rf = false
     if (size == 3) {
       t2rf = tanks(2).getFluid.getFluid == resource.getFluid

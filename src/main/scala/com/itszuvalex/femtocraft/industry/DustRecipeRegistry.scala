@@ -73,7 +73,7 @@ object DustRecipeRegistry {
         case None =>
         case Some(grind) =>
           val ret = grind.copy()
-          ret.stackSize = oreDustNum.getOrElse(ore, defaultDust)
+          ret.func_190920_e(oreDustNum.getOrElse(ore, defaultDust))
           return Some(ret)
       }
     }
