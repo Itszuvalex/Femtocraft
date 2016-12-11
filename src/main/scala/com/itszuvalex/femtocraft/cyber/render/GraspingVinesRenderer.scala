@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 01.10.2015.
   */
 object GraspingVinesRenderer {
-  //  val model = AdvancedModelLoader.loadModel(Resources.Model("growth chamber/Growth Chamber.obj")).asInstanceOf[WavefrontObject]
+  //  val model = AdvancedModelLoader.loadModel(Resources.Model("growth chamber/growth chamber.obj")).asInstanceOf[WavefrontObject]
   val texture            = Resources.CustomModelBlock("grasping_vines/Grasping Vines Template.png")
   //val testTex = Resources.Model("growth chamber/test.png")
   val vineTexture        = Resources.Texture("vine_beam.png")

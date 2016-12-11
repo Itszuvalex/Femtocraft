@@ -14,8 +14,8 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
   */
 object NodeCrystalRenderer {
-  val crystalModelLocation = Resources.CustomModelBlock("crystal cluster/Crystals.obj")
-  val crystalTexLocation   = Resources.CustomModelBlockTex("crystal cluster/Crystals Texture 64x64.png")
+  val crystalModelLocation = Resources.CustomModelBlock("crystal cluster/crystals.obj")
+  val crystalTexLocation   = Resources.CustomModelBlockTex("crystal cluster/crystals texture 64x64.png")
 }
 
 trait NodeCrystalRenderer[T <: TileEntity with IPowerNode] extends TileEntitySpecialRenderer[T] {

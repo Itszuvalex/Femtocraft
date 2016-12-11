@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 8/29/2015.
   */
 object NaniteHiveSmallRenderer {
-  val hiveModelLocation    = Resources.CustomModelBlock("nanite hive small/Nanite Hive Small.obj")
+  val hiveModelLocation    = Resources.CustomModelBlock("nanite hive small/nanite hive small.obj")
   val hiveTexLocation      = Resources.CustomModelBlockTex("nanite hive small/nanite hive small.png")
   val hiveColorTexLocation = Resources.CustomModelBlockTex("nanite hive small/nanite hive small color.png")
 }

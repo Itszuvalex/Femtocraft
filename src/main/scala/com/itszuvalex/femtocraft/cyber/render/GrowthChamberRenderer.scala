@@ -14,8 +14,8 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 01.10.2015.
   */
 object GrowthChamberRenderer {
-  val model   = LoadObj(Resources.CustomModelBlock("growth chamber/Growth Chamber.obj"))
-  val texture = Resources.CustomModelBlockTex("growth chamber/Growth Chamber Template.png")
+  val model   = LoadObj(Resources.CustomModelBlock("growth chamber/growth chamber.obj"))
+  val texture = Resources.CustomModelBlockTex("growth chamber/growth chamber template.png")
   //val testTex = Resources.Model("growth chamber/test.png")
 }
 

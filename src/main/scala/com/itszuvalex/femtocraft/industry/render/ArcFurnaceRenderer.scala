@@ -14,10 +14,10 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 9/19/2015.
   */
 object ArcFurnaceRenderer {
-  val modelLoc           = Resources.CustomModelBlock("arc furnace/Arc Furnace.obj")
-  val textureLoc         = Resources.CustomModelBlockTex("arc furnace/Arc Furnace Template.png")
-  val inProgressModelLoc = Resources.CustomModelBlock("arc furnace/Arc Furnace In-Progress.obj")
-  val inProgressTexLoc   = Resources.CustomModelBlockTex("arc furnace/Arc Furnace In-Progress.png")
+  val modelLoc           = Resources.CustomModelBlock("arc furnace/arc furnace.obj")
+  val textureLoc         = Resources.CustomModelBlockTex("arc furnace/arc furnace template.png")
+  val inProgressModelLoc = Resources.CustomModelBlock("arc furnace/arc furnace in-progress.obj")
+  val inProgressTexLoc   = Resources.CustomModelBlockTex("arc furnace/arc furnace in-progress.png")
 }
 
 

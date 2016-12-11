@@ -13,12 +13,12 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 28.09.2015.
   */
 object CyberBaseRenderer {
-  val smallBaseModelLoc: ResourceLocation = Resources.CustomModelBlock("cyber base/Base 1x1.obj")
-  val smallBaseTexLoc  : ResourceLocation = Resources.CustomModelBlockTex("cyber base/Base 1x1 Template.png")
-  val medBaseModelLoc  : ResourceLocation = Resources.CustomModelBlock("cyber base/Base 2x2.obj")
-  val medBaseTexLoc    : ResourceLocation = Resources.CustomModelBlockTex("cyber base/Base 2x2 Template.png")
-  val largeBaseModelLoc: ResourceLocation = Resources.CustomModelBlock("cyber base/Base 3x3.obj")
-  val largeBaseTexLoc  : ResourceLocation = Resources.CustomModelBlockTex("cyber base/Base 3x3 Template.png")
+  val smallBaseModelLoc: ResourceLocation = Resources.CustomModelBlock("cyber base/base 1x1.obj")
+  val smallBaseTexLoc  : ResourceLocation = Resources.CustomModelBlockTex("cyber base/base 1x1 template.png")
+  val medBaseModelLoc  : ResourceLocation = Resources.CustomModelBlock("cyber base/base 2x2.obj")
+  val medBaseTexLoc    : ResourceLocation = Resources.CustomModelBlockTex("cyber base/base 2x2 template.png")
+  val largeBaseModelLoc: ResourceLocation = Resources.CustomModelBlock("cyber base/base 3x3.obj")
+  val largeBaseTexLoc  : ResourceLocation = Resources.CustomModelBlockTex("cyber base/base 3x3 template.png")
 
   val smallBaseModel = LoadObj(smallBaseModelLoc)
   val medBaseModel   = LoadObj(medBaseModelLoc)
