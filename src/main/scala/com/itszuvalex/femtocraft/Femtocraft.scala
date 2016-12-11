@@ -21,7 +21,7 @@ import org.apache.logging.log4j.LogManager
   */
 @Mod(modid = Femtocraft.ID, name = Femtocraft.ID, version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:ItszuLib")
 object Femtocraft {
-  final val ID      = "Femtocraft"
+  final val ID      = "femtocraft"
   final val VERSION = Version.FULL_VERSION
   final val logger  = LogManager.getLogger(ID)
   final val blocks  = FemtoBlocks
