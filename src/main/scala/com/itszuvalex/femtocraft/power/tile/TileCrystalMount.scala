@@ -11,10 +11,8 @@ import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
-import net.minecraft.block.BlockChest
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 
@@ -47,10 +45,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @return The color of this power node.  This is used for aesthetics.
     */
   override def getColor: Int = {
-    getCrystalStack match {
-      case null => super.getColor
-      case i => i.getItem.asInstanceOf[IPowerCrystal].getColor(i)
-    }
+    if (getCrystalStack.func_190926_b()) super.getColor else
+      getCrystalStack.getItem.asInstanceOf[IPowerCrystal].getColor(getCrystalStack)
   }
 
   /**
@@ -72,14 +68,14 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def validate(): Unit = {
     super.validate()
     if (getWorld.isRemote) return
-    if (getCrystalStack != null)
+    if (!getCrystalStack.func_190926_b())
       PowerManager.addNode(this)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
     if (getWorld.isRemote) return
-    if (getCrystalStack != null)
+    if (!getCrystalStack.func_190926_b())
       PowerManager.removeNode(this)
   }
 
@@ -96,7 +92,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @return True if child is capable of being a child of this node.
     */
   override def canAddChild(child: IPowerNode): Boolean =
-  child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType) && (child.getNodeLoc != parentLoc)
+    child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType) && (child.getNodeLoc != parentLoc)
 
   /**
     *
@@ -112,23 +108,22 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    getCrystalStack match {
-      case null =>
-      case stack =>
-        stack.getItem match {
-          case null =>
-          case crystal: IPowerCrystal =>
-            crystal.onTick(stack)
-            distributePower(stack, crystal)
-          case _ =>
-        }
-    }
+    if (!getCrystalStack.func_190926_b())
+      getCrystalStack.getItem match {
+        case null =>
+        case crystal: IPowerCrystal =>
+          crystal.onTick(getCrystalStack)
+          distributePower(getCrystalStack, crystal)
+        case _ =>
+      }
   }
 
   def distributePower(item: ItemStack, crystal: IPowerCrystal): Unit = {
     val rate = crystal.getTransferRate(item)
     val amount = Math.min(getPowerCurrent, rate)
+
     def isNaN(x: Double) = x != x
+
     if (amount < 0d || isNaN(amount)) return
     //TODO:  This is crap.  Needs to be replaced. Probably with Femto 1 algorithm.
     // Why?  Imagine 10 connections, only 1 has power.  This will be completely random on giving between
@@ -152,7 +147,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def getPowerCurrent: Double = {
     getCrystalStack match {
-      case null => 0
+      case stack if stack.func_190926_b() => 0
       case stack => stack.getItem match {
         case crystal: IPowerCrystal =>
           crystal.getStorageCurrent(stack)
@@ -170,7 +165,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def usePower(amount: Double, doUse: Boolean): Double = {
     getCrystalStack match {
-      case null => 0
+      case stack if stack.func_190926_b() => 0
       case stack => stack.getItem match {
         case crystal: IPowerCrystal =>
           crystal.consume(stack, amount, doUse)
@@ -185,7 +180,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def getPowerMax: Double = {
     getCrystalStack match {
-      case null => 0
+      case stack if stack.func_190926_b() => 0
       case stack => stack.getItem match {
         case null => 0
         case crystal: IPowerCrystal =>
@@ -225,7 +220,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def hasDescription: Boolean = true
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    slot == 0 && (item == null || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
+    slot == 0 && (item == null || item.func_190926_b() || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
   }
 
   override def defaultStorage: ItemStorageArray = new ItemStorageArray(1)
@@ -284,7 +279,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setModified()
     setUpdate()
     getCrystalStack match {
-      case null =>
+      case stack if stack.func_190926_b() =>
         PowerManager.removeNode(this)
         getChildren.foreach(_.setParent(null))
         childrenLocs.clear()
@@ -396,7 +391,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def addPower(amount: Double, doFill: Boolean): Double = {
     getCrystalStack match {
-      case null => 0
+      case stack if stack.func_190926_b() => 0
       case stack => stack.getItem match {
         case null => 0
         case crystal: IPowerCrystal =>
@@ -411,7 +406,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     */
   override def setPower(amount: Double): Unit = {
     getCrystalStack match {
-      case null =>
+      case stack if stack.func_190926_b() =>
       case stack => stack.getItem match {
         case null =>
         case crystal: IPowerCrystal =>
