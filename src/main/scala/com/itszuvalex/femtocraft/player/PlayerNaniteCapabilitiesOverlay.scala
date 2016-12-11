@@ -23,8 +23,8 @@ object PlayerNaniteCapabilitiesOverlay {
   val texWidth  = 16
   val texHeight = 32
 
-  val textureLoc           = Resources.TexGui("NaniteOverlay_base.png")
-  val textureFillLoc       = Resources.TexGui("NaniteOverlay_fill.png")
+  val textureLoc           = Resources.TexGui("naniteoverlay_base.png")
+  val textureFillLoc       = Resources.TexGui("naniteoverlay_fill.png")
   val textureFillBotOffset = 2
   val textureFillTopOffset = 2
 
