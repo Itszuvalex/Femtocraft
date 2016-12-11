@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 2/18/2016.
   */
 object GuiFrameConstructing {
-  val texture = Resources.TexGui("GuiFrameConstruction.png")
+  val texture = Resources.TexGui("guiframeconstruction.png")
 }
 
 class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrameConstructing(player, inv, tile)) {

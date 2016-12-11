@@ -19,8 +19,8 @@ object GuiPowerMeter {
   val DEFAULT_LOWERED_COLOR       = Color(255.toByte, 15, 15, 15).toInt
   val DEFAULT_ACCENT_COLOR        = Color(255.toByte, 0, 0, 255.toByte).toInt
 
-  val baseTexture = Resources.TexGui("GuiPowerMeter_SegmentBase.png")
-  val lightTexture = Resources.TexGui("GuiPowerMeter_SegmentLight.png")
+  val baseTexture = Resources.TexGui("guipowermeter_segmentbase.png")
+  val lightTexture = Resources.TexGui("guipowermeter_segmentlight.png")
 }
 
 /**

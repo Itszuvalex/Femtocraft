@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 18.10.2015.
   */
 object GuiGrowthChamber {
-  val texture = Resources.TexGui("GuiGrowthChamber.png")
+  val texture = Resources.TexGui("guigrowthchamber.png")
 }
 
 class GuiGrowthChamber(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileGrowthChamber) extends GuiBase(new ContainerGrowthChamber(player, inv, tile)) {

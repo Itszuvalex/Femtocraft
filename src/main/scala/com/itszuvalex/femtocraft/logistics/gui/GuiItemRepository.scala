@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object GuiItemRepository {
-  val TEXTURE_LOC    = Resources.TexGui("GuiItemRepository.png")
+  val TEXTURE_LOC    = Resources.TexGui("guiitemrepository.png")
   val TEXTURE_HEIGHT = 211
 }
 

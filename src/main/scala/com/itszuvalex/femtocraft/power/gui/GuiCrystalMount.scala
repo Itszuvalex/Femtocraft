@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object GuiCrystalMount {
-  val TEXTURE_LOC = Resources.TexGui("GuiCrystalMount.png")
+  val TEXTURE_LOC = Resources.TexGui("guicrystalmount.png")
 }
 
 class GuiCrystalMount(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCrystalMount)

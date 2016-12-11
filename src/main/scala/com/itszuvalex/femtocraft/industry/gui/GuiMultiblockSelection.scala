@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 9/1/2015.
   */
 object GuiMultiblockSelection {
-  val texture         = Resources.TexGui("GuiMultiblockSelector.png")
+  val texture         = Resources.TexGui("guimultiblockselector.png")
   val xSelectionMin   = 7
   val ySelectionMin   = 7
   val SelectionHeight = 128

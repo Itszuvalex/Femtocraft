@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 03.10.2015.
   */
 object GuiCyberBase {
-  val texture = Resources.TexGui("GuiCyberBase.png")
+  val texture = Resources.TexGui("guicyberbase.png")
 }
 
 class GuiCyberBase(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCyberBase) extends GuiBase(new ContainerCyberBase(player, inv, tile)) {

@@ -13,8 +13,8 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 18.08.2016.
   */
 object GuiNanoFurnace {
-  val texture      = Resources.TexGui("GuiNanoFurnace.png")
-  val colorTexture = Resources.TexGui("GuiNanoFurnaceColor.png")
+  val texture      = Resources.TexGui("guinanofurnace.png")
+  val colorTexture = Resources.TexGui("guinanofurnacecolor.png")
 }
 
 class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNanoFurnace) extends GuiBase(new ContainerNanoFurnace(player, inv, tile)) {

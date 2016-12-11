@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
 object GuiMaterialProcessor {
-  val texture = Resources.TexGui("GuiMaterialProcessor.png")
+  val texture = Resources.TexGui("guimaterialprocessor.png")
 }
 
 @SideOnly(Side.CLIENT) class GuiMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileMaterialProcessor) extends

@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11
 
 
 object GuiNaniteExtractor {
-  val texture      = Resources.TexGui("GuiNaniteExtractor.png")
+  val texture      = Resources.TexGui("guinaniteextractor.png")
   val colorTexture = Resources.TexGui("GuiNaniteExtractorColor.png")
 }
 

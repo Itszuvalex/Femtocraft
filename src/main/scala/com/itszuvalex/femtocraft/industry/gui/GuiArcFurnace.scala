@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 9/1/2015.
   */
 @SideOnly(Side.CLIENT) object GuiArcFurnace {
-  val texture = Resources.TexGui("GuiCrystalMount.png")
+  val texture = Resources.TexGui("guicrystalmount.png")
 }
 
 @SideOnly(Side.CLIENT) class GuiArcFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileArcFurnace) extends

@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 9/1/2015.
   */
 @SideOnly(Side.CLIENT) object GuiNaniteHive {
-  val texture = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/guis/GuiNaniteHive_small.png")
+  val texture = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/guis/guinanitehive_small.png")
   val WIDTH   = 226
   val HEIGHT  = 166
 }

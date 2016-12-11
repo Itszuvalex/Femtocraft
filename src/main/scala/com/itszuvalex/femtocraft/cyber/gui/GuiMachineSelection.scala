@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11
   * Created by Alex on 15.10.2015.
   */
 object GuiMachineSelection {
-  val texture         = Resources.TexGui("GuiMachineSelector.png")
+  val texture         = Resources.TexGui("guimachineselector.png")
   val xSelectionMin   = 7
   val ySelectionMin   = 7
   val SelectionHeight = 108
