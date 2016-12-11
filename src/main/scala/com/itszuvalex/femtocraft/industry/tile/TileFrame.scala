@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 
@@ -384,4 +385,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def setField(id: Int, value: Int): Unit =
     if (isController) {} else forwardToController[TileFrame](_.setField(id, value))
+
+  override def func_191420_l(): Boolean = true
 }

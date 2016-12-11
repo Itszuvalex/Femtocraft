@@ -65,7 +65,7 @@ class ItemStackFilterRule extends IItemFilterRule {
   override def deserializeNBT(compound: NBTTagCompound): Unit = {
     setDamageSensitive(compound.Bool(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY))
     setNBTSensitive(compound.Bool(ItemStackFilterRule.NBT_SENSITIVE_KEY))
-    compound.NBTCompound(ItemStackFilterRule.STACK_KEY) { comp => stack = ItemStack.loadItemStackFromNBT(comp)
+    compound.NBTCompound(ItemStackFilterRule.STACK_KEY) { comp => stack = new ItemStack(comp)
       Unit
     }
   }

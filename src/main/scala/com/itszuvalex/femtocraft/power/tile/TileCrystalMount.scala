@@ -11,8 +11,10 @@ import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
+import net.minecraft.block.BlockChest
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 
@@ -257,7 +259,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(ItemStack.loadItemStackFromNBT))
+    setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(new ItemStack(_)))
     loadPowerConnectionInfo(compound)
     loadPedestalLocInfo(compound)
     setRenderUpdate()
@@ -423,4 +425,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def getField(id: Int): Int = inventory.getField(id)
 
   override def setField(id: Int, value: Int): Unit = inventory.setField(id, value)
+
+  override def func_191420_l(): Boolean = false
 }

@@ -150,9 +150,9 @@ class TileGraspingVines extends TileEntityBase with CyberMachineMultiblock with 
 
   override def defaultTank: FluidTank = new FluidTank(1000)
 
-  override def canFill(from: EnumFacing, fluid: Fluid): Boolean = false
+  def canFill(from: EnumFacing, fluid: Fluid): Boolean = false
 
-  override def canDrain(from: EnumFacing, fluid: Fluid): Boolean = false
+  def canDrain(from: EnumFacing, fluid: Fluid): Boolean = false
 
   override def defaultInventory: IndexedInventory = new IndexedInventory(9)
 

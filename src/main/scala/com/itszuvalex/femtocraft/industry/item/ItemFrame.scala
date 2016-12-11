@@ -13,7 +13,7 @@ import net.minecraft.block.BlockSnow
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
-import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.item.{Item, ItemBow, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util._
@@ -55,13 +55,14 @@ class ItemFrame extends Item with IFrameItem {
   override def renderID: Int = RenderIDs.framePreviewableID
 
 
-  override def onItemRightClick(itemStackIn: ItemStack, worldIn: World, playerIn: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
+  override def onItemRightClick(worldIn: World, playerIn: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (playerIn.isSneaking) {
       playerIn.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, worldIn, 0, 0, 0)
-      new ActionResult(EnumActionResult.SUCCESS, itemStackIn)
+      val itemStack = playerIn.getHeldItem(hand)
+      new ActionResult(EnumActionResult.SUCCESS, itemStack)
     }
     else
-      super.onItemRightClick(itemStackIn, worldIn, playerIn, hand)
+      super.onItemRightClick(worldIn, playerIn, hand)
   }
 
   override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
@@ -74,16 +75,16 @@ class ItemFrame extends Item with IFrameItem {
 
   override def getFrameType(stack: ItemStack) = "Basic"
 
-  override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
-    if (stack == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+  override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    val stack = playerIn.getHeldItem(hand)
     if (playerIn.isSneaking) {
       playerIn.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, worldIn, 0, 0, 0)
       return EnumActionResult.SUCCESS
     }
     val multiString = getSelectedMultiblock(stack)
-    if (multiString == null || multiString.isEmpty) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    if (multiString == null || multiString.isEmpty) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
-    if (multi == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    if (multi == null) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
     val block = worldIn.getBlockState(pos).getBlock
 
@@ -96,11 +97,11 @@ class ItemFrame extends Item with IFrameItem {
         }
 
         val bpos = pos.offset(dir)
-        if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+        if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
         val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
-        if (!playerIn.capabilities.isCreativeMode && stack.stackSize < multi.numFrames) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
-        else if (!playerIn.capabilities.isCreativeMode) stack.stackSize -= multi.numFrames
+        if (!playerIn.capabilities.isCreativeMode && stack.func_190916_E() < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+        else if (!playerIn.capabilities.isCreativeMode) stack.func_190920_e(stack.func_190916_E() - multi.numFrames)
 
         locations.foreach { loc =>
           worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)

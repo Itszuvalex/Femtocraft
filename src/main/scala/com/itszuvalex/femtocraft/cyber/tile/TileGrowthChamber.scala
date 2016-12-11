@@ -257,6 +257,7 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
       stack
     }
 
+    override def func_191420_l(): Boolean = false
   }
 
   override def hasDescription: Boolean = true
@@ -299,4 +300,6 @@ class TileGrowthChamber extends TileEntityBase with CyberMachineMultiblock with 
   }
 
   override def getCyberMachine = MachineGrowthChamber.NAME
+
+  override def getTankProperties: Array[IFluidTankProperties] = tank.getTankProperties
 }

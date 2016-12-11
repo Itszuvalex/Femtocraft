@@ -8,7 +8,8 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
-import net.minecraftforge.fluids.{Fluid, FluidTank}
+import net.minecraftforge.fluids.capability.IFluidTankProperties
+import net.minecraftforge.fluids.{Fluid, FluidStack, FluidTank}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/28/15.
@@ -26,10 +27,6 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
 
   override def defaultTank: FluidTank = new FluidTank(TileArcFurnace.FLUID_TANK_SIZE)
 
-  override def canFill(from: EnumFacing, fluid: Fluid) = false
-
-  override def canDrain(from: EnumFacing, fluid: Fluid) = isValidMultiBlock
-
   override def hasGUI = isValidMultiBlock
 
   override def getGuiID = GuiIDs.TileArcFurnaceGuiID
@@ -46,4 +43,12 @@ import net.minecraftforge.fluids.{Fluid, FluidTank}
     }
     else super.getRenderBoundingBox
   }
+
+  override def getTankProperties: Array[IFluidTankProperties] = tank.getTankProperties
+
+  override def drain(resource: FluidStack, doDrain: Boolean): FluidStack = tank.drain(resource, doDrain)
+
+  override def drain(maxDrain: Int, doDrain: Boolean): FluidStack = tank.drain(maxDrain, doDrain)
+
+  override def fill(resource: FluidStack, doFill: Boolean): Int = tank.fill(resource, doFill)
 }

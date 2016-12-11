@@ -18,7 +18,8 @@ import net.minecraft.world.World
 class ItemDumbDust extends Item {
   setCreativeTab(Femtocraft.tab)
 
-  override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+  override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    val stack = playerIn.getHeldItem(hand)
     if (worldIn.isAirBlock(pos)) return EnumActionResult.FAIL
     CybermaterialRegistry.getReplacement(worldIn.getBlockState(pos).getBlock, worldIn.getBlockState(pos).getBlock.getMetaFromState(worldIn.getBlockState(pos))) match {
       case Some((rblock, rdamage)) =>

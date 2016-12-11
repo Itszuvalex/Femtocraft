@@ -21,5 +21,5 @@ class BlockGlowStick extends TileContainer(Material.CIRCUITS) {
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int) = new TileGlowStick
 
-  override def getCollisionBoundingBox(blockState: IBlockState, worldIn: World, pos: BlockPos): AxisAlignedBB = null
+  override def getCollisionBoundingBox(blockState: IBlockState, worldIn: IBlockAccess, pos: BlockPos): AxisAlignedBB = null
 }

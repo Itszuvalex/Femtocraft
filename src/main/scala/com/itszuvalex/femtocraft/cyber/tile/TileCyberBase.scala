@@ -21,6 +21,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
 import net.minecraftforge.common.util.INBTSerializable
 import net.minecraftforge.fluids._
+import net.minecraftforge.fluids.capability.IFluidTankProperties
 
 import scala.collection.mutable
 
@@ -480,4 +481,8 @@ class TileCyberBase extends TileEntityBase with MultiBlockComponent with TileMul
   override def getName: String = indInventory.getName
 
   override def hasCustomName: Boolean = indInventory.hasCustomName
+
+  override def func_191420_l(): Boolean = false
+
+  override def getTankProperties: Array[IFluidTankProperties] = null
 }

@@ -117,7 +117,8 @@ class ItemBaseSeed extends Item with IPreviewable {
     list.add("Size: " + ItemBaseSeed.getSizeString(stack))
   }
 
-  override def onItemRightClick(stack: ItemStack, worldIn: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
+  override def onItemRightClick(worldIn: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
+    val stack = player.getHeldItem(hand)
     if (player.isSneaking) {
       ItemBaseSeed.setSize(stack, ItemBaseSeed.getSize(stack) match {
         case 1 => 2
@@ -130,7 +131,8 @@ class ItemBaseSeed extends Item with IPreviewable {
     new ActionResult(EnumActionResult.SUCCESS, stack)
   }
 
-  override def onItemUse(stack: ItemStack, player: EntityPlayer, world: World, pos: BlockPos, hand: EnumHand, side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+  override def onItemUse(player: EntityPlayer, world: World, pos: BlockPos, hand: EnumHand, side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    val stack = player.getHeldItem(hand)
     if (player.isSneaking) return EnumActionResult.FAIL
     var dir = EnumFacing.values()(side.getIndex)
     //    if (world.getBlockState(pos).getBlock.isReplaceable(world, pos)) dir = EnumFacing.UNKNOWN

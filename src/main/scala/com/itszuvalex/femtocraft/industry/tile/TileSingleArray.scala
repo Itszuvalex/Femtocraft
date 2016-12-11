@@ -77,19 +77,19 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     }
     else {
       if (IDDamageWildCardNBTComparator.compare(item, slotItem) == 0) {
-        val room = slotItem.getMaxStackSize - slotItem.stackSize
-        val amount = Math.min(room, item.stackSize)
-        slotItem.stackSize += amount
+        val room = slotItem.getMaxStackSize - slotItem.func_190916_E()
+        val amount = Math.min(room, item.func_190916_E())
+        slotItem.func_190920_e(slotItem.func_190916_E() + amount)
         if (room > 0 && amount <= room) {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
+          item.func_190920_e(item.func_190916_E() - amount)
+          if (item.func_190916_E() == 0)
             null
           else
             item
         }
         else {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
+          item.func_190920_e(item.func_190916_E() - amount)
+          if (item.func_190916_E() == 0)
             null
           else
             item
@@ -118,7 +118,7 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     */
   override def addOrMergeOutputItem(item: ItemStack, slot: Int): ItemStack = {
     if (item == null) return null
-    if (item.stackSize == 0) return null
+    if (item.func_190916_E() == 0) return null
 
     val slotItem = getOutputItem(slot)
     if (slotItem == null) {
@@ -127,19 +127,19 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
     }
     else {
       if (IDDamageWildCardNBTComparator.compare(item, slotItem) == 0) {
-        val room = slotItem.getMaxStackSize - slotItem.stackSize
-        val amount = Math.min(room, item.stackSize)
-        slotItem.stackSize += amount
+        val room = slotItem.getMaxStackSize - slotItem.func_190916_E()
+        val amount = Math.min(room, item.func_190916_E())
+        slotItem.func_190920_e(slotItem.func_190916_E() + amount)
         if (room > 0 && amount <= room) {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
+          item.func_190920_e(item.func_190916_E() - amount)
+          if (item.func_190916_E() == 0)
             null
           else
             item
         }
         else {
-          item.stackSize -= amount
-          if (item.stackSize == 0)
+          item.func_190920_e(item.func_190916_E() - amount)
+          if (item.func_190916_E() == 0)
             null
           else
             item
@@ -251,4 +251,6 @@ class TileSingleArray extends TileEntityBase with ITileAssemblyArray with PowerN
   override def getCurrentPower: Double = ???
 
   override def getMaximumPower: Double = ???
+
+  override def func_191420_l(): Boolean = ???
 }

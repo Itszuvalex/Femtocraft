@@ -188,4 +188,6 @@ import scala.collection.Set
   override def getName: String = indInventory.getName
 
   override def hasCustomName: Boolean = indInventory.hasCustomName
+
+  override def func_191420_l(): Boolean = false
 }

@@ -54,12 +54,12 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def decrStackSize(i: Int, amount: Int): ItemStack = {
     var itemstack: ItemStack = null
     if (inventory(i) != null) {
-      if (inventory(i).stackSize <= amount) {
+      if (inventory(i).func_190916_E() <= amount) {
         itemstack = inventory(i)
         removeItemStack(i)
       } else {
         itemstack = inventory(i).splitStack(amount)
-        if (inventory(i).stackSize == 0) {
+        if (inventory(i).func_190916_E() == 0) {
           removeItemStack(i)
         }
       }
@@ -170,4 +170,6 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def getContainedOres: Set[String] = inventoryCache.getContainedOres
 
   override def getContainedIDs: Set[Int] = inventoryCache.getContainedIDs
+
+  override def func_191420_l(): Boolean = true
 }

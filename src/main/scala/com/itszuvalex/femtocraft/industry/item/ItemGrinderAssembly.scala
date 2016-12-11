@@ -38,7 +38,7 @@ object ItemGrinderAssembly {
 
   def getGrindingItem(item: ItemStack): Option[ItemStack] = getGrindingItemCompound(item) match {
     case Some(comp) =>
-      Option(ItemStack.loadItemStackFromNBT(comp))
+      Option(new ItemStack(comp))
     case None => None
   }
 
@@ -64,7 +64,7 @@ object ItemGrinderAssembly {
 
   def getResultItem(item: ItemStack): Option[ItemStack] = getResultItemCompound(item) match {
     case Some(comp) =>
-      Option(ItemStack.loadItemStackFromNBT(comp))
+      Option(new ItemStack(comp))
     case None => None
   }
 
@@ -176,7 +176,7 @@ class ItemGrinderAssembly extends Item with IItemAssembly {
       (0 until tile.getInputSlots).map(i => (i, tile.getInputItem(i))).filter { case (i, it) => it != null }.exists { case (i, it) => DustRecipeRegistry.getDust(it) match {
         case Some(stack) =>
           val ite = it.copy()
-          ite.stackSize = 1
+          ite.func_190920_e(1)
           setGrindingItem(item, ite)
           tile.removeInputItem(i, 1)
           true

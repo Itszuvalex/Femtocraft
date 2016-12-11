@@ -572,4 +572,5 @@ object TileMaterialProcessor {
     if (!worldObj.isRemote && isController) PowerManager.addNode(this)
   }
 
+  override def func_191420_l(): Boolean = false
 }

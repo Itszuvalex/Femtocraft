@@ -197,4 +197,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
     * @return True if this node is capable of having that node as a parent.
     */
   override def canSetParent(parent: IPowerNode): Boolean = super.canSetParent(parent) && parent.getType == IPowerNode.CRYSTAL_MOUNT
+
+  override def func_191420_l(): Boolean = true
 }

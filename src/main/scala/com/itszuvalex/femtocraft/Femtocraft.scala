@@ -8,7 +8,7 @@ import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilities
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.item.Item
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.network.NetworkRegistry
@@ -28,7 +28,7 @@ object Femtocraft {
   final val items   = FemtoItems
   final val fluids  = FemtoFluids
   val tab                      = new CreativeTabs(Femtocraft.ID) {
-    override def getTabIconItem: Item = Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall)
+    override def getTabIconItem: ItemStack = new ItemStack(Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall))
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
     serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")

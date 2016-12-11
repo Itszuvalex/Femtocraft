@@ -107,4 +107,6 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
   override def getContainedIDs: collection.Set[Int] = indInventory.getContainedIDs
 
   override def hasDescription: Boolean = false
+
+  override def func_191420_l(): Boolean = true
 }

@@ -36,12 +36,12 @@ class ItemMultiblock extends Item with IPreviewable {
   @SideOnly(Side.CLIENT)
   override def renderID = RenderIDs.multiblockPreviewableID
 
-  override def onItemUse(stack: ItemStack, playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
-    if (stack == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+  override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    val stack = playerIn.getHeldItem(hand)
     val multiString = getMultiblock(stack)
-    if (multiString == null || multiString.isEmpty) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    if (multiString == null || multiString.isEmpty) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
-    if (multi == null) return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    if (multi == null) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
 
     var hitSide = facing

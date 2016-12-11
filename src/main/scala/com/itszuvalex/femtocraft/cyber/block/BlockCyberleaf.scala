@@ -16,7 +16,5 @@ class BlockCyberleaf extends Block(Material.LEAVES) {
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
   override def getBlockLayer: BlockRenderLayer = BlockRenderLayer.CUTOUT_MIPPED
-
-  override def isVisuallyOpaque: Boolean = false
 }
 
