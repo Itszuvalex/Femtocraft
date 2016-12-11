@@ -12,10 +12,10 @@ import org.lwjgl.opengl.GL11
 /**
   * Created by Chris on 8/14/2016.
   */
-abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLocation) extends TileEntityRenderCube[T](Femtocraft.ID.toLowerCase(), Resources.TexBlock("BlockMachineBlock_side_base.png")) {
-  val colorTex      = Resources.TexBlock("BlockMachineBlock_side_color.png")
-  val frontTex      = Resources.TexBlock("BlockMachineBlock_front_base.png")
-  val frontColorTex = Resources.TexBlock("BlockMachineBlock_front_color.png")
+abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLocation) extends TileEntityRenderCube[T](Femtocraft.ID.toLowerCase(), Resources.TexBlock("blockmachineblock_side_base.png")) {
+  val colorTex      = Resources.TexBlock("blockmachineblock_side_color.png")
+  val frontTex      = Resources.TexBlock("blockmachineblock_front_base.png")
+  val frontColorTex = Resources.TexBlock("blockmachineblock_front_color.png")
   var pass          = 0
   var color         = Color(0, 255.toByte, 255.toByte, 255.toByte)
   var lastTe: T     = _
