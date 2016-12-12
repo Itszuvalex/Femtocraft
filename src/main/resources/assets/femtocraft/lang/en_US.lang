@@ -30,6 +30,7 @@ tile.blockNaniteExtractor.name=Nanite Extractor
 tile.blockPowerSink.name=Power Sink
 tile.blockPowerGenerator.name=Power Generator
 tile.blockGlowStick.name=Glow Stick
+tile.blockNaniteInfuser.name=Nanite Infuser
 tile.testBlock.name=Test Block
 tile.testNetworkBlock.name=Network Block
 tile.testDiffusionNode.name=Diffusion Node

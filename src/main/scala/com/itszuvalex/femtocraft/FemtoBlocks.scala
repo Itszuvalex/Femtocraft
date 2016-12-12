@@ -44,6 +44,7 @@ object FemtoBlocks {
   var blockSporeDistributor      : Block = _
   var blockItemRepository        : Block = _
   var blockNanoFurnace           : Block = _
+  var blockNaniteInfuser         : Block = _
 
 
   var blockFrame                 : Block = _
@@ -95,6 +96,7 @@ object FemtoBlocks {
     blockPhotosynthesisTower = registerBlock(new BlockPhotosynthesisTower(), "blockPhotosynthesisTower")
     blockSporeDistributor = registerBlock(new BlockSporeDistributor(), "blockSporeDistributor")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
+    blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")
     blockFrame = registerBlock(new BlockFrame(), "blockFrame")
     blockCyberBase = registerBlock(new BlockCyberBase(), "blockCyberBase")
     blockCyberMachineInProgress = registerBlock(new BlockCyberMachineInProgress(), "blockInProgressMachine").setBlockUnbreakable().setResistance(Float.MaxValue / 3f)
