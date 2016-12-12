@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.nanite.tile
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.TASK_NBT
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor.ExtractTask
-import com.itszuvalex.femtocraft.nanite.{NaniteStack, NaniteTank}
+import com.itszuvalex.femtocraft.nanite.{NaniteStack, NaniteTank, TileNaniteStorage}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -48,12 +48,11 @@ object TileNaniteExtractor {
 
 }
 
-class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerNode {
-  private val task       : ExtractTask = new ExtractTask(null)
-  private val storageTank: NaniteTank  = new NaniteTank(50)
+class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerNode with TileNaniteStorage {
+  private val task: ExtractTask = new ExtractTask(null)
   powerMax = 4000
 
-  def getStorageTank = storageTank
+  override def defaultStorageTank: NaniteTank = new NaniteTank(50)
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(1)
 

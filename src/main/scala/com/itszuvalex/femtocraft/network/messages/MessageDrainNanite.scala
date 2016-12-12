@@ -36,7 +36,7 @@ class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends Message
     message.loc.getTileEntity() match {
       case Some(tile: TileNaniteExtractor) =>
         // TODO: Take Nanite to drain and amount to drain from nanite stack
-        val storageTank = tile.getStorageTank
+        val storageTank = tile.naniteStorageTank
         val nanites = storageTank.nanitesInTank
         if (nanites.nonEmpty && ctx.getServerHandler.playerEntity.hasCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
           val capability = ctx.getServerHandler.playerEntity.getCapability[IPlayerNaniteCapabilities](PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.UP)
