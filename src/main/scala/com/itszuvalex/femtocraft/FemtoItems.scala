@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.{ItemBaseSeed, ItemDumbDust}
-import com.itszuvalex.femtocraft.industry.item.{ItemFrame, ItemFurnaceAssembly, ItemGrinderAssembly, ItemMultiblock}
+import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.registry.GameRegistry
@@ -23,6 +23,8 @@ object FemtoItems {
   var itemBaseSeed  : Item = null
   var itemMultiblock: Item = null
 
+  var itemMultiTool: Item = null
+
   def preInit(): Unit = {
     itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
     itemFrame = registerItem(new ItemFrame(), "itemFrame")
@@ -32,6 +34,7 @@ object FemtoItems {
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
     itemFurnaceAssembly = registerItem(new ItemFurnaceAssembly(), "itemFurnaceAssembly").registerOre("assemblyFurnace")
     itemGrinderAssembly = registerItem(new ItemGrinderAssembly(), "itemGrinderAssembly").registerOre("assemblyGrinder")
+    itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
   }
 
   def init(): Unit = {
@@ -43,7 +46,6 @@ object FemtoItems {
   def postInit(): Unit = {
 
   }
-
 
   def registerItem[T <: Item](item: T, name: String): T = {
     item.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase(), name).setUnlocalizedName(name)
