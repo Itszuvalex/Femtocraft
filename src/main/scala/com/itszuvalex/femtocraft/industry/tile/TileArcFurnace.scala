@@ -7,12 +7,9 @@ import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.{MultiBlockComponent, TileFluidTank}
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.fluids.capability.IFluidTankProperties
 import net.minecraftforge.fluids.{FluidStack, FluidTank}
-
-import scala.collection.JavaConversions._
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/28/15.
@@ -56,20 +53,4 @@ import scala.collection.JavaConversions._
   override def drain(maxDrain: Int, doDrain: Boolean): FluidStack = tank.drain(maxDrain, doDrain)
 
   override def fill(resource: FluidStack, doFill: Boolean): Int = tank.fill(resource, doFill)
-
-  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(compound)
-    val techCompound = new NBTTagCompound
-    techs.foreach(f => techCompound.setInteger(f._1, f._2))
-    compound.setTag("techCompound", techCompound)
-    compound
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.writeToNBT(compound)
-    val techCompound: NBTTagCompound = compound.getCompoundTag("techCompound")
-    techCompound.getKeySet.foreach { tech =>
-      techs += ((tech, techCompound.getInteger(tech)))
-    }
-  }
 }
