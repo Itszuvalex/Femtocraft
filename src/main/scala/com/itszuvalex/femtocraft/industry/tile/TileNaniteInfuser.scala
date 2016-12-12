@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.femtocraft.industry.item.ItemMultiTool
 import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
@@ -30,10 +30,16 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerNode
   override def getField(id: Int): Int = 0
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    if (slot == 0) {
-      item.isInstanceOf[ItemMultiTool]
+    (slot, item) match {
+      case (_, null) => true
+      case (_, a) if a.func_190926_b() => true
+      case (s, i) =>
+        (s, i.getItem) match {
+          case (0, multi: ItemMultiTool) => true
+          case (1, upgr) => true
+          case _ => false
+        }
     }
-    true
   }
 
   override def hasGUI: Boolean = true
@@ -44,6 +50,4 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerNode
     if (hasGUI) par5EntityPlayer.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
     hasGUI
   }
-
-
 }
