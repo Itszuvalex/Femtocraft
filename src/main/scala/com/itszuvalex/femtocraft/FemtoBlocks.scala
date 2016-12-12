@@ -11,7 +11,10 @@ import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.ItemBlock
+import net.minecraft.tileentity.TileEntityChest
+import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.oredict.OreDictionary
 
 /**
@@ -72,7 +75,6 @@ object FemtoBlocks {
 
   var testTaskProvider  : Block = _
   var testWorkerProvider: Block = _
-
 
   def preInit(): Unit = {
     blockCyberweave = registerBlock(new BlockCyberweave(), "blockCyberweave").registerOre("cyberweave")
