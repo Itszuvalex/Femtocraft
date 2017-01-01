@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/18/2016.
   */
-class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerBase {
+class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerBase(true) {
   var lastProgress = 0
 
   override def canInteractWith(p_75145_1_ : EntityPlayer): Boolean = true

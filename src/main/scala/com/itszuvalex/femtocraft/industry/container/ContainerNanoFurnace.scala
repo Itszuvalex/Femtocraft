@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Alex on 18.08.2016.
   */
-class ContainerNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: TileNanoFurnace) extends ContainerInv[TileNanoFurnace](player, tile, 0, 1) {
+class ContainerNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: TileNanoFurnace) extends ContainerInv[TileNanoFurnace](player, tile, 0, 1, true) {
   var powerMaxLast    : Double = _
   var powerCurrentLast: Double = _
   var progressLast    : Double = _

@@ -16,9 +16,6 @@ object GuiIDs {
   val TileFrameMultiblockSelectorGuiID = nextID
   val TileFrameMultiblockGuiID         = nextID
   val TileFrameConstructingGuiID       = nextID
-  val TileCyberBaseGuiID               = nextID
-  val TileCyberBaseBuildGuiID          = nextID
-  val TileGrowthChamberGuiID           = nextID
   val TileItemRepositoryGuiID          = nextID
   val TileFurnaceGuiID                 = nextID
   val TileNaniteExtractorID            = nextID

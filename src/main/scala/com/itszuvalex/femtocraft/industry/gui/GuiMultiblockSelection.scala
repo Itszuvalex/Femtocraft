@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem, 
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageMultiblockSelection
 import com.itszuvalex.femtocraft.{FemtoItems, Resources}
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderHelper
@@ -33,13 +34,17 @@ object GuiMultiblockSelection {
         panelWidth - 40, panelHeight / 2, multi.getName
       ),
       new GuiFlowLayout(2, panelHeight - 20, panelWidth - 4, panelHeight / 2,
-        multi.getRequiredResources.map(new GuiItemStack(0, 0, _, false)): _*),
+        multi.getRequiredResources.map( i => new GuiItemStack(0, 0, () => false) {
+          override def itemStack = Converter.IItemStackFromItemStack(i)
+        }): _*),
       new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
         (panelHeight - Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT) / 2,
         Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
         Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT,
         multi.numFrames.toString),
-      new GuiItemStack(panelWidth - 20, (panelHeight - 18) / 2, new ItemStack(FemtoItems.itemFrame), false)
+      new GuiItemStack(panelWidth - 20, (panelHeight - 18) / 2, () => false) {
+        override def itemStack = Converter.IItemStackFromItemStack(new ItemStack(FemtoItems.itemFrame))
+      }
     )
 
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {

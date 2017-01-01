@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack
 /**
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
-class ContainerCrystalMount(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileCrystalMount) extends ContainerInv[TileCrystalMount](parPlayer, te, 0, 0) {
+class ContainerCrystalMount(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileCrystalMount) extends ContainerInv[TileCrystalMount](parPlayer, te, 0, 0, true) {
   addSlotToContainer(new FilteredSlot(te, 0, 80, 34))
 
   addPlayerInventorySlots(inv)

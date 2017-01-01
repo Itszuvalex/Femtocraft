@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -15,7 +16,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 
@@ -210,7 +210,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           isModifyingInv = true
           val random = new Random()
           indInventory.getInventory.zipWithIndex.foreach { case (item, slot) =>
-            if (!worldObj.isRemote) InventoryUtils.dropItem(item, getLoc, random)
+            if (!worldObj.isRemote) InventoryUtils.dropItem(Converter.IItemStackFromItemStack(item), getLoc, random)
             indInventory.setInventorySlotContents(slot, null)
           }
           isModifyingInv = false
@@ -279,14 +279,14 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
               if (TileFrame.shouldDrop) {
                 val itemStack = new ItemStack(FemtoItems.itemFrame)
                 ItemFrame.setSelection(itemStack, multiBlock)
-                InventoryUtils.dropItem(itemStack, getLoc, random)
+                InventoryUtils.dropItem(Converter.IItemStackFromItemStack(itemStack), getLoc, random)
               }
             }
             if (isBuilding && TileFrame.shouldDrop)
-              multi.getRequiredResources.foreach(InventoryUtils.dropItem(_, getLoc, random))
+              multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(Converter.IItemStackFromItemStack(i), getLoc, random))
           case _ =>
         }
-        indInventory.getInventory.foreach {InventoryUtils.dropItem(_, getLoc, random)}
+        indInventory.getInventory.foreach(i => InventoryUtils.dropItem(Converter.IItemStackFromItemStack(i), getLoc, random))
       }
       else info.cLoc.getTileEntity() match {
         case Some(frame: TileFrame) => worldObj.setBlockToAir(getPos)

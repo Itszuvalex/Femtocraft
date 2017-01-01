@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.cyber.item.{ItemBaseSeed, ItemDumbDust}
+import com.itszuvalex.femtocraft.cyber.item.ItemDumbDust
 import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
@@ -20,7 +20,6 @@ object FemtoItems {
   var itemGrinderAssembly: Item = null
 
   var itemFrame     : Item = null
-  var itemBaseSeed  : Item = null
   var itemMultiblock: Item = null
 
   var itemMultiTool: Item = null
@@ -28,7 +27,6 @@ object FemtoItems {
   def preInit(): Unit = {
     itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
     itemFrame = registerItem(new ItemFrame(), "itemFrame")
-    itemBaseSeed = registerItem(new ItemBaseSeed(), "itemBaseSeed")
     itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")

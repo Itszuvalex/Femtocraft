@@ -18,7 +18,7 @@ object ContainerItemRepository {
   val playerInventoryStartY = 129
 }
 
-class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0) {
+class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0, true) {
 
   (0 until TileItemRepository.INVENTORY_SIZE).
     foreach { i =>

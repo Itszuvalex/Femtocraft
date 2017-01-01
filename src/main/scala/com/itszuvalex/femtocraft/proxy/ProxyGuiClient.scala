@@ -1,10 +1,8 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.cyber.gui.{GuiCyberBase, GuiGrowthChamber, GuiMachineSelection}
-import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.gui._
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileMaterialProcessor, TileNanoFurnace, TileNaniteInfuser}
+import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.gui.GuiItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
@@ -24,11 +22,8 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, player.getHeldItemMainhand)
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
-      case (GuiIDs.TileCyberBaseGuiID, te: TileCyberBase) => new GuiCyberBase(player, player.inventory, te)
-      case (GuiIDs.TileCyberBaseBuildGuiID, te: TileCyberBase) => new GuiMachineSelection(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new GuiArcFurnace(player, player.inventory, te)
-      case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new GuiGrowthChamber(player, player.inventory, te)
       case (GuiIDs.TileMaterialProcessorGuiID, te: TileMaterialProcessor) => new GuiMaterialProcessor(player, player.inventory, te)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new GuiItemRepository(player, player.inventory, te)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new GuiCrystalMount(player, player.inventory, te)

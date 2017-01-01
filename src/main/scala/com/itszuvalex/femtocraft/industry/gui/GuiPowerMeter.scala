@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.itszulib.gui.GuiPanel
+import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter._
 import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.gui.GuiPanel
 import com.itszuvalex.itszulib.util.Color
-import GuiPowerMeter._
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.{GuiScreen, Gui}
+import net.minecraft.client.gui.Gui
 import org.lwjgl.opengl.GL11
 
 import scala.collection.mutable.ListBuffer

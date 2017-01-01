@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderHelper
@@ -30,12 +31,20 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
   val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
   val reqItems      = multiblock match {
     case Some(m) =>
-      m.getRequiredResources.map(new GuiItemStack(0, 0, _, false))
+      m.getRequiredResources.map { item =>
+        new GuiItemStack(0, 0, () => false) {
+          override def itemStack = Converter.IItemStackFromItemStack(item)
+        }
+      }
     case None => Seq[GuiElement]()
   }
   val layout        = new GuiFlowLayout(7, 11 + fontRendererObj.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
   val itemSlots     =
-    (0 until 9).map(i => new GuiItemStack(7 + 18 * i, 61, null)).toSeq
+    (0 until 9).map { i =>
+      new GuiItemStack(7 + 18 * i, 61, null) {
+        override def itemStack = null
+      }
+    }.toSeq
 
   itemSlots.foreach(_.setShouldRender(false))
 

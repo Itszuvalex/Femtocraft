@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.industry.gui
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.container.ContainerNaniteInfuser
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -11,7 +12,7 @@ import org.lwjgl.opengl.GL11
 
 object GuiNaniteInfuser {
   //TODO; Temporarily using the nano furnace textures.
-  val texture = Resources.TexGui("guinanofurnace.png")
+  val texture      = Resources.TexGui("guinanofurnace.png")
   val colorTexture = Resources.TexGui("guinanofurnacecolor.png")
 }
 
@@ -24,8 +25,8 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
   var color = new Color(Option(tile.getParent).map(_.getColor).getOrElse(tile.getColor)) //Color(255.toByte, 64, 255.toByte, 255.toByte)
 
   val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Infuser"), fontRendererObj.FONT_HEIGHT, "Nanite Infuser")
-  val inputSlot  = new GuiItemStack(44, 23)
-  val outputSlot = new GuiItemStack(85, 23)
+  val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
+  val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
   val powerMeter = new GuiPowerMeter(6, 22, tile.getBattery, color.toInt)
 
   val elems = List(nameLabel, inputSlot, outputSlot, powerMeter)

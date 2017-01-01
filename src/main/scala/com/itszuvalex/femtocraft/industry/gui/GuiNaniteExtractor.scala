@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.industry.container.ContainerNaniteExtractor
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageDrainNanite
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiButton, GuiItemStack, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -26,7 +27,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   var color = new Color(Option(tile.getParent).map(_.getColor).getOrElse(tile.getColor)) //Color(255.toByte, 64, 255.toByte, 255.toByte)
 
   val nameLabel   = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Extractor"), fontRendererObj.FONT_HEIGHT, "Nanite Extractor")
-  val inputSlot   = new GuiItemStack(44, 23)
+  val inputSlot   = new GuiItemStack(44, 23) { override def itemStack = IItemStack.Empty}
   val powerMeter  = new GuiPowerMeter(6, 22, tile.getBattery, color.toInt)
   val drainButton = new GuiButton(85, 23, 45, 15, "Drain") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {

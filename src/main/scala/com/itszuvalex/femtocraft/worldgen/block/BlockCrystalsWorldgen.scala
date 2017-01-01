@@ -7,6 +7,7 @@ import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen._
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.block.material.Material
@@ -69,7 +70,7 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
           val storage = (random.nextDouble() * (DROP_STORAGE_MAX_MAX - DROP_STORAGE_MAX_MIN)).toLong + DROP_STORAGE_MAX_MIN
           val transfer = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN) + DROP_TRANSFER_MIN
           val crystal = new ItemStack(FemtoItems.itemPowerCrystal, 1)
-          InventoryUtils.dropItem(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer), new Loc4(world, pos), random)
+          InventoryUtils.dropItem(Converter.IItemStackFromItemStack(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer)), new Loc4(world, pos), random)
         }
       case _ =>
     }

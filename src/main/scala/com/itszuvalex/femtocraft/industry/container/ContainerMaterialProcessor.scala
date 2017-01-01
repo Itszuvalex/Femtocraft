@@ -16,7 +16,7 @@ object ContainerMaterialProcessor {
   val POWER_SMALL_INDEX = 1
 }
 
-class ContainerMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, tile: TileMaterialProcessor) extends ContainerInv[TileMaterialProcessor](player, tile, 0, 0) {
+class ContainerMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, tile: TileMaterialProcessor) extends ContainerInv[TileMaterialProcessor](player, tile, 0, 0, true) {
   private var lastPower = 0L
 
   //Input

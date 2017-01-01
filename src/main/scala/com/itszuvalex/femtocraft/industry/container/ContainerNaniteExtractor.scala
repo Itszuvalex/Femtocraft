@@ -12,7 +12,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Alex on 18.08.2016.
   */
-class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteExtractor) extends ContainerInv[TileNaniteExtractor](player, tile, 0, 0) {
+class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteExtractor) extends ContainerInv[TileNaniteExtractor](player, tile, 0, 0, true) {
   var powerMaxLast    : Double = _
   var powerCurrentLast: Double = _
   var progressLast    : Double = _

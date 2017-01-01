@@ -11,8 +11,6 @@ import net.minecraftforge.fml.relauncher.Side
 object FemtoPacketHandler extends PacketHandler(Femtocraft.ID.toLowerCase) {
   def preInit(): Unit = {
     register(classOf[MessageMultiblockSelection], Side.SERVER)
-    register(classOf[MessageBuildMachine], Side.SERVER)
-    register(classOf[MessageGrowthChamberUpdate], Side.CLIENT)
     register(classOf[MessageOpenGui], Side.SERVER)
     register(classOf[MessageNaniteCapabilities], Side.CLIENT)
     register(classOf[MessageDrainNanite], Side.SERVER)

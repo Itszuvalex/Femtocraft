@@ -45,7 +45,6 @@ import net.minecraftforge.fml.common.IWorldGenerator
 
 }
 
-
 @Configurable class FemtocraftOreGenerator extends IWorldGenerator {
 
 

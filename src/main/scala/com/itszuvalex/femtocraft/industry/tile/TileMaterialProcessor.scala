@@ -8,7 +8,7 @@ import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.item.{IPowerCrystal, IPowerStorage}
 import com.itszuvalex.femtocraft.power.node.{DiffusionTargetNode, IPowerNode, PowerNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
@@ -35,7 +35,7 @@ object TileMaterialProcessor {
   private val INV_COMPOUND_TAG = "Inventory"
 }
 
-@Configurable class TileMaterialProcessor extends TileEntityBase
+class TileMaterialProcessor extends TileEntityBase
   with TileMultiblockIndexedInventory
   with TileMultiblockIndexedInventoryWithIInventory
   with PowerNode

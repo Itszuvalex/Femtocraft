@@ -8,7 +8,6 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.EnumBlockRenderType
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.{IBlockAccess, World}
 

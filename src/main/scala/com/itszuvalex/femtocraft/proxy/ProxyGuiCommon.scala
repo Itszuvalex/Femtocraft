@@ -1,8 +1,6 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.cyber.container.{ContainerCyberBase, ContainerGrowthChamber, ContainerMachineSelection}
-import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.container._
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileMaterialProcessor, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
@@ -25,11 +23,8 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new ContainerFrameConstructing(player, player.inventory, te)
-      case (GuiIDs.TileCyberBaseGuiID, te: TileCyberBase) => new ContainerCyberBase(player, player.inventory, te)
-      case (GuiIDs.TileCyberBaseBuildGuiID, te: TileCyberBase) => new ContainerMachineSelection(te)
       case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
-      case (GuiIDs.TileGrowthChamberGuiID, te: TileGrowthChamber) => new ContainerGrowthChamber(player, player.inventory, te)
       case (GuiIDs.TileMaterialProcessorGuiID, te: TileMaterialProcessor) => new ContainerMaterialProcessor(player, player.inventory, te)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)

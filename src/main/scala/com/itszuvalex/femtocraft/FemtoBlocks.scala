@@ -11,10 +11,7 @@ import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.ItemBlock
-import net.minecraft.tileentity.TileEntityChest
-import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fml.common.registry.GameRegistry
-import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.oredict.OreDictionary
 
 /**
@@ -86,20 +83,9 @@ object FemtoBlocks {
     blockCrystallizationChamber = registerBlock(new BlockCrystallizationChamber(), "blockCrystallizationChamber")
     blockCentrifuge = registerBlock(new BlockCentrifuge(), "blockCentrifuge")
     blockMaterialProcessor = registerBlock(new BlockMaterialProcessor(), "blockMaterialProcessor")
-    blockGrowthChamber = registerBlock(new BlockGrowthChamber(), "blockGrowthChamber")
-    blockBioBeacon = registerBlock(new BlockBioBeacon(), "blockBioBeacon")
-    blockCondensationArray = registerBlock(new BlockCondensationArray(), "blockCondensationArray")
-    blockCybermatDisintegrator = registerBlock(new BlockCybermatDisintegrator(), "blockCybermatDisintegrator")
-    blockGraspingVines = registerBlock(new BlockGraspingVines(), "blockGraspingVines")
-    blockLashingVines = registerBlock(new BlockLashingVines(), "blockLashingVines")
-    blockMetabolicConverter = registerBlock(new BlockMetabolicConverter(), "blockMetabolicConverter")
-    blockPhotosynthesisTower = registerBlock(new BlockPhotosynthesisTower(), "blockPhotosynthesisTower")
-    blockSporeDistributor = registerBlock(new BlockSporeDistributor(), "blockSporeDistributor")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")
     blockFrame = registerBlock(new BlockFrame(), "blockFrame")
-    blockCyberBase = registerBlock(new BlockCyberBase(), "blockCyberBase")
-    blockCyberMachineInProgress = registerBlock(new BlockCyberMachineInProgress(), "blockInProgressMachine").setBlockUnbreakable().setResistance(Float.MaxValue / 3f)
     blockNaniteHiveSmall = registerBlock(new BlockNaniteHiveSmall(), "blockNaniteHive_small")
     blockItemRepository = registerBlock(new BlockItemRepository(), "blockItemRepository")
     blockCrystalMount = registerBlock(new BlockCrystalMount(), "blockCrystalMount")

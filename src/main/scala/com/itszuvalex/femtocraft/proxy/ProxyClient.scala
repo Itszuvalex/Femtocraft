@@ -21,9 +21,6 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.cyber.CyberMachineRendererRegistry
-import com.itszuvalex.femtocraft.cyber.render.{CyberBaseRenderer, GraspingVinesRenderer, GrowthChamberRenderer}
-import com.itszuvalex.femtocraft.cyber.tile.{TileCyberBase, TileGraspingVines, TileGrowthChamber}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileNanoFurnace}
@@ -105,7 +102,6 @@ class ProxyClient extends ProxyCommon {
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
-    RenderIDs.seedPreviewableID = PreviewableRendererRegistry.bindRenderer(new CyberPreviewableRenderer)
     RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
 
     val arcFurnaceRenderer = new ArcFurnaceRenderer
@@ -116,13 +112,6 @@ class ProxyClient extends ProxyCommon {
     //    RenderIDs.multiblockFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(furnaceRenderer)
     //    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileMaterialProcessor], furnaceRenderer)
 
-    val growthChamberRenderer = new GrowthChamberRenderer
-    RenderIDs.growthChamberID = CyberMachineRendererRegistry.bindRenderer(growthChamberRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGrowthChamber], growthChamberRenderer)
-
-    val graspingVinesRenderer = new GraspingVinesRenderer
-    RenderIDs.graspingVinesID = CyberMachineRendererRegistry.bindRenderer(graspingVinesRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGraspingVines], graspingVinesRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], new PowerPedestalRenderer)
@@ -148,8 +137,6 @@ class ProxyClient extends ProxyCommon {
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
-
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCyberBase], new CyberBaseRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 

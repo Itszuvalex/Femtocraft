@@ -10,13 +10,12 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.block.BlockSnow
-import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
-import net.minecraft.item.{Item, ItemBow, ItemStack}
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util._
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 /**

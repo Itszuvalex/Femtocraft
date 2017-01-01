@@ -20,7 +20,7 @@ object ContainerNaniteHive {
   private val inventoryYStart   = 21
 }
 
-class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0) {
+class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, true) {
   private var lastPower = 0L
 
   for (i <- 0 until 3) {

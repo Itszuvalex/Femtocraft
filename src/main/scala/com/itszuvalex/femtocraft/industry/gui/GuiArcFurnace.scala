@@ -42,7 +42,8 @@ import org.lwjgl.opengl.GL11
   /**
     * Draw the background layer for the GuiContainer (everything behind the items)
     */
-  protected def drawGuiContainerBackgroundLayer(par1: Float, par2: Int, par3: Int) {
+  override def drawGuiContainerBackgroundLayer(par1: Float, par2: Int, par3: Int) {
+    super.drawGuiContainerBackgroundLayer(par1, par2, par3)
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
     Minecraft.getMinecraft.getTextureManager.bindTexture(GuiArcFurnace.texture)
     val k = (width - xSize) / 2

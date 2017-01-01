@@ -19,7 +19,7 @@ object ContainerArcFurnace {
   private val POWER_SMALL_INDEX = 2
 }
 
-class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: TileArcFurnace) extends ContainerInv[TileArcFurnace](player, tile, 0, 0) {
+class ContainerArcFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: TileArcFurnace) extends ContainerInv[TileArcFurnace](player, tile, 0, 0, true) {
   private var lastCookTime = 0
   private var lastPower    = 0L
 
