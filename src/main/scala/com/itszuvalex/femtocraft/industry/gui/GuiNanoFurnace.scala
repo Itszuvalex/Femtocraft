@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.industry.gui
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
-import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -28,8 +27,8 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   var color = new Color(Option(tile.getParent).map(_.getColor).getOrElse(tile.getColor)) //Color(255.toByte, 64, 255.toByte, 255.toByte)
 
   val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
-  val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
-  val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
+  val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = null} //TODO: IItemStack.Empty - needs ItszuLib GuiItemStack change
+  val outputSlot = new GuiItemStack(85, 23) {override def itemStack = null} // TODO: IItemStack.Empty
   val powerMeter = new GuiPowerMeter(6, 22, tile.getBattery, color.toInt)
 
   val elems = List(nameLabel, inputSlot, outputSlot, powerMeter)

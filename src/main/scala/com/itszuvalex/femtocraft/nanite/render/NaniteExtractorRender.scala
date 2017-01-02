@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.nanite.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.industry.render.FemtoMachineRender
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.util.Color
 

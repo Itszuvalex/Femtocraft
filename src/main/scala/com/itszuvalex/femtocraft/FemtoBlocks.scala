@@ -25,24 +25,10 @@ object FemtoBlocks {
 
   var blockCrystals: Block = _
 
-
-  var blockArcFurnace            : Block = _
-  var blockCrystallizationChamber: Block = _
-  var blockCentrifuge            : Block = _
-  var blockMaterialProcessor     : Block = _
-  var blockGrowthChamber         : Block = _
-  var blockBioBeacon             : Block = _
-  var blockCondensationArray     : Block = _
-  var blockCybermatDisintegrator : Block = _
-  var blockGraspingVines         : Block = _
-  var blockLashingVines          : Block = _
-  var blockMetabolicConverter    : Block = _
-  var blockPhotosynthesisTower   : Block = _
-  var blockSporeDistributor      : Block = _
-  var blockItemRepository        : Block = _
-  var blockNanoFurnace           : Block = _
-  var blockNaniteInfuser         : Block = _
-
+  var blockMaterialProcessor: Block = _
+  var blockItemRepository   : Block = _
+  var blockNanoFurnace      : Block = _
+  var blockNaniteInfuser    : Block = _
 
   var blockFrame                 : Block = _
   var blockCyberBase             : Block = _
@@ -79,9 +65,6 @@ object FemtoBlocks {
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
     blockCrystals = registerBlock(new BlockCrystalsWorldgen(), "crystalCluster")
-    blockArcFurnace = registerBlock(new BlockArcFurnace(), "blockArcFurnace")
-    blockCrystallizationChamber = registerBlock(new BlockCrystallizationChamber(), "blockCrystallizationChamber")
-    blockCentrifuge = registerBlock(new BlockCentrifuge(), "blockCentrifuge")
     blockMaterialProcessor = registerBlock(new BlockMaterialProcessor(), "blockMaterialProcessor")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")

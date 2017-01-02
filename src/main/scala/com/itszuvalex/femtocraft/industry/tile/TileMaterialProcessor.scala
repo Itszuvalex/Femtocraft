@@ -509,6 +509,30 @@ class TileMaterialProcessor extends TileEntityBase
     else forwardToController[PowerNode, Double](_.getPowerCurrent)
   }
 
+  def setPowerCurrent(power: Double) = {
+    if (isController) {
+      getStackInSlot(indexPowerSlot) match {
+        case null =>
+          getParentLoc match {
+            case null => 0
+            case loc =>
+              loc.getTileEntity() match {
+                case None => 0
+                case Some(power: IPowerNode) =>
+                  power.setPower(power)
+              }
+          }
+        case item =>
+          item.getItem match {
+            case null => 0
+            case power: IPowerStorage =>
+              power.setStorageCurrent(item, power)
+          }
+      }
+    }
+    else forwardToController[PowerNode, Double](_.getPowerCurrent)
+  }
+
   /**
     *
     * @return Base Power usage * getPowerMultipler = actual power requirement.  Assemblies are responsible for calculating their power usage before draining power.

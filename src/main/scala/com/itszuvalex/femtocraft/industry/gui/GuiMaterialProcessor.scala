@@ -4,7 +4,11 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.container.ContainerMaterialProcessor
 import com.itszuvalex.femtocraft.industry.tile.TileMaterialProcessor
 import com.itszuvalex.femtocraft.util.StringUtil
-import com.itszuvalex.itszulib.gui.GuiBase
+import com.itszuvalex.itszulib.api.storage.IItemStorage
+import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.container.ContainerBase
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
@@ -15,8 +19,34 @@ object GuiMaterialProcessor {
 }
 
 @SideOnly(Side.CLIENT) class GuiMaterialProcessor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileMaterialProcessor) extends
-  GuiBase(new ContainerMaterialProcessor(player, inv, tile)) {
+  GuiBase(new ContainerMaterialProcessor(player, inv, tile, false)) {
 
+  {
+    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
+
+    def addGuiAndSync(storage: IItemStorage, ind: Int, x: Int, y: Int) = {
+      var gui = new GuiIItemStorageSlot(x, y, storage, ind)
+      gui.sync = new SyncItemStorageItemStack(storage, ind)
+      this.add(gui)
+      inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
+    }
+
+    addGuiAndSync(storage, 0, 34, 7)
+    addGuiAndSync(storage, 1, 52, 7)
+    addGuiAndSync(storage, 2, 34, 25)
+    addGuiAndSync(storage, 3, 52, 25)
+    addGuiAndSync(storage, 4, 151, 44)
+    addGuiAndSync(storage, 5, 151, 62)
+    addGuiAndSync(storage, 6, 34, 44)
+    addGuiAndSync(storage, 7, 52, 44)
+    addGuiAndSync(storage, 8, 34, 62)
+    addGuiAndSync(storage, 9, 52, 62)
+    addGuiAndSync(storage, 10, 9, 63)
+    addGuiAndSync(storage, 11, 151, 7)
+
+    // ----------------
+    addPlayerInventorySlots(inv)
+  }
 
   override def drawScreen(par1: Int, par2: Int, par3: Float) {
     super.drawScreen(par1, par2, par3)

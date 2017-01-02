@@ -39,9 +39,9 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
     if (MinecraftForgeClient.getRenderPass == 0)
-      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null, new Color(te.getColor))
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), new Color(te.getColor))
 
-    if (te.getCrystalStack != null) {
+    if (te.getCrystalStack != null && !te.getCrystalStack.func_190926_b()) {
       if (te.getParent != null) {
         te.getParent.getType match {
           case IPowerNode.CRYSTAL_MOUNT if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, te.getParent.getNodeLoc)

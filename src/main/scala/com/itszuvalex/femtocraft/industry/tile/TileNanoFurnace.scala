@@ -61,7 +61,6 @@ object TileNanoFurnace {
 
 class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
-  powerMax = 4000
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
@@ -83,12 +82,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   override def hasGUI = true
 
   override def getGuiID = GuiIDs.TileFurnaceGuiID
-
-  /**
-    *
-    * @return The type of PowerNode this is.
-    */
-  override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
 
   override def onSideActivate(player: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) player.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
