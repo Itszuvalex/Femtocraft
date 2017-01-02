@@ -1,12 +1,14 @@
 package com.itszuvalex.femtocraft.power.node
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerNetworkNodeDelegate, PowerStorageNodeType}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
-import com.itszuvalex.itszulib.util.Color
+import com.itszuvalex.itszulib.util.{Color, PlayerUtils}
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
@@ -69,6 +71,11 @@ trait PowerNode extends TileEntityBase {
     PowerManager.removeNode(powerDelegate)
   }
 
+
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
+    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, if (powerDelegate.network == null) "networkless " else powerDelegate.network.id.toString)
+    super.onSideActivate(par5EntityPlayer, side)
+  }
 
   override def invalidate(): Unit = {
     super.invalidate()

@@ -37,6 +37,7 @@ object PowerManager {
   def removeNode(node: IPowerNetworkNode): Unit = {
     nodeTracker.removeLocation(node.getLoc)
     node.getNetwork.removeNode(node)
+    node.setNetwork(null)
   }
 
 
