@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.player
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay._
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.util.Color
@@ -47,7 +48,7 @@ class PlayerNaniteCapabilitiesOverlay {
 
   def capabilities: IPlayerNaniteCapabilities = {
     if (player != Minecraft.getMinecraft.thePlayer) {
-      val caps = Minecraft.getMinecraft.thePlayer.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+      val caps = Minecraft.getMinecraft.thePlayer.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
       if (caps != naniteCapabilities)
         naniteCapabilities = caps
     }

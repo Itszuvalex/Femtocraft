@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.player
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.nanite.NaniteTank
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteCapabilities
@@ -17,9 +18,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
   */
 object PlayerNaniteCapabilities {
   val tankVolume = 100
-
-  @CapabilityInject(classOf[IPlayerNaniteCapabilities])
-  val NANITE_CAPABILITY: Capability[IPlayerNaniteCapabilities] = null
 
   def register(): Unit = {
     CapabilityManager.INSTANCE.register(classOf[IPlayerNaniteCapabilities], new PlayerNaniteCapabilitiesStorage, classOf[PlayerNaniteCapabilities])
@@ -70,13 +68,13 @@ class PlayerNaniteCapabilities(player: EntityPlayer) extends IPlayerNaniteCapabi
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == PlayerNaniteCapabilities.NANITE_CAPABILITY)
+    if (capability == Capabilities.NANITE_CAPABILITY)
       this.asInstanceOf[T]
     else
       null.asInstanceOf[T]
   }
 
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == PlayerNaniteCapabilities.NANITE_CAPABILITY
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.NANITE_CAPABILITY
 
   override def sync() = {
     player match {

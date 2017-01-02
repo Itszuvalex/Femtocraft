@@ -6,21 +6,12 @@ import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.{NBTBase, NBTTagCompound, NBTTagInt}
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.common.capabilities.{Capability, CapabilityInject, CapabilityManager}
+import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
 
 /**
   * Created by Chris on 1/1/2017.
   */
-object Capabilities {
-  @CapabilityInject(classOf[IBattery])
-  val POWER_STORAGE: Capability[IBattery] = null
-
-  @CapabilityInject(classOf[IPowerNetworkNode])
-  val POWER_NODE: Capability[IPowerNetworkNode] = null
-
-  @CapabilityInject(classOf[Color])
-  val COLORABLE: Capability[Color] = null
-
+object ManagerCapabilities {
   def register(): Unit = {
     CapabilityManager.INSTANCE.register(classOf[IBattery], new PowerStorageStorage, classOf[PowerBattery])
     CapabilityManager.INSTANCE.register(classOf[IPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])

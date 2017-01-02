@@ -8,6 +8,7 @@ import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot, GuiItemStack, GuiLabel}
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.util.EnumFacing
@@ -42,7 +43,7 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   addPlayerInventorySlots(inv, 4, 75)
 
   //TODO: Make actual "machine color"
-  var color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
+  var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
   val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
   val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}

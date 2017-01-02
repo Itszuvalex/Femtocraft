@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft
 
+import com.itszuvalex.femtocraft.api.ManagerCapabilities
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
@@ -49,6 +50,7 @@ object Femtocraft {
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
     PlayerNaniteCapabilities.register()
+    ManagerCapabilities.register()
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {

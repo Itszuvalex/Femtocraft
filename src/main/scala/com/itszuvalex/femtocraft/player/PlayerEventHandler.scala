@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.player
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.{PlayerLoggedInEvent, PlayerRespawnEvent}
@@ -11,12 +12,12 @@ class PlayerEventHandler {
   @SubscribeEvent
   def handlePlayerJoin(event: PlayerLoggedInEvent): Unit = {
     if (event.player.worldObj.isRemote) return
-    event.player.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
+    event.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
   }
 
   @SubscribeEvent
   def handlePlayerRespawn(event: PlayerRespawnEvent): Unit = {
     if (event.player.worldObj.isRemote) return
-    event.player.getCapability(PlayerNaniteCapabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
+    event.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
   }
 }

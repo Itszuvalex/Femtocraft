@@ -46,26 +46,18 @@ trait PowerNode extends TileEntityBase {
     if (super.hasCapability(capability, facing)) {
       true
     } else {
-      capability match {
-        case Capabilities.POWER_NODE => true
-        case Capabilities.POWER_STORAGE => true
-        case Capabilities.COLORABLE => true
-        case _ => false
-      }
+      if (capability == Capabilities.POWER_NODE) true
+      else if (capability == Capabilities.POWER_STORAGE) true
+      else if (capability == Capabilities.COLORABLE) true
+      else false
     }
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    val cap = super.getCapability(capability, facing)
-    if (cap != null) cap
-    else {
-      capability match {
-        case Capabilities.POWER_STORAGE => battery.asInstanceOf[T]
-        case Capabilities.POWER_NODE => powerDelegate.asInstanceOf[T]
-        case Capabilities.COLORABLE => color.asInstanceOf[T]
-        case _ => null.asInstanceOf[T]
-      }
-    }
+    if (capability == Capabilities.POWER_STORAGE) battery.asInstanceOf[T]
+    else if (capability == Capabilities.POWER_NODE) powerDelegate.asInstanceOf[T]
+    else if (capability == Capabilities.COLORABLE) new Color(color).asInstanceOf[T]
+    else super.getCapability(capability, facing)
   }
 
   var color = Color(255.toByte,

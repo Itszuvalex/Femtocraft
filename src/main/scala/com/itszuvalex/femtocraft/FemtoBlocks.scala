@@ -24,10 +24,9 @@ object FemtoBlocks {
 
   var blockCrystals: Block = _
 
-  var blockMaterialProcessor: Block = _
-  var blockItemRepository   : Block = _
-  var blockNanoFurnace      : Block = _
-  var blockNaniteInfuser    : Block = _
+  var blockItemRepository: Block = _
+  var blockNanoFurnace   : Block = _
+  var blockNaniteInfuser : Block = _
 
   var blockFrame                 : Block = _
   var blockCyberBase             : Block = _
@@ -38,9 +37,6 @@ object FemtoBlocks {
   var blockPowerPedestal  : Block = _
 
   var blockNaniteExtractor: Block = _
-
-  var blockPowerSink     : Block = _
-  var blockPowerGenerator: Block = _
 
   var blockGlowStick: Block = _
 
@@ -89,7 +85,6 @@ object FemtoBlocks {
     blockCrystalMount.registerModel()
     blockPowerPedestal.registerModel()
     blockNaniteHiveSmall.registerModel()
-    blockPowerSink.registerModel()
     blockCrystals.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()
