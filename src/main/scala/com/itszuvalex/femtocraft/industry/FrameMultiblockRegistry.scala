@@ -1,7 +1,5 @@
 package com.itszuvalex.femtocraft.industry
 
-import com.itszuvalex.femtocraft.industry.multiblock._
-
 import scala.collection._
 
 /**
@@ -15,7 +13,6 @@ object FrameMultiblockRegistry {
   def getMultiblocksForFrameType(ftype: String) = frameMap.values.filter(_.getAllowedFrameTypes.contains(ftype))
 
   def init(): Unit = {
-    registerMultiblock(new MultiblockMaterialProcessor)
   }
 
   def registerMultiblock(multi: IFrameMultiblock) = frameMap.put(multi.getName, multi)

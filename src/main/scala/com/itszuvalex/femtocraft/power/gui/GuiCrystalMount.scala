@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalMount
 import com.itszuvalex.femtocraft.power.gui.GuiCrystalMount._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
+import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot}
 import net.minecraft.client.Minecraft
@@ -24,7 +25,7 @@ class GuiCrystalMount(player: EntityPlayer, inv: InventoryPlayer, private val ti
     val gui = new GuiIItemStorageSlot(79, 33, tile.storage, 0)
     gui.sync = new SyncItemStorageItemStack(tile.storage, 0)
     this.add(gui)
-    inventorySlots.asInstanceOf[ContainerCrystalMount].addSync(gui.sync)
+    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
   }
 
   addPlayerInventorySlots(inv)

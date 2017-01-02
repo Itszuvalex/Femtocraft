@@ -62,6 +62,8 @@ object Capabilities {
 
     override def rendersConnections: Boolean = false
 
+    override def renderLocations: Set[Loc4] = Set()
+
     override def transferRate: Double = 0
 
     override def storage: IBattery = null

@@ -1,15 +1,18 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.container.ContainerNaniteExtractor
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageDrainNanite
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiButton, GuiItemStack, GuiLabel}
-import com.itszuvalex.itszulib.util.Color
+import com.itszuvalex.itszulib.container.ContainerBase
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
+import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
+import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
 
@@ -18,17 +21,26 @@ object GuiNaniteExtractor {
   val colorTexture = Resources.TexGui("GuiNaniteExtractorColor.png")
 }
 
-class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteExtractor) extends GuiBase(new ContainerNaniteExtractor(player, inv, tile)) {
+class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteExtractor) extends GuiBase(new ContainerNaniteExtractor(player, inv, tile, false)) {
   fontRendererObj = Minecraft.getMinecraft.fontRendererObj
   xSize = 183
   ySize = 161
 
+  {
+    val gui = new GuiIItemStorageSlot(43, 23, tile.storage, 0)
+    gui.sync = new SyncItemStorageItemStack(tile.storage, 0)
+    this.add(gui)
+    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
+  }
+
+  addPlayerInventorySlots(inv, 4, 75)
+
   //TODO: Make actual "machine color"
-  var color = new Color(Option(tile.getParent).map(_.getColor).getOrElse(tile.getColor)) //Color(255.toByte, 64, 255.toByte, 255.toByte)
+  var color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
   val nameLabel   = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Extractor"), fontRendererObj.FONT_HEIGHT, "Nanite Extractor")
-  val inputSlot   = new GuiItemStack(44, 23) { override def itemStack = IItemStack.Empty}
-  val powerMeter  = new GuiPowerMeter(6, 22, tile.getBattery, color.toInt)
+  val inputSlot   = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
+  val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP), color.toInt)
   val drainButton = new GuiButton(85, 23, 45, 15, "Drain") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       val ret = super.onMouseClick(mouseX, mouseY, button)

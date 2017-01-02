@@ -1,11 +1,13 @@
 package com.itszuvalex.femtocraft.power.tile
 
+import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerStorageNodeType}
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal, PowerManager}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -32,6 +34,18 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   private val pedestalLocs = mutable.HashSet[Loc4]()
 
 
+  override def defaultBattery: IBattery = new PowerBattery(5000)
+
+  override def powerStorageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
+
+  override def powerConnectionType: PowerConnectionNodeType = PowerConnectionNodeType.MAIN
+
+  override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
+
+  override def powerTransfer: Double = 100d
+
+  override def rendersPower: Boolean = true
+
   override def hasGUI = true
 
   override def getGuiID = GuiIDs.TileCrystalMountGuiID
@@ -39,15 +53,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def getMod: AnyRef = Femtocraft
 
   override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
-
-  /**
-    *
-    * @return The color of this power node.  This is used for aesthetics.
-    */
-  override def getColor: Int = {
-    if (getCrystalStack.func_190926_b()) super.getColor else
-      getCrystalStack.getItem.asInstanceOf[IPowerCrystal].getColor(getCrystalStack)
-  }
 
   /**
     *
@@ -69,14 +74,14 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     super.validate()
     if (getWorld.isRemote) return
     if (!getCrystalStack.func_190926_b())
-      PowerManager.addNode(this)
+      PowerManager.addNode(powerDelegate)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
     if (getWorld.isRemote) return
     if (!getCrystalStack.func_190926_b())
-      PowerManager.removeNode(this)
+      PowerManager.removeNode(powerDelegate)
   }
 
   /**
@@ -84,138 +89,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     * @return Crystal ItemStack.  Null if no crystal.
     */
   override def getCrystalStack = getStackInSlot(0)
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child is capable of being a child of this node.
-    */
-  override def canAddChild(child: IPowerNode): Boolean =
-    child != null && Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE, IPowerNode.DIRECT_NODE, IPowerNode.DIFFUSION_TARGET_NODE).contains(child.getType) && (child.getNodeLoc != parentLoc)
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child is successfully added.
-    */
-  override def addChild(child: IPowerNode): Boolean = {
-    val ret = super.addChild(child)
-    setUpdate()
-    ret
-  }
-
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
-    if (!getCrystalStack.func_190926_b())
-      getCrystalStack.getItem match {
-        case null =>
-        case crystal: IPowerCrystal =>
-          crystal.onTick(getCrystalStack)
-          distributePower(getCrystalStack, crystal)
-        case _ =>
-      }
-  }
-
-  def distributePower(item: ItemStack, crystal: IPowerCrystal): Unit = {
-    val rate = crystal.getTransferRate(item)
-    val amount = Math.min(getPowerCurrent, rate)
-
-    def isNaN(x: Double) = x != x
-
-    if (amount < 0d || isNaN(amount)) return
-    //TODO:  This is crap.  Needs to be replaced. Probably with Femto 1 algorithm.
-    // Why?  Imagine 10 connections, only 1 has power.  This will be completely random on giving between
-    // 1/10, 1/9, 1/8....1/1  * transferRate power to that one node.  It will give more power to the node the later in this random
-    // list that it is found.  If found first, it gives the least power.
-    val connections = (childrenLocs + parentLoc).filter(_ != null).flatMap(_.getTileEntity(false)).collect { case node: IPowerNode => node }.filter(tile => (tile.getPowerMax > 0d) && ((tile.getPowerCurrent / tile.getPowerMax) < (getPowerCurrent / getPowerMax)))
-    val filPerc = connections.map(node => (node, node.getPowerCurrent / node.getPowerMax)).filter { case (node, miss) => miss >= 0d && !isNaN(miss) }
-    val difPerc = filPerc.map { case (node, fil) => (node, (getPowerCurrent / getPowerMax) - fil) }
-    val totalDifPerc = difPerc.foldLeft(0d) { case (t, (_, dif)) => t + dif }
-    if (totalDifPerc > 0d && !isNaN(totalDifPerc))
-      difPerc.foreach { case (tile, perc) =>
-        val amt = Math.min(amount * (perc / totalDifPerc), tile.getPowerMax * perc)
-        if (amt > 0d && !isNaN(amt))
-          usePower(tile.addPower(amt, doFill = true), doUse = true)
-      }
-  }
-
-  /**
-    *
-    * @return Amount of power currently stored in this node.
-    */
-  override def getPowerCurrent: Double = {
-    getCrystalStack match {
-      case stack if stack.func_190926_b() => 0
-      case stack => stack.getItem match {
-        case crystal: IPowerCrystal =>
-          crystal.getStorageCurrent(stack)
-        case _ => 0
-      }
-    }
-  }
-
-  /**
-    *
-    * @param amount Amount of power to consume.
-    * @param doUse  True if actually change values, false to simulate.
-    *
-    * @return Amount of power consumed out of @amount from the internal storage of this Tile.
-    */
-  override def usePower(amount: Double, doUse: Boolean): Double = {
-    getCrystalStack match {
-      case stack if stack.func_190926_b() => 0
-      case stack => stack.getItem match {
-        case crystal: IPowerCrystal =>
-          crystal.consume(stack, amount, doUse)
-        case _ => 0
-      }
-    }
-  }
-
-  /**
-    *
-    * @return Amount of power capable of being stored in this node.
-    */
-  override def getPowerMax: Double = {
-    getCrystalStack match {
-      case stack if stack.func_190926_b() => 0
-      case stack => stack.getItem match {
-        case null => 0
-        case crystal: IPowerCrystal =>
-          crystal.getStorageMax(stack)
-      }
-    }
-  }
-
-  /**
-    *
-    * @param parent IPowerNode that is being checked.
-    *
-    * @return True if this node is capable of having that node as a parent.
-    */
-  override def canSetParent(parent: IPowerNode): Boolean = parent != null &&
-    Set(IPowerNode.CRYSTAL_MOUNT, IPowerNode.TRANSFER_NODE).contains(parent.getType) && !childrenLocs.contains(parent.getNodeLoc)
-
-
-  /**
-    *
-    * @param parent Parent being set.
-    *
-    * @return True if parent is successfully set to input parent.
-    */
-  override def setParent(parent: IPowerNode): Boolean = {
-    val ret = super.setParent(parent)
-    setUpdate()
-    ret
-  }
-
-  /**
-    *
-    * @return The type of PowerNode this is.
-    */
-  override def getType: String = IPowerNode.CRYSTAL_MOUNT
 
   override def hasDescription: Boolean = true
 
@@ -233,7 +106,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       getCrystalStack.writeToNBT(co)
     }
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
-    savePowerConnectionInfo(compound)
     savePedestalLocInfo(compound)
   }
 
@@ -255,7 +127,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(new ItemStack(_)))
-    loadPowerConnectionInfo(compound)
     loadPedestalLocInfo(compound)
     setRenderUpdate()
   }
@@ -268,11 +139,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setRenderUpdate()
   }
 
-  override def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
-    super.loadPowerConnectionInfo(compound)
-    setRenderUpdate()
-  }
-
   override def markDirty(): Unit = {
     super.markDirty()
     if (getWorld.isRemote) return
@@ -280,19 +146,14 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setUpdate()
     getCrystalStack match {
       case stack if stack.func_190926_b() =>
-        PowerManager.removeNode(this)
-        getChildren.foreach(_.setParent(null))
-        childrenLocs.clear()
-        Option(getParent).filter(_ != this).map(_.removeChild(this))
-        parentLoc = null
-      case _ => PowerManager.addNode(this)
+        PowerManager.removeNode(powerDelegate)
+      case _ => PowerManager.addNode(powerDelegate)
     }
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     savePedestalLocInfo(compound)
-    savePowerConnectionInfo(compound)
     compound
   }
 
@@ -308,24 +169,17 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
     loadPedestalLocInfo(compound)
-    loadPowerConnectionInfo(compound)
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
-    new AxisAlignedBB(center.x - childrenConnectionRadius,
-      center.y - childrenConnectionRadius,
-      center.z - childrenConnectionRadius,
-      center.x + childrenConnectionRadius,
-      center.y + childrenConnectionRadius,
-      center.z + childrenConnectionRadius)
+    new AxisAlignedBB(center.x - powerDelegate.connectionRadius,
+      center.y - powerDelegate.connectionRadius,
+      center.z - powerDelegate.connectionRadius,
+      center.x + powerDelegate.connectionRadius,
+      center.y + powerDelegate.connectionRadius,
+      center.z + powerDelegate.connectionRadius)
   }
-
-  /**
-    *
-    * @return Maximum distance children can be from this node, to connect.
-    */
-  override def childrenConnectionRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
   override def onBlockBreak(): Unit = {
     pedestalLocs.flatMap(_.getTileEntity(true)).collect { case p: IPowerPedestal => p }.foreach(_.setMount(null))
@@ -368,51 +222,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   override def canAcceptPedestal(loc: Loc4): Boolean = {
     getLoc.getOffset(EnumFacing.UP) == loc ||
       getLoc.getOffset(EnumFacing.DOWN) == loc
-  }
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child was a child of this node, and was successfully removed.
-    */
-  override def removeChild(child: IPowerNode): Boolean = {
-    val ret = super.removeChild(child)
-    setUpdate()
-    ret
-  }
-
-  /**
-    *
-    * @param amount Amount of power to add.
-    * @param doFill True if actually change values, false to simulate.
-    *
-    * @return Amount of power used out of @amount to fill the internal storage of this Tile.
-    */
-  override def addPower(amount: Double, doFill: Boolean): Double = {
-    getCrystalStack match {
-      case stack if stack.func_190926_b() => 0
-      case stack => stack.getItem match {
-        case null => 0
-        case crystal: IPowerCrystal =>
-          crystal.store(stack, amount, doFill)
-      }
-    }
-  }
-
-  /**
-    *
-    * @param amount Set current stored power to the given value.
-    */
-  override def setPower(amount: Double): Unit = {
-    getCrystalStack match {
-      case stack if stack.func_190926_b() =>
-      case stack => stack.getItem match {
-        case null =>
-        case crystal: IPowerCrystal =>
-          crystal.setStorageCurrent(stack, amount)
-      }
-    }
   }
 
   override def getFieldCount: Int = inventory.getFieldCount

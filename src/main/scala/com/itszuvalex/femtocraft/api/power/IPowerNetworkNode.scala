@@ -33,5 +33,7 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
 
   def setRenderLocations(set: Set[Loc4]): Unit
 
+  def renderLocations: Set[Loc4]
+
   def storage: IBattery
 }

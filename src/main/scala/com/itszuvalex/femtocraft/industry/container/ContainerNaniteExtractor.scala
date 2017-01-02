@@ -1,58 +1,28 @@
 package com.itszuvalex.femtocraft.industry.container
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.container.ContainerInv
+import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncItemStorageItemStack}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.IContainerListener
 import net.minecraft.item.ItemStack
-
-import scala.collection.JavaConversions._
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Alex on 18.08.2016.
   */
-class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteExtractor) extends ContainerInv[TileNaniteExtractor](player, tile, 0, 0, true) {
-  var powerMaxLast    : Double = _
-  var powerCurrentLast: Double = _
-  var progressLast    : Double = _
+class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteExtractor, shouldSync: Boolean) extends ContainerInv[TileNaniteExtractor](player, tile, 0, 0, shouldSync) {
+  addSync(new SyncDouble(() => tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP).storage, (a: Double) => tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP).storage = a))
+  addSync(new SyncDouble(() => tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP).maxStorage, (a: Double) => tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP).maxStorage = a))
+  addSync(new SyncDouble(() => tile.getProgress, (a: Double) => tile.setProgress(a)))
 
-  addSlotToContainer(new FilteredSlot(tile, 0, 45, 24))
+  if (shouldSync) {
+    addSync(new SyncItemStorageItemStack(tile.storage, 0))
+    //    addSlotToContainer(new FilteredSlot(tile, 0, 45, 24))
 
-  addPlayerInventorySlots(inv, 5, 76)
+    addPlayerInventorySlots(inv, 5, 76)
+  }
 
   override def eligibleForInput(item: ItemStack): Boolean = CybermaterialRegistry.getNaniteFromItem(item.getItem, item.getItemDamage).isDefined
-
-  override def detectAndSendChanges(): Unit = {
-    super.detectAndSendChanges()
-
-    listeners.foreach { listener =>
-      if (powerMaxLast != tile.getPowerMax)
-        sendUpdateToListener(this, listener, 0, tile.getPowerMax.toInt)
-
-      if (powerCurrentLast != tile.getPowerCurrent)
-        sendUpdateToListener(this, listener, 1, tile.getPowerCurrent.toInt)
-
-      if (progressLast != tile.getProgress)
-        sendUpdateToListener(this, listener, 2, tile.getProgress.toInt)
-    }
-
-    powerMaxLast = tile.getPowerMax
-    powerCurrentLast = tile.getPowerCurrent
-    progressLast = tile.getProgress
-  }
-
-  override def addListener(listener: IContainerListener) {
-    super.addListener(listener)
-    listener.sendAllWindowProperties(this, tile)
-  }
-
-  override def updateProgressBar(id: Int, data: Int): Unit = {
-    id match {
-      case 0 => tile.powerMax = data.toDouble
-      case 1 => tile.setPower(data.toDouble)
-      case 2 => tile.setProgress(data.toDouble)
-      case _ =>
-    }
-  }
 }

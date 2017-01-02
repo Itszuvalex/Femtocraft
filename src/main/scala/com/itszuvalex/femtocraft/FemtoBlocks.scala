@@ -7,7 +7,6 @@ import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
-import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.ItemBlock
@@ -65,7 +64,6 @@ object FemtoBlocks {
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
     blockCrystals = registerBlock(new BlockCrystalsWorldgen(), "crystalCluster")
-    blockMaterialProcessor = registerBlock(new BlockMaterialProcessor(), "blockMaterialProcessor")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")
     blockFrame = registerBlock(new BlockFrame(), "blockFrame")
@@ -74,19 +72,12 @@ object FemtoBlocks {
     blockCrystalMount = registerBlock(new BlockCrystalMount(), "blockCrystalMount")
     blockPowerPedestal = registerBlock(new BlockPowerPedestal(), "blockPowerPedestal")
     blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
-    blockPowerSink = registerBlock(new BlockPowerSink(), "blockPowerSink")
-    blockPowerGenerator = registerBlock(new BlockPowerGenerator(), "blockPowerGenerator")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
 
     //tests
 
     testBlock = registerBlock(new BlockTest, "testBlock")
     testNetworkBlock = registerBlock(new BlockNetworkTest, "testNetworkBlock")
-    testDiffusionNode = registerBlock(new BlockDiffusionNodeTest, "testDiffusionNode")
-    testDiffusionTargetNode = registerBlock(new BlockDiffusionTargetNodeTest, "testDiffusionTargetNode")
-    testDirectNode = registerBlock(new BlockDirectNodeTest, "testDirectNode")
-    testGenerationNode = registerBlock(new BlockGenerationNodeTest, "testGenerationNode")
-    testTransferNode = registerBlock(new BlockTransferNodeTest, "testTransferNode")
     testTaskProvider = registerBlock(new BlockTaskProviderTest, "testTaskProvider")
     testWorkerProvider = registerBlock(new BlockWorkerProviderTest, "testWorkerProvider")
   }

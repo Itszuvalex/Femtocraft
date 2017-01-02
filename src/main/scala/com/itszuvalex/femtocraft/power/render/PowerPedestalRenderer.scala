@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.femtocraft.power.tile.TilePowerPedestal
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
@@ -8,6 +9,7 @@ import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
+import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
 /**
@@ -31,7 +33,7 @@ class PowerPedestalRenderer extends TileEntityCombinedRenderer[TilePowerPedestal
   override def renderTileEntityInWorld(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
     val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
-      case Some(a: ICrystalMount) => new Color(a.getColor)
+      case Some(a: ICrystalMount) => a.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
       case _ => Color(0.toByte, 255.toByte, 255.toByte, 255.toByte)
     }).getOrElse(Color(0, 0, 0, 0))
     renderPedestalAt(te, x, y, z, color)

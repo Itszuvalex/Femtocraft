@@ -1,7 +1,9 @@
 package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.power.node.IPowerNode
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.power.PowerConnectionNodeType
+import com.itszuvalex.femtocraft.power.node.PowerNode
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
@@ -39,20 +41,14 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
     if (MinecraftForgeClient.getRenderPass == 0)
-      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getNodeLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), new Color(te.getColor))
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
 
     if (te.getCrystalStack != null && !te.getCrystalStack.func_190926_b()) {
-      if (te.getParent != null) {
-        te.getParent.getType match {
-          case IPowerNode.CRYSTAL_MOUNT if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, te.getParent.getNodeLoc)
-          case _ =>
-        }
-      }
-      te.getChildrenLocs.map(loc => loc.getTileEntity().orNull).collect { case i: IPowerNode => i }.
+      te.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).renderLocations.map(loc => loc.getTileEntity().orNull).collect { case i: PowerNode => i }.
         foreach { t =>
-          t.getType match {
-            case IPowerNode.CRYSTAL_MOUNT if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
-            case IPowerNode.DIFFUSION_TARGET_NODE if MinecraftForgeClient.getRenderPass == 1 => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getNodeLoc)
+          t.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).connectType match {
+            case PowerConnectionNodeType.MAIN if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getLoc)
+            case PowerConnectionNodeType.LEAF if MinecraftForgeClient.getRenderPass == 1 => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getLoc)
             case _ =>
           }
         }

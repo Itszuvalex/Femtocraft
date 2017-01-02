@@ -30,8 +30,6 @@ object FemtoItems {
     itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
-    itemFurnaceAssembly = registerItem(new ItemFurnaceAssembly(), "itemFurnaceAssembly").registerOre("assemblyFurnace")
-    itemGrinderAssembly = registerItem(new ItemGrinderAssembly(), "itemGrinderAssembly").registerOre("assemblyGrinder")
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
   }
 

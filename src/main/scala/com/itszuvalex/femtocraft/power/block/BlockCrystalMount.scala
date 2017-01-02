@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.power.block
 import java.util.Random
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
@@ -13,6 +14,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.{IBlockAccess, World}
 
@@ -36,7 +38,7 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
             pos.getX + .5 + (rand.nextDouble() * .2 - .1),
             pos.getY + .5 + (rand.nextDouble() * .2 - .1),
             pos.getZ + .5 + (rand.nextDouble() * .2 - .1),
-            mount.getColor)
+            mount.getCapability(Capabilities.COLORABLE, EnumFacing.UP).toInt)
       case _ =>
     }
   }
