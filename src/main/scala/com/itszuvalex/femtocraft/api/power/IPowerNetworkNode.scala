@@ -1,11 +1,8 @@
 package com.itszuvalex.femtocraft.api.power
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IBattery
-import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
-import net.minecraft.util.EnumFacing
 
 /**
   * Created by Chris on 1/1/2017.
@@ -20,11 +17,12 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
     if (getLoc.compareTo(loc) == 0)
       return false
 
-    loc.getTileEntity(false) match {
-      case None => false
-      case Some(a: TileEntityBase) if a.hasCapability(Capabilities.POWER_NODE, EnumFacing.UP) =>
-        connectType.canConnect(a.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).connectType)
-    }
+//    loc.getTileEntity(false) match {
+//      case None => false
+//      case Some(a: TileEntity) if a.hasCapability(Capabilities.POWER_NODE, EnumFacing.UP) =>
+//        connectType.canConnect(a.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).connectType)
+//    }
+    true
   }
 
   def storageType: PowerStorageNodeType

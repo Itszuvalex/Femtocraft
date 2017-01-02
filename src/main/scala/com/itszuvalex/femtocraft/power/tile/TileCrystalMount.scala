@@ -70,11 +70,13 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setUpdate()
   }
 
-  override def onLoad(): Unit = {
-    super.onLoad()
-    if (getWorld.isRemote) return
-    if (!getCrystalStack.func_190926_b())
-      PowerManager.addNode(powerDelegate)
+
+  override def serverUpdate(): Unit = {
+    super.serverUpdate()
+    if (powerDelegate.network == null) {
+      if (!getCrystalStack.func_190926_b())
+        PowerManager.addNode(powerDelegate)
+    }
   }
 
   override def invalidate(): Unit = {

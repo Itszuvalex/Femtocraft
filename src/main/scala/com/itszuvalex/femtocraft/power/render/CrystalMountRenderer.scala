@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.power.render
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerConnectionNodeType
-import com.itszuvalex.femtocraft.power.node.PowerNode
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
@@ -44,11 +43,12 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
 
     if (te.getCrystalStack != null && !te.getCrystalStack.func_190926_b()) {
-      te.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).renderLocations.map(loc => loc.getTileEntity().orNull).collect { case i: PowerNode => i }.
+      te.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).renderLocations.flatMap(loc => loc.getTileEntity()).filter(_.hasCapability(Capabilities.POWER_NODE, null)).
         foreach { t =>
-          t.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).connectType match {
-            case PowerConnectionNodeType.MAIN if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, t.getLoc)
-            case PowerConnectionNodeType.LEAF if MinecraftForgeClient.getRenderPass == 1 => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getLoc)
+          val cap = t.getCapability(Capabilities.POWER_NODE, EnumFacing.UP)
+          cap.connectType match {
+            case PowerConnectionNodeType.MAIN if MinecraftForgeClient.getRenderPass == 1 => PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
+            case PowerConnectionNodeType.LEAF if MinecraftForgeClient.getRenderPass == 1 => DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
             case _ =>
           }
         }

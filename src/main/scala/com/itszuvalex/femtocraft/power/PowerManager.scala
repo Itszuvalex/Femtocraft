@@ -24,11 +24,14 @@ object PowerManager {
   def addNode(node: IPowerNetworkNode): Unit = {
     val loc = node.getLoc
 
-    val network = PowerNetwork.createFromTile(node)
     val nodes = getIPowerNetworkNodesInRange(nodeTracker, node, node.connectionRadius).filterNot(_._1.getLoc.compareTo(loc) == 0).toSet
-    nodes.map(_._1).foreach { nloc =>
-      if (node.getNetwork.canConnect(loc, nloc.getLoc))
-        node.getNetwork.addConnection(loc, nloc.getLoc)
+    if (nodes.isEmpty) {
+      val network = PowerNetwork.createFromTile(node)
+    }
+    else {
+      nodes.map(_._1).foreach { nloc =>
+        nloc.getNetwork.addNode(node)
+      }
     }
 
     /* Actually track the node */
