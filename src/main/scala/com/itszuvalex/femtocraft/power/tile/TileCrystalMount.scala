@@ -13,6 +13,7 @@ import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -27,12 +28,12 @@ object TileCrystalMount {
   val MOUNT_COMPOUND = "Mount"
   val PEDESTALS_KEY  = "Pedestals"
   val CRYSTAL_KEY    = "Crystal"
+  val LOCS_KEY       = "Locs"
   val PEDESTAL_RANGE = 8f
 }
 
 class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
   private val pedestalLocs = mutable.HashSet[Loc4]()
-
 
   override def defaultBattery: IBattery = new PowerBattery(5000)
 
@@ -69,9 +70,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     setUpdate()
   }
 
-  /* Tile Entity */
-  override def validate(): Unit = {
-    super.validate()
+  override def onLoad(): Unit = {
+    super.onLoad()
     if (getWorld.isRemote) return
     if (!getCrystalStack.func_190926_b())
       PowerManager.addNode(powerDelegate)
@@ -107,6 +107,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     }
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
     savePedestalLocInfo(compound)
+    saveConnectionInfo(compound)
   }
 
   //  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
@@ -128,6 +129,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     super.handleDescriptionNBT(compound)
     setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(new ItemStack(_)))
     loadPedestalLocInfo(compound)
+    loadConnectionInfo(compound)
     setRenderUpdate()
   }
 
@@ -135,6 +137,14 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
       pedestalLocs.clear()
       pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
+    }
+    setRenderUpdate()
+  }
+
+  def loadConnectionInfo(compound: NBTTagCompound): Unit = {
+    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
+      powerDelegate.setRenderLocations(comp.NBTList(TileCrystalMount.LOCS_KEY).map(Loc4(_)).toSet)
+      Unit
     }
     setRenderUpdate()
   }
@@ -162,6 +172,15 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       TileCrystalMount.MOUNT_COMPOUND ->
         NBTCompound(
           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
+        )
+    )
+  }
+
+  def saveConnectionInfo(compound: NBTTagCompound): NBTTagCompound = {
+    compound(
+      TileCrystalMount.MOUNT_COMPOUND ->
+        NBTCompound(
+          TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
         )
     )
   }
@@ -211,6 +230,19 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     if (!canAcceptPedestal(loc)) return
     pedestalLocs += loc
     setUpdate()
+  }
+
+
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
+    if (!worldObj.isRemote && par5EntityPlayer.isSneaking) {
+      if (powerDelegate.getNetwork != null) {
+        PowerManager.removeNode(powerDelegate)
+      }
+      else {
+        PowerManager.addNode(powerDelegate)
+      }
+    }
+    super.onSideActivate(par5EntityPlayer, side)
   }
 
   /**

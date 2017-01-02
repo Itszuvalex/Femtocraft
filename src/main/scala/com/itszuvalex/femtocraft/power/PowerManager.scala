@@ -1,8 +1,9 @@
 package com.itszuvalex.femtocraft.power
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerNetworkNode, PowerNetwork}
 import com.itszuvalex.itszulib.logistics.LocationTracker
-import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
@@ -23,30 +24,32 @@ object PowerManager {
   def addNode(node: IPowerNetworkNode): Unit = {
     val loc = node.getLoc
 
-    /* Actually track the node */
-    nodeTracker.trackLocation(loc)
-
     val network = PowerNetwork.createFromTile(node)
-    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node, node.connectionRadius).filterNot(_._1 == loc)
-      .map(_._1).foreach { nloc =>
-      if (node.getNetwork.canConnect(loc, nloc.getLoc) && node.getNetwork != nloc.getNetwork)
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node, node.connectionRadius).filterNot(_._1.getLoc.compareTo(loc) == 0).toSet
+    nodes.map(_._1).foreach { nloc =>
+      if (node.getNetwork.canConnect(loc, nloc.getLoc))
         node.getNetwork.addConnection(loc, nloc.getLoc)
     }
+
+    /* Actually track the node */
+    nodeTracker.trackLocation(loc)
   }
 
   def removeNode(node: IPowerNetworkNode): Unit = {
     nodeTracker.removeLocation(node.getLoc)
-    node.getNetwork.removeNode(node)
+    if (node.getNetwork != null)
+      node.getNetwork.removeNode(node)
     node.setNetwork(null)
   }
 
 
-  private def getIPowerNetworkNodesInRange(tracker: LocationTracker, node: IPowerNetworkNode, radius: Float): Iterable[(TileEntity with IPowerNetworkNode, Double)] = {
+  private def getIPowerNetworkNodesInRange(tracker: LocationTracker, node: IPowerNetworkNode, radius: Float): Iterable[(IPowerNetworkNode, Double)] = {
     val loc = node.getLoc
     tracker.getLocationsInRange(loc, radius).view
-      .filterNot(_ == node.getLoc)
+      .filterNot(_.compareTo(node.getLoc) == 0)
       .flatMap(_.getTileEntity(force = false))
-      .collect { case cnode: IPowerNetworkNode => cnode }
+      .filter(_.hasCapability(Capabilities.POWER_NODE, EnumFacing.UP))
+      .map {_.getCapability(Capabilities.POWER_NODE, EnumFacing.UP)}
       .map(cnode => (cnode, cnode.getLoc.distSqr(loc)))
       .filter(pair => (pair._2 <= (pair._1.connectionRadius * pair._1.connectionRadius)) &&
         (pair._2 <= (node.connectionRadius * node.connectionRadius)))

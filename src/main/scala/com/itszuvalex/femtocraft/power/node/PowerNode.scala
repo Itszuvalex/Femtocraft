@@ -67,13 +67,16 @@ trait PowerNode extends TileEntityBase {
     (Random.nextInt(125) + 130).toByte,
     (Random.nextInt(125) + 130).toByte).toInt
 
-  override def onBlockBreak() = {
-    PowerManager.removeNode(powerDelegate)
-  }
-
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, if (powerDelegate.network == null) "networkless " else powerDelegate.network.id.toString)
+    if (!getWorld.isRemote) {
+      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, if (powerDelegate.network == null) "networkless " else powerDelegate.network.id.toString)
+      if (powerDelegate.network != null) {
+        powerDelegate.network.getConnections(getLoc).getOrElse(Set()).foreach(loc =>
+          PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Loc4:" + loc)
+        )
+      }
+    }
     super.onSideActivate(par5EntityPlayer, side)
   }
 

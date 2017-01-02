@@ -15,7 +15,7 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
   renders: => Boolean,
   power: => IBattery
 ) extends IPowerNetworkNode {
-  var renderLocs: Set[Loc4] = Set()
+  var renderLocs: scala.collection.Set[Loc4] = Set()
 
   override def storageType: PowerStorageNodeType = storageNodeType
 
@@ -27,11 +27,26 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
 
   override def rendersConnections: Boolean = renders
 
-  override def setRenderLocations(set: Set[Loc4]): Unit = renderLocs = set
+  override def setRenderLocations(set: scala.collection.Set[Loc4]): Unit = {
+    renderLocs = set
+    tileEntity.setUpdate()
+  }
 
-  override def renderLocations: Set[Loc4] = renderLocs
+  override def renderLocations: scala.collection.Set[Loc4] = renderLocs
 
   override def storage: IBattery = power
 
   override def getLoc: Loc4 = tileEntity.getLoc
+
+  override def connect(node: Loc4): Unit = {
+    super.connect(node)
+    setRenderLocations(getNetwork.getConnections(getLoc).getOrElse(Set[Loc4]()))
+  }
+
+  override def disconnect(node: Loc4): Unit = {
+    super.disconnect(node)
+    setRenderLocations(getNetwork.getConnections(getLoc).getOrElse(Set[Loc4]()))
+  }
+
+
 }

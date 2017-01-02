@@ -149,9 +149,8 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
 
   def getProgressMax = task.adjustedMax(0)
 
-  /* Tile Entity */
-  override def validate(): Unit = {
-    super.validate()
+  override def onLoad(): Unit = {
+    super.onLoad()
     if (!getWorld.isRemote) PowerManager.addNode(powerDelegate)
   }
 

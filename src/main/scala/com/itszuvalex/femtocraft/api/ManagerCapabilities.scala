@@ -53,7 +53,7 @@ object ManagerCapabilities {
 
     override def rendersConnections: Boolean = false
 
-    override def renderLocations: Set[Loc4] = Set()
+    override def renderLocations: scala.collection.Set[Loc4] = Set()
 
     override def transferRate: Double = 0
 
@@ -61,7 +61,7 @@ object ManagerCapabilities {
 
     override def getLoc: Loc4 = Loc4(0, 0, 0, 0)
 
-    override def setRenderLocations(set: Set[Loc4]): Unit = {}
+    override def setRenderLocations(set: scala.collection.Set[Loc4]): Unit = {}
   }
 
 }

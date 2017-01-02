@@ -1,7 +1,9 @@
 package com.itszuvalex.femtocraft.api.power
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import com.itszuvalex.itszulib.util.Debug
+import net.minecraftforge.common.capabilities.Capability
 import org.apache.logging.log4j.Level
 
 import scala.collection.mutable
@@ -18,6 +20,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
   val producerSet: mutable.HashSet[IPowerNetworkNode] = new mutable.HashSet[IPowerNetworkNode]()
   val storageSet : mutable.HashSet[IPowerNetworkNode] = new mutable.HashSet[IPowerNetworkNode]()
   val consumerSet: mutable.HashSet[IPowerNetworkNode] = new mutable.HashSet[IPowerNetworkNode]()
+
+  override def networkCapability: Capability[IPowerNetworkNode] = Capabilities.POWER_NODE
 
   override def create(): PowerNetwork = new PowerNetwork
 

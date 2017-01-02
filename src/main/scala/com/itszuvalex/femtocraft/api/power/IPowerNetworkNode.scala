@@ -1,8 +1,11 @@
 package com.itszuvalex.femtocraft.api.power
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Chris on 1/1/2017.
@@ -14,10 +17,13 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
     if (!(getLoc.distSqr(loc) <= connectionRadius * connectionRadius))
       return false
 
+    if (getLoc.compareTo(loc) == 0)
+      return false
+
     loc.getTileEntity(false) match {
       case None => false
-      case Some(a: IPowerNetworkNode) =>
-        connectType.canConnect(a.connectType)
+      case Some(a: TileEntityBase) if a.hasCapability(Capabilities.POWER_NODE, EnumFacing.UP) =>
+        connectType.canConnect(a.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).connectType)
     }
   }
 
@@ -31,9 +37,9 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
 
   def rendersConnections: Boolean
 
-  def setRenderLocations(set: Set[Loc4]): Unit
+  def setRenderLocations(set: scala.collection.Set[Loc4]): Unit
 
-  def renderLocations: Set[Loc4]
+  def renderLocations: scala.collection.Set[Loc4]
 
   def storage: IBattery
 }
