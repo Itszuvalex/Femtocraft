@@ -144,10 +144,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
   }
 
   def loadConnectionInfo(compound: NBTTagCompound): Unit = {
-    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
-      powerDelegate.setRenderLocations(comp.NBTList(TileCrystalMount.LOCS_KEY).map(Loc4(_)).toSet)
-      Unit
-    }
+    powerDelegate.setRenderLocations(compound.NBTList(TileCrystalMount.LOCS_KEY).map(Loc4(_)).toSet)
     setRenderUpdate()
   }
 
@@ -180,10 +177,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   def saveConnectionInfo(compound: NBTTagCompound): NBTTagCompound = {
     compound(
-      TileCrystalMount.MOUNT_COMPOUND ->
-        NBTCompound(
-          TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
-        )
+      TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
     )
   }
 
