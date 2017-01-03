@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilities
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import net.minecraft.creativetab.CreativeTabs
@@ -59,6 +60,7 @@ object Femtocraft {
     FemtoFluids.init()
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
+    PowerManager.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {

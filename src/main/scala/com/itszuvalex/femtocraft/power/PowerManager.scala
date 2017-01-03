@@ -4,12 +4,20 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerNetworkNode, PowerNetwork}
 import com.itszuvalex.itszulib.logistics.LocationTracker
 import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object PowerManager {
   val nodeTracker = new LocationTracker
+
+  def init(): Unit = {
+    MinecraftForge.EVENT_BUS.register(this)
+  }
 
   def clear() = {
     nodeTracker.clear()
@@ -30,7 +38,7 @@ object PowerManager {
       network.register()
     }
     else {
-      nodes.map(_._1).filter(_.canConnect(loc)).foreach { nloc =>
+      nodes.map(_._1).view.filter(_.canConnect(loc)).foreach { nloc =>
         Option(nloc.getNetwork).foreach(_.addNode(node))
       }
     }
@@ -59,5 +67,11 @@ object PowerManager {
         (pair._2 <= (node.connectionRadius * node.connectionRadius)))
   }
 
+
+  @SubscribeEvent def onWorldUnload(worldEvent: WorldEvent.Unload): Unit = {
+    if (!FMLCommonHandler.instance().getMinecraftServerInstance.isServerRunning) {
+      clear()
+    }
+  }
 
 }

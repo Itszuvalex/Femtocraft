@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.api.power
 
+import java.util
+
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
@@ -7,6 +9,7 @@ import com.itszuvalex.itszulib.util.Debug
 import net.minecraftforge.common.capabilities.Capability
 import org.apache.logging.log4j.Level
 
+import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 object PowerNetwork {
@@ -38,23 +41,23 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       val producerPowerNodes = producerSet.map { node =>
         val min = Math.min(node.storage.storage, node.transferRate)
         producedPower += min
-        (node, min)
-      }.toSeq.sortWith(_._2 > _._2)
+        (node, min, node.storage.storage)
+      }.toSeq.sortWith(_._3 > _._3)
       val storedPowerNodes = storageSet.map { node =>
         val min = Math.min(node.storage.storage, node.transferRate)
         storedPower += min
-        (node, min)
-      }.toSeq.sortWith(_._2 > _._2)
+        (node, min, node.storage.storage)
+      }.toSeq.sortWith(_._3 > _._3)
       val storageRoomNodes = storageSet.map { node =>
         val min = Math.min(node.storage.maxStorage - node.storage.storage, node.transferRate)
         storageRoom += min
-        (node, min)
-      }.toSeq.sortWith(_._2 > _._2)
+        (node, min, node.storage.maxStorage - node.storage.storage)
+      }.toSeq.sortWith(_._3 > _._3)
       val consumerRoomNodes = consumerSet.map { node =>
         val min = Math.min(node.storage.maxStorage - node.storage.storage, node.transferRate)
         consumerRoom += min
-        (node, min)
-      }.toSeq.sortWith(_._2 > _._2)
+        (node, min, node.storage.maxStorage - node.storage.storage)
+      }.toSeq.sortWith(_._3 > _._3)
 
       // Return early to prevent unnecessary computation
 
@@ -66,9 +69,9 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
       //Distribute
       val producerIt = producerPowerNodes.iterator
-      val storageTakeIt = storageRoomNodes.iterator
+      val storageTakeIt = storedPowerNodes.iterator
 
-      def nextPowerSource: (IPowerNetworkNode, Double) = {
+      def nextPowerSource: (IPowerNetworkNode, Double, Double) = {
         if (producerIt.hasNext) {
           producerIt.next()
         }
@@ -79,9 +82,9 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       }
 
       val consumerIt = consumerRoomNodes.iterator
-      val storageStoreIt = storedPowerNodes.iterator
+      val storageStoreIt = storageRoomNodes.iterator
 
-      def nextPowerSink: (IPowerNetworkNode, Double) = {
+      def nextPowerSink: (IPowerNetworkNode, Double, Double) = {
         if (consumerIt.hasNext) {
           consumerIt.next()
         }
@@ -104,8 +107,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
       var powerSource = nextPowerSource
       var powerSink = nextPowerSink
-      var powerToDrain = 0d
-      var powerToFill = 0d
+      var powerToDrain = if (powerSource != null) powerSource._2 else 0d
+      var powerToFill = if (powerSink != null) powerSink._2 else 0d
       while ((powerDistributed < powerToDistribute) && powerSource != null && powerSink != null) {
         var powerShift = Math.min(powerToDrain, powerToFill)
         powerSource._1.storage.storage -= powerShift
@@ -132,15 +135,9 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
     }
   }
 
-  override def onTakeover(iNetwork: PowerNetwork): Unit = {
-    producerSet ++= iNetwork.producerSet
-    storageSet ++= iNetwork.storageSet
-    consumerSet ++= iNetwork.consumerSet
-  }
+  override def onTakeover(iNetwork: PowerNetwork): Unit = {}
 
-  override def onSplit(iNetwork: PowerNetwork): Unit = {
-
-  }
+  override def onSplit(iNetwork: PowerNetwork): Unit = {}
 
   override def addNodeSilently(node: IPowerNetworkNode): Unit = {
     super.addNodeSilently(node)
@@ -150,6 +147,13 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       case PowerStorageNodeType.CONSUMER => consumerSet += node
       case _ =>
     }
+  }
+
+  override def removeNodes(nodes: util.Collection[IPowerNetworkNode]): Unit = {
+    super.removeNodes(nodes)
+    producerSet --= nodes
+    storageSet --= nodes
+    consumerSet --= nodes
   }
 
   override def refresh(): Unit = {

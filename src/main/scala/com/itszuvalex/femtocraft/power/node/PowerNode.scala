@@ -84,8 +84,8 @@ trait PowerNode extends TileEntityBase {
     super.onSideActivate(par5EntityPlayer, side)
   }
 
-  override def invalidate(): Unit = {
-    super.invalidate()
+  override def onChunkUnload(): Unit = {
+    super.onChunkUnload()
     if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
   }
 

@@ -35,7 +35,53 @@ object TileCrystalMount {
 class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
   private val pedestalLocs = mutable.HashSet[Loc4]()
 
-  override def defaultBattery: IBattery = new PowerBattery(5000)
+  override def defaultBattery: IBattery = new IBattery {
+    override def maxStorage = Option(getCrystalStack).map { it =>
+      it.getItem match {
+        case a: IPowerCrystal => a.getStorageMax(getCrystalStack)
+        case _ => 0
+      }
+    }
+      .getOrElse(0)
+
+    override def clear() = Option(getCrystalStack).foreach { it =>
+      it.getItem match {
+        case a: IPowerCrystal => a.setStorageCurrent(getCrystalStack, 0)
+        case _ =>
+      }
+    }
+
+    override def copy() = new PowerBattery(storage, maxStorage)
+
+    override def writeToNBT(nbt: NBTTagCompound) = {}
+
+    override def maxStorage_=(max: Double) = Option(getCrystalStack).foreach { it =>
+      it.getItem match {
+        case a: IPowerCrystal => a.setStorageMax(getCrystalStack, max)
+          markDirty()
+        case _ =>
+      }
+    }
+
+    override def storage_=(amt: Double) = Option(getCrystalStack).foreach { it =>
+      it.getItem match {
+        case a: IPowerCrystal => a.setStorageCurrent(getCrystalStack, amt)
+          markDirty()
+        case _ =>
+      }
+    }
+
+    override def storage = Option(getCrystalStack).map { it =>
+      it.getItem match {
+        case a: IPowerCrystal => a.getStorageCurrent(getCrystalStack)
+        case _ => 0
+      }
+    }.getOrElse(0)
+
+    override def deserializeNBT(nbt: NBTTagCompound) = {}
+
+    override def serializeNBT() = new NBTTagCompound
+  }
 
   override def powerStorageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
@@ -73,7 +119,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    if (powerDelegate.network == null) {
+    if (powerDelegate.network == null && !isInvalid) {
       if (!getCrystalStack.func_190926_b())
         PowerManager.addNode(powerDelegate)
     }
@@ -82,15 +128,9 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       getCrystalStack.getItem match {
         case item: IPowerCrystal =>
           item.onTick(getCrystalStack)
+          markDirty()
       }
     }
-  }
-
-  override def invalidate(): Unit = {
-    super.invalidate()
-    if (getWorld.isRemote) return
-    if (!getCrystalStack.func_190926_b())
-      PowerManager.removeNode(powerDelegate)
   }
 
   /**
@@ -258,6 +298,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     getLoc.getOffset(EnumFacing.UP) == loc ||
       getLoc.getOffset(EnumFacing.DOWN) == loc
   }
+
+  override def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {}
 
   override def getFieldCount: Int = inventory.getFieldCount
 
