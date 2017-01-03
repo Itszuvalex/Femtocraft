@@ -77,6 +77,13 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       if (!getCrystalStack.func_190926_b())
         PowerManager.addNode(powerDelegate)
     }
+
+    if (!getCrystalStack.func_190926_b()) {
+      getCrystalStack.getItem match {
+        case item: IPowerCrystal =>
+          item.onTick(getCrystalStack)
+      }
+    }
   }
 
   override def invalidate(): Unit = {

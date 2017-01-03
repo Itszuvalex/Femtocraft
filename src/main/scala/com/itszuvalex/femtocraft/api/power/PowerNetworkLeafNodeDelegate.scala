@@ -33,4 +33,12 @@ class PowerNetworkLeafNodeDelegate(tileEntity: TileEntityBase,
     }
     parent = Some(node)
   }
+
+//  override def disconnect(node: Loc4): Unit = {
+//    super.disconnect(node)
+//    if (parent.isDefined && parent.get.compareTo(node) == 0) {
+//      network.removeNode(this)
+//      network = null
+//    }
+//  }
 }
