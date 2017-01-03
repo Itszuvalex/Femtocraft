@@ -102,6 +102,8 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   }
 
   override def serverUpdate(): Unit = {
+    if (powerDelegate.getNetwork == null) PowerManager.addNode(powerDelegate)
+
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty) {
@@ -148,11 +150,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
-
-  override def onLoad(): Unit = {
-    super.onLoad()
-    if (!getWorld.isRemote) PowerManager.addNode(powerDelegate)
-  }
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     super.deserializeNBT(nbt)

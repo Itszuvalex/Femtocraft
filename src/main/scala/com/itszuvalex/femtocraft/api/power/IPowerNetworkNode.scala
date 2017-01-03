@@ -11,8 +11,6 @@ import net.minecraft.util.EnumFacing
   * Created by Chris on 1/1/2017.
   */
 trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork] {
-
-
   override def canConnect(loc: Loc4): Boolean = {
     if (!(getLoc.distSqr(loc) <= connectionRadius * connectionRadius))
       return false

@@ -37,16 +37,4 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
   override def storage: IBattery = power
 
   override def getLoc: Loc4 = tileEntity.getLoc
-
-  override def connect(node: Loc4): Unit = {
-    super.connect(node)
-    setRenderLocations(getNetwork.getConnections(getLoc).getOrElse(Set[Loc4]()))
-  }
-
-  override def disconnect(node: Loc4): Unit = {
-    super.disconnect(node)
-    setRenderLocations(getNetwork.getConnections(getLoc).getOrElse(Set[Loc4]()))
-  }
-
-
 }

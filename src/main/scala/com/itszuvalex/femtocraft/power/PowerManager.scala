@@ -30,8 +30,8 @@ object PowerManager {
       network.register()
     }
     else {
-      nodes.map(_._1).foreach { nloc =>
-        nloc.getNetwork.addNode(node)
+      nodes.map(_._1).filter(_.canConnect(loc)).foreach { nloc =>
+        Option(nloc.getNetwork).foreach(_.addNode(node))
       }
     }
 

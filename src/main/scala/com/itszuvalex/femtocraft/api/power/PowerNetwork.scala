@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.api.power
 
 import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import com.itszuvalex.itszulib.util.Debug
 import net.minecraftforge.common.capabilities.Capability
@@ -151,4 +152,20 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
     }
   }
 
+  override def refresh(): Unit = {
+    super.refresh()
+    val mst = MinimalSpanningTree.calculate(this)
+    mst.foreach { case (a: Loc4, b: scala.collection.Set[Loc4]) =>
+      nodeMap(a).setRenderLocations(b)
+    }
+  }
+
+  override def addNode(node: IPowerNetworkNode): Unit = {
+    super.addNode(node)
+
+    val mst = MinimalSpanningTree.calculate(this)
+    mst.foreach { case (a: Loc4, b: scala.collection.Set[Loc4]) =>
+      nodeMap.get(a).filter(_.rendersConnections).foreach(_.setRenderLocations(b))
+    }
+  }
 }

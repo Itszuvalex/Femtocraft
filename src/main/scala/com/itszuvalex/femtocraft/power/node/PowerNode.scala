@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerNetworkNodeDelegate, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerNetworkLeafNodeDelegate, PowerNetworkNodeDelegate, PowerStorageNodeType}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -30,7 +30,11 @@ object PowerNode {
 
 trait PowerNode extends TileEntityBase {
   var battery      : IBattery                 = defaultBattery
-  var powerDelegate: PowerNetworkNodeDelegate = new PowerNetworkNodeDelegate(this, powerStorageType, powerConnectionType, powerRadius, powerTransfer, rendersPower, battery)
+  var powerDelegate: PowerNetworkNodeDelegate =
+    if (powerConnectionType == PowerConnectionNodeType.MAIN)
+      new PowerNetworkNodeDelegate(this, powerStorageType, powerConnectionType, powerRadius, powerTransfer, rendersPower, battery)
+    else
+      new PowerNetworkLeafNodeDelegate(this, powerStorageType, powerConnectionType, powerRadius, powerTransfer, rendersPower, battery)
 
   def defaultBattery: IBattery
 
