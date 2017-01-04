@@ -58,7 +58,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     override def maxStorage_=(max: Double) = Option(getCrystalStack).foreach { it =>
       it.getItem match {
         case a: IPowerCrystal => a.setStorageMax(getCrystalStack, max)
-          markDirty()
+          setModified()
         case _ =>
       }
     }
@@ -66,7 +66,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
     override def storage_=(amt: Double) = Option(getCrystalStack).foreach { it =>
       it.getItem match {
         case a: IPowerCrystal => a.setStorageCurrent(getCrystalStack, amt)
-          markDirty()
+          setModified()
         case _ =>
       }
     }
@@ -128,7 +128,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
       getCrystalStack.getItem match {
         case item: IPowerCrystal =>
           item.onTick(getCrystalStack)
-          markDirty()
+          setModified()
       }
     }
   }

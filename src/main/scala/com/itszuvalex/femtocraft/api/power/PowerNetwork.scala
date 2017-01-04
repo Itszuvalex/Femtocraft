@@ -154,6 +154,11 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
     producerSet --= nodes
     storageSet --= nodes
     consumerSet --= nodes
+
+    val mst = MinimalSpanningTree.calculate(this)
+    mst.foreach { case (a: Loc4, b: scala.collection.Set[Loc4]) =>
+      nodeMap.get(a).filter(_.rendersConnections).foreach(_.setRenderLocations(b))
+    }
   }
 
   override def refresh(): Unit = {

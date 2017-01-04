@@ -1,8 +1,10 @@
 package com.itszuvalex.femtocraft.api.power
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
+import org.apache.logging.log4j.Level
 
 /**
   * Created by Chris on 1/1/2017.
@@ -29,6 +31,9 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
 
   override def setRenderLocations(set: scala.collection.Set[Loc4]): Unit = {
     renderLocs = set
+
+    Femtocraft.logger.log(Level.WARN, getLoc + " updated renderLocations " + renderLocs)
+
     tileEntity.setUpdate()
   }
 
