@@ -117,6 +117,8 @@ class ProxyClient extends ProxyCommon {
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalsWorldgen], new CrystalRenderer)
 
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteExtractor], new NaniteExtractorRender)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNanoFurnace], new NanoFurnaceRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 

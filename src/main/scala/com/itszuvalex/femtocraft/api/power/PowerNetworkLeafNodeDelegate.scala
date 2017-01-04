@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.api.power
 
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -28,17 +29,21 @@ class PowerNetworkLeafNodeDelegate(tileEntity: TileEntityBase,
   override def connect(node: Loc4): Unit = {
     super.connect(node)
 
-    if (parent.isDefined) {
-      network.removeConnection(getLoc, parent.get)
+    if (parent.isDefined && node.compareTo(parent.get) != 0) {
+      parent = Some(node)
     }
-    parent = Some(node)
+    else
+      parent = Some(node)
   }
 
-//  override def disconnect(node: Loc4): Unit = {
-//    super.disconnect(node)
-//    if (parent.isDefined && parent.get.compareTo(node) == 0) {
-//      network.removeNode(this)
-//      network = null
-//    }
-//  }
+  override def disconnect(node: Loc4): Unit = {
+    super.disconnect(node)
+    if (parent.isDefined && node.compareTo(parent.get) == 0) {
+      parent = None
+      network.removeNode(this)
+      PowerManager.addNode(this)
+    }
+    else
+      parent = None
+  }
 }

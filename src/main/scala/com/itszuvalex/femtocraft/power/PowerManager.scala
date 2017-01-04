@@ -38,7 +38,7 @@ object PowerManager {
       network.register()
     }
     else {
-      nodes.map(_._1).view.filter(_.canConnect(loc)).foreach { nloc =>
+      nodes.map(_._1).withFilter(_.canConnect(loc)).foreach { nloc =>
         Option(nloc.getNetwork).foreach(_.addNode(node))
       }
     }
