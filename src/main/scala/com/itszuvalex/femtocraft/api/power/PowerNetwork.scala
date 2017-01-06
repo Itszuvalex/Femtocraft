@@ -9,9 +9,6 @@ import com.itszuvalex.itszulib.util.Debug
 import net.minecraftforge.common.capabilities.Capability
 import org.apache.logging.log4j.Level
 
-import scala.collection.JavaConversions._
-import scala.collection.mutable
-
 object PowerNetwork {
   def createFromTile(tile: IPowerNetworkNode): PowerNetwork = {
     val network = new PowerNetwork
@@ -21,15 +18,18 @@ object PowerNetwork {
 }
 
 class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.getNextID) {
-  val producerSet: mutable.HashSet[IPowerNetworkNode] = new mutable.HashSet[IPowerNetworkNode]()
-  val storageSet : mutable.HashSet[IPowerNetworkNode] = new mutable.HashSet[IPowerNetworkNode]()
-  val consumerSet: mutable.HashSet[IPowerNetworkNode] = new mutable.HashSet[IPowerNetworkNode]()
 
   override def networkCapability: Capability[IPowerNetworkNode] = Capabilities.POWER_NODE
 
   override def create(): PowerNetwork = new PowerNetwork
 
   override def onTickStart(): Unit = {}
+
+  def producerNodes = nodeMap.values.flatMap(_.storageNodes).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
+
+  def storageNodes = nodeMap.values.flatMap(_.storageNodes).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
+
+  def consumerNodes = nodeMap.values.flatMap(_.storageNodes).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
 
   override def onTickEnd(): Unit = {
     try {
@@ -38,26 +38,37 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       var storageRoom = 0d
       var consumerRoom = 0d
 
-      val producerPowerNodes = producerSet.map { node =>
-        val min = Math.min(node.storage.storage, node.transferRate)
+      val cacheStorageNodes = storageNodes
+
+      val producerPowerNodes = producerNodes.map { node =>
+        val min = Math.min(node.battery.storage, node.transferRate)
         producedPower += min
-        (node, min, node.storage.storage)
-      }.toSeq.sortWith(_._3 > _._3)
-      val storedPowerNodes = storageSet.map { node =>
-        val min = Math.min(node.storage.storage, node.transferRate)
+        (node, min)
+      }.toSeq.
+        // Order by nodes with least room.  This prioritizes preventing generators from filling up in power.
+        sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
+      val storedPowerNodes = cacheStorageNodes.map { node =>
+        val min = Math.min(node.battery.storage, node.transferRate)
         storedPower += min
-        (node, min, node.storage.storage)
-      }.toSeq.sortWith(_._3 > _._3)
-      val storageRoomNodes = storageSet.map { node =>
-        val min = Math.min(node.storage.maxStorage - node.storage.storage, node.transferRate)
+        (node, min)
+      }.toSeq.
+        // Order by nodes with least room.  This prioritizes preventing storage from filling up in power.
+        sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
+      val storageRoomNodes = cacheStorageNodes.map { node =>
+        val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
         storageRoom += min
-        (node, min, node.storage.maxStorage - node.storage.storage)
-      }.toSeq.sortWith(_._3 > _._3)
-      val consumerRoomNodes = consumerSet.map { node =>
-        val min = Math.min(node.storage.maxStorage - node.storage.storage, node.transferRate)
+        (node, min)
+      }.toSeq.
+      // Order by nodes with least power.  This prioritizes preventing storage from running out of power.
+      sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
+      // Doesn't matter since storage is assumed equal
+      val consumerRoomNodes = consumerNodes.map { node =>
+        val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
         consumerRoom += min
-        (node, min, node.storage.maxStorage - node.storage.storage)
-      }.toSeq.sortWith(_._3 > _._3)
+        (node, min)
+      }.toSeq.
+        // Order by nodes with least power.  This prioritizes preventing consumers from running out of power.
+        sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
 
       // Return early to prevent unnecessary computation
 
@@ -71,7 +82,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       val producerIt = producerPowerNodes.iterator
       val storageTakeIt = storedPowerNodes.iterator
 
-      def nextPowerSource: (IPowerNetworkNode, Double, Double) = {
+      def nextPowerSource: (IPowerStorageNode, Double) = {
         if (producerIt.hasNext) {
           producerIt.next()
         }
@@ -84,7 +95,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       val consumerIt = consumerRoomNodes.iterator
       val storageStoreIt = storageRoomNodes.iterator
 
-      def nextPowerSink: (IPowerNetworkNode, Double, Double) = {
+      def nextPowerSink: (IPowerStorageNode, Double) = {
         if (consumerIt.hasNext) {
           consumerIt.next()
         }
@@ -111,9 +122,9 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       var powerToFill = if (powerSink != null) powerSink._2 else 0d
       while ((powerDistributed < powerToDistribute) && powerSource != null && powerSink != null) {
         var powerShift = Math.min(powerToDrain, powerToFill)
-        powerSource._1.storage.storage -= powerShift
+        powerSource._1.battery.storage -= powerShift
         powerToDrain -= powerShift
-        powerSink._1.storage.storage += powerShift
+        powerSink._1.battery.storage += powerShift
         powerToFill -= powerShift
         powerDistributed += powerShift
 
@@ -139,21 +150,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   override def onSplit(iNetwork: PowerNetwork): Unit = {}
 
-  override def addNodeSilently(node: IPowerNetworkNode): Unit = {
-    super.addNodeSilently(node)
-    node.storageType match {
-      case PowerStorageNodeType.PRODUCER => producerSet += node
-      case PowerStorageNodeType.STORAGE => storageSet += node
-      case PowerStorageNodeType.CONSUMER => consumerSet += node
-      case _ =>
-    }
-  }
-
   override def removeNodes(nodes: util.Collection[IPowerNetworkNode]): Unit = {
     super.removeNodes(nodes)
-    producerSet --= nodes
-    storageSet --= nodes
-    consumerSet --= nodes
 
     val mst = MinimalSpanningTree.calculate(this)
     mst.foreach { case (a: Loc4, b: scala.collection.Set[Loc4]) =>

@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.api
 
-import com.itszuvalex.femtocraft.api.power.{IPowerNetworkNode, PowerConnectionNodeType, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.util.Color
@@ -15,6 +15,8 @@ object ManagerCapabilities {
   def register(): Unit = {
     CapabilityManager.INSTANCE.register(classOf[IBattery], new PowerStorageStorage, classOf[PowerBattery])
     CapabilityManager.INSTANCE.register(classOf[IPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[Color], new ColorStorage, classOf[Color])
   }
 

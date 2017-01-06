@@ -1,11 +1,7 @@
 package com.itszuvalex.femtocraft.api.power
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.EnumFacing
 
 /**
   * Created by Chris on 1/1/2017.
@@ -15,23 +11,20 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
     if (!(getLoc.distSqr(loc) <= connectionRadius * connectionRadius))
       return false
 
-    if (getLoc.compareTo(loc) == 0)
-      return false
-
-    loc.getTileEntity(false) match {
-      case None => false
-      case Some(a: TileEntity) if a.hasCapability(Capabilities.POWER_NODE, EnumFacing.UP) =>
-        connectType.canConnect(a.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).connectType)
-    }
+    getLoc.compareTo(loc) != 0
   }
-
-  def storageType: PowerStorageNodeType
-
-  def connectType: PowerConnectionNodeType
 
   def connectionRadius: Float
 
-  def transferRate: Double
+  def leafNodes: scala.collection.Set[IPowerLeafNode]
+
+  def canAddLeafNode(node: IPowerLeafNode) : Boolean = node.getStorageLoc.distSqr(getLoc) <= connectionRadius*connectionRadius
+
+  def addLeafNode(node: IPowerLeafNode): Unit
+
+  def removeLeafNode(node: IPowerLeafNode): Unit
+
+  def storageNodes: scala.collection.Set[IPowerStorageNode]
 
   def rendersConnections: Boolean
 
@@ -39,5 +32,5 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
 
   def renderLocations: scala.collection.Set[Loc4]
 
-  def storage: IBattery
+  def leafTransferRate: Double
 }

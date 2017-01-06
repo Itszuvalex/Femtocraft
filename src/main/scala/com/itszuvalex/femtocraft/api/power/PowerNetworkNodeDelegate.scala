@@ -1,45 +1,74 @@
 package com.itszuvalex.femtocraft.api.power
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
-import org.apache.logging.log4j.Level
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
+import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraftforge.common.util.INBTSerializable
+
+import scala.collection.{Set, mutable}
 
 /**
   * Created by Chris on 1/1/2017.
   */
+object PowerNetworkNodeDelegate {
+  val LEAF_NODE_TAG = "Leaf"
+}
+
 class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
-  storageNodeType: => PowerStorageNodeType,
-  connectNodeType: => PowerConnectionNodeType,
   radius: => Float,
   transfer: => Double,
-  renders: => Boolean,
-  power: => IBattery
-) extends IPowerNetworkNode {
-  var renderLocs: scala.collection.Set[Loc4] = Set()
+  renders: => Boolean
+) extends IPowerNetworkNode with INBTSerializable[NBTTagCompound] {
+  var renderLocs  : scala.collection.Set[Loc4] = Set()
+  val leafNodeLocs: mutable.HashSet[Loc4]      = new mutable.HashSet[Loc4]()
 
-  override def storageType: PowerStorageNodeType = storageNodeType
+  override def addLeafNode(node: IPowerLeafNode): Unit = {
+    leafNodeLocs += node.getStorageLoc
+    tileEntity.setModified()
+  }
 
-  override def connectType: PowerConnectionNodeType = connectNodeType
+  override def removeLeafNode(node: IPowerLeafNode): Unit = {
+    leafNodeLocs -= node.getStorageLoc
+    tileEntity.setModified()
+  }
+
+  override def leafTransferRate: Double = transfer
+
+  override def leafNodes: Set[IPowerLeafNode] = leafNodeLocs.flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.POWER_LEAF_NODE, null))
+
+  override def storageNodes: Set[IPowerStorageNode] = {
+    val set = if (tileEntity.hasCapability(Capabilities.POWER_STORAGE_NODE, null))
+      Set(tileEntity.getCapability(Capabilities.POWER_STORAGE_NODE, null))
+    else Set()
+
+    set ++ leafNodeLocs.flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.POWER_STORAGE_NODE, null)).map(_.getCapability(Capabilities.POWER_STORAGE_NODE, null))
+  }
 
   override def connectionRadius: Float = radius
-
-  override def transferRate: Double = transfer
 
   override def rendersConnections: Boolean = renders
 
   override def setRenderLocations(set: scala.collection.Set[Loc4]): Unit = {
     renderLocs = set
-
-    Femtocraft.logger.log(Level.WARN, getLoc + " updated renderLocations " + renderLocs)
-
     tileEntity.setUpdate()
   }
 
   override def renderLocations: scala.collection.Set[Loc4] = renderLocs
 
-  override def storage: IBattery = power
-
   override def getLoc: Loc4 = tileEntity.getLoc
+
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    leafNodeLocs.clear()
+    leafNodeLocs ++= nbt.NBTList(PowerNetworkNodeDelegate.LEAF_NODE_TAG).map(Loc4(_))
+    tileEntity.setRenderUpdate()
+  }
+
+  override def serializeNBT(): NBTTagCompound = {
+    NBTCompound(
+      PowerNetworkNodeDelegate.LEAF_NODE_TAG -> NBTList(leafNodeLocs.map(NBTCompound))
+    )
+  }
 }

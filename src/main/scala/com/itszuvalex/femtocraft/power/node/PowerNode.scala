@@ -2,9 +2,8 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerNetworkLeafNodeDelegate, PowerNetworkNodeDelegate, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.PowerNetworkNodeDelegate
 import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.util.{Color, PlayerUtils}
@@ -19,7 +18,7 @@ import scala.util.Random
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object PowerNode {
-  val POWER_COMPOUND_KEY = "FemtoPower"
+  val POWER_COMPOUND_KEY = "PowerNode"
   val POWER_STORAGE_KEY  = "Storage"
   //TODO: Fix this up
   val NODE_PARENT_KEY    = "Parent"
@@ -29,18 +28,8 @@ object PowerNode {
 
 
 trait PowerNode extends TileEntityBase {
-  var battery      : IBattery                 = defaultBattery
   var powerDelegate: PowerNetworkNodeDelegate =
-    if (powerConnectionType == PowerConnectionNodeType.MAIN)
-      new PowerNetworkNodeDelegate(this, powerStorageType, powerConnectionType, powerRadius, powerTransfer, rendersPower, battery)
-    else
-      new PowerNetworkLeafNodeDelegate(this, powerStorageType, powerConnectionType, powerRadius, powerTransfer, rendersPower, battery)
-
-  def defaultBattery: IBattery
-
-  def powerStorageType: PowerStorageNodeType
-
-  def powerConnectionType: PowerConnectionNodeType
+    new PowerNetworkNodeDelegate(this, powerRadius, powerTransfer, rendersPower)
 
   def powerRadius: Float
 
@@ -53,15 +42,13 @@ trait PowerNode extends TileEntityBase {
       true
     } else {
       if (capability == Capabilities.POWER_NODE) true
-      else if (capability == Capabilities.POWER_STORAGE) true
       else if (capability == Capabilities.COLORABLE) true
       else false
     }
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.POWER_STORAGE) battery.asInstanceOf[T]
-    else if (capability == Capabilities.POWER_NODE) powerDelegate.asInstanceOf[T]
+    if (capability == Capabilities.POWER_NODE) powerDelegate.asInstanceOf[T]
     else if (capability == Capabilities.COLORABLE) new Color(color).asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
@@ -94,6 +81,12 @@ trait PowerNode extends TileEntityBase {
     if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
   }
 
+
+  override def onBlockBreak(): Unit = {
+    super.onBlockBreak()
+    powerDelegate.leafNodeLocs.flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.POWER_LEAF_NODE, null)).foreach(_.onParentBroken(powerDelegate))
+  }
+
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     savePowerStorageInfo(compound)
@@ -101,7 +94,7 @@ trait PowerNode extends TileEntityBase {
   }
 
   def savePowerStorageInfo(compound: NBTTagCompound): Unit = {
-    compound(PowerNode.POWER_STORAGE_KEY -> battery)
+    compound(PowerNode.POWER_STORAGE_KEY -> powerDelegate.serializeNBT())
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
@@ -110,6 +103,6 @@ trait PowerNode extends TileEntityBase {
   }
 
   def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {
-    battery = IBattery.createFromNBT(compound.getCompoundTag(PowerNode.POWER_STORAGE_KEY))
+    powerDelegate.deserializeNBT(compound.getCompoundTag(PowerNode.POWER_STORAGE_KEY))
   }
 }
