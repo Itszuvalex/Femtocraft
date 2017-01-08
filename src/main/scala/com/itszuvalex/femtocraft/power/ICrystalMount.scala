@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.power
 
-import com.itszuvalex.femtocraft.power.node.IPowerNode
+import com.itszuvalex.femtocraft.power.node.PowerNode
 import com.itszuvalex.itszulib.api.core.Loc4
 import net.minecraft.item.ItemStack
 
 /**
   * Created by Christopher on 8/27/2015.
   */
-trait ICrystalMount extends IPowerNode {
+trait ICrystalMount extends PowerNode {
 
   /**
     *

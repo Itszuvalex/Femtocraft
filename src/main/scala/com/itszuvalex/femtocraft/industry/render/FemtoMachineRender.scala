@@ -70,5 +70,4 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
       RenderUtils.drawArbitraryFace(0, 0, 0, -.001f, 1.001f, -.001f, 1.001f, -.001f, 1.001f, facing, null, 0, 1, 0, 1)
     }
   }
-
 }

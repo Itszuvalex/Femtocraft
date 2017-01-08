@@ -3,7 +3,11 @@ package com.itszuvalex.femtocraft.nanite.gui
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
-import com.itszuvalex.itszulib.gui.GuiBase
+import com.itszuvalex.itszulib.api.storage.IItemStorage
+import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.container.ContainerBase
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -15,15 +19,40 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher on 9/1/2015.
   */
 @SideOnly(Side.CLIENT) object GuiNaniteHive {
-  val texture = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/guis/guinanitehive_small.png")
-  val WIDTH   = 226
-  val HEIGHT  = 166
+  val texture         = new ResourceLocation(Femtocraft.ID.toLowerCase, "textures/guis/guinanitehive_small.png")
+  val WIDTH           = 226
+  val HEIGHT          = 166
+  val inventoryXStart = 32
+  val inventoryYStart = 20
 }
 
 @SideOnly(Side.CLIENT) class GuiNaniteHive(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteHiveSmall) extends
-  GuiBase(new ContainerNaniteHive(player, inv, tile)) {
+  GuiBase(new ContainerNaniteHive(player, inv, tile, false)) {
   xSize = GuiNaniteHive.WIDTH
   ySize = GuiNaniteHive.HEIGHT
+
+  {
+    def addGuiAndSync(storage: IItemStorage, ind: Int, x: Int, y: Int): Unit = {
+      var gui = new GuiIItemStorageSlot(x, y, storage, ind)
+      gui.sync = new SyncItemStorageItemStack(storage, ind)
+      this.add(gui)
+      inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
+    }
+
+    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
+
+    (0 until 3).foreach { i =>
+      (0 until 9).foreach { j =>
+        addGuiAndSync(storage, j + i * 9, GuiNaniteHive.inventoryXStart + j * 18, GuiNaniteHive.inventoryYStart + i * 18)
+      }
+    }
+
+    addGuiAndSync(storage, 27, 204, 20)
+    addGuiAndSync(storage, 28, 204, 38)
+    addGuiAndSync(storage, 29, 204, 56)
+  }
+
+  addPlayerInventorySlots(inv, 32, 83)
 
   /**
     * Draw the foreground layer for the GuiContainer (everything in front of the items)

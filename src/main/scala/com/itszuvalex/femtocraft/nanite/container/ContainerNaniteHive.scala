@@ -1,75 +1,39 @@
 package com.itszuvalex.femtocraft.nanite.container
 
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerInv
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.{IContainerListener, Slot}
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.relauncher.{Side, SideOnly}
-
-import scala.collection.JavaConversions._
 
 /**
   * Created by Christopher on 9/1/2015.
   */
 object ContainerNaniteHive {
-  private val COOK_INDEX        = 0
-  private val POWER_BIG_INDEX   = 1
-  private val POWER_SMALL_INDEX = 2
-  private val inventoryXStart   = 33
-  private val inventoryYStart   = 21
+  val COOK_INDEX        = 0
+  val POWER_BIG_INDEX   = 1
+  val POWER_SMALL_INDEX = 2
 }
 
-class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, true) {
-  private var lastPower = 0L
+class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall, shouldSync: Boolean) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, shouldSync) {
+//  addSync(new SyncDouble(() => inventory.battery.storage, (a: Double) => inventory.battery.storage = a))
 
-  for (i <- 0 until 3) {
-    for (j <- 0 until 9) {
-      addSlotToContainer(new Slot(tile, j + i * 9, ContainerNaniteHive.inventoryXStart + j * 18, ContainerNaniteHive.inventoryYStart + i * 18))
-    }
-  }
+  if (shouldSync) {
+    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
 
-  addSlotToContainer(new Slot(tile, 27, 205, 21))
-  addSlotToContainer(new Slot(tile, 28, 205, 39))
-  addSlotToContainer(new Slot(tile, 29, 205, 57))
-  addPlayerInventorySlots(inv, 33, 84)
-
-  override def addListener(par1ICrafting: IContainerListener) {
-    super.addListener(par1ICrafting)
-
-    updatePower(par1ICrafting)
-  }
-
-  def updatePower(par1ICrafting: IContainerListener): Unit = {
-    sendUpdateToListener(this, par1ICrafting, ContainerNaniteHive.POWER_BIG_INDEX, (((inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) >> 32) & 0xFFFFFFFFL).toInt)
-    sendUpdateToListener(this, par1ICrafting, ContainerNaniteHive.POWER_SMALL_INDEX, (inventory.getPowerCurrent.toLong & 0xFFFFFFFFL).toInt)
-  }
-
-  /**
-    * Looks for changes made in the container, sends them to every listener.
-    */
-  override def detectAndSendChanges() {
-    super.detectAndSendChanges()
-    listeners.foreach { icrafting: IContainerListener =>
-      if (lastPower != inventory.getPowerCurrent.toLong) {
-        updatePower(icrafting)
+    (0 until 3).foreach { i =>
+      (0 until 9).foreach { j =>
+        addSync(new SyncItemStorageItemStack(storage, j + i * 9))
       }
     }
-    lastPower = inventory.getPowerCurrent.toLong
+
+    addSync(new SyncItemStorageItemStack(storage, 27))
+    addSync(new SyncItemStorageItemStack(storage, 28))
+    addSync(new SyncItemStorageItemStack(storage, 29))
+    addPlayerInventorySlots(inv, 32, 83)
   }
 
-
-  @SideOnly(Side.CLIENT) override def updateProgressBar(par1: Int, par2: Int) = par1 match {
-    case ContainerNaniteHive.POWER_BIG_INDEX =>
-      inventory.setPower(
-        (par2.toLong << 32) | (inventory.getPowerCurrent.toLong & 0x00000000FFFFFFFFL)
-      )
-    case ContainerNaniteHive.POWER_SMALL_INDEX =>
-      inventory.setPower(
-        (inventory.getPowerCurrent.toLong & 0xFFFFFFFF00000000L) | (par2.toLong & 0xFFFFFFFFL)
-      )
-    case _ =>
-  }
 
   override def eligibleForInput(item: ItemStack): Boolean = false
 }

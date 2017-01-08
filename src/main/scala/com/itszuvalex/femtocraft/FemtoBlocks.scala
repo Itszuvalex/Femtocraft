@@ -7,7 +7,6 @@ import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
-import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.ItemBlock
@@ -25,24 +24,9 @@ object FemtoBlocks {
 
   var blockCrystals: Block = _
 
-
-  var blockArcFurnace            : Block = _
-  var blockCrystallizationChamber: Block = _
-  var blockCentrifuge            : Block = _
-  var blockMaterialProcessor     : Block = _
-  var blockGrowthChamber         : Block = _
-  var blockBioBeacon             : Block = _
-  var blockCondensationArray     : Block = _
-  var blockCybermatDisintegrator : Block = _
-  var blockGraspingVines         : Block = _
-  var blockLashingVines          : Block = _
-  var blockMetabolicConverter    : Block = _
-  var blockPhotosynthesisTower   : Block = _
-  var blockSporeDistributor      : Block = _
-  var blockItemRepository        : Block = _
-  var blockNanoFurnace           : Block = _
-  var blockNaniteInfuser         : Block = _
-
+  var blockItemRepository: Block = _
+  var blockNanoFurnace   : Block = _
+  var blockNaniteInfuser : Block = _
 
   var blockFrame                 : Block = _
   var blockCyberBase             : Block = _
@@ -53,9 +37,6 @@ object FemtoBlocks {
   var blockPowerPedestal  : Block = _
 
   var blockNaniteExtractor: Block = _
-
-  var blockPowerSink     : Block = _
-  var blockPowerGenerator: Block = _
 
   var blockGlowStick: Block = _
 
@@ -79,10 +60,6 @@ object FemtoBlocks {
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
     blockCrystals = registerBlock(new BlockCrystalsWorldgen(), "crystalCluster")
-    blockArcFurnace = registerBlock(new BlockArcFurnace(), "blockArcFurnace")
-    blockCrystallizationChamber = registerBlock(new BlockCrystallizationChamber(), "blockCrystallizationChamber")
-    blockCentrifuge = registerBlock(new BlockCentrifuge(), "blockCentrifuge")
-    blockMaterialProcessor = registerBlock(new BlockMaterialProcessor(), "blockMaterialProcessor")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")
     blockFrame = registerBlock(new BlockFrame(), "blockFrame")
@@ -91,19 +68,12 @@ object FemtoBlocks {
     blockCrystalMount = registerBlock(new BlockCrystalMount(), "blockCrystalMount")
     blockPowerPedestal = registerBlock(new BlockPowerPedestal(), "blockPowerPedestal")
     blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
-    blockPowerSink = registerBlock(new BlockPowerSink(), "blockPowerSink")
-    blockPowerGenerator = registerBlock(new BlockPowerGenerator(), "blockPowerGenerator")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
 
     //tests
 
     testBlock = registerBlock(new BlockTest, "testBlock")
     testNetworkBlock = registerBlock(new BlockNetworkTest, "testNetworkBlock")
-    testDiffusionNode = registerBlock(new BlockDiffusionNodeTest, "testDiffusionNode")
-    testDiffusionTargetNode = registerBlock(new BlockDiffusionTargetNodeTest, "testDiffusionTargetNode")
-    testDirectNode = registerBlock(new BlockDirectNodeTest, "testDirectNode")
-    testGenerationNode = registerBlock(new BlockGenerationNodeTest, "testGenerationNode")
-    testTransferNode = registerBlock(new BlockTransferNodeTest, "testTransferNode")
     testTaskProvider = registerBlock(new BlockTaskProviderTest, "testTaskProvider")
     testWorkerProvider = registerBlock(new BlockWorkerProviderTest, "testWorkerProvider")
   }
@@ -115,7 +85,6 @@ object FemtoBlocks {
     blockCrystalMount.registerModel()
     blockPowerPedestal.registerModel()
     blockNaniteHiveSmall.registerModel()
-    blockPowerSink.registerModel()
     blockCrystals.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()

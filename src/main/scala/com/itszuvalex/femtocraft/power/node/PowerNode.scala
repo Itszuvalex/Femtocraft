@@ -1,281 +1,116 @@
 package com.itszuvalex.femtocraft.power.node
 
+import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.power.PowerNetworkNodeDelegate
 import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
-import com.itszuvalex.itszulib.util.Color
+import com.itszuvalex.itszulib.util.{Color, PlayerUtils}
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.Capability
 
-import scala.collection._
 import scala.util.Random
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object PowerNode {
-  val POWER_COMPOUND_KEY = "FemtoPower"
+  val POWER_COMPOUND_KEY = "PowerNode"
   val POWER_STORAGE_KEY  = "Storage"
   //TODO: Fix this up
   val NODE_PARENT_KEY    = "Parent"
-  val NODE_CHILDREN_KEY  = "Children"
   val COLOR_KEY          = "Color"
 }
 
 
-trait PowerNode extends TileEntityBase with IPowerNode {
-  val childrenLocs         = mutable.HashSet[Loc4]()
-  var parentLoc   : Loc4   = null
-  var powerCurrent: Double = 0
-  var powerMax    : Double = 0
-  var color                = Color(255.toByte,
+trait PowerNode extends TileEntityBase {
+  var powerDelegate: PowerNetworkNodeDelegate =
+    new PowerNetworkNodeDelegate(this, powerRadius, powerTransfer, rendersPower)
+
+  def powerRadius: Float
+
+  def powerTransfer: Double
+
+  def rendersPower: Boolean
+
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
+    if (capability == Capabilities.POWER_NODE) true
+    else if (capability == Capabilities.COLORABLE) true
+    else super.hasCapability(capability, facing)
+  }
+
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+    if (capability == Capabilities.POWER_NODE) powerDelegate.asInstanceOf[T]
+    else if (capability == Capabilities.COLORABLE) new Color(color).asInstanceOf[T]
+    else super.getCapability(capability, facing)
+  }
+
+  var color = Color(255.toByte,
     (Random.nextInt(125) + 130).toByte,
     (Random.nextInt(125) + 130).toByte,
     (Random.nextInt(125) + 130).toByte).toInt
 
-  override def onBlockBreak() = {
-    PowerManager.removeNode(this)
-    val parent = getParent
-    if (parent != null && parent != this) parent.removeChild(this)
-    val children = getChildren
-    if (children != null) children.foreach(_.setParent(null))
-  }
 
-  /**
-    *
-    * @return The IPowerNode this has as its parent.  If this is of type 'Power', this will be itself.
-    */
-  override def getParent: IPowerNode = if (parentLoc == null) null
-  else parentLoc.getTileEntity(true) match {
-    case Some(i) if i.isInstanceOf[IPowerNode] => i.asInstanceOf[IPowerNode]
-    case _ => null
-  }
-
-  /**
-    *
-    * @return Iterable of IPowerNodes this has as children. If this is a leaf node, returns null, otherwise, empty list.
-    */
-  override def getChildren = childrenLocs.flatMap(_.getTileEntity(true)).collect { case node: IPowerNode => node }
-
-  /* Tile Entity */
-  override def validate(): Unit = {
-    super.validate()
-    //    if (!getWorldObj.isRemote) PowerManager.addNode(this)
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
+    if (!getWorld.isRemote) {
+      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, if (powerDelegate.network == null) "networkless " else powerDelegate.network.id.toString)
+      if (powerDelegate.network != null) {
+        powerDelegate.network.getConnections(getLoc).getOrElse(Set()).foreach(loc =>
+          PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Loc4:" + loc)
+        )
+      }
+    }
+    super.onSideActivate(par5EntityPlayer, side)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (!getWorld.isRemote) PowerManager.removeNode(this)
+    if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
+  }
+
+  override def onChunkUnload(): Unit = {
+    super.onChunkUnload()
+    if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
+  }
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    savePowerChildrenInfo(compound)
+    compound.setInteger(PowerNode.COLOR_KEY, color)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    loadPowerChildrenInfo(compound)
+    color = compound.getInteger(PowerNode.COLOR_KEY)
+    setRenderUpdate()
+  }
+
+  override def onBlockBreak(): Unit = {
+    super.onBlockBreak()
+    PowerManager.removeNode(powerDelegate)
+    powerDelegate.leafNodeLocs.flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.POWER_LEAF_NODE, null)).foreach(_.onParentBroken(powerDelegate))
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
-    savePowerConnectionInfo(compound)
-    savePowerStorageInfo(compound)
+    savePowerChildrenInfo(compound)
     compound
   }
 
-  def savePowerStorageInfo(compound: NBTTagCompound): Unit = {
-    compound(PowerNode.POWER_STORAGE_KEY -> getPowerCurrent)
+  def savePowerChildrenInfo(compound: NBTTagCompound): Unit = {
+    compound(PowerNode.POWER_STORAGE_KEY -> powerDelegate.serializeNBT())
   }
-
-  /**
-    *
-    * @return Amount of power currently stored in this node.
-    */
-  override def getPowerCurrent: Double = powerCurrent
-
-  def savePowerConnectionInfo(compound: NBTTagCompound) =
-    compound(PowerNode.POWER_COMPOUND_KEY ->
-      NBTCompound(
-        PowerNode.NODE_PARENT_KEY -> getParentLoc,
-        PowerNode.NODE_CHILDREN_KEY -> NBTList(getChildrenLocs.view.map(NBTCompound)),
-        PowerNode.COLOR_KEY -> getColor
-      )
-    )
-
-  /* IPowerNode */
-
-  /**
-    *
-    * @return Iterable of Loc4s containing the locations of this node's children.  If this is a leaf node, returns null.
-    *         This is to bypass chunk churn by using a reference to the location containing the tile entity, instead of having to load
-    *         the chunk.
-    */
-  override def getChildrenLocs: Set[Loc4] = childrenLocs
-
-  /**
-    *
-    * @return The color of this power node.  This is used for aesthetics.
-    */
-  override def getColor: Int = color
-
-  /**
-    *
-    * @return Loc4 of this node's parent, null if it has no parent.  This is primarily to bypass chunk churn, as a node may have a parent set but the parent is in an unloaded chunk.  If that is the case, then
-    *         it can return its parent location here, without having to explicitly load that chunk.
-    */
-  override def getParentLoc: Loc4 = parentLoc
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
-    loadPowerConnectionInfo(compound)
-    loadPowerStorageInfo(compound)
+    loadPowerChildrenInfo(compound)
   }
 
-  def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {
-    powerCurrent = compound.Double(PowerNode.POWER_STORAGE_KEY)
-  }
-
-  def loadPowerConnectionInfo(compound: NBTTagCompound): Unit = {
-    compound.NBTCompound(PowerNode.POWER_COMPOUND_KEY) { comp =>
-      color = comp.Int(PowerNode.COLOR_KEY)
-      parentLoc = comp.NBTCompound(PowerNode.NODE_PARENT_KEY)(Loc4(_))
-      childrenLocs.clear()
-      childrenLocs ++= comp.NBTList(PowerNode.NODE_CHILDREN_KEY).map(Loc4(_))
-    }
-  }
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child is successfully added.
-    */
-  override def addChild(child: IPowerNode): Boolean = {
-    if (child == null) return true
-    childrenLocs += child.getNodeLoc
-    true
-  }
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child was a child of this node, and was successfully removed.
-    */
-  override def removeChild(child: IPowerNode): Boolean = {
-    if (child == null) return true
-    if (childrenLocs.contains(child.getNodeLoc)) {
-      childrenLocs -= child.getNodeLoc
-      true
-    }
-    else false
-  }
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child is capable of being a child of this node.
-    */
-  override def canAddChild(child: IPowerNode): Boolean = {
-    child != null && child.getNodeLoc != parentLoc
-  }
-
-  /**
-    *
-    * @param parent IPowerNode that is being checked.
-    *
-    * @return True if this node is capable of having that node as a parent.
-    */
-  override def canSetParent(parent: IPowerNode): Boolean = {
-    parent != null && !childrenLocs.contains(parent.getNodeLoc)
-  }
-
-  /**
-    *
-    * @return Amount of power capable of being stored in this node.
-    */
-  override def getPowerMax: Double = powerMax
-
-  /**
-    *
-    * @return Get world loc of this node.  This will be the location used for tracking and range calculations.
-    */
-  override def getNodeLoc: Loc4 = new Loc4(this)
-
-  /**
-    *
-    * @param parent Parent being set.
-    *
-    * @return True if parent is successfully set to input parent.
-    */
-  override def setParent(parent: IPowerNode): Boolean = {
-    if (parent != null) {
-      parentLoc = parent.getNodeLoc
-    } else {
-      parentLoc = null
-    }
-    PowerManager.refreshParentlessStatus(this)
-    true
-  }
-
-  /**
-    *
-    * @param amount Set current stored power to the given value.
-    */
-  override def setPower(amount: Double): Unit = powerCurrent = amount
-
-  /**
-    *
-    * @return Maximum distance to look for parents in.
-    */
-  override def parentConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
-
-  /**
-    *
-    * @param amount Amount of power to consume.
-    * @param doUse  True if actually change values, false to simulate.
-    *
-    * @return Amount of power consumed out of @amount from the internal storage of this Tile.
-    */
-  override def usePower(amount: Double, doUse: Boolean): Double = {
-    val min = Math.min(amount, powerCurrent)
-    if (doUse)
-      powerCurrent -= min
-    min
-  }
-
-  /**
-    *
-    * @return Maximum distance children can be from this node, to connect.
-    */
-  override def childrenConnectionRadius: Float = IPowerNode.DEFAULT_MAX_RADIUS
-
-  /**
-    *
-    * @param amount Amount of power to add.
-    * @param doFill True if actually change values, false to simulate.
-    *
-    * @return Amount of power used out of @amount to fill the internal storage of this Tile.
-    */
-  override def addPower(amount: Double, doFill: Boolean): Double = {
-    val min = Math.min(amount, powerMax - powerCurrent)
-    if (doFill)
-      powerCurrent += min
-    min
-  }
-
-  def getBattery: IBattery = new IBattery {
-    override def maxStorage: Double = powerMax
-
-    override def clear(): Unit = {}
-
-    override def copy(): IBattery = null
-
-    override def writeToNBT(nbt: NBTTagCompound): Unit = writeToNBT(nbt)
-
-    override def maxStorage_=(max: Double): Unit = {}
-
-    override def storage_=(amt: Double): Unit = {}
-
-    override def storage: Double = powerCurrent
-
-    override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
-
-    override def serializeNBT(): NBTTagCompound = null
+  def loadPowerChildrenInfo(compound: NBTTagCompound): Unit = {
+    powerDelegate.deserializeNBT(compound.getCompoundTag(PowerNode.POWER_STORAGE_KEY))
   }
 }

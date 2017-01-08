@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
-import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.util.Task
@@ -59,9 +59,16 @@ object TileNanoFurnace {
 
 }
 
-class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
+class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNode {
   private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
-  powerMax = 4000
+
+  override def connectionRadius: Float = 8f
+
+  override def leafTransferRate = 50d
+
+  override def defaultBattery: IBattery = new PowerBattery(5000)
+
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
@@ -84,12 +91,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
 
   override def getGuiID = GuiIDs.TileFurnaceGuiID
 
-  /**
-    *
-    * @return The type of PowerNode this is.
-    */
-  override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
-
   override def onSideActivate(player: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) player.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
     hasGUI
@@ -105,7 +106,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
       }
     }
     else {
-      usePower(task.contribute(Math.min(task.powerPerTick(0, 0), getPowerCurrent), 0, 0), doUse = true)
+      battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
       if (task.completed(0)) {
         val item = task.stack
         if (item == null || item.isEmpty) {
@@ -143,12 +144,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
 
   def getProgressMax = task.adjustedMax(0)
 
-  /* Tile Entity */
-  override def validate(): Unit = {
-    super.validate()
-    if (!getWorld.isRemote) PowerManager.addNode(this)
-  }
-
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     super.deserializeNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
@@ -159,44 +154,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
     ret.setTag(TASK_NBT, task.serializeNBT())
     ret
   }
-
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    savePowerConnectionInfo(compound)
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    loadPowerConnectionInfo(compound)
-  }
-
-  /**
-    *
-    * @param parent Parent being set.
-    *
-    * @return True if parent is successfully set to input parent.
-    */
-  override def setParent(parent: IPowerNode): Boolean = {
-    val ret = super.setParent(parent)
-    setUpdate()
-    ret
-  }
-
-  /**
-    *
-    * @param child
-    *
-    * @return True if child is capable of being a child of this node.
-    */
-  override def canAddChild(child: IPowerNode): Boolean = false
-
-  /**
-    *
-    * @param parent IPowerNode that is being checked.
-    *
-    * @return True if this node is capable of having that node as a parent.
-    */
-  override def canSetParent(parent: IPowerNode): Boolean = super.canSetParent(parent) && parent.getType == IPowerNode.CRYSTAL_MOUNT
 
   override def func_191420_l(): Boolean = true
 }

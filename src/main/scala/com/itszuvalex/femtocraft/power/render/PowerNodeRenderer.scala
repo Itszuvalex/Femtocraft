@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.render
 
-import com.itszuvalex.femtocraft.power.node.IPowerNode
+import com.itszuvalex.femtocraft.power.node.PowerNode
 import net.minecraft.tileentity.TileEntity
 
 /**
@@ -11,7 +11,7 @@ object PowerNodeRenderer {
   val RENDER_RADIUS = PowerNodeBeamRenderer.RENDER_RADIUS
 }
 
-class PowerNodeRenderer[T <: TileEntity with IPowerNode] extends NodeCrystalRenderer[T] {
+class PowerNodeRenderer[T <: TileEntity with PowerNode] extends NodeCrystalRenderer[T] {
 
   override def renderTileEntityAt(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     renderNode(te, x, y, z, partialTicks)

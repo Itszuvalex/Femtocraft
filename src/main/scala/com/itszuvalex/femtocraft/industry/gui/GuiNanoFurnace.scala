@@ -1,13 +1,17 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
+import com.itszuvalex.itszulib.container.ContainerBase
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot, GuiItemStack, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
+import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
 /**
@@ -18,19 +22,35 @@ object GuiNanoFurnace {
   val colorTexture = Resources.TexGui("guinanofurnacecolor.png")
 }
 
-class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNanoFurnace) extends GuiBase(new ContainerNanoFurnace(player, inv, tile)) {
+class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNanoFurnace) extends GuiBase(new ContainerNanoFurnace(player, inv, tile, false)) {
 
   fontRendererObj = Minecraft.getMinecraft.fontRendererObj
   xSize = 183
   ySize = 161
 
+  {
+    var gui = new GuiIItemStorageSlot(44, 23, tile.storage, 0)
+    gui.sync = new SyncItemStorageItemStack(tile.storage, 0)
+    this.add(gui)
+    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
+
+    gui = new GuiIItemStorageSlot(85, 23, tile.storage, 1)
+    gui.sync = new SyncItemStorageItemStack(tile.storage, 1)
+    this.add(gui)
+    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
+  }
+
+  addPlayerInventorySlots(inv, 4, 75)
+
   //TODO: Make actual "machine color"
-  var color = new Color(Option(tile.getParent).map(_.getColor).getOrElse(tile.getColor)) //Color(255.toByte, 64, 255.toByte, 255.toByte)
+  var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
   val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
   val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
+  //TODO: IItemStack.Empty - needs ItszuLib GuiItemStack change
   val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
-  val powerMeter = new GuiPowerMeter(6, 22, tile.getBattery, color.toInt)
+  // TODO: IItemStack.Empty
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE_NODE, null).battery, color.toInt)
 
   val elems = List(nameLabel, inputSlot, outputSlot, powerMeter)
   add(elems: _*)
@@ -60,6 +80,8 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
     inputSlot.render(anchorX + inputSlot.anchorX, anchorY + inputSlot.anchorY, mouseX - anchorX - inputSlot.anchorX, mouseY - anchorY - inputSlot.anchorY, partialTicks)
     outputSlot.render(anchorX + outputSlot.anchorX, anchorY + outputSlot.anchorY, mouseX - anchorX - outputSlot.anchorX, mouseY - anchorY - outputSlot.anchorY, partialTicks)
     powerMeter.render(anchorX + powerMeter.anchorX, anchorY + powerMeter.anchorY, mouseX - anchorX - powerMeter.anchorX, mouseY - anchorY - powerMeter.anchorY, partialTicks)
+
+    super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY)
   }
 
 }

@@ -23,8 +23,6 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
-      case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new GuiArcFurnace(player, player.inventory, te)
-      case (GuiIDs.TileMaterialProcessorGuiID, te: TileMaterialProcessor) => new GuiMaterialProcessor(player, player.inventory, te)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new GuiItemRepository(player, player.inventory, te)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new GuiCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new GuiNanoFurnace(player, player.inventory, te)

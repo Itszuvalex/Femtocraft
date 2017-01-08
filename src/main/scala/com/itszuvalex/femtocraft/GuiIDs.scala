@@ -6,9 +6,6 @@ package com.itszuvalex.femtocraft
 object GuiIDs {
 
   val TileCrystalMountGuiID            = nextID
-  val TileArcFurnaceGuiID              = nextID
-  val TileCentrifugeGuiID              = nextID
-  val TileCrystallizerGuiID            = nextID
   val TileMaterialProcessorGuiID       = nextID
   val TileCubic2DCraftingGuiID         = nextID
   val TileCubic3DCraftingGuiID         = nextID

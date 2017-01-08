@@ -1,25 +1,35 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.item.ItemMultiTool
-import com.itszuvalex.femtocraft.power.node.{IPowerNode, PowerNode}
+import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
+import com.itszuvalex.itszulib.api.wrappers.PowerBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 
-class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerNode {
-  powerMax = 4000
+class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeafNode {
+
+  override def defaultBattery = new PowerBattery(4000)
+
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
+
+  override def connectionRadius: Float = 8f
+
+  override def leafTransferRate = 50d
+
+  override def getStorageLoc: Loc4 = getLoc
 
   override def hasDescription: Boolean = false
 
   override def getMod: AnyRef = Femtocraft
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
-
-  override def getType: String = IPowerNode.DIFFUSION_TARGET_NODE
 
   override def func_191420_l(): Boolean = false
 

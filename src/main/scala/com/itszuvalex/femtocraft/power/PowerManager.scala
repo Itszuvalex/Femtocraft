@@ -1,76 +1,108 @@
 package com.itszuvalex.femtocraft.power
 
-import com.itszuvalex.femtocraft.power.node.IPowerNode
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, PowerNetwork}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.logistics.LocationTracker
-import net.minecraft.tileentity.TileEntity
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object PowerManager {
-  val nodeTracker       = new LocationTracker
-  val parentlessTracker = new LocationTracker
+  val nodeTracker = new LocationTracker
+  val leafTracker = new LocationTracker
+
+  def init(): Unit = {
+    MinecraftForge.EVENT_BUS.register(this)
+  }
 
   def clear() = {
     nodeTracker.clear()
-    parentlessTracker.clear()
+    leafTracker.clear()
   }
 
   /**
-    * Attempts to add node to the IPowerNode mapping.  If the node has no parent location, PowerManager will attempt to find a parent for it.  If one is not found,
+    * Attempts to add node to the IPowerNetworkNode mapping.  If the node has no parent location, PowerManager will attempt to find a parent for it.  If one is not found,
     * it will add the node to its parentless list, and will then try to find a parent for it every time a new node is added.
     *
     * @param node Node to be added.
     */
-  def addNode(node: IPowerNode): Unit = {
-    val loc = node.getNodeLoc
-    /* If added node doesn't have a stored parent */
-    if (node.getParentLoc == null) {
-      findParent(node)
+  def addNode(node: IPowerNetworkNode): Unit = {
+    val loc = node.getLoc
+
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
+    if (nodes.isEmpty) {
+      val network = PowerNetwork.createFromTile(node)
+      network.register()
     }
-    /* Try and add new node as parent to as many parentless nodes as possible. */
-    getIPowerNodesInRange(parentlessTracker, node, node.childrenConnectionRadius).view
-      .filter { case (cnode, _) => cnode.canSetParent(node) && node.canAddChild(cnode) }
-      .foreach { case (cnode, _) =>
-        if (cnode.setParent(node) && node.addChild(cnode))
-          parentlessTracker.removeLocation(cnode.getNodeLoc)
-      }
+    else {
+      nodes.withFilter(l => l.getLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)).withFilter(n => n.canConnect(loc) && node.canConnect(n.getLoc)).
+        foreach { nloc =>
+          Option(nloc.getNetwork).foreach(_.addNode(node))
+        }
+    }
+
+    refreshLeafsOnMain(node)
 
     /* Actually track the node */
     nodeTracker.trackLocation(loc)
-    refreshParentlessStatus(node)
   }
 
-  def refreshParentlessStatus(node: IPowerNode): Unit = {
-    if (node.getParentLoc == null) {
-      parentlessTracker.trackLocation(node.getNodeLoc)
-      findParent(node)
+  def addLeaf(node: IPowerLeafNode): Unit = {
+    refreshLeaf(node)
+    leafTracker.trackLocation(node.getStorageLoc)
+  }
+
+  def removeNode(node: IPowerNetworkNode): Unit = {
+    nodeTracker.removeLocation(node.getLoc)
+    if (node.getNetwork != null)
+      node.getNetwork.removeNode(node)
+    node.setNetwork(null)
+  }
+
+  def removeLeaf(node: IPowerLeafNode): Unit = {
+    leafTracker.removeLocation(node.getStorageLoc)
+  }
+
+  def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
+    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
+    leafs.withFilter(_.getParent == null).
+      withFilter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
+      .withFilter(l => l.canSetParent(node) && node.canAddLeafNode(l)).foreach { l =>
+      node.addLeafNode(l)
+      l.setParent(node)
     }
-    else parentlessTracker.removeLocation(node.getNodeLoc)
   }
 
-  def removeNode(node: IPowerNode): Unit = {
-    nodeTracker.removeLocation(node.getNodeLoc)
-    parentlessTracker.removeLocation(node.getNodeLoc)
+  def refreshLeaf(node: IPowerLeafNode): Unit = {
+    if (node.getParent != null) return
+
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
+    nodes.withFilter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).withFilter(l => l.canAddLeafNode(node) && node.canSetParent(l)).foreach { n =>
+      n.addLeafNode(node)
+      node.setParent(n)
+      return // Only do this once.
+    }
   }
 
-  private def findParent(node: IPowerNode) = {
-    getIPowerNodesInRange(nodeTracker, node, node.parentConnectionRadius)
-      .filter { case (cnode, _) => cnode.canAddChild(node) && node.canSetParent(cnode) }
-      .toList.sortWith(_._2 < _._2)
-      .exists(pnode => pnode._1.addChild(node) && node.setParent(pnode._1))
-  }
-
-  private def getIPowerNodesInRange(tracker: LocationTracker, node: IPowerNode, radius: Float): Iterable[(TileEntity with IPowerNode, Double)] = {
-    val loc = node.getNodeLoc
+  private def getIPowerNetworkNodesInRange[T](tracker: LocationTracker, loc: Loc4, capability: Capability[T], radius: Float): Iterable[T] = {
     tracker.getLocationsInRange(loc, radius).view
-      .filterNot(_ == node.getNodeLoc)
+      .withFilter(_.compareTo(loc) != 0)
       .flatMap(_.getTileEntity(force = false))
-      .collect { case cnode: IPowerNode => cnode }
-      .map(cnode => (cnode, cnode.getNodeLoc.distSqr(loc)))
-      .filter(pair => (pair._2 <= (pair._1.parentConnectionRadius * pair._1.parentConnectionRadius)) &&
-        (pair._2 <= (node.childrenConnectionRadius * node.childrenConnectionRadius)))
+      .withFilter(_.hasCapability(capability, null))
+      .map(_.getCapability(capability, null))
   }
 
+
+  @SubscribeEvent def onWorldUnload(worldEvent: WorldEvent.Unload): Unit = {
+    if (!FMLCommonHandler.instance().getMinecraftServerInstance.isServerRunning) {
+      clear()
+    }
+  }
 
 }

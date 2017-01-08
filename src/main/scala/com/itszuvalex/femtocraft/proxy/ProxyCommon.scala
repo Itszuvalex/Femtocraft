@@ -25,7 +25,6 @@ import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProvid
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
-import com.itszuvalex.femtocraft.power.test._
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import net.minecraft.block.Block
@@ -52,25 +51,13 @@ class ProxyCommon {
 
   def registerTileEntities(): Unit = {
     // Tests
-    GameRegistry.registerTileEntity(classOf[TileDiffusionNodeTest], "TileDiffusionNodeTest")
-    GameRegistry.registerTileEntity(classOf[TileDiffusionTargetNodeTest], "TileDiffusionTargeTNodeTest")
-    GameRegistry.registerTileEntity(classOf[TileDirectNodeTest], "TileDirectNodeTest")
-    GameRegistry.registerTileEntity(classOf[TileGenerationNodeTest], "TileGenerationNodeTest")
-    GameRegistry.registerTileEntity(classOf[TileTransferNodeTest], "TileTransferNodeTest")
     GameRegistry.registerTileEntity(classOf[TileCrystalsWorldgen], "TileCrystalsWorldgen")
     GameRegistry.registerTileEntity(classOf[TileTaskProviderTest], "TileTaskProviderTest")
     GameRegistry.registerTileEntity(classOf[TileWorkerProviderTest], "TileWorkerProviderTest")
     //
-    GameRegistry.registerTileEntity(classOf[TileArcFurnace], "TileArcFurnace")
-    GameRegistry.registerTileEntity(classOf[TileCrystallizationChamber], "TileCrystallizationChamber")
-    GameRegistry.registerTileEntity(classOf[TileCentrifuge], "TileCentrifuge")
-    GameRegistry.registerTileEntity(classOf[TileMaterialProcessor], "TileMaterialProcessor")
     GameRegistry.registerTileEntity(classOf[TileItemRepository], "TileItemRepository")
     GameRegistry.registerTileEntity(classOf[TileCrystalMount], "TileCrystalMount")
     GameRegistry.registerTileEntity(classOf[TilePowerPedestal], "TilePowerPedestal")
-
-    GameRegistry.registerTileEntity(classOf[TilePowerSink], "TilePowerSink")
-    GameRegistry.registerTileEntity(classOf[TilePowerGenerator], "TilePowerGenerator")
 
     GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 

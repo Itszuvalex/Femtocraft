@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
-import com.itszuvalex.femtocraft.industry.tile.{TileArcFurnace, TileFrame, TileMaterialProcessor, TileNanoFurnace}
+import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
@@ -23,13 +23,11 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new ContainerFrameConstructing(player, player.inventory, te)
-      case (GuiIDs.TileArcFurnaceGuiID, te: TileArcFurnace) => new ContainerArcFurnace(player, player.inventory, te)
-      case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te)
-      case (GuiIDs.TileMaterialProcessorGuiID, te: TileMaterialProcessor) => new ContainerMaterialProcessor(player, player.inventory, te)
+      case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te, true)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
-      case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te)
-      case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te)
+      case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te, true)
+      case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te, true)
       case (_, _) => null
     }
   }
