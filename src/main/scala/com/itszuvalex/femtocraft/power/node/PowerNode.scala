@@ -78,36 +78,39 @@ trait PowerNode extends TileEntityBase {
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
-    savePowerStorageInfo(compound)
+    savePowerChildrenInfo(compound)
+    compound.setInteger(PowerNode.COLOR_KEY, color)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    loadPowerStorageInfo(compound)
+    loadPowerChildrenInfo(compound)
+    color = compound.getInteger(PowerNode.COLOR_KEY)
     setRenderUpdate()
   }
 
   override def onBlockBreak(): Unit = {
     super.onBlockBreak()
+    PowerManager.removeNode(powerDelegate)
     powerDelegate.leafNodeLocs.flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.POWER_LEAF_NODE, null)).foreach(_.onParentBroken(powerDelegate))
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
-    savePowerStorageInfo(compound)
+    savePowerChildrenInfo(compound)
     compound
   }
 
-  def savePowerStorageInfo(compound: NBTTagCompound): Unit = {
+  def savePowerChildrenInfo(compound: NBTTagCompound): Unit = {
     compound(PowerNode.POWER_STORAGE_KEY -> powerDelegate.serializeNBT())
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
-    loadPowerStorageInfo(compound)
+    loadPowerChildrenInfo(compound)
   }
 
-  def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {
+  def loadPowerChildrenInfo(compound: NBTTagCompound): Unit = {
     powerDelegate.deserializeNBT(compound.getCompoundTag(PowerNode.POWER_STORAGE_KEY))
   }
 }

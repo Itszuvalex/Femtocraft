@@ -40,7 +40,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
 
   val nameLabel   = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Extractor"), fontRendererObj.FONT_HEIGHT, "Nanite Extractor")
   val inputSlot   = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
-  val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP), color.toInt)
+  val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   val drainButton = new GuiButton(85, 23, 45, 15, "Drain") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       val ret = super.onMouseClick(mouseX, mouseY, button)

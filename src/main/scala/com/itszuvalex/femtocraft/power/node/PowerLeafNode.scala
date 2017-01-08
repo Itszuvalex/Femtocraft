@@ -15,6 +15,7 @@ import net.minecraftforge.common.capabilities.Capability
   */
 object PowerLeafNode {
   val PARENT_TAG = "parent"
+  val COLOR_TAG  = "color"
 }
 
 trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeafNode {
@@ -58,11 +59,13 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeaf
 
   override def setParent(node: IPowerNetworkNode): Unit = {
     parent = node.getLoc
+    setUpdate()
     setModified()
   }
 
   override def onParentBroken(node: IPowerNetworkNode): Unit = {
     parent = null
+    setUpdate()
     setModified()
 
     if (getWorld.isRemote) return
@@ -82,11 +85,23 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeaf
     tag
   }
 
-  def color = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.COLORABLE, null)).map(_.getCapability(Capabilities.COLORABLE, null)).getOrElse(Color(255.toByte, 100.toByte, 100.toByte, 100.toByte))
+  def writeColorTag(tag: NBTTagCompound): NBTTagCompound = {
+    tag.setInteger(PowerLeafNode.COLOR_TAG, color.toInt)
+    tag
+  }
+
+  def readColorTag(tag: NBTTagCompound): Unit = {
+    color = new Color(tag.getInteger(PowerLeafNode.COLOR_TAG))
+    setRenderUpdate()
+  }
+
+  var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
+
+  def getColor = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.COLORABLE, null)).map(_.getCapability(Capabilities.COLORABLE, null)).getOrElse(color)
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.POWER_LEAF_NODE) this.asInstanceOf[T]
-    else if (capability == Capabilities.COLORABLE) color.asInstanceOf[T]
+    else if (capability == Capabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
@@ -96,9 +111,22 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeaf
     else super.hasCapability(capability, facing)
   }
 
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    writeParentTag(compound)
+    writeColorTag(compound)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    readParentTag(compound)
+    readColorTag(compound)
+  }
+
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.readFromNBT(par1nbtTagCompound)
     readParentTag(par1nbtTagCompound)
+    setRenderUpdate()
   }
 
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {

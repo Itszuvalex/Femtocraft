@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.api.power
 
 import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -35,6 +36,7 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
     leafNodeLocs -= node.getStorageLoc
     tileEntity.setUpdate()
     tileEntity.setModified()
+    PowerManager.refreshLeafsOnMain(this)
   }
 
   override def leafTransferRate: Double = transfer
@@ -70,7 +72,7 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
 
   override def serializeNBT(): NBTTagCompound = {
     NBTCompound(
-      PowerNetworkNodeDelegate.LEAF_NODE_TAG -> NBTList(leafNodeLocs.map(NBTCompound))
+      PowerNetworkNodeDelegate.LEAF_NODE_TAG -> NBTList(leafNodeLocs.map(_.serializeNBT()))
     )
   }
 }

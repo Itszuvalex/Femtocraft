@@ -35,11 +35,13 @@ trait PowerStorageNode extends TileEntityBase with IPowerStorageNode {
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.POWER_STORAGE_NODE) this.asInstanceOf[T]
+    else if (capability == Capabilities.POWER_STORAGE) battery.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.POWER_STORAGE_NODE) true
+    else if (capability == Capabilities.POWER_STORAGE) true
     else super.hasCapability(capability, facing)
   }
 

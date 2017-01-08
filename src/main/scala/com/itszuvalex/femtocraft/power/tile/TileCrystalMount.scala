@@ -304,8 +304,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
       getLoc.getOffset(EnumFacing.DOWN) == loc
   }
 
-  override def loadPowerStorageInfo(compound: NBTTagCompound): Unit = {}
-
   override def getFieldCount: Int = inventory.getFieldCount
 
   override def getField(id: Int): Int = inventory.getField(id)

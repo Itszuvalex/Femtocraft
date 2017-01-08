@@ -47,13 +47,7 @@ object PowerManager {
         }
     }
 
-    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(loc) == 0).toSet
-    leafs.withFilter(_.getParent == null).
-      withFilter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
-      .withFilter(l => l.canSetParent(node) && node.canAddLeafNode(l)).foreach { l =>
-      node.addLeafNode(l)
-      l.setParent(node)
-    }
+    refreshLeafsOnMain(node)
 
     /* Actually track the node */
     nodeTracker.trackLocation(loc)
@@ -75,12 +69,22 @@ object PowerManager {
     leafTracker.removeLocation(node.getStorageLoc)
   }
 
+  def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
+    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
+    leafs.withFilter(_.getParent == null).
+      withFilter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
+      .withFilter(l => l.canSetParent(node) && node.canAddLeafNode(l)).foreach { l =>
+      node.addLeafNode(l)
+      l.setParent(node)
+    }
+  }
+
   def refreshLeaf(node: IPowerLeafNode): Unit = {
     if (node.getParent != null) return
 
     val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
     nodes.withFilter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).withFilter(l => l.canAddLeafNode(node) && node.canSetParent(l)).foreach { n =>
-      n.canAddLeafNode(node)
+      n.addLeafNode(node)
       node.setParent(n)
       return // Only do this once.
     }
