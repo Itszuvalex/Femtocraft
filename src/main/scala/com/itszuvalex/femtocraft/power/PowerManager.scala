@@ -71,23 +71,27 @@ object PowerManager {
 
   def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
     val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
-    leafs.withFilter(_.getParent == null).
-      withFilter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
-      .withFilter(l => l.canSetParent(node) && node.canAddLeafNode(l)).foreach { l =>
-      node.addLeafNode(l)
-      l.setParent(node)
-    }
+    leafs.view.filter(_.getParent == null).
+      filter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
+      .filter(l => l.canSetParent(node) && node.canAddLeafNode(l)).
+      toSeq.sortBy(_.getStorageLoc.distSqr(node.getLoc))
+      .foreach { l =>
+        node.addLeafNode(l)
+        l.setParent(node)
+      }
   }
 
   def refreshLeaf(node: IPowerLeafNode): Unit = {
     if (node.getParent != null) return
 
     val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
-    nodes.withFilter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).withFilter(l => l.canAddLeafNode(node) && node.canSetParent(l)).foreach { n =>
-      n.addLeafNode(node)
-      node.setParent(n)
-      return // Only do this once.
-    }
+    nodes.view.filter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).filter(l => l.canAddLeafNode(node) && node.canSetParent(l)).
+      toSeq.sortBy(_.getLoc.distSqr(node.getStorageLoc)).
+      foreach { n =>
+        n.addLeafNode(node)
+        node.setParent(n)
+        return // Only do this once.
+      }
   }
 
   private def getIPowerNetworkNodesInRange[T](tracker: LocationTracker, loc: Loc4, capability: Capability[T], radius: Float): Iterable[T] = {
