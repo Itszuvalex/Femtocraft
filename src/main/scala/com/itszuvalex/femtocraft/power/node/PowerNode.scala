@@ -6,7 +6,7 @@ import com.itszuvalex.femtocraft.api.power.PowerNetworkNodeDelegate
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
-import com.itszuvalex.itszulib.util.{Color, PlayerUtils}
+import com.itszuvalex.itszulib.util.{Color, Debug, PlayerUtils}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -55,12 +55,14 @@ trait PowerNode extends TileEntityBase {
 
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    if (!getWorld.isRemote) {
-      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, if (powerDelegate.network == null) "networkless " else powerDelegate.network.id.toString)
-      if (powerDelegate.network != null) {
-        powerDelegate.network.getConnections(getLoc).getOrElse(Set()).foreach(loc =>
-          PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Loc4:" + loc)
-        )
+    Debug.only {
+      if (!getWorld.isRemote) {
+        PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, if (powerDelegate.network == null) "networkless " else powerDelegate.network.id.toString)
+        if (powerDelegate.network != null) {
+          powerDelegate.network.getConnections(getLoc).getOrElse(Set()).foreach(loc =>
+            PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Loc4:" + loc)
+          )
+        }
       }
     }
     super.onSideActivate(par5EntityPlayer, side)
