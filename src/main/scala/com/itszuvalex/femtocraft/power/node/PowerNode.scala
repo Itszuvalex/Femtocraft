@@ -22,7 +22,6 @@ object PowerNode {
   val POWER_STORAGE_KEY  = "Storage"
   //TODO: Fix this up
   val NODE_PARENT_KEY    = "Parent"
-  val NODE_CHILDREN_KEY  = "Children"
   val COLOR_KEY          = "Color"
 }
 
@@ -38,13 +37,9 @@ trait PowerNode extends TileEntityBase {
   def rendersPower: Boolean
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    if (super.hasCapability(capability, facing)) {
-      true
-    } else {
-      if (capability == Capabilities.POWER_NODE) true
-      else if (capability == Capabilities.COLORABLE) true
-      else false
-    }
+    if (capability == Capabilities.POWER_NODE) true
+    else if (capability == Capabilities.COLORABLE) true
+    else super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
@@ -81,6 +76,16 @@ trait PowerNode extends TileEntityBase {
     if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
   }
 
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    savePowerStorageInfo(compound)
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    loadPowerStorageInfo(compound)
+    setRenderUpdate()
+  }
 
   override def onBlockBreak(): Unit = {
     super.onBlockBreak()

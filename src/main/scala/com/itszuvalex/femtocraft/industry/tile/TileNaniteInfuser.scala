@@ -1,31 +1,29 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.item.ItemMultiTool
-import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.femtocraft.power.node.PowerNode
+import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.PowerBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 
-class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerNode {
+class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeafNode {
 
-  override def defaultBattery: IBattery = new PowerBattery(4000)
+  override def defaultBattery = new PowerBattery(4000)
 
-  override def powerStorageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-  override def powerConnectionType: PowerConnectionNodeType = PowerConnectionNodeType.LEAF
+  override def connectionRadius: Float = 8f
 
-  override def powerRadius: Float = 8f
+  override def leafTransferRate = 50d
 
-  override def powerTransfer: Double = 50d
-
-  override def rendersPower: Boolean = false
+  override def getStorageLoc: Loc4 = getLoc
 
   override def hasDescription: Boolean = false
 
@@ -40,13 +38,6 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerNode
   override def setField(id: Int, value: Int): Unit = {}
 
   override def getField(id: Int): Int = 0
-
-
-  override def onLoad(): Unit = {
-    super.onLoad()
-    if (getWorld.isRemote) return
-    PowerManager.addNode(powerDelegate)
-  }
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
     (slot, item) match {

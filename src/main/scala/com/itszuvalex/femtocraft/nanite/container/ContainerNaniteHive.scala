@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.nanite.container
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerInv
-import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncItemStorageItemStack}
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.item.ItemStack
 
@@ -17,7 +17,7 @@ object ContainerNaniteHive {
 }
 
 class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall, shouldSync: Boolean) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, shouldSync) {
-  addSync(new SyncDouble(() => inventory.battery.storage, (a: Double) => inventory.battery.storage = a))
+//  addSync(new SyncDouble(() => inventory.battery.storage, (a: Double) => inventory.battery.storage = a))
 
   if (shouldSync) {
     val storage = Converter.IItemStorageFromIInventory(tile.indInventory)

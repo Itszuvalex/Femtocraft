@@ -1,10 +1,11 @@
 package com.itszuvalex.femtocraft.power
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.power.{IPowerNetworkNode, PowerNetwork}
+import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, PowerNetwork}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.logistics.LocationTracker
-import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
   */
 object PowerManager {
   val nodeTracker = new LocationTracker
+  val leafTracker = new LocationTracker
 
   def init(): Unit = {
     MinecraftForge.EVENT_BUS.register(this)
@@ -21,6 +23,7 @@ object PowerManager {
 
   def clear() = {
     nodeTracker.clear()
+    leafTracker.clear()
   }
 
   /**
@@ -32,19 +35,33 @@ object PowerManager {
   def addNode(node: IPowerNetworkNode): Unit = {
     val loc = node.getLoc
 
-    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node, node.connectionRadius).filterNot(_._1.getLoc.compareTo(loc) == 0).toSet
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
     if (nodes.isEmpty) {
       val network = PowerNetwork.createFromTile(node)
       network.register()
     }
     else {
-      nodes.map(_._1).withFilter(_.canConnect(loc)).foreach { nloc =>
-        Option(nloc.getNetwork).foreach(_.addNode(node))
-      }
+      nodes.withFilter(l => l.getLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)).withFilter(n => n.canConnect(loc) && node.canConnect(n.getLoc)).
+        foreach { nloc =>
+          Option(nloc.getNetwork).foreach(_.addNode(node))
+        }
+    }
+
+    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(loc) == 0).toSet
+    leafs.withFilter(_.getParent == null).
+      withFilter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
+      .withFilter(l => l.canSetParent(node) && node.canAddLeafNode(l)).foreach { l =>
+      node.addLeafNode(l)
+      l.setParent(node)
     }
 
     /* Actually track the node */
     nodeTracker.trackLocation(loc)
+  }
+
+  def addLeaf(node: IPowerLeafNode): Unit = {
+    refreshLeaf(node)
+    leafTracker.trackLocation(node.getStorageLoc)
   }
 
   def removeNode(node: IPowerNetworkNode): Unit = {
@@ -54,17 +71,27 @@ object PowerManager {
     node.setNetwork(null)
   }
 
+  def removeLeaf(node: IPowerLeafNode): Unit = {
+    leafTracker.removeLocation(node.getStorageLoc)
+  }
 
-  private def getIPowerNetworkNodesInRange(tracker: LocationTracker, node: IPowerNetworkNode, radius: Float): Iterable[(IPowerNetworkNode, Double)] = {
-    val loc = node.getLoc
+  def refreshLeaf(node: IPowerLeafNode): Unit = {
+    if (node.getParent != null) return
+
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
+    nodes.withFilter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).withFilter(l => l.canAddLeafNode(node) && node.canSetParent(l)).foreach { n =>
+      n.canAddLeafNode(node)
+      node.setParent(n)
+      return // Only do this once.
+    }
+  }
+
+  private def getIPowerNetworkNodesInRange[T](tracker: LocationTracker, loc: Loc4, capability: Capability[T], radius: Float): Iterable[T] = {
     tracker.getLocationsInRange(loc, radius).view
-      .filterNot(_.compareTo(node.getLoc) == 0)
+      .withFilter(_.compareTo(loc) != 0)
       .flatMap(_.getTileEntity(force = false))
-      .filter(_.hasCapability(Capabilities.POWER_NODE, EnumFacing.UP))
-      .map {_.getCapability(Capabilities.POWER_NODE, EnumFacing.UP)}
-      .map(cnode => (cnode, cnode.getLoc.distSqr(loc)))
-      .filter(pair => (pair._2 <= (pair._1.connectionRadius * pair._1.connectionRadius)) &&
-        (pair._2 <= (node.connectionRadius * node.connectionRadius)))
+      .withFilter(_.hasCapability(capability, null))
+      .map(_.getCapability(capability, null))
   }
 
 

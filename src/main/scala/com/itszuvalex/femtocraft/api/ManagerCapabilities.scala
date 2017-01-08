@@ -8,6 +8,8 @@ import net.minecraft.nbt.{NBTBase, NBTTagCompound, NBTTagInt}
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
 
+import scala.collection.Set
+
 /**
   * Created by Chris on 1/1/2017.
   */
@@ -15,8 +17,8 @@ object ManagerCapabilities {
   def register(): Unit = {
     CapabilityManager.INSTANCE.register(classOf[IBattery], new PowerStorageStorage, classOf[PowerBattery])
     CapabilityManager.INSTANCE.register(classOf[IPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[PowerStorageNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[PowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[Color], new ColorStorage, classOf[Color])
   }
 
@@ -46,10 +48,29 @@ object ManagerCapabilities {
     override def readNBT(capability: Capability[IPowerNetworkNode], instance: IPowerNetworkNode, side: EnumFacing, nbt: NBTBase): Unit = {}
   }
 
-  class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
-    override def storageType: PowerStorageNodeType = PowerStorageNodeType.NONE
+  class PowerStorageNodeStorageDummy extends Capability.IStorage[IPowerStorageNode] {
+    override def writeNBT(capability: Capability[IPowerStorageNode], instance: IPowerStorageNode, side: EnumFacing): NBTBase = {new NBTTagCompound}
 
-    override def connectType: PowerConnectionNodeType = PowerConnectionNodeType.MAIN
+    override def readNBT(capability: Capability[IPowerStorageNode], instance: IPowerStorageNode, side: EnumFacing, nbt: NBTBase): Unit = {}
+  }
+
+  class PowerLeafNodeStorageDummy extends Capability.IStorage[IPowerLeafNode] {
+    override def writeNBT(capability: Capability[IPowerLeafNode], instance: IPowerLeafNode, side: EnumFacing): NBTBase = {new NBTTagCompound}
+
+    override def readNBT(capability: Capability[IPowerLeafNode], instance: IPowerLeafNode, side: EnumFacing, nbt: NBTBase): Unit = {}
+  }
+
+  class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
+
+    override def leafNodes: Set[IPowerLeafNode] = Set()
+
+    override def addLeafNode(node: IPowerLeafNode): Unit = {}
+
+    override def removeLeafNode(node: IPowerLeafNode): Unit = {}
+
+    override def storageNodes: Set[IPowerStorageNode] = Set()
+
+    override def leafTransferRate: Double = 0
 
     override def connectionRadius: Float = 0
 
@@ -57,13 +78,29 @@ object ManagerCapabilities {
 
     override def renderLocations: scala.collection.Set[Loc4] = Set()
 
-    override def transferRate: Double = 0
-
-    override def storage: IBattery = null
-
     override def getLoc: Loc4 = Loc4(0, 0, 0, 0)
 
     override def setRenderLocations(set: scala.collection.Set[Loc4]): Unit = {}
+  }
+
+  class PowerStorageNodeImplementationDummy extends IPowerStorageNode {
+    override def battery: IBattery = null
+
+    override def storageType: PowerStorageNodeType = PowerStorageNodeType.NONE
+
+    override def transferRate: Double = 0
+
+    override def getStorageLoc: Loc4 = Loc4(0, 0, 0, 0)
+  }
+
+  class PowerLeafNodeImplementationDummy extends PowerStorageNodeImplementationDummy with IPowerLeafNode {
+    override def connectionRadius: Float = 0
+
+    override def getParent: Loc4 = Loc4(0, 0, 0, 0)
+
+    override def setParent(node: IPowerNetworkNode): Unit = {}
+
+    override def onParentBroken(node: IPowerNetworkNode): Unit = {}
   }
 
 }

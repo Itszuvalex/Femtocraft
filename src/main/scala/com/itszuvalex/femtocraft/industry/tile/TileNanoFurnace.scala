@@ -1,10 +1,9 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
-import com.itszuvalex.femtocraft.power.PowerManager
-import com.itszuvalex.femtocraft.power.node.PowerNode
+import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
@@ -60,20 +59,16 @@ object TileNanoFurnace {
 
 }
 
-class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
+class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNode {
   private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
+
+  override def connectionRadius: Float = 8f
+
+  override def leafTransferRate = 50d
 
   override def defaultBattery: IBattery = new PowerBattery(5000)
 
-  override def powerStorageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
-
-  override def powerConnectionType: PowerConnectionNodeType = PowerConnectionNodeType.LEAF
-
-  override def powerRadius: Float = 8f
-
-  override def powerTransfer: Double = 50d
-
-  override def rendersPower: Boolean = false
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
@@ -102,8 +97,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
   }
 
   override def serverUpdate(): Unit = {
-    if (powerDelegate.getNetwork == null) PowerManager.addNode(powerDelegate)
-
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty) {
@@ -113,7 +106,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerNode {
       }
     }
     else {
-      powerDelegate.storage.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), powerDelegate.storage.storage), 0, 0)
+      battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
       if (task.completed(0)) {
         val item = task.stack
         if (item == null || item.isEmpty) {

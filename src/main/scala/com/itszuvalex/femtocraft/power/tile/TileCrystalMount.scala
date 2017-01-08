@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.api.power.{PowerConnectionNodeType, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal, PowerManager}
@@ -32,21 +32,21 @@ object TileCrystalMount {
   val PEDESTAL_RANGE = 8f
 }
 
-class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount with TileInventory {
+class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with ICrystalMount with TileInventory {
   private val pedestalLocs = mutable.HashSet[Loc4]()
 
   override def defaultBattery: IBattery = new IBattery {
     override def maxStorage = Option(getCrystalStack).map { it =>
       it.getItem match {
-        case a: IPowerCrystal => a.getStorageMax(getCrystalStack)
-        case _ => 0
+        case a: IPowerCrystal => a.getStorageMax(it)
+        case _ => 0d
       }
     }
-      .getOrElse(0)
+      .getOrElse(0d)
 
     override def clear() = Option(getCrystalStack).foreach { it =>
       it.getItem match {
-        case a: IPowerCrystal => a.setStorageCurrent(getCrystalStack, 0)
+        case a: IPowerCrystal => a.setStorageCurrent(it, 0)
         case _ =>
       }
     }
@@ -57,7 +57,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
     override def maxStorage_=(max: Double) = Option(getCrystalStack).foreach { it =>
       it.getItem match {
-        case a: IPowerCrystal => a.setStorageMax(getCrystalStack, max)
+        case a: IPowerCrystal => a.setStorageMax(it, max)
           setModified()
         case _ =>
       }
@@ -65,7 +65,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
     override def storage_=(amt: Double) = Option(getCrystalStack).foreach { it =>
       it.getItem match {
-        case a: IPowerCrystal => a.setStorageCurrent(getCrystalStack, amt)
+        case a: IPowerCrystal => a.setStorageCurrent(it, amt)
           setModified()
         case _ =>
       }
@@ -73,19 +73,24 @@ class TileCrystalMount extends TileEntityBase with PowerNode with ICrystalMount 
 
     override def storage = Option(getCrystalStack).map { it =>
       it.getItem match {
-        case a: IPowerCrystal => a.getStorageCurrent(getCrystalStack)
-        case _ => 0
+        case a: IPowerCrystal => a.getStorageCurrent(it)
+        case _ => 0d
       }
-    }.getOrElse(0)
+    }.getOrElse(0d)
 
     override def deserializeNBT(nbt: NBTTagCompound) = {}
 
     override def serializeNBT() = new NBTTagCompound
   }
 
-  override def powerStorageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
-  override def powerConnectionType: PowerConnectionNodeType = PowerConnectionNodeType.MAIN
+  override def transferRate: Double = Option(getCrystalStack).map { it =>
+    it.getItem match {
+      case a: IPowerCrystal => a.getTransferRate(it)
+      case _ => 0d
+    }
+  }.getOrElse(0d)
 
   override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 

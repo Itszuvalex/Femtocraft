@@ -27,11 +27,13 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
 
   override def addLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs += node.getStorageLoc
+    tileEntity.setUpdate()
     tileEntity.setModified()
   }
 
   override def removeLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs -= node.getStorageLoc
+    tileEntity.setUpdate()
     tileEntity.setModified()
   }
 
