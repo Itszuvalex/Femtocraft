@@ -20,6 +20,7 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
@@ -28,7 +29,6 @@ import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
-import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal}
 import com.itszuvalex.femtocraft.render._
@@ -132,7 +132,7 @@ class ProxyClient extends ProxyCommon {
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
 
     Minecraft.getMinecraft.getItemColors.registerItemColorHandler(new IItemColor {
-      override def getColorFromItemstack(stack: ItemStack, tintIndex: Int): Int = ItemPowerCrystal.getColor(stack)
+      override def getColorFromItemstack(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
     }, FemtoItems.itemPowerCrystal)
 
   }
@@ -144,7 +144,7 @@ class ProxyClient extends ProxyCommon {
     // ItemPowerCrystal
     val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, (stack: ItemStack) => {
-      val ctype = ItemPowerCrystal.getType(stack)
+      val ctype = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
       val suffix = if (ctype != null && !ctype.isEmpty) {
         "_" + ctype
       } else ""

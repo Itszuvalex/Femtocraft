@@ -42,13 +42,13 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
 
     if (te.getCrystalStack != null && !te.getCrystalStack.func_190926_b()) {
-      te.getCapability(Capabilities.POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.POWER_NODE, null)).
+      te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).
         foreach { t =>
-          val cap = t.getCapability(Capabilities.POWER_NODE, null)
+          val cap = t.getCapability(Capabilities.TILE_POWER_NODE, null)
           if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
         }
 
-      te.getCapability(Capabilities.POWER_NODE, null).leafNodes.
+      te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes.
         foreach { t =>
           if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
         }

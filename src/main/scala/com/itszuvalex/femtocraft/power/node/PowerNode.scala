@@ -37,13 +37,13 @@ trait PowerNode extends TileEntityBase {
   def rendersPower: Boolean
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    if (capability == Capabilities.POWER_NODE) true
+    if (capability == Capabilities.TILE_POWER_NODE) true
     else if (capability == Capabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.POWER_NODE) powerDelegate.asInstanceOf[T]
+    if (capability == Capabilities.TILE_POWER_NODE) powerDelegate.asInstanceOf[T]
     else if (capability == Capabilities.COLORABLE) new Color(color).asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
@@ -94,7 +94,7 @@ trait PowerNode extends TileEntityBase {
   override def onBlockBreak(): Unit = {
     super.onBlockBreak()
     PowerManager.removeNode(powerDelegate)
-    powerDelegate.leafNodeLocs.flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.POWER_LEAF_NODE, null)).foreach(_.onParentBroken(powerDelegate))
+    powerDelegate.leafNodeLocs.flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).foreach(_.onParentBroken(powerDelegate))
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {

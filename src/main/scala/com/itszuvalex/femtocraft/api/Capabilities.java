@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.power.IPowerLeafNode;
 import com.itszuvalex.femtocraft.api.power.IPowerNetworkNode;
 import com.itszuvalex.femtocraft.api.power.IPowerStorageNode;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapabilities;
+import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
 import com.itszuvalex.itszulib.util.Color;
 import net.minecraftforge.common.capabilities.Capability;
@@ -17,17 +18,20 @@ public class Capabilities {
     public static Capability<IBattery> POWER_STORAGE = null;
 
     @CapabilityInject(IPowerStorageNode.class)
-    public static Capability<IPowerStorageNode> POWER_STORAGE_NODE = null;
+    public static Capability<IPowerStorageNode> TILE_POWER_STORAGE_NODE = null;
 
     @CapabilityInject(IPowerLeafNode.class)
-    public static Capability<IPowerLeafNode> POWER_LEAF_NODE = null;
+    public static Capability<IPowerLeafNode> TILE_POWER_LEAF_NODE = null;
 
     @CapabilityInject(IPowerNetworkNode.class)
-    public static Capability<IPowerNetworkNode> POWER_NODE = null;
+    public static Capability<IPowerNetworkNode> TILE_POWER_NODE = null;
 
     @CapabilityInject(Color.class)
     public static Capability<Color> COLORABLE = null;
 
     @CapabilityInject(IPlayerNaniteCapabilities.class)
     public static Capability<IPlayerNaniteCapabilities> NANITE_CAPABILITY = null;
+
+    @CapabilityInject(IPowerCrystal.class)
+    public static Capability<IPowerCrystal> ITEM_POWER_CRYSTAL = null;
 }

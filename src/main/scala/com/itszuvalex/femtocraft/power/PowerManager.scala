@@ -35,7 +35,7 @@ object PowerManager {
   def addNode(node: IPowerNetworkNode): Unit = {
     val loc = node.getLoc
 
-    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
     if (nodes.isEmpty) {
       val network = PowerNetwork.createFromTile(node)
       network.register()
@@ -70,7 +70,7 @@ object PowerManager {
   }
 
   def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
-    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
+    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.TILE_POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
     leafs.view.filter(_.getParent == null).
       filter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
       .filter(l => l.canSetParent(node) && node.canAddLeafNode(l)).
@@ -84,7 +84,7 @@ object PowerManager {
   def refreshLeaf(node: IPowerLeafNode): Unit = {
     if (node.getParent != null) return
 
-    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
     nodes.view.filter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).filter(l => l.canAddLeafNode(node) && node.canSetParent(l)).
       toSeq.sortBy(_.getLoc.distSqr(node.getStorageLoc)).
       foreach { n =>

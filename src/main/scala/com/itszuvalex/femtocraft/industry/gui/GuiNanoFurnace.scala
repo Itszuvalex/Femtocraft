@@ -50,7 +50,7 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   //TODO: IItemStack.Empty - needs ItszuLib GuiItemStack change
   val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
   // TODO: IItemStack.Empty
-  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE_NODE, null).battery, color.toInt)
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
 
   val elems = List(nameLabel, inputSlot, outputSlot, powerMeter)
   add(elems: _*)

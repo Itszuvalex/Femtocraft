@@ -19,7 +19,7 @@ object PowerNetwork {
 
 class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.getNextID) {
 
-  override def networkCapability: Capability[IPowerNetworkNode] = Capabilities.POWER_NODE
+  override def networkCapability: Capability[IPowerNetworkNode] = Capabilities.TILE_POWER_NODE
 
   override def create(): PowerNetwork = new PowerNetwork
 

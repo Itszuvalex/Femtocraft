@@ -2,12 +2,13 @@ package com.itszuvalex.femtocraft.power.item
 
 import java.util
 
-import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
-import com.itszuvalex.itszulib.util.Color
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.itszulib.api.wrappers.WrapperNBTBattery
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 
 import scala.collection.JavaConversions._
 
@@ -26,129 +27,23 @@ object ItemPowerCrystal {
   val TRANSFER_KEY        = "Transfer"
   val NAME_KEY            = "Name"
 
-  def onTick(stack: ItemStack): Unit = {
-    if (stack == null) return
-    stack.getItem match {
-      case null =>
-      case crystal: IPowerCrystal =>
-        crystal.setStoragePartial(stack, crystal.getStoragePartial(stack) + crystal.getPassiveGen(stack))
-        if (crystal.getStoragePartial(stack) > 1) {
-          crystal.setStoragePartial(stack, crystal.getStoragePartial(stack) - 1)
-          crystal.store(stack, 1, doStore = true)
-        }
-      case _ =>
-    }
-
-  }
-
   def addInformation(stack: ItemStack, tooltipList: util.List[_]): Unit = {
     val tlist = tooltipList.asInstanceOf[util.List[String]]
-    stack.getItem match {
-      case null =>
-      case crystal: IPowerCrystal =>
-        tlist += "Crystal Type:" + crystal.getType(stack)
-        tlist += "Passive Gen:" + crystal.getPassiveGen(stack).formatted("%.2f")
-        tlist += "Transfer Rate:" + crystal.getTransferRate(stack)
-        tlist += "Power:" + crystal.getStorageCurrent(stack).formatted("%.0f") + "/" + crystal.getStorageMax(stack).formatted("%.0f")
-      //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
-      case _ =>
-    }
+    if (stack == null) return
+    if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) return
+    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    tlist += "Crystal Type:" + cap.getType()
+    tlist += "Passive Gen:" + cap.getPassiveGen().formatted("%.2f")
+    tlist += "Transfer Rate:" + cap.getTransferRate()
+    tlist += "Power:" + cap.battery.storage.formatted("%.0f") + "/" + cap.battery.maxStorage.formatted("%.0f")
+    //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
   }
 
-  def getColor(stack: ItemStack): Int = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Int(COLOR_KEY)
-      }
-    Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt
-  }
-
-  def getTransferRate(stack: ItemStack): Int = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Int(TRANSFER_KEY)
-      }
-    0
-  }
-
-  def getPassiveGen(stack: ItemStack): Float = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Float(PASSIVE_GEN_KEY)
-      }
-    0
-  }
-
-  def getFullName(stack: ItemStack) = getType(stack) + " " + getName(stack)
-
-  def getType(stack: ItemStack): String = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.String(TYPE_KEY)
-      }
-    null
-  }
-
-  def getName(stack: ItemStack): String = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.String(NAME_KEY)
-      }
-    ""
-  }
-
-  def store(stack: ItemStack, amount: Double, doStore: Boolean): Double = {
-    var ret = 0d
-    if (stack != null) {
-      stack.getItem match {
-        case null =>
-        case crystal: IPowerCrystal =>
-          ret = Math.min(amount, crystal.getStorageMax(stack) - crystal.getStorageCurrent(stack))
-          if (doStore)
-            crystal.setStorageCurrent(stack, crystal.getStorageCurrent(stack) + ret)
-        case _ =>
-      }
-    }
-    ret
-  }
-
-  def getStorageMax(stack: ItemStack): Double = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Double(STORAGE_MAX_KEY)
-      }
-    0
-  }
-
-  def getStoragePartial(stack: ItemStack): Double = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Double(STORAGE_PARTIAL_KEY)
-      }
-    0
-  }
-
-  def consume(stack: ItemStack, amount: Double, doConsume: Boolean): Double = {
-    var ret = 0d
-    if (stack != null) {
-      stack.getItem match {
-        case null =>
-        case crystal: IPowerCrystal =>
-          ret = Math.min(amount, crystal.getStorageCurrent(stack))
-          if (doConsume)
-            crystal.setStorageCurrent(stack, crystal.getStorageCurrent(stack) - ret)
-        case _ =>
-      }
-    }
-    ret
-  }
-
-  def getStorageCurrent(stack: ItemStack): Double = {
-    if (stack != null)
-      stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-        return comp.Double(STORAGE_CURRENT_KEY)
-      }
-    0
+  def getFullName(stack: ItemStack): String = {
+    if (stack == null) return ""
+    if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) return ""
+    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    cap.getType() + " " + cap.getName()
   }
 
   def initialize(stack: ItemStack,
@@ -157,207 +52,47 @@ object ItemPowerCrystal {
     color: Int,
     storage: Double,
     passiveGen: Float,
-    transfer: Int) = {
-    stack match {
-      case null =>
-      case s =>
-        s.getItem match {
-          case null =>
-          case crystal: IPowerCrystal =>
-            crystal.setName(stack, name)
-            crystal.setType(stack, rtype)
-            crystal.setColor(stack, color)
-            crystal.setStorageMax(stack, storage)
-            crystal.setStorageCurrent(stack, storage / 2)
-            crystal.setPassiveGen(stack, passiveGen)
-            crystal.setTransferRate(stack, transfer)
-            crystal.setStoragePartial(stack, 0)
-          case _ =>
-        }
-    }
+    transfer: Int): ItemStack = {
+    if (stack == null) return stack
+    if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) return stack
+
+    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    cap.setName(name)
+    cap.setType(rtype)
+    cap.setColor(color)
+    cap.battery.maxStorage = storage
+    cap.battery.storage = storage / 2
+    cap.setPassiveGen(passiveGen)
+    cap.setTransferRate(transfer)
+    cap.setStoragePartial(0)
     stack
-  }
-
-  def setStorageCurrent(stack: ItemStack, amount: Double): Unit = {
-    if (amount != amount) //amount is NaN
-      return
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          STORAGE_CURRENT_KEY -> amount
-        )
-      )
-  }
-
-  def setColor(stack: ItemStack, color: Int): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          COLOR_KEY -> color
-        )
-      )
-  }
-
-  def setTransferRate(stack: ItemStack, rate: Int): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          TRANSFER_KEY -> rate
-        )
-      )
-  }
-
-  def setType(stack: ItemStack, ctype: String): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          TYPE_KEY -> ctype
-        )
-      )
-  }
-
-  def setPassiveGen(stack: ItemStack, passiveGen: Float): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          PASSIVE_GEN_KEY -> passiveGen)
-      )
-  }
-
-  def setName(stack: ItemStack, name: String): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          NAME_KEY -> name
-        )
-      )
-  }
-
-  def setStorageMax(stack: ItemStack, amount: Double): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          STORAGE_MAX_KEY -> amount
-        )
-      )
-  }
-
-  def setStoragePartial(stack: ItemStack, amount: Double): Unit = {
-    if (stack != null)
-      stack.forceTag.merge(NBT_COMPOUND_KEY ->
-        NBTCompound(
-          STORAGE_PARTIAL_KEY -> amount
-        )
-      )
   }
 }
 
-class ItemPowerCrystal extends Item with IPowerCrystal {
+class ItemPowerCrystal extends Item {
   setNoRepair()
   setMaxDamage(100)
 
-  override def onTick(stack: ItemStack) = ItemPowerCrystal.onTick(stack)
 
-  /**
-    *
-    * @param stack
-    *
-    * @return Color of the crystal.
-    */
-  override def getColor(stack: ItemStack) = ItemPowerCrystal.getColor(stack)
+  override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
+    new ICapabilityProvider {
+      override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+        if (capability == Capabilities.ITEM_POWER_CRYSTAL) new PowerCrystalItemWrapper(stack).asInstanceOf[T]
+        else if (capability == Capabilities.POWER_STORAGE) new WrapperNBTBattery(if (stack.hasTagCompound) stack.getTagCompound
+        else {val tag = new NBTTagCompound; stack.setTagCompound(tag); tag}).asInstanceOf[T]
+        else null.asInstanceOf[T]
+      }
 
-  override def getName(stack: ItemStack) = ItemPowerCrystal.getName(stack)
+      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
+        if (capability == Capabilities.ITEM_POWER_CRYSTAL) true
+        else if (capability == Capabilities.POWER_STORAGE) true
+        else false
+      }
+    }
+  }
 
   override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
     super.addInformation(stack, playerIn, tooltip, advanced)
     ItemPowerCrystal.addInformation(stack, tooltip)
-  }
-
-  override def getStoragePartial(stack: ItemStack) = ItemPowerCrystal.getStoragePartial(stack)
-
-  /**
-    *
-    * @param stack
-    *
-    * @return Size of the crystal.
-    */
-  override def getType(stack: ItemStack) = ItemPowerCrystal.getType(stack)
-
-  /**
-    *
-    * @param stack
-    *
-    * @return Amount of power to generate per tick.
-    */
-  override def getPassiveGen(stack: ItemStack) = ItemPowerCrystal.getPassiveGen(stack)
-
-  /**
-    *
-    * @param stack
-    *
-    * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
-    */
-  override def getTransferRate(stack: ItemStack) = ItemPowerCrystal.getTransferRate(stack)
-
-  /**
-    *
-    * @param stack
-    *
-    * @return Maximum amount of power crystal can store.
-    */
-  override def getStorageMax(stack: ItemStack) = ItemPowerCrystal.getStorageMax(stack)
-
-  /**
-    *
-    * @param stack
-    *
-    * @return Current amount of power crystal is storing.
-    */
-  override def getStorageCurrent(stack: ItemStack) = ItemPowerCrystal.getStorageCurrent(stack)
-
-  /**
-    *
-    * @param amount    Amount of power to attempt to consume.
-    * @param doConsume Pass true to actually consume resources.  False simulates the store.
-    *
-    * @return Amount of @amount successfully removed.
-    */
-  override def consume(stack: ItemStack, amount: Double, doConsume: Boolean) = ItemPowerCrystal.consume(stack, amount, doConsume)
-
-  /**
-    *
-    * @param amount  Amount of power to store.
-    * @param doStore Pass true to actually consume resources.  False simulates the store.
-    *
-    * @return Amount of @amount successfully stored.
-    */
-  override def store(stack: ItemStack, amount: Double, doStore: Boolean) = ItemPowerCrystal.store(stack, amount, doStore)
-
-  override def setStorageCurrent(stack: ItemStack, amount: Double): Unit = {
-    ItemPowerCrystal.setStorageCurrent(stack, amount)
-    updateDamage(stack)
-  }
-
-  override def setStoragePartial(stack: ItemStack, amount: Double) = ItemPowerCrystal.setStoragePartial(stack, amount)
-
-  override def setPassiveGen(stack: ItemStack, passiveGen: Float) = ItemPowerCrystal.setPassiveGen(stack, passiveGen)
-
-  override def setType(stack: ItemStack, ctype: String) = ItemPowerCrystal.setType(stack, ctype)
-
-  override def setTransferRate(stack: ItemStack, rate: Int) = ItemPowerCrystal.setTransferRate(stack, rate)
-
-  override def setName(stack: ItemStack, name: String) = ItemPowerCrystal.setName(stack, name)
-
-  override def setColor(stack: ItemStack, color: Int) = ItemPowerCrystal.setColor(stack, color)
-
-  override def setStorageMax(stack: ItemStack, amount: Double): Unit = {
-    ItemPowerCrystal.setStorageMax(stack, amount)
-    updateDamage(stack)
-  }
-
-  def updateDamage(stack: ItemStack): Unit = {
-    val max = ItemPowerCrystal.getStorageMax(stack)
-    if (max > 0)
-      stack.setItemDamage(stack.getMaxDamage - ((ItemPowerCrystal.getStorageCurrent(stack) / max) * stack.getMaxDamage).toInt)
   }
 }

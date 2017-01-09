@@ -46,12 +46,12 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeaf
     if (getWorld.isRemote) return
 
     if (parent != null)
-      Option(parent).flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.POWER_NODE, null)).map(_.getCapability(Capabilities.POWER_NODE, null)).foreach(_.removeLeafNode(this))
+      Option(parent).flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null)).foreach(_.removeLeafNode(this))
 
     PowerManager.removeLeaf(this)
   }
 
-  override def transferRate: Double = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.POWER_NODE, null)).map(_.getCapability(Capabilities.POWER_NODE, null)).map(_.leafTransferRate).getOrElse(leafTransferRate)
+  override def transferRate: Double = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null)).map(_.leafTransferRate).getOrElse(leafTransferRate)
 
   def leafTransferRate: Double
 
@@ -100,13 +100,13 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeaf
   def getColor = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.COLORABLE, null)).map(_.getCapability(Capabilities.COLORABLE, null)).getOrElse(color)
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.POWER_LEAF_NODE) this.asInstanceOf[T]
+    if (capability == Capabilities.TILE_POWER_LEAF_NODE) this.asInstanceOf[T]
     else if (capability == Capabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    if (capability == Capabilities.POWER_LEAF_NODE) true
+    if (capability == Capabilities.TILE_POWER_LEAF_NODE) true
     else if (capability == Capabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
   }

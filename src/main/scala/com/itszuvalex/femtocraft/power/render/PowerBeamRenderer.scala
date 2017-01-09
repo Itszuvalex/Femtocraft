@@ -58,7 +58,7 @@ object PowerBeamRenderer {
 
   def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with PowerNode, beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
-    node.getCapability(Capabilities.POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
+    node.getCapability(Capabilities.TILE_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
       renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
     }
     beamRenderTeardown()

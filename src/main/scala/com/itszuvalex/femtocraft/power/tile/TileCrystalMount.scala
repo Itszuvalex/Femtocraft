@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power.tile
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.power.node._
@@ -36,61 +37,31 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   private val pedestalLocs = mutable.HashSet[Loc4]()
 
   override def defaultBattery: IBattery = new IBattery {
-    override def maxStorage = Option(getCrystalStack).map { it =>
-      it.getItem match {
-        case a: IPowerCrystal => a.getStorageMax(it)
-        case _ => 0d
-      }
-    }
+    override def maxStorage: Double = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.battery.maxStorage)
       .getOrElse(0d)
 
-    override def clear() = Option(getCrystalStack).foreach { it =>
-      it.getItem match {
-        case a: IPowerCrystal => a.setStorageCurrent(it, 0)
-        case _ =>
-      }
-    }
+    override def clear(): Unit = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { a => a.battery.storage = 0; setModified() }
 
     override def copy() = new PowerBattery(storage, maxStorage)
 
-    override def writeToNBT(nbt: NBTTagCompound) = {}
+    override def writeToNBT(nbt: NBTTagCompound): Unit = {}
 
-    override def maxStorage_=(max: Double) = Option(getCrystalStack).foreach { it =>
-      it.getItem match {
-        case a: IPowerCrystal => a.setStorageMax(it, max)
-          setModified()
-        case _ =>
-      }
-    }
+    override def maxStorage_=(max: Double): Unit = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { a => a.battery.maxStorage = max; setModified() }
 
-    override def storage_=(amt: Double) = Option(getCrystalStack).foreach { it =>
-      it.getItem match {
-        case a: IPowerCrystal => a.setStorageCurrent(it, amt)
-          setModified()
-        case _ =>
-      }
-    }
+    override def storage_=(amt: Double): Unit = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { a => a.battery.storage = amt; setModified() }
 
-    override def storage = Option(getCrystalStack).map { it =>
-      it.getItem match {
-        case a: IPowerCrystal => a.getStorageCurrent(it)
-        case _ => 0d
-      }
-    }.getOrElse(0d)
+    override def storage: Double = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.battery.storage)
+      .getOrElse(0d)
 
-    override def deserializeNBT(nbt: NBTTagCompound) = {}
+    override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
 
     override def serializeNBT() = new NBTTagCompound
   }
 
   override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
-  override def transferRate: Double = Option(getCrystalStack).map { it =>
-    it.getItem match {
-      case a: IPowerCrystal => a.getTransferRate(it)
-      case _ => 0d
-    }
-  }.getOrElse(0d)
+  override def transferRate: Double = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getTransferRate())
+    .getOrElse(0d)
 
   override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
@@ -129,13 +100,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
         PowerManager.addNode(powerDelegate)
     }
 
-    if (!getCrystalStack.func_190926_b()) {
-      getCrystalStack.getItem match {
-        case item: IPowerCrystal =>
-          item.onTick(getCrystalStack)
-          setModified()
-      }
-    }
+    Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach(_.onTick())
   }
 
   /**

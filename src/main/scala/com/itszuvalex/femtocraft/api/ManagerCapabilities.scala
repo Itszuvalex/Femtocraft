@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.api
 
 import com.itszuvalex.femtocraft.api.power._
+import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.util.Color
@@ -20,6 +21,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[PowerStorageNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[PowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[Color], new ColorStorage, classOf[Color])
+    CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -42,23 +44,19 @@ object ManagerCapabilities {
     }
   }
 
-  class PowerNetworkNodeStorageDummy extends Capability.IStorage[IPowerNetworkNode] {
-    override def writeNBT(capability: Capability[IPowerNetworkNode], instance: IPowerNetworkNode, side: EnumFacing): NBTBase = {new NBTTagCompound}
+  abstract class DummyStorage[T] extends Capability.IStorage[T] {
+    override def writeNBT(capability: Capability[T], instance: T, side: EnumFacing): NBTBase = {new NBTTagCompound}
 
-    override def readNBT(capability: Capability[IPowerNetworkNode], instance: IPowerNetworkNode, side: EnumFacing, nbt: NBTBase): Unit = {}
+    override def readNBT(capability: Capability[T], instance: T, side: EnumFacing, nbt: NBTBase): Unit = {}
   }
 
-  class PowerStorageNodeStorageDummy extends Capability.IStorage[IPowerStorageNode] {
-    override def writeNBT(capability: Capability[IPowerStorageNode], instance: IPowerStorageNode, side: EnumFacing): NBTBase = {new NBTTagCompound}
+  class PowerNetworkNodeStorageDummy extends DummyStorage[IPowerNetworkNode]
 
-    override def readNBT(capability: Capability[IPowerStorageNode], instance: IPowerStorageNode, side: EnumFacing, nbt: NBTBase): Unit = {}
-  }
+  class PowerStorageNodeStorageDummy extends DummyStorage[IPowerStorageNode]
 
-  class PowerLeafNodeStorageDummy extends Capability.IStorage[IPowerLeafNode] {
-    override def writeNBT(capability: Capability[IPowerLeafNode], instance: IPowerLeafNode, side: EnumFacing): NBTBase = {new NBTTagCompound}
+  class PowerLeafNodeStorageDummy extends DummyStorage[IPowerLeafNode]
 
-    override def readNBT(capability: Capability[IPowerLeafNode], instance: IPowerLeafNode, side: EnumFacing, nbt: NBTBase): Unit = {}
-  }
+  class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
@@ -101,6 +99,59 @@ object ManagerCapabilities {
     override def setParent(node: IPowerNetworkNode): Unit = {}
 
     override def onParentBroken(node: IPowerNetworkNode): Unit = {}
+  }
+
+  class PowerCrystalImplementationDummy extends IPowerCrystal {
+    /**
+      * Used to trigger passive trickle charging.
+      */
+    override def onTick(): Unit = {}
+
+    override def getName(): String = ""
+
+    /**
+      *
+      * @return Color of the crystal.
+      */
+    override def getColor(): Int = 0
+
+    /**
+      *
+      * @return Amount of power to generate per tick.
+      */
+    override def getPassiveGen(): Double = 0d
+
+    /**
+      *
+      * @return Amount of power in crystal that is less than current storage.  Used for passive trickle charging.
+      */
+    override def getStoragePartial(): Double = 0d
+
+    /**
+      *
+      * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
+      */
+    override def getTransferRate(): Double = 0d
+
+    /**
+      *
+      * @return Size of the crystal.
+      */
+    override def getType(): String = ""
+
+    override def setColor(color: Int): Unit = {}
+
+    override def setTransferRate(rate: Double): Unit = {}
+
+    override def setType(ctype: String): Unit = {}
+
+    override def setPassiveGen(passiveGen: Float): Unit = {}
+
+    override def setName(name: String): Unit = {}
+
+    override def setStoragePartial(amount: Double): Unit = {}
+
+    override def battery: IBattery = null
   }
 
 }
