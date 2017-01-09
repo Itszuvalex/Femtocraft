@@ -16,9 +16,6 @@ object FemtoItems {
   var itemDumbDust     : Item = null
   var itemCracklingDust: Item = null
 
-  var itemFurnaceAssembly: Item = null
-  var itemGrinderAssembly: Item = null
-
   var itemFrame     : Item = null
   var itemMultiblock: Item = null
 
@@ -34,7 +31,6 @@ object FemtoItems {
   }
 
   def init(): Unit = {
-    itemPowerCrystal.registerModel()
     itemDumbDust.registerModel()
     itemCracklingDust.registerModel()
   }
@@ -55,8 +51,8 @@ object FemtoItems {
       item
     }
 
-    def registerModel() = {
-      Femtocraft.proxy.onRegisterItem(item, item.getUnlocalizedName.substring(5))
+    def registerModel(): Unit = {
+      Femtocraft.proxy.onRegisterItem(item, item.getUnlocalizedName.substring(5).toLowerCase())
     }
   }
 

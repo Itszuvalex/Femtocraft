@@ -39,6 +39,14 @@ object ProxyCommon {
 }
 
 class ProxyCommon {
+  def preInit() : Unit = {
+
+  }
+
+  def init(): Unit = {
+
+  }
+
   def postInit(): Unit = {
     registerRendering()
     registerTileEntities()

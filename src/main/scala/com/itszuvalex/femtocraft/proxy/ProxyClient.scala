@@ -20,7 +20,6 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
@@ -29,18 +28,22 @@ import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
+import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalMount, TilePowerPedestal}
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.renderer.block.model.ModelResourceLocation
-import net.minecraft.item.Item
+import net.minecraft.client.renderer.block.model.{ModelBakery, ModelResourceLocation}
+import net.minecraft.client.renderer.color.IItemColor
+import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.obj.OBJLoader
@@ -127,6 +130,32 @@ class ProxyClient extends ProxyCommon {
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
+
+    Minecraft.getMinecraft.getItemColors.registerItemColorHandler(new IItemColor {
+      override def getColorFromItemstack(stack: ItemStack, tintIndex: Int): Int = ItemPowerCrystal.getColor(stack)
+    }, FemtoItems.itemPowerCrystal)
+
+  }
+
+
+  override def init(): Unit = {
+    super.init()
+
+    // ItemPowerCrystal
+    val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
+    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, (stack: ItemStack) => {
+      val ctype = ItemPowerCrystal.getType(stack)
+      val suffix = if (ctype != null && !ctype.isEmpty) {
+        "_" + ctype
+      } else ""
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + suffix), "inventory")
+    })
+
+    ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "small"), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "medium"), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "large"), "inventory"))
   }
 
   override def registerEventHandlers(): Unit = {
@@ -136,7 +165,7 @@ class ProxyClient extends ProxyCommon {
   }
 
   override def onRegisterItem[T <: Item](item: T, name: String): Unit = {
-    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(item, 0, new ModelResourceLocation(Femtocraft.ID.toLowerCase() + ":" + name, "inventory"))
+    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(item, 0, new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase(), name), "inventory"))
   }
 
   override def onRegisterBlock[T <: Block](block: T, name: String): Unit = {

@@ -52,6 +52,7 @@ object Femtocraft {
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
     PlayerNaniteCapabilities.register()
     ManagerCapabilities.register()
+    proxy.preInit()
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
@@ -61,6 +62,7 @@ object Femtocraft {
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     PowerManager.init()
+    proxy.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {

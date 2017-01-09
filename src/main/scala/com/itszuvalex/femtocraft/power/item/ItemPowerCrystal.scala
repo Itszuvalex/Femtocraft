@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.power.item
 
 import java.util
 
-import com.itszuvalex.femtocraft.power.item.IPowerCrystal._
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -17,7 +16,6 @@ import scala.collection.JavaConversions._
   */
 object ItemPowerCrystal {
 
-  val TEXTURE_PREFIX      = "ItemCrystal"
   val NBT_COMPOUND_KEY    = "PowerCrystal"
   val COLOR_KEY           = "Color"
   val TYPE_KEY            = "Type"
@@ -27,8 +25,6 @@ object ItemPowerCrystal {
   val PASSIVE_GEN_KEY     = "Passive"
   val TRANSFER_KEY        = "Transfer"
   val NAME_KEY            = "Name"
-
-  val DEFAULT_ICON_TYPE = TYPE_LARGE
 
   def onTick(stack: ItemStack): Unit = {
     if (stack == null) return

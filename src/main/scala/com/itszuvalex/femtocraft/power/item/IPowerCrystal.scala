@@ -12,7 +12,6 @@ object IPowerCrystal {
 }
 
 trait IPowerCrystal extends Item with IPowerStorage {
-
   /**
     * Used to trigger passive trickle charging.
     */
