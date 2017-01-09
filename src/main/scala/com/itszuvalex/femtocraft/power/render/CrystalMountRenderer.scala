@@ -6,10 +6,10 @@ import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
-import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
+import com.itszuvalex.itszulib.render.{RenderUtils, ShaderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.{EnumFacing, ResourceLocation}
 import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
 
@@ -41,18 +41,16 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
     if (MinecraftForgeClient.getRenderPass == 0)
       renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, te.getPedestalLocations.contains(te.getLoc.getOffset(EnumFacing.UP)), te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
 
-    if (te.getCrystalStack != null && !te.getCrystalStack.func_190926_b()) {
-      te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).
-        foreach { t =>
-          val cap = t.getCapability(Capabilities.TILE_POWER_NODE, null)
-          if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
-        }
+    te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).
+      foreach { t =>
+        val cap = t.getCapability(Capabilities.TILE_POWER_NODE, null)
+        if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
+      }
 
-      te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes.
-        foreach { t =>
-          if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
-        }
-    }
+    te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes.
+      foreach { t =>
+        if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
+      }
   }
 
   def renderCrystalMountAt(tile: TileCrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, time: Float, hasTop: Boolean, hasCrystal: Boolean, color: Color): Unit = {
@@ -77,10 +75,27 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
 
     GL11.glColor4ub(color.red, color.green, color.blue, 220.toByte)
 
-    FemtoRenderUtils.disableLightMaps()
-    if (hasCrystal)
+    if (hasCrystal) {
+      FemtoRenderUtils.disableLightMaps()
       crystalModel.renderGroups(Set(crystalName))
-    FemtoRenderUtils.enableLightMap(tile)
+      FemtoRenderUtils.enableLightMap(tile)
+    }
+    else {
+      FemtoRenderUtils.disableLightMaps()
+      ShaderUtils.bindShader(ShaderUtils.portal)
+      GL11.glPushMatrix()
+      RenderUtils.translationBlock(0, .5, 0) {
+        GL11.glRotatef(rot, .25f, 2f, 3f)
+        GL11.glScalef(1, .5f, 1)
+        val scale = (Math.abs(Math.sin(rot / 10f)).toFloat * .15f) + .95f
+        GL11.glScalef(scale, scale, scale)
+      }
+      Minecraft.getMinecraft.getTextureManager.bindTexture(new ResourceLocation("textures/entity/end_portal.png"))
+      crystalModel.renderGroups(Set(crystalName))
+      GL11.glPopMatrix()
+      ShaderUtils.releaseShader()
+      FemtoRenderUtils.enableLightMap(tile)
+    }
   }
 
   //  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {

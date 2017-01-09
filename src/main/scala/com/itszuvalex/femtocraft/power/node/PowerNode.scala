@@ -12,8 +12,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
 
-import scala.util.Random
-
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
@@ -44,15 +42,16 @@ trait PowerNode extends TileEntityBase {
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_NODE) powerDelegate.asInstanceOf[T]
-    else if (capability == Capabilities.COLORABLE) new Color(color).asInstanceOf[T]
+    else if (capability == Capabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
   var color = Color(255.toByte,
-    (Random.nextInt(125) + 130).toByte,
-    (Random.nextInt(125) + 130).toByte,
-    (Random.nextInt(125) + 130).toByte).toInt
+    0.toByte,
+    0.toByte,
+    0.toByte)
 
+  def getColor = color
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     Debug.only {
@@ -81,13 +80,13 @@ trait PowerNode extends TileEntityBase {
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     savePowerChildrenInfo(compound)
-    compound.setInteger(PowerNode.COLOR_KEY, color)
+    compound.setInteger(PowerNode.COLOR_KEY, color.toInt)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     loadPowerChildrenInfo(compound)
-    color = compound.getInteger(PowerNode.COLOR_KEY)
+    color = new Color(compound.getInteger(PowerNode.COLOR_KEY))
     setRenderUpdate()
   }
 

@@ -14,7 +14,7 @@ import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
-import net.minecraft.entity.player.EntityPlayer
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -65,7 +65,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
 
   override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
-  override def powerTransfer: Double = 100d
+  override def powerTransfer: Double = transferRate
 
   override def rendersPower: Boolean = true
 
@@ -83,6 +83,9 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     */
   override def getPedestalLocations: Set[Loc4] = pedestalLocs
 
+  override def getColor: Color = Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(c => new Color(c.getColor()))
+    .getOrElse(super.getColor)
+
   /**
     *
     * @param loc Location to remove pedestal from.
@@ -96,8 +99,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def serverUpdate(): Unit = {
     super.serverUpdate()
     if (powerDelegate.network == null && !isInvalid) {
-      if (!getCrystalStack.func_190926_b())
-        PowerManager.addNode(powerDelegate)
+      PowerManager.addNode(powerDelegate)
     }
 
     Option(getCrystalStack).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach(_.onTick())
@@ -163,18 +165,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   def loadConnectionInfo(compound: NBTTagCompound): Unit = {
     powerDelegate.setRenderLocations(compound.NBTList(TileCrystalMount.LOCS_KEY).map(Loc4(_)).toSet)
     setRenderUpdate()
-  }
-
-  override def markDirty(): Unit = {
-    super.markDirty()
-    if (getWorld.isRemote) return
-    setModified()
-    setUpdate()
-    getCrystalStack match {
-      case stack if stack.func_190926_b() =>
-        PowerManager.removeNode(powerDelegate)
-      case _ => PowerManager.addNode(powerDelegate)
-    }
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
@@ -243,19 +233,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     if (!canAcceptPedestal(loc)) return
     pedestalLocs += loc
     setUpdate()
-  }
-
-
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    if (!worldObj.isRemote && par5EntityPlayer.isSneaking) {
-      if (powerDelegate.getNetwork != null) {
-        PowerManager.removeNode(powerDelegate)
-      }
-      else {
-        PowerManager.addNode(powerDelegate)
-      }
-    }
-    super.onSideActivate(par5EntityPlayer, side)
   }
 
   /**
