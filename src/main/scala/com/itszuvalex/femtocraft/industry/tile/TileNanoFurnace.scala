@@ -99,7 +99,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def serverUpdate(): Unit = {
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
-      if (!item.isEmpty) {
+      if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).func_190926_b()) {
         val ins = storage.split(0, 1)
         task.reset()
         task.stack = ins
@@ -117,7 +117,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
         var insertItem = task.stack
         if (!task.smelted) {
           val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
-          if (resultItem == null) {
+          if (resultItem == null || resultItem.func_190926_b()) {
             task.reset()
             return
           }
