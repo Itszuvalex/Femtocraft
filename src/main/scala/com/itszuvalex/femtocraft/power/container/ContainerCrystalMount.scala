@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.container
 
-import com.itszuvalex.femtocraft.power.item.IPowerCrystal
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
@@ -18,6 +18,6 @@ class ContainerCrystalMount(parPlayer: EntityPlayer, inv: InventoryPlayer, te: T
   }
 
   override def eligibleForInput(item: ItemStack): Boolean = {
-    item != null && item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]
+    item != null && item.getItem != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
   }
 }

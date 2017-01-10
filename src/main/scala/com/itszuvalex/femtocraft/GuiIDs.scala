@@ -17,6 +17,8 @@ object GuiIDs {
   val TileFurnaceGuiID                 = nextID
   val TileNaniteExtractorID            = nextID
   val TileNaniteInfuserID              = nextID
+  val TileCrystalChargingArrayID       = nextID
+  val TileCrystalStorageArrayID        = nextID
   private var n = 0
 
   private def nextID = {

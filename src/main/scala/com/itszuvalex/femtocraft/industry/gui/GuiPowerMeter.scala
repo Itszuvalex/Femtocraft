@@ -15,35 +15,36 @@ import scala.collection.mutable.ListBuffer
   * Created by Alex on 18.08.2016.
   */
 object GuiPowerMeter {
-  val DEFAULT_RAISED_COLOR        = Color(255.toByte, 64, 64, 64).toInt
-  val DEFAULT_LOWERED_COLOR       = Color(255.toByte, 15, 15, 15).toInt
-  val DEFAULT_ACCENT_COLOR        = Color(255.toByte, 0, 0, 255.toByte).toInt
+  val DEFAULT_RAISED_COLOR  = Color(255.toByte, 64, 64, 64).toInt
+  val DEFAULT_LOWERED_COLOR = Color(255.toByte, 15, 15, 15).toInt
+  val DEFAULT_ACCENT_COLOR  = Color(255.toByte, 0, 0, 255.toByte).toInt
 
-  val baseTexture = Resources.TexGui("guipowermeter_segmentbase.png")
+  val baseTexture  = Resources.TexGui("guipowermeter_segmentbase.png")
   val lightTexture = Resources.TexGui("guipowermeter_segmentlight.png")
 }
 
 /**
   * Gui item for displaying stored power amount.
+  *
   * @param anchorX
   * @param anchorY
-  * @param battery IBattery object to display power status of.
+  * @param battery     IBattery object to display power status of.
   * @param colorAccent Custom accent color for the scale (defaults to blue).
   */
 class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var battery: IBattery,
-                    var colorAccent: Int = DEFAULT_ACCENT_COLOR) extends GuiPanel {
+  var colorAccent: Int = DEFAULT_ACCENT_COLOR) extends GuiPanel {
 
-  override var _panelWidth: Int = 18
+  override var _panelWidth : Int = 18
   override var _panelHeight: Int = 52
 
-  var colorRaised = DEFAULT_RAISED_COLOR
+  var colorRaised  = DEFAULT_RAISED_COLOR
   var colorLowered = DEFAULT_LOWERED_COLOR
 
   override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
     super.addTooltip(mouseX, mouseY, tooltip)
     tooltip ++= List[String](
       "Energy:",
-      battery.storage + "/" + battery.maxStorage + " DE"
+      "%.1f".format(battery.storage) + "/" + "%.1f".format(battery.maxStorage) + " DE"
     )
   }
 

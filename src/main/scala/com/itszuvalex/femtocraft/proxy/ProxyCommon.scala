@@ -39,7 +39,7 @@ object ProxyCommon {
 }
 
 class ProxyCommon {
-  def preInit() : Unit = {
+  def preInit(): Unit = {
 
   }
 
@@ -66,6 +66,8 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileItemRepository], "TileItemRepository")
     GameRegistry.registerTileEntity(classOf[TileCrystalMount], "TileCrystalMount")
     GameRegistry.registerTileEntity(classOf[TilePowerPedestal], "TilePowerPedestal")
+    GameRegistry.registerTileEntity(classOf[TileCrystalChargingArray], "TileCrystalChargingArray")
+    GameRegistry.registerTileEntity(classOf[TileCrystalStorageArray], "TileCrystalStorageArray")
 
     GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 
