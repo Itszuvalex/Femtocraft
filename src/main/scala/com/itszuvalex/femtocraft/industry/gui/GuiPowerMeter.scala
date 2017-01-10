@@ -44,7 +44,7 @@ class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var ba
     super.addTooltip(mouseX, mouseY, tooltip)
     tooltip ++= List[String](
       "Energy:",
-      "%.1f".format(battery.storage) + "/" + "%.1f".format(battery.maxStorage) + " DE"
+      "%,.1f".format(battery.storage) + "/" + "%,.1f".format(battery.maxStorage) + " DE"
     )
   }
 

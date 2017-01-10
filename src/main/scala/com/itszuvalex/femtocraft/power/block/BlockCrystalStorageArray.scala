@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.power.block
 
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
 import com.itszuvalex.itszulib.core.TileContainer
+import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
@@ -12,7 +13,7 @@ import net.minecraft.world.{IBlockAccess, World}
 /**
   * Created by Chris on 1/8/2017.
   */
-class BlockCrystalStorageArray extends TileContainer(Material.IRON) with BlockFacing {
+class BlockCrystalStorageArray extends TileContainer(Material.IRON) with BlockFacing with DroppableInventory {
   override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileCrystalStorageArray
 
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
