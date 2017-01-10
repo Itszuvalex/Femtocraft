@@ -83,6 +83,7 @@ class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var ba
     GL11.glEnable(GL11.GL_BLEND)
     Minecraft.getMinecraft.getTextureManager.bindTexture(GuiPowerMeter.lightTexture)
     Gui.drawModalRectWithCustomSizedTexture(screenX, screenY, 0, 0, 16, 5, 16, 5)
+    GL11.glDisable(GL11.GL_BLEND)
   }
 
   private def rgbFloatsFromColor(color: Int): (Float, Float, Float) = {

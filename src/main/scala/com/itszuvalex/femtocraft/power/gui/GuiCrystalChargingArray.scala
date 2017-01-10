@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalChargingArray
 import com.itszuvalex.femtocraft.power.tile.TileCrystalChargingArray
-import com.itszuvalex.itszulib.gui.GuiBase
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiLabel}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
@@ -23,7 +23,8 @@ class GuiCrystalChargingArray(player: EntityPlayer, inv: InventoryPlayer, privat
   addPlayerInventorySlots(inv)
 
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(Capabilities.COLORABLE, null).toInt)
-  add(powerMeter)
+  val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT, "")
+  add(powerReading, powerMeter)
 
   override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
@@ -32,6 +33,7 @@ class GuiCrystalChargingArray(player: EntityPlayer, inv: InventoryPlayer, privat
     val l = (height - ySize) / 2
     drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
 
+    powerReading.text = "%.1f".format(tile.powerPerTick) + " DE/t"
     super.drawGuiContainerBackgroundLayer(p_146976_1_, p_146976_2_, p_146976_3_)
   }
 }

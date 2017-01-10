@@ -35,6 +35,8 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
 
   override def leafTransferRate: Double = 50d
 
+  override def hasDescription: Boolean = true
+
   override def connectionRadius: Float = 8f
 
   override def func_191420_l(): Boolean = false
