@@ -20,6 +20,7 @@ object FemtoItems {
   var itemMultiblock: Item = null
 
   var itemMultiTool: Item = null
+  var itemShiftTest: Item = null
 
   def preInit(): Unit = {
     itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
@@ -28,6 +29,7 @@ object FemtoItems {
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
+    itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
 
   def init(): Unit = {
