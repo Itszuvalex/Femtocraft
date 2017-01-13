@@ -41,8 +41,8 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
           (ry + loc.y).toInt,
           (rz + loc.z).toInt)
     }
-      .foreach { loc =>
-        RenderUtils.renderCube(rx.toFloat + (loc.x - loc.x), ry.toFloat + (loc.y - loc.y), rz.toFloat + (loc.z - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+      .foreach { rloc =>
+        RenderUtils.renderCube(rx.toFloat + (rloc.x - loc.x), ry.toFloat + (rloc.y - loc.y), rz.toFloat + (rloc.z - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
       }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)

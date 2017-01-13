@@ -10,6 +10,7 @@ object RenderIDs {
   var framePreviewableID      = 0
   var seedPreviewableID       = 0
   var multiblockPreviewableID = 0
+  var itemShiftPreviewableID = 0
 
   //Multiblock IDs
   var multiblockArcFurnaceID   = 0

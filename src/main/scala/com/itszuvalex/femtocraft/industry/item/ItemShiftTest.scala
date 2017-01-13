@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.industry.item
 import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteTeleport
+import com.itszuvalex.femtocraft.render.RenderIDs
+import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
@@ -10,11 +12,12 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.{ActionResult, EnumHand, SoundCategory}
 import net.minecraft.world.World
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint
+import net.minecraftforge.fml.relauncher.SideOnly
 
 /**
   * Created by Chris on 1/10/2017.
   */
-class ItemShiftTest extends Item {
+class ItemShiftTest extends Item with IPreviewable {
   override def onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (!world.isRemote) {
       val look = player.getLookVec
@@ -58,4 +61,6 @@ class ItemShiftTest extends Item {
     else None
   }
 
+  @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
+  override def renderID: Int = RenderIDs.itemShiftPreviewableID
 }
