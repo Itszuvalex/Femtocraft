@@ -20,6 +20,7 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
@@ -40,11 +41,11 @@ object ProxyCommon {
 
 class ProxyCommon {
   def preInit(): Unit = {
-
+    FemtoSounds.preInit()
   }
 
   def init(): Unit = {
-
+    FemtoSounds.init()
   }
 
   def postInit(): Unit = {
@@ -52,6 +53,7 @@ class ProxyCommon {
     registerTileEntities()
     registerTickHandlers()
     registerEventHandlers()
+    FemtoSounds.postInit()
   }
 
   def registerRendering() {
