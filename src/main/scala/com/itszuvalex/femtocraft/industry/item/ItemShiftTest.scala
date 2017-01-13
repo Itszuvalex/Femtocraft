@@ -8,16 +8,18 @@ import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{ActionResult, EnumHand, SoundCategory}
+import net.minecraft.util.{ActionResult, EnumFacing, EnumHand, SoundCategory}
 import net.minecraft.world.World
+import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint
 import net.minecraftforge.fml.relauncher.SideOnly
 
 /**
   * Created by Chris on 1/10/2017.
   */
-class ItemShiftTest extends Item with IPreviewable {
+class ItemShiftTest extends Item {
   override def onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (!world.isRemote) {
       val look = player.getLookVec
@@ -41,9 +43,9 @@ class ItemShiftTest extends Item with IPreviewable {
     var lastY = -1
     var lastZ = -1
     val found = (dist to(0, -.25d)).exists { step =>
-      val x = (player.posX + dir.x * step + .5d).toInt
-      val y = Math.max((player.posY + dir.y * step + .5d).toInt, 1)
-      val z = (player.posZ + dir.z * step + .5d).toInt
+      val x = (player.posX + (dir.x * step) + .5d /* offset */).toInt
+      val y = Math.max((player.posY + (dir.y * step) + .5d /* offset */).toInt, 1)
+      val z = (player.posZ + (dir.z * step) + .5d /* offset */).toInt
 
       if (lastX == x && lastY == y && lastZ == z) false
       else {
@@ -61,6 +63,20 @@ class ItemShiftTest extends Item with IPreviewable {
     else None
   }
 
-  @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
-  override def renderID: Int = RenderIDs.itemShiftPreviewableID
+
+  override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
+    new ICapabilityProvider {
+      override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+        if (capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE) {
+          new IPreviewable {
+            @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
+            override def renderID: Int = RenderIDs.itemShiftPreviewableID
+          }.asInstanceOf[T]
+        }
+        else null.asInstanceOf[T]
+      }
+
+      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE
+    }
+  }
 }

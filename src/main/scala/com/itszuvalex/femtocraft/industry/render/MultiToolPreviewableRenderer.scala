@@ -5,6 +5,7 @@ import com.itszuvalex.itszulib.api.IPreviewableRenderer
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.{RenderUtils, Vector3}
 import net.minecraft.client.Minecraft
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
@@ -15,11 +16,35 @@ import org.lwjgl.opengl.GL11
   */
 @SideOnly(Side.CLIENT)
 class MultiToolPreviewableRenderer extends IPreviewableRenderer {
-  override def renderAtLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+  override def render(stack: ItemStack, player: EntityPlayer): Unit = {
     stack.getItem match {
       case shift: ItemShiftTest =>
-        val vec = Minecraft.getMinecraft.thePlayer.getLookVec
-        shift.getDestination(loc.getWorld.get, Minecraft.getMinecraft.thePlayer, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
+        val vec = player.getLookVec
+        shift.getDestination(player.worldObj, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
+          case Some(a) =>
+            val rx = /*player.prevPosX +*/ (player.posX - player.prevPosX) * Minecraft.getMinecraft.getRenderPartialTicks
+            val ry = /*player.prevPosY +*/ (player.posY - player.prevPosY) * Minecraft.getMinecraft.getRenderPartialTicks
+            val rz = /*player.prevPosZ +*/ (player.posZ - player.prevPosZ) * Minecraft.getMinecraft.getRenderPartialTicks
+            GL11.glDisable(GL11.GL_CULL_FACE)
+            GL11.glEnable(GL11.GL_BLEND)
+            GL11.glDisable(GL11.GL_DEPTH_TEST)
+            GL11.glColor4f(0, 1, 0, .5f)
+            RenderUtils.renderCube(rx.toFloat + (a.getX - player.getPosition.getX), ry.toFloat + (a.getY - player.getPosition.getY), rz.toFloat + (a.getZ - player.getPosition.getZ), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+            RenderUtils.renderCube(rx.toFloat + (a.getX - player.getPosition.getX), ry.toFloat + (a.getY - player.getPosition.getY) + 1, rz.toFloat + (a.getZ - player.getPosition.getZ), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+            GL11.glEnable(GL11.GL_CULL_FACE)
+            GL11.glEnable(GL11.GL_DEPTH_TEST)
+            GL11.glDisable(GL11.GL_BLEND)
+          case None =>
+        }
+      case _ =>
+    }
+  }
+
+  override def renderAtLocation(stack: ItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+    stack.getItem match {
+      case shift: ItemShiftTest =>
+        val vec = player.getLookVec
+        shift.getDestination(loc.getWorld.get, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
           case Some(a) =>
             GL11.glDisable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_BLEND)
