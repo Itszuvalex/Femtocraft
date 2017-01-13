@@ -90,7 +90,7 @@ class ProxyCommon {
     MinecraftForge.EVENT_BUS.register(new PlayerEventHandler)
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double = 0d, velY: Double = 0d, velZ: Double = 0d): Object = {
     null
   }
 

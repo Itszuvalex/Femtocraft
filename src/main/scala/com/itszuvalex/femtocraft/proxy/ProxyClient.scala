@@ -52,7 +52,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry
 import org.apache.logging.log4j.Level
 
 class ProxyClient extends ProxyCommon {
-  override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
+  override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
     if (!world.isRemote) {
       Femtocraft.logger.log(Level.WARN, "Attempted to spawn particle of type \"" + name + "\" on a non-client world.")
       return null
@@ -80,7 +80,8 @@ class ProxyClient extends ProxyCommon {
         fx = new EntityFxNanites(world, x, y, z,
           (col.red.toInt & 255).toFloat / 255f,
           (col.green.toInt & 255).toFloat / 255f,
-          (col.blue.toInt & 255).toFloat / 255f)
+          (col.blue.toInt & 255).toFloat / 255f,
+          velX, velY, velZ)
       case _ =>
         return null
     }

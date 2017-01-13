@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.item
 
 import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
-import com.itszuvalex.femtocraft.network.messages.MessageNaniteStorm
+import com.itszuvalex.femtocraft.network.messages.MessageNaniteTeleport
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
@@ -21,10 +21,10 @@ class ItemShiftTest extends Item {
       val vec = Vector3(look.xCoord, look.yCoord, look.zCoord).normalize()
       getDestination(world, player, vec, 8d) match {
         case Some(a) =>
-          FemtoPacketHandler.INSTANCE.sendToAllAround(new MessageNaniteStorm(player.getPosition.getX, player.getPosition.getY, player.getPosition.getZ, world.provider.getDimension), new TargetPoint(world.provider.getDimension, player.getPosition.getX, player.getPosition.getY, player.getPosition.getZ, 32f))
+          val old = player.getPosition
           player.setPositionAndUpdate(a.getX + .5d, a.getY, a.getZ + .5d)
           world.playSound(null /* this is a filter player who won't hear sound */ , a.getX + .5d, a.getY + .5d, a.getZ + .5d, FemtoSounds.shiftSound, SoundCategory.PLAYERS, 1, 1)
-          FemtoPacketHandler.INSTANCE.sendToAllAround(new MessageNaniteStorm(a.getX, a.getY, a.getZ, world.provider.getDimension), new TargetPoint(world.provider.getDimension, a.getX, a.getY, a.getZ, 32f))
+          FemtoPacketHandler.INSTANCE.sendToAllAround(new MessageNaniteTeleport(old.getX, old.getY, old.getZ, world.provider.getDimension, a.getX, a.getY, a.getZ), new TargetPoint(world.provider.getDimension, a.getX, a.getY, a.getZ, 32f))
         case None =>
       }
       player.fallDistance = 0

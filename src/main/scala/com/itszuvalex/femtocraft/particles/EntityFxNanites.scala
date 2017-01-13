@@ -40,7 +40,7 @@ class EntityFxNanites(args: ParticleArgs) extends
   BaseEntityFx(args) {
   loadFromArgs(args)
 
-  def this(par1World: World, x: Double, y: Double, z: Double, _scale: Float, _red: Float, _green: Float, _blue: Float) =
+  def this(par1World: World, x: Double, y: Double, z: Double, _scale: Float, _red: Float, _green: Float, _blue: Float, velX: Double, velY: Double, velZ: Double) =
     this(new ParticleArgs(
       dimension = par1World.provider.getDimension,
       posX = x,
@@ -49,17 +49,20 @@ class EntityFxNanites(args: ParticleArgs) extends
       scale = _scale,
       red = _red,
       green = _green,
-      blue = _blue
+      blue = _blue,
+      motionX = velX.toFloat,
+      motionY = velY.toFloat,
+      motionZ = velZ.toFloat
     )
     )
 
-  def this(par1World: World, x: Double, y: Double, z: Double, red: Float, green: Float, blue: Float) =
-    this(par1World, x, y, z, 1.0F, red, green, blue)
+  def this(par1World: World, x: Double, y: Double, z: Double, red: Float, green: Float, blue: Float, velX: Double, velY: Double, velZ: Double) =
+    this(par1World, x, y, z, 1.0F, red, green, blue, velX, velY, velZ)
 
   def loadFromArgs(args: ParticleArgs): Unit = {
-    this.motionX *= args.motionX
-    this.motionY *= args.motionY
-    this.motionZ *= args.motionZ
+    this.motionX = args.motionX
+    this.motionY = args.motionY
+    this.motionZ = args.motionZ
     this.particleTextureIndexX = 0
     this.particleTextureIndexY = 1
     val f4 = Math.random.toFloat * 0.4F + 0.6F
@@ -110,10 +113,6 @@ class EntityFxNanites(args: ParticleArgs) extends
 
     this.setParticleTextureIndex((this.particleAge * 16 / this.particleMaxAge) % 8)
     this.moveEntity(this.motionX, this.motionY, this.motionZ)
-    if (this.posY == this.prevPosY) {
-      this.motionX *= 1.1D
-      this.motionZ *= 1.1D
-    }
     this.motionX *= 0.9599999785423279D
     this.motionY *= 0.9599999785423279D
     this.motionZ *= 0.9599999785423279D
