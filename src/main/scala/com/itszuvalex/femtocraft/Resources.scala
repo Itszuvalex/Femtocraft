@@ -6,6 +6,9 @@ import net.minecraft.util.ResourceLocation
   * Created by Christopher Harris (Itszuvalex) on 9/17/15.
   */
 object Resources {
+
+  def Sound(loc: String) = Femtocraft(loc)
+
   def TexBlock(name: String) = Texture("blocks/" + name)
 
   def Texture(name: String) = Femtocraft("textures/" + name)

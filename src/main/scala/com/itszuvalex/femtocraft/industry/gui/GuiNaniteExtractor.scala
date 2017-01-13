@@ -7,8 +7,6 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageDrainNanite
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.container.ContainerBase
-import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -26,13 +24,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   xSize = 183
   ySize = 161
 
-  {
-    val gui = new GuiIItemStorageSlot(43, 23, tile.storage, 0)
-    gui.sync = new SyncItemStorageItemStack(tile.storage, 0)
-    this.add(gui)
-    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
-  }
-
+  addGuiAndSync(tile.storage, 0, 43, 23)
   addPlayerInventorySlots(inv, 4, 75)
 
   //TODO: Make actual "machine color"

@@ -73,7 +73,6 @@ class ItemPowerCrystal extends Item {
   setNoRepair()
   setMaxDamage(100)
 
-
   override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
     new ICapabilityProvider {
       override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
@@ -89,6 +88,17 @@ class ItemPowerCrystal extends Item {
         else false
       }
     }
+  }
+
+
+  override def isDamaged(stack: ItemStack): Boolean = {
+    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    cap.battery.storage != cap.battery.maxStorage
+  }
+
+  override def getDamage(stack: ItemStack): Int = {
+    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    (getMaxDamage(stack) - ((cap.battery.storage * getMaxDamage(stack)) / cap.battery.maxStorage)).toInt
   }
 
   override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {

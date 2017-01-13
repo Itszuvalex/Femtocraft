@@ -5,9 +5,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.container.ContainerBase
-import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot, GuiItemStack, GuiLabel}
+import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -28,17 +26,8 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   xSize = 183
   ySize = 161
 
-  {
-    var gui = new GuiIItemStorageSlot(44, 23, tile.storage, 0)
-    gui.sync = new SyncItemStorageItemStack(tile.storage, 0)
-    this.add(gui)
-    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
-
-    gui = new GuiIItemStorageSlot(85, 23, tile.storage, 1)
-    gui.sync = new SyncItemStorageItemStack(tile.storage, 1)
-    this.add(gui)
-    inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
-  }
+  addGuiAndSync(tile.storage, 0, 44, 23)
+  addGuiAndSync(tile.storage, 1, 85, 23)
 
   addPlayerInventorySlots(inv, 4, 75)
 

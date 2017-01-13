@@ -1,6 +1,6 @@
-package com.itszuvalex.femtocraft.industry.block
+package com.itszuvalex.femtocraft.power.block
 
-import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
+import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
@@ -11,10 +11,10 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.{IBlockAccess, World}
 
 /**
-  * Created by Chris on 8/14/2016.
+  * Created by Chris on 1/8/2017.
   */
-class BlockNanoFurnace extends TileContainer(Material.IRON) with BlockFacing with DroppableInventory {
-  override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileNanoFurnace
+class BlockCrystalStorageArray extends TileContainer(Material.IRON) with BlockFacing with DroppableInventory {
+  override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileCrystalStorageArray
 
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
 

@@ -20,6 +20,7 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
@@ -39,12 +40,12 @@ object ProxyCommon {
 }
 
 class ProxyCommon {
-  def preInit() : Unit = {
-
+  def preInit(): Unit = {
+    FemtoSounds.preInit()
   }
 
   def init(): Unit = {
-
+    FemtoSounds.init()
   }
 
   def postInit(): Unit = {
@@ -52,6 +53,7 @@ class ProxyCommon {
     registerTileEntities()
     registerTickHandlers()
     registerEventHandlers()
+    FemtoSounds.postInit()
   }
 
   def registerRendering() {
@@ -66,6 +68,8 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileItemRepository], "TileItemRepository")
     GameRegistry.registerTileEntity(classOf[TileCrystalMount], "TileCrystalMount")
     GameRegistry.registerTileEntity(classOf[TilePowerPedestal], "TilePowerPedestal")
+    GameRegistry.registerTileEntity(classOf[TileCrystalChargingArray], "TileCrystalChargingArray")
+    GameRegistry.registerTileEntity(classOf[TileCrystalStorageArray], "TileCrystalStorageArray")
 
     GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 
@@ -86,7 +90,7 @@ class ProxyCommon {
     MinecraftForge.EVENT_BUS.register(new PlayerEventHandler)
   }
 
-  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int): Object = {
+  def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double = 0d, velY: Double = 0d, velZ: Double = 0d): Object = {
     null
   }
 

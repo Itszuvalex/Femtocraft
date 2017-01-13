@@ -10,11 +10,9 @@ import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, Po
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.util.Task
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
 
 /**
   * Created by Chris on 8/14/2016.
@@ -83,18 +81,16 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def hasDescription: Boolean = true
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    if (slot == 0) FurnaceRecipes.instance().getSmeltingResult(item) != null
+    if (slot == 0) {
+      val result = FurnaceRecipes.instance().getSmeltingResult(item)
+      result != null && !result.func_190926_b()
+    }
     else false
   }
 
   override def hasGUI = true
 
   override def getGuiID = GuiIDs.TileFurnaceGuiID
-
-  override def onSideActivate(player: EntityPlayer, side: EnumFacing): Boolean = {
-    if (hasGUI) player.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
-    hasGUI
-  }
 
   override def serverUpdate(): Unit = {
     if (task.stack == null || task.stack.isEmpty) {

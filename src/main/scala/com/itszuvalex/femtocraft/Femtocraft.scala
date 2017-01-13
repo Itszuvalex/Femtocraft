@@ -47,7 +47,6 @@ object Femtocraft {
     NaniteRegistry.preInit()
 
     FemtoPacketHandler.preInit()
-
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
     PlayerNaniteCapabilities.register()
