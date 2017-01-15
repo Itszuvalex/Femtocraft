@@ -22,6 +22,11 @@ object FemtoBlocks {
   var blockCyberwood : Block = _
   var blockCyberleaf : Block = _
 
+  var blockRiftiron : Block = _
+  var blockPhasemetal : Block = _
+  var blockRedstonereplacement : Block = _
+  var blockDiamondreplacement : Block = _
+
   var blockCrystals: Block = _
 
   var blockItemRepository: Block = _
@@ -62,6 +67,12 @@ object FemtoBlocks {
     blockCyberweave = registerBlock(new BlockCyberweave(), "blockCyberweave").registerOre("cyberweave")
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
+
+    blockRiftiron = registerBlock(new BlockRiftiron(), "blockRiftiron").registerOre("oreRiftiron")
+    blockPhasemetal = registerBlock(new BlockPhasemetal(), "blockPhasemetal").registerOre("orePhasemetal")
+    blockRedstonereplacement = registerBlock(new BlockRedstonereplacement(), "blockRedstonereplacement").registerOre("oreRedstonereplacement")
+    blockDiamondreplacement = registerBlock(new BlockDiamondreplacement(), "blockDiamondreplacement").registerOre("oreDiamondreplacement")
+
     blockCrystals = registerBlock(new BlockCrystalsWorldgen(), "crystalCluster")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")
@@ -88,6 +99,10 @@ object FemtoBlocks {
     blockCyberweave.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
+    blockRiftiron.registerModel()
+    blockPhasemetal.registerModel()
+    blockRedstonereplacement.registerModel()
+    blockDiamondreplacement.registerModel()
     blockCrystalMount.registerModel()
     blockPowerPedestal.registerModel()
     blockNaniteHiveSmall.registerModel()

@@ -8,7 +8,7 @@ import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal, PowerMana
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -117,7 +117,11 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     slot == 0 && (item == null || item.func_190926_b() || (item.getItem != null && item.getItem.isInstanceOf[IPowerCrystal]))
   }
 
-  override def defaultStorage: ItemStorageArray = new ItemStorageArray(1)
+  override def defaultStorage: ItemStorageArray = new ItemStorageArray(1) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      stack.isEmpty || stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    }
+  }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)

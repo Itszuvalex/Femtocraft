@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import net.minecraft.nbt.NBTTagCompound
@@ -28,7 +28,7 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
     super.serverUpdate()
 
     if (burnTime > 0) {
-      Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.toMinecraft.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
+      Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
         val power = Math.min(c.battery.storage, c.getTransferRate())
         battery.storage = Math.min(battery.maxStorage, battery.storage + power)
         c.battery.storage = Math.max(0, c.battery.storage - power)
@@ -39,8 +39,8 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
       burnTime -= 1
     }
 
-    if (burnTime <= 0 && Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).map(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).getOrElse(false)) {
-      Option(storage(TileCrystalHeatExchanger.FUEL_INDEX)).withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)).map(_.toMinecraft.getCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)).foreach { f =>
+    if (burnTime <= 0 && battery.storage < battery.maxStorage && Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).map(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).getOrElse(false)) {
+      Option(storage(TileCrystalHeatExchanger.FUEL_INDEX)).withFilter(!_.isEmpty).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)).foreach { f =>
         burnTime = (f.getBurnTime * TileCrystalHeatExchanger.BURN_TIME_MULTIPLIER).toInt
         storage.split(TileCrystalHeatExchanger.FUEL_INDEX, 1)
       }
@@ -51,7 +51,7 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
 
   def setBurnTime(i: Int): Unit = burnTime = i
 
-  def powerPerTick: Double = Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.toMinecraft.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
+  def powerPerTick: Double = Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
 
   override def getMod: AnyRef = Femtocraft
 
@@ -59,7 +59,15 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
 
   override def getGuiID: Int = GuiIDs.TileCrystalHeatExchangerID
 
-  override def defaultStorage: IItemStorage = new ItemStorageArray(2)
+  override def defaultStorage: IItemStorage = new ItemStorageArray(2) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      stack.isEmpty || (i match {
+        case TileCrystalHeatExchanger.CRYSTAL_INDEX => stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+        case TileCrystalHeatExchanger.FUEL_INDEX => stack.hasCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)
+        case _ => false
+      })
+    }
+  }
 
   override def hasDescription: Boolean = true
 

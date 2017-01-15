@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 
@@ -31,7 +31,11 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
 
   override def getGuiID: Int = GuiIDs.TileCrystalStorageArrayID
 
-  override def defaultStorage: IItemStorage = new ItemStorageArray(6)
+  override def defaultStorage: IItemStorage = new ItemStorageArray(6) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      stack.isEmpty || stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    }
+  }
 
   override def leafTransferRate: Double = 50d
 
