@@ -30,7 +30,7 @@ import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiv
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
 import com.itszuvalex.femtocraft.power.render._
-import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalMount, TileCrystalStorageArray, TilePowerPedestal}
+import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
@@ -128,6 +128,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNanoFurnace], new NanoFurnaceRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalChargingArray], new CrystalChargingArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalStorageArray], new CrystalStorageArrayRender)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalHeatExchanger], new CrystalHeatExchangeRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 

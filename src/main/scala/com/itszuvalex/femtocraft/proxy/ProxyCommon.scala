@@ -70,6 +70,7 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TilePowerPedestal], "TilePowerPedestal")
     GameRegistry.registerTileEntity(classOf[TileCrystalChargingArray], "TileCrystalChargingArray")
     GameRegistry.registerTileEntity(classOf[TileCrystalStorageArray], "TileCrystalStorageArray")
+    GameRegistry.registerTileEntity(classOf[TileCrystalHeatExchanger], "TileCrystalHeatExchanger")
 
     GameRegistry.registerTileEntity(classOf[TileGlowStick], "TileGlowStick")
 

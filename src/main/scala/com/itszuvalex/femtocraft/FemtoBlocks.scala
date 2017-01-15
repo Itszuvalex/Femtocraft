@@ -37,6 +37,7 @@ object FemtoBlocks {
   var blockPowerPedestal  : Block = _
   var blockCrystalChargingArray  : Block = _
   var blockCrystalStorageArray  : Block = _
+  var blockCrystalHeatExchanger  : Block = _
 
   var blockNaniteExtractor: Block = _
 
@@ -71,6 +72,7 @@ object FemtoBlocks {
     blockPowerPedestal = registerBlock(new BlockPowerPedestal(), "blockPowerPedestal")
     blockCrystalChargingArray = registerBlock(new BlockCrystalChargingArray(), "blockCrystalChargingArray")
     blockCrystalStorageArray = registerBlock(new BlockCrystalStorageArray(), "blockCrystalStorageArray")
+    blockCrystalHeatExchanger = registerBlock(new BlockCrystalHeatExchanger(), "blockCrystalHeatExchanger")
     blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
 
@@ -94,6 +96,7 @@ object FemtoBlocks {
     blockNaniteExtractor.registerModel()
     blockCrystalChargingArray.registerModel()
     blockCrystalStorageArray.registerModel()
+    blockCrystalHeatExchanger.registerModel()
   }
 
   def postInit(): Unit = {
