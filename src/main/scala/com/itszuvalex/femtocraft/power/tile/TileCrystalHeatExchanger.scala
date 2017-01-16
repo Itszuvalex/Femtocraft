@@ -19,39 +19,46 @@ object TileCrystalHeatExchanger {
   val CRYSTAL_INDEX = 1
 
   val BURN_TIME_KEY = "Burn"
+  val BURN_MAX_KEY  = "BurnMax"
 }
 
 class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with PowerLeafNode {
   var burnTime = 0
+  var burnMax  = 0
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
     if (burnTime > 0) {
-      Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
+      storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { c =>
         val power = Math.min(c.battery.storage, c.getTransferRate())
         battery.storage = Math.min(battery.maxStorage, battery.storage + power)
         c.battery.storage = Math.max(0, c.battery.storage - power)
         val gen = powerPerTick
         battery.storage = Math.min(battery.maxStorage, battery.storage + gen)
-      }
+                                                                                                                      }
 
       burnTime -= 1
     }
 
-    if (burnTime <= 0 && battery.storage < battery.maxStorage && Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).map(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).getOrElse(false)) {
-      Option(storage(TileCrystalHeatExchanger.FUEL_INDEX)).withFilter(!_.isEmpty).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)).foreach { f =>
+    if (burnTime <= 0 && battery.storage < battery.maxStorage && storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) {
+      storage(TileCrystalHeatExchanger.FUEL_INDEX).capabilityOption(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null).foreach { f =>
         burnTime = (f.getBurnTime * TileCrystalHeatExchanger.BURN_TIME_MULTIPLIER).toInt
+        burnMax = burnTime
         storage.split(TileCrystalHeatExchanger.FUEL_INDEX, 1)
-      }
+                                                                                                                                          }
     }
   }
+
+  def getBurnMax: Int = burnMax
+
+  def setBurnMax(i: Int): Unit = burnMax = i
 
   def getBurnTime: Int = burnTime
 
   def setBurnTime(i: Int): Unit = burnTime = i
 
-  def powerPerTick: Double = Option(storage(TileCrystalHeatExchanger.CRYSTAL_INDEX)).withFilter(!_.isEmpty).withFilter(_.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
+  def powerPerTick: Double = storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
 
   override def getMod: AnyRef = Femtocraft
 
@@ -88,11 +95,13 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.readFromNBT(par1nbtTagCompound)
     burnTime = par1nbtTagCompound.getInteger(TileCrystalHeatExchanger.BURN_TIME_KEY)
+    burnMax = par1nbtTagCompound.getInteger(TileCrystalHeatExchanger.BURN_MAX_KEY)
   }
 
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
     val ret = super.writeToNBT(par1nbtTagCompound)
     par1nbtTagCompound.setInteger(TileCrystalHeatExchanger.BURN_TIME_KEY, burnTime)
+    par1nbtTagCompound.setInteger(TileCrystalHeatExchanger.BURN_MAX_KEY, burnMax)
     ret
   }
 

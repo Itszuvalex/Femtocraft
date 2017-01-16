@@ -18,11 +18,11 @@ object TileCrystalStorageArray {
 
 class TileCrystalStorageArray extends TileEntityBase with TileInventory with PowerLeafNode {
   override def serverUpdate(): Unit = {
-    storage.withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.toMinecraft.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
+    storage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
       val power = Math.min(c.battery.storage, c.getTransferRate())
       battery.storage = Math.min(battery.maxStorage, battery.storage + power)
       c.battery.storage = Math.max(0, c.battery.storage - power)
-    }
+                                                                                       }
   }
 
   override def getMod: AnyRef = Femtocraft
@@ -55,7 +55,7 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
 
   override def defaultBattery: IBattery = new PowerBattery(0) {
     override def maxStorage: Double = {
-      istorage.withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.toMinecraft.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((sum, crystal) => sum + crystal.battery.maxStorage) * TileCrystalStorageArray.STORAGE_MULTIPLIER
+      istorage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((sum, crystal) => sum + crystal.battery.maxStorage) * TileCrystalStorageArray.STORAGE_MULTIPLIER
     }
   }
 
