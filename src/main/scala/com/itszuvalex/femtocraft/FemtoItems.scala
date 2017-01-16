@@ -13,8 +13,12 @@ import net.minecraftforge.oredict.OreDictionary
 object FemtoItems {
   var itemPowerCrystal: Item = null
 
-  var itemDumbDust     : Item = null
-  var itemCracklingDust: Item = null
+  var itemDumbDust               : Item = null
+  var itemCracklingDust          : Item = null
+  var itemRiftironDust           : Item = null
+  var itemPhasemetalDust         : Item = null
+  var itemRedstonereplacementDust: Item = null
+  var itemDiamondreplacementDust : Item = null
 
   var itemFrame     : Item = null
   var itemMultiblock: Item = null
@@ -28,6 +32,10 @@ object FemtoItems {
     itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
+    itemRiftironDust = registerItem(new Item(), "itemRiftironDust").setCreativeTab(Femtocraft.tab).registerOre("dustRiftiron")
+    itemPhasemetalDust = registerItem(new Item(), "itemPhasemetalDust").setCreativeTab(Femtocraft.tab).registerOre("dustPhasemetal")
+    itemRedstonereplacementDust = registerItem(new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
+    itemDiamondreplacementDust = registerItem(new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
@@ -35,6 +43,10 @@ object FemtoItems {
   def init(): Unit = {
     itemDumbDust.registerModel()
     itemCracklingDust.registerModel()
+    itemRiftironDust.registerModel()
+    itemPhasemetalDust.registerModel()
+    itemRedstonereplacementDust.registerModel()
+    itemDiamondreplacementDust.registerModel()
   }
 
   def postInit(): Unit = {
