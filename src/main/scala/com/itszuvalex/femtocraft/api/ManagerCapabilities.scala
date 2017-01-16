@@ -1,6 +1,8 @@
 package com.itszuvalex.femtocraft.api
 
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable}
 import com.itszuvalex.femtocraft.api.power._
+import com.itszuvalex.femtocraft.nanite.NaniteTank
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
@@ -22,6 +24,8 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[PowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[Color], new ColorStorage, classOf[Color])
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
+    CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -43,6 +47,10 @@ object ManagerCapabilities {
       */
     }
   }
+
+  class NaniteTankStorage extends DummyStorage[INaniteTank]
+
+  class NaniteUpgradeableStorage extends DummyStorage[INaniteUpgradeable]
 
   abstract class DummyStorage[T] extends Capability.IStorage[T] {
     override def writeNBT(capability: Capability[T], instance: T, side: EnumFacing): NBTBase = {new NBTTagCompound}
@@ -152,6 +160,10 @@ object ManagerCapabilities {
     override def setStoragePartial(amount: Double): Unit = {}
 
     override def battery: IBattery = null
+  }
+
+  class NaniteUpgradeableDummy extends INaniteUpgradeable {
+    override def tank: INaniteTank = null
   }
 
 }

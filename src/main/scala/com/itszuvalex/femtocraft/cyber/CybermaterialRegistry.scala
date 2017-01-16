@@ -56,6 +56,10 @@ object CybermaterialRegistry {
     registerBlockWithItem(FemtoBlocks.blockCyberwood, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
     registerBlockWithItem(FemtoBlocks.blockCyberleaf, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
     registerBlockWithItem(FemtoBlocks.blockCyberweave, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockRiftiron, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockPhasemetal, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockDiamondreplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockRedstonereplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
   }
 
   private def registerReplacements(): Unit = {
@@ -71,6 +75,10 @@ object CybermaterialRegistry {
     (0 until 16).foreach(registerBlockReplacement(Blocks.STONE, _, FemtoBlocks.blockCyberweave, 0))
     (0 until 16).foreach(registerBlockReplacement(Blocks.GRASS, _, FemtoBlocks.blockCyberweave, 0))
     (0 until 16).foreach(registerBlockReplacement(Blocks.DIRT, _, FemtoBlocks.blockCyberweave, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.IRON_ORE, _, FemtoBlocks.blockRiftiron, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.GOLD_ORE, _, FemtoBlocks.blockPhasemetal, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.REDSTONE_ORE, _, FemtoBlocks.blockRedstonereplacement, 0))
+    (0 until 16).foreach(registerBlockReplacement(Blocks.DIAMOND_ORE, _, FemtoBlocks.blockDiamondreplacement, 0))
   }
 
   def registerBlockReplacement(block: Block, damage: Int, replaceBlock: Block, replaceDamage: Int) = {

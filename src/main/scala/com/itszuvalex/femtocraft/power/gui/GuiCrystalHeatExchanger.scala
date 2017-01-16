@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power.gui
 
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalHeatExchanger
@@ -9,6 +10,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import org.lwjgl.opengl.GL11
 
+
+object GuiCrystalHeatExchanger {
+  val TEXTURE_LOC = Resources.TexGui("guicrystalheatexchanger.png")
+}
 
 class GuiCrystalHeatExchanger(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCrystalHeatExchanger)
   extends GuiBase(new ContainerCrystalHeatExchanger(player, inv, tile, false)) {
@@ -23,7 +28,7 @@ class GuiCrystalHeatExchanger(player: EntityPlayer, inv: InventoryPlayer, privat
 
   override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiCrystalChargingArray.TEXTURE_LOC)
+    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiCrystalHeatExchanger.TEXTURE_LOC)
     val k = (width - xSize) / 2
     val l = (height - ySize) / 2
     drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
