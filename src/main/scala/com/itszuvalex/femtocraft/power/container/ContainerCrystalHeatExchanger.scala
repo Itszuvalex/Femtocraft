@@ -14,6 +14,7 @@ class ContainerCrystalHeatExchanger(parPlayer: EntityPlayer, inv: InventoryPlaye
   addSync(new SyncDouble(() => te.battery.maxStorage, (max) => te.battery.maxStorage = max))
   addSync(new SyncDouble(() => te.battery.storage, (storage) => te.battery.storage = storage))
   addSync(new SyncInt(() => te.getBurnTime, (i: Int) => te.setBurnTime(i)))
+  addSync(new SyncInt(() => te.getBurnMax, (i: Int) => te.setBurnMax(i)))
 
   if (addSyncs) {
     te.storage.indices.foreach(i => addSync(new SyncItemStorageItemStack(te.storage, i)))
