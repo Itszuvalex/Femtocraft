@@ -16,6 +16,8 @@ import scala.collection.mutable
 object DustRecipeRegistry {
   val defaultDust = 2
 
+  private val itemStackOverrides: mutable.TreeMap[ItemStack, ItemStack] = new mutable.TreeMap[ItemStack, ItemStack]()((x: ItemStack, y: ItemStack) => com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator.compare(x, y))
+
   private val validOres  = mutable.Set[String]()
   private val oreDustNum = mutable.HashMap[String, Int]()
 
@@ -38,9 +40,14 @@ object DustRecipeRegistry {
 
   def registerDustOverrides(): Unit = {
     overrideDustMapping("oreRedstone", 6)
+    overrideDustMapping("oreRedstonereplacement", 6)
   }
 
   def overrideDustMapping(ore: String, num: Int) = oreDustNum(ore) = num
+
+  def addItemStackMapping(ore: ItemStack, dust: ItemStack) = {
+    itemStackOverrides += ((ore, dust))
+  }
 
   def extractOresFromOreDictionary(): Unit = {
     val oreOreToDustMap = mutable.HashMap[String, (Boolean, Boolean)]()
@@ -68,6 +75,12 @@ object DustRecipeRegistry {
   }
 
   def getDust(item: ItemStack): Option[ItemStack] = {
+    itemStackOverrides.find(p => ItemStack.areItemStacksEqual(item, p._1) && ItemStack.areItemStackTagsEqual(item, p._1)) match {
+      case Some(a) =>
+        return Some(a._2.copy())
+      case None =>
+    }
+
     OreDictionary.getOreIDs(item).map(OreDictionary.getOreName).foreach { ore =>
       getDustForOre(ore) match {
         case None =>

@@ -6,11 +6,12 @@ import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.gui.{GuiItemStack, GuiLabel}
+import com.itszuvalex.itszulib.gui.{GuiItemStack, GuiLabel, GuiProgress}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.util.EnumFacing
+import org.lwjgl.opengl.GL11
 
 /**
   * Created by Alex on 18.08.2016.
@@ -34,6 +35,10 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   //TODO: Make actual "machine color"
   var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
+  val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat)
+  progressBar.colorProgress = color.toInt
+  add(progressBar)
+
   val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
   val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
   //TODO: IItemStack.Empty - needs ItszuLib GuiItemStack change
@@ -43,34 +48,5 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
 
   val elems = List(nameLabel, inputSlot, outputSlot, powerMeter)
   add(elems: _*)
-//  elems.foreach(e => e.setShouldRender(false))
-
-  override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
-//    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-//    GL11.glDisable(GL11.GL_BLEND)
-//    GL11.glDisable(GL11.GL_LIGHTING)
-//    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiNanoFurnace.texture)
-//    val k = (width - xSize) / 2
-//    val l = (height - ySize) / 2
-//    drawTexturedModalRect(k, l, 0, 2, xSize, ySize)
-//
-//    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiNanoFurnace.colorTexture)
-//    GL11.glColor4f((color.red & 255) / 255f, (color.green & 255) / 255f, (color.blue & 255) / 255f, 1)
-//    drawTexturedModalRect(k + 67, l + 48, 0, 0, 106, 107)
-//
-//    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiNanoFurnace.texture)
-//    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-//    val prog = (tile.getProgress / tile.getProgressMax * 13).toInt
-//    drawTexturedModalRect(k + 67, l + 26 + 13 - prog, 183, 13 - prog, 13, prog)
-//
-//    GL11.glScaled(.5, .5, .5)
-//    nameLabel.render(2 * (anchorX + nameLabel.anchorX), 2 * (anchorY + nameLabel.anchorY), mouseX - anchorX - nameLabel.anchorX, mouseY - anchorY - nameLabel.anchorY, partialTicks)
-//    GL11.glScaled(2, 2, 2)
-//    inputSlot.render(anchorX + inputSlot.anchorX, anchorY + inputSlot.anchorY, mouseX - anchorX - inputSlot.anchorX, mouseY - anchorY - inputSlot.anchorY, partialTicks)
-//    outputSlot.render(anchorX + outputSlot.anchorX, anchorY + outputSlot.anchorY, mouseX - anchorX - outputSlot.anchorX, mouseY - anchorY - outputSlot.anchorY, partialTicks)
-//    powerMeter.render(anchorX + powerMeter.anchorX, anchorY + powerMeter.anchorY, mouseX - anchorX - powerMeter.anchorX, mouseY - anchorY - powerMeter.anchorY, partialTicks)
-
-    super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY)
-  }
-
+  //  elems.foreach(e => e.setShouldRender(false))
 }

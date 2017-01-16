@@ -49,7 +49,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-    GL11.glDisable(GL11.GL_BLEND)
+//    GL11.glDisable(GL11.GL_BLEND)
     GL11.glDisable(GL11.GL_LIGHTING)
     Minecraft.getMinecraft.getTextureManager.bindTexture(GuiNaniteExtractor.texture)
     val k = (width - xSize) / 2
@@ -68,9 +68,11 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
     GL11.glScaled(.5, .5, .5)
     nameLabel.render(2 * (anchorX + nameLabel.anchorX), 2 * (anchorY + nameLabel.anchorY), mouseX - anchorX - nameLabel.anchorX, mouseY - anchorY - nameLabel.anchorY, partialTicks)
     GL11.glScaled(2, 2, 2)
-    inputSlot.render(anchorX + inputSlot.anchorX, anchorY + inputSlot.anchorY, mouseX - anchorX - inputSlot.anchorX, mouseY - anchorY - inputSlot.anchorY, partialTicks)
+    //    inputSlot.render(anchorX + inputSlot.anchorX, anchorY + inputSlot.anchorY, mouseX - anchorX - inputSlot.anchorX, mouseY - anchorY - inputSlot.anchorY, partialTicks)
     powerMeter.render(anchorX + powerMeter.anchorX, anchorY + powerMeter.anchorY, mouseX - anchorX - powerMeter.anchorX, mouseY - anchorY - powerMeter.anchorY, partialTicks)
     drainButton.render(anchorX + drainButton.anchorX, anchorY + drainButton.anchorY, mouseX - anchorX - drainButton.anchorX, mouseY - anchorY - drainButton.anchorY, partialTicks)
+
+    super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY)
   }
 
 }
