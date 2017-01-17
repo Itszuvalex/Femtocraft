@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
@@ -68,7 +69,11 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
 
   override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-  override def defaultStorage: IItemStorage = new ItemStorageArray(2)
+  override def defaultStorage: IItemStorage = new ItemStorageArray(2) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      isItemValidForSlot(i, stack.toMinecraft)
+    }
+  }
 
   override def getFieldCount: Int = 0
 
