@@ -39,7 +39,7 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   progressBar.colorProgress = color.toInt
   add(progressBar)
 
-  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
+  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, () => "Nano Furnace")
 //  val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
   //TODO: IItemStack.Empty - needs ItszuLib GuiItemStack change
 //  val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}

@@ -30,7 +30,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   //TODO: Make actual "machine color"
   var color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
-  val nameLabel   = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Extractor"), fontRendererObj.FONT_HEIGHT, "Nanite Extractor")
+  val nameLabel   = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Extractor"), fontRendererObj.FONT_HEIGHT, () => "Nanite Extractor")
   val inputSlot   = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
   val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   val drainButton = new GuiButton(85, 23, 45, 15, "Drain") {

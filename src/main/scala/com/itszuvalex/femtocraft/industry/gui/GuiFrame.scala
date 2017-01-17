@@ -24,10 +24,10 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
 
   val nameLabel     = new GuiLabel((panelWidth - fontRendererObj.getStringWidth(tile.multiBlock)) / 2, 7,
     fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
-    tile.multiBlock)
+    () => tile.multiBlock)
   val requiredLabel = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Required")) / 2, 9 + fontRendererObj.FONT_HEIGHT,
     fontRendererObj.getStringWidth("Required"), fontRendererObj.FONT_HEIGHT,
-    "Required")
+    () => "Required")
   val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
   val reqItems      = multiblock match {
     case Some(m) =>

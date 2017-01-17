@@ -27,8 +27,7 @@ class GuiCrystalHeatExchanger(player: EntityPlayer, inv: InventoryPlayer, privat
   add(progressGui)
 
   val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(Capabilities.COLORABLE, null).toInt)
-  val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT, "")
-  powerReading.text = labelText
+  val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT, labelText)
   add(powerReading, powerMeter)
 
   override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
