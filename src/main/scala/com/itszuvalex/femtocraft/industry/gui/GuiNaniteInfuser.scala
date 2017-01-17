@@ -25,7 +25,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
 
   var color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
-  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Infuser"), fontRendererObj.FONT_HEIGHT, "Nanite Infuser")
+  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nanite Infuser"), fontRendererObj.FONT_HEIGHT, () => "Nanite Infuser")
   val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
   val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, EnumFacing.UP), color.toInt)

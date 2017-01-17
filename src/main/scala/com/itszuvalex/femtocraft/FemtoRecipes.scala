@@ -22,8 +22,9 @@ object FemtoRecipes {
 
   def registerVanillaRecipes() = {
     GameRegistry.addShapedRecipe(new ItemStack(FemtoItems.itemFrame, 4), Array("CIC", "I I", "CIC", 'C', FemtoBlocks.blockCyberweave, 'I', Items.IRON_INGOT): _*)
-//    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemFurnaceAssembly), Array[Any](" C ", "CFC", "III", 'C', "cyberweave", 'F', Blocks.FURNACE, 'I', "ingotIron").box: _*))
-//    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemGrinderAssembly), Array[Any](" C ", "CPC", "III", 'C', "cyberweave", 'P', Blocks.PISTON, 'I', "ingotIron").box: _*))
+    GameRegistry.addShapedRecipe(new ItemStack(FemtoItems.itemNanoweaveSheet, 1), Array("TT", "TT", 'T', FemtoItems.itemNanoweaveThread): _*)
+    //    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemFurnaceAssembly), Array[Any](" C ", "CFC", "III", 'C', "cyberweave", 'F', Blocks.FURNACE, 'I', "ingotIron").box: _*))
+    //    GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(FemtoItems.itemGrinderAssembly), Array[Any](" C ", "CPC", "III", 'C', "cyberweave", 'P', Blocks.PISTON, 'I', "ingotIron").box: _*))
   }
 
   def init(): Unit = {

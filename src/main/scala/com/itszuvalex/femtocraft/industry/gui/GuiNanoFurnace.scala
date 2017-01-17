@@ -39,7 +39,7 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   progressBar.colorProgress = color.toInt
   add(progressBar)
 
-  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
+  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, () => "Nano Furnace")
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
 
   val elems = List(nameLabel, powerMeter)

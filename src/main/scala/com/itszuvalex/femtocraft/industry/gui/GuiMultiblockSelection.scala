@@ -31,7 +31,7 @@ object GuiMultiblockSelection {
 
     add(
          new GuiLabel(2, 2,
-                      panelWidth - 40, panelHeight / 2, multi.getName
+                      panelWidth - 40, panelHeight / 2, () => multi.getName
                      ),
          new GuiFlowLayout(2, panelHeight - 20, panelWidth - 4, panelHeight / 2,
                            multi.getRequiredResources.map(i => new GuiItemStack(0, 0, () => false) {
@@ -100,8 +100,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
                      )
   val pageLabel     = new GuiLabel((GuiMultiblockSelection.WIDTH - 100) / 2,
                                    GuiMultiblockSelection.ySelectionMin + GuiMultiblockSelection.SelectionHeight + 4,
-                                   100, 10, "")
-  pageLabel.text = refreshPageLabelText
+                                   100, 10, refreshPageLabelText)
   selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
   var selected: GuiMultiblockSelector = null
   refreshPageLabelText()
@@ -129,7 +128,7 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
           true
         } else false
 
-        override def isDisabled: Boolean = selectionFlow.subElements.headOption.map(_.shouldRender).getOrElse(true)
+        override def isDisabled: Boolean = selectionFlow.subElements.headOption.forall(_.shouldRender)
       },
       pageLabel,
       new GuiButton((GuiMultiblockSelection.WIDTH - 100) / 2,

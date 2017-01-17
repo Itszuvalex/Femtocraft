@@ -37,6 +37,7 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     facing = EnumFacing.SOUTH
     super.renderTileEntityAsItem(x, y, z, partialTicks)
+    GL11.glColor4ub(255.toByte, 255.toByte, 255.toByte, 255.toByte)
   }
 
   override def renderTileEntityInWorld(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
