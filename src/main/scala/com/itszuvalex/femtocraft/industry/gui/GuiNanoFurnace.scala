@@ -40,13 +40,13 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   add(progressBar)
 
   val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Nano Furnace"), fontRendererObj.FONT_HEIGHT, "Nano Furnace")
-  val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
+//  val inputSlot  = new GuiItemStack(44, 23) {override def itemStack = IItemStack.Empty}
   //TODO: IItemStack.Empty - needs ItszuLib GuiItemStack change
-  val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
+//  val outputSlot = new GuiItemStack(85, 23) {override def itemStack = IItemStack.Empty}
   // TODO: IItemStack.Empty
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
 
-  val elems = List(nameLabel, inputSlot, outputSlot, powerMeter)
+  val elems = List(nameLabel, powerMeter)
   add(elems: _*)
   //  elems.foreach(e => e.setShouldRender(false))
 }

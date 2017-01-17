@@ -22,6 +22,7 @@ object FemtoBlocks {
   var blockCyberwood : Block = _
   var blockCyberleaf : Block = _
 
+  var blockNanoweave : Block = _
   var blockRiftiron : Block = _
   var blockPhasemetal : Block = _
   var blockRedstonereplacement : Block = _
@@ -68,6 +69,7 @@ object FemtoBlocks {
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
 
+    blockNanoweave = registerBlock(new BlockNanoweave(), "blockNanoweave").registerOre("oreNanoweave")
     blockRiftiron = registerBlock(new BlockRiftiron(), "blockRiftiron").registerOre("oreRiftiron")
     blockPhasemetal = registerBlock(new BlockPhasemetal(), "blockPhasemetal").registerOre("orePhasemetal")
     blockRedstonereplacement = registerBlock(new BlockRedstonereplacement(), "blockRedstonereplacement").registerOre("oreRedstonereplacement")
@@ -99,6 +101,7 @@ object FemtoBlocks {
     blockCyberweave.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
+    blockNanoweave.registerModel()
     blockRiftiron.registerModel()
     blockPhasemetal.registerModel()
     blockRedstonereplacement.registerModel()
