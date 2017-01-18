@@ -11,7 +11,7 @@ import net.minecraftforge.common.{EnumPlantType, IPlantable}
 /**
   * Created by Christopher on 8/27/2015.
   */
-class BlockCyberweave extends Block(Material.IRON) {
+class BlockSubstrate extends Block(Material.IRON) {
   setHardness(.8f)
 
   override def canSustainPlant(state: IBlockState, world: IBlockAccess, pos: BlockPos, direction: EnumFacing, plantable: IPlantable): Boolean = {

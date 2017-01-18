@@ -18,7 +18,7 @@ import net.minecraftforge.oredict.OreDictionary
   */
 object FemtoBlocks {
   //Cyber
-  var blockCyberweave: Block = _
+  var blockSubstrate: Block = _
   var blockCyberwood : Block = _
   var blockCyberleaf : Block = _
 
@@ -65,7 +65,7 @@ object FemtoBlocks {
   var testWorkerProvider: Block = _
 
   def preInit(): Unit = {
-    blockCyberweave = registerBlock(new BlockCyberweave(), "blockCyberweave").registerOre("cyberweave")
+    blockSubstrate = registerBlock(new BlockSubstrate(), "blockSubstrate").registerOre("substrate")
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
 
@@ -98,7 +98,7 @@ object FemtoBlocks {
   }
 
   def init(): Unit = {
-    blockCyberweave.registerModel()
+    blockSubstrate.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
     blockNanoweave.registerModel()
