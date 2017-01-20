@@ -14,6 +14,7 @@ object FemtoItems {
   var itemPowerCrystal: Item = null
 
   var itemDumbDust               : Item = null
+  var itemCyberleaf              : Item = null
   var itemNanoweaveThread        : Item = null
   var itemNanoweaveSheet         : Item = null
   var itemCracklingDust          : Item = null
@@ -33,6 +34,7 @@ object FemtoItems {
     itemFrame = registerItem(new ItemFrame(), "itemFrame")
     itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
+    itemCyberleaf = registerItem(new Item, "itemCyberleaf")
     itemNanoweaveThread = registerItem(new Item(), "itemNanoweaveThread")
     itemNanoweaveSheet = registerItem(new Item(), "itemNanoweaveSheet")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
@@ -46,6 +48,7 @@ object FemtoItems {
 
   def init(): Unit = {
     itemDumbDust.registerModel()
+    itemCyberleaf.registerModel()
     itemNanoweaveSheet.registerModel()
     itemNanoweaveThread.registerModel()
     itemCracklingDust.registerModel()
