@@ -11,23 +11,25 @@ import net.minecraftforge.oredict.OreDictionary
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
   */
 object FemtoItems {
-  var itemPowerCrystal: Item = null
+  var itemPowerCrystal: Item = _
 
-  var itemDumbDust               : Item = null
-  var itemCyberleaf              : Item = null
-  var itemNanoweaveThread        : Item = null
-  var itemNanoweaveSheet         : Item = null
-  var itemCracklingDust          : Item = null
-  var itemRiftironDust           : Item = null
-  var itemPhasemetalDust         : Item = null
-  var itemRedstonereplacementDust: Item = null
-  var itemDiamondreplacementDust : Item = null
+  var itemDumbDust               : Item = _
+  var itemCyberleaf              : Item = _
+  var itemNanoweaveThread        : Item = _
+  var itemNanoweaveSheet         : Item = _
+  var itemCracklingDust          : Item = _
+  var itemRiftironDust           : Item = _
+  var itemPhasemetalDust         : Item = _
+  var itemRedstonereplacementDust: Item = _
+  var itemDiamondreplacementDust : Item = _
 
-  var itemFrame     : Item = null
-  var itemMultiblock: Item = null
+  var itemSolarPanel              : Item = _
 
-  var itemMultiTool: Item = null
-  var itemShiftTest: Item = null
+  var itemFrame     : Item = _
+  var itemMultiblock: Item = _
+
+  var itemMultiTool: Item = _
+  var itemShiftTest: Item = _
 
   def preInit(): Unit = {
     itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
@@ -35,6 +37,7 @@ object FemtoItems {
     itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
     itemCyberleaf = registerItem(new Item, "itemCyberleaf")
+    itemSolarPanel = registerItem(new Item(), "itemSolarPanel")
     itemNanoweaveThread = registerItem(new Item(), "itemNanoweaveThread")
     itemNanoweaveSheet = registerItem(new Item(), "itemNanoweaveSheet")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
@@ -49,6 +52,7 @@ object FemtoItems {
   def init(): Unit = {
     itemDumbDust.registerModel()
     itemCyberleaf.registerModel()
+    itemSolarPanel.registerModel()
     itemNanoweaveSheet.registerModel()
     itemNanoweaveThread.registerModel()
     itemCracklingDust.registerModel()
