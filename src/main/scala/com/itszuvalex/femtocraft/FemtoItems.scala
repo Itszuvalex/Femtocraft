@@ -22,8 +22,10 @@ object FemtoItems {
   var itemPhasemetalDust         : Item = _
   var itemRedstonereplacementDust: Item = _
   var itemDiamondreplacementDust : Item = _
+  var itemRiftironIngotDevoid    : Item = _
+  var itemPhasemetalIngotDevoid  : Item = _
 
-  var itemSolarPanel              : Item = _
+  var itemSolarPanel: Item = _
 
   var itemFrame     : Item = _
   var itemMultiblock: Item = _
@@ -45,6 +47,8 @@ object FemtoItems {
     itemPhasemetalDust = registerItem(new Item(), "itemPhasemetalDust").setCreativeTab(Femtocraft.tab).registerOre("dustPhasemetal")
     itemRedstonereplacementDust = registerItem(new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
     itemDiamondreplacementDust = registerItem(new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
+    itemRiftironIngotDevoid = registerItem(new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
+    itemPhasemetalIngotDevoid = registerItem(new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
@@ -58,6 +62,8 @@ object FemtoItems {
     itemCracklingDust.registerModel()
     itemRiftironDust.registerModel()
     itemPhasemetalDust.registerModel()
+    itemRiftironIngotDevoid.registerModel()
+    itemPhasemetalIngotDevoid.registerModel()
     itemRedstonereplacementDust.registerModel()
     itemDiamondreplacementDust.registerModel()
   }

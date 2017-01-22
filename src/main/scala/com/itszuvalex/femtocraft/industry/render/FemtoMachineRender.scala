@@ -17,7 +17,7 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
   val frontTex      = Resources.TexBlock("blockmachineblock_front_base.png")
   val frontColorTex = Resources.TexBlock("blockmachineblock_front_color.png")
   var pass          = 0
-  var color         = Color(0, 255.toByte, 255.toByte, 255.toByte)
+  var color         = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
   var lastTe: T     = _
 
   def getColor(te: T): Color
