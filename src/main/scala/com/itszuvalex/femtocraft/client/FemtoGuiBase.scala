@@ -55,7 +55,7 @@ class FemtoGuiBase(tile: TileEntity, c: ContainerBase) extends GuiBase(c) {
       offset += 1
     }
 
-    val greyColor = Color(255.toByte, 40.toByte, 40.toByte, 40.toByte).toInt
+    val greyColor = Color(255.toByte, 30.toByte, 30.toByte, 30.toByte).toInt
     Gui.drawRect(k + offset, l + offset, k + xSize - offset, l + ySize - offset, greyColor)
   }
 }

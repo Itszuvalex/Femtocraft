@@ -30,7 +30,7 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   addGuiAndSync(tile.storage, 0, 44, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
 
-  addPlayerInventorySlots(inv, 4, 75)
+  addPlayerInventorySlots(inv)
 
   //TODO: Make actual "machine color"
   var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)

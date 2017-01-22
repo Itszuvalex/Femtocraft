@@ -24,6 +24,7 @@ object FemtoItems {
   var itemDiamondreplacementDust : Item = _
   var itemRiftironIngotDevoid    : Item = _
   var itemPhasemetalIngotDevoid  : Item = _
+  var itemBasicCircuit           : Item = _
 
   var itemSolarPanel: Item = _
 
@@ -49,12 +50,14 @@ object FemtoItems {
     itemDiamondreplacementDust = registerItem(new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
     itemRiftironIngotDevoid = registerItem(new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
     itemPhasemetalIngotDevoid = registerItem(new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
+    itemBasicCircuit = registerItem(new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
 
   def init(): Unit = {
     itemDumbDust.registerModel()
+    itemFrame.registerModel()
     itemCyberleaf.registerModel()
     itemSolarPanel.registerModel()
     itemNanoweaveSheet.registerModel()
@@ -66,6 +69,7 @@ object FemtoItems {
     itemPhasemetalIngotDevoid.registerModel()
     itemRedstonereplacementDust.registerModel()
     itemDiamondreplacementDust.registerModel()
+    itemBasicCircuit.registerModel()
   }
 
   def postInit(): Unit = {
