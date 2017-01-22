@@ -31,8 +31,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileCrystalChargingArrayID, te: TileCrystalChargingArray) => new GuiCrystalChargingArray(player, player.inventory, te)
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new GuiCrystalStorageArray(player, player.inventory, te)
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new GuiCrystalHeatExchanger(player, player.inventory, te)
-      case (_, _) => null
-      case (_, _) => null
+      case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new GuiDemolisher(player, player.inventory, te)
       case (_, _) => null
     }
   }

@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
+import com.itszuvalex.femtocraft.industry.{DustRecipeRegistry, SynthesizerRegistry}
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.registry.GameRegistry
@@ -9,15 +9,12 @@ import net.minecraftforge.fml.common.registry.GameRegistry
   * Created by Christopher Harris (Itszuvalex) on 1/5/16.
   */
 object FemtoRecipes {
-  implicit def boxChar(char: Char): Character = {
-    new Character(char)
-  }
-
   implicit def boxArray(array: Array[Any]): Array[Object] = array.map { case c: Char => c.asInstanceOf[Character]; case a: Object => a }
 
   def preInit(): Unit = {
     registerVanillaRecipes()
     DustRecipeRegistry.preInit()
+    SynthesizerRegistry.preInit()
   }
 
   def registerVanillaRecipes() = {
@@ -29,14 +26,11 @@ object FemtoRecipes {
 
   def init(): Unit = {
     DustRecipeRegistry.init()
+    SynthesizerRegistry.init()
   }
 
   def postInit() = {
     DustRecipeRegistry.postInit()
+    SynthesizerRegistry.postInit()
   }
-
-  implicit class boxedArray(array: Array[Any]) {
-    def box: Array[Object] = array
-  }
-
 }

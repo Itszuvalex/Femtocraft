@@ -46,6 +46,7 @@ object FemtoBlocks {
   var blockCrystalHeatExchanger  : Block = _
 
   var blockNaniteExtractor: Block = _
+  var blockDemolisher: Block = _
 
   var blockGlowStick: Block = _
 
@@ -87,6 +88,7 @@ object FemtoBlocks {
     blockCrystalStorageArray = registerBlock(new BlockCrystalStorageArray(), "blockCrystalStorageArray")
     blockCrystalHeatExchanger = registerBlock(new BlockCrystalHeatExchanger(), "blockCrystalHeatExchanger")
     blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
+    blockDemolisher = registerBlock(new BlockDemolisher(), "blockDemolisher")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
 
     //tests
@@ -112,6 +114,7 @@ object FemtoBlocks {
     blockCrystals.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()
+    blockDemolisher.registerModel()
     blockCrystalChargingArray.registerModel()
     blockCrystalStorageArray.registerModel()
     blockCrystalHeatExchanger.registerModel()
