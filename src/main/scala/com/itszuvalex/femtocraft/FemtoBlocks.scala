@@ -101,6 +101,7 @@ object FemtoBlocks {
 
   def init(): Unit = {
     blockSubstrate.registerModel()
+    blockFrame.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
     blockNanoweave.registerModel()
