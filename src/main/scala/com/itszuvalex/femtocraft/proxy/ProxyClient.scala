@@ -105,6 +105,7 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalStorageArray), 0, classOf[TileCrystalStorageArray])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalHeatExchanger), 0, classOf[TileCrystalHeatExchanger])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
+    ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
