@@ -40,6 +40,8 @@ object Femtocraft {
   var guiProxy: ProxyGuiCommon = _
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
+    FemtoSounds.preInit()
+
     FemtoBlocks.preInit()
     FemtoItems.preInit()
     FemtoFluids.preInit()
@@ -55,6 +57,7 @@ object Femtocraft {
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
+    FemtoSounds.init()
     FemtoBlocks.init()
     FemtoItems.init()
     FemtoFluids.init()
@@ -65,6 +68,7 @@ object Femtocraft {
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
+    FemtoSounds.postInit()
     FemtoBlocks.postInit()
     FemtoItems.postInit()
     FemtoFluids.postInit()

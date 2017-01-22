@@ -1,3 +1,4 @@
 {
-  "shiftsound": { "category": "player", "sounds" : ["femtocraft:shiftsound"], "subtitle":"femtocraft.subtitle.shiftsound" }
+  "shiftsound": { "category": "player", "sounds" : ["femtocraft:shiftsound"], "subtitle":"femtocraft.subtitle.shiftsound" },
+  "crystalbreak": { "category": "blocks", "sounds" : ["femtocraft:crystalbreak"], "subtitle":"femtocraft.subtitle.crystalbreak" }
 }
