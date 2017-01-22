@@ -96,6 +96,7 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       ShaderUtils.releaseShader()
       FemtoRenderUtils.enableLightMap(tile)
     }
+    GL11.glColor3f(1f, 1f, 1f)
   }
 
   //  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {

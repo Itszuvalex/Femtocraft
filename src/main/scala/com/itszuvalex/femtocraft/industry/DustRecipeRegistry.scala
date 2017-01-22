@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.industry
 import java.util.regex.Pattern
 
 import com.itszuvalex.femtocraft.Femtocraft
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.oredict.OreDictionary
 import org.apache.logging.log4j.Level
@@ -36,6 +37,10 @@ object DustRecipeRegistry {
   def postInit(): Unit = {
     extractOresFromOreDictionary()
     registerDustOverrides()
+
+    addItemStackMapping(new ItemStack(Blocks.STONE), new ItemStack(Blocks.GRAVEL))
+    addItemStackMapping(new ItemStack(Blocks.COBBLESTONE), new ItemStack(Blocks.GRAVEL))
+    addItemStackMapping(new ItemStack(Blocks.GRAVEL), new ItemStack(Blocks.SAND))
   }
 
   def registerDustOverrides(): Unit = {
@@ -75,7 +80,7 @@ object DustRecipeRegistry {
   }
 
   def getDust(item: ItemStack): Option[ItemStack] = {
-    itemStackOverrides.find(p => ItemStack.areItemStacksEqual(item, p._1) && ItemStack.areItemStackTagsEqual(item, p._1)) match {
+    itemStackOverrides.find(p => ItemStack.areItemsEqual(item, p._1) && ItemStack.areItemStackTagsEqual(item, p._1)) match {
       case Some(a) =>
         return Some(a._2.copy())
       case None =>
