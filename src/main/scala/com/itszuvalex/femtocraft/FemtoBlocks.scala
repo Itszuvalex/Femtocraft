@@ -19,13 +19,13 @@ import net.minecraftforge.oredict.OreDictionary
 object FemtoBlocks {
   //Cyber
   var blockSubstrate: Block = _
-  var blockCyberwood : Block = _
-  var blockCyberleaf : Block = _
+  var blockCyberwood: Block = _
+  var blockCyberleaf: Block = _
 
-  var blockNanoweave : Block = _
-  var blockRiftiron : Block = _
-  var blockPhasemetal : Block = _
-  var blockRedstonereplacement : Block = _
+  var blockNanoweave          : Block = _
+  var blockRiftiron           : Block = _
+  var blockPhasemetal         : Block = _
+  var blockRedstonereplacement: Block = _
   var blockDiamondreplacement : Block = _
 
   var blockCrystals: Block = _
@@ -38,15 +38,15 @@ object FemtoBlocks {
   var blockCyberBase             : Block = _
   var blockCyberMachineInProgress: Block = _
 
-  var blockNaniteHiveSmall: Block = _
-  var blockCrystalMount   : Block = _
-  var blockPowerPedestal  : Block = _
-  var blockCrystalChargingArray  : Block = _
-  var blockCrystalStorageArray  : Block = _
-  var blockCrystalHeatExchanger  : Block = _
+  var blockNaniteHiveSmall     : Block = _
+  var blockCrystalMount        : Block = _
+  var blockPowerPedestal       : Block = _
+  var blockCrystalChargingArray: Block = _
+  var blockCrystalStorageArray : Block = _
+  var blockCrystalHeatExchanger: Block = _
 
   var blockNaniteExtractor: Block = _
-  var blockDemolisher: Block = _
+  var blockDemolisher     : Block = _
 
   var blockGlowStick: Block = _
 
@@ -138,7 +138,7 @@ object FemtoBlocks {
       block
     }
 
-    def registerModel() = {
+    def registerModel(): Unit = {
       Femtocraft.proxy.onRegisterBlock(block, block.getUnlocalizedName.substring(5))
     }
   }

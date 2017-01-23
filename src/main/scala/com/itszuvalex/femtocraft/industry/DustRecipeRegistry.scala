@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.industry
 import java.util.regex.Pattern
 
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
-import net.minecraft.init.Blocks
+import net.minecraft.init.{Blocks, Items}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.oredict.OreDictionary
 import org.apache.logging.log4j.Level
@@ -42,6 +42,7 @@ object DustRecipeRegistry {
     addItemStackMapping(new ItemStack(Blocks.COBBLESTONE), new ItemStack(Blocks.GRAVEL))
     addItemStackMapping(new ItemStack(Blocks.GRAVEL), new ItemStack(Blocks.SAND))
     addItemStackMapping(new ItemStack(FemtoBlocks.blockSubstrate), new ItemStack(FemtoItems.itemDumbDust))
+    addItemStackMapping(new ItemStack(Items.DIAMOND), new ItemStack(FemtoItems.itemDiamondDust))
   }
 
   def registerDustOverrides(): Unit = {

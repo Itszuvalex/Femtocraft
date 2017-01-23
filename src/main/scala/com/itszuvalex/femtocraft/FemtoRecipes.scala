@@ -36,6 +36,8 @@ object FemtoRecipes {
     FurnaceRecipes.instance().addSmelting(FemtoItems.itemRiftironDust, new ItemStack(FemtoItems.itemRiftironIngotDevoid), .1f)
     FurnaceRecipes.instance().addSmeltingRecipe(new ItemStack(FemtoBlocks.blockPhasemetal), new ItemStack(FemtoItems.itemPhasemetalIngotDevoid), .1f)
     FurnaceRecipes.instance().addSmelting(FemtoItems.itemPhasemetalDust, new ItemStack(FemtoItems.itemPhasemetalIngotDevoid), .1f)
+    FurnaceRecipes.instance().addSmelting(FemtoItems.itemIronDust, new ItemStack(Items.IRON_INGOT), .1f)
+    FurnaceRecipes.instance().addSmelting(FemtoItems.itemGoldDust, new ItemStack(Items.GOLD_INGOT), .1f)
   }
 
   def init(): Unit = {
