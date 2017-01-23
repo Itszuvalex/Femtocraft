@@ -29,8 +29,16 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
             GL11.glEnable(GL11.GL_BLEND)
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glColor4f(0, 1, 0, .5f)
-            RenderUtils.renderCube(rx.toFloat + (a.getX - player.getPosition.getX), ry.toFloat + (a.getY - player.getPosition.getY), rz.toFloat + (a.getZ - player.getPosition.getZ), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
-            RenderUtils.renderCube(rx.toFloat + (a.getX - player.getPosition.getX), ry.toFloat + (a.getY - player.getPosition.getY) + 1, rz.toFloat + (a.getZ - player.getPosition.getZ), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+            RenderUtils.renderCube(
+              rx.toFloat + (a.getX - player.getPosition.getX),
+              ry.toFloat + (a.getY - player.getPosition.getY),
+              rz.toFloat + (a.getZ - player.getPosition.getZ),
+              0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+            RenderUtils.renderCube(
+              rx.toFloat + (a.getX - player.getPosition.getX),
+              ry.toFloat + (a.getY - player.getPosition.getY) + 1,
+              rz.toFloat + (a.getZ - player.getPosition.getZ),
+              0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
             GL11.glEnable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDisable(GL11.GL_BLEND)
@@ -50,8 +58,16 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
             GL11.glEnable(GL11.GL_BLEND)
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glColor4f(0, 1, 0, .5f)
-            RenderUtils.renderCube(rx.toFloat + (a.getX - loc.x), ry.toFloat + (a.getY - loc.y), rz.toFloat + (a.getZ - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
-            RenderUtils.renderCube(rx.toFloat + (a.getX - loc.x), ry.toFloat + (a.getY - loc.y) + 1, rz.toFloat + (a.getZ - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+            RenderUtils.renderCube(
+              rx.toFloat + (a.getX - loc.x),
+              ry.toFloat + (a.getY - loc.y),
+              rz.toFloat + (a.getZ - loc.z),
+              0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+            RenderUtils.renderCube(
+              rx.toFloat + (a.getX - loc.x),
+              ry.toFloat + (a.getY - loc.y) + 1,
+              rz.toFloat + (a.getZ - loc.z),
+              0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
             GL11.glEnable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDisable(GL11.GL_BLEND)
