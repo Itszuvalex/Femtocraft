@@ -15,4 +15,6 @@ trait IPowerStorageNode {
   def transferRate: Double
 
   def getStorageLoc: Loc4
+
+  def changeForLastTick: Double = 0d
 }

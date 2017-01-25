@@ -10,6 +10,8 @@ import net.minecraftforge.common.capabilities.Capability
 import org.apache.logging.log4j.Level
 
 object PowerNetwork {
+  val TICKS_TO_AVERAGE_POWER_OVER: Int = 20 * 10
+
   def createFromTile(tile: IPowerNetworkNode): PowerNetwork = {
     val network = new PowerNetwork
     network.addNode(tile)
@@ -18,6 +20,44 @@ object PowerNetwork {
 }
 
 class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.getNextID) {
+  var lastTickProducerGen = 0d
+  var lastTickConsumerReq = 0d
+  var lastTickStored = 0d
+  var lastTickStorageMax = 0d
+  var lastTickStorageChange = 0d
+  var lastTickNetChange = 0d
+  val powerAverageCache = new Array[Double](PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
+  var powerAverageCount = 0
+  var powerAverageInd = 0
+  var producerNodeCount = 0
+  var consumerNodeCount = 0
+  var storageNodeCount = 0
+
+  def countProducers: Int = producerNodeCount
+
+  def countConsumer: Int = consumerNodeCount
+
+  def countStorage: Int = storageNodeCount
+
+  def powerProducedLastTick: Double = lastTickProducerGen
+
+  def powerConsumedLastTick: Double = lastTickConsumerReq
+
+  def powerStored: Double = lastTickStored
+
+  def powerStorage: Double = lastTickStorageMax
+
+  def powerStorageDelta: Double = lastTickStorageChange
+
+  def lastTickNetworkDelta: Double = lastTickNetChange
+
+  def averagePowerTrend: Double = if (powerAverageCount == 0) 0 else (0 until powerAverageCount).map(powerAverageCache).sum / powerAverageCount
+
+  private def trackPowerTrend(a: Double): Unit = {
+    powerAverageCache(powerAverageInd) = a
+    powerAverageCount = Math.max(PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER, powerAverageCount + 1)
+    powerAverageInd = (powerAverageInd + 1) % PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER
+  }
 
   override def networkCapability: Capability[IPowerNetworkNode] = Capabilities.TILE_POWER_NODE
 
@@ -38,11 +78,22 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       var storageRoom = 0d
       var consumerRoom = 0d
 
+      lastTickProducerGen = 0d
+      lastTickConsumerReq = 0d
+      lastTickStorageChange = 0d
+      lastTickStored = 0d
+      lastTickStorageMax = 0d
+      consumerNodeCount = 0
+      producerNodeCount = 0
+      storageNodeCount = 0
+
       val cacheStorageNodes = storageNodes
 
       val producerPowerNodes = producerNodes.map { node =>
         val min = Math.min(node.battery.storage, node.transferRate)
         producedPower += min
+        lastTickProducerGen += node.changeForLastTick
+        producerNodeCount += 1
         (node, min)
       }.toSeq.
         // Order by nodes with least room.  This prioritizes preventing generators from filling up in power.
@@ -50,6 +101,10 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       val storedPowerNodes = cacheStorageNodes.map { node =>
         val min = Math.min(node.battery.storage, node.transferRate)
         storedPower += min
+        lastTickStored += storedPower
+        lastTickStorageMax += node.battery.maxStorage
+        lastTickStorageChange += node.changeForLastTick
+        storageNodeCount += 1
         (node, min)
       }.toSeq.
         // Order by nodes with least room.  This prioritizes preventing storage from filling up in power.
@@ -59,18 +114,23 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         storageRoom += min
         (node, min)
       }.toSeq.
-      // Order by nodes with least power.  This prioritizes preventing storage from running out of power.
-      sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
+        // Order by nodes with least power.  This prioritizes preventing storage from running out of power.
+        sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
       // Doesn't matter since storage is assumed equal
       val consumerRoomNodes = consumerNodes.map { node =>
         val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
         consumerRoom += min
+        lastTickConsumerReq += node.changeForLastTick
+        consumerNodeCount += 1
         (node, min)
       }.toSeq.
         // Order by nodes with least power.  This prioritizes preventing consumers from running out of power.
         sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
 
       // Return early to prevent unnecessary computation
+
+      lastTickNetChange = lastTickProducerGen + lastTickConsumerReq
+      trackPowerTrend(lastTickNetChange)
 
       // No power left to distribute
       if (producedPower <= 0 && storedPower <= 0) return
