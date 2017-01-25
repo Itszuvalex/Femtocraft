@@ -18,11 +18,13 @@ object TileCrystalStorageArray {
 
 class TileCrystalStorageArray extends TileEntityBase with TileInventory with PowerLeafNode {
   override def serverUpdate(): Unit = {
+    super.serverUpdate()
+
     storage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
       val power = Math.min(c.battery.storage, c.getTransferRate())
       battery.storage = Math.min(battery.maxStorage, battery.storage + power)
       c.battery.storage = Math.max(0, c.battery.storage - power)
-                                                                                       }
+    }
   }
 
   override def getMod: AnyRef = Femtocraft

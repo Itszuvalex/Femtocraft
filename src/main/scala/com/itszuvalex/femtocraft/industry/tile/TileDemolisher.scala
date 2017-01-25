@@ -93,6 +93,7 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
   override def getGuiID = GuiIDs.TileDemolisherGuiID
 
   override def serverUpdate(): Unit = {
+    super.serverUpdate()
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty && DustRecipeRegistry.getDust(item.toMinecraft).isDefined) {

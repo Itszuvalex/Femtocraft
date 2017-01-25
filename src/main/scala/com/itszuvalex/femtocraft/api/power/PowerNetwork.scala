@@ -51,11 +51,11 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   def lastTickNetworkDelta: Double = lastTickNetChange
 
-  def averagePowerTrend: Double = if (powerAverageCount == 0) 0 else (0 until powerAverageCount).map(powerAverageCache).sum / powerAverageCount
+  def averagePowerTrend: Double = if (powerAverageCount == 0) 0d else powerAverageCache.map(_ / powerAverageCount).sum
 
   private def trackPowerTrend(a: Double): Unit = {
     powerAverageCache(powerAverageInd) = a
-    powerAverageCount = Math.max(PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER, powerAverageCount + 1)
+    powerAverageCount = Math.min(PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER, powerAverageCount + 1)
     powerAverageInd = (powerAverageInd + 1) % PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER
   }
 
@@ -101,7 +101,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       val storedPowerNodes = cacheStorageNodes.map { node =>
         val min = Math.min(node.battery.storage, node.transferRate)
         storedPower += min
-        lastTickStored += storedPower
+        lastTickStored += node.battery.storage
         lastTickStorageMax += node.battery.maxStorage
         lastTickStorageChange += node.changeForLastTick
         storageNodeCount += 1

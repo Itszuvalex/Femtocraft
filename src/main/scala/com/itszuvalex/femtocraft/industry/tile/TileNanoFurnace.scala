@@ -98,6 +98,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def getGuiID = GuiIDs.TileFurnaceGuiID
 
   override def serverUpdate(): Unit = {
+    super.serverUpdate()
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).func_190926_b()) {
