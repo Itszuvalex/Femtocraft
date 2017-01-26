@@ -132,7 +132,7 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
 
   override def setField(id: Int, value: Int): Unit = {}
 
-  override def getDisplayName: ITextComponent = new TextComponentString("")
+  override def getDisplayName: ITextComponent = null
 
   /**
     * Changes size of the inventory to be equal to size.  Keeps current inventory from slots 0 -> (size-1), and will
