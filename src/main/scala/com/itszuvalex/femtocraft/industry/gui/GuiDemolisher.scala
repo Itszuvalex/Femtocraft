@@ -1,9 +1,10 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.client.FemtoGuiBase
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiPanelTexture}
 import com.itszuvalex.femtocraft.industry.container.ContainerDemolisher
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiProgress}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -11,6 +12,7 @@ import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.util.EnumFacing
 
 class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileDemolisher) extends FemtoGuiBase(tile, new ContainerDemolisher(player, inv, tile, false)) {
+  tabBar.addTab("Network", new GuiPanelTexture(2, 2, 18, 18, Resources.TexGui("tabnetwork.png")), GuiIDs.TilePowerNetworkID)
 
   fontRendererObj = Minecraft.getMinecraft.fontRendererObj
   xSize = 183
@@ -28,7 +30,7 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
   progressBar.colorProgress = color.toInt
   add(progressBar)
 
-  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Demolisher"), fontRendererObj.FONT_HEIGHT, () => "Demolisher")
+  val nameLabel = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Demolisher"), fontRendererObj.FONT_HEIGHT, () => "Demolisher")
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
 
   val elems = List(nameLabel, powerMeter)
