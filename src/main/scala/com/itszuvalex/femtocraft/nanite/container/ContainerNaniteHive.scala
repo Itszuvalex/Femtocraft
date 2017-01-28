@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.nanite.container
 
+import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerInv
@@ -16,21 +17,21 @@ object ContainerNaniteHive {
   val POWER_SMALL_INDEX = 2
 }
 
-class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall, shouldSync: Boolean) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, shouldSync) {
-//  addSync(new SyncDouble(() => inventory.battery.storage, (a: Double) => inventory.battery.storage = a))
+class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall, shouldSync: Boolean) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, GuiIDs.TileNaniteHiveGuiID, shouldSync) {
+  //  addSync(new SyncDouble(() => inventory.battery.storage, (a: Double) => inventory.battery.storage = a))
 
   if (shouldSync) {
     val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
 
     (0 until 3).foreach { i =>
       (0 until 9).foreach { j =>
-        addSync(new SyncItemStorageItemStack(storage, j + i * 9))
+        addSync(new SyncItemStorageItemStack(GuiID, storage, j + i * 9))
       }
     }
 
-    addSync(new SyncItemStorageItemStack(storage, 27))
-    addSync(new SyncItemStorageItemStack(storage, 28))
-    addSync(new SyncItemStorageItemStack(storage, 29))
+    addSync(new SyncItemStorageItemStack(GuiID, storage, 27))
+    addSync(new SyncItemStorageItemStack(GuiID, storage, 28))
+    addSync(new SyncItemStorageItemStack(GuiID, storage, 29))
     addPlayerInventorySlots(inv, 32, 83)
   }
 

@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.container.ContainerNaniteExtractor
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
@@ -46,6 +46,9 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   val elems = List(nameLabel, inputSlot, powerMeter, drainButton)
   add(elems: _*)
   elems.foreach(e => e.setShouldRender(false))
+
+
+  override def GuiID: Int = GuiIDs.TileNaniteExtractorID
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)

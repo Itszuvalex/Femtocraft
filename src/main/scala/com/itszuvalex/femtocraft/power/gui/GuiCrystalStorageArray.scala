@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalStorageArray
@@ -25,6 +25,8 @@ class GuiCrystalStorageArray(player: EntityPlayer, inv: InventoryPlayer, private
 
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(Capabilities.COLORABLE, null).toInt)
   add(powerMeter)
+
+  override def GuiID: Int = GuiIDs.TileCrystalStorageArrayID
 
   override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)

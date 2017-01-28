@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.industry.gui.GuiMultiblockSelection.GuiMultiblo
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem, IFrameMultiblock}
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageMultiblockSelection
-import com.itszuvalex.femtocraft.{FemtoItems, Resources}
+import com.itszuvalex.femtocraft.{FemtoItems, GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
@@ -104,6 +104,8 @@ class GuiMultiblockSelection(player: EntityPlayer, stack: ItemStack) extends Gui
   selectionFlow.primaryFlow = GuiFlowLayout.FlowDirection.Vertical
   var selected: GuiMultiblockSelector = null
   refreshPageLabelText()
+
+  override def GuiID: Int = GuiIDs.TileFrameMultiblockSelectorGuiID
 
   def selectMultiblock(multi: GuiMultiblockSelector) = {
     if (selected != null) selected.setSelected(false)

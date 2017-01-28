@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.industry.container.ContainerFrameConstructing
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.util.ItemUtils
@@ -28,6 +28,8 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
   val constructingLabel    = new GuiLabel((panelWidth - frender.getStringWidth(constructingString)) / 2, panelHeight - 30, frender.getStringWidth(constructingString), frender.FONT_HEIGHT, () => constructingString)
 
   add(nameLabel, constructingLabel)
+
+  override def GuiID: Int = GuiIDs.TileFrameConstructingGuiID
 
   def frender: FontRenderer = {
     Minecraft.getMinecraft.fontRendererObj

@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.container
 
+import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.container.ContainerBase
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -10,7 +11,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/18/2016.
   */
-class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerBase(true) {
+class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerBase(GuiIDs.TileFrameConstructingGuiID, true) {
   var lastProgress = 0
 
   override def canInteractWith(p_75145_1_ : EntityPlayer): Boolean = true

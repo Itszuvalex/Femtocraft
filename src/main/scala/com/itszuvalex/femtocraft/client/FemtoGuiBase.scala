@@ -14,17 +14,15 @@ import org.lwjgl.opengl.GL11
 /**
   * Created by Chris on 1/15/2017.
   */
-class FemtoGuiBase(tile: TileEntity, c: ContainerBase) extends GuiBase(c) {
+abstract class FemtoGuiBase(tile: TileEntity, c: ContainerBase) extends GuiBase(c) {
   val tabBar: GuiTabBar = new GuiTabBar(-GuiTabBar.WIDTH, 0,
-    ySize, getGuiID, tile.asInstanceOf[TileEntityBase])
-  tabBar.addTab(tile.getDisplayName.getFormattedText, new GuiItemStack(0, 0, () => false, "") {
+    ySize, GuiID, tile.asInstanceOf[TileEntityBase])
+  tabBar.addTab(Option(tile.getDisplayName).map(_.getFormattedText).getOrElse("Inventory"), new GuiItemStack(0, 0, () => false, "") {
     val item = Converter.IItemStackFromItemStack(new ItemStack(tile.getBlockType))
 
     override def itemStack = item
   }, tile.asInstanceOf[TileEntityBase].getGuiID)
   add(tabBar)
-
-  def getGuiID = tile.asInstanceOf[TileEntityBase].getGuiID
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)

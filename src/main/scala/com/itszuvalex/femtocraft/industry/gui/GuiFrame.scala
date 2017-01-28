@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
@@ -55,6 +55,8 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
       elements: _*
     )
   }
+
+  override def GuiID: Int = GuiIDs.TileFrameMultiblockGuiID
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)

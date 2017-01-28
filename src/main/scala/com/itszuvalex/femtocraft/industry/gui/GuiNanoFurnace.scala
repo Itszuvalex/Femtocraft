@@ -1,17 +1,15 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
-import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.gui.{GuiItemStack, GuiLabel, GuiProgress}
+import com.itszuvalex.itszulib.gui.{GuiLabel, GuiProgress}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.util.EnumFacing
-import org.lwjgl.opengl.GL11
 
 /**
   * Created by Alex on 18.08.2016.
@@ -45,4 +43,5 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
   val elems = List(nameLabel, powerMeter)
   add(elems: _*)
   //  elems.foreach(e => e.setShouldRender(false))
+  override def GuiID: Int = GuiIDs.TileFurnaceGuiID
 }

@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalMount
 import com.itszuvalex.femtocraft.power.gui.GuiCrystalMount._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
@@ -21,6 +21,8 @@ class GuiCrystalMount(player: EntityPlayer, inv: InventoryPlayer, private val ti
 
   addGuiAndSync(tile.storage, 0, 79, 33)
   addPlayerInventorySlots(inv)
+
+  override def GuiID: Int = GuiIDs.TileCrystalMountGuiID
 
   override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)

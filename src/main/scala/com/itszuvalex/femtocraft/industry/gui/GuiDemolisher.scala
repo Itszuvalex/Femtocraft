@@ -23,6 +23,8 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
 
   addPlayerInventorySlots(inv)
 
+  override def GuiID: Int = GuiIDs.TileDemolisherGuiID
+
   //TODO: Make actual "machine color"
   var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
