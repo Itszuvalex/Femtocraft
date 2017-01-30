@@ -27,8 +27,6 @@ import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
-import com.itszuvalex.femtocraft.network.FemtoPacketHandler
-import com.itszuvalex.femtocraft.network.messages.MessageRequestSyncs
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
 import com.itszuvalex.femtocraft.power.render._
@@ -37,9 +35,6 @@ import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
-import com.itszuvalex.itszulib.ItszuLib
-import com.itszuvalex.itszulib.container.ContainerBase
-import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
@@ -51,12 +46,9 @@ import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
-import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.model.obj.OBJLoader
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.entity.player.PlayerContainerEvent
 import net.minecraftforge.fml.client.registry.ClientRegistry
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
@@ -178,7 +170,6 @@ class ProxyClient extends ProxyCommon {
     super.registerEventHandlers()
     //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
     MinecraftForge.EVENT_BUS.register(new PlayerNaniteCapabilitiesOverlay)
-    MinecraftForge.EVENT_BUS.register(this)
   }
 
   override def onRegisterItem[T <: Item](item: T, name: String): Unit = {
@@ -187,16 +178,5 @@ class ProxyClient extends ProxyCommon {
 
   override def onRegisterBlock[T <: Block](block: T, name: String): Unit = {
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(Femtocraft.ID.toLowerCase() + ":" + name, "inventory"))
-  }
-
-  @SubscribeEvent
-  def onGuiOpen(event: GuiOpenEvent): Unit = {
-    event.getGui match {
-      case null =>
-      case a: GuiBase if a.inventorySlots.isInstanceOf[ContainerBase] =>
-        ItszuLib.proxy.syncCache.onContainerOpen(new PlayerContainerEvent.Open(Minecraft.getMinecraft.thePlayer, a.inventorySlots))
-        FemtoPacketHandler.INSTANCE.sendToServer(new MessageRequestSyncs)
-      case _ =>
-    }
   }
 }

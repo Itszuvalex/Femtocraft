@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.network.messages
 
+import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -33,12 +34,14 @@ class MessageRequestSyncs(var x: Int, var y: Int, var z: Int, var dim: Int) exte
   }
 
   override def onMessage(message: MessageRequestSyncs, ctx: MessageContext): IMessage = {
-    ctx.getServerHandler.playerEntity.openContainer match {
-      case a: ContainerBase =>
-        Debug.log(Level.WARN, "Received Sync Request")
-        a.syncs.foreach(_.sync(ctx.getServerHandler.playerEntity))
-      case _ =>
-    }
+    ItszuLib.proxy.addScheduledTask(() => {
+      ctx.getServerHandler.playerEntity.openContainer match {
+        case a: ContainerBase =>
+          Debug.log(Level.WARN, "Received Sync Request")
+          a.syncs.foreach(_.sync(ctx.getServerHandler.playerEntity))
+        case _ =>
+      }
+    })
     null
   }
 }

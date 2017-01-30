@@ -4,6 +4,7 @@ import java.util.Random
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
@@ -41,9 +42,11 @@ class MessageNaniteTeleport(var x: Int, var y: Int, var z: Int, var dim: Int, va
     val start = Loc4(message.x, message.y, message.z, message.dim)
     val end = Loc4(message.endX, message.endY, message.endZ, message.dim)
     val world = start.getWorld.get
-    spawnParticles(world, start)
-    spawnParticles(world, end)
-    spawnTransitionParticles(world, start, end)
+    ItszuLib.proxy.addScheduledTask(() => {
+      spawnParticles(world, start)
+      spawnParticles(world, end)
+      spawnTransitionParticles(world, start, end)
+    })
     null
   }
 
