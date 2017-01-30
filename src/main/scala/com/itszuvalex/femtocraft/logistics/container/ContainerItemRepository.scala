@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.container
 
+import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository._
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.itszulib.container.ContainerInv
@@ -18,7 +19,7 @@ object ContainerItemRepository {
   val playerInventoryStartY = 129
 }
 
-class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0, true) {
+class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0, GuiIDs.TileItemRepositoryGuiID, true) {
 
   (0 until TileItemRepository.INVENTORY_SIZE).
     foreach { i =>

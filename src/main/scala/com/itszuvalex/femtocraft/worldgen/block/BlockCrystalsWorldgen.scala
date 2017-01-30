@@ -5,13 +5,15 @@ import java.util.Random
 import com.itszuvalex.femtocraft.power.item.{IPowerCrystal, ItemPowerCrystal}
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen._
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoItems, FemtoSounds, Femtocraft}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.util.InventoryUtils
+import net.minecraft.block.SoundType
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
+import net.minecraft.init.SoundEvents
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
@@ -38,6 +40,7 @@ object BlockCrystalsWorldgen {
 }
 
 class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
+  setSoundType(new SoundType(1.0F, 1.0F, FemtoSounds.crystalBreakSound, SoundEvents.BLOCK_GLASS_STEP, FemtoSounds.crystalBreakSound, SoundEvents.BLOCK_GLASS_HIT, SoundEvents.BLOCK_GLASS_FALL))
   setCreativeTab(Femtocraft.tab)
 
   override def isOpaqueCube(state: IBlockState): Boolean = false

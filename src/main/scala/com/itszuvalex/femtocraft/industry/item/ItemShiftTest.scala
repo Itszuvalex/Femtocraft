@@ -43,9 +43,9 @@ class ItemShiftTest extends Item {
     var lastY = -1
     var lastZ = -1
     val found = (dist to(0, -.25d)).exists { step =>
-      val x = (player.posX + (dir.x * step) + .5d /* offset */).toInt
-      val y = Math.max((player.posY + (dir.y * step) + .5d /* offset */).toInt, 1)
-      val z = (player.posZ + (dir.z * step) + .5d /* offset */).toInt
+      val x = (player.posX + (dir.x * step)).toInt
+      val y = Math.max((player.posY + (dir.y * step) + player.eyeHeight).toInt, 1)
+      val z = (player.posZ + (dir.z * step)).toInt
 
       if (lastX == x && lastY == y && lastZ == z) false
       else {

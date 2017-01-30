@@ -22,7 +22,7 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.render._
-import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileNanoFurnace}
+import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
@@ -30,7 +30,7 @@ import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiv
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
 import com.itszuvalex.femtocraft.power.render._
-import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalMount, TileCrystalStorageArray, TilePowerPedestal}
+import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
@@ -49,14 +49,10 @@ import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.obj.OBJLoader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.client.registry.ClientRegistry
-import org.apache.logging.log4j.Level
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
-    if (!world.isRemote) {
-      Femtocraft.logger.log(Level.WARN, "Attempted to spawn particle of type \"" + name + "\" on a non-client world.")
-      return null
-    }
+    val worldToUse = Minecraft.getMinecraft.theWorld
 
     val mc = Minecraft.getMinecraft
     val deltaX = mc.getRenderViewEntity.posX - x
@@ -71,13 +67,13 @@ class ProxyClient extends ProxyCommon {
 
     name match {
       case ProxyCommon.PARTICLE_POWER =>
-        fx = new EntityFxPower(world, x, y, z,
+        fx = new EntityFxPower(worldToUse, x, y, z,
           (col.red.toInt & 255).toFloat / 255f,
           (col.green.toInt & 255).toFloat / 255f,
           (col.blue.toInt & 255).toFloat / 255f
         )
       case ProxyCommon.PARTICLE_NANITE =>
-        fx = new EntityFxNanites(world, x, y, z,
+        fx = new EntityFxNanites(worldToUse, x, y, z,
           (col.red.toInt & 255).toFloat / 255f,
           (col.green.toInt & 255).toFloat / 255f,
           (col.blue.toInt & 255).toFloat / 255f,
@@ -100,8 +96,12 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockPowerPedestal), 0, classOf[TilePowerPedestal])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystals), 0, classOf[TileCrystalsWorldgen])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockNaniteExtractor), 0, classOf[TileNaniteExtractor])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockDemolisher), 0, classOf[TileDemolisher])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalChargingArray), 0, classOf[TileCrystalChargingArray])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalStorageArray), 0, classOf[TileCrystalStorageArray])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalHeatExchanger), 0, classOf[TileCrystalHeatExchanger])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
+    ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
@@ -126,8 +126,10 @@ class ProxyClient extends ProxyCommon {
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteExtractor], new NaniteExtractorRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNanoFurnace], new NanoFurnaceRender)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileDemolisher], new DemolisherRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalChargingArray], new CrystalChargingArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalStorageArray], new CrystalStorageArrayRender)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalHeatExchanger], new CrystalHeatExchangeRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 

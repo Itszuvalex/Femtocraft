@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.api;
 
+import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
+import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
 import com.itszuvalex.femtocraft.api.power.IPowerLeafNode;
 import com.itszuvalex.femtocraft.api.power.IPowerNetworkNode;
 import com.itszuvalex.femtocraft.api.power.IPowerStorageNode;
@@ -34,4 +36,10 @@ public class Capabilities {
 
     @CapabilityInject(IPowerCrystal.class)
     public static Capability<IPowerCrystal> ITEM_POWER_CRYSTAL = null;
+
+    @CapabilityInject(INaniteTank.class)
+    public static Capability<INaniteTank> NANITE_STORAGE_TANK = null;
+
+    @CapabilityInject(INaniteUpgradeable.class)
+    public static Capability<INaniteUpgradeable> NANITE_UPGRADEABLE = null;
 }

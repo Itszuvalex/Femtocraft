@@ -18,9 +18,15 @@ import net.minecraftforge.oredict.OreDictionary
   */
 object FemtoBlocks {
   //Cyber
-  var blockCyberweave: Block = _
-  var blockCyberwood : Block = _
-  var blockCyberleaf : Block = _
+  var blockSubstrate: Block = _
+  var blockCyberwood: Block = _
+  var blockCyberleaf: Block = _
+
+  var blockNanoweave          : Block = _
+  var blockRiftiron           : Block = _
+  var blockPhasemetal         : Block = _
+  var blockRedstonereplacement: Block = _
+  var blockDiamondreplacement : Block = _
 
   var blockCrystals: Block = _
 
@@ -32,13 +38,15 @@ object FemtoBlocks {
   var blockCyberBase             : Block = _
   var blockCyberMachineInProgress: Block = _
 
-  var blockNaniteHiveSmall: Block = _
-  var blockCrystalMount   : Block = _
-  var blockPowerPedestal  : Block = _
-  var blockCrystalChargingArray  : Block = _
-  var blockCrystalStorageArray  : Block = _
+  var blockNaniteHiveSmall     : Block = _
+  var blockCrystalMount        : Block = _
+  var blockPowerPedestal       : Block = _
+  var blockCrystalChargingArray: Block = _
+  var blockCrystalStorageArray : Block = _
+  var blockCrystalHeatExchanger: Block = _
 
   var blockNaniteExtractor: Block = _
+  var blockDemolisher     : Block = _
 
   var blockGlowStick: Block = _
 
@@ -58,9 +66,16 @@ object FemtoBlocks {
   var testWorkerProvider: Block = _
 
   def preInit(): Unit = {
-    blockCyberweave = registerBlock(new BlockCyberweave(), "blockCyberweave").registerOre("cyberweave")
+    blockSubstrate = registerBlock(new BlockSubstrate(), "blockSubstrate").registerOre("substrate")
     blockCyberwood = registerBlock(new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
+
+    blockNanoweave = registerBlock(new BlockNanoweave(), "blockNanoweave").registerOre("oreNanoweave")
+    blockRiftiron = registerBlock(new BlockRiftiron(), "blockRiftiron").registerOre("oreRiftiron")
+    blockPhasemetal = registerBlock(new BlockPhasemetal(), "blockPhasemetal").registerOre("orePhasemetal")
+    blockRedstonereplacement = registerBlock(new BlockRedstonereplacement(), "blockRedstonereplacement").registerOre("oreRedstonereplacement")
+    blockDiamondreplacement = registerBlock(new BlockDiamondreplacement(), "blockDiamondreplacement").registerOre("oreDiamondreplacement")
+
     blockCrystals = registerBlock(new BlockCrystalsWorldgen(), "crystalCluster")
     blockNanoFurnace = registerBlock(new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(new BlockNaniteInfuser, "blockNaniteInfuser")
@@ -71,7 +86,9 @@ object FemtoBlocks {
     blockPowerPedestal = registerBlock(new BlockPowerPedestal(), "blockPowerPedestal")
     blockCrystalChargingArray = registerBlock(new BlockCrystalChargingArray(), "blockCrystalChargingArray")
     blockCrystalStorageArray = registerBlock(new BlockCrystalStorageArray(), "blockCrystalStorageArray")
+    blockCrystalHeatExchanger = registerBlock(new BlockCrystalHeatExchanger(), "blockCrystalHeatExchanger")
     blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
+    blockDemolisher = registerBlock(new BlockDemolisher(), "blockDemolisher")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
 
     //tests
@@ -83,17 +100,25 @@ object FemtoBlocks {
   }
 
   def init(): Unit = {
-    blockCyberweave.registerModel()
+    blockSubstrate.registerModel()
+    blockFrame.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
+    blockNanoweave.registerModel()
+    blockRiftiron.registerModel()
+    blockPhasemetal.registerModel()
+    blockRedstonereplacement.registerModel()
+    blockDiamondreplacement.registerModel()
     blockCrystalMount.registerModel()
     blockPowerPedestal.registerModel()
     blockNaniteHiveSmall.registerModel()
     blockCrystals.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()
+    blockDemolisher.registerModel()
     blockCrystalChargingArray.registerModel()
     blockCrystalStorageArray.registerModel()
+    blockCrystalHeatExchanger.registerModel()
   }
 
   def postInit(): Unit = {
@@ -113,7 +138,7 @@ object FemtoBlocks {
       block
     }
 
-    def registerModel() = {
+    def registerModel(): Unit = {
       Femtocraft.proxy.onRegisterBlock(block, block.getUnlocalizedName.substring(5))
     }
   }

@@ -1,13 +1,10 @@
 package com.itszuvalex.femtocraft.nanite.gui
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
-import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.api.wrappers.Converter
-import com.itszuvalex.itszulib.container.ContainerBase
-import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
-import com.itszuvalex.itszulib.gui.{GuiBase, GuiIItemStorageSlot}
+import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -32,13 +29,6 @@ import org.lwjgl.opengl.GL11
   ySize = GuiNaniteHive.HEIGHT
 
   {
-    def addGuiAndSync(storage: IItemStorage, ind: Int, x: Int, y: Int): Unit = {
-      var gui = new GuiIItemStorageSlot(x, y, storage, ind)
-      gui.sync = new SyncItemStorageItemStack(storage, ind)
-      this.add(gui)
-      inventorySlots.asInstanceOf[ContainerBase].addSync(gui.sync)
-    }
-
     val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
 
     (0 until 3).foreach { i =>
@@ -53,6 +43,8 @@ import org.lwjgl.opengl.GL11
   }
 
   addPlayerInventorySlots(inv, 32, 83)
+
+  override def GuiID: Int = GuiIDs.TileNaniteHiveGuiID
 
   /**
     * Draw the foreground layer for the GuiContainer (everything in front of the items)

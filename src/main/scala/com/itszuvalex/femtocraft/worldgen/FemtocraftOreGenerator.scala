@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
 @Configurable object FemtocraftOreGenerator {
   @Configurable val GENERATION_WEIGHT = 1
 
-  @Configurable val Y_MIN = 20
+  @Configurable val Y_MIN = 0
   @Configurable val Y_MAX = 100
 
   @Configurable val CRYSTAL_SPAWN_DIST_MAX = 5
@@ -52,7 +52,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
     if (random.nextFloat > CHANCE_PER_CHUNK) return
 
     val x = chunkX * 16 + random.nextInt(16)
-    var y = random.nextInt(Y_MAX - Y_MIN) + Y_MIN
+    var y = random.nextInt(Y_MAX - Y_MIN + 1) + Y_MIN
     val z = chunkZ * 16 + random.nextInt(16)
     while (world.isAirBlock(new BlockPos(x, y, z))) y -= 1
     var distMin = 0
@@ -77,8 +77,8 @@ import net.minecraftforge.fml.common.IWorldGenerator
         crystMax = LARGE_CRYSTAL_MAX
     }
 
-    val dist = random.nextInt(distMax - distMin) + distMin
-    val cryst = random.nextInt(crystMax - crystMin) + crystMin
+    val dist = random.nextInt(distMax - distMin + 1) + distMin
+    val cryst = random.nextInt(crystMax - crystMin + 1) + crystMin
 
     //Replace in sphere
     {
@@ -88,6 +88,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
         lz <- (z - dist) to (z + dist)
       } yield (lx, ly, lz)
     }
+      .view
       .filter { case (lx, ly, lz) => ((x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)) < (dist * dist) }
       .filterNot { case (ax, ay, az) => world.isAirBlock(new BlockPos(ax, ay, az)) }
       .foreach { case (lx, ly, lz) =>

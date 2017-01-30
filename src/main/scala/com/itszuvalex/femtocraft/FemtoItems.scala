@@ -11,30 +11,75 @@ import net.minecraftforge.oredict.OreDictionary
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
   */
 object FemtoItems {
-  var itemPowerCrystal: Item = null
+  var itemPowerCrystal: Item = _
 
-  var itemDumbDust     : Item = null
-  var itemCracklingDust: Item = null
+  var itemDumbDust               : Item = _
+  var itemCyberleaf              : Item = _
+  var itemNanoweaveThread        : Item = _
+  var itemNanoweaveSheet         : Item = _
+  var itemCracklingDust          : Item = _
+  var itemRiftironDust           : Item = _
+  var itemPhasemetalDust         : Item = _
+  var itemRedstonereplacementDust: Item = _
+  var itemDiamondreplacementDust : Item = _
+  var itemRiftironIngotDevoid    : Item = _
+  var itemPhasemetalIngotDevoid  : Item = _
+  var itemBasicCircuit           : Item = _
 
-  var itemFrame     : Item = null
-  var itemMultiblock: Item = null
+  var itemIronDust   : Item = _
+  var itemGoldDust   : Item = _
+  var itemDiamondDust: Item = _
 
-  var itemMultiTool: Item = null
-  var itemShiftTest: Item = null
+  var itemSolarPanel: Item = _
+
+  var itemFrame     : Item = _
+  var itemMultiblock: Item = _
+
+  var itemMultiTool: Item = _
+  var itemShiftTest: Item = _
 
   def preInit(): Unit = {
     itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
     itemFrame = registerItem(new ItemFrame(), "itemFrame")
     itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
+    itemCyberleaf = registerItem(new Item, "itemCyberleaf")
+    itemSolarPanel = registerItem(new Item(), "itemSolarPanel")
+    itemNanoweaveThread = registerItem(new Item(), "itemNanoweaveThread")
+    itemNanoweaveSheet = registerItem(new Item(), "itemNanoweaveSheet")
     itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
+    itemRiftironDust = registerItem(new Item(), "itemRiftironDust").setCreativeTab(Femtocraft.tab).registerOre("dustRiftiron")
+    itemPhasemetalDust = registerItem(new Item(), "itemPhasemetalDust").setCreativeTab(Femtocraft.tab).registerOre("dustPhasemetal")
+    itemIronDust = registerItem(new Item(), "itemIronDust").setCreativeTab(Femtocraft.tab).registerOre("dustIron")
+    itemGoldDust = registerItem(new Item(), "itemGoldDust").setCreativeTab(Femtocraft.tab).registerOre("dustGold")
+    itemDiamondDust = registerItem(new Item(), "itemDiamondDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamond")
+    itemRedstonereplacementDust = registerItem(new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
+    itemDiamondreplacementDust = registerItem(new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
+    itemRiftironIngotDevoid = registerItem(new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
+    itemPhasemetalIngotDevoid = registerItem(new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
+    itemBasicCircuit = registerItem(new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
 
   def init(): Unit = {
     itemDumbDust.registerModel()
+    itemFrame.registerModel()
+    itemCyberleaf.registerModel()
+    itemSolarPanel.registerModel()
+    itemNanoweaveSheet.registerModel()
+    itemNanoweaveThread.registerModel()
     itemCracklingDust.registerModel()
+    itemRiftironDust.registerModel()
+    itemPhasemetalDust.registerModel()
+    itemIronDust.registerModel()
+    itemGoldDust.registerModel()
+    itemDiamondDust.registerModel()
+    itemRiftironIngotDevoid.registerModel()
+    itemPhasemetalIngotDevoid.registerModel()
+    itemRedstonereplacementDust.registerModel()
+    itemDiamondreplacementDust.registerModel()
+    itemBasicCircuit.registerModel()
   }
 
   def postInit(): Unit = {

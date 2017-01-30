@@ -4,11 +4,12 @@ import java.util.Random
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
 import io.netty.buffer.ByteBuf
-import net.minecraft.client.Minecraft
+import net.minecraft.world.World
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
 
 /**
@@ -40,13 +41,16 @@ class MessageNaniteTeleport(var x: Int, var y: Int, var z: Int, var dim: Int, va
   override def onMessage(message: MessageNaniteTeleport, ctx: MessageContext): IMessage = {
     val start = Loc4(message.x, message.y, message.z, message.dim)
     val end = Loc4(message.endX, message.endY, message.endZ, message.dim)
-    spawnParticles(start)
-    spawnParticles(end)
-    spawnTransitionParticles(start, end)
+    val world = start.getWorld.get
+    ItszuLib.proxy.addScheduledTask(() => {
+      spawnParticles(world, start)
+      spawnParticles(world, end)
+      spawnTransitionParticles(world, start, end)
+    })
     null
   }
 
-  private def spawnParticles(loc: Loc4): Unit = {
+  private def spawnParticles(world: World, loc: Loc4): Unit = {
     val random = new Random()
     (0 until 10).foreach { i =>
       val xRand = random.nextDouble()
@@ -54,11 +58,11 @@ class MessageNaniteTeleport(var x: Int, var y: Int, var z: Int, var dim: Int, va
       val zRand = random.nextDouble()
       val color = Color(255.toByte, (random.nextFloat() * 155 + 100).toByte, (random.nextFloat() * 155 + 100).toByte, (random.nextFloat() * 155 + 100).toByte)
 
-      Femtocraft.proxy.spawnParticle(Minecraft.getMinecraft.theWorld, ProxyCommon.PARTICLE_NANITE, loc.x + xRand, loc.y + yRand, loc.z + zRand, color.toInt)
+      Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, loc.x + xRand, loc.y + yRand, loc.z + zRand, color.toInt)
     }
   }
 
-  private def spawnTransitionParticles(start: Loc4, end: Loc4): Unit = {
+  private def spawnTransitionParticles(world: World, start: Loc4, end: Loc4): Unit = {
     val random = new Random()
     (0 until 20).foreach { i =>
       val xRand = random.nextDouble()
@@ -71,7 +75,7 @@ class MessageNaniteTeleport(var x: Int, var y: Int, var z: Int, var dim: Int, va
       val timeInTicks = 20
       val speed = dist / timeInTicks
 
-      Femtocraft.proxy.spawnParticle(Minecraft.getMinecraft.theWorld, ProxyCommon.PARTICLE_NANITE, start.x + xRand, start.y + yRand, start.z + zRand, color.toInt, speed.x, speed.y, speed.z
+      Femtocraft.proxy.spawnParticle(world, ProxyCommon.PARTICLE_NANITE, start.x + xRand, start.y + yRand, start.z + zRand, color.toInt, speed.x, speed.y, speed.z
       )
     }
   }

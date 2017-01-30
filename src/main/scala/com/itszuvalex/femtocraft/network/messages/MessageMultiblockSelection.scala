@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.network.messages
 
 import com.itszuvalex.femtocraft.industry.IFrameItem
+import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.network.messages.MessageBase
 import io.netty.buffer.ByteBuf
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
@@ -27,18 +28,20 @@ class MessageMultiblockSelection(var multi: String) extends MessageBase[MessageM
   }
 
   override def onMessage(message: MessageMultiblockSelection, ctx: MessageContext): IMessage = {
-    val player = ctx.getServerHandler.playerEntity
-    player.getHeldItemMainhand match {
-      case null =>
-      case stack =>
-        stack.getItem match {
-          case null =>
-          case item: IFrameItem =>
-            item.setSelectedMultiblock(stack, message.multi)
-            player.inventory.markDirty()
-          case _ =>
-        }
-    }
+    ItszuLib.proxy.addScheduledTask(() => {
+      val player = ctx.getServerHandler.playerEntity
+      player.getHeldItemMainhand match {
+        case null =>
+        case stack =>
+          stack.getItem match {
+            case null =>
+            case item: IFrameItem =>
+              item.setSelectedMultiblock(stack, message.multi)
+              player.inventory.markDirty()
+            case _ =>
+          }
+      }
+    })
     null
   }
 }

@@ -12,6 +12,7 @@ object FemtoPacketHandler extends PacketHandler(Femtocraft.ID.toLowerCase) {
   def preInit(): Unit = {
     register(classOf[MessageMultiblockSelection], Side.SERVER)
     register(classOf[MessageOpenGui], Side.SERVER)
+    register(classOf[MessageRequestSyncs], Side.SERVER)
     register(classOf[MessageNaniteCapabilities], Side.CLIENT)
     register(classOf[MessageDrainNanite], Side.SERVER)
     register(classOf[MessageNaniteTeleport], Side.CLIENT)

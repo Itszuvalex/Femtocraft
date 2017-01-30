@@ -1,9 +1,11 @@
 itemGroup.femtocraft=Femtocraft
 
-tile.blockCyberweave.name=Cyberweave
+tile.blockSubstrate.name=Substrate
 tile.blockCyberwood.name=Cyberwood
 tile.blockCyberleaf.name=Cyberleaf
 tile.crystalCluster.name=Crystal Cluster
+tile.blockRiftiron.name=Riftiron Ore
+tile.blockPhasemetal.name=Phasemetal Ore
 
 tile.blockArcFurnace.name=Arc Furnace
 tile.blockCrystallizationChamber.name=Crystallization Chamber
@@ -19,8 +21,10 @@ tile.blockMetabolicConverter.name=Metabolic Converter
 tile.blockPhotosynthesisTower.name=Photosynthesis Tower
 tile.blockSporeDistributor.name=Spore Distributor
 tile.blockNanoFurnace.name=Nano Furnace
+tile.blockDemolisher.name=Demolisher
 tile.blockCrystalChargingArray.name=Crystal Charging Array
 tile.blockCrystalStorageArray.name=Crystal Storage Array
+tile.blockCrystalHeatExchanger.name=Crystal Heat Exchanger
 tile.blockFrame.name=Frame
 tile.blockCyberBase.name=Cyber Base
 tile.blockInProgressMachine.name=In Progress Machine
@@ -51,3 +55,12 @@ item.itemCracklingDust.name=Crackling Dust
 item.itemFurnaceAssembly.name=Furnace Assembly
 item.itemGrinderAssembly.name=Grinder Assembly
 item.itemMultiTool.name=MultiTool
+item.itemRiftironIngotDevoid.name=Devoid Riftiron Ingot
+item.itemRiftironDust.name=Riftiron Dust
+item.itemPhasemetalIngotDevoid.name=Devoid Phasemetal Ingot
+item.itemPhasemetalDust.name=Phasemetal Dust
+item.itemNanoweaveThread.name=Nanoweave Thread
+item.itemNanoweaveSheet.name=Nanoweave Sheet
+item.itemIronDust.name=Iron Dust
+item.itemGoldDust.name=Gold Dust
+item.itemDiamondDust.name=Diamond Dust

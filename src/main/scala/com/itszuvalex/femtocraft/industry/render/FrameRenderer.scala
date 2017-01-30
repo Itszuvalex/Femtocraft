@@ -4,8 +4,8 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import org.lwjgl.opengl.GL11
 
 /**
@@ -46,9 +46,15 @@ object FrameRenderer {
 
 }
 
-class FrameRenderer extends TileEntitySpecialRenderer[TileFrame] {
+class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
 
-  override def renderTileEntityAt(te: TileFrame, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
+    FrameRenderer.renderFrameAt(x, y, z, partialTicks, TileFrame.fullRenderIndexes.toSet)
+  }
+
+  override def renderTileEntityInWorld(te: TileFrame, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
     FrameRenderer.renderFrameAt(x, y, z, partialTicks, {
       for {
         a <- 0 to 1
@@ -70,6 +76,4 @@ class FrameRenderer extends TileEntitySpecialRenderer[TileFrame] {
       }
     }
   }
-
-
 }

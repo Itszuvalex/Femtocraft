@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.container
 
+import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
 import com.itszuvalex.itszulib.container.ContainerInv
@@ -11,14 +12,14 @@ import net.minecraft.item.crafting.FurnaceRecipes
 /**
   * Created by Alex on 18.08.2016.
   */
-class ContainerNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: TileNanoFurnace, shouldSync: Boolean) extends ContainerInv[TileNanoFurnace](player, tile, 0, 1, shouldSync) {
-  addSync(new SyncDouble(() => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage = a))
-  addSync(new SyncDouble(() => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage = a))
-  addSync(new SyncDouble(() => tile.getProgress, (a: Double) => tile.setProgress(a)))
+class ContainerNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, tile: TileNanoFurnace, shouldSync: Boolean) extends ContainerInv[TileNanoFurnace](player, tile, 0, 1, GuiIDs.TileFurnaceGuiID, shouldSync) {
+  addSync(new SyncDouble(GuiID, () => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage = a))
+  addSync(new SyncDouble(GuiID, () => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage = a))
+  addSync(new SyncDouble(GuiID, () => tile.getProgress, (a: Double) => tile.setProgress(a)))
 
   if (shouldSync) {
-    addSync(new SyncItemStorageItemStack(tile.storage, 0))
-    addSync(new SyncItemStorageItemStack(tile.storage, 1))
+    addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 0))
+    addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 1))
 
     addPlayerInventorySlots(inv, 5, 76)
   }

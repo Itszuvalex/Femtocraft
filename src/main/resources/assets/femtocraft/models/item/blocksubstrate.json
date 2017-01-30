@@ -1,5 +1,5 @@
 {
-  "parent":"femtocraft:block/blockCyberweave",
+  "parent":"femtocraft:block/blockSubstrate",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170],

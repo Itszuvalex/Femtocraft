@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack
 /**
   * Created by Christopher on 9/21/2015.
   */
-class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerInv[TileFrame](player, tile, 0, 0, true) {
+class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame) extends ContainerInv[TileFrame](player, tile, 0, 0, GuiIDs.TileFrameMultiblockGuiID, true) {
 
 
   (0 until 9).foreach { i =>

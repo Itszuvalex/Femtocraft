@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
@@ -24,10 +24,10 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
 
   val nameLabel     = new GuiLabel((panelWidth - fontRendererObj.getStringWidth(tile.multiBlock)) / 2, 7,
     fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
-    tile.multiBlock)
+    () => tile.multiBlock)
   val requiredLabel = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Required")) / 2, 9 + fontRendererObj.FONT_HEIGHT,
     fontRendererObj.getStringWidth("Required"), fontRendererObj.FONT_HEIGHT,
-    "Required")
+    () => "Required")
   val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
   val reqItems      = multiblock match {
     case Some(m) =>
@@ -55,6 +55,8 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
       elements: _*
     )
   }
+
+  override def GuiID: Int = GuiIDs.TileFrameMultiblockGuiID
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)

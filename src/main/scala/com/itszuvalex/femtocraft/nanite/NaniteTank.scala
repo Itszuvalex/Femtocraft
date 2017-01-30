@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.nanite
 
+import com.itszuvalex.femtocraft.api.nanite.INaniteTank
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.util.INBTSerializable
 
@@ -8,24 +9,24 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by Chris on 8/18/2016.
   */
-class NaniteTank(private var vol: Int) extends INBTSerializable[NBTTagCompound] {
+class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable[NBTTagCompound] {
   private val nanites = ArrayBuffer[NaniteStack]()
 
-  def volume = vol
+  override def volume: Int = vol
 
-  def volumeFilled = nanites.map(_.volume).sum
+  override def volumeFilled: Int = nanites.map(_.volume).sum
 
-  def nMols = nanites.map(_.nMol).sum
+  override def nMols: Int = nanites.map(_.nMol).sum
 
-  def canDrain(nanite: INanite, vol: Int): Boolean = nanites.exists(_.nanite == nanite)
+  override def canDrain(nanite: INanite, vol: Int): Boolean = nanites.exists(_.nanite == nanite)
 
-  def canFill(nanite: INanite, vol: Int): Boolean = true
+  override def canFill(nanite: INanite, vol: Int): Boolean = true
 
-  def containsNanite(nanite: INanite): Boolean = findStack(nanite).isDefined
+  override def containsNanite(nanite: INanite): Boolean = findStack(nanite).isDefined
 
-  def volForNanite(nanite: INanite): Int = findStack(nanite).map(ind => nanites(ind).vol).getOrElse(0)
+  override def volForNanite(nanite: INanite): Int = findStack(nanite).map(ind => nanites(ind).vol).getOrElse(0)
 
-  def nanitesInTank = nanites.map(_.nanite)
+  override def nanitesInTank: Iterable[INanite] = nanites.map(_.nanite)
 
   /**
     *
@@ -35,7 +36,7 @@ class NaniteTank(private var vol: Int) extends INBTSerializable[NBTTagCompound] 
     *
     * @return Stack containing the results of the drain
     */
-  def drain(nanite: INanite, vol: Int, doDrain: Boolean): NaniteStack = {
+  override def drain(nanite: INanite, vol: Int, doDrain: Boolean): NaniteStack = {
     if (nanite == null) return null
 
     findStack(nanite).map { index =>
@@ -57,7 +58,7 @@ class NaniteTank(private var vol: Int) extends INBTSerializable[NBTTagCompound] 
     *
     * @return Copy of NaniteStack containing the remainder, or null
     */
-  def fill(stack: NaniteStack, doFill: Boolean): NaniteStack = {
+  override def fill(stack: NaniteStack, doFill: Boolean): NaniteStack = {
     if (stack.nanite == null) return stack
 
     val room = volume - volumeFilled

@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 
@@ -21,16 +21,16 @@ class TileCrystalChargingArray extends TileEntityBase with TileInventory with Po
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    storage.withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.toMinecraft.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
+    storage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foreach { c =>
       val power = Math.min(c.battery.storage, c.getTransferRate())
       battery.storage = Math.min(battery.maxStorage, battery.storage + power)
       c.battery.storage = Math.max(0, c.battery.storage - power)
       val gen = c.getPassiveGen() * TileCrystalChargingArray.PASSIVE_GEN_MULTIPLIER
       battery.storage = Math.min(battery.maxStorage, battery.storage + gen)
-    }
+                                                                                       }
   }
 
-  def powerPerTick: Double = storage.withFilter(!_.isEmpty).withFilter(_.toMinecraft.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).map(_.toMinecraft.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((s, c) => s + c.getPassiveGen() * TileCrystalChargingArray.PASSIVE_GEN_MULTIPLIER)
+  def powerPerTick: Double = storage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((s, c) => s + c.getPassiveGen() * TileCrystalChargingArray.PASSIVE_GEN_MULTIPLIER)
 
   override def getMod: AnyRef = Femtocraft
 
@@ -38,7 +38,11 @@ class TileCrystalChargingArray extends TileEntityBase with TileInventory with Po
 
   override def getGuiID: Int = GuiIDs.TileCrystalChargingArrayID
 
-  override def defaultStorage: IItemStorage = new ItemStorageArray(6)
+  override def defaultStorage: IItemStorage = new ItemStorageArray(6) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      stack.isEmpty || stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+    }
+  }
 
   override def hasDescription: Boolean = true
 

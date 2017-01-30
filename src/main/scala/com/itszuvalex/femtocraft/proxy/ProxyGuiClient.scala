@@ -7,8 +7,9 @@ import com.itszuvalex.femtocraft.logistics.gui.GuiItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
-import com.itszuvalex.femtocraft.power.gui.{GuiCrystalChargingArray, GuiCrystalMount, GuiCrystalStorageArray}
-import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalMount, TileCrystalStorageArray}
+import com.itszuvalex.femtocraft.power.gui._
+import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
+import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -30,8 +31,9 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileNaniteInfuserID, te: TileNaniteInfuser) => new GuiNaniteInfuser(player, player.inventory, te)
       case (GuiIDs.TileCrystalChargingArrayID, te: TileCrystalChargingArray) => new GuiCrystalChargingArray(player, player.inventory, te)
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new GuiCrystalStorageArray(player, player.inventory, te)
-      case (_, _) => null
-      case (_, _) => null
+      case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new GuiCrystalHeatExchanger(player, player.inventory, te)
+      case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new GuiDemolisher(player, player.inventory, te)
+      case (GuiIDs.TilePowerNetworkID, te: TileEntityBase) => new GuiPowerNetwork(te)
       case (_, _) => null
     }
   }
