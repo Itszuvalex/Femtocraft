@@ -21,9 +21,11 @@ class ContainerPowerNetwork(tile: TileEntity, registerSyncs: Boolean) extends Co
   var lastNetworkDelta: Double = 0d
   var networkAvg      : Double = 0d
 
-  var storageDelta  : Double = 0d
-  var networkStored : Double = 0d
-  var networkStorage: Double = 0d
+  var storageDelta       : Double = 0d
+  var networkStored      : Double = 0d
+  var networkStorage     : Double = 0d
+  var networkTotalStored : Double = 0d
+  var networkTotalStorage: Double = 0d
 
   addSync(new SyncInt(GuiID, () => getNetwork.map(_.countProducers).getOrElse(0), producerCount = _))
   addSync(new SyncInt(GuiID, () => getNetwork.map(_.countConsumer).getOrElse(0), consumerCount = _))
@@ -35,8 +37,10 @@ class ContainerPowerNetwork(tile: TileEntity, registerSyncs: Boolean) extends Co
   addSync(new SyncDouble(GuiID, () => getNetwork.map(_.averagePowerTrend).getOrElse(0d), networkAvg = _))
 
   addSync(new SyncDouble(GuiID, () => getNetwork.map(_.powerStorageDelta).getOrElse(0d), storageDelta = _))
-  addSync(new SyncDouble(GuiID, () => getNetwork.map(_.powerStored).getOrElse(0d), networkStored = _))
-  addSync(new SyncDouble(GuiID, () => getNetwork.map(_.powerStorage).getOrElse(0d), networkStorage = _))
+  addSync(new SyncDouble(GuiID, () => getNetwork.map(_.dedicatedPowerStored).getOrElse(0d), networkStored = _))
+  addSync(new SyncDouble(GuiID, () => getNetwork.map(_.dedicatedPowerStorage).getOrElse(0d), networkStorage = _))
+  addSync(new SyncDouble(GuiID, () => getNetwork.map(_.totalPowerStored).getOrElse(0d), networkTotalStored = _))
+  addSync(new SyncDouble(GuiID, () => getNetwork.map(_.totalPowerStorage).getOrElse(0d), networkTotalStorage = _))
 
   def getNetwork: Option[PowerNetwork] = {
     if (tile.hasCapability(Capabilities.TILE_POWER_NODE, null)) {

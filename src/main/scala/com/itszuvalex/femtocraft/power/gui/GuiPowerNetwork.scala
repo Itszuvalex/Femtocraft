@@ -35,9 +35,15 @@ class GuiPowerNetwork(tile: TileEntityBase) extends FemtoGuiBase(tile, new Conta
   networkPanel.add(networkLastTickLabel, networkAverageLabel)
 
   val storagePanel       = new GuiSpacingPanel(5, 3 * HEIGHT + 35, panelWidth, HEIGHT)
-  val storageAmountLabel = new GuiLabel(0, 0, 200, HEIGHT, () => f"Storage: ${inventorySlots.asInstanceOf[ContainerPowerNetwork].networkStored}%,.1f/${inventorySlots.asInstanceOf[ContainerPowerNetwork].networkStorage}%,.1f DE")
-  storagePanel.add(storageAmountLabel)
+  val storageTypeLabel   = new GuiLabel(0, 0, panelWidth, HEIGHT, () => "Dedicated Storage:")
+  val storageAmountLabel = new GuiLabel(0, HEIGHT / 2, panelWidth, HEIGHT, () => f"${inventorySlots.asInstanceOf[ContainerPowerNetwork].networkStored}%,.1f/${inventorySlots.asInstanceOf[ContainerPowerNetwork].networkStorage}%,.1f DE")
+  storagePanel.add(storageTypeLabel, storageAmountLabel)
 
-  add(numbersPanel, changePanel, networkPanel, storagePanel)
+  val totalStoragePanel       = new GuiSpacingPanel(5, 4 * HEIGHT + 45, panelWidth, HEIGHT)
+  val totalStorageTypeLabel   = new GuiLabel(0, 0, panelWidth, HEIGHT, () => "Total Storage:")
+  val totalStorageAmountLabel = new GuiLabel(0, HEIGHT / 2, panelWidth, HEIGHT, () => f"${inventorySlots.asInstanceOf[ContainerPowerNetwork].networkTotalStored}%,.1f/${inventorySlots.asInstanceOf[ContainerPowerNetwork].networkTotalStorage}%,.1f DE")
+  totalStoragePanel.add(totalStorageTypeLabel, totalStorageAmountLabel)
+
+  add(numbersPanel, changePanel, networkPanel, storagePanel, totalStoragePanel)
 
 }

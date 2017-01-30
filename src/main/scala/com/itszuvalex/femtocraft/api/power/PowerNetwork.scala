@@ -20,18 +20,20 @@ object PowerNetwork {
 }
 
 class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.getNextID) {
-  var lastTickProducerGen = 0d
-  var lastTickConsumerReq = 0d
-  var lastTickStored = 0d
-  var lastTickStorageMax = 0d
+  var lastTickProducerGen   = 0d
+  var lastTickConsumerReq   = 0d
+  var lastTickStored        = 0d
+  var lastTickStorageMax    = 0d
   var lastTickStorageChange = 0d
-  var lastTickNetChange = 0d
-  val powerAverageCache = new Array[Double](PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
-  var powerAverageCount = 0
-  var powerAverageInd = 0
-  var producerNodeCount = 0
-  var consumerNodeCount = 0
-  var storageNodeCount = 0
+  var lastTickTotalStored   = 0d
+  var lastTickTotalStorage  = 0d
+  var lastTickNetChange     = 0d
+  val powerAverageCache     = new Array[Double](PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
+  var powerAverageCount     = 0
+  var powerAverageInd       = 0
+  var producerNodeCount     = 0
+  var consumerNodeCount     = 0
+  var storageNodeCount      = 0
 
   def countProducers: Int = producerNodeCount
 
@@ -43,9 +45,13 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   def powerConsumedLastTick: Double = lastTickConsumerReq
 
-  def powerStored: Double = lastTickStored
+  def dedicatedPowerStored: Double = lastTickStored
 
-  def powerStorage: Double = lastTickStorageMax
+  def dedicatedPowerStorage: Double = lastTickStorageMax
+
+  def totalPowerStored: Double = lastTickTotalStored
+
+  def totalPowerStorage: Double = lastTickTotalStorage
 
   def powerStorageDelta: Double = lastTickStorageChange
 
@@ -83,6 +89,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       lastTickStorageChange = 0d
       lastTickStored = 0d
       lastTickStorageMax = 0d
+      lastTickTotalStored = 0d
+      lastTickTotalStorage = 0d
       consumerNodeCount = 0
       producerNodeCount = 0
       storageNodeCount = 0
@@ -94,6 +102,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         producedPower += min
         lastTickProducerGen += node.changeForLastTick
         producerNodeCount += 1
+        lastTickTotalStored += node.battery.storage
+        lastTickTotalStorage += node.battery.maxStorage
         (node, min)
       }.toSeq.
         // Order by nodes with least room.  This prioritizes preventing generators from filling up in power.
@@ -104,6 +114,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         lastTickStored += node.battery.storage
         lastTickStorageMax += node.battery.maxStorage
         lastTickStorageChange += node.changeForLastTick
+        lastTickTotalStored += node.battery.storage
+        lastTickTotalStorage += node.battery.maxStorage
         storageNodeCount += 1
         (node, min)
       }.toSeq.
@@ -122,6 +134,8 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         consumerRoom += min
         lastTickConsumerReq += node.changeForLastTick
         consumerNodeCount += 1
+        lastTickTotalStored += node.battery.storage
+        lastTickTotalStorage += node.battery.maxStorage
         (node, min)
       }.toSeq.
         // Order by nodes with least power.  This prioritizes preventing consumers from running out of power.

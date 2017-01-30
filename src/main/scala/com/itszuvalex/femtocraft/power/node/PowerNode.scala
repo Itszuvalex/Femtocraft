@@ -65,7 +65,7 @@ trait PowerNode extends TileEntityBase {
           PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, f"Consumer Nodes: ${powerDelegate.network.countConsumer}, Net Con: ${powerDelegate.network.powerConsumedLastTick}%,.1f")
           PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, f"Net Dif: ${powerDelegate.network.lastTickNetworkDelta}%,.1f, 10s Avg: ${powerDelegate.network.averagePowerTrend}%,.1f")
           PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, f"Storage Nodes: ${powerDelegate.network.countStorage}, Net Trend: ${powerDelegate.network.powerStorageDelta}%,.1f")
-          PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, f"Storage: ${powerDelegate.network.powerStored}%,.1f/${powerDelegate.network.powerStorage}%,.1f")
+          PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, f"Storage: ${powerDelegate.network.dedicatedPowerStored}%,.1f/${powerDelegate.network.dedicatedPowerStorage}%,.1f")
         }
       }
     }
