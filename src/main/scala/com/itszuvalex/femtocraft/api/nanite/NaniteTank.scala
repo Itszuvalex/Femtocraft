@@ -27,6 +27,12 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
 
   override def nanitesInTank: Iterable[INanite] = nanites.map(_.nanite)
 
+  def copy(): NaniteTank = {
+    val ret = new NaniteTank(vol)
+    ret.deserializeNBT(serializeNBT())
+    ret
+  }
+
   /**
     *
     * @param nanite  Nanite to drain

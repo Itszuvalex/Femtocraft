@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.container.ContainerInv
@@ -16,6 +17,7 @@ class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile:
   addSync(new SyncDouble(GuiID, () => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage = a))
   addSync(new SyncDouble(GuiID, () => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage = a))
   addSync(new SyncDouble(GuiID, () => tile.getProgress, (a: Double) => tile.setProgress(a)))
+  addSync(new SyncNaniteTank(GuiID, () => tile.naniteStorageTank.copy(), (a: NaniteTank) => tile.naniteStorageTank.deserializeNBT(a.serializeNBT())))
 
   if (shouldSync) {
     addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 0))
