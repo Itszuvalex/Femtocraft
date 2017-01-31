@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.util.Color
 
 /**

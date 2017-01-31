@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.block
 
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing

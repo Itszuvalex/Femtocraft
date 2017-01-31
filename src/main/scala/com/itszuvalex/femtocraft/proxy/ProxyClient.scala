@@ -22,11 +22,11 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.render._
-import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNanoFurnace}
+import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNaniteExtractor, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
-import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
+import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
 import com.itszuvalex.femtocraft.power.render._

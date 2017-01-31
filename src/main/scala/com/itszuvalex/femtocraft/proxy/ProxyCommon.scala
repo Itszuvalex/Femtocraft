@@ -23,7 +23,7 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
-import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
+import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen

@@ -1,6 +1,5 @@
-package com.itszuvalex.femtocraft.nanite
+package com.itszuvalex.femtocraft.api.nanite
 
-import com.itszuvalex.femtocraft.api.nanite.INaniteTank
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.util.INBTSerializable
 

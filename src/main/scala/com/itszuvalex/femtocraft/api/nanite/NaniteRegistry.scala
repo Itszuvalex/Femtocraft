@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.nanite
+package com.itszuvalex.femtocraft.api.nanite
 
 import scala.collection.mutable
 

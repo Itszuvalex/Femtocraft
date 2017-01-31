@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.industry.container
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncItemStorageItemStack}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}

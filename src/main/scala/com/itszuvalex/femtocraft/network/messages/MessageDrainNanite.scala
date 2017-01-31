@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.network.messages
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.nanite.NaniteStack
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor
+import com.itszuvalex.femtocraft.api.nanite.NaniteStack
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapabilities
 import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4

@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.cyber
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.nanite.{INanite, NaniteRegistry, NaniteStack}
+import com.itszuvalex.femtocraft.api.nanite.{INanite, NaniteRegistry, NaniteStack}
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
