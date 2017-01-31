@@ -20,7 +20,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
 
   fontRendererObj = Minecraft.getMinecraft.fontRendererObj
   addGuiAndSync(tile.storage, 0, 43, 23)
-  addPlayerInventorySlots(inv, 4, 75)
+  addPlayerInventorySlots(inv)
 
   //TODO: Make actual "machine color"
   var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)

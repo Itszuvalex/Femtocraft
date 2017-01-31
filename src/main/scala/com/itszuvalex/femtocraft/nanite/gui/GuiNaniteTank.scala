@@ -46,7 +46,7 @@ class GuiNaniteTank(
 
       tank.nanitesInTank.foreach { n =>
         val vol = tank.volForNanite(n)
-        tooltip += f"${n.strain}  ${vol * n.density}nMol  $vol cm3"
+        tooltip += f"${n.strain}  ${vol * n.density} nMol  $vol cm3"
       }
     }
   }

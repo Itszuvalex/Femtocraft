@@ -18,8 +18,8 @@ object PowerStorageNode {
 }
 
 trait PowerStorageNode extends TileEntityBase with IPowerStorageNode {
-  var battery: IBattery = defaultBattery
-  var lastPowerAmount: Double = 0d
+  var battery        : IBattery      = defaultBattery
+  var lastPowerAmount: Array[Double] = Array(0d, 0d)
 
   def defaultBattery: IBattery
 
@@ -35,11 +35,12 @@ trait PowerStorageNode extends TileEntityBase with IPowerStorageNode {
   }
 
   override def serverUpdate(): Unit = {
-    lastPowerAmount = battery.storage //TODO: This may not actually be correct, might need to track two, current and prev.
+    lastPowerAmount(1) = lastPowerAmount(0)
+    lastPowerAmount(0) = battery.storage //TODO: This may not actually be correct, might need to track two, current and prev.
     super.serverUpdate()
   }
 
-  override def changeForLastTick: Double = battery.storage - lastPowerAmount
+  override def changeForLastTick: Double = battery.storage - lastPowerAmount(1)
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_STORAGE_NODE) this.asInstanceOf[T]
