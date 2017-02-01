@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.nanite
+package com.itszuvalex.femtocraft.api.nanite
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 7/3/15.

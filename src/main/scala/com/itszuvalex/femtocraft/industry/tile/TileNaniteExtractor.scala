@@ -1,10 +1,11 @@
-package com.itszuvalex.femtocraft.nanite.tile
+package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.nanite.{NaniteStack, NaniteTank}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor.ExtractTask
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.TASK_NBT
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteExtractor.ExtractTask
-import com.itszuvalex.femtocraft.nanite.{NaniteStack, NaniteTank, TileNaniteStorage}
+import com.itszuvalex.femtocraft.nanite.TileNaniteStorage
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
@@ -83,6 +84,7 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
   override def getGuiID = GuiIDs.TileNaniteExtractorID
 
   override def serverUpdate(): Unit = {
+    super.serverUpdate()
     if (task.stack == null) {
       val item = storage(0)
       if (!item.isEmpty) {

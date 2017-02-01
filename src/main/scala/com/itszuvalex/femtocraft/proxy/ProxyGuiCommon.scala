@@ -2,11 +2,11 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
-import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNanoFurnace}
+import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNaniteExtractor, TileNanoFurnace}
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
-import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
+import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
 import net.minecraft.entity.player.EntityPlayer

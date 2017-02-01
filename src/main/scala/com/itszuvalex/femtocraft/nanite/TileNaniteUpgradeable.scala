@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.nanite
 
+import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 

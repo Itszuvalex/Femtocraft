@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.player
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.nanite.NaniteTank
+import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteCapabilities
 import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}

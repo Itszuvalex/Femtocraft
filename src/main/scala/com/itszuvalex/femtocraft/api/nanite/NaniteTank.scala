@@ -1,6 +1,5 @@
-package com.itszuvalex.femtocraft.nanite
+package com.itszuvalex.femtocraft.api.nanite
 
-import com.itszuvalex.femtocraft.api.nanite.INaniteTank
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.util.INBTSerializable
 
@@ -27,6 +26,12 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
   override def volForNanite(nanite: INanite): Int = findStack(nanite).map(ind => nanites(ind).vol).getOrElse(0)
 
   override def nanitesInTank: Iterable[INanite] = nanites.map(_.nanite)
+
+  def copy(): NaniteTank = {
+    val ret = new NaniteTank(vol)
+    ret.deserializeNBT(serializeNBT())
+    ret
+  }
 
   /**
     *

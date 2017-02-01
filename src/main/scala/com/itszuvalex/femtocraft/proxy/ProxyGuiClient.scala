@@ -6,7 +6,7 @@ import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.gui.GuiItemRepository
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
-import com.itszuvalex.femtocraft.nanite.tile.{TileNaniteExtractor, TileNaniteHiveSmall}
+import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.gui._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
 import com.itszuvalex.itszulib.core.TileEntityBase

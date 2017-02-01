@@ -1,8 +1,7 @@
 package com.itszuvalex.femtocraft.api
 
-import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
-import com.itszuvalex.femtocraft.nanite.NaniteTank
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}

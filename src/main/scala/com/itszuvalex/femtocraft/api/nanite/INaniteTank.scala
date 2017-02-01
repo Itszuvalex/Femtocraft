@@ -1,7 +1,5 @@
 package com.itszuvalex.femtocraft.api.nanite
 
-import com.itszuvalex.femtocraft.nanite.{INanite, NaniteStack}
-
 /**
   * Created by Chris on 1/15/2017.
   */

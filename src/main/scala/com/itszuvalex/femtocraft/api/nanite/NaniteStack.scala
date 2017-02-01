@@ -1,6 +1,6 @@
-package com.itszuvalex.femtocraft.nanite
+package com.itszuvalex.femtocraft.api.nanite
 
-import com.itszuvalex.femtocraft.nanite.NaniteStack.{STRAIN_KEY, VOL_KEY}
+import com.itszuvalex.femtocraft.api.nanite.NaniteStack._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.nbt.NBTTagCompound
