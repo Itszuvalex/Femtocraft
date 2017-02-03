@@ -2,7 +2,10 @@ package com.itszuvalex.femtocraft.industry
 
 import java.util.regex.Pattern
 
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
+import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import net.minecraft.init.{Blocks, Items}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.oredict.OreDictionary
@@ -17,15 +20,22 @@ import scala.collection.mutable
 object DustRecipeRegistry {
   val defaultDust = 2
 
-  private val itemStackOverrides: mutable.TreeMap[ItemStack, ItemStack] = new mutable.TreeMap[ItemStack, ItemStack]()((x: ItemStack, y: ItemStack) => com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator.compare(x, y))
+  private trait IDustRecipe {
+    def matches(item: ItemStack): Boolean
 
-  private val validOres  = mutable.Set[String]()
+    def result(item: ItemStack): ItemStack
+  }
+
+  private val itemStackOverrides: mutable.TreeMap[ItemStack, ItemStack] = new mutable.TreeMap[ItemStack, ItemStack]()((x: ItemStack, y: ItemStack) => com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator.compare(x, y))
+  private val itemStackMatcherOverrides: mutable.ArrayBuffer[IDustRecipe] = new mutable.ArrayBuffer[IDustRecipe]()
+
+  private val validOres = mutable.Set[String]()
   private val oreDustNum = mutable.HashMap[String, Int]()
 
-  private val oreGroupName  = "ore"
+  private val oreGroupName = "ore"
   private val dustGroupName = "dust"
 
-  private val orePattern  = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
+  private val orePattern = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
   private val dustPattern = Pattern.compile("dust(?<" + dustGroupName + ">.*)")
 
   def registeredOres = validOres
@@ -38,11 +48,24 @@ object DustRecipeRegistry {
     extractOresFromOreDictionary()
     registerDustOverrides()
 
-    addItemStackMapping(new ItemStack(Blocks.STONE), new ItemStack(Blocks.GRAVEL))
-    addItemStackMapping(new ItemStack(Blocks.COBBLESTONE), new ItemStack(Blocks.GRAVEL))
-    addItemStackMapping(new ItemStack(Blocks.GRAVEL), new ItemStack(Blocks.SAND))
-    addItemStackMapping(new ItemStack(FemtoBlocks.blockSubstrate), new ItemStack(FemtoItems.itemDumbDust))
-    addItemStackMapping(new ItemStack(Items.DIAMOND), new ItemStack(FemtoItems.itemDiamondDust))
+    addItemStackMapping(Blocks.STONE.newStack(), Blocks.GRAVEL.newStack())
+    addItemStackMapping(Blocks.COBBLESTONE.newStack(), Blocks.GRAVEL.newStack())
+    addItemStackMapping(Blocks.GRAVEL.newStack(), Blocks.SAND.newStack())
+    addItemStackMapping(FemtoBlocks.blockSubstrate.newStack(), FemtoItems.itemDumbDust.newStack())
+    addItemStackMapping(Items.DIAMOND.newStack(), FemtoItems.itemDiamondDust.newStack())
+
+    addStackMatcher(new IDustRecipe {
+      override def matches(item: ItemStack): Boolean = item != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+
+      override def result(item: ItemStack): ItemStack = {
+        val amt = item.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType() match {
+          case IPowerCrystal.TYPE_SMALL => 1
+          case IPowerCrystal.TYPE_MEDIUM => 2
+          case IPowerCrystal.TYPE_LARGE => 3
+        }
+        FemtoItems.itemCracklingDust.newStack(amt)
+      }
+    })
   }
 
   def registerDustOverrides(): Unit = {
@@ -54,6 +77,10 @@ object DustRecipeRegistry {
 
   def addItemStackMapping(ore: ItemStack, dust: ItemStack) = {
     itemStackOverrides += ((ore, dust))
+  }
+
+  private def addStackMatcher(matcher: IDustRecipe): Unit = {
+    itemStackMatcherOverrides += matcher
   }
 
   def extractOresFromOreDictionary(): Unit = {
@@ -85,6 +112,11 @@ object DustRecipeRegistry {
     itemStackOverrides.find(p => ItemStack.areItemsEqual(item, p._1) && ItemStack.areItemStackTagsEqual(item, p._1)) match {
       case Some(a) =>
         return Some(a._2.copy())
+      case None =>
+    }
+
+    itemStackMatcherOverrides.find(_.matches(item)) match {
+      case Some(recipe) => return Some(recipe.result(item).copy())
       case None =>
     }
 
