@@ -92,13 +92,21 @@ class ItemPowerCrystal extends Item {
 
 
   override def isDamaged(stack: ItemStack): Boolean = {
-    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
-    cap.battery.storage != cap.battery.maxStorage
+    if (stack == null || stack.func_190926_b()) false
+    else if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) false
+    else {
+      val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+      cap.battery.storage != cap.battery.maxStorage
+    }
   }
 
   override def getDamage(stack: ItemStack): Int = {
-    val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
-    (getMaxDamage(stack) - ((cap.battery.storage * getMaxDamage(stack)) / cap.battery.maxStorage)).toInt
+    if (stack == null || stack.func_190926_b()) 0
+    else if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) 0
+    else {
+      val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+      (getMaxDamage(stack) - ((cap.battery.storage * getMaxDamage(stack)) / cap.battery.maxStorage)).toInt
+    }
   }
 
   override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
