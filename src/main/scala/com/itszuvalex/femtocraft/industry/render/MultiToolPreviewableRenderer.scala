@@ -42,7 +42,7 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
             GL11.glEnable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDisable(GL11.GL_BLEND)
-          case None =>
+          case _ =>
         }
       case _ =>
     }
@@ -71,7 +71,7 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
             GL11.glEnable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDisable(GL11.GL_BLEND)
-          case None =>
+          case _ =>
         }
       case _ =>
     }
