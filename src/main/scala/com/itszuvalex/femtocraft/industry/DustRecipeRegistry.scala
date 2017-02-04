@@ -1,17 +1,21 @@
 package com.itszuvalex.femtocraft.industry
 
+import java.util
+import java.util.Comparator
 import java.util.regex.Pattern
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
+import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.init.{Blocks, Items}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.oredict.OreDictionary
 import org.apache.logging.log4j.Level
 
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
@@ -26,16 +30,18 @@ object DustRecipeRegistry {
     def result(item: ItemStack): ItemStack
   }
 
-  private val itemStackOverrides: mutable.TreeMap[ItemStack, ItemStack] = new mutable.TreeMap[ItemStack, ItemStack]()((x: ItemStack, y: ItemStack) => com.itszuvalex.itszulib.util.Comparators.ItemStack.IDDamageWildCardNBTComparator.compare(x, y))
+  private val itemStackOverrides                                          = new util.TreeMap[ItemStack, ItemStack](new Comparator[ItemStack] {
+    override def compare(x: ItemStack, y: ItemStack): Int = IDDamageWildCardNBTComparator.compare(x, y)
+  }).asScala
   private val itemStackMatcherOverrides: mutable.ArrayBuffer[IDustRecipe] = new mutable.ArrayBuffer[IDustRecipe]()
 
-  private val validOres = mutable.Set[String]()
+  private val validOres  = mutable.Set[String]()
   private val oreDustNum = mutable.HashMap[String, Int]()
 
-  private val oreGroupName = "ore"
+  private val oreGroupName  = "ore"
   private val dustGroupName = "dust"
 
-  private val orePattern = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
+  private val orePattern  = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
   private val dustPattern = Pattern.compile("dust(?<" + dustGroupName + ">.*)")
 
   def registeredOres = validOres
