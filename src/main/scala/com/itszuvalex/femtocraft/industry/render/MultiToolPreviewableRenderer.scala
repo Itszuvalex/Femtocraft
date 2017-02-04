@@ -49,6 +49,8 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
   }
 
   override def renderAtLocation(stack: ItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+    if(loc.getWorld.isEmpty) return
+
     stack.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
