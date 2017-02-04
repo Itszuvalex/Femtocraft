@@ -35,6 +35,9 @@ object FemtoRecipes {
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalChargingArray.newStack(), Array("RMR", "CFC", "RMR",
       'R', FemtoItems.itemEnergyRegulator, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'F', FemtoItems.itemFrame
     ): _*)
+    GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalHeatExchanger.newStack(), Array("ERE", "CMC", "BPB",
+      'R', FemtoItems.itemEnergyRegulator, 'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'E', FemtoItems.itemRiftironIngotDevoid, 'P', FemtoItems.itemPhasemetalIngotDevoid
+    ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalMount.newStack(), Array(" S ", "RFR", "CSC", 'S', FemtoItems.itemNanoweaveSheet, 'R', FemtoItems.itemRiftironIngotDevoid.newStack(), 'F', FemtoItems.itemFrame, 'C', FemtoItems.itemBasicCircuit): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemEnergyRegulator.newStack(), Array("LIL", "ICI", "LIL", 'L', FemtoItems.itemCyberleaf, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemCrystalBattery.newStack(), Array(" R ", "ICI", "DCD", 'R', FemtoItems.itemEnergyRegulator, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust, 'D', FemtoItems.itemRiftironIngotDevoid): _ *)
