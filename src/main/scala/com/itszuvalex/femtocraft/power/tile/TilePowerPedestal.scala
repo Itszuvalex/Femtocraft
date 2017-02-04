@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal}
+import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -17,7 +17,7 @@ object TilePowerPedestal {
   val MOUNT_KEY         = "Mount"
 }
 
-class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
+class TilePowerPedestal extends TileEntityBase {
   var mountLocation: Loc4 = null
   var stored       : Long = 0
 
@@ -75,7 +75,7 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
     *
     * @return Location of the mount this is connected to.  UNKNOWN otherwise.
     */
-  override def mountLoc: Loc4 = mountLocation
+  def mountLoc: Loc4 = mountLocation
 
   def onPostBlockPlaced(): Unit = {
     if (getWorld.isRemote) return
@@ -102,13 +102,13 @@ class TilePowerPedestal extends TileEntityBase with IPowerPedestal {
     *
     * @return True if mount can be added to this location.
     */
-  override def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(EnumFacing.UP) == loc || getLoc.getOffset(EnumFacing.DOWN) == loc
+  def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(EnumFacing.UP) == loc || getLoc.getOffset(EnumFacing.DOWN) == loc
 
   /**
     *
     * @param loc Location of mount.
     */
-  override def setMount(loc: Loc4): Unit = {
+  def setMount(loc: Loc4): Unit = {
     mountLocation = loc
     setUpdate()
   }

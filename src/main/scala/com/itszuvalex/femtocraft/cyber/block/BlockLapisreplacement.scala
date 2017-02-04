@@ -13,19 +13,20 @@ import net.minecraft.world.World
 /**
   * Created by Christopher on 8/27/2015.
   */
-object BlockRedstonereplacement {
+object BlockLapisreplacement {
   val MIN_DROP = 3
   val MAX_DROP = 5
 }
 
-class BlockRedstonereplacement extends Block(Material.IRON) {
+class BlockLapisreplacement extends Block(Material.IRON) {
   setHardness(3.0F)
   setCreativeTab(Femtocraft.tab)
+
 
   /**
     * Get the Item that this Block should drop when harvested.
     */
-  override def getItemDropped(state: IBlockState, rand: Random, fortune: Int): Item = Femtocraft.items.itemRedstonereplacementDust
+  override def getItemDropped(state: IBlockState, rand: Random, fortune: Int): Item = Femtocraft.items.itemLapisreplacementDust
 
   /**
     * Get the quantity dropped based on the given fortune level
@@ -35,7 +36,7 @@ class BlockRedstonereplacement extends Block(Material.IRON) {
   /**
     * Returns the quantity of items to drop on block destruction.
     */
-  override def quantityDropped(random: Random): Int = BlockRedstonereplacement.MIN_DROP + random.nextInt(BlockRedstonereplacement.MAX_DROP - BlockRedstonereplacement.MIN_DROP + 1)
+  override def quantityDropped(random: Random): Int = BlockLapisreplacement.MIN_DROP + random.nextInt(BlockLapisreplacement.MAX_DROP - BlockLapisreplacement.MIN_DROP + 1)
 
   /**
     * Spawns this Block's drops into the World as EntityItems.

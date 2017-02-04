@@ -26,6 +26,7 @@ object FemtoBlocks {
   var blockRiftiron           : Block = _
   var blockPhasemetal         : Block = _
   var blockRedstonereplacement: Block = _
+  var blockLapisreplacement   : Block = _
   var blockDiamondreplacement : Block = _
 
   var blockCrystals: Block = _
@@ -74,6 +75,7 @@ object FemtoBlocks {
     blockRiftiron = registerBlock(new BlockRiftiron(), "blockRiftiron").registerOre("oreRiftiron")
     blockPhasemetal = registerBlock(new BlockPhasemetal(), "blockPhasemetal").registerOre("orePhasemetal")
     blockRedstonereplacement = registerBlock(new BlockRedstonereplacement(), "blockRedstonereplacement").registerOre("oreRedstonereplacement")
+    blockLapisreplacement = registerBlock(new BlockLapisreplacement(), "blockLapisreplacement").registerOre("oreLapisreplacement")
     blockDiamondreplacement = registerBlock(new BlockDiamondreplacement(), "blockDiamondreplacement").registerOre("oreDiamondreplacement")
 
     blockCrystals = registerBlock(new BlockCrystalsWorldgen(), "crystalCluster")
@@ -108,6 +110,7 @@ object FemtoBlocks {
     blockRiftiron.registerModel()
     blockPhasemetal.registerModel()
     blockRedstonereplacement.registerModel()
+    blockLapisreplacement.registerModel()
     blockDiamondreplacement.registerModel()
     blockCrystalMount.registerModel()
     blockPowerPedestal.registerModel()

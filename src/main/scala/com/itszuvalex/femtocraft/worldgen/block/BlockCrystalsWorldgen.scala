@@ -9,6 +9,7 @@ import com.itszuvalex.femtocraft.{FemtoItems, FemtoSounds, Femtocraft}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileContainer
+import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.block.SoundType
 import net.minecraft.block.material.Material
@@ -23,18 +24,20 @@ import net.minecraft.world.World
   * Created by Alex on 08.08.2015.
   */
 object BlockCrystalsWorldgen {
-  val DROP_CRYSTALS_MIN    = 2
-  val DROP_CRYSTALS_MAX    = 7
+  val DROP_CRYSTALS_MIN = 2
+  val DROP_CRYSTALS_MAX = 7
   //  Random defaults until some more orderly form of randomly generating crystals exists.
-  val DROP_SMALL_WEIGHT    = 10
-  val DROP_MEDIUM_WEIGHT   = 5
-  val DROP_LARGE_WEIGHT    = 2
+  val DROP_SMALL_WEIGHT = 10
+  val DROP_MEDIUM_WEIGHT = 5
+  val DROP_LARGE_WEIGHT = 2
   val DROP_PASSIVE_GEN_MIN = 0f
   val DROP_PASSIVE_GEN_MAX = 1f
   val DROP_STORAGE_MAX_MIN = 1000L
   val DROP_STORAGE_MAX_MAX = 5000L
-  val DROP_TRANSFER_MIN    = 50
-  val DROP_TRANSFER_MAX    = 500
+  val DROP_TRANSFER_MIN = 50
+  val DROP_TRANSFER_MAX = 500
+  val DROP_DUST_MIN = 3
+  val DROP_DUST_MAX = 5
 
   def DROP_TOTAL_WEIGHT = DROP_SMALL_WEIGHT + DROP_MEDIUM_WEIGHT + DROP_LARGE_WEIGHT
 }
@@ -63,7 +66,7 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
         val random = new Random()
         val color = i.color
         val colorOffsets = i.colorOffsets
-        (0 until random.nextInt(DROP_CRYSTALS_MAX - DROP_CRYSTALS_MIN) + DROP_CRYSTALS_MIN).foreach { _ =>
+        (0 until random.nextInt(DROP_CRYSTALS_MAX - DROP_CRYSTALS_MIN + 1) + DROP_CRYSTALS_MIN).foreach { _ =>
           val crystalType = random.nextInt(DROP_TOTAL_WEIGHT) match {
             case t if t < DROP_SMALL_WEIGHT => IPowerCrystal.TYPE_SMALL
             case t if t < DROP_MEDIUM_WEIGHT + DROP_SMALL_WEIGHT => IPowerCrystal.TYPE_MEDIUM
@@ -71,10 +74,11 @@ class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
           }
           val passiveGen = random.nextFloat() * (DROP_PASSIVE_GEN_MAX - DROP_PASSIVE_GEN_MIN) + DROP_PASSIVE_GEN_MIN
           val storage = (random.nextDouble() * (DROP_STORAGE_MAX_MAX - DROP_STORAGE_MAX_MIN)).toLong + DROP_STORAGE_MAX_MIN
-          val transfer = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN) + DROP_TRANSFER_MIN
+          val transfer = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN + 1) + DROP_TRANSFER_MIN
           val crystal = new ItemStack(FemtoItems.itemPowerCrystal, 1)
           InventoryUtils.dropItem(Converter.IItemStackFromItemStack(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer)), new Loc4(world, pos), random)
         }
+        InventoryUtils.dropItem(FemtoItems.itemCracklingDust.newIStack(random.nextInt(DROP_DUST_MAX - DROP_DUST_MIN + 1) + DROP_DUST_MIN), new Loc4(world, pos), random)
       case _ =>
     }
     super.breakBlock(world, pos, state)
