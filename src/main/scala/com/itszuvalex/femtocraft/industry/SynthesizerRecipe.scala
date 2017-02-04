@@ -1,17 +1,19 @@
 package com.itszuvalex.femtocraft.industry
 
+import java.util
+
 import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 /**
   * Created by Chris on 1/21/2017.
   */
 case class SynthesizerRecipe(output: IItemStack, inputs: java.util.Collection[ItemStackCraftingComponent], ticks: Int) {
   def canCraft(storage: IItemStorage): Boolean = {
-    val used = new mutable.TreeMap[Int, Int]
+    val used = new util.TreeMap[Int, Int].asScala
 
     def getAmt(slot: Int): Int = storage(slot).stackSize - used.getOrElse(slot, 0)
 

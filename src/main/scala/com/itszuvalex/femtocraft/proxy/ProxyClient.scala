@@ -40,6 +40,7 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
+import net.minecraft.client.renderer.ItemMeshDefinition
 import net.minecraft.client.renderer.block.model.{ModelBakery, ModelResourceLocation}
 import net.minecraft.client.renderer.color.IItemColor
 import net.minecraft.item.{Item, ItemStack}
@@ -151,12 +152,14 @@ class ProxyClient extends ProxyCommon {
 
     // ItemPowerCrystal
     val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
-    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, (stack: ItemStack) => {
-      val ctype = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
-      val suffix = if (ctype != null && !ctype.isEmpty) {
-        "_" + ctype
-      } else ""
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + suffix), "inventory")
+    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, new ItemMeshDefinition {
+      override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
+        val ctype = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
+        val suffix = if (ctype != null && !ctype.isEmpty) {
+          "_" + ctype
+        } else ""
+        new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + suffix), "inventory")
+      }
     })
 
     ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
