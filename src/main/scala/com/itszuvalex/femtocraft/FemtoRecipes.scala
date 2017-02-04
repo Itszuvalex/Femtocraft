@@ -5,6 +5,7 @@ import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import net.minecraft.init.{Blocks, Items}
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.oredict.ShapedOreRecipe
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/5/16.
@@ -35,12 +36,13 @@ object FemtoRecipes {
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalChargingArray.newStack(), Array("RMR", "CFC", "RMR",
       'R', FemtoItems.itemEnergyRegulator, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'F', FemtoItems.itemFrame
     ): _*)
-    GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalHeatExchanger.newStack(), Array("ERE", "CMC", "BPB",
-      'R', FemtoItems.itemEnergyRegulator, 'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'E', FemtoItems.itemRiftironIngotDevoid, 'P', FemtoItems.itemPhasemetalIngotDevoid
+    GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalHeatExchanger.newStack(), Array("ERE", "CMC", "BFB",
+      'R', FemtoItems.itemEnergyRegulator, 'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'E', FemtoItems.itemRiftironIngotDevoid, 'F', Blocks.FURNACE
     ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalMount.newStack(), Array(" S ", "RFR", "CSC", 'S', FemtoItems.itemNanoweaveSheet, 'R', FemtoItems.itemRiftironIngotDevoid.newStack(), 'F', FemtoItems.itemFrame, 'C', FemtoItems.itemBasicCircuit): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemEnergyRegulator.newStack(), Array("LIL", "ICI", "LIL", 'L', FemtoItems.itemCyberleaf, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemCrystalBattery.newStack(), Array(" R ", "ICI", "DCD", 'R', FemtoItems.itemEnergyRegulator, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust, 'D', FemtoItems.itemRiftironIngotDevoid): _ *)
+    GameRegistry.addRecipe(new ShapedOreRecipe(FemtoItems.itemNaniteBeacon.newStack(4), boxArray(Array("SCS", "RCR", "EDE", 'S', Items.REDSTONE, 'C', FemtoItems.itemBasicCircuit, 'R', FemtoItems.itemRiftironIngotDevoid, 'E', FemtoItems.itemEnergyRegulator, 'D', "dustDiamond")): _ *))
   }
 
   def addSmeltingRecipes(): Unit = {

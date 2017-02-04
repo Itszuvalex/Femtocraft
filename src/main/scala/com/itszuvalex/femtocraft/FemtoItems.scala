@@ -28,6 +28,7 @@ object FemtoItems {
   var itemBasicCircuit           : Item = _
   var itemEnergyRegulator        : Item = _
   var itemCrystalBattery         : Item = _
+  var itemNaniteBeacon           : Item = _
 
   var itemIronDust   : Item = _
   var itemGoldDust   : Item = _
@@ -64,6 +65,7 @@ object FemtoItems {
     itemBasicCircuit = registerItem(new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
     itemEnergyRegulator = registerItem(new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
     itemCrystalBattery = registerItem(new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
+    itemNaniteBeacon = registerItem(new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
@@ -89,6 +91,7 @@ object FemtoItems {
     itemBasicCircuit.registerModel()
     itemEnergyRegulator.registerModel()
     itemCrystalBattery.registerModel()
+    itemNaniteBeacon.registerModel()
   }
 
   def postInit(): Unit = {
