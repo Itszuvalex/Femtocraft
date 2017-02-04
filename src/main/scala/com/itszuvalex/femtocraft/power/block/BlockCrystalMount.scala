@@ -11,8 +11,6 @@ import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
@@ -41,14 +39,5 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
             mount.getCapability(Capabilities.COLORABLE, EnumFacing.UP).toInt)
       case _ =>
     }
-  }
-
-  override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
-    worldIn.getTileEntity(pos) match {
-      case i: TileCrystalMount =>
-        i.onPostBlockPlaced()
-      case _ =>
-    }
-    super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
   }
 }

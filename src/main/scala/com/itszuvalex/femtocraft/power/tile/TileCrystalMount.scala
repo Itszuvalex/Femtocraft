@@ -2,8 +2,8 @@ package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
+import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node._
-import com.itszuvalex.femtocraft.power.{ICrystalMount, IPowerPedestal, PowerManager}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
@@ -16,28 +16,21 @@ import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
-
-import scala.collection.{Set, mutable}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/27/15.
   */
 object TileCrystalMount {
-  val MOUNT_COMPOUND = "Mount"
-  val PEDESTALS_KEY  = "Pedestals"
   val CRYSTAL_KEY    = "Crystal"
   val LOCS_KEY       = "Locs"
   val PEDESTAL_RANGE = 8f
 }
 
-class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with ICrystalMount with TileInventory {
-  private val pedestalLocs = mutable.HashSet[Loc4]()
-
+class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with TileInventory {
   override def defaultBattery: IBattery = new IBattery {
     override def maxStorage: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery.maxStorage)
-                                      .getOrElse(0d)
+      .getOrElse(0d)
 
     override def clear(): Unit = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { a => a.battery.storage = 0; setModified() }
 
@@ -50,7 +43,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     override def storage_=(amt: Double): Unit = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { a => a.battery.storage = amt; setModified() }
 
     override def storage: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery.storage)
-                                   .getOrElse(0d)
+      .getOrElse(0d)
 
     override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
 
@@ -60,7 +53,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
   override def transferRate: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
-                                      .getOrElse(0d)
+    .getOrElse(0d)
 
   override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
@@ -76,23 +69,8 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
 
   override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
 
-  /**
-    *
-    * @return Set of all locations that have pedestal connections.
-    */
-  override def getPedestalLocations: Set[Loc4] = pedestalLocs
-
   override def getColor: Color = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(c => new Color(c.getColor()))
-                                 .getOrElse(super.getColor)
-
-  /**
-    *
-    * @param loc Location to remove pedestal from.
-    */
-  override def removePedestal(loc: Loc4): Unit = {
-    pedestalLocs -= loc
-    setUpdate()
-  }
+    .getOrElse(super.getColor)
 
 
   override def serverUpdate(): Unit = {
@@ -108,7 +86,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     *
     * @return Crystal ItemStack.  Null if no crystal.
     */
-  override def getCrystalStack = getStackInSlot(0)
+  def getCrystalStack: ItemStack = getStackInSlot(0)
 
   private def crystalStack = storage(0)
 
@@ -132,7 +110,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
       getCrystalStack.writeToNBT(co)
     }
     compound(TileCrystalMount.CRYSTAL_KEY -> co)
-    savePedestalLocInfo(compound)
     saveConnectionInfo(compound)
   }
 
@@ -154,16 +131,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     setInventorySlotContents(0, compound.NBTCompound(TileCrystalMount.CRYSTAL_KEY)(new ItemStack(_)))
-    loadPedestalLocInfo(compound)
     loadConnectionInfo(compound)
-    setRenderUpdate()
-  }
-
-  def loadPedestalLocInfo(compound: NBTTagCompound): Unit = {
-    compound.NBTCompound(TileCrystalMount.MOUNT_COMPOUND) { comp =>
-      pedestalLocs.clear()
-      pedestalLocs ++= comp.NBTList(TileCrystalMount.PEDESTALS_KEY).map(Loc4(_))
-                                                          }
     setRenderUpdate()
   }
 
@@ -174,81 +142,25 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
-    savePedestalLocInfo(compound)
     compound
-  }
-
-  def savePedestalLocInfo(compound: NBTTagCompound): NBTTagCompound = {
-    compound(
-              TileCrystalMount.MOUNT_COMPOUND ->
-              NBTCompound(
-                           TileCrystalMount.PEDESTALS_KEY -> NBTList(pedestalLocs.map(NBTCompound))
-                         )
-            )
   }
 
   def saveConnectionInfo(compound: NBTTagCompound): NBTTagCompound = {
     compound(
-              TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
-            )
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadPedestalLocInfo(compound)
+      TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
+    )
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
     new AxisAlignedBB(center.x - powerDelegate.connectionRadius,
-                      center.y - powerDelegate.connectionRadius,
-                      center.z - powerDelegate.connectionRadius,
-                      center.x + powerDelegate.connectionRadius,
-                      center.y + powerDelegate.connectionRadius,
-                      center.z + powerDelegate.connectionRadius)
+      center.y - powerDelegate.connectionRadius,
+      center.z - powerDelegate.connectionRadius,
+      center.x + powerDelegate.connectionRadius,
+      center.y + powerDelegate.connectionRadius,
+      center.z + powerDelegate.connectionRadius)
   }
 
-  override def onBlockBreak(): Unit = {
-    pedestalLocs.flatMap(_.getTileEntity(true)).collect { case p: IPowerPedestal => p }.foreach(_.setMount(null))
-    super.onBlockBreak()
-  }
-
-  def onPostBlockPlaced(): Unit = {
-    if (getWorld.isRemote) return
-    checkAndAddPedestal(EnumFacing.UP)
-    checkAndAddPedestal(EnumFacing.DOWN)
-  }
-
-  def checkAndAddPedestal(dir: EnumFacing) = {
-    getLoc.getOffset(dir).getTileEntity(true) match {
-      case Some(i: IPowerPedestal) =>
-        if (i.mountLoc == null && i.canSetMount(getLoc) && canAcceptPedestal(getLoc.getOffset(dir))) {
-          addPedestal(getLoc.getOffset(dir))
-          i.setMount(getLoc)
-        }
-      case _ =>
-    }
-  }
-
-  /**
-    *
-    * @param loc Location to add as pedestal
-    */
-  override def addPedestal(loc: Loc4): Unit = {
-    if (!canAcceptPedestal(loc)) return
-    pedestalLocs += loc
-    setUpdate()
-  }
-
-  /**
-    *
-    * @param loc Location of pedestal to connect with.
-    * @return True if this block can accept a pedestal connection from this location.
-    */
-  override def canAcceptPedestal(loc: Loc4): Boolean = {
-    getLoc.getOffset(EnumFacing.UP) == loc ||
-    getLoc.getOffset(EnumFacing.DOWN) == loc
-  }
 
   override def getFieldCount: Int = inventory.getFieldCount
 
