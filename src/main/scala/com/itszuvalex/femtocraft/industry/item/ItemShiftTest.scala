@@ -19,6 +19,10 @@ import net.minecraftforge.fml.relauncher.SideOnly
 /**
   * Created by Chris on 1/10/2017.
   */
+object ItemShiftTest {
+  val COOLDOWN_TICKS: Int = 5 * 20
+}
+
 class ItemShiftTest extends Item {
   override def onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (!world.isRemote) {
@@ -30,6 +34,7 @@ class ItemShiftTest extends Item {
           player.setPositionAndUpdate(a.getX + .5d, a.getY, a.getZ + .5d)
           world.playSound(null /* this is a filter player who won't hear sound */ , a.getX + .5d, a.getY + .5d, a.getZ + .5d, FemtoSounds.shiftSound, SoundCategory.PLAYERS, 1, 1)
           FemtoPacketHandler.INSTANCE.sendToAllAround(new MessageNaniteTeleport(old.getX, old.getY, old.getZ, world.provider.getDimension, a.getX, a.getY, a.getZ), new TargetPoint(world.provider.getDimension, a.getX, a.getY, a.getZ, 32f))
+          player.getCooldownTracker.setCooldown(this, ItemShiftTest.COOLDOWN_TICKS)
         case None =>
       }
       player.fallDistance = 0

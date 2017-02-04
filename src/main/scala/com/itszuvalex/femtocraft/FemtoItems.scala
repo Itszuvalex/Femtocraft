@@ -21,10 +21,13 @@ object FemtoItems {
   var itemRiftironDust           : Item = _
   var itemPhasemetalDust         : Item = _
   var itemRedstonereplacementDust: Item = _
+  var itemLapisreplacementDust   : Item = _
   var itemDiamondreplacementDust : Item = _
   var itemRiftironIngotDevoid    : Item = _
   var itemPhasemetalIngotDevoid  : Item = _
   var itemBasicCircuit           : Item = _
+  var itemEnergyRegulator        : Item = _
+  var itemCrystalBattery         : Item = _
 
   var itemIronDust   : Item = _
   var itemGoldDust   : Item = _
@@ -54,10 +57,13 @@ object FemtoItems {
     itemGoldDust = registerItem(new Item(), "itemGoldDust").setCreativeTab(Femtocraft.tab).registerOre("dustGold")
     itemDiamondDust = registerItem(new Item(), "itemDiamondDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamond")
     itemRedstonereplacementDust = registerItem(new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
+    itemLapisreplacementDust = registerItem(new Item(), "itemLapisreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustLapisreplacement")
     itemDiamondreplacementDust = registerItem(new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
     itemRiftironIngotDevoid = registerItem(new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
     itemPhasemetalIngotDevoid = registerItem(new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
     itemBasicCircuit = registerItem(new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
+    itemEnergyRegulator = registerItem(new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
+    itemCrystalBattery = registerItem(new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
@@ -78,8 +84,11 @@ object FemtoItems {
     itemRiftironIngotDevoid.registerModel()
     itemPhasemetalIngotDevoid.registerModel()
     itemRedstonereplacementDust.registerModel()
+    itemLapisreplacementDust.registerModel()
     itemDiamondreplacementDust.registerModel()
     itemBasicCircuit.registerModel()
+    itemEnergyRegulator.registerModel()
+    itemCrystalBattery.registerModel()
   }
 
   def postInit(): Unit = {
