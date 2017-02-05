@@ -12,7 +12,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.relauncher
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
@@ -40,7 +39,7 @@ object PlayerNaniteCapabilitiesOverlay {
   var alwaysShow = false
 }
 
-@relauncher.SideOnly(Side.CLIENT)
+@SideOnly(Side.CLIENT)
 class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
@@ -48,8 +47,8 @@ class PlayerNaniteCapabilitiesOverlay {
   var player            : EntityPlayer              = _
 
   def capabilities: IPlayerNaniteCapabilities = {
-    if (player != Minecraft.getMinecraft.thePlayer) {
-      val caps = Minecraft.getMinecraft.thePlayer.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+    if (player != Minecraft.getMinecraft.player) {
+      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
       if (caps != naniteCapabilities)
         naniteCapabilities = caps
     }
@@ -116,7 +115,7 @@ class PlayerNaniteCapabilitiesOverlay {
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
     mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     mc.fontRendererObj.drawSplitString(capabilities.tank.nMols + " nMols", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2 + mc.fontRendererObj.FONT_HEIGHT) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
-//    GL11.glScaled(scale, scale, scale)
+    //    GL11.glScaled(scale, scale, scale)
     GL11.glPopMatrix()
   }
 

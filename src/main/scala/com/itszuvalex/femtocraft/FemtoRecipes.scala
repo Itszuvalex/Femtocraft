@@ -41,7 +41,7 @@ object FemtoRecipes {
     ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalMount.newStack(), Array(" S ", "RFR", "CSC", 'S', FemtoItems.itemNanoweaveSheet, 'R', FemtoItems.itemRiftironIngotDevoid.newStack(), 'F', FemtoItems.itemFrame, 'C', FemtoItems.itemBasicCircuit): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemEnergyRegulator.newStack(), Array("LIL", "ICI", "LIL", 'L', FemtoItems.itemCyberleaf, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust): _ *)
-    GameRegistry.addShapedRecipe(FemtoItems.itemCrystalBattery.newStack(), Array(" R ", "ICI", "DCD", 'R', FemtoItems.itemEnergyRegulator, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust, 'D', FemtoItems.itemRiftironIngotDevoid): _ *)
+    GameRegistry.addShapedRecipe(FemtoItems.itemCrystalBattery.newStack(), Array(" R ", "ICI", "DCD", 'R', FemtoItems.itemCyberleaf, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust, 'D', FemtoItems.itemRiftironIngotDevoid): _ *)
     GameRegistry.addRecipe(new ShapedOreRecipe(FemtoItems.itemNaniteBeacon.newStack(4), boxArray(Array("SCS", "RCR", "EDE", 'S', Items.REDSTONE, 'C', FemtoItems.itemBasicCircuit, 'R', FemtoItems.itemRiftironIngotDevoid, 'E', FemtoItems.itemEnergyRegulator, 'D', "dustDiamond")): _ *))
   }
 

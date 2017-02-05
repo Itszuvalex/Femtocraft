@@ -82,8 +82,8 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
     if (slot == 0) {
-      val result = DustRecipeRegistry.getDust(item).getOrElse(ItemStack.field_190927_a)
-      result != null && !result.func_190926_b()
+      val result = DustRecipeRegistry.getDust(item).getOrElse(ItemStack.EMPTY)
+      result != null && !result.isEmpty
     }
     else false
   }
@@ -113,8 +113,8 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
 
         var insertItem = task.stack
         if (!task.demolished) {
-          val resultItem = DustRecipeRegistry.getDust(item.toMinecraft).getOrElse(ItemStack.field_190927_a)
-          if (resultItem == null || resultItem.func_190926_b()) {
+          val resultItem = DustRecipeRegistry.getDust(item.toMinecraft).getOrElse(ItemStack.EMPTY)
+          if (resultItem == null || resultItem.isEmpty) {
             task.reset()
             return
           }
@@ -151,6 +151,4 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     ret.setTag(TASK_NBT, task.serializeNBT())
     ret
   }
-
-  override def func_191420_l(): Boolean = true
 }

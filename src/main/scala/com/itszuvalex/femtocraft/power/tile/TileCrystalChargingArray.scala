@@ -52,8 +52,6 @@ class TileCrystalChargingArray extends TileEntityBase with TileInventory with Po
 
   override def storageType: PowerStorageNodeType = PowerStorageNodeType.PRODUCER
 
-  override def func_191420_l(): Boolean = false
-
   override def getFieldCount: Int = 0
 
   override def getField(id: Int): Int = 0

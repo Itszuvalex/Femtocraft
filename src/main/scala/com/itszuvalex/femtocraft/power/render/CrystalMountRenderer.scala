@@ -33,7 +33,7 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     super.renderTileEntityAsItem(x, y, z, partialTicks)
-    renderCrystalMountAt(null, x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), hasTop = false, hasBottom = true, hasCrystal = false, Color(0, 0, 0, 0))
+    renderCrystalMountAt(null, x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), hasTop = false, hasBottom = true, hasCrystal = false, Color(0, 0, 0, 0))
   }
 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
@@ -43,7 +43,7 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       val stateBelow = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)
       val renderAbove = stateAbove.getBlock.isSideSolid(stateAbove, te.getWorld, te.getLoc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
       val renderBelow = stateBelow.getBlock.isSideSolid(stateBelow, te.getWorld, te.getLoc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
-      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.func_190926_b(), te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
     }
 
     te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).

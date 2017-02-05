@@ -25,7 +25,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   val connections = new mutable.HashSet[Loc4]()
 
   override def update(): Unit = {
-    if (worldObj.isRemote) return
+    if (world.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
   }
 
@@ -56,13 +56,13 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (worldObj.isRemote) return
+    if (world.isRemote) return
     DistributedManager.removeWorkerProvider(this)
   }
 
   override def validate(): Unit = {
     super.validate()
-    if (worldObj.isRemote) return
+    if (world.isRemote) return
     DistributedManager.addWorkerProvider(this)
   }
 
@@ -81,7 +81,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     )
 
   override def getConnections: Set[Loc4] = {
-    if (worldObj.isRemote) connections
+    if (world.isRemote) connections
     else {
       workers.flatMap(worker => if (worker.getTask == null) None else Option(worker.getTask.getProvider.getProviderLocation))
     }
@@ -101,7 +101,7 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
-    if (worldObj.isRemote) return ret
+    if (world.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))

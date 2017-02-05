@@ -41,7 +41,7 @@ class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer[TileWorkerPro
 
   def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileWorkerProviderTest, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit = {
     val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
-    val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
+    val f3: Float = -f2 * 0.2F - MathHelper.floor(-f2 * 0.1F).toFloat
     val nloc = node.getProviderLocation
     val diff = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)
     val startLoc = Vector3(x, y, z)

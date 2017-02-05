@@ -23,9 +23,9 @@ object PowerBeamRenderer {
     beamRenderTeardown()
   }
 
-  def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with PowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit = {
+  def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with PowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float, reverse: Boolean = false): Unit = {
     val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
-    val f3: Float = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F).toFloat
+    val f3: Float = -f2 * 0.2F - MathHelper.floor(-f2 * 0.1F).toFloat
     val nloc = node.getLoc
     val diff = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)
     val startLoc = Vector3(x, y, z)

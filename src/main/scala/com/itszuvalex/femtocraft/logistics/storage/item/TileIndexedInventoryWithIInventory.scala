@@ -24,7 +24,7 @@ trait TileIndexedInventoryWithIInventory extends TileIndexedInventory with IInve
 
   override def isItemValidForSlot(p_94041_1_ : Int, p_94041_2_ : ItemStack): Boolean = indInventory.isItemValidForSlot(p_94041_1_, p_94041_2_)
 
-  override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUseableByPlayer(p_70300_1_)
+  override def isUsableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUsableByPlayer(p_70300_1_)
 
   override def openInventory(player: EntityPlayer): Unit = indInventory.openInventory(player)
 

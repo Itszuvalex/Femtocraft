@@ -131,7 +131,7 @@ object DustRecipeRegistry {
         case None =>
         case Some(grind) =>
           val ret = grind.copy()
-          ret.func_190920_e(oreDustNum.getOrElse(ore, defaultDust))
+          ret.setCount(oreDustNum.getOrElse(ore, defaultDust))
           return Some(ret)
       }
     }

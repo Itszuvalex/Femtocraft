@@ -128,7 +128,7 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
       setExpired()
     }
     this.setParticleTextureIndex(this.particleAge * 8 / this.particleMaxAge)
-    this.moveEntity(this.motionX, this.motionY, this.motionZ)
+    this.move(this.motionX, this.motionY, this.motionZ)
     if (this.posY == this.prevPosY) {
       this.motionX *= 1.1D
       this.motionZ *= 1.1D

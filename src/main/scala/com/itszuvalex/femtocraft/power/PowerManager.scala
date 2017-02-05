@@ -104,7 +104,8 @@ object PowerManager {
 
 
   @SubscribeEvent def onWorldUnload(worldEvent: WorldEvent.Unload): Unit = {
-    if (!FMLCommonHandler.instance().getMinecraftServerInstance.isServerRunning) {
+    val server = FMLCommonHandler.instance().getMinecraftServerInstance
+    if (server == null || !server.isServerRunning) {
       clear()
     }
   }

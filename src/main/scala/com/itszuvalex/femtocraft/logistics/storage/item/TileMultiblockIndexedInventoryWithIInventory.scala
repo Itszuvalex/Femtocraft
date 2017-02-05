@@ -52,10 +52,10 @@ trait TileMultiblockIndexedInventoryWithIInventory extends TileEntityBase with I
     else
       forwardToController[TileMultiblockIndexedInventoryWithIInventory, Unit](_.markDirty())
 
-  override def isUseableByPlayer(player: EntityPlayer): Boolean =
-    if (isController) indInventory.isUseableByPlayer(player)
+  override def isUsableByPlayer(player: EntityPlayer): Boolean =
+    if (isController) indInventory.isUsableByPlayer(player)
     else
-      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.isUseableByPlayer(player))
+      forwardToController[TileMultiblockIndexedInventoryWithIInventory, Boolean](_.isUsableByPlayer(player))
 
   override def getStackInSlot(slot: Int): ItemStack =
     if (isController) indInventory.getStackInSlot(slot)

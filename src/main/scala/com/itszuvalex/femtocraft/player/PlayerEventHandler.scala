@@ -11,13 +11,13 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.{PlayerLoggedInEvent,
 class PlayerEventHandler {
   @SubscribeEvent
   def handlePlayerJoin(event: PlayerLoggedInEvent): Unit = {
-    if (event.player.worldObj.isRemote) return
+    if (event.player.world.isRemote) return
     event.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
   }
 
   @SubscribeEvent
   def handlePlayerRespawn(event: PlayerRespawnEvent): Unit = {
-    if (event.player.worldObj.isRemote) return
+    if (event.player.world.isRemote) return
     event.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
   }
 }

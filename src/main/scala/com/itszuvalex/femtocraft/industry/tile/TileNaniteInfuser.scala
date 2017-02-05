@@ -31,8 +31,6 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
-  override def func_191420_l(): Boolean = false
-
   override def getFieldCount: Int = 0
 
   override def setField(id: Int, value: Int): Unit = {}
@@ -42,7 +40,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
     (slot, item) match {
       case (_, null) => true
-      case (_, a) if a.func_190926_b() => true
+      case (_, a) if a.isEmpty => true
       case (s, i) =>
         (s, i.getItem) match {
           case (0, multi: ItemMultiTool) => true
@@ -57,7 +55,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    if (hasGUI) par5EntityPlayer.openGui(getMod, getGuiID, worldObj, pos.getX, pos.getY, pos.getZ)
+    if (hasGUI) par5EntityPlayer.openGui(getMod, getGuiID, world, pos.getX, pos.getY, pos.getZ)
     hasGUI
   }
 }

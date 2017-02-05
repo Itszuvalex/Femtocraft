@@ -25,13 +25,13 @@ class NaniteHiveSmallRenderer extends TileEntityCombinedRenderer[TileNaniteHiveS
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     super.renderTileEntityAsItem(x, y, z, partialTicks)
-    renderAtLocWithColor(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, 0, Option(Minecraft.getMinecraft.theWorld).map(_.getTotalWorldTime.toFloat).getOrElse(0f), Color(0, 255.toByte, 255.toByte, 255.toByte))
+    renderAtLocWithColor(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, 0, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), Color(0, 255.toByte, 255.toByte, 255.toByte))
   }
 
   override def renderTileEntityInWorld(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
     renderAtLocWithColor(x, y, z, partialTicks, destroyStage, te.getWorld.getTotalWorldTime.toFloat, te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
-//    DiffusionNodeBeamRenderer.renderDiffuseBeams(te, x, y, z, partialTicks)
+    //    DiffusionNodeBeamRenderer.renderDiffuseBeams(te, x, y, z, partialTicks)
   }
 
   private def renderAtLocWithColor(x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, time: Float, color: Color): Unit = {

@@ -128,6 +128,4 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
     ret.setTag(TASK_NBT, task.serializeNBT())
     ret
   }
-
-  override def func_191420_l(): Boolean = true
 }
