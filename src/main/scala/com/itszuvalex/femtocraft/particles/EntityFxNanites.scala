@@ -112,7 +112,7 @@ class EntityFxNanites(args: ParticleArgs) extends
 
 
     this.setParticleTextureIndex((this.particleAge * 16 / this.particleMaxAge) % 8)
-    this.moveEntity(this.motionX, this.motionY, this.motionZ)
+    this.move(this.motionX, this.motionY, this.motionZ)
     this.motionX *= 0.9599999785423279D
     this.motionY *= 0.9599999785423279D
     this.motionZ *= 0.9599999785423279D

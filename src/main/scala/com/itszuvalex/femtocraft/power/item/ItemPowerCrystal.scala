@@ -92,7 +92,7 @@ class ItemPowerCrystal extends Item {
 
 
   override def isDamaged(stack: ItemStack): Boolean = {
-    if (stack == null || stack.func_190926_b()) false
+    if (stack == null || stack.isEmpty) false
     else if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) false
     else {
       val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
@@ -101,7 +101,7 @@ class ItemPowerCrystal extends Item {
   }
 
   override def getDamage(stack: ItemStack): Int = {
-    if (stack == null || stack.func_190926_b()) 0
+    if (stack == null || stack.isEmpty) 0
     else if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) 0
     else {
       val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)

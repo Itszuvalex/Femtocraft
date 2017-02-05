@@ -1,6 +1,5 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
@@ -88,7 +87,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
     if (slot == 0) {
       val result = FurnaceRecipes.instance().getSmeltingResult(item)
-      result != null && !result.func_190926_b()
+      result != null && !result.isEmpty
     }
     else false
   }
@@ -101,7 +100,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     super.serverUpdate()
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
-      if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).func_190926_b()) {
+      if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty) {
         val ins = storage.split(0, 1)
         task.reset()
         task.stack = ins
@@ -119,7 +118,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
         var insertItem = task.stack
         if (!task.smelted) {
           val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
-          if (resultItem == null || resultItem.func_190926_b()) {
+          if (resultItem == null || resultItem.isEmpty) {
             task.reset()
             return
           }
@@ -157,5 +156,5 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     ret
   }
 
-  override def func_191420_l(): Boolean = true
+  override def isEmpty: Boolean = inventory.isEmpty
 }

@@ -50,7 +50,7 @@ class TileNetworkTest extends TileEntityBase with TileNetworkNode[TileNetworkTes
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     super.onSideActivate(par5EntityPlayer, side)
-    if (!worldObj.isRemote)
+    if (!world.isRemote)
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Network ID:" + getNetwork.id)
     true
   }

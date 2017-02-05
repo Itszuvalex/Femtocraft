@@ -72,7 +72,7 @@ import net.minecraft.nbt.NBTTagCompound
     indInventory.setInventorySlotContents(p_70299_1_, p_70299_2_)
   }
 
-  override def isUseableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUseableByPlayer(p_70300_1_)
+  override def isUsableByPlayer(p_70300_1_ : EntityPlayer): Boolean = indInventory.isUsableByPlayer(p_70300_1_)
 
   override def getStackInSlot(p_70301_1_ : Int): ItemStack = indInventory.getStackInSlot(p_70301_1_)
 
@@ -90,5 +90,5 @@ import net.minecraft.nbt.NBTTagCompound
 
   override def hasCustomName: Boolean = indInventory.hasCustomName
 
-  override def func_191420_l(): Boolean = false
+  override def isEmpty: Boolean = indInventory.isEmpty
 }

@@ -24,7 +24,7 @@ class ItemDumbDust extends Item {
     CybermaterialRegistry.getReplacement(worldIn.getBlockState(pos).getBlock, worldIn.getBlockState(pos).getBlock.getMetaFromState(worldIn.getBlockState(pos))) match {
       case Some((rblock, rdamage)) =>
         worldIn.setBlockState(pos, rblock.getStateFromMeta(rdamage))
-        stack.func_190920_e(stack.func_190916_E() - 1)
+        stack.setCount(stack.getCount - 1)
         if (worldIn.isRemote) {
           val random = new Random()
           (0 until 4).foreach { i =>

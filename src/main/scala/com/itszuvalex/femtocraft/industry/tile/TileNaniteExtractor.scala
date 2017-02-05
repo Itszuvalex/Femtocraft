@@ -129,5 +129,5 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
     ret
   }
 
-  override def func_191420_l(): Boolean = true
+  override def isEmpty = inventory.isEmpty
 }

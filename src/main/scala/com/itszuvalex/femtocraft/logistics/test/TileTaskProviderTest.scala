@@ -16,7 +16,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   val tasks = new mutable.HashSet[ITask]()
 
   override def update(): Unit = {
-    if (worldObj.isRemote) return
+    if (world.isRemote) return
 
     getActiveTasks.foreach(_.onTick())
 
@@ -51,20 +51,20 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (worldObj.isRemote) return
+    if (world.isRemote) return
     DistributedManager.removeTaskProvider(this)
   }
 
   override def validate(): Unit = {
     super.validate()
-    if (worldObj.isRemote) return
+    if (world.isRemote) return
     DistributedManager.addTaskProvider(this)
   }
 
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     val ret = super.onSideActivate(par5EntityPlayer, side)
-    if (worldObj.isRemote) return ret
+    if (world.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Tasks(" + tasks.size + "):")
     tasks.collect { case task: TestTask =>
       PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap + "   progress:" + task.progress + "-" + task.progressToFinish)
@@ -76,7 +76,7 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
   }
 
   def particle(): Unit = {
-    //    if (worldObj.isRemote) Femtocraft.proxy.spawnParticle(worldObj, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
+    //    if (world.isRemote) Femtocraft.proxy.spawnParticle(world, "nanitesBlue", xCoord + 0.5, yCoord + 1, zCoord + 0.5)
   }
 
   class TestTask(val provider: TileTaskProviderTest) extends ITask {

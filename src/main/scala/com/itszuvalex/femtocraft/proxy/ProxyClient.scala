@@ -53,7 +53,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
-    val worldToUse = Minecraft.getMinecraft.theWorld
+    val worldToUse = Minecraft.getMinecraft.world
 
     val mc = Minecraft.getMinecraft
     val deltaX = mc.getRenderViewEntity.posX - x

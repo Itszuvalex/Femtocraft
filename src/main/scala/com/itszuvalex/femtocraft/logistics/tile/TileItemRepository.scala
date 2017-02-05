@@ -78,7 +78,7 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
 
   override def markDirty(): Unit = indInventory.markDirty()
 
-  override def isUseableByPlayer(entityplayer: EntityPlayer): Boolean = indInventory.isUseableByPlayer(entityplayer)
+  override def isUsableByPlayer(entityplayer: EntityPlayer): Boolean = indInventory.isUsableByPlayer(entityplayer)
 
   override def isItemValidForSlot(i: Int, itemstack: ItemStack): Boolean = indInventory.isItemValidForSlot(i, itemstack)
 
@@ -108,5 +108,5 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
 
   override def hasDescription: Boolean = false
 
-  override def func_191420_l(): Boolean = true
+  override def isEmpty: Boolean = indInventory.isEmpty
 }

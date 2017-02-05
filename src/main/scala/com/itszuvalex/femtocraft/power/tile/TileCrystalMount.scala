@@ -93,7 +93,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def hasDescription: Boolean = true
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    slot == 0 && (item == null || item.func_190926_b() || (item.getItem != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)))
+    slot == 0 && (item == null || item.isEmpty || (item.getItem != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)))
   }
 
   override def defaultStorage: ItemStorageArray = new ItemStorageArray(1) {
@@ -168,5 +168,5 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
 
   override def setField(id: Int, value: Int): Unit = inventory.setField(id, value)
 
-  override def func_191420_l(): Boolean = false
+  override def isEmpty: Boolean = inventory.isEmpty
 }

@@ -99,8 +99,8 @@ class ItemFrame extends Item with IFrameItem {
         if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
         val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
-        if (!playerIn.capabilities.isCreativeMode && stack.func_190916_E() < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
-        else if (!playerIn.capabilities.isCreativeMode) stack.func_190920_e(stack.func_190916_E() - multi.numFrames)
+        if (!playerIn.capabilities.isCreativeMode && stack.getCount < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+        else if (!playerIn.capabilities.isCreativeMode) stack.setCount(stack.getCount - multi.numFrames)
 
         locations.foreach { loc =>
           worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)

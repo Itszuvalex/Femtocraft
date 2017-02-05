@@ -184,22 +184,22 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           forall { case (item, slots) =>
             if (slots.isEmpty) false
             else {
-              var needed = item.func_190916_E
+              var needed = item.getCount
               slots.exists { slot =>
                 val i = getStackInSlot(slot)
-                needed -= i.func_190916_E
+                needed -= i.getCount
                 needed <= 0
               }
             }
           }) {
           itemsAndSlots.foreach { case (item, slots) =>
-            var needed = item.func_190916_E
+            var needed = item.getCount
             slots.exists { slot =>
               val i = getStackInSlot(slot)
-              val amt = Math.min(needed, i.func_190916_E)
+              val amt = Math.min(needed, i.getCount)
               needed -= amt
-              i.func_190920_e(i.func_190916_E() - amt)
-              if (i.func_190916_E <= 0) {
+              i.setCount(i.getCount - amt)
+              if (i.getCount <= 0) {
                 isModifyingInv = true
                 setInventorySlotContents(slot, null)
                 isModifyingInv = false
@@ -210,7 +210,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           isModifyingInv = true
           val random = new Random()
           indInventory.getInventory.zipWithIndex.foreach { case (item, slot) =>
-            if (!worldObj.isRemote) InventoryUtils.dropItem(Converter.IItemStackFromItemStack(item), getLoc, random)
+            if (!world.isRemote) InventoryUtils.dropItem(Converter.IItemStackFromItemStack(item), getLoc, random)
             indInventory.setInventorySlotContents(slot, null)
           }
           isModifyingInv = false
@@ -289,7 +289,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
         indInventory.getInventory.foreach(i => InventoryUtils.dropItem(Converter.IItemStackFromItemStack(i), getLoc, random))
       }
       else info.cLoc.getTileEntity() match {
-        case Some(frame: TileFrame) => worldObj.setBlockToAir(getPos)
+        case Some(frame: TileFrame) => world.setBlockToAir(getPos)
         case _ =>
       }
     }
@@ -349,8 +349,8 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
       markDirty()
     } else forwardToController[TileFrame, Unit](_.setInventorySlotContents(slot, item))
 
-  override def isUseableByPlayer(player: EntityPlayer): Boolean =
-    if (isController) indInventory.isUseableByPlayer(player) else forwardToController[TileFrame, Boolean](_.isUseableByPlayer(player))
+  override def isUsableByPlayer(player: EntityPlayer): Boolean =
+    if (isController) indInventory.isUsableByPlayer(player) else forwardToController[TileFrame, Boolean](_.isUsableByPlayer(player))
 
   override def getStackInSlot(slot: Int): ItemStack =
     if (isController) indInventory.getStackInSlot(slot) else forwardToController[TileFrame, ItemStack](_.getStackInSlot(slot))
@@ -386,5 +386,5 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   override def setField(id: Int, value: Int): Unit =
     if (isController) {} else forwardToController[TileFrame](_.setField(id, value))
 
-  override def func_191420_l(): Boolean = true
+  override def isEmpty = indInventory.isEmpty
 }

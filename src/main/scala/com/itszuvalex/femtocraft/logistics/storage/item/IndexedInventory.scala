@@ -29,7 +29,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.{Container, IInventory}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.text.{ITextComponent, TextComponentString}
+import net.minecraft.util.text.ITextComponent
 import net.minecraftforge.common.util.INBTSerializable
 
 import scala.collection.Set
@@ -54,12 +54,12 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def decrStackSize(i: Int, amount: Int): ItemStack = {
     var itemstack: ItemStack = null
     if (inventory(i) != null) {
-      if (inventory(i).func_190916_E() <= amount) {
+      if (inventory(i).getCount <= amount) {
         itemstack = inventory(i)
         removeItemStack(i)
       } else {
         itemstack = inventory(i).splitStack(amount)
-        if (inventory(i).func_190916_E() == 0) {
+        if (inventory(i).getCount == 0) {
           removeItemStack(i)
         }
       }
@@ -76,7 +76,7 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
   override def markDirty() {
   }
 
-  override def isUseableByPlayer(entityplayer: EntityPlayer) = true
+  override def isUsableByPlayer(entityplayer: EntityPlayer) = true
 
   override def closeInventory(player: EntityPlayer): Unit = {}
 
@@ -171,5 +171,5 @@ class IndexedInventory(size: Int) extends IInventory with IIndexedInventory with
 
   override def getContainedIDs: Set[Int] = inventoryCache.getContainedIDs
 
-  override def func_191420_l(): Boolean = true
+  override def isEmpty = inventory.forall(_.isEmpty)
 }

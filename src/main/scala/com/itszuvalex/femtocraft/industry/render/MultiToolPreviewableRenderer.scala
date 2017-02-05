@@ -20,7 +20,7 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
     stack.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
-        shift.getDestination(player.worldObj, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
+        shift.getDestination(player.world, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
           case Some(a) =>
             val rx = /*player.prevPosX +*/ (player.posX - player.prevPosX) * Minecraft.getMinecraft.getRenderPartialTicks
             val ry = /*player.prevPosY +*/ (player.posY - player.prevPosY) * Minecraft.getMinecraft.getRenderPartialTicks

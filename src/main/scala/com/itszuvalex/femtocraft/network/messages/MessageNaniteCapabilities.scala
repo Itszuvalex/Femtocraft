@@ -15,7 +15,7 @@ class MessageNaniteCapabilities(cap: PlayerNaniteCapabilities) extends MessageUp
   def this() = this(null)
 
   override def onMessage(message: MessageNaniteCapabilities, ctx: MessageContext): IMessage = {
-    val player = Minecraft.getMinecraft.thePlayer
+    val player = Minecraft.getMinecraft.player
     if (player == null) return null
 
     ItszuLib.proxy.addScheduledTask(() => {
