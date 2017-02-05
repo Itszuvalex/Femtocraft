@@ -155,6 +155,4 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     ret.setTag(TASK_NBT, task.serializeNBT())
     ret
   }
-
-  override def isEmpty: Boolean = inventory.isEmpty
 }

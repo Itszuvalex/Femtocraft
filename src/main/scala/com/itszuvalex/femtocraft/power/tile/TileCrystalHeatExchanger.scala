@@ -84,8 +84,6 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
 
   override def storageType: PowerStorageNodeType = PowerStorageNodeType.PRODUCER
 
-  override def isEmpty: Boolean = inventory.isEmpty
-
   override def getFieldCount: Int = 0
 
   override def getField(id: Int): Int = 0

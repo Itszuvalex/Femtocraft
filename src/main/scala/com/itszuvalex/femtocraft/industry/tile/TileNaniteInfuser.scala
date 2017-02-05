@@ -31,8 +31,6 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
-  override def isEmpty(): Boolean = inventory.isEmpty
-
   override def getFieldCount: Int = 0
 
   override def setField(id: Int, value: Int): Unit = {}

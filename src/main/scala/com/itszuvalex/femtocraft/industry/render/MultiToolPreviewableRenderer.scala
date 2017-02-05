@@ -49,12 +49,10 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
   }
 
   override def renderAtLocation(stack: ItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
-    if(loc.getWorld.isEmpty) return
-
     stack.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
-        shift.getDestination(loc.getWorld.get, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
+        shift.getDestination(player.world, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
           case Some(a) =>
             GL11.glDisable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_BLEND)

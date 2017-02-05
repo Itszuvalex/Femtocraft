@@ -167,6 +167,4 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def getField(id: Int): Int = inventory.getField(id)
 
   override def setField(id: Int, value: Int): Unit = inventory.setField(id, value)
-
-  override def isEmpty: Boolean = inventory.isEmpty
 }

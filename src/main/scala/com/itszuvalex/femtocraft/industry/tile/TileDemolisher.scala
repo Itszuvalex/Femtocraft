@@ -151,6 +151,4 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     ret.setTag(TASK_NBT, task.serializeNBT())
     ret
   }
-
-  override def isEmpty: Boolean = inventory.isEmpty
 }

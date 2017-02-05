@@ -45,8 +45,6 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
 
   override def connectionRadius: Float = 8f
 
-  override def isEmpty: Boolean = inventory.isEmpty
-
   override def getFieldCount: Int = 0
 
   override def getField(id: Int): Int = 0

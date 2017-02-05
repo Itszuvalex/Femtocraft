@@ -386,5 +386,5 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   override def setField(id: Int, value: Int): Unit =
     if (isController) {} else forwardToController[TileFrame](_.setField(id, value))
 
-  override def isEmpty = indInventory.isEmpty
+  override def isEmpty: Boolean = indInventory.isEmpty
 }
