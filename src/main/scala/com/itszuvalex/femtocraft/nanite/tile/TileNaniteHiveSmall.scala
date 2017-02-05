@@ -7,7 +7,6 @@ import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.TileDescriptionPacket
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
@@ -21,7 +20,7 @@ import net.minecraft.nbt.NBTTagCompound
                 val INVENTORY_SIZE = 30
 }
 
-@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with PowerLeafNode with TileDescriptionPacket with IInventory {
+@Configurable class TileNaniteHiveSmall extends TileEntityBase with TileIndexedInventory with PowerLeafNode with IInventory {
 
   override def defaultBattery: IBattery = new PowerBattery(5000)
 
