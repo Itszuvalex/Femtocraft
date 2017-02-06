@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.particles
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
@@ -9,5 +10,5 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 @SideOnly(Side.CLIENT)
 abstract class BaseEntityFx(protected var args: ParticleArgs) extends
-  Particle(args.worldObj, args.posX, args.posY, args.posZ, args.motionX, args.motionY, args.motionZ)
+  Particle(Minecraft.getMinecraft.world, args.posX, args.posY, args.posZ, args.motionX, args.motionY, args.motionZ)
 

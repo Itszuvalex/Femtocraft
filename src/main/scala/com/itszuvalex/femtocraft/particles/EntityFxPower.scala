@@ -71,44 +71,42 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
     val vertexbuffer = tessellator.getBuffer
     vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
     Minecraft.getMinecraft.getTextureManager.bindTexture(EntityFxPower.particleLocation)
-    FemtoRenderUtils.disableLightMaps();
+    FemtoRenderUtils.disableLightMaps()
 
-    {
-      var f = this.particleTextureIndexX.toFloat / 16.0F
-      var f1 = f + 0.0624375F
-      var f2 = this.particleTextureIndexY.toFloat / 16.0F
-      var f3 = f2 + 0.0624375F
-      val f4 = 0.1F * this.particleScale
-      if (this.particleTexture != null) {
-        f = this.particleTexture.getMinU
-        f1 = this.particleTexture.getMaxU
-        f2 = this.particleTexture.getMinV
-        f3 = this.particleTexture.getMaxV
-      }
-      val f5 = (this.prevPosX + (this.posX - this.prevPosX) * partialTicks.toDouble - interpPosX).toFloat
-      val f6 = (this.prevPosY + (this.posY - this.prevPosY) * partialTicks.toDouble - interpPosY).toFloat
-      val f7 = (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks.toDouble - interpPosZ).toFloat
-      val avec3d = Array[Vec3d](new Vec3d((-rotationX * f4 - rotationXY * f4).toDouble, (-rotationZ * f4).toDouble, (-rotationYZ * f4 - rotationXZ * f4).toDouble), new Vec3d((-rotationX * f4 + rotationXY * f4).toDouble, (rotationZ * f4).toDouble, (-rotationYZ * f4 + rotationXZ * f4).toDouble), new Vec3d((rotationX * f4 + rotationXY * f4).toDouble, (rotationZ * f4).toDouble, (rotationYZ * f4 + rotationXZ * f4).toDouble), new Vec3d((rotationX * f4 - rotationXY * f4).toDouble, (-rotationZ * f4).toDouble, (rotationYZ * f4 - rotationXZ * f4).toDouble))
-      if (this.particleAngle != 0.0F) {
-        val f8 = this.particleAngle + (this.particleAngle - this.prevParticleAngle) * partialTicks
-        val f9 = MathHelper.cos(f8 * 0.5F)
-        val f10 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.xCoord.toFloat
-        val f11 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.yCoord.toFloat
-        val f12 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.zCoord.toFloat
-        val vec3d = new Vec3d(f10.toDouble, f11.toDouble, f12.toDouble)
-        var l = 0
-        while (l < 4) {
-          {
-            avec3d(l) = vec3d.scale(2.0D * avec3d(l).dotProduct(vec3d)).add(avec3d(l).scale((f9 * f9).toDouble - vec3d.dotProduct(vec3d))).add(vec3d.crossProduct(avec3d(l)).scale((2.0F * f9).toDouble))
-          }
-          {l += 1; l}
-        }
-      }
-      worldRendererIn.pos(f5.toDouble + avec3d(0).xCoord, f6.toDouble + avec3d(0).yCoord, f7.toDouble + avec3d(0).zCoord).tex(f1.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
-      worldRendererIn.pos(f5.toDouble + avec3d(1).xCoord, f6.toDouble + avec3d(1).yCoord, f7.toDouble + avec3d(1).zCoord).tex(f1.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
-      worldRendererIn.pos(f5.toDouble + avec3d(2).xCoord, f6.toDouble + avec3d(2).yCoord, f7.toDouble + avec3d(2).zCoord).tex(f.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
-      worldRendererIn.pos(f5.toDouble + avec3d(3).xCoord, f6.toDouble + avec3d(3).yCoord, f7.toDouble + avec3d(3).zCoord).tex(f.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    var f = this.particleTextureIndexX.toFloat / 16.0F
+    var f1 = f + 0.0624375F
+    var f2 = this.particleTextureIndexY.toFloat / 16.0F
+    var f3 = f2 + 0.0624375F
+    val f4 = 0.1F * this.particleScale
+    if (this.particleTexture != null) {
+      f = this.particleTexture.getMinU
+      f1 = this.particleTexture.getMaxU
+      f2 = this.particleTexture.getMinV
+      f3 = this.particleTexture.getMaxV
     }
+    val f5 = (this.prevPosX + (this.posX - this.prevPosX) * partialTicks.toDouble - interpPosX).toFloat
+    val f6 = (this.prevPosY + (this.posY - this.prevPosY) * partialTicks.toDouble - interpPosY).toFloat
+    val f7 = (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks.toDouble - interpPosZ).toFloat
+    val avec3d = Array[Vec3d](new Vec3d((-rotationX * f4 - rotationXY * f4).toDouble, (-rotationZ * f4).toDouble, (-rotationYZ * f4 - rotationXZ * f4).toDouble), new Vec3d((-rotationX * f4 + rotationXY * f4).toDouble, (rotationZ * f4).toDouble, (-rotationYZ * f4 + rotationXZ * f4).toDouble), new Vec3d((rotationX * f4 + rotationXY * f4).toDouble, (rotationZ * f4).toDouble, (rotationYZ * f4 + rotationXZ * f4).toDouble), new Vec3d((rotationX * f4 - rotationXY * f4).toDouble, (-rotationZ * f4).toDouble, (rotationYZ * f4 - rotationXZ * f4).toDouble))
+    if (this.particleAngle != 0.0F) {
+      val f8 = this.particleAngle + (this.particleAngle - this.prevParticleAngle) * partialTicks
+      val f9 = MathHelper.cos(f8 * 0.5F)
+      val f10 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.xCoord.toFloat
+      val f11 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.yCoord.toFloat
+      val f12 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.zCoord.toFloat
+      val vec3d = new Vec3d(f10.toDouble, f11.toDouble, f12.toDouble)
+      var l = 0
+      while (l < 4) {
+        {
+          avec3d(l) = vec3d.scale(2.0D * avec3d(l).dotProduct(vec3d)).add(avec3d(l).scale((f9 * f9).toDouble - vec3d.dotProduct(vec3d))).add(vec3d.crossProduct(avec3d(l)).scale((2.0F * f9).toDouble))
+        }
+        {l += 1; l}
+      }
+    }
+    worldRendererIn.pos(f5.toDouble + avec3d(0).xCoord, f6.toDouble + avec3d(0).yCoord, f7.toDouble + avec3d(0).zCoord).tex(f1.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(1).xCoord, f6.toDouble + avec3d(1).yCoord, f7.toDouble + avec3d(1).zCoord).tex(f1.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(2).xCoord, f6.toDouble + avec3d(2).yCoord, f7.toDouble + avec3d(2).zCoord).tex(f.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(3).xCoord, f6.toDouble + avec3d(3).yCoord, f7.toDouble + avec3d(3).zCoord).tex(f.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
     tessellator.draw()
     FemtoRenderUtils.enableLightMap(null)
   }
@@ -136,10 +134,6 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
     this.motionX *= 0.9599999785423279D
     this.motionY *= 0.9599999785423279D
     this.motionZ *= 0.9599999785423279D
-    //    if (this.onGround) {
-    //      this.motionX *= 0.699999988079071D
-    //      this.motionZ *= 0.699999988079071D
-    //    }
   }
 
   override def setParticleTextureIndex(par1: Int) {
