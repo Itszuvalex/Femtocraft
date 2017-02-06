@@ -31,13 +31,13 @@ object FemtoRecipes {
       'S', FemtoItems.itemNanoweaveSheet, 'C', FemtoItems.itemBasicCircuit, 'P', Blocks.PISTON, 'R', FemtoItems.itemRiftironIngotDevoid, 'M', FemtoItems.itemFrame
     ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalStorageArray.newStack(), Array("BMB", "CFC", "BMB",
-      'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'F', FemtoItems.itemFrame
+      'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoItems.itemNanoweaveSheet, 'F', FemtoItems.itemFrame
     ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalChargingArray.newStack(), Array("RMR", "CFC", "RMR",
-      'R', FemtoItems.itemEnergyRegulator, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'F', FemtoItems.itemFrame
+      'R', FemtoItems.itemEnergyRegulator, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoItems.itemNanoweaveSheet, 'F', FemtoItems.itemFrame
     ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalHeatExchanger.newStack(), Array("ERE", "CMC", "BFB",
-      'R', FemtoItems.itemEnergyRegulator, 'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoBlocks.blockCrystalMount, 'E', FemtoItems.itemRiftironIngotDevoid, 'F', Blocks.FURNACE
+      'R', FemtoItems.itemEnergyRegulator, 'B', FemtoItems.itemCrystalBattery, 'C', FemtoItems.itemBasicCircuit, 'M', FemtoItems.itemFrame, 'E', FemtoItems.itemRiftironIngotDevoid, 'F', Blocks.FURNACE
     ): _*)
     GameRegistry.addShapedRecipe(FemtoBlocks.blockCrystalMount.newStack(), Array(" S ", "RFR", "CSC", 'S', FemtoItems.itemNanoweaveSheet, 'R', FemtoItems.itemRiftironIngotDevoid.newStack(), 'F', FemtoItems.itemFrame, 'C', FemtoItems.itemBasicCircuit): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemEnergyRegulator.newStack(), Array("LIL", "ICI", "LIL", 'L', FemtoItems.itemCyberleaf, 'I', Items.IRON_INGOT, 'C', FemtoItems.itemCracklingDust): _ *)

@@ -66,7 +66,10 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     leafNodeLocs.clear()
-    leafNodeLocs ++= nbt.NBTList(PowerNetworkNodeDelegate.LEAF_NODE_TAG).map(Loc4(_))
+    val locs = nbt.NBTList(PowerNetworkNodeDelegate.LEAF_NODE_TAG)
+    if (locs != null) {
+      leafNodeLocs ++= locs.map(Loc4(_))
+    }
     tileEntity.setRenderUpdate()
   }
 
