@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
 import com.itszuvalex.femtocraft.api.power.IPowerLeafNode;
 import com.itszuvalex.femtocraft.api.power.IPowerNetworkNode;
 import com.itszuvalex.femtocraft.api.power.IPowerStorageNode;
+import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapabilities;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
@@ -42,4 +43,7 @@ public class Capabilities {
 
     @CapabilityInject(INaniteUpgradeable.class)
     public static Capability<INaniteUpgradeable> NANITE_UPGRADEABLE = null;
+
+    @CapabilityInject(IMultitool.class)
+    public static Capability<IMultitool> ITEM_MULTITOOL = null;
 }

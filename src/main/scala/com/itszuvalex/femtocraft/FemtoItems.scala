@@ -92,6 +92,7 @@ object FemtoItems {
     itemEnergyRegulator.registerModel()
     itemCrystalBattery.registerModel()
     itemNaniteBeacon.registerModel()
+    itemMultiTool.registerModel()
   }
 
   def postInit(): Unit = {

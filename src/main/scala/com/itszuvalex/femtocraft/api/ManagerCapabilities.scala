@@ -1,7 +1,10 @@
 package com.itszuvalex.femtocraft.api
 
+import java.util
+
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
+import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
@@ -10,6 +13,7 @@ import net.minecraft.nbt.{NBTBase, NBTTagCompound, NBTTagInt}
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
 
+import scala.collection.JavaConversions._
 import scala.collection.Set
 
 /**
@@ -25,6 +29,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
+    CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -64,6 +69,8 @@ object ManagerCapabilities {
   class PowerLeafNodeStorageDummy extends DummyStorage[IPowerLeafNode]
 
   class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
+
+  class MultitoolStorageDummy extends DummyStorage[IMultitool]
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
@@ -163,6 +170,26 @@ object ManagerCapabilities {
 
   class NaniteUpgradeableDummy extends INaniteUpgradeable {
     override def tank: INaniteTank = null
+  }
+
+  class MultitoolImplDummy extends IMultitool {
+    override def allInstalledUpgrades: util.Collection[IMultitoolUpgrade] = Set()
+
+    override def installedUpgrades(slot: EnumMultitoolUpgradeSlot): util.Collection[IMultitoolUpgrade] = Set()
+
+    override def canInstallUpgrade(upgrade: IMultitoolUpgrade): Boolean = false
+
+    override def installUpgrade(upgrade: IMultitoolUpgrade): Unit = {}
+
+    override def removeUpgrade(upgrade: IMultitoolUpgrade): Unit = {}
+
+    override def activePrimary: Option[IMultitoolPrimaryUpgrade] = None
+
+    override def activeSecondary: Option[IMultitoolSecondaryUpgrade] = None
+
+    override def setActivePrimary(upgrade: IMultitoolUpgrade): Unit = {}
+
+    override def setActiveSecondary(upgrade: IMultitoolUpgrade): Unit = {}
   }
 
 }
