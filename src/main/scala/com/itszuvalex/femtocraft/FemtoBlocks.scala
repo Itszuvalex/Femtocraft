@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block._
-import com.itszuvalex.femtocraft.logistics.block.BlockItemRepository
+import com.itszuvalex.femtocraft.logistics.block.{BlockConduit, BlockItemRepository}
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
@@ -49,6 +49,8 @@ object FemtoBlocks {
   var blockNaniteExtractor: Block = _
   var blockDemolisher     : Block = _
 
+  var blockConduit     : Block = _
+
   var blockGlowStick: Block = _
 
   //Tests
@@ -91,6 +93,7 @@ object FemtoBlocks {
     blockCrystalHeatExchanger = registerBlock(new BlockCrystalHeatExchanger(), "blockCrystalHeatExchanger")
     blockNaniteExtractor = registerBlock(new BlockNaniteExtractor(), "blockNaniteExtractor")
     blockDemolisher = registerBlock(new BlockDemolisher(), "blockDemolisher")
+    blockConduit = registerBlock(new BlockConduit(), "blockConduit")
     blockGlowStick = registerBlock(new BlockGlowStick(), "blockGlowStick")
 
     //tests

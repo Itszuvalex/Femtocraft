@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.api
 
 import java.util
 
+import com.itszuvalex.femtocraft.api.logistics.IConduit
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry.item._
@@ -30,6 +31,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
     CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -71,6 +73,8 @@ object ManagerCapabilities {
   class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
 
   class MultitoolStorageDummy extends DummyStorage[IMultitool]
+
+  class ConduitStorageDummy extends DummyStorage[IConduit]
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
@@ -173,9 +177,9 @@ object ManagerCapabilities {
   }
 
   class MultitoolImplDummy extends IMultitool {
-    override def allInstalledUpgrades: util.Collection[IMultitoolUpgrade] = Set()
+    override def allInstalledUpgrades: util.Collection[IMultitoolUpgrade] = Set[IMultitoolUpgrade]()
 
-    override def installedUpgrades(slot: EnumMultitoolUpgradeSlot): util.Collection[IMultitoolUpgrade] = Set()
+    override def installedUpgrades(slot: EnumMultitoolUpgradeSlot): util.Collection[IMultitoolUpgrade] = Set[IMultitoolUpgrade]()
 
     override def canInstallUpgrade(upgrade: IMultitoolUpgrade): Boolean = false
 
@@ -190,6 +194,10 @@ object ManagerCapabilities {
     override def setActivePrimary(upgrade: IMultitoolUpgrade): Unit = {}
 
     override def setActiveSecondary(upgrade: IMultitoolUpgrade): Unit = {}
+  }
+
+  class ConduitImplDummy extends IConduit {
+    override def isConnected(facing: EnumFacing): Boolean = false
   }
 
 }

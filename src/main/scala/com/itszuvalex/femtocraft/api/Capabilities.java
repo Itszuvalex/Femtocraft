@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.api;
 
+import com.itszuvalex.femtocraft.api.logistics.IConduit;
 import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
 import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
 import com.itszuvalex.femtocraft.api.power.IPowerLeafNode;
@@ -46,4 +47,7 @@ public class Capabilities {
 
     @CapabilityInject(IMultitool.class)
     public static Capability<IMultitool> ITEM_MULTITOOL = null;
+
+    @CapabilityInject(IConduit.class)
+    public static Capability<IConduit> TILE_CONDUIT = null;
 }
