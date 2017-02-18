@@ -40,27 +40,23 @@ class BlockConduit extends TileContainer(Material.IRON) {
       case t: TileConduit =>
         val conduit = t.getCapability(Capabilities.TILE_CONDUIT, null)
         list ++= VALUES.withFilter(conduit.isConnected).map {
-          facing =>
-            (facing match {
-              case UP => new AxisAlignedBB(.25, .75, .25, .75, 1, .75) // POS Y
-              case DOWN => new AxisAlignedBB(.25, 0, .25, .75, .25, .75) // NEG Y
-              case NORTH => new AxisAlignedBB(.25, .25, 0, .75, .75, .25) // NEG Z
-              case SOUTH => new AxisAlignedBB(.25, .25, .75, .75, .75, 1) // POS Z
-              case EAST => new AxisAlignedBB(.75, .25, .25, 1, .75, .75) // POS X
-              case WEST => new AxisAlignedBB(0, .25, .25, .25, .75, .75) // NEG X
-              case _ => new AxisAlignedBB(.25, .25, .25, .75, .75, .75) // Default
-            }).offset(pos)
+          case UP => new AxisAlignedBB(.25, .75, .25, .75, 1, .75) // POS Y
+          case DOWN => new AxisAlignedBB(.25, 0, .25, .75, .25, .75) // NEG Y
+          case NORTH => new AxisAlignedBB(.25, .25, 0, .75, .75, .25) // NEG Z
+          case SOUTH => new AxisAlignedBB(.25, .25, .75, .75, .75, 1) // POS Z
+          case EAST => new AxisAlignedBB(.75, .25, .25, 1, .75, .75) // POS X
+          case WEST => new AxisAlignedBB(0, .25, .25, .25, .75, .75) // NEG X
+          case _ => new AxisAlignedBB(.25, .25, .25, .75, .75, .75) // Default
         }
     }
     list
   }
 
   override def collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult = {
-    getBoundingBoxes(worldIn, pos).foreach { box =>
-      val result = this.rayTrace(pos, start, end, box)
-      if (result != null) return result
+    val results = getBoundingBoxes(worldIn, pos).map(rayTrace(pos, start, end, _)).filter(_ != null).sortWith { (a, b) =>
+      start.squareDistanceTo(a.hitVec) < start.squareDistanceTo(b.hitVec)
     }
-    null
+    results.headOption.orNull
   }
 
   override protected def rayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, boundingBox: AxisAlignedBB): RayTraceResult = {
@@ -73,5 +69,9 @@ class BlockConduit extends TileContainer(Material.IRON) {
 
   override def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos): AxisAlignedBB = {
     new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
+  }
+
+  override def getSelectedBoundingBox(state: IBlockState, worldIn: World, pos: BlockPos): AxisAlignedBB = {
+    super.getSelectedBoundingBox(state, worldIn, pos)
   }
 }
