@@ -9,4 +9,10 @@ trait IConduit {
 
   def isConnected(facing: EnumFacing): Boolean
 
+  def canAddConnection(facing: EnumFacing): Boolean
+
+  def addConnection(facing: EnumFacing): Unit
+
+  def removeConnection(facing: EnumFacing): Unit
+
 }

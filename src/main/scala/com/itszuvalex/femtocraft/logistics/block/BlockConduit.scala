@@ -7,7 +7,8 @@ import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.itszulib.core.TileContainer
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.Entity
+import net.minecraft.entity.{Entity, EntityLivingBase}
+import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing._
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult, Vec3d}
@@ -24,6 +25,16 @@ class BlockConduit extends TileContainer(Material.IRON) {
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
   override def isNormalCube(state: IBlockState): Boolean = false
+
+
+  override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+    super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
+    worldIn.getTileEntity(pos) match {
+      case null =>
+      case t:TileConduit => t.onBlockPlaced()
+      case _ =>
+    }
+  }
 
   override def addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB, collidingBoxes: util.List[AxisAlignedBB], entityIn: Entity, p_185477_7_ : Boolean): Unit = {
     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, p_185477_7_)

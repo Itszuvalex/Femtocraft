@@ -197,6 +197,12 @@ object ManagerCapabilities {
   }
 
   class ConduitImplDummy extends IConduit {
+    override def canAddConnection(facing: EnumFacing): Boolean = false
+
+    override def addConnection(facing: EnumFacing): Unit = {}
+
+    override def removeConnection(facing: EnumFacing): Unit = {}
+
     override def isConnected(facing: EnumFacing): Boolean = false
   }
 
