@@ -8,6 +8,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.items.CapabilityItemHandler
 
 /**
   * Created by Chris on 2/16/2017.
@@ -33,6 +34,9 @@ class TileConduit extends TileEntityBase {
           conduit.addConnection(f.getOpposite)
           thisConduit.addConnection(f)
         }
+      }
+      floc.getTileEntity(false).withFilter(_.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite)).map(_.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite)).foreach { handler =>
+        getCapability(Capabilities.TILE_CONDUIT, f).addConnection(f)
       }
     }
   }
@@ -95,11 +99,13 @@ class TileConduit extends TileEntityBase {
 
         override def addConnection(facing: EnumFacing): Unit = {
           connections(facing.getIndex) = true
+          setModified()
           setUpdate()
         }
 
         override def removeConnection(facing: EnumFacing): Unit = {
           connections(facing.getIndex) = false
+          setModified()
           setUpdate()
         }
 
