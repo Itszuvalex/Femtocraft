@@ -47,7 +47,12 @@ class ContainerPowerNetwork(tile: TileEntity, registerSyncs: Boolean) extends Co
       Option(tile.getCapability(Capabilities.TILE_POWER_NODE, null).getNetwork)
     }
     else if (tile.hasCapability(Capabilities.TILE_POWER_LEAF_NODE, null)) {
-      tile.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null).getParent.getTileEntity(false).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null).getNetwork)
+      val parentTile = Option(tile.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).flatMap(x => Option(x.getParent)).flatMap(_.getTileEntity(false))
+      if (parentTile.isEmpty) None
+      else {
+        val cap = parentTile.withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null))
+        cap.flatMap(x => Option(x.getNetwork))
+      }
     }
     else None
   }

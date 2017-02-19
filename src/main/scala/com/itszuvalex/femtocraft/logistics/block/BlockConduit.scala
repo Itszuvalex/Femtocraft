@@ -27,6 +27,15 @@ class BlockConduit extends TileContainer(Material.IRON) {
   override def isNormalCube(state: IBlockState): Boolean = false
 
 
+  override def onNeighborChange(world: IBlockAccess, pos: BlockPos, neighbor: BlockPos): Unit = {
+    super.onNeighborChange(world, pos, neighbor)
+    world.getTileEntity(pos) match {
+      case null =>
+      case t: TileConduit=> t.onNeighborChange(neighbor)
+      case _ =>
+    }
+  }
+
   override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
     super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
     worldIn.getTileEntity(pos) match {

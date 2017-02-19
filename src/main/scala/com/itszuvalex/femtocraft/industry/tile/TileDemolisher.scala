@@ -6,7 +6,6 @@ import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.DemolishTask._
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.{DemolishTask, TASK_NBT}
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -14,8 +13,6 @@ import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
-import net.minecraftforge.common.capabilities.Capability
 
 object TileDemolisher {
   val TICKS_REQ      = 20 * 8
@@ -153,13 +150,5 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     val ret = super.serializeNBT()
     ret.setTag(TASK_NBT, task.serializeNBT())
     ret
-  }
-
-  //TODO: Remove once Itszulib version bump
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) true
-    else if (capability == Capabilities.ITEM_STORAGE) true
-    else
-      super.hasCapability(capability, facing)
   }
 }
