@@ -31,8 +31,20 @@ trait IConnection[T] {
     */
   def contributeFlops(flops: Double): Double
 
+  def direction: ConnectionDirection
+
   def buffer: T
 
   def setBuffer(a: T): Unit
+
+  def canInsert(con: T): Boolean
+
+  /**
+    *
+    * @param t Stack to insert
+    *
+    * @return Remains of insert that are unused.
+    */
+  def insert(t: T): T
 
 }
