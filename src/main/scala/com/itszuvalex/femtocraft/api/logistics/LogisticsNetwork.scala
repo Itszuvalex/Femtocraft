@@ -25,13 +25,12 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
 
   override def onTickEnd(): Unit = {
     LogisticsResourceRegistry.getResources.foreach { resource =>
-      resourceLoop(resource)
+      val connections = nodeMap.values.flatMap(node => EnumFacing.VALUES.flatMap(node.getConnectionsForResource(_, resource)))
+      resourceDistributionLoop(resource, connections)
     }
   }
 
-  private def resourceLoop[T](resource: IResource[T]) = {
-    val connections = nodeMap.values.flatMap(node => EnumFacing.VALUES.flatMap(node.getConnectionsForResource(_, resource)))
-
+  private def resourceDistributionLoop[T](resource: IResource[T], connections: Iterable[IConnection[T]]) = {
     //Generate Flops
 
     //Distribute Flops
@@ -41,6 +40,10 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
     val inputs = connections.withFilter(_.direction == ConnectionDirection.INPUT)
     connections.withFilter(_.direction == ConnectionDirection.OUTPUT).foreach(outputSet.add(_, 1))
 
+    // This will not take into account the change of an empty output slot to an itemstack output slot for cases of ordering of insertion
+    // I.E. In the case of inserting into an empty item location (which will be last in the list, anyways), we don't reorder so that slot is further up
+    // However, in this case, it's already assumed we skipped everything to get to the empty location
+    // Don't think it matters too much.
     inputs.withFilter(_.active).foreach { icon =>
       outputSet.filter(a => icon.canInsert(a.buffer)).forall { ocon =>
         icon.setBuffer(ocon.insert(icon.buffer))
