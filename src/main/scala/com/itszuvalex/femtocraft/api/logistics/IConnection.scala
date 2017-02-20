@@ -47,4 +47,11 @@ trait IConnection[T] {
     */
   def insert(t: T): T
 
+  /**
+    * Function to determine whether buffer is empty for purposes of efficient input searching
+    *
+    * @return True if buffer has the equivalent of 'emptiness'
+    */
+  def isEmpty: Boolean
+
 }

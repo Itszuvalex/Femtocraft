@@ -15,5 +15,4 @@ trait IResource[T] {
     * @return True if A is less than B.
     */
   def sort(a: T, b: T): Boolean
-
 }

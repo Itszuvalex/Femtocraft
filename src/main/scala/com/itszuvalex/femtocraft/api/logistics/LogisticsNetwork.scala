@@ -25,20 +25,21 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
 
   override def onTickEnd(): Unit = {
     LogisticsResourceRegistry.getResources.foreach { resource =>
-      val connections = nodeMap.values.flatMap(node => EnumFacing.VALUES.flatMap(node.getConnectionsForResource(_, resource)))
-      resourceDistributionLoop(resource, connections)
+      val connections = nodeMap.values.flatMap { node =>
+        EnumFacing.VALUES.flatMap(e => node.getConnectionsForResource[Any](e, resource.asInstanceOf[IResource[Any]]))
+      }
+      //Generate Flops
+
+      //Distribute Flops
+
+      resourceDistributionLoop(resource.asInstanceOf[IResource[Any]], connections)
     }
   }
 
   private def resourceDistributionLoop[T](resource: IResource[T], connections: Iterable[IConnection[T]]) = {
-    //Generate Flops
-
-    //Distribute Flops
-
-    //Distribute Resources
     var outputSet = TreeMultiset.create[IConnection[T]](ResourceConnectionComparer.FromResource(resource))
     val inputs = connections.withFilter(_.direction == ConnectionDirection.INPUT)
-    connections.withFilter(_.direction == ConnectionDirection.OUTPUT).foreach(outputSet.add(_, 1))
+    connections.withFilter(a => a.direction == ConnectionDirection.OUTPUT && a.active).foreach(outputSet.add(_, 1))
 
     // This will not take into account the change of an empty output slot to an itemstack output slot for cases of ordering of insertion
     // I.E. In the case of inserting into an empty item location (which will be last in the list, anyways), we don't reorder so that slot is further up
