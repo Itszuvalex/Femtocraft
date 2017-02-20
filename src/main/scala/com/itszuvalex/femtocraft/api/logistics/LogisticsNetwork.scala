@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.api.logistics
 
 import java.util
 
+import com.google.common.collect.TreeMultiset
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import net.minecraft.util.EnumFacing
@@ -24,15 +25,26 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
 
   override def onTickEnd(): Unit = {
     LogisticsResourceRegistry.getResources.foreach { resource =>
-      val connections = nodeMap.values.view.flatMap(node => EnumFacing.VALUES.view.flatMap(node.getConnectionsForResource(_, resource)))
-      val inputs = connections.withFilter(_.direction == ConnectionDirection.INPUT)
-      val outputs = connections.withFilter(_.direction == ConnectionDirection.OUTPUT)
+      resourceLoop(resource)
+    }
+  }
 
-      inputs.withFilter(_.active).foreach { icon =>
-        outputs.withFilter(icon.canInsert).forall { ocon =>
-          icon.setBuffer(ocon.insert(icon.buffer))
-          icon.active
-        }
+  private def resourceLoop[T](resource: IResource[T]) = {
+    val connections = nodeMap.values.flatMap(node => EnumFacing.VALUES.flatMap(node.getConnectionsForResource(_, resource)))
+
+    //Generate Flops
+
+    //Distribute Flops
+
+    //Distribute Resources
+    var outputSet = TreeMultiset.create[IConnection[T]](ResourceConnectionComparer.FromResource(resource))
+    val inputs = connections.withFilter(_.direction == ConnectionDirection.INPUT)
+    connections.withFilter(_.direction == ConnectionDirection.OUTPUT).foreach(outputSet.add(_, 1))
+
+    inputs.withFilter(_.active).foreach { icon =>
+      outputSet.filter(a => icon.canInsert(a.buffer)).forall { ocon =>
+        icon.setBuffer(ocon.insert(icon.buffer))
+        icon.active
       }
     }
   }
