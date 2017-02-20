@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.api.ManagerCapabilities
+import com.itszuvalex.femtocraft.api.logistics.LogisticsResourceRegistry
 import com.itszuvalex.femtocraft.api.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
@@ -64,6 +65,7 @@ object Femtocraft {
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     PowerManager.init()
+    LogisticsResourceRegistry.init()
     proxy.init()
   }
 

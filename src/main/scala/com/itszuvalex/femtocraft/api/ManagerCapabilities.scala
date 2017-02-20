@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.api
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.logistics.IConduit
+import com.itszuvalex.femtocraft.api.logistics.{IConduit, ILogisticsNetworkNode, LogisticsNetwork}
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry.item._
@@ -31,6 +31,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
     CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[ILogisticsNetworkNode], new LogisticsStorageDummy, classOf[LogisticsImplDummy])
     CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
   }
 
@@ -75,6 +76,8 @@ object ManagerCapabilities {
   class MultitoolStorageDummy extends DummyStorage[IMultitool]
 
   class ConduitStorageDummy extends DummyStorage[IConduit]
+
+  class LogisticsStorageDummy extends DummyStorage[ILogisticsNetworkNode]
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
@@ -194,6 +197,20 @@ object ManagerCapabilities {
     override def setActivePrimary(upgrade: IMultitoolUpgrade): Unit = {}
 
     override def setActiveSecondary(upgrade: IMultitoolUpgrade): Unit = {}
+  }
+
+  class LogisticsImplDummy extends ILogisticsNetworkNode {
+    override def networkCapability: Capability[ILogisticsNetworkNode] = Capabilities.TILE_LOGISTICS_NODE
+
+    override def create(): LogisticsNetwork = null
+
+    override def onTickStart(): Unit = {}
+
+    override def onTickEnd(): Unit = {}
+
+    override def onTakeover(iNetwork: LogisticsNetwork): Unit = {}
+
+    override def onSplit(iNetwork: LogisticsNetwork): Unit = {}
   }
 
   class ConduitImplDummy extends IConduit {
