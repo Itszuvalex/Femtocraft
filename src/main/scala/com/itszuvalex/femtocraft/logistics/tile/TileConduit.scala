@@ -159,7 +159,7 @@ class TileConduit extends TileEntityBase {
       conduit.seek = false
       conduit.connections.indices.withFilter(conduit.connections).map(EnumFacing.VALUES).foreach { facing =>
         val loc = getLoc.getOffset(facing)
-        val c = loc.getTileEntity(false) match {
+        loc.getTileEntity(false) match {
           case None =>
           case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
             val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
@@ -230,9 +230,6 @@ class TileConduit extends TileEntityBase {
     super.onChunkUnload()
     if (getWorld.isRemote) return
 
-    //    conduit.connections.indices.withFilter(conduit.connections).map(EnumFacing.VALUES).foreach { f =>
-    //      conduit.disconnectFromNetwork(getLoc.getOffset(f), f)
-    //    }
     conduit.network.removeNode(conduit)
   }
 }
