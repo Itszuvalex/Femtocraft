@@ -12,12 +12,12 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Chris on 2/19/2017.
   */
 trait ILogisticsNetworkNode extends TileNetworkNode[ILogisticsNetworkNode, LogisticsNetwork] {
-  def getConnections(facing: EnumFacing): util.Map[IResource, util.Collection[IConnection]]
+  def getConnections(facing: EnumFacing): util.Map[IResource[_], util.Collection[IConnection[_]]]
 
-  def getConnectionsForResource(facing: EnumFacing, resource: IResource): util.Collection[IConnection] =
-    getConnections(facing).find(_._1 == resource).map(_._2).getOrElse(new ArrayBuffer[IConnection]())
+  def getConnectionsForResource[T](facing: EnumFacing, resource: IResource[T]): util.Collection[IConnection[T]] =
+    getConnections(facing).find(_._1 == resource).map(_._2.asInstanceOf[util.Collection[IConnection[T]]]).getOrElse(new ArrayBuffer[IConnection[T]]())
 
-  def getConnectionsForResourceForChannel(facing: EnumFacing, resource: IResource, channel: String): util.Collection[IConnection]
+  def getConnectionsForResourceForChannel[T](facing: EnumFacing, resource: IResource[T], channel: String): util.Collection[IConnection[T]]
   = getConnectionsForResource(facing, resource).filter(_.channel == channel)
 
 }

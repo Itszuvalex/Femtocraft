@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.api
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.logistics.{IConduit, ILogisticsNetworkNode, LogisticsNetwork}
+import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry.item._
@@ -200,17 +200,9 @@ object ManagerCapabilities {
   }
 
   class LogisticsImplDummy extends ILogisticsNetworkNode {
-    override def networkCapability: Capability[ILogisticsNetworkNode] = Capabilities.TILE_LOGISTICS_NODE
+    override def getConnections(facing: EnumFacing): util.Map[IResource[_], util.Collection[IConnection[_]]] = null
 
-    override def create(): LogisticsNetwork = null
-
-    override def onTickStart(): Unit = {}
-
-    override def onTickEnd(): Unit = {}
-
-    override def onTakeover(iNetwork: LogisticsNetwork): Unit = {}
-
-    override def onSplit(iNetwork: LogisticsNetwork): Unit = {}
+    override def getLoc: Loc4 = new Loc4
   }
 
   class ConduitImplDummy extends IConduit {
