@@ -125,6 +125,7 @@ object FemtoBlocks {
     blockCrystalChargingArray.registerModel()
     blockCrystalStorageArray.registerModel()
     blockCrystalHeatExchanger.registerModel()
+    blockConduit.registerModel()
   }
 
   def postInit(): Unit = {
