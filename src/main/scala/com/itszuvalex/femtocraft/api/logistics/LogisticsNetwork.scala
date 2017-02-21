@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.api.logistics
 
 import java.util
 
-import com.google.common.collect.TreeMultiset
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import net.minecraft.util.EnumFacing
@@ -31,24 +30,28 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
       //Generate Flops
 
       //Distribute Flops
+      //TODO Actual Impl
+      connections.withFilter(_.active).foreach(_.contributeFlops(100))
 
       resourceDistributionLoop(resource.asInstanceOf[IResource[Any]], connections)
     }
   }
 
   private def resourceDistributionLoop[T](resource: IResource[T], connections: Iterable[IConnection[T]]) = {
-    var outputSet = TreeMultiset.create[IConnection[T]](ResourceConnectionComparer.FromResource(resource))
+    val comparator = ResourceConnectionComparer.FromResource(resource)
+    val sortedOutputs = connections.filter(_.direction == ConnectionDirection.OUTPUT).toSeq.sortWith((a, b) => comparator.compare(a, b) < 0)
     val inputs = connections.withFilter(_.direction == ConnectionDirection.INPUT)
-    connections.withFilter(a => a.direction == ConnectionDirection.OUTPUT && a.active).foreach(outputSet.add(_, 1))
 
     // This will not take into account the change of an empty output slot to an itemstack output slot for cases of ordering of insertion
     // I.E. In the case of inserting into an empty item location (which will be last in the list, anyways), we don't reorder so that slot is further up
     // However, in this case, it's already assumed we skipped everything to get to the empty location
     // Don't think it matters too much.
-    inputs.withFilter(_.active).foreach { icon =>
-      outputSet.filter(a => icon.canInsert(a.buffer)).forall { ocon =>
-        icon.setBuffer(ocon.insert(icon.buffer))
-        icon.active
+    inputs.withFilter(a => !a.isEmpty).foreach { icon =>
+      sortedOutputs.exists { ocon =>
+        if (ocon.canInsert(icon.buffer)) {
+          icon.setBuffer(ocon.insert(icon.buffer))
+          icon.isEmpty
+        } else false
       }
     }
   }

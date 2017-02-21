@@ -21,7 +21,7 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
   var flopsToGo    : Double       = 0d
   var uploadBuffer : IItemStorage = new ItemStorageArray(1)
   var uploadChannel: String       = "default"
-  var paused       : Boolean      = true
+  var paused       : Boolean      = false
 
   override def resource: IResource[ItemStack] = LogisticsResourceRegistry.RESOURCE_ITEMS
 
@@ -61,7 +61,7 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
     * @return Amount of FLOPs from FLOPs that are unused.
     */
   override def contributeFlops(flops: Double): Double = {
-    val contribute = Math.min(flopsRequired, flops)
+    val contribute = Math.min(flopsRemaining, flops)
     flopsToGo -= contribute
     flops - contribute
   }

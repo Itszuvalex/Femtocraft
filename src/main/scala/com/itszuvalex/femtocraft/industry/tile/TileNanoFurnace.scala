@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
+import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
@@ -13,6 +13,9 @@ import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.items.CapabilityItemHandler
 
 /**
   * Created by Chris on 8/14/2016.
@@ -144,6 +147,18 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
+
+
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+    if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+      facing match {
+        case EnumFacing.UP => Converter.IItemHandlerModifiableFromIItemStorage(new ItemStorageSlice(storage, Array(0))).asInstanceOf[T]
+        case EnumFacing.DOWN => Converter.IItemHandlerModifiableFromIItemStorage(new ItemStorageSlice(storage, Array(1))).asInstanceOf[T]
+        case _ => super.getCapability(capability, facing)
+      }
+    else
+      super.getCapability(capability, facing)
+  }
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     super.deserializeNBT(nbt)
