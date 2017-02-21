@@ -36,6 +36,10 @@ object FemtoItems {
 
   var itemSolarPanel: Item = _
 
+  var itemLogisticsItemChipBasic  : Item = _
+  var itemLogisticsFluidChipBasic : Item = _
+  var itemLogisticsNaniteChipBasic: Item = _
+
   var itemFrame     : Item = _
   var itemMultiblock: Item = _
 
@@ -66,6 +70,9 @@ object FemtoItems {
     itemEnergyRegulator = registerItem(new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
     itemCrystalBattery = registerItem(new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
     itemNaniteBeacon = registerItem(new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
+    itemLogisticsItemChipBasic = registerItem(new Item(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
+    itemLogisticsFluidChipBasic = registerItem(new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
+    itemLogisticsNaniteChipBasic = registerItem(new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
   }
@@ -92,6 +99,9 @@ object FemtoItems {
     itemEnergyRegulator.registerModel()
     itemCrystalBattery.registerModel()
     itemNaniteBeacon.registerModel()
+    itemLogisticsItemChipBasic.registerModel()
+    itemLogisticsFluidChipBasic.registerModel()
+    itemLogisticsNaniteChipBasic.registerModel()
     itemMultiTool.registerModel()
   }
 
