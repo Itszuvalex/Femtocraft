@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.connections
 
-import com.itszuvalex.femtocraft.api.logistics.{IConnection, IResource, LogisticsResourceRegistry}
+import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IResource, LogisticsResourceRegistry}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import net.minecraft.item.ItemStack
@@ -11,6 +11,7 @@ object ItemConnection {
   val FLOPS_KEY   = "flops"
   val BUFFER_KEY  = "buffer"
   val CHANNEL_KEY = "channel"
+  val PAUSED_KEY  = "paused"
 }
 
 /**
@@ -20,6 +21,7 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
   var flopsToGo    : Double       = 0d
   var uploadBuffer : IItemStorage = new ItemStorageArray(1)
   var uploadChannel: String       = "default"
+  var paused       : Boolean      = true
 
   override def resource: IResource[ItemStack] = LogisticsResourceRegistry.RESOURCE_ITEMS
 
@@ -36,11 +38,21 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
     *
     * @return
     */
-  override def active: Boolean = !isEmpty
+  override def active: Boolean = !isPaused && !isEmpty
 
   override def flopsRemaining: Double = flopsToGo
 
   override def flopsMaximum: Double = flopsRequired
+
+  override def direction: ConnectionDirection = ConnectionDirection.DISABLED
+
+  def pause(): Unit = paused = true
+
+  def unpause(): Unit = paused = false
+
+  def togglePause(): Unit = if (isPaused) unpause() else pause()
+
+  def isPaused: Boolean = paused
 
   /**
     *
@@ -58,7 +70,7 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
 
   override def setBuffer(a: ItemStack): Unit = uploadBuffer(0) = Converter.IItemStackFromItemStack(a)
 
-  override def canInsert(con: ItemStack): Boolean = true
+  override def canInsert(con: ItemStack): Boolean = !paused && storage.indices.exists(storage.canInsert(_, Converter.IItemStackFromItemStack(con)))
 
   /**
     *
@@ -78,6 +90,7 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     uploadChannel = nbt.getString(ItemConnection.CHANNEL_KEY)
     flopsToGo = nbt.getDouble(ItemConnection.FLOPS_KEY)
+    paused = nbt.getBoolean(ItemConnection.PAUSED_KEY)
     uploadBuffer.deserializeNBT(nbt.getCompoundTag(ItemConnection.BUFFER_KEY))
   }
 
@@ -86,6 +99,7 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
     nbt.setString(ItemConnection.CHANNEL_KEY, channel)
     nbt.setDouble(ItemConnection.FLOPS_KEY, flopsToGo)
     nbt.setTag(ItemConnection.BUFFER_KEY, uploadBuffer.serializeNBT())
+    nbt.setBoolean(ItemConnection.PAUSED_KEY, isPaused)
     nbt
   }
 }
