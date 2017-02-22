@@ -34,8 +34,8 @@ object ItemPowerCrystal {
     val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
     tlist += "Crystal Type:" + cap.getType()
     tlist += "Passive Gen:" + cap.getPassiveGen().formatted("%.2f")
-    tlist += "Transfer Rate:" + cap.getTransferRate()
-    tlist += "Power:" + cap.battery.storage.formatted("%.0f") + "/" + cap.battery.maxStorage.formatted("%.0f")
+    tlist += "Transfer Rate:" + cap.getTransferRate().formatted("%,.0f")
+    tlist += "Power:" + cap.battery.storage.formatted("%,.0f") + "/" + cap.battery.maxStorage.formatted("%,.0f")
     //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
   }
 
