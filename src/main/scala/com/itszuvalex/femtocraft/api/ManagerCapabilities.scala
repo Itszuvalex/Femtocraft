@@ -33,6 +33,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
     CapabilityManager.INSTANCE.register(classOf[ILogisticsNetworkNode], new LogisticsStorageDummy, classOf[LogisticsImplDummy])
     CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[IConnectionProvider], new ConnectionProviderStorageDummy, classOf[ConnectionProviderImplDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -78,6 +79,8 @@ object ManagerCapabilities {
   class ConduitStorageDummy extends DummyStorage[IConduit]
 
   class LogisticsStorageDummy extends DummyStorage[ILogisticsNetworkNode]
+
+  class ConnectionProviderStorageDummy extends DummyStorage[IConnectionProvider]
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
@@ -213,6 +216,20 @@ object ManagerCapabilities {
     override def removeConnection(facing: EnumFacing): Unit = {}
 
     override def isConnected(facing: EnumFacing): Boolean = false
+  }
+
+  class ConnectionProviderImplDummy extends IConnectionProvider {
+    /**
+      * Given loc and facing to allow the provider to build the connection...connections...as needed
+      *
+      * @param loc    Loc holding this connection provider
+      * @param facing Facing
+      *
+      * @return Set of Connections provided by this provider
+      */
+    override def getConnections(loc: Loc4, facing: EnumFacing): util.Collection[IConnection[_]] = Set[IConnection[_]]()
+
+    override def addTooltip(tooltip: util.List[String]): Unit = {}
   }
 
 }

@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.api;
 
 import com.itszuvalex.femtocraft.api.logistics.IConduit;
+import com.itszuvalex.femtocraft.api.logistics.IConnectionProvider;
 import com.itszuvalex.femtocraft.api.logistics.ILogisticsNetworkNode;
 import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
 import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
@@ -54,4 +55,7 @@ public class Capabilities {
 
     @CapabilityInject(ILogisticsNetworkNode.class)
     public static Capability<ILogisticsNetworkNode> TILE_LOGISTICS_NODE = null;
+
+    @CapabilityInject(IConnectionProvider.class)
+    public static Capability<IConnectionProvider> ITEM_CONNECTION_PROVIDER = null;
 }

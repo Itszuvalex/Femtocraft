@@ -1,33 +1,61 @@
 package com.itszuvalex.femtocraft.logistics.connections
 
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IResource, LogisticsResourceRegistry}
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.common.util.INBTSerializable
+import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.items.CapabilityItemHandler
 
 object ItemConnection {
-  val FLOPS_KEY   = "flops"
-  val BUFFER_KEY  = "buffer"
-  val CHANNEL_KEY = "channel"
-  val PAUSED_KEY  = "paused"
+  val FLOPS_KEY                = "flops"
+  val BUFFER_KEY               = "buffer"
+  val CHANNEL_KEY              = "channel"
+  val PAUSED_KEY               = "paused"
+  val CONNECTION_DIRECTION_KEY = "condir"
+  val INTERFACE_DIRECTION_KEY  = "intdir"
 }
 
 /**
   * Created by Chris on 2/20/2017.
   */
-abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, val storage: IItemStorage, var stackLimit: Int = 64) extends IConnection[ItemStack] with INBTSerializable[NBTTagCompound] {
-  var flopsToGo    : Double       = 0d
-  var uploadBuffer : IItemStorage = new ItemStorageArray(1)
-  var uploadChannel: String       = "default"
-  var paused       : Boolean      = false
+class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound, var flopsRequired: Double, var itemsPerOp: Int, var stackLimit: Int = 64) extends IConnection[ItemStack] {
+  channel = "default"
+  direction = ConnectionDirection.DISABLED
+  interfaceDirection = facing.getOpposite
+
+  def storage: Option[IItemStorage] = {
+    loc.getOffset(facing).getTileEntity(false) match {
+      case Some(i: TileEntity) if i.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, interfaceDirection) =>
+        Some(Converter.IItemStorageFromIItemHandler(i.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, interfaceDirection)))
+      case _ => None
+    }
+  }
+
+  def flopsToGo: Double = nbt.getDouble(ItemConnection.FLOPS_KEY)
+
+  def flopsToGo_=(d: Double): Unit = nbt.setDouble(ItemConnection.FLOPS_KEY, d)
+
+  def interfaceDirection: EnumFacing = {
+    EnumFacing.VALUES(nbt.getInteger(ItemConnection.INTERFACE_DIRECTION_KEY))
+  }
+
+  def interfaceDirection_=(facing: EnumFacing): Unit = {
+    nbt.setInteger(ItemConnection.INTERFACE_DIRECTION_KEY, facing.getIndex)
+  }
 
   override def resource: IResource[ItemStack] = LogisticsResourceRegistry.RESOURCE_ITEMS
 
-  override def channel: String = uploadChannel
+  override def channel: String = nbt.getString(ItemConnection.CHANNEL_KEY)
 
-  def setChannel(channel: String): Unit = uploadChannel = channel
+  def channel_=(channel: String): Unit = setChannel(channel)
+
+  override def setChannel(channel: String): Unit = {
+    nbt.setString(ItemConnection.CHANNEL_KEY, channel)
+  }
 
   /**
     * Active is whether or not this channel is actively performing computation.
@@ -38,21 +66,33 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
     *
     * @return
     */
-  override def active: Boolean = !isPaused && !isEmpty
+  override def active: Boolean = !isPaused &&
+    (direction match {
+      case ConnectionDirection.INPUT => isEmpty
+      case _ => !isEmpty
+    })
 
   override def flopsRemaining: Double = flopsToGo
 
   override def flopsMaximum: Double = flopsRequired
 
-  override def direction: ConnectionDirection = ConnectionDirection.DISABLED
+  override def direction: ConnectionDirection = if (isPaused) ConnectionDirection.DISABLED else ConnectionDirection.valueOf(nbt.getString(ItemConnection.CONNECTION_DIRECTION_KEY))
 
-  def pause(): Unit = paused = true
+  override def setDirection(dir: ConnectionDirection): Unit = nbt.setString(ItemConnection.CONNECTION_DIRECTION_KEY, dir.toString)
 
-  def unpause(): Unit = paused = false
+  def direction_=(dir: ConnectionDirection): Unit = setDirection(dir)
+
+  def pause(): Unit = isPaused = true
+
+  def unpause(): Unit = isPaused = false
 
   def togglePause(): Unit = if (isPaused) unpause() else pause()
 
-  def isPaused: Boolean = paused
+  def isPaused: Boolean = {
+    nbt.getBoolean(ItemConnection.PAUSED_KEY)
+  }
+
+  def isPaused_=(b: Boolean): Unit = nbt.setBoolean(ItemConnection.PAUSED_KEY, b)
 
   /**
     *
@@ -63,14 +103,76 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
   override def contributeFlops(flops: Double): Double = {
     val contribute = Math.min(flopsRemaining, flops)
     flopsToGo -= contribute
-    flops - contribute
+    val ret = flops - contribute
+    if (flopsRemaining <= 0) {
+      direction match {
+        case ConnectionDirection.DISABLED =>
+        case ConnectionDirection.INPUT => inputItem()
+        case ConnectionDirection.OUTPUT => outputItem()
+        case _ =>
+      }
+    }
+
+    ret
   }
 
-  override def buffer: ItemStack = uploadBuffer.head.toMinecraft
+  private def inputItem(): Unit = {
+    if (isEmpty) {
+      // We received computation because we no longer have an item in our uploaded buffer.
+      // Do not reset computation until we have found an item, (unless we want to delay checks until computation completes, as a timeout)
+      // This will however put greater computational load on the system and slow down reaction time to new items entering it.
+      // Find new item to upload
+      storage.foreach { s =>
+        s.indices.exists { i =>
+          if (!s(i).isEmpty)
+            setIBuffer(s.split(i, Math.min(itemsPerOp, stackLimit)))
+          !isEmpty
+        }
 
-  override def setBuffer(a: ItemStack): Unit = uploadBuffer(0) = Converter.IItemStackFromItemStack(a)
+        // Reset computation, wait till next cycle to check again.
+        flopsToGo = flopsRequired
+      }
+    }
+  }
 
-  override def canInsert(con: ItemStack): Boolean = !paused && storage.indices.exists(storage.canInsert(_, Converter.IItemStackFromItemStack(con)))
+  private def outputItem(): Unit = {
+    if (!isEmpty) {
+      var itemsToTransfer = Math.min(buffer.getCount, itemsPerOp)
+      storage.foreach { s =>
+        val ibuf = ibuffer
+        s.indices.view.filter(s.canInsert(_, ibuffer)).exists { i =>
+          val stack = Converter.IItemStackFromItemStack(buffer)
+          val newBuf = stack.copy()
+
+          val amt = Math.min(stack.stackSize, itemsToTransfer)
+          stack.stackSize = amt
+
+          val remains = s.insert(i, stack)
+          val transfered = amt - (if (remains == null || remains.isEmpty) 0 else remains.stackSize)
+          itemsToTransfer -= transfered
+          newBuf.stackSize -= transfered
+          setIBuffer(newBuf)
+          isEmpty || (itemsToTransfer <= 0)
+        }
+
+        // We tried to transfer as much as we could.  Clear our amount
+        // We won't busy wait like we do for input.
+        // Input busy-wait essentially is a onTick replacement to pull the initial itemstack into itself
+        // We don't need to do that here.
+        flopsToGo = flopsRequired
+      }
+    }
+  }
+
+  override def buffer: ItemStack = ibuffer.toMinecraft
+
+  def ibuffer: IItemStack = IItemStack.createFromNBT(nbt.getCompoundTag(ItemConnection.BUFFER_KEY))
+
+  override def setBuffer(a: ItemStack): Unit = setIBuffer(Converter.IItemStackFromItemStack(a))
+
+  def setIBuffer(a: IItemStack): Unit = nbt.setTag(ItemConnection.BUFFER_KEY, a.serializeNBT())
+
+  override def canInsert(con: ItemStack): Boolean = !isPaused && storage.exists(s => s.indices.exists(s.canInsert(_, Converter.IItemStackFromItemStack(con))))
 
   /**
     *
@@ -78,29 +180,21 @@ abstract class ItemConnection(var flopsRequired: Double, var itemsPerOp: Int, va
     *
     * @return Remains of insert that are unused.
     */
-  override def insert(t: ItemStack): ItemStack = uploadBuffer.insert(0, Converter.IItemStackFromItemStack(t)).toMinecraft
+  override def insert(t: ItemStack): ItemStack = {
+    val storage = new ItemStorageArray(1)
+    storage(0) = ibuffer
+    val ret = storage.insert(0, Converter.IItemStackFromItemStack(t)).toMinecraft
+    setIBuffer(storage(0))
+    ret
+  }
 
   /**
     * Function to determine whether buffer is empty for purposes of efficient input searching
     *
     * @return True if buffer has the equivalent of 'emptiness'
     */
-  override def isEmpty: Boolean = buffer == null || buffer.isEmpty
-
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    uploadChannel = nbt.getString(ItemConnection.CHANNEL_KEY)
-    flopsToGo = nbt.getDouble(ItemConnection.FLOPS_KEY)
-    paused = nbt.getBoolean(ItemConnection.PAUSED_KEY)
-    uploadBuffer.deserializeNBT(nbt.getCompoundTag(ItemConnection.BUFFER_KEY))
-  }
-
-  override def serializeNBT(): NBTTagCompound = {
-    val nbt = new NBTTagCompound
-    nbt.setString(ItemConnection.CHANNEL_KEY, channel)
-    nbt.setDouble(ItemConnection.FLOPS_KEY, flopsToGo)
-    nbt.setTag(ItemConnection.BUFFER_KEY, uploadBuffer.serializeNBT())
-    nbt.setBoolean(ItemConnection.PAUSED_KEY, isPaused)
-    nbt
+  override def isEmpty: Boolean = {
+    ibuffer.isEmpty
   }
 }
 

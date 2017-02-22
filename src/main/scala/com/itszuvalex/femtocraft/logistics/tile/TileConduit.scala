@@ -5,10 +5,9 @@ import java.util
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics._
-import com.itszuvalex.femtocraft.logistics.connections.{ItemInputConnection, ItemOutputConnection}
+import com.itszuvalex.femtocraft.logistics.connections.ItemConnection
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
@@ -189,10 +188,15 @@ class TileConduit extends TileEntityBase {
                 cap.network.addConnection(getLoc, cap.getLoc)
           //TODO MUCH BETTER WAY
           case Some(i: TileEntity) if i.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite) =>
-            val storage = Converter.IItemStorageFromIItemHandler(i.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite))
             facing match {
-              case EnumFacing.DOWN => conduit.addConnection(facing, new ItemOutputConnection(5000d, 1, storage))
-              case EnumFacing.UP => conduit.addConnection(facing, new ItemInputConnection(5000d, 1, storage))
+              case EnumFacing.DOWN =>
+                val con = new ItemConnection(getLoc, facing, new NBTTagCompound, 5000d, 1)
+                con.setDirection(ConnectionDirection.OUTPUT)
+                conduit.addConnection(facing, con)
+              case EnumFacing.UP =>
+                val con = new ItemConnection(getLoc, facing, new NBTTagCompound, 5000d, 1 )
+                con.setDirection(ConnectionDirection.INPUT)
+                conduit.addConnection(facing, con)
               case _ =>
             }
           case _ =>

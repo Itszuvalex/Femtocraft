@@ -8,6 +8,8 @@ trait IConnection[T] {
 
   def channel: String
 
+  def setChannel(channel: String): Unit
+
   /**
     * Active is whether or not this channel is actively performing computation.
     * I.E.  An input channel would be performing computation if it had resources in its buffer.
@@ -32,6 +34,8 @@ trait IConnection[T] {
   def contributeFlops(flops: Double): Double
 
   def direction: ConnectionDirection
+
+  def setDirection(dir: ConnectionDirection): Unit
 
   def buffer: T
 
