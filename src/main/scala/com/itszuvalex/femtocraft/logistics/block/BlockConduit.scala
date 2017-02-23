@@ -20,18 +20,19 @@ import scala.collection.JavaConversions._
   * Created by Chris on 2/16/2017.
   */
 class BlockConduit extends TileContainer(Material.IRON) {
+  var renderBox = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
+
   override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileConduit
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
   override def isNormalCube(state: IBlockState): Boolean = false
 
-
   override def onNeighborChange(world: IBlockAccess, pos: BlockPos, neighbor: BlockPos): Unit = {
     super.onNeighborChange(world, pos, neighbor)
     world.getTileEntity(pos) match {
       case null =>
-      case t: TileConduit=> t.onNeighborChange(neighbor)
+      case t: TileConduit => t.onNeighborChange(neighbor)
       case _ =>
     }
   }
@@ -40,7 +41,7 @@ class BlockConduit extends TileContainer(Material.IRON) {
     super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
     worldIn.getTileEntity(pos) match {
       case null =>
-      case t:TileConduit => t.onBlockPlaced()
+      case t: TileConduit => t.onBlockPlaced()
       case _ =>
     }
   }
@@ -73,10 +74,13 @@ class BlockConduit extends TileContainer(Material.IRON) {
   }
 
   override def collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult = {
-    val results = getBoundingBoxes(worldIn, pos).map(rayTrace(pos, start, end, _)).filter(_ != null).sortWith { (a, b) =>
-      start.squareDistanceTo(a.hitVec) < start.squareDistanceTo(b.hitVec)
+    val results = getBoundingBoxes(worldIn, pos).map(box => (box, rayTrace(pos, start, end, box))).filter(a => a._2 != null).sortWith { (a, b) =>
+      start.squareDistanceTo(a._2.hitVec) < start.squareDistanceTo(b._2.hitVec)
     }
-    results.headOption.orNull
+    results.headOption.map { r =>
+      renderBox = r._1
+      r._2
+    }.orNull
   }
 
   override protected def rayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, boundingBox: AxisAlignedBB): RayTraceResult = {
@@ -92,6 +96,6 @@ class BlockConduit extends TileContainer(Material.IRON) {
   }
 
   override def getSelectedBoundingBox(state: IBlockState, worldIn: World, pos: BlockPos): AxisAlignedBB = {
-    super.getSelectedBoundingBox(state, worldIn, pos)
+    renderBox.offset(pos)
   }
 }

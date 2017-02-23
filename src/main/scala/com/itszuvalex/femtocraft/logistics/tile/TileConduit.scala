@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.logistics.connections.ItemConnection
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
@@ -24,12 +25,20 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Chris on 2/16/2017.
   */
 object TileConduit {
-  val CONDUIT_KEY = "connections"
+  val CONDUIT_KEY = "conduit"
+
+  object ConduitImpl {
+    val CONNECTION_KEY = "connections"
+    val BLOCKED_KEY = "blocked"
+    val STORAGE_KEY = "storage"
+  }
 
   class ConduitImpl(val conduit: TileConduit) extends IConduit with ILogisticsNetworkNode {
-    val connections                                                                                         = new Array[Boolean](6)
-    var seek                                                                                                = true
+    val connections = new Array[Boolean](6)
+    val blocked = new Array[Boolean](6)
+    var seek = true
     val connectionMap: mutable.HashMap[EnumFacing, util.Map[IResource[_], util.Collection[IConnection[_]]]] = new mutable.HashMap[EnumFacing, util.Map[IResource[_], util.Collection[IConnection[_]]]]()
+    val connectionStorage = Array(new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4))
 
     def addConnection(facing: EnumFacing, con: IConnection[_]): Boolean = {
       connectionMap.getOrElseUpdate(facing, new mutable.HashMap[IResource[_], util.Collection[IConnection[_]]]).getOrElseUpdate(con.resource, new ArrayBuffer[IConnection[_]]).add(con)
@@ -50,14 +59,18 @@ object TileConduit {
 
     override def getLoc: Loc4 = conduit.getLoc
 
-
     override def canConnect(loc: Loc4): Boolean = {
-      super.canConnect(loc) // TODO: Check Blacklist
+      if (!super.canConnect(loc)) return false
+
+      EnumFacing.VALUES.exists { f =>
+        val l = getLoc.getOffset(f)
+        (l == loc) && !blocked(f.getIndex)
+      }
     }
 
-    override def isConnected(facing: EnumFacing): Boolean = connections(facing.getIndex)
+    override def isConnected(facing: EnumFacing): Boolean = !blocked(facing.getIndex) && connections(facing.getIndex)
 
-    override def canAddConnection(facing: EnumFacing): Boolean = true
+    override def canAddConnection(facing: EnumFacing): Boolean = !blocked(facing.getIndex)
 
     override def addConnection(facing: EnumFacing): Unit = {
       connections(facing.getIndex) = true
@@ -96,12 +109,24 @@ object TileConduit {
       connections.indices.foreach { i =>
         compound.setBoolean(EnumFacing.VALUES(i).getName, connections(i))
       }
+
+      val storage = new NBTTagCompound
+      connectionStorage.indices.foreach { i =>
+        storage.setTag(EnumFacing.VALUES(i).getName, connectionStorage(i).serializeNBT())
+      }
+      compound.setTag(ConduitImpl.STORAGE_KEY, storage)
     }
 
     def loadConnectionInfoNBT(compound: NBTTagCompound): Unit = {
       connections.indices.foreach { i =>
         connections(i) = compound.getBoolean(EnumFacing.VALUES(i).getName)
       }
+
+      val storage = compound.getCompoundTag(ConduitImpl.STORAGE_KEY)
+      connectionStorage.indices.foreach { i =>
+        connectionStorage(i).deserializeNBT(storage.getCompoundTag(EnumFacing.VALUES(i).getName))
+      }
+
       conduit.setRenderUpdate()
     }
   }
@@ -114,6 +139,8 @@ class TileConduit extends TileEntityBase {
   override def hasDescription: Boolean = true
 
   override def getMod: AnyRef = Femtocraft
+
+  def getStorage(facing: EnumFacing): IItemStorage = conduit.connectionStorage(facing.getIndex)
 
   def onNeighborChange(neighbor: BlockPos): Unit = {
     if (getWorld.isRemote) return
@@ -170,7 +197,6 @@ class TileConduit extends TileEntityBase {
     conduit.network.removeNode(conduit)
   }
 
-
   override def serverUpdate(): Unit = {
     super.serverUpdate()
     if (conduit.seek) {
@@ -194,7 +220,7 @@ class TileConduit extends TileEntityBase {
                 con.setDirection(ConnectionDirection.OUTPUT)
                 conduit.addConnection(facing, con)
               case EnumFacing.UP =>
-                val con = new ItemConnection(getLoc, facing, new NBTTagCompound, 5000d, 1 )
+                val con = new ItemConnection(getLoc, facing, new NBTTagCompound, 5000d, 1)
                 con.setDirection(ConnectionDirection.INPUT)
                 conduit.addConnection(facing, con)
               case _ =>
