@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.logistics
+package com.itszuvalex.femtocraft.logistics.item
 
 import java.util
 
@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IConnectionProvider}
 import com.itszuvalex.femtocraft.logistics.connections.ItemConnection
 import com.itszuvalex.itszulib.api.core.Loc4
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -39,11 +40,24 @@ class ItemLogisticsItemChip extends Item {
             Set(con)
           }
 
-          override def addTooltip(tooltip: util.List[String]): Unit = {}
+          override def addTooltip(tooltip: util.List[String]): Unit = {
+            val con = new ItemConnection(new Loc4, null, stack.getTagCompound, 5000d, 1, 16)
+            tooltip += "Item:" + con.ibuffer.toString
+            tooltip += "FLOPs:" + con.flopsRequired + "/" + con.flopsMaximum
+            tooltip += "Items Per Op:" + con.itemsPerOp
+            tooltip += "Buffer Size:" + con.stackLimit
+            tooltip += "Mode:" + con.direction
+            tooltip += "Interface Direction:" + con.interfaceDirection.toString
+          }
         }.asInstanceOf[T]
       } else null.asInstanceOf[T]
 
       override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.ITEM_CONNECTION_PROVIDER
     }
+  }
+
+  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
+    super.addInformation(stack, playerIn, tooltip, advanced)
+    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).addTooltip(tooltip)
   }
 }

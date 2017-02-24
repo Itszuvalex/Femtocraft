@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.ItemDumbDust
 import com.itszuvalex.femtocraft.industry.item._
-import com.itszuvalex.femtocraft.logistics.ItemLogisticsItemChip
+import com.itszuvalex.femtocraft.logistics.item.ItemLogisticsItemChip
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.registry.GameRegistry

@@ -25,7 +25,7 @@ object ItemConnection {
 class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound, var flopsRequired: Double, var itemsPerOp: Int, var stackLimit: Int = 64) extends IConnection[ItemStack] {
   channel = "default"
   direction = ConnectionDirection.DISABLED
-  interfaceDirection = facing.getOpposite
+  interfaceDirection = Option(facing).map(_.getOpposite).getOrElse(EnumFacing.NORTH)
 
   def storage: Option[IItemStorage] = {
     loc.getOffset(facing).getTileEntity(false) match {
