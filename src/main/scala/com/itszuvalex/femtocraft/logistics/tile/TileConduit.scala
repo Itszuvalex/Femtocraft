@@ -2,12 +2,13 @@ package com.itszuvalex.femtocraft.logistics.tile
 
 import java.util
 
-import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
@@ -30,12 +31,17 @@ object TileConduit {
     val STORAGE_KEY    = "storage"
   }
 
+  class ConduitStorage(size: Int) extends ItemStorageArray(size) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = stack.hasCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
+
+    override def maxStackSize(i: Int): Int = 1
+  }
+
   class ConduitImpl(val conduit: TileConduit) extends IConduit with ILogisticsNetworkNode {
     val connections       = new Array[Boolean](6)
     val blocked           = new Array[Boolean](6)
     var seek              = true
-    val connectionStorage = Array(new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4))
-
+    val connectionStorage = Array(new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4))
 
     override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = {
       if (facing == null) return Set[IConnection[T]]()
@@ -127,6 +133,10 @@ class TileConduit extends TileEntityBase {
   override def hasDescription: Boolean = true
 
   override def getMod: AnyRef = Femtocraft
+
+  override def hasGUI: Boolean = true
+
+  override def getGuiID: Int = GuiIDs.TileConduitID
 
   def getStorage(facing: EnumFacing): IItemStorage = conduit.connectionStorage(facing.getIndex)
 

@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.ItemDumbDust
 import com.itszuvalex.femtocraft.industry.item._
+import com.itszuvalex.femtocraft.logistics.ItemLogisticsItemChip
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.registry.GameRegistry
@@ -70,7 +71,7 @@ object FemtoItems {
     itemEnergyRegulator = registerItem(new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
     itemCrystalBattery = registerItem(new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
     itemNaniteBeacon = registerItem(new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
-    itemLogisticsItemChipBasic = registerItem(new Item(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
+    itemLogisticsItemChipBasic = registerItem(new ItemLogisticsItemChip(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsFluidChipBasic = registerItem(new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsNaniteChipBasic = registerItem(new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
