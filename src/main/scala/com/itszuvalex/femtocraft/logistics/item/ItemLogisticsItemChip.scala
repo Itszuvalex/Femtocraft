@@ -41,7 +41,7 @@ class ItemLogisticsItemChip extends Item {
           }
 
           override def addTooltip(tooltip: util.List[String]): Unit = {
-            val con = new ItemConnection(new Loc4, null, stack.getTagCompound, 5000d, 1, 16)
+            val con = new ItemConnection(new Loc4, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
             tooltip += "Item:" + con.ibuffer.toString
             tooltip += "FLOPs:" + con.flopsRequired + "/" + con.flopsMaximum
             tooltip += "Items Per Op:" + con.itemsPerOp
