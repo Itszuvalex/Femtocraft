@@ -5,7 +5,6 @@ import java.util
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics._
-import com.itszuvalex.femtocraft.logistics.connections.ItemConnection
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
@@ -18,8 +17,6 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.items.CapabilityItemHandler
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by Chris on 2/16/2017.
@@ -29,33 +26,24 @@ object TileConduit {
 
   object ConduitImpl {
     val CONNECTION_KEY = "connections"
-    val BLOCKED_KEY = "blocked"
-    val STORAGE_KEY = "storage"
+    val BLOCKED_KEY    = "blocked"
+    val STORAGE_KEY    = "storage"
   }
 
   class ConduitImpl(val conduit: TileConduit) extends IConduit with ILogisticsNetworkNode {
-    val connections = new Array[Boolean](6)
-    val blocked = new Array[Boolean](6)
-    var seek = true
-    val connectionMap: mutable.HashMap[EnumFacing, util.Map[IResource[_], util.Collection[IConnection[_]]]] = new mutable.HashMap[EnumFacing, util.Map[IResource[_], util.Collection[IConnection[_]]]]()
+    val connections       = new Array[Boolean](6)
+    val blocked           = new Array[Boolean](6)
+    var seek              = true
     val connectionStorage = Array(new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4), new ItemStorageArray(4))
 
-    def addConnection(facing: EnumFacing, con: IConnection[_]): Boolean = {
-      connectionMap.getOrElseUpdate(facing, new mutable.HashMap[IResource[_], util.Collection[IConnection[_]]]).getOrElseUpdate(con.resource, new ArrayBuffer[IConnection[_]]).add(con)
-    }
 
-    def removeConnection(facing: EnumFacing, con: IConnection[_]): Boolean = {
-      val facingMap = connectionMap.getOrElse(facing, return false)
-      val col = facingMap.getOrElse(con.resource, return false)
-      val ret = col.remove(con)
-      if (col.isEmpty)
-        facingMap.remove(con.resource)
-      if (facingMap.isEmpty)
-        connectionMap.remove(facing)
-      ret
-    }
+    override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = {
+      if (facing == null) return Set[IConnection[T]]()
 
-    override def getConnections(facing: EnumFacing): util.Map[IResource[_], util.Collection[IConnection[_]]] = connectionMap.getOrElse(facing, new mutable.HashMap[IResource[_], util.Collection[IConnection[_]]]())
+      connectionStorage(facing.getIndex).withFilter(f => !f.isEmpty && f.hasCapability(Capabilities.ITEM_CONNECTION_PROVIDER, facing)).map(_.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, facing)).flatMap { f =>
+        f.getConnections[T](getLoc, facing)
+      }
+    }
 
     override def getLoc: Loc4 = conduit.getLoc
 
@@ -212,19 +200,6 @@ class TileConduit extends TileEntityBase {
                 cap.network.addNode(conduit)
               else
                 cap.network.addConnection(getLoc, cap.getLoc)
-          //TODO MUCH BETTER WAY
-          case Some(i: TileEntity) if i.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite) =>
-            facing match {
-              case EnumFacing.DOWN =>
-                val con = new ItemConnection(getLoc, facing, new NBTTagCompound, 5000d, 1)
-                con.setDirection(ConnectionDirection.OUTPUT)
-                conduit.addConnection(facing, con)
-              case EnumFacing.UP =>
-                val con = new ItemConnection(getLoc, facing, new NBTTagCompound, 5000d, 1)
-                con.setDirection(ConnectionDirection.INPUT)
-                conduit.addConnection(facing, con)
-              case _ =>
-            }
           case _ =>
         }
       }

@@ -18,7 +18,7 @@ trait IConnectionProvider {
     *
     * @return Set of Connections provided by this provider
     */
-  def getConnections(loc: Loc4, facing: EnumFacing): util.Collection[IConnection[_]]
+  def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]]
 
   def addTooltip(tooltip: util.List[String]): Unit
 }

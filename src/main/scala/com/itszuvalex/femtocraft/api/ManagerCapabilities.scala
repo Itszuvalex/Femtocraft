@@ -203,7 +203,7 @@ object ManagerCapabilities {
   }
 
   class LogisticsImplDummy extends ILogisticsNetworkNode {
-    override def getConnections(facing: EnumFacing): util.Map[IResource[_], util.Collection[IConnection[_]]] = null
+    override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
     override def getLoc: Loc4 = new Loc4
   }
@@ -227,7 +227,7 @@ object ManagerCapabilities {
       *
       * @return Set of Connections provided by this provider
       */
-    override def getConnections(loc: Loc4, facing: EnumFacing): util.Collection[IConnection[_]] = Set[IConnection[_]]()
+    override def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
     override def addTooltip(tooltip: util.List[String]): Unit = {}
   }
