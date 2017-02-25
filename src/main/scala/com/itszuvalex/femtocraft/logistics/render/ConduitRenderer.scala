@@ -26,8 +26,10 @@ object ConduitRenderer {
 }
 
 class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
-  val conduitModel = LoadObj(ConduitRenderer.conduitModelLocation)
-
+  val conduitModel  = LoadObj(ConduitRenderer.conduitModelLocation)
+  var colorIndex    = 0
+  var lastSweep     = 0
+  val slowingFactor = 1.3f
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     super.renderTileEntityAsItem(x, y, z, partialTicks)
@@ -56,7 +58,18 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
       GL11.glDisable(GL11.GL_CULL_FACE)
       GL11.glDisable(GL11.GL_LIGHTING)
 
-      GL11.glColor4f(1f, 1f, 1f, 1f)
+      val time = Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f)
+      val sweep = (time * slowingFactor).toInt % 255
+      if (sweep < lastSweep) {
+        colorIndex = (colorIndex + 1) % 3
+      }
+
+      lastSweep = sweep
+      val colorr = (if (colorIndex == 0) sweep else if (colorIndex == 1) 255 - sweep else 0).toFloat / 255f
+      val colorg = (if (colorIndex == 1) sweep else if (colorIndex == 2) 255 - sweep else 0).toFloat / 255f
+      val colorb = (if (colorIndex == 2) sweep else if (colorIndex == 0) 255 - sweep else 0).toFloat / 255f
+
+      GL11.glColor4f(colorr, colorg, colorb, 1f)
       this.bindTexture(ConduitRenderer.conduitColorTexLocation)
 
       FemtoRenderUtils.disableLightMaps()
