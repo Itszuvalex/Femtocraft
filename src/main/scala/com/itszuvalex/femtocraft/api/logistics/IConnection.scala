@@ -33,6 +33,12 @@ trait IConnection[T] {
     */
   def contributeFlops(flops: Double): Double
 
+  /**
+    *
+    * @return Flops generated per tick
+    */
+  def passiveFlopGen: Double
+
   def direction: ConnectionDirection
 
   def setDirection(dir: ConnectionDirection): Unit

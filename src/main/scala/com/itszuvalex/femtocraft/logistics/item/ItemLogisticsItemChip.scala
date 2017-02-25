@@ -22,7 +22,6 @@ class ItemLogisticsItemChip extends Item {
 
   override def isDamageable: Boolean = true
 
-
   override def isDamaged(stack: ItemStack): Boolean = {
     getDamage(stack) != getMaxDamage(stack)
   }
@@ -67,7 +66,6 @@ class ItemLogisticsItemChip extends Item {
       override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.ITEM_CONNECTION_PROVIDER
     }
   }
-
 
   override def getMaxDamage(stack: ItemStack): Int = {
     var sum = 0d

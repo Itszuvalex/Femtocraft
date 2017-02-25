@@ -5,6 +5,7 @@ import java.util
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
+import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
@@ -19,8 +20,9 @@ import scala.collection.JavaConversions._
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
   */
 object ConduitRenderer {
-  val conduitModelLocation = Resources.CustomModelBlock("conduit/conduit.obj")
-  val conduitTexLocation   = Resources.CustomModelBlockTex("conduit/conduit.png")
+  val conduitModelLocation    = Resources.CustomModelBlock("conduit/conduit.obj")
+  val conduitTexLocation      = Resources.CustomModelBlockTex("conduit/conduit.png")
+  val conduitColorTexLocation = Resources.CustomModelBlockTex("conduit/conduit_color.png")
 }
 
 class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
@@ -41,16 +43,27 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
   }
 
   def renderConduitAt(x: Double, y: Double, z: Double, partialTicks: Float, time: Float, connections: util.EnumSet[EnumFacing]): Unit = {
-    this.bindTexture(ConduitRenderer.conduitTexLocation)
-    GL11.glDisable(GL11.GL_CULL_FACE)
-    GL11.glDisable(GL11.GL_LIGHTING)
     GL11.glPushMatrix()
 
     translationBlock(x + .5, y + .5, z + .5) {
+      this.bindTexture(ConduitRenderer.conduitTexLocation)
+
       conduitModel.renderGroups(Set("Core_Cube"), bindTextures = false)
 
       val set = connections.map(f => StringUtils.capitalize(f.getName) + "_Cube").toSet
       conduitModel.renderGroups(set, bindTextures = false)
+
+      GL11.glDisable(GL11.GL_CULL_FACE)
+      GL11.glDisable(GL11.GL_LIGHTING)
+
+      GL11.glColor4f(1f, 1f, 1f, 1f)
+      this.bindTexture(ConduitRenderer.conduitColorTexLocation)
+
+      FemtoRenderUtils.disableLightMaps()
+      conduitModel.renderGroups(Set("Core_Cube"), bindTextures = false)
+
+      conduitModel.renderGroups(set, bindTextures = false)
+      FemtoRenderUtils.enableLightMap(null)
     }
     GL11.glPopMatrix()
     GL11.glColor4f(1f, 1f, 1f, 1f)

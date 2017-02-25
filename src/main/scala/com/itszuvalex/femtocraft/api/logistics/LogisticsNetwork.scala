@@ -31,7 +31,7 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
 
       //Distribute Flops
       //TODO Actual Impl
-      connections.withFilter(_.active).foreach(_.contributeFlops(100))
+      connections.withFilter(_.active).foreach(a => a.contributeFlops(a.passiveFlopGen))
 
       resourceDistributionLoop(resource.asInstanceOf[IResource[Any]], connections)
     }

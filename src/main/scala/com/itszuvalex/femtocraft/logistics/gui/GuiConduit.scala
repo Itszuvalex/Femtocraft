@@ -25,7 +25,7 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
   addPlayerInventorySlots(inv)
 
 
-  val nameLabel = new GuiLabel(0, 0, fontRendererObj.getStringWidth("Conduit"), fontRendererObj.FONT_HEIGHT, () => "Conduit")
+  val nameLabel = new GuiLabel(2, 2, fontRendererObj.getStringWidth("Conduit"), fontRendererObj.FONT_HEIGHT, () => "Conduit")
 
   val elems = List(nameLabel)
   add(elems: _*)

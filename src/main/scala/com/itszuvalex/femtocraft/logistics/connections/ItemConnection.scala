@@ -31,6 +31,13 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     }
   }
 
+
+  /**
+    *
+    * @return Flops generated per tick
+    */
+  override def passiveFlopGen: Double = flopsMaximum / (20 * 10)
+
   def flopsToGo: Double = nbt.getDouble(ItemConnection.FLOPS_KEY)
 
   def flopsToGo_=(d: Double): Unit = nbt.setDouble(ItemConnection.FLOPS_KEY, d)
