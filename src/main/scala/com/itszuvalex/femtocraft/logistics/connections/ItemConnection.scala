@@ -197,7 +197,9 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     * @return Remains of insert that are unused.
     */
   override def insert(t: ItemStack): ItemStack = {
-    val storage = new ItemStorageArray(1)
+    val storage = new ItemStorageArray(1) {
+      override def maxStackSize(i: Int): Int = stackLimit
+    }
     storage(0) = ibuffer
     val ret = storage.insert(0, Converter.IItemStackFromItemStack(t)).toMinecraft
     setIBuffer(storage(0))
