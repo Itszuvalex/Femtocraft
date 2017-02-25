@@ -38,7 +38,12 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     */
   override def passiveFlopGen: Double = flopsMaximum / (20 * 10)
 
-  def flopsToGo: Double = nbt.getDouble(ItemConnection.FLOPS_KEY)
+  def flopsToGo: Double = {
+    if (!nbt.hasKey(ItemConnection.FLOPS_KEY)) {
+      flopsToGo = flopsRequired
+    }
+    nbt.getDouble(ItemConnection.FLOPS_KEY)
+  }
 
   def flopsToGo_=(d: Double): Unit = nbt.setDouble(ItemConnection.FLOPS_KEY, d)
 
@@ -79,9 +84,13 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     */
   override def active: Boolean = !isPaused &&
     (direction match {
-      case ConnectionDirection.INPUT => isEmpty
+      case ConnectionDirection.INPUT => canAcceptMoreInput
       case _ => !isEmpty
     })
+
+  private def canAcceptMoreInput: Boolean = {
+    isEmpty || ibuffer.stackSize < stackLimit
+  }
 
   override def flopsRemaining: Double = flopsToGo
 
@@ -133,16 +142,21 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
   }
 
   private def inputItem(): Unit = {
-    if (isEmpty) {
+    if (canAcceptMoreInput) {
       // We received computation because we no longer have an item in our uploaded buffer.
       // Do not reset computation until we have found an item, (unless we want to delay checks until computation completes, as a timeout)
       // This will however put greater computational load on the system and slow down reaction time to new items entering it.
       // Find new item to upload
+      var itemsToTransfer = Math.min(itemsPerOp, stackLimit)
       storage.foreach { s =>
         s.indices.exists { i =>
-          if (!s(i).isEmpty)
-            setIBuffer(s.split(i, Math.min(itemsPerOp, stackLimit)))
-          !isEmpty
+          if (!s(i).isEmpty) {
+            val ins = s.split(i, itemsToTransfer).toMinecraft
+            val insStart = ins.getCount
+            val ret = insert(ins)
+            itemsToTransfer -= (insStart - ret.getCount)
+          }
+          !canAcceptMoreInput || itemsToTransfer <= 0
         }
 
         // Reset computation, wait till next cycle to check again.

@@ -20,7 +20,7 @@ import scala.collection.JavaConversions._
   */
 class ItemLogisticsItemChip extends Item {
 
-  override def isDamageable: Boolean = true
+//  override def isDamageable: Boolean = true
 
   override def isDamaged(stack: ItemStack): Boolean = {
     getDamage(stack) != getMaxDamage(stack)
@@ -76,7 +76,7 @@ class ItemLogisticsItemChip extends Item {
   override def getDamage(stack: ItemStack): Int = {
     var sum = 0d
     stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsRemaining)
-    sum.toInt
+    getMaxDamage(stack) - sum.toInt
   }
 
   override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
