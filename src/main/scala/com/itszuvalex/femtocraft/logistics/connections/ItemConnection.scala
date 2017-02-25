@@ -23,10 +23,6 @@ object ItemConnection {
   * Created by Chris on 2/20/2017.
   */
 class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound, var flopsRequired: Double, var itemsPerOp: Int, var stackLimit: Int = 64) extends IConnection[ItemStack] {
-  channel = "default"
-  direction = ConnectionDirection.DISABLED
-  interfaceDirection = Option(facing).map(_.getOpposite).getOrElse(EnumFacing.NORTH)
-
   def storage: Option[IItemStorage] = {
     loc.getOffset(facing).getTileEntity(false) match {
       case Some(i: TileEntity) if i.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, interfaceDirection) =>
@@ -40,6 +36,9 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
   def flopsToGo_=(d: Double): Unit = nbt.setDouble(ItemConnection.FLOPS_KEY, d)
 
   def interfaceDirection: EnumFacing = {
+    if (!nbt.hasKey(ItemConnection.INTERFACE_DIRECTION_KEY)) {
+      interfaceDirection = Option(facing).map(_.getOpposite).getOrElse(EnumFacing.NORTH)
+    }
     EnumFacing.VALUES(nbt.getInteger(ItemConnection.INTERFACE_DIRECTION_KEY))
   }
 
@@ -49,7 +48,12 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
 
   override def resource: IResource[ItemStack] = LogisticsResourceRegistry.RESOURCE_ITEMS
 
-  override def channel: String = nbt.getString(ItemConnection.CHANNEL_KEY)
+  override def channel: String = {
+    if (!nbt.hasKey(ItemConnection.CHANNEL_KEY)) {
+      channel = "default"
+    }
+    nbt.getString(ItemConnection.CHANNEL_KEY)
+  }
 
   def channel_=(channel: String): Unit = setChannel(channel)
 
@@ -76,7 +80,12 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
 
   override def flopsMaximum: Double = flopsRequired
 
-  override def direction: ConnectionDirection = if (isPaused) ConnectionDirection.DISABLED else ConnectionDirection.valueOf(nbt.getString(ItemConnection.CONNECTION_DIRECTION_KEY))
+  override def direction: ConnectionDirection = {
+    if (!nbt.hasKey(ItemConnection.CONNECTION_DIRECTION_KEY))
+      direction = ConnectionDirection.DISABLED
+
+    if (isPaused) ConnectionDirection.DISABLED else ConnectionDirection.valueOf(nbt.getString(ItemConnection.CONNECTION_DIRECTION_KEY))
+  }
 
   override def setDirection(dir: ConnectionDirection): Unit = nbt.setString(ItemConnection.CONNECTION_DIRECTION_KEY, dir.toString)
 
