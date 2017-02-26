@@ -47,16 +47,19 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
 
   def flopsToGo_=(d: Double): Unit = nbt.setDouble(ItemConnection.FLOPS_KEY, d)
 
-  def interfaceDirection: EnumFacing = {
+  override def interfaceDirection: EnumFacing = {
     if (!nbt.hasKey(ItemConnection.INTERFACE_DIRECTION_KEY)) {
       interfaceDirection = Option(facing).map(_.getOpposite).getOrElse(EnumFacing.NORTH)
     }
     EnumFacing.VALUES(nbt.getInteger(ItemConnection.INTERFACE_DIRECTION_KEY))
   }
 
-  def interfaceDirection_=(facing: EnumFacing): Unit = {
+  override def canSetInterfaceDirection(facing: EnumFacing): Boolean = false
+
+  override def setInterfaceDirection(facing: EnumFacing): Unit =
     nbt.setInteger(ItemConnection.INTERFACE_DIRECTION_KEY, facing.getIndex)
-  }
+
+  def interfaceDirection_=(facing: EnumFacing): Unit = setInterfaceDirection(facing)
 
   override def resource: IResource[ItemStack] = LogisticsResourceRegistry.RESOURCE_ITEMS
 

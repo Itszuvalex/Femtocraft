@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.api.logistics
 
+import net.minecraft.util.EnumFacing
+
 /**
   * Created by Chris on 2/19/2017.
   */
@@ -48,6 +50,12 @@ trait IConnection[T] {
   def setBuffer(a: T): Unit
 
   def canInsert(con: T): Boolean
+
+  def interfaceDirection: EnumFacing
+
+  def canSetInterfaceDirection(facing: EnumFacing): Boolean
+
+  def setInterfaceDirection(facing: EnumFacing): Unit
 
   /**
     *

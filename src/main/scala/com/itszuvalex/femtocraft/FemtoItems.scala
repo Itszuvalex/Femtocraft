@@ -30,6 +30,7 @@ object FemtoItems {
   var itemEnergyRegulator        : Item = _
   var itemCrystalBattery         : Item = _
   var itemNaniteBeacon           : Item = _
+  var itemNanoChannel            : Item = _
 
   var itemIronDust   : Item = _
   var itemGoldDust   : Item = _
@@ -71,6 +72,7 @@ object FemtoItems {
     itemEnergyRegulator = registerItem(new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
     itemCrystalBattery = registerItem(new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
     itemNaniteBeacon = registerItem(new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
+    itemNanoChannel = registerItem(new Item(), "itemNanoChannel").setCreativeTab(Femtocraft.tab)
     itemLogisticsItemChipBasic = registerItem(new ItemLogisticsItemChip(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsFluidChipBasic = registerItem(new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsNaniteChipBasic = registerItem(new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
@@ -100,6 +102,7 @@ object FemtoItems {
     itemEnergyRegulator.registerModel()
     itemCrystalBattery.registerModel()
     itemNaniteBeacon.registerModel()
+    itemNanoChannel.registerModel()
     itemLogisticsItemChipBasic.registerModel()
     itemLogisticsFluidChipBasic.registerModel()
     itemLogisticsNaniteChipBasic.registerModel()
