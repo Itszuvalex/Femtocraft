@@ -20,7 +20,7 @@ import scala.collection.JavaConversions._
   */
 class ItemLogisticsItemChip extends Item {
 
-//  override def isDamageable: Boolean = true
+  //  override def isDamageable: Boolean = true
 
   override def isDamaged(stack: ItemStack): Boolean = {
     getDamage(stack) != getMaxDamage(stack)
@@ -43,17 +43,20 @@ class ItemLogisticsItemChip extends Item {
               stack.setTagCompound(new NBTTagCompound)
             }
             val inbt = stack.getTagCompound
-            val con = new ItemConnection(loc, facing, inbt, 5000d, 1, 16).asInstanceOf[IConnection[V]]
-            if (facing != null)
+            val con = new ItemConnection(loc, facing, inbt, 5000d, 1, 16)
+            if (facing != null) {
               con.setDirection(if (facing.getIndex % 2 == 0) ConnectionDirection.INPUT else ConnectionDirection.OUTPUT)
-            Set(con)
+              con.interfaceDirection = facing.getOpposite
+            }
+            Set(con.asInstanceOf[IConnection[V]])
           }
 
           override def addTooltip(tooltip: util.List[String]): Unit = {
             val con = new ItemConnection(new Loc4, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
             val itemstack = con.ibuffer
             tooltip += ChatFormatting.YELLOW + "Item: " + ChatFormatting.RESET + (if (itemstack.isEmpty) ChatFormatting.ITALIC + "Empty" else itemstack.toMinecraft.toString) + ChatFormatting.RESET
-            tooltip += ChatFormatting.YELLOW + "FLOPs: " + ChatFormatting.RESET + con.flopsRemaining + "/" + con.flopsMaximum
+            tooltip += ChatFormatting.YELLOW + "FLOPs: " + ChatFormatting.RESET + con.flopsRemaining.formatted("%,.1f") + "/" + con.flopsMaximum.formatted("%,.1f")
+            tooltip += ChatFormatting.YELLOW + "Passive FLOPs: " + ChatFormatting.RESET + con.passiveFlopGen.formatted("%,.1f")
             tooltip += ChatFormatting.YELLOW + "Channel: " + ChatFormatting.RESET + con.channel
             tooltip += ChatFormatting.YELLOW + "Items Per Op: " + ChatFormatting.RESET + con.itemsPerOp
             tooltip += ChatFormatting.YELLOW + "Buffer Size: " + ChatFormatting.RESET + con.stackLimit

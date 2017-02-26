@@ -45,6 +45,9 @@ object FemtoRecipes {
     GameRegistry.addShapedRecipe(FemtoItems.itemLogisticsItemChipBasic.newStack(8), Array(" C ", "RBR", 'R', FemtoItems.itemRedstonereplacementDust, 'C', FemtoItems.itemNaniteBeacon, 'B', FemtoItems.itemBasicCircuit): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemLogisticsFluidChipBasic.newStack(8), Array(" C ", "LBL", 'L', FemtoItems.itemLapisreplacementDust, 'C', FemtoItems.itemNaniteBeacon, 'B', FemtoItems.itemBasicCircuit): _ *)
     GameRegistry.addShapedRecipe(FemtoItems.itemLogisticsNaniteChipBasic.newStack(8), Array(" C ", "PBP", 'P', FemtoItems.itemPhasemetalDust, 'C', FemtoItems.itemNaniteBeacon, 'B', FemtoItems.itemBasicCircuit): _ *)
+    GameRegistry.addShapelessRecipe(FemtoItems.itemLogisticsItemChipBasic.newStack(), Array(FemtoItems.itemLogisticsItemChipBasic): _ *)
+    GameRegistry.addShapelessRecipe(FemtoItems.itemLogisticsFluidChipBasic.newStack(), Array(FemtoItems.itemLogisticsFluidChipBasic): _ *)
+    GameRegistry.addShapelessRecipe(FemtoItems.itemLogisticsNaniteChipBasic.newStack(), Array(FemtoItems.itemLogisticsNaniteChipBasic): _ *)
     GameRegistry.addRecipe(new ShapedOreRecipe(FemtoItems.itemNaniteBeacon.newStack(4), boxArray(Array("SCS", "RCR", "EDE", 'S', Items.REDSTONE, 'C', FemtoItems.itemBasicCircuit, 'R', FemtoItems.itemRiftironIngotDevoid, 'E', FemtoItems.itemEnergyRegulator, 'D', "dustDiamond")): _ *))
   }
 

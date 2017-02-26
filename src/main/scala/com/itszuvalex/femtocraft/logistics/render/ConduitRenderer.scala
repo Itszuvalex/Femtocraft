@@ -50,10 +50,10 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
     translationBlock(x + .5, y + .5, z + .5) {
       this.bindTexture(ConduitRenderer.conduitTexLocation)
 
-      conduitModel.renderGroups(Set("Core_Cube"), bindTextures = false)
+      conduitModel.renderGroups(Set("Core_Cube"))
 
       val set = connections.map(f => StringUtils.capitalize(f.getName) + "_Cube").toSet
-      conduitModel.renderGroups(set, bindTextures = false)
+      conduitModel.renderGroups(set)
 
       GL11.glDisable(GL11.GL_CULL_FACE)
       GL11.glDisable(GL11.GL_LIGHTING)
@@ -73,9 +73,9 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
       this.bindTexture(ConduitRenderer.conduitColorTexLocation)
 
       FemtoRenderUtils.disableLightMaps()
-      conduitModel.renderGroups(Set("Core_Cube"), bindTextures = false)
+      conduitModel.renderGroups(Set("Core_Cube"))
 
-      conduitModel.renderGroups(set, bindTextures = false)
+      conduitModel.renderGroups(set)
       FemtoRenderUtils.enableLightMap(null)
     }
     GL11.glPopMatrix()
