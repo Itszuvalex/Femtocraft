@@ -2,10 +2,10 @@ package com.itszuvalex.femtocraft.logistics.tile
 
 import java.util
 
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
@@ -15,15 +15,30 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.items.CapabilityItemHandler
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by Chris on 2/16/2017.
   */
 object TileConduit {
   val CONDUIT_KEY = "conduit"
+
+  lazy val connectionCapabilities: ArrayBuffer[Capability[_]] = mutable.ArrayBuffer[Capability[_]](
+    Capabilities.TILE_CONDUIT,
+    Capabilities.TILE_LOGISTICS_NODE,
+    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+    Capabilities.NANITE_STORAGE_TANK,
+    CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
+  )
+
+  def addConnectionCapability(cap: Capability[_]): Unit = {
+    connectionCapabilities += cap
+  }
 
   object ConduitImpl {
     val CONNECTION_KEY = "connections"
@@ -144,8 +159,9 @@ class TileConduit extends TileEntityBase {
     if (getWorld.isRemote) return
 
     val loc = getLoc
+    val nloc = new Loc4(getWorld, neighbor)
     EnumFacing.VALUES.withFilter(p =>
-      p.getFrontOffsetX + loc.x == neighbor.getX && p.getFrontOffsetY + loc.y == neighbor.getY && p.getFrontOffsetZ + loc.z == neighbor.getZ
+      getLoc.getOffset(p) == nloc
     ).foreach(checkFacingForConnection)
   }
 
@@ -159,23 +175,31 @@ class TileConduit extends TileEntityBase {
 
   private def checkFacingForConnection(f: EnumFacing) = {
     val loc = getLoc
-    val floc = Loc4(loc.x + f.getFrontOffsetX, loc.y + f.getFrontOffsetY, loc.z + f.getFrontOffsetZ, loc.dim)
-    var addedConnection = false
-    floc.getTileEntity(false).withFilter(_.hasCapability(Capabilities.TILE_CONDUIT, f.getOpposite)).map(_.getCapability(Capabilities.TILE_CONDUIT, f.getOpposite)).foreach { conduit =>
-      val thisConduit = getCapability(Capabilities.TILE_CONDUIT, f)
-      if (conduit.canAddConnection(f.getOpposite) && thisConduit.canAddConnection(f)) {
-        conduit.addConnection(f.getOpposite)
-        thisConduit.addConnection(f)
-        addedConnection = true
+    val floc = getLoc.getOffset(f)
+    if (conduit.isConnected(f)) {
+      floc.getTileEntity(false) match {
+        case Some(a: TileEntity) =>
+          if (!TileConduit.connectionCapabilities.exists(c => a.hasCapability(c, f.getOpposite)))
+            conduit.removeConnection(f)
+        case _ => conduit.removeConnection(f)
       }
     }
-    floc.getTileEntity(false).withFilter(_.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite)).map(_.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite)).foreach { handler =>
-      getCapability(Capabilities.TILE_CONDUIT, f).addConnection(f)
-      addedConnection = true
-    }
-
-    if (!addedConnection) {
-      getCapability(Capabilities.TILE_CONDUIT, f).removeConnection(f)
+    else {
+      floc.getTileEntity(false) match {
+        case Some(a: TileEntity) if a.hasCapability(Capabilities.TILE_CONDUIT, f.getOpposite) =>
+          val cond = a.getCapability(Capabilities.TILE_CONDUIT, f.getOpposite)
+          if (!cond.isConnected(f.getOpposite) || !conduit.isConnected(f)) {
+            if (cond.canAddConnection(f.getOpposite) && conduit.canAddConnection(f)) {
+              cond.addConnection(f.getOpposite)
+              conduit.addConnection(f)
+              conduit.connectToNetwork(getLoc.getOffset(f), f)
+            }
+          }
+        case Some(a: TileEntity) =>
+          if (TileConduit.connectionCapabilities.exists(c => a.hasCapability(c, f.getOpposite)))
+            conduit.addConnection(f)
+        case _ =>
+      }
     }
   }
 
@@ -186,7 +210,7 @@ class TileConduit extends TileEntityBase {
 
     conduit.connections.indices.withFilter(conduit.connections).map(EnumFacing.VALUES).foreach { f =>
       val loc = getLoc
-      val floc = Loc4(loc.x + f.getFrontOffsetX, loc.y + f.getFrontOffsetY, loc.z + f.getFrontOffsetZ, loc.dim)
+      val floc = loc.getOffset(f)
       floc.getTileEntity(false).withFilter(_.hasCapability(Capabilities.TILE_CONDUIT, f.getOpposite)).map(_.getCapability(Capabilities.TILE_CONDUIT, f.getOpposite)).foreach { c =>
         c.removeConnection(f.getOpposite)
       }
