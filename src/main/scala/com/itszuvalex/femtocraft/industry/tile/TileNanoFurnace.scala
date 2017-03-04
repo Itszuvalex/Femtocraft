@@ -2,13 +2,14 @@ package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
-import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
+import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
-import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.TileInventory
+import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
@@ -26,7 +27,12 @@ object TileNanoFurnace {
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
 
-  val TASK_NBT = "Task"
+  val INPUT_INV_KEY  = "Input"
+  val OUTPUT_INV_KEY = "Output"
+  val NONE_INV_KEY   = "None"
+
+  val TASK_NBT         = "Task"
+  val SIDED_CONFIG_NBT = "ItemConfig"
 
   object SmeltTask {
     val SMELTING_STACK_NBT   = "Smelt"
@@ -61,7 +67,18 @@ object TileNanoFurnace {
 }
 
 class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNode {
-  private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
+  private val task         : SmeltTask    = new SmeltTask(IItemStack.Empty)
+  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+    case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
+    case _ => NONE_INV_KEY
+  },
+  Map(NONE_INV_KEY -> IItemStorage.Empty,
+    INPUT_INV_KEY -> inputStorage,
+    OUTPUT_INV_KEY -> outputStorage),
+  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
 
   override def connectionRadius: Float = 8f
 
@@ -148,14 +165,11 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
 
   def getProgressMax = task.adjustedMax(0)
 
-
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-      facing match {
-        case EnumFacing.UP => Converter.IItemHandlerModifiableFromIItemStorage(new ItemStorageSlice(storage, Array(0))).asInstanceOf[T]
-        case EnumFacing.DOWN => Converter.IItemHandlerModifiableFromIItemStorage(new ItemStorageSlice(storage, Array(1))).asInstanceOf[T]
-        case _ => super.getCapability(capability, facing)
-      }
+      Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
+    else if (capability == Capabilities.ITEM_STORAGE)
+      sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
     else
       super.getCapability(capability, facing)
   }
@@ -163,11 +177,13 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     super.deserializeNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
+    sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(SIDED_CONFIG_NBT))
   }
 
   override def serializeNBT(): NBTTagCompound = {
     val ret = super.serializeNBT()
     ret.setTag(TASK_NBT, task.serializeNBT())
+    ret.setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
     ret
   }
 }

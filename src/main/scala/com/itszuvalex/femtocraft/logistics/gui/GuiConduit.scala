@@ -16,9 +16,13 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
   fontRendererObj = Minecraft.getMinecraft.fontRendererObj
 
   EnumFacing.VALUES.foreach { f =>
+    val labelName: String = f.getName.charAt(0).toUpper.toString
+    val faceLabel = new GuiLabel(3 + (f.getIndex / 3) * 90, 14 + (f.getIndex % 3) * 20, fontRendererObj.getStringWidth(labelName), fontRendererObj.FONT_HEIGHT, () => labelName)
+    add(faceLabel)
+
     val storage = tile.conduit.connectionStorage(f.getIndex)
     storage.indices.foreach { i =>
-      addGuiAndSync(storage, i, 10 + (f.getIndex / 3) * 76 + i*18, 10 + (f.getIndex % 3) * 20)
+      addGuiAndSync(storage, i, 10 + (f.getIndex / 3) * 90 + i * 18, 10 + (f.getIndex % 3) * 20)
     }
   }
 
