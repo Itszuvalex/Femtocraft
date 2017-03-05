@@ -73,7 +73,7 @@ object TileConduit {
 
       EnumFacing.VALUES.exists { f =>
         val l = getLoc.getOffset(f)
-        (l == loc) && !blocked(f.getIndex)
+        (l == loc) && canAddConnection(f)
       }
     }
 
@@ -82,20 +82,55 @@ object TileConduit {
     override def canAddConnection(facing: EnumFacing): Boolean = !blocked(facing.getIndex)
 
     override def addConnection(facing: EnumFacing): Unit = {
+      if (connections(facing.getIndex)) return
+      if (!canAddConnection(facing)) return
+
+      getLoc.getOffset(facing).getTileEntity(false)
+        .withFilter(_.hasCapability(Capabilities.TILE_CONDUIT, facing.getOpposite))
+        .map(_.getCapability(Capabilities.TILE_CONDUIT, facing.getOpposite))
+        .withFilter(!_.canAddConnection(facing.getOpposite))
+        .foreach(a => return)
+
       connections(facing.getIndex) = true
+      connectToNetwork(getLoc.getOffset(facing), facing.getOpposite)
       conduit.setModified()
       conduit.setUpdate()
     }
 
+    def addConnectionInternal(facing: EnumFacing): Unit = {
+      if (connections(facing.getIndex)) return
+      if (!canAddConnection(facing)) return
+
+      addConnection(facing)
+
+      if (!connections(facing.getIndex)) return
+
+      getLoc.getOffset(facing).getTileEntity(false).foreach { t =>
+        if (!t.hasCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)) return
+        val cap = t.getCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)
+        if (!cap.canAddConnection(facing.getOpposite)) return
+
+        cap.addConnection(facing.getOpposite)
+        t match {
+          case tb: TileEntityBase =>
+            tb.setUpdate()
+            tb.setModified()
+          case _ =>
+        }
+      }
+    }
+
     override def removeConnection(facing: EnumFacing): Unit = {
+      if (!connections(facing.getIndex)) return
+
       connections(facing.getIndex) = false
+      disconnectFromNetwork(getLoc.getOffset(facing), facing.getOpposite)
       conduit.setModified()
       conduit.setUpdate()
     }
 
     def connectToNetwork(loc: Loc4, facing: EnumFacing): Unit = {
       loc.getTileEntity(false) match {
-        case None =>
         case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
           val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
           val network = if (cap.getNetwork != null) cap.getNetwork else getNetwork
@@ -106,7 +141,6 @@ object TileConduit {
 
     def disconnectFromNetwork(loc: Loc4, facing: EnumFacing): Unit = {
       loc.getTileEntity(false) match {
-        case None =>
         case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
           val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
           getNetwork.removeConnection(getLoc, cap.getLoc)
@@ -160,17 +194,17 @@ class TileConduit extends TileEntityBase {
 
     val loc = getLoc
     val nloc = new Loc4(getWorld, neighbor)
-    EnumFacing.VALUES.withFilter(p =>
-      getLoc.getOffset(p) == nloc
-    ).foreach(checkFacingForConnection)
+    EnumFacing.VALUES.withFilter(getLoc.getOffset(_) == nloc).foreach(checkFacingForConnection)
   }
 
   def onBlockPlaced(): Unit = {
     if (getWorld.isRemote) return
 
-    EnumFacing.VALUES.foreach { f =>
-      checkFacingForConnection(f)
-    }
+    val network = new LogisticsNetwork
+    network.addNode(conduit)
+    network.register()
+
+    EnumFacing.VALUES.foreach(checkFacingForConnection)
   }
 
   private def checkFacingForConnection(f: EnumFacing) = {
@@ -178,26 +212,14 @@ class TileConduit extends TileEntityBase {
     val floc = getLoc.getOffset(f)
     if (conduit.isConnected(f)) {
       floc.getTileEntity(false) match {
-        case Some(a: TileEntity) =>
-          if (!TileConduit.connectionCapabilities.exists(c => a.hasCapability(c, f.getOpposite)))
-            conduit.removeConnection(f)
+        case Some(a: TileEntity) if TileConduit.connectionCapabilities.exists(a.hasCapability(_, f.getOpposite)) =>
         case _ => conduit.removeConnection(f)
       }
     }
     else {
       floc.getTileEntity(false) match {
-        case Some(a: TileEntity) if a.hasCapability(Capabilities.TILE_CONDUIT, f.getOpposite) =>
-          val cond = a.getCapability(Capabilities.TILE_CONDUIT, f.getOpposite)
-          if (!cond.isConnected(f.getOpposite) || !conduit.isConnected(f)) {
-            if (cond.canAddConnection(f.getOpposite) && conduit.canAddConnection(f)) {
-              cond.addConnection(f.getOpposite)
-              conduit.addConnection(f)
-              conduit.connectToNetwork(getLoc.getOffset(f), f)
-            }
-          }
-        case Some(a: TileEntity) =>
-          if (TileConduit.connectionCapabilities.exists(c => a.hasCapability(c, f.getOpposite)))
-            conduit.addConnection(f)
+        case Some(a: TileEntity) if TileConduit.connectionCapabilities.exists(a.hasCapability(_, f.getOpposite)) =>
+          conduit.addConnectionInternal(f)
         case _ =>
       }
     }
@@ -216,7 +238,7 @@ class TileConduit extends TileEntityBase {
       }
     }
 
-    conduit.network.removeNode(conduit)
+    //    conduit.network.removeNode(conduit)
   }
 
   override def serverUpdate(): Unit = {
@@ -226,7 +248,6 @@ class TileConduit extends TileEntityBase {
       conduit.connections.indices.withFilter(conduit.connections).map(EnumFacing.VALUES).foreach { facing =>
         val loc = getLoc.getOffset(facing)
         loc.getTileEntity(false) match {
-          case None =>
           case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
             val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
             if (cap.network != null)
@@ -280,9 +301,9 @@ class TileConduit extends TileEntityBase {
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    if (capability == Capabilities.TILE_CONDUIT) true
-    else if (capability == Capabilities.TILE_LOGISTICS_NODE) true
-    else super.hasCapability(capability, facing)
+    capability == Capabilities.TILE_CONDUIT ||
+      capability == Capabilities.TILE_LOGISTICS_NODE ||
+      super.hasCapability(capability, facing)
   }
 
   override def invalidate(): Unit = {

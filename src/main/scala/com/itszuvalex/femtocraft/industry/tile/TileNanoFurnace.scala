@@ -165,13 +165,11 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
 
   def getProgressMax = task.adjustedMax(0)
 
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-      Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
-    else if (capability == Capabilities.ITEM_STORAGE)
-      sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
-    else
-      super.getCapability(capability, facing)
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
+    case (_, null) => super.getCapability(capability, facing)
+    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case _ => super.getCapability(capability, facing)
   }
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
