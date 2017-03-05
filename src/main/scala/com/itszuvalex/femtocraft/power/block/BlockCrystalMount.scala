@@ -69,7 +69,7 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
     val list = new util.ArrayList[AxisAlignedBB]()
     list += new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
     if (renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, .6, 2f / 16f, 14f / 16f, 1, 14f / 16f)
-    if (renderBelow(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, 0, 2f / 16f, 14f / 16f, .4, 14f / 16f)
+    if (renderBelow(worldIn, pos) || !renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, 0, 2f / 16f, 14f / 16f, .4, 14f / 16f)
     list
   }
 

@@ -111,12 +111,6 @@ object TileConduit {
         if (!cap.canAddConnection(facing.getOpposite)) return
 
         cap.addConnection(facing.getOpposite)
-        t match {
-          case tb: TileEntityBase =>
-            tb.setUpdate()
-            tb.setModified()
-          case _ =>
-        }
       }
     }
 
