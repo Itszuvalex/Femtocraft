@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork, GuiTabSideConfig}
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiProgress}
@@ -16,6 +16,7 @@ import net.minecraft.util.EnumFacing
   */
 class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNanoFurnace) extends FemtoGuiBase(tile, new ContainerNanoFurnace(player, inv, tile, false)) {
   GuiTabNetwork.addToGuiTabBar(tabBar, tile)
+  GuiTabSideConfig.addToGuiTabBar(tabBar, tile)
 
   fontRendererObj = Minecraft.getMinecraft.fontRendererObj
 
@@ -24,7 +25,6 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
 
   addPlayerInventorySlots(inv)
 
-  //TODO: Make actual "machine color"
   var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
 
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat)

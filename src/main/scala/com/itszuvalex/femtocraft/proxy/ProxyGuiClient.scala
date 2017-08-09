@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
+import com.itszuvalex.femtocraft.industry.TileSideConfigurable
 import com.itszuvalex.femtocraft.industry.gui._
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.gui.{GuiConduit, GuiItemRepository}
@@ -35,6 +36,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new GuiDemolisher(player, player.inventory, te)
       case (GuiIDs.TilePowerNetworkID, te: TileEntityBase) => new GuiPowerNetwork(te)
       case (GuiIDs.TileConduitID, te: TileConduit) => new GuiConduit(player, player.inventory, te)
+      case (GuiIDs.TileSidedInventoryConfigID, te: TileSideConfigurable) => new GuiSidedInventoryConfig(te)
       case (_, _) => null
     }
   }
