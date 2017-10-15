@@ -12,6 +12,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
@@ -39,7 +40,7 @@ object PlayerNaniteCapabilitiesOverlay {
   var alwaysShow = false
 }
 
-@SideOnly(Side.CLIENT)
+@relauncher.SideOnly(Side.CLIENT)
 class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
