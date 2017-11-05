@@ -49,7 +49,7 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
   override def addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB, collidingBoxes: util.List[AxisAlignedBB], entityIn: Entity, p_185477_7_ : Boolean): Unit = {
     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, p_185477_7_)
 
-    getBoundingBoxes(worldIn, pos).withFilter(entityBox.intersectsWith).foreach(collidingBoxes.add)
+    getBoundingBoxes(worldIn, pos).withFilter(entityBox.intersects).foreach(collidingBoxes.add)
   }
 
 

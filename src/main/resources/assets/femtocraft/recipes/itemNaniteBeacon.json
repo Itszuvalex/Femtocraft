@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SCS",
+    "RCR",
+    "EDE"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "femtocraft:itemBasicCircuit"
+    },
+    "R": {
+      "item": "femtoraft:itemRiftironIngotDevoid"
+    },
+    "E": {
+      "item": "femtocraft:itemEnergyRegulator"
+    },
+    "D": {
+      "item": "femtocraft:itemDiamondDust"
+    }
+  },
+  "result": {
+    "item": "femtocraft:itemNaniteBeacon",
+    "count": 4
+  }
+}

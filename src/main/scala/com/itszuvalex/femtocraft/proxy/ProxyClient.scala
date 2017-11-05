@@ -145,7 +145,7 @@ class ProxyClient extends ProxyCommon {
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
 
     Minecraft.getMinecraft.getItemColors.registerItemColorHandler(new IItemColor {
-      override def getColorFromItemstack(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
+      override def colorMultiplier(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
     }, FemtoItems.itemPowerCrystal)
 
   }

@@ -26,7 +26,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.particle.Particle._
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.client.renderer.{Tessellator, VertexBuffer}
+import net.minecraft.client.renderer.{BufferBuilder, Tessellator}
 import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.{MathHelper, Vec3d}
@@ -66,7 +66,7 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
   override def getFXLayer = 3
 
 
-  override def renderParticle(worldRendererIn: VertexBuffer, entityIn: Entity, partialTicks: Float, rotationX: Float, rotationZ: Float, rotationYZ: Float, rotationXY: Float, rotationXZ: Float): Unit = {
+  override def renderParticle(worldRendererIn: BufferBuilder, entityIn: Entity, partialTicks: Float, rotationX: Float, rotationZ: Float, rotationYZ: Float, rotationXY: Float, rotationXZ: Float): Unit = {
     val tessellator = Tessellator.getInstance()
     val vertexbuffer = tessellator.getBuffer
     vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
@@ -91,9 +91,9 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
     if (this.particleAngle != 0.0F) {
       val f8 = this.particleAngle + (this.particleAngle - this.prevParticleAngle) * partialTicks
       val f9 = MathHelper.cos(f8 * 0.5F)
-      val f10 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.xCoord.toFloat
-      val f11 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.yCoord.toFloat
-      val f12 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.zCoord.toFloat
+      val f10 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.x.toFloat
+      val f11 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.y.toFloat
+      val f12 = MathHelper.sin(f8 * 0.5F) * cameraViewDir.z.toFloat
       val vec3d = new Vec3d(f10.toDouble, f11.toDouble, f12.toDouble)
       var l = 0
       while (l < 4) {
@@ -103,10 +103,10 @@ class EntityFxPower(par1World: World, x: Double, y: Double, z: Double, scale: Fl
         {l += 1; l}
       }
     }
-    worldRendererIn.pos(f5.toDouble + avec3d(0).xCoord, f6.toDouble + avec3d(0).yCoord, f7.toDouble + avec3d(0).zCoord).tex(f1.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
-    worldRendererIn.pos(f5.toDouble + avec3d(1).xCoord, f6.toDouble + avec3d(1).yCoord, f7.toDouble + avec3d(1).zCoord).tex(f1.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
-    worldRendererIn.pos(f5.toDouble + avec3d(2).xCoord, f6.toDouble + avec3d(2).yCoord, f7.toDouble + avec3d(2).zCoord).tex(f.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
-    worldRendererIn.pos(f5.toDouble + avec3d(3).xCoord, f6.toDouble + avec3d(3).yCoord, f7.toDouble + avec3d(3).zCoord).tex(f.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(0).x, f6.toDouble + avec3d(0).y, f7.toDouble + avec3d(0).z).tex(f1.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(1).x, f6.toDouble + avec3d(1).y, f7.toDouble + avec3d(1).z).tex(f1.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(2).x, f6.toDouble + avec3d(2).y, f7.toDouble + avec3d(2).z).tex(f.toDouble, f2.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
+    worldRendererIn.pos(f5.toDouble + avec3d(3).x, f6.toDouble + avec3d(3).y, f7.toDouble + avec3d(3).z).tex(f.toDouble, f3.toDouble).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).endVertex()
     tessellator.draw()
     FemtoRenderUtils.enableLightMap(null)
   }

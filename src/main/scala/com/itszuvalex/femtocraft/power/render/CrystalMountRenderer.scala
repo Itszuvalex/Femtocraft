@@ -36,8 +36,8 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
     renderCrystalMountAt(null, x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), hasTop = false, hasBottom = true, hasCrystal = false, Color(0, 0, 0, 0))
   }
 
-  override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+  override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     if (MinecraftForgeClient.getRenderPass == 0) {
       val stateAbove = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.UP).getPos)
       val stateBelow = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)

@@ -27,7 +27,7 @@ class ItemShiftTest extends Item {
   override def onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (!world.isRemote) {
       val look = player.getLookVec
-      val vec = Vector3(look.xCoord, look.yCoord, look.zCoord).normalize()
+      val vec = Vector3(look.x, look.y, look.z).normalize()
       getDestination(world, player, vec, 8d) match {
         case Some(a) =>
           val old = player.getPosition

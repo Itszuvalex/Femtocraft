@@ -27,8 +27,8 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
     renderCrystalAt(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), Color(0, 255.toByte, 255.toByte, 255.toByte), Array.fill(11)(Color(255.toByte, 0, 0, 0).toInt))
   }
 
-  override def renderTileEntityInWorld(te: TileCrystalsWorldgen, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+  override def renderTileEntityInWorld(te: TileCrystalsWorldgen, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     renderCrystalAt(x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, new Color(te.color), te.colorOffsets)
   }
 

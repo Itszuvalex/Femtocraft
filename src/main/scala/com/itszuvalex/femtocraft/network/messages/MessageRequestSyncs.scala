@@ -35,10 +35,10 @@ class MessageRequestSyncs(var x: Int, var y: Int, var z: Int, var dim: Int) exte
 
   override def onMessage(message: MessageRequestSyncs, ctx: MessageContext): IMessage = {
     ItszuLib.proxy.addScheduledTask(() => {
-      ctx.getServerHandler.playerEntity.openContainer match {
+      ctx.getServerHandler.player.openContainer match {
         case a: ContainerBase =>
           Debug.log(Level.WARN, "Received Sync Request")
-          a.syncs.foreach(_.sync(ctx.getServerHandler.playerEntity))
+          a.syncs.foreach(_.sync(ctx.getServerHandler.player))
         case _ =>
       }
     })

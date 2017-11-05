@@ -12,6 +12,7 @@ import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.network.NetworkRegistry
@@ -43,8 +44,9 @@ object Femtocraft {
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     FemtoSounds.preInit()
 
-    FemtoBlocks.preInit()
-    FemtoItems.preInit()
+    MinecraftForge.EVENT_BUS.register(FemtoBlocks)
+    MinecraftForge.EVENT_BUS.register(FemtoItems)
+
     FemtoFluids.preInit()
     FemtoRecipes.preInit()
     NaniteRegistry.preInit()

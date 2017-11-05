@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteCapabilities
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.{EnumFacing, ResourceLocation}
@@ -41,8 +42,8 @@ object PlayerNaniteCapabilities {
   }
 
   @SubscribeEvent
-  def attachCapability(event: AttachCapabilitiesEvent.Entity): Unit = {
-    event.getEntity match {
+  def attachCapability(event: AttachCapabilitiesEvent[Entity]): Unit = {
+    event.getObject match {
       case player: EntityPlayer =>
         event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapabilities(player))
       case _ =>

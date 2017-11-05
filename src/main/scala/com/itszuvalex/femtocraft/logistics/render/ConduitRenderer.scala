@@ -36,8 +36,8 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
     renderConduitAt(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), util.EnumSet.noneOf(classOf[EnumFacing]))
   }
 
-  override def renderTileEntityInWorld(te: TileConduit, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+  override def renderTileEntityInWorld(te: TileConduit, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     val cap = te.getCapability(Capabilities.TILE_CONDUIT, null)
     val facings = EnumFacing.VALUES.filter(cap.isConnected)
     val enumSet = if (facings.isEmpty) util.EnumSet.noneOf(classOf[EnumFacing]) else util.EnumSet.copyOf(facings.toSet)

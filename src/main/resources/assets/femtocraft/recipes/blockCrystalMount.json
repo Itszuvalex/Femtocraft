@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "RFR",
+    "CSC"
+  ],
+  "key": {
+    "S": {
+      "item": "femtocraft:itemNanoweaveSheet"
+    },
+    "R": {
+      "item": "femtocraft:itemRiftironIngotDevoid"
+    },
+    "F": {
+      "item": "femtocraft:itemFrame"
+    },
+    "C": {
+      "item": "femtocraft:itemBasicCircuit"
+    }
+  },
+  "result": {
+    "item": "femtocraft:blockCrystalMount",
+    "data": 0
+  }
+}

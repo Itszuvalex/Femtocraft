@@ -36,7 +36,7 @@ class MessageOpenGui(var x: Int, var y: Int, var z: Int, var dim: Int, var guiID
 
   override def onMessage(message: MessageOpenGui, ctx: MessageContext): IMessage = {
     ItszuLib.proxy.addScheduledTask(() => {
-      ctx.getServerHandler.playerEntity.openGui(Femtocraft, message.guiID, DimensionManager.getWorld(message.dim), message.x, message.y, message.z)
+      ctx.getServerHandler.player.openGui(Femtocraft, message.guiID, DimensionManager.getWorld(message.dim), message.x, message.y, message.z)
     })
     null
   }

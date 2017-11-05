@@ -24,7 +24,7 @@ object WorkerProviderBeamRenderer {
 
 class WorkerProviderBeamRenderer extends TileEntitySpecialRenderer[TileWorkerProviderTest] {
 
-  override def renderTileEntityAt(te: TileWorkerProviderTest, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def render(te: TileWorkerProviderTest, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) = {
     this.bindTexture(WorkerProviderBeamRenderer.beamOuterLocation)
     renderBeamsToAllChildren(x, y, z, partialTicks, te, WorkerProviderBeamRenderer.BEAM_WIDTH, Color(160.toByte, 255.toByte, 255.toByte, 255.toByte))
     this.bindTexture(WorkerProviderBeamRenderer.beamColorLocation)

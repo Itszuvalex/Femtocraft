@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
@@ -20,13 +20,13 @@ object GuiFrame {
 
 class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrame(player, inv, tile)) {
 
-  fontRendererObj = Minecraft.getMinecraft.fontRendererObj
+  fontRenderer = Minecraft.getMinecraft.fontRenderer
 
-  val nameLabel     = new GuiLabel((panelWidth - fontRendererObj.getStringWidth(tile.multiBlock)) / 2, 7,
-    fontRendererObj.getStringWidth(tile.multiBlock), fontRendererObj.FONT_HEIGHT,
+  val nameLabel     = new GuiLabel((panelWidth - fontRenderer.getStringWidth(tile.multiBlock)) / 2, 7,
+    fontRenderer.getStringWidth(tile.multiBlock), fontRenderer.FONT_HEIGHT,
     () => tile.multiBlock)
-  val requiredLabel = new GuiLabel((panelWidth - fontRendererObj.getStringWidth("Required")) / 2, 9 + fontRendererObj.FONT_HEIGHT,
-    fontRendererObj.getStringWidth("Required"), fontRendererObj.FONT_HEIGHT,
+  val requiredLabel = new GuiLabel((panelWidth - fontRenderer.getStringWidth("Required")) / 2, 9 + fontRenderer.FONT_HEIGHT,
+    fontRenderer.getStringWidth("Required"), fontRenderer.FONT_HEIGHT,
     () => "Required")
   val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
   val reqItems      = multiblock match {
@@ -38,7 +38,7 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
       }
     case None => Seq[GuiElement]()
   }
-  val layout        = new GuiFlowLayout(7, 11 + fontRendererObj.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
+  val layout        = new GuiFlowLayout(7, 11 + fontRenderer.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
   val itemSlots     =
     (0 until 9).map { i =>
       new GuiItemStack(7 + 18 * i, 61, null) {

@@ -17,11 +17,11 @@ import scala.collection.mutable.ListBuffer
   * Created by Alex on 18.08.2016.
   */
 class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit) extends FemtoGuiBase(tile, new ContainerConduit(player, inv, tile, false)) {
-  fontRendererObj = Minecraft.getMinecraft.fontRendererObj
+  fontRenderer = Minecraft.getMinecraft.fontRenderer
 
   EnumFacing.VALUES.foreach { f =>
     val labelName: String = f.getName.charAt(0).toUpper.toString
-    val faceLabel = new GuiLabel(3 + (f.getIndex / 3) * 90, 14 + (f.getIndex % 3) * 20, fontRendererObj.getStringWidth(labelName), fontRendererObj.FONT_HEIGHT, () => {
+    val faceLabel = new GuiLabel(3 + (f.getIndex / 3) * 90, 14 + (f.getIndex % 3) * 20, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, () => {
       (if (tile.getCapability(Capabilities.TILE_CONDUIT, f).isConnected(f)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
     }) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
@@ -46,7 +46,7 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
   addPlayerInventorySlots(inv)
 
 
-  val nameLabel = new GuiLabel(2, 2, fontRendererObj.getStringWidth("Conduit"), fontRendererObj.FONT_HEIGHT, () => "Conduit")
+  val nameLabel = new GuiLabel(2, 2, fontRenderer.getStringWidth("Conduit"), fontRenderer.FONT_HEIGHT, () => "Conduit")
 
   val elems = List(nameLabel)
   add(elems: _*)

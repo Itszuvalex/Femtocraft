@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "RBR"
+  ],
+  "key": {
+    "R": {
+      "item": "femtocraft:itemPhasemetalDust"
+    },
+    "C": {
+      "item": "femtocraft:itemNaniteBeacon"
+    },
+    "B": {
+      "item": "femtocraft:itemBasicCircuit"
+    }
+  },
+  "result": {
+    "item": "femtocraft:itemLogisticsNaniteChipBasic",
+    "count": 8,
+    "data": 0
+  }
+}

@@ -10,6 +10,7 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.block.BlockSnow
+import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.{Item, ItemStack}
@@ -64,8 +65,8 @@ class ItemFrame extends Item with IFrameItem {
       super.onItemRightClick(worldIn, playerIn, hand)
   }
 
-  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
-    super.addInformation(stack, playerIn, tooltip, advanced)
+  override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag) = {
+    super.addInformation(stack, worldIn, tooltip, flagIn)
     val list = tooltip.asInstanceOf[util.List[String]]
     list.add("Frame: " + getFrameType(stack))
     val selected = getSelectedMultiblock(stack)
@@ -87,32 +88,32 @@ class ItemFrame extends Item with IFrameItem {
 
     val block = worldIn.getBlockState(pos).getBlock
 
-        var dir: EnumFacing = null
-        if (block == Blocks.SNOW_LAYER && (worldIn.getBlockState(pos).getValue(BlockSnow.LAYERS).toInt & 7) < 1) {
-          dir = EnumFacing.UP
-        } else if (block != Blocks.VINE && block != Blocks.TALLGRASS && block != Blocks.DEADBUSH
-                   && !block.isReplaceable(worldIn, pos)) {
-          dir = facing
-        }
+    var dir: EnumFacing = null
+    if (block == Blocks.SNOW_LAYER && (worldIn.getBlockState(pos).getValue(BlockSnow.LAYERS).toInt & 7) < 1) {
+      dir = EnumFacing.UP
+    } else if (block != Blocks.VINE && block != Blocks.TALLGRASS && block != Blocks.DEADBUSH
+      && !block.isReplaceable(worldIn, pos)) {
+      dir = facing
+    }
 
-        val bpos = pos.offset(dir)
-        if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    val bpos = pos.offset(dir)
+    if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
-        val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
-        if (!playerIn.capabilities.isCreativeMode && stack.getCount < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
-        else if (!playerIn.capabilities.isCreativeMode) stack.setCount(stack.getCount - multi.numFrames)
+    val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
+    if (!playerIn.capabilities.isCreativeMode && stack.getCount < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    else if (!playerIn.capabilities.isCreativeMode) stack.setCount(stack.getCount - multi.numFrames)
 
-        locations.foreach { loc =>
-          worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)
-          worldIn.getTileEntity(loc.getPos) match {
-            case frame: TileFrame =>
-              frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
-              frame.formMultiBlock(new Loc4(worldIn, bpos))
-              frame.multiBlock = multiString
-            case _ =>
-          }
-                          }
-        worldIn.playSound(null, bpos, SoundEvent.REGISTRY.getObject(new ResourceLocation("block.stone.break")), SoundCategory.BLOCKS, 1f, 1f / 5f)
+    locations.foreach { loc =>
+      worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)
+      worldIn.getTileEntity(loc.getPos) match {
+        case frame: TileFrame =>
+          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
+          frame.formMultiBlock(new Loc4(worldIn, bpos))
+          frame.multiBlock = multiString
+        case _ =>
+      }
+    }
+    worldIn.playSound(null, bpos, SoundEvent.REGISTRY.getObject(new ResourceLocation("block.stone.break")), SoundCategory.BLOCKS, 1f, 1f / 5f)
     EnumActionResult.SUCCESS
   }
 

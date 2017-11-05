@@ -29,7 +29,7 @@ class MessageMultiblockSelection(var multi: String) extends MessageBase[MessageM
 
   override def onMessage(message: MessageMultiblockSelection, ctx: MessageContext): IMessage = {
     ItszuLib.proxy.addScheduledTask(() => {
-      val player = ctx.getServerHandler.playerEntity
+      val player = ctx.getServerHandler.player
       player.getHeldItemMainhand match {
         case null =>
         case stack =>
