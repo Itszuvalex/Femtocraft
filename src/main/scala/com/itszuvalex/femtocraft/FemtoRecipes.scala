@@ -14,7 +14,6 @@ object FemtoRecipes {
   def preInit(): Unit = {
     DustRecipeRegistry.preInit()
     SynthesizerRegistry.preInit()
-    addSmeltingRecipes()
   }
 
   def addSmeltingRecipes(): Unit = {
@@ -29,6 +28,7 @@ object FemtoRecipes {
   def init(): Unit = {
     DustRecipeRegistry.init()
     SynthesizerRegistry.init()
+    addSmeltingRecipes()
   }
 
   def postInit() = {

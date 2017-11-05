@@ -21,6 +21,6 @@ object FemtoSounds {
   def registerSound(registry: IForgeRegistry[SoundEvent], name: String): SoundEvent = {
     val sound = new SoundEvent(Resources.Sound(name)).setRegistryName(name)
     registry.register(sound)
-    sound
+    SoundEvent.REGISTRY.getObject(Resources.Sound(name))
   }
 }

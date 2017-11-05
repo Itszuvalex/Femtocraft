@@ -73,6 +73,7 @@ object FemtoBlocks {
   var testWorkerProvider: Block = _
 
   private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
+  private val oresToRegister       = new ArrayBuffer[(Block, String)]
 
   @SubscribeEvent
   def registerBlocks(event: RegistryEvent.Register[Block]) {
@@ -152,11 +153,16 @@ object FemtoBlocks {
       registry.register(new ItemBlock(blockname._1).setRegistryName(blockname._1.getRegistryName).setUnlocalizedName(blockname._2))
     }
     itemBlocksToRegister.clear()
+
+    oresToRegister.foreach { blockname =>
+      OreDictionary.registerOre(blockname._2, blockname._1)
+    }
+    oresToRegister.clear()
   }
 
   implicit class BlockHelpers[T <: Block](block: T) {
     def registerOre(name: String): T = {
-      OreDictionary.registerOre(name, block)
+      oresToRegister += ((block, name))
       block
     }
 

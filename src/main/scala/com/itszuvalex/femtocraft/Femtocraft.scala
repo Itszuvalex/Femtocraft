@@ -42,9 +42,9 @@ object Femtocraft {
   var guiProxy: ProxyGuiCommon = _
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
+    MinecraftForge.EVENT_BUS.register(FemtoSounds)
     MinecraftForge.EVENT_BUS.register(FemtoBlocks)
     MinecraftForge.EVENT_BUS.register(FemtoItems)
-    MinecraftForge.EVENT_BUS.register(FemtoSounds)
 
     FemtoFluids.preInit()
     FemtoRecipes.preInit()

@@ -35,7 +35,7 @@ import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoItems, FemtoSounds, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
@@ -177,6 +177,7 @@ class ProxyClient extends ProxyCommon {
     super.registerEventHandlers()
     //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
     MinecraftForge.EVENT_BUS.register(new PlayerNaniteCapabilitiesOverlay)
+    MinecraftForge.EVENT_BUS.register(FemtoSounds)
   }
 
   override def onRegisterItem[T <: Item](item: T, name: String): Unit = {
