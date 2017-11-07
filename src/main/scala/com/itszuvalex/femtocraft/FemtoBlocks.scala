@@ -74,6 +74,7 @@ object FemtoBlocks {
 
   private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
   private val oresToRegister       = new ArrayBuffer[(Block, String)]
+  val blockCallbacks = new ArrayBuffer[() => Unit]()
 
   @SubscribeEvent
   def registerBlocks(event: RegistryEvent.Register[Block]) {
@@ -111,6 +112,9 @@ object FemtoBlocks {
     testNetworkBlock = registerBlock(registry, new BlockNetworkTest, "testNetworkBlock")
     testTaskProvider = registerBlock(registry, new BlockTaskProviderTest, "testTaskProvider")
     testWorkerProvider = registerBlock(registry, new BlockWorkerProviderTest, "testWorkerProvider")
+
+    blockCallbacks.foreach(_ ())
+    blockCallbacks.clear()
   }
 
   def init(): Unit = {

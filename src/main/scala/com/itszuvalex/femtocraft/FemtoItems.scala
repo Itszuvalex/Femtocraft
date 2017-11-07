@@ -10,6 +10,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.oredict.OreDictionary
 import net.minecraftforge.registries.IForgeRegistry
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
   */
@@ -50,6 +52,8 @@ object FemtoItems {
   var itemMultiTool: Item = _
   var itemShiftTest: Item = _
 
+  val itemCallbacks = new ArrayBuffer[() => Unit]()
+
   @SubscribeEvent
   def registerItems(event: RegistryEvent.Register[Item]): Unit = {
     val registry = event.getRegistry
@@ -84,6 +88,9 @@ object FemtoItems {
     itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest")
 
     FemtoBlocks.registerItemBlocks(registry)
+
+    itemCallbacks.foreach(_())
+    itemCallbacks.clear()
   }
 
   def init(): Unit = {

@@ -57,7 +57,7 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
     stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
       return comp.Int(COLOR_KEY)
     }
-    Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt
+    Color(0.toByte, 255.toByte, 255.toByte, 255.toByte).toInt
   }
 
   override def getTransferRate(): Double = {

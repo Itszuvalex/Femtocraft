@@ -35,7 +35,7 @@ import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
-import com.itszuvalex.femtocraft.{FemtoItems, FemtoSounds, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
@@ -85,6 +85,16 @@ class ProxyClient extends ProxyCommon {
     }
     mc.effectRenderer.addEffect(fx)
     fx
+  }
+
+  override def preInit(): Unit = {
+    super.preInit()
+    FemtoItems.itemCallbacks += registerModels
+  }
+
+  override def init(): Unit = {
+    super.init()
+    registerItemRendering()
   }
 
   override def registerRendering() {
@@ -144,17 +154,14 @@ class ProxyClient extends ProxyCommon {
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
 
+  }
+
+  def registerItemRendering(): Unit = {
+
     Minecraft.getMinecraft.getItemColors.registerItemColorHandler(new IItemColor {
       override def colorMultiplier(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
     }, FemtoItems.itemPowerCrystal)
 
-  }
-
-
-  override def init(): Unit = {
-    super.init()
-
-    // ItemPowerCrystal
     val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, new ItemMeshDefinition {
       override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
@@ -166,6 +173,10 @@ class ProxyClient extends ProxyCommon {
       }
     })
 
+  }
+
+  def registerModels(): Unit = {
+    val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
       new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file), "inventory"),
       new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "small"), "inventory"),
@@ -177,7 +188,6 @@ class ProxyClient extends ProxyCommon {
     super.registerEventHandlers()
     //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
     MinecraftForge.EVENT_BUS.register(new PlayerNaniteCapabilitiesOverlay)
-    MinecraftForge.EVENT_BUS.register(FemtoSounds)
   }
 
   override def onRegisterItem[T <: Item](item: T, name: String): Unit = {
