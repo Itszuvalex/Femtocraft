@@ -1,23 +1,30 @@
 package com.itszuvalex.femtocraft.power.block
 
+import java.util
 import java.util.Random
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.Entity
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult, Vec3d}
 import net.minecraft.world.{IBlockAccess, World}
+
+import scala.collection.JavaConversions._
 
 /**
   * Created by Christopher on 8/30/2015.
   */
 class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInventory {
+  var renderBox = new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
   setCreativeTab(Femtocraft.tab)
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileCrystalMount
@@ -37,5 +44,58 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
             mount.getCapability(Capabilities.COLORABLE, null).toInt)
       case _ =>
     }
+  }
+
+  override def addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB, collidingBoxes: util.List[AxisAlignedBB], entityIn: Entity, p_185477_7_ : Boolean): Unit = {
+    super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, p_185477_7_)
+
+    getBoundingBoxes(worldIn, pos).withFilter(entityBox.intersects).foreach(collidingBoxes.add)
+  }
+
+
+  def renderAbove(worldIn: World, pos: BlockPos): Boolean = {
+    val loc = new Loc4(worldIn, pos)
+    val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.UP).getPos)
+    stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
+  }
+
+  def renderBelow(worldIn: World, pos: BlockPos): Boolean = {
+    val loc = new Loc4(worldIn, pos)
+    val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.DOWN).getPos)
+    stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
+  }
+
+  def getBoundingBoxes(worldIn: World, pos: BlockPos): util.List[AxisAlignedBB] = {
+    val list = new util.ArrayList[AxisAlignedBB]()
+    list += new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
+    if (renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, .6, 2f / 16f, 14f / 16f, 1, 14f / 16f)
+    if (renderBelow(worldIn, pos) || !renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, 0, 2f / 16f, 14f / 16f, .4, 14f / 16f)
+    list
+  }
+
+  override def collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult = {
+    val results = getBoundingBoxes(worldIn, pos).map(box => (box, rayTrace(pos, start, end, box))).filter(a => a._2 != null).sortWith { (a, b) =>
+      start.squareDistanceTo(a._2.hitVec) < start.squareDistanceTo(b._2.hitVec)
+    }
+    results.headOption.map { r =>
+      renderBox = r._1
+      r._2
+    }.orNull
+  }
+
+  override protected def rayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, boundingBox: AxisAlignedBB): RayTraceResult = {
+    val vec3d: Vec3d = start.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
+    val vec3d1: Vec3d = end.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
+    val raytraceresult: RayTraceResult = boundingBox.calculateIntercept(vec3d, vec3d1)
+    if (raytraceresult == null) null
+    else new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble), raytraceresult.sideHit, pos)
+  }
+
+  override def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos): AxisAlignedBB = {
+    new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
+  }
+
+  override def getSelectedBoundingBox(state: IBlockState, worldIn: World, pos: BlockPos): AxisAlignedBB = {
+    renderBox.offset(pos)
   }
 }

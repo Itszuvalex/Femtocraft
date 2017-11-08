@@ -1,18 +1,27 @@
 package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
+import com.itszuvalex.femtocraft.industry.TileSideConfigurable
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
-import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.{SmeltTask, TASK_NBT}
+import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs, Resources}
+import com.itszuvalex.itszulib.api.Capabilities
+import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
+import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
-import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.TileInventory
+import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.render.RenderUtils
 import com.itszuvalex.itszulib.util.Task
+import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.{EnumFacing, ResourceLocation}
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.items.CapabilityItemHandler
+import org.lwjgl.opengl.GL11
 
 /**
   * Created by Chris on 8/14/2016.
@@ -23,7 +32,20 @@ object TileNanoFurnace {
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
 
-  val TASK_NBT = "Task"
+  val INPUT_INV_KEY  = "Input"
+  val OUTPUT_INV_KEY = "Output"
+  val NONE_INV_KEY   = "None"
+
+  val TASK_NBT         = "Task"
+  val SIDED_CONFIG_NBT = "ItemConfig"
+
+  val FRONT_TEX_BASE = Resources.TexBlock("blockmachineblock_front_base.png")
+  val FRONT_TEX_COLOR = Resources.TexBlock("blockmachineblock_front_color.png")
+  val FRONT_TEX_ADD = Resources.TexBlock("nanofurnace_front.png")
+  val SIDE_TEX_BASE = Resources.TexBlock("blockmachineblock_side_base.png")
+  val SIDE_TEX_COLOR = Resources.TexBlock("blockmachineblock_side_color.png")
+  val SIDE_TEX_EMPTY = Resources.TexBlock("blockmachineblock_side_empty.png")
+  val SIDE_TEX_EMPTY_LIGHT = Resources.TexBlock("blockmachineblock_side_empty_light.png")
 
   object SmeltTask {
     val SMELTING_STACK_NBT   = "Smelt"
@@ -57,8 +79,19 @@ object TileNanoFurnace {
 
 }
 
-class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNode {
-  private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
+class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNode with TileSideConfigurable {
+  private val task         : SmeltTask    = new SmeltTask(IItemStack.Empty)
+  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+    case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
+    case _ => NONE_INV_KEY
+  },
+  Map(NONE_INV_KEY -> IItemStorage.Empty,
+    INPUT_INV_KEY -> inputStorage,
+    OUTPUT_INV_KEY -> outputStorage),
+  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
 
   override def connectionRadius: Float = 8f
 
@@ -91,6 +124,12 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     }
     else false
   }
+
+  override def canInsertItem(index: Int, itemStackIn: ItemStack, direction: EnumFacing): Boolean =
+    index == 0 && faceStates(direction.getIndex) == 1 && isItemValidForSlot(0, itemStackIn)
+
+  override def canExtractItem(index: Int, stack: ItemStack, direction: EnumFacing): Boolean =
+    index == 1 && faceStates(direction.getIndex) == 2
 
   override def hasGUI = true
 
@@ -145,14 +184,79 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
 
   def getProgressMax = task.adjustedMax(0)
 
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
+    case (_, null) => super.getCapability(capability, facing)
+    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(getStorageForAbsoluteFace(facing)/*sidedStorageConfig.getStorageForGlobalFacing(facing)*/).asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE => getStorageForAbsoluteFace(facing)/*sidedStorageConfig.getStorageForGlobalFacing(facing)*/.asInstanceOf[T]
+    case _ => super.getCapability(capability, facing)
+  }
+
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     super.deserializeNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
+    sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(SIDED_CONFIG_NBT))
   }
 
   override def serializeNBT(): NBTTagCompound = {
     val ret = super.serializeNBT()
     ret.setTag(TASK_NBT, task.serializeNBT())
+    ret.setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
     ret
+  }
+
+  override val maxFaceState: Int = 2
+
+  override def frontFace: EnumFacing = EnumFacing.NORTH
+
+  /**
+    * @param face Face relative to front (front = north)
+    */
+  override def renderFace(face: EnumFacing, x: Int, y: Int, partialTicks: Float, _3d: Boolean = false): Unit = {
+    val tm = Minecraft.getMinecraft.getTextureManager
+    val clr = getColor
+    face match {
+      case EnumFacing.NORTH =>
+        tm.bindTexture(TileNanoFurnace.FRONT_TEX_BASE)
+        drawFace(_3d, face, x, y)
+        tm.bindTexture(TileNanoFurnace.FRONT_TEX_COLOR)
+        GL11.glColor4f(clr.red, clr.green, clr.blue, clr.alpha)
+        drawFace(_3d, face, x, y)
+        GL11.glColor4f(1, 1, 1, 1)
+        tm.bindTexture(TileNanoFurnace.FRONT_TEX_ADD)
+        drawFace(_3d, face, x, y)
+      case _ =>
+        faceStates(face.getIndex) match {
+          case 0 =>
+            tm.bindTexture(TileNanoFurnace.SIDE_TEX_BASE)
+            drawFace(_3d, face, x, y)
+            tm.bindTexture(TileNanoFurnace.SIDE_TEX_COLOR)
+            GL11.glColor4f(clr.red, clr.green, clr.blue, clr.alpha)
+            drawFace(_3d, face, x, y)
+            GL11.glColor4f(1, 1, 1, 1)
+          case 1 =>
+            tm.bindTexture(TileNanoFurnace.SIDE_TEX_EMPTY)
+            drawFace(_3d, face, x, y)
+            tm.bindTexture(TileNanoFurnace.SIDE_TEX_EMPTY_LIGHT)
+            GL11.glColor4f(clr.red * .5f, clr.green * .5f, 1, 1)
+            drawFace(_3d, face, x, y)
+            GL11.glColor4f(1, 1, 1, 1)
+          case 2 =>
+            tm.bindTexture(TileNanoFurnace.SIDE_TEX_EMPTY)
+            drawFace(_3d, face, x, y)
+            tm.bindTexture(TileNanoFurnace.SIDE_TEX_EMPTY_LIGHT)
+            GL11.glColor4f(1, clr.green * .5f, clr.blue * .5f, 1)
+            drawFace(_3d, face, x, y)
+            GL11.glColor4f(1, 1, 1, 1)
+        }
+    }
+  }
+
+  private def getStorageForAbsoluteFace(face: EnumFacing): IItemStorage = {
+    val relFace = FacingUtil.getHorizontalRelativeFacingFromAbsolute(face, frontFace)
+    faceStates(relFace.getIndex) match {
+      case 0 => IItemStorage.Empty
+      case 1 => inputStorage
+      case 2 => outputStorage
+    }
   }
 }

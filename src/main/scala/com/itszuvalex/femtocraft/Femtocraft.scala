@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.api.ManagerCapabilities
+import com.itszuvalex.femtocraft.api.logistics.LogisticsResourceRegistry
 import com.itszuvalex.femtocraft.api.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
@@ -11,6 +12,7 @@ import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.network.NetworkRegistry
@@ -40,10 +42,10 @@ object Femtocraft {
   var guiProxy: ProxyGuiCommon = _
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
-    FemtoSounds.preInit()
+    MinecraftForge.EVENT_BUS.register(FemtoSounds)
+    MinecraftForge.EVENT_BUS.register(FemtoBlocks)
+    MinecraftForge.EVENT_BUS.register(FemtoItems)
 
-    FemtoBlocks.preInit()
-    FemtoItems.preInit()
     FemtoFluids.preInit()
     FemtoRecipes.preInit()
     NaniteRegistry.preInit()
@@ -57,18 +59,17 @@ object Femtocraft {
   }
 
   @EventHandler def init(event: FMLInitializationEvent): Unit = {
-    FemtoSounds.init()
     FemtoBlocks.init()
     FemtoItems.init()
     FemtoFluids.init()
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     PowerManager.init()
+    LogisticsResourceRegistry.init()
     proxy.init()
   }
 
   @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
-    FemtoSounds.postInit()
     FemtoBlocks.postInit()
     FemtoItems.postInit()
     FemtoFluids.postInit()

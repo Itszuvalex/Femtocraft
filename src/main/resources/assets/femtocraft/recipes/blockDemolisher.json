@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "CMC",
+    "RPR"
+  ],
+  "key": {
+    "S" : {
+      "item": "femtocraft:itemNanoweaveSheet"
+    },
+    "C": {
+      "item": "femtocraft:itemBasicCircuit"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "R": {
+      "item": "femtocraft:itemRiftironIngotDevoid"
+    },
+    "M": {
+      "item": "femtocraft:itemFrame"
+    }
+  },
+  "result": {
+    "item": "femtocraft:blockDemolisher",
+    "data": 0
+  }
+}

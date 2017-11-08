@@ -18,7 +18,7 @@ object TestRenderer {
 class TestRenderer extends TileEntitySpecialRenderer[TileEntity] {
   val testModel = LoadObj(TestRenderer.testModelLocation)
 
-  override def renderTileEntityAt(te: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def render(te: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) = {
     this.bindTexture(TestRenderer.testTexLocation)
     GL11.glPushMatrix()
     GL11.glDisable(GL11.GL_LIGHTING)

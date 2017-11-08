@@ -28,8 +28,8 @@ class NaniteHiveSmallRenderer extends TileEntityCombinedRenderer[TileNaniteHiveS
     renderAtLocWithColor(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, 0, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), Color(0, 255.toByte, 255.toByte, 255.toByte))
   }
 
-  override def renderTileEntityInWorld(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+  override def renderTileEntityInWorld(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     renderAtLocWithColor(x, y, z, partialTicks, destroyStage, te.getWorld.getTotalWorldTime.toFloat, te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
     //    DiffusionNodeBeamRenderer.renderDiffuseBeams(te, x, y, z, partialTicks)
   }

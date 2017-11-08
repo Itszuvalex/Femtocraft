@@ -1,7 +1,11 @@
 package com.itszuvalex.femtocraft.api
 
+import java.util
+
+import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
+import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
@@ -10,6 +14,7 @@ import net.minecraft.nbt.{NBTBase, NBTTagCompound, NBTTagInt}
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
 
+import scala.collection.JavaConversions._
 import scala.collection.Set
 
 /**
@@ -25,6 +30,10 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
+    CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[ILogisticsNetworkNode], new LogisticsStorageDummy, classOf[LogisticsImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[IConnectionProvider], new ConnectionProviderStorageDummy, classOf[ConnectionProviderImplDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -64,6 +73,14 @@ object ManagerCapabilities {
   class PowerLeafNodeStorageDummy extends DummyStorage[IPowerLeafNode]
 
   class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
+
+  class MultitoolStorageDummy extends DummyStorage[IMultitool]
+
+  class ConduitStorageDummy extends DummyStorage[IConduit]
+
+  class LogisticsStorageDummy extends DummyStorage[ILogisticsNetworkNode]
+
+  class ConnectionProviderStorageDummy extends DummyStorage[IConnectionProvider]
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
@@ -163,6 +180,56 @@ object ManagerCapabilities {
 
   class NaniteUpgradeableDummy extends INaniteUpgradeable {
     override def tank: INaniteTank = null
+  }
+
+  class MultitoolImplDummy extends IMultitool {
+    override def allInstalledUpgrades: util.Collection[IMultitoolUpgrade] = Set[IMultitoolUpgrade]()
+
+    override def installedUpgrades(slot: EnumMultitoolUpgradeSlot): util.Collection[IMultitoolUpgrade] = Set[IMultitoolUpgrade]()
+
+    override def canInstallUpgrade(upgrade: IMultitoolUpgrade): Boolean = false
+
+    override def installUpgrade(upgrade: IMultitoolUpgrade): Unit = {}
+
+    override def removeUpgrade(upgrade: IMultitoolUpgrade): Unit = {}
+
+    override def activePrimary: Option[IMultitoolPrimaryUpgrade] = None
+
+    override def activeSecondary: Option[IMultitoolSecondaryUpgrade] = None
+
+    override def setActivePrimary(upgrade: IMultitoolUpgrade): Unit = {}
+
+    override def setActiveSecondary(upgrade: IMultitoolUpgrade): Unit = {}
+  }
+
+  class LogisticsImplDummy extends ILogisticsNetworkNode {
+    override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
+
+    override def getLoc: Loc4 = new Loc4
+  }
+
+  class ConduitImplDummy extends IConduit {
+    override def canAddConnection(facing: EnumFacing): Boolean = false
+
+    override def addConnection(facing: EnumFacing): Unit = {}
+
+    override def removeConnection(facing: EnumFacing): Unit = {}
+
+    override def isConnected(facing: EnumFacing): Boolean = false
+  }
+
+  class ConnectionProviderImplDummy extends IConnectionProvider {
+    /**
+      * Given loc and facing to allow the provider to build the connection...connections...as needed
+      *
+      * @param loc    Loc holding this connection provider
+      * @param facing Facing
+      *
+      * @return Set of Connections provided by this provider
+      */
+    override def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
+
+    override def addTooltip(tooltip: util.List[String]): Unit = {}
   }
 
 }

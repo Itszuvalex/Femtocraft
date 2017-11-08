@@ -13,7 +13,7 @@ object PowerNodeRenderer {
 
 class PowerNodeRenderer[T <: TileEntity with PowerNode] extends NodeCrystalRenderer[T] {
 
-  override def renderTileEntityAt(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def render(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) = {
     renderNode(te, x, y, z, partialTicks)
     PowerNodeBeamRenderer.renderPowerBeams(te, x, y, z, partialTicks)
   }

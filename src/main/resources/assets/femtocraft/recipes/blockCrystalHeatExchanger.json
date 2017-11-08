@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ERE",
+    "CMC",
+    "BFB"
+  ],
+  "key": {
+    "R": {
+      "item": "femtocraft:itemEnergyRegulator"
+    },
+    "B": {
+      "item": "femtocraft:itemCrystalBattery"
+    },
+    "C": {
+      "item": "femtocraft:itemBasicCircuit"
+    },
+    "M": {
+      "item": "femtocraft:itemFrame"
+    },
+    "E": {
+      "item": "femtocraft:itemRiftironIngotDevoid"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    }
+  },
+  "result": {
+    "item": "femtocraft:blockCrystalHeatExchanger",
+    "data": 0
+  }
+}

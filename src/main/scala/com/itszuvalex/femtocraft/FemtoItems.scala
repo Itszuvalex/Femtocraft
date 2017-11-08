@@ -2,10 +2,15 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.ItemDumbDust
 import com.itszuvalex.femtocraft.industry.item._
+import com.itszuvalex.femtocraft.logistics.item.ItemLogisticsItemChip
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
-import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.event.RegistryEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.oredict.OreDictionary
+import net.minecraftforge.registries.IForgeRegistry
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
@@ -29,6 +34,7 @@ object FemtoItems {
   var itemEnergyRegulator        : Item = _
   var itemCrystalBattery         : Item = _
   var itemNaniteBeacon           : Item = _
+  var itemNanoChannel            : Item = _
 
   var itemIronDust   : Item = _
   var itemGoldDust   : Item = _
@@ -36,38 +42,55 @@ object FemtoItems {
 
   var itemSolarPanel: Item = _
 
+  var itemLogisticsItemChipBasic  : Item = _
+  var itemLogisticsFluidChipBasic : Item = _
+  var itemLogisticsNaniteChipBasic: Item = _
+
   var itemFrame     : Item = _
   var itemMultiblock: Item = _
 
   var itemMultiTool: Item = _
   var itemShiftTest: Item = _
 
-  def preInit(): Unit = {
-    itemPowerCrystal = registerItem(new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
-    itemFrame = registerItem(new ItemFrame(), "itemFrame")
-    itemMultiblock = registerItem(new ItemMultiblock(), "itemMultiblock")
-    itemDumbDust = registerItem(new ItemDumbDust(), "itemDumbDust")
-    itemCyberleaf = registerItem(new Item, "itemCyberleaf")
-    itemSolarPanel = registerItem(new Item(), "itemSolarPanel")
-    itemNanoweaveThread = registerItem(new Item(), "itemNanoweaveThread")
-    itemNanoweaveSheet = registerItem(new Item(), "itemNanoweaveSheet")
-    itemCracklingDust = registerItem(new Item(), "itemCracklingDust")
-    itemRiftironDust = registerItem(new Item(), "itemRiftironDust").setCreativeTab(Femtocraft.tab).registerOre("dustRiftiron")
-    itemPhasemetalDust = registerItem(new Item(), "itemPhasemetalDust").setCreativeTab(Femtocraft.tab).registerOre("dustPhasemetal")
-    itemIronDust = registerItem(new Item(), "itemIronDust").setCreativeTab(Femtocraft.tab).registerOre("dustIron")
-    itemGoldDust = registerItem(new Item(), "itemGoldDust").setCreativeTab(Femtocraft.tab).registerOre("dustGold")
-    itemDiamondDust = registerItem(new Item(), "itemDiamondDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamond")
-    itemRedstonereplacementDust = registerItem(new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
-    itemLapisreplacementDust = registerItem(new Item(), "itemLapisreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustLapisreplacement")
-    itemDiamondreplacementDust = registerItem(new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
-    itemRiftironIngotDevoid = registerItem(new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
-    itemPhasemetalIngotDevoid = registerItem(new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
-    itemBasicCircuit = registerItem(new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
-    itemEnergyRegulator = registerItem(new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
-    itemCrystalBattery = registerItem(new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
-    itemNaniteBeacon = registerItem(new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
-    itemMultiTool = registerItem(new ItemMultiTool(), "itemMultiTool")
-    itemShiftTest = registerItem(new ItemShiftTest(), "itemShiftTest")
+  val itemCallbacks = new ArrayBuffer[() => Unit]()
+
+  @SubscribeEvent
+  def registerItems(event: RegistryEvent.Register[Item]): Unit = {
+    val registry = event.getRegistry
+    itemPowerCrystal = registerItem(registry, new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
+    itemFrame = registerItem(registry, new ItemFrame(), "itemFrame")
+    itemMultiblock = registerItem(registry, new ItemMultiblock(), "itemMultiblock")
+    itemDumbDust = registerItem(registry, new ItemDumbDust(), "itemDumbDust")
+    itemCyberleaf = registerItem(registry, new Item, "itemCyberleaf")
+    itemSolarPanel = registerItem(registry, new Item(), "itemSolarPanel")
+    itemNanoweaveThread = registerItem(registry, new Item(), "itemNanoweaveThread")
+    itemNanoweaveSheet = registerItem(registry, new Item(), "itemNanoweaveSheet")
+    itemCracklingDust = registerItem(registry, new Item(), "itemCracklingDust")
+    itemRiftironDust = registerItem(registry, new Item(), "itemRiftironDust").setCreativeTab(Femtocraft.tab).registerOre("dustRiftiron")
+    itemPhasemetalDust = registerItem(registry, new Item(), "itemPhasemetalDust").setCreativeTab(Femtocraft.tab).registerOre("dustPhasemetal")
+    itemIronDust = registerItem(registry, new Item(), "itemIronDust").setCreativeTab(Femtocraft.tab).registerOre("dustIron")
+    itemGoldDust = registerItem(registry, new Item(), "itemGoldDust").setCreativeTab(Femtocraft.tab).registerOre("dustGold")
+    itemDiamondDust = registerItem(registry, new Item(), "itemDiamondDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamond")
+    itemRedstonereplacementDust = registerItem(registry, new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
+    itemLapisreplacementDust = registerItem(registry, new Item(), "itemLapisreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustLapisreplacement")
+    itemDiamondreplacementDust = registerItem(registry, new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
+    itemRiftironIngotDevoid = registerItem(registry, new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
+    itemPhasemetalIngotDevoid = registerItem(registry, new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
+    itemBasicCircuit = registerItem(registry, new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
+    itemEnergyRegulator = registerItem(registry, new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
+    itemCrystalBattery = registerItem(registry, new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
+    itemNaniteBeacon = registerItem(registry, new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
+    itemNanoChannel = registerItem(registry, new Item(), "itemNanoChannel").setCreativeTab(Femtocraft.tab)
+    itemLogisticsItemChipBasic = registerItem(registry, new ItemLogisticsItemChip(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
+    itemLogisticsFluidChipBasic = registerItem(registry, new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
+    itemLogisticsNaniteChipBasic = registerItem(registry, new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
+    itemMultiTool = registerItem(registry, new ItemMultiTool(), "itemMultiTool")
+    itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest")
+
+    FemtoBlocks.registerItemBlocks(registry)
+
+    itemCallbacks.foreach(_())
+    itemCallbacks.clear()
   }
 
   def init(): Unit = {
@@ -92,15 +115,20 @@ object FemtoItems {
     itemEnergyRegulator.registerModel()
     itemCrystalBattery.registerModel()
     itemNaniteBeacon.registerModel()
+    itemNanoChannel.registerModel()
+    itemLogisticsItemChipBasic.registerModel()
+    itemLogisticsFluidChipBasic.registerModel()
+    itemLogisticsNaniteChipBasic.registerModel()
+    itemMultiTool.registerModel()
   }
 
   def postInit(): Unit = {
 
   }
 
-  def registerItem[T <: Item](item: T, name: String): T = {
+  def registerItem[T <: Item](registry: IForgeRegistry[Item], item: T, name: String): T = {
     item.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase(), name).setUnlocalizedName(name)
-    GameRegistry.register(item)
+    registry.register(item)
     item
   }
 

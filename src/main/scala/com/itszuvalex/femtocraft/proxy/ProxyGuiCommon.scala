@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
 import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNaniteExtractor, TileNanoFurnace}
-import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
-import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
+import com.itszuvalex.femtocraft.logistics.container.{ContainerConduit, ContainerItemRepository}
+import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
@@ -34,6 +34,8 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new ContainerCrystalHeatExchanger(player, player.inventory, te, true)
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new ContainerDemolisher(player, player.inventory, te, true)
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(te, true)
+      case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
+      case (GuiIDs.TileSidedInventoryConfigID, _) => new ContainerSidedInventoryConfig
       case (_, _) => null
     }
   }

@@ -24,27 +24,32 @@ import net.minecraft.world.World
   * Created by Alex on 08.08.2015.
   */
 object BlockCrystalsWorldgen {
-  val DROP_CRYSTALS_MIN = 2
-  val DROP_CRYSTALS_MAX = 7
+  val DROP_CRYSTALS_MIN    = 2
+  val DROP_CRYSTALS_MAX    = 7
   //  Random defaults until some more orderly form of randomly generating crystals exists.
-  val DROP_SMALL_WEIGHT = 10
-  val DROP_MEDIUM_WEIGHT = 5
-  val DROP_LARGE_WEIGHT = 2
+  val DROP_SMALL_WEIGHT    = 10
+  val DROP_MEDIUM_WEIGHT   = 5
+  val DROP_LARGE_WEIGHT    = 2
   val DROP_PASSIVE_GEN_MIN = 0f
   val DROP_PASSIVE_GEN_MAX = 1f
   val DROP_STORAGE_MAX_MIN = 1000L
   val DROP_STORAGE_MAX_MAX = 5000L
-  val DROP_TRANSFER_MIN = 50
-  val DROP_TRANSFER_MAX = 500
-  val DROP_DUST_MIN = 3
-  val DROP_DUST_MAX = 5
+  val DROP_TRANSFER_MIN    = 50
+  val DROP_TRANSFER_MAX    = 500
+  val DROP_DUST_MIN        = 3
+  val DROP_DUST_MAX        = 5
 
   def DROP_TOTAL_WEIGHT = DROP_SMALL_WEIGHT + DROP_MEDIUM_WEIGHT + DROP_LARGE_WEIGHT
 }
 
 class BlockCrystalsWorldgen extends TileContainer(Material.GLASS) {
-  setSoundType(new SoundType(1.0F, 1.0F, FemtoSounds.crystalBreakSound, SoundEvents.BLOCK_GLASS_STEP, FemtoSounds.crystalBreakSound, SoundEvents.BLOCK_GLASS_HIT, SoundEvents.BLOCK_GLASS_FALL))
   setCreativeTab(Femtocraft.tab)
+
+  FemtoSounds.addCallback(addSound)
+
+  def addSound(): Unit = {
+    setSoundType(new SoundType(1.0F, 1.0F, FemtoSounds.crystalBreakSound, SoundEvents.BLOCK_GLASS_STEP, FemtoSounds.crystalBreakSound, SoundEvents.BLOCK_GLASS_HIT, SoundEvents.BLOCK_GLASS_FALL))
+  }
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 

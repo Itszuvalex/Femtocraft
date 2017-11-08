@@ -23,8 +23,9 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNaniteExtractor, TileNanoFurnace}
-import com.itszuvalex.femtocraft.logistics.render.WorkerProviderBeamRenderer
+import com.itszuvalex.femtocraft.logistics.render.{ConduitRenderer, WorkerProviderBeamRenderer}
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
+import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
@@ -86,6 +87,16 @@ class ProxyClient extends ProxyCommon {
     fx
   }
 
+  override def preInit(): Unit = {
+    super.preInit()
+    FemtoItems.itemCallbacks += registerModels
+  }
+
+  override def init(): Unit = {
+    super.init()
+    registerItemRendering()
+  }
+
   override def registerRendering() {
     super.registerRendering()
 
@@ -103,6 +114,7 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalHeatExchanger), 0, classOf[TileCrystalHeatExchanger])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
     ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockConduit), 0, classOf[TileConduit])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
@@ -132,6 +144,8 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalStorageArray], new CrystalStorageArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalHeatExchanger], new CrystalHeatExchangeRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileConduit], new ConduitRenderer)
+
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
@@ -140,17 +154,14 @@ class ProxyClient extends ProxyCommon {
 
     //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileTaskProviderTest], new TestRenderer)
 
-    Minecraft.getMinecraft.getItemColors.registerItemColorHandler(new IItemColor {
-      override def getColorFromItemstack(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
-    }, FemtoItems.itemPowerCrystal)
-
   }
 
+  def registerItemRendering(): Unit = {
 
-  override def init(): Unit = {
-    super.init()
+    Minecraft.getMinecraft.getItemColors.registerItemColorHandler(new IItemColor {
+      override def colorMultiplier(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
+    }, FemtoItems.itemPowerCrystal)
 
-    // ItemPowerCrystal
     val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, new ItemMeshDefinition {
       override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
@@ -162,6 +173,10 @@ class ProxyClient extends ProxyCommon {
       }
     })
 
+  }
+
+  def registerModels(): Unit = {
+    val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
       new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file), "inventory"),
       new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "small"), "inventory"),

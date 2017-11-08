@@ -14,7 +14,7 @@ import net.minecraft.util.EnumFacing
 class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileDemolisher) extends FemtoGuiBase(tile, new ContainerDemolisher(player, inv, tile, false)) {
   GuiTabNetwork.addToGuiTabBar(tabBar, tile)
 
-  fontRendererObj = Minecraft.getMinecraft.fontRendererObj
+  fontRenderer = Minecraft.getMinecraft.fontRenderer
 
   addGuiAndSync(tile.storage, 0, 44, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
@@ -30,7 +30,7 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
   progressBar.colorProgress = color.toInt
   add(progressBar)
 
-  val nameLabel  = new GuiLabel(20, 12, fontRendererObj.getStringWidth("Demolisher"), fontRendererObj.FONT_HEIGHT, () => "Demolisher")
+  val nameLabel  = new GuiLabel(20, 12, fontRenderer.getStringWidth("Demolisher"), fontRenderer.FONT_HEIGHT, () => "Demolisher")
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
 
   val elems = List(nameLabel, powerMeter)

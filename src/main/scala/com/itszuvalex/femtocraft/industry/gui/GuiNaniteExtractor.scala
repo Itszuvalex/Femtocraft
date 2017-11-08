@@ -18,7 +18,7 @@ import net.minecraft.util.EnumFacing
 class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteExtractor) extends FemtoGuiBase(tile, new ContainerNaniteExtractor(player, inv, tile, false)) {
   GuiTabNetwork.addToGuiTabBar(tabBar, tile)
 
-  fontRendererObj = Minecraft.getMinecraft.fontRendererObj
+  fontRenderer = Minecraft.getMinecraft.fontRenderer
   addGuiAndSync(tile.storage, 0, 43, 23)
   addPlayerInventorySlots(inv)
 
@@ -29,7 +29,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   progressBar.colorProgress = color.toInt
   add(progressBar)
 
-  val nameLabel   = new GuiLabel(20, 4, fontRendererObj.getStringWidth("Nanite Extractor"), fontRendererObj.FONT_HEIGHT, () => "Nanite Extractor")
+  val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Extractor"), fontRenderer.FONT_HEIGHT, () => "Nanite Extractor")
   val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   val drainButton = new GuiButton(103, 24, 45, 16, "Drain") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RMR",
+    "CFC",
+    "RMR"
+  ],
+  "key": {
+    "R": {
+      "item": "femtocraft:itemEnergyRegulator"
+    },
+    "C": {
+      "item": "femtocraft:itemBasicCircuit"
+    },
+    "M": {
+      "item": "femtocraft:itemNanoweaveSheet"
+    },
+    "F": {
+      "item": "femtocraft:itemFrame"
+    }
+  },
+  "result": {
+    "item": "femtocraft:blockCrystalChargingArray",
+    "data": 0
+  }
+}

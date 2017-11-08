@@ -30,8 +30,8 @@ class PowerPedestalRenderer extends TileEntityCombinedRenderer[TilePowerPedestal
     renderPedestalAt(null, x, y, z, Color(0, 255.toByte, 255.toByte, 255.toByte))
   }
 
-  override def renderTileEntityInWorld(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+  override def renderTileEntityInWorld(te: TilePowerPedestal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     val color = Option(te.mountLoc).map(_.getTileEntity(false) match {
       case Some(a: ICrystalMount) => a.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
       case _ => Color(0.toByte, 255.toByte, 255.toByte, 255.toByte)

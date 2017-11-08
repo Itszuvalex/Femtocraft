@@ -4,10 +4,11 @@ import java.util
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.api.wrappers.WrapperNBTBattery
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
+import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 
 import scala.collection.JavaConversions._
@@ -34,8 +35,8 @@ object ItemPowerCrystal {
     val cap = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
     tlist += "Crystal Type:" + cap.getType()
     tlist += "Passive Gen:" + cap.getPassiveGen().formatted("%.2f")
-    tlist += "Transfer Rate:" + cap.getTransferRate()
-    tlist += "Power:" + cap.battery.storage.formatted("%.0f") + "/" + cap.battery.maxStorage.formatted("%.0f")
+    tlist += "Transfer Rate:" + cap.getTransferRate().formatted("%,.0f")
+    tlist += "Power:" + cap.battery.storage.formatted("%,.0f") + "/" + cap.battery.maxStorage.formatted("%,.0f")
     //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
   }
 
@@ -109,8 +110,8 @@ class ItemPowerCrystal extends Item {
     }
   }
 
-  override def addInformation(stack: ItemStack, playerIn: EntityPlayer, tooltip: util.List[String], advanced: Boolean): Unit = {
-    super.addInformation(stack, playerIn, tooltip, advanced)
+  override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag) = {
+    super.addInformation(stack, worldIn, tooltip, flagIn)
     ItemPowerCrystal.addInformation(stack, tooltip)
   }
 }

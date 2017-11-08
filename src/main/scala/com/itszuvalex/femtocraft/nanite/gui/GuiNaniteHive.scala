@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.nanite.gui
 
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.util.Color
@@ -51,8 +51,8 @@ import org.lwjgl.opengl.GL11
     */
   protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
     val s = "Small Nanite Hive"
-    fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
-    fontRendererObj.drawString("container.inventory", 30, ySize - 96 + 4, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
+    fontRenderer.drawString(s, xSize / 2 - fontRenderer.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
+    fontRenderer.drawString("container.inventory", 30, ySize - 96 + 4, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
   }
 
   /**

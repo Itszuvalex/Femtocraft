@@ -53,8 +53,8 @@ class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
     FrameRenderer.renderFrameAt(x, y, z, partialTicks, TileFrame.fullRenderIndexes.toSet)
   }
 
-  override def renderTileEntityInWorld(te: TileFrame, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+  override def renderTileEntityInWorld(te: TileFrame, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     FrameRenderer.renderFrameAt(x, y, z, partialTicks, {
       for {
         a <- 0 to 1

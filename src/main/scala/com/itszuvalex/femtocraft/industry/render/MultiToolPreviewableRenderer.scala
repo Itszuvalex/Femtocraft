@@ -20,7 +20,7 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
     stack.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
-        shift.getDestination(player.world, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
+        shift.getDestination(player.world, player, Vector3(vec.x, vec.y, vec.z), 8d) match {
           case Some(a) =>
             val rx = /*player.prevPosX +*/ (player.posX - player.prevPosX) * Minecraft.getMinecraft.getRenderPartialTicks
             val ry = /*player.prevPosY +*/ (player.posY - player.prevPosY) * Minecraft.getMinecraft.getRenderPartialTicks
@@ -52,7 +52,7 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
     stack.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
-        shift.getDestination(player.world, player, Vector3(vec.xCoord, vec.yCoord, vec.zCoord), 8d) match {
+        shift.getDestination(player.world, player, Vector3(vec.x, vec.y, vec.z), 8d) match {
           case Some(a) =>
             GL11.glDisable(GL11.GL_CULL_FACE)
             GL11.glEnable(GL11.GL_BLEND)

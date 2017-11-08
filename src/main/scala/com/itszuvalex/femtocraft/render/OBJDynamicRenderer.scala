@@ -46,8 +46,10 @@ object OBJDynamicRenderer {
             val normal = face.getNormal
             val verts = face.getVertices
             verts.foreach { vert =>
+              val vertU = Option(vert.getTextureCoordinate).map(_.u).getOrElse(0f)
+              val vertV = Option(vert.getTextureCoordinate).map(_.v).getOrElse(0f)
               addVertexUVNormal(vert.getPos3.getX, vert.getPos3.getY, vert.getPos3.getZ,
-                vert.getTextureCoordinate.u, 1d-vert.getTextureCoordinate.v,
+                vertU, 1d - vertV,
                 normal.x, normal.y, normal.z)
             }
           }

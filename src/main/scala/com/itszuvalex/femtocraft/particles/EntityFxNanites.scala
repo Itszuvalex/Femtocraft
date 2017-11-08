@@ -23,7 +23,7 @@ package com.itszuvalex.femtocraft.particles
 import com.itszuvalex.femtocraft.Femtocraft
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.client.renderer.{Tessellator, VertexBuffer}
+import net.minecraft.client.renderer.{BufferBuilder, Tessellator}
 import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
@@ -75,7 +75,7 @@ class EntityFxNanites(args: ParticleArgs) extends
   override def getFXLayer = 3
 
 
-  override def renderParticle(worldRendererIn: VertexBuffer, entityIn: Entity, partialTicks: Float, rotationX: Float, rotationZ: Float, rotationYZ: Float, rotationXY: Float, rotationXZ: Float): Unit = {
+  override def renderParticle(worldRendererIn: BufferBuilder, entityIn: Entity, partialTicks: Float, rotationX: Float, rotationZ: Float, rotationYZ: Float, rotationXY: Float, rotationXZ: Float): Unit = {
     val tessellator = Tessellator.getInstance()
     val vertexbuffer = tessellator.getBuffer
     vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)

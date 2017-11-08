@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
     }
@@ -57,7 +57,7 @@ project.ext {
     massive = "0"
     major = "1"
     minor = "0"
-    mcVersion = "1.11.2"
+    mcVersion = "1.12.2"
 }
 
 version = "${project.ext.mcVersion}-${project.ext.massive}.${project.ext.major}.${project.minor}"
@@ -76,14 +76,22 @@ compileJava {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 }
+compileScala {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.useAnt = false
+}
 
 group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "femtocraft"
 
 minecraft {
-    version = "${project.ext.mcVersion}-13.20.0.2226"
+    version = "${project.ext.mcVersion}-14.23.0.2528"
     runDir = "run"
-    mappings = "snapshot_20161220"
+    mappings = "snapshot_20171003"
 // replacing stuff in the source
     replace '@MASSIVE@', project.massive
     replace '@MAJOR@', project.major
@@ -97,7 +105,7 @@ minecraft {
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-145-dev"
+    def name = "${project.mcVersion}-0.1.0-39457548-dev"
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'deobf')
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'src')
 
@@ -275,6 +283,9 @@ artifactory {
 }
 
 idea {
+    project {
+        languageLevel = '1.8'
+    }
     module {
         inheritOutputDirs = true
     }

@@ -37,10 +37,10 @@ object GuiMultiblockSelection {
                            multi.getRequiredResources.map(i => new GuiItemStack(0, 0, () => false) {
                              override def itemStack = Converter.IItemStackFromItemStack(i)
                            }): _*),
-         new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
-                      (panelHeight - Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT) / 2,
-                      Minecraft.getMinecraft.fontRendererObj.getStringWidth(multi.numFrames.toString),
-                      Minecraft.getMinecraft.fontRendererObj.FONT_HEIGHT,
+         new GuiLabel(panelWidth - 20 - Minecraft.getMinecraft.fontRenderer.getStringWidth(multi.numFrames.toString),
+                      (panelHeight - Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT) / 2,
+                      Minecraft.getMinecraft.fontRenderer.getStringWidth(multi.numFrames.toString),
+                      Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT,
                       multi.numFrames.toString),
          new GuiItemStack(panelWidth - 20, (panelHeight - 18) / 2, () => false) {
            override def itemStack = Converter.IItemStackFromItemStack(new ItemStack(FemtoItems.itemFrame))

@@ -32,7 +32,7 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
   override def GuiID: Int = GuiIDs.TileFrameConstructingGuiID
 
   def frender: FontRenderer = {
-    Minecraft.getMinecraft.fontRendererObj
+    Minecraft.getMinecraft.fontRenderer
   }
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {

@@ -22,29 +22,30 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
 
   def getColor(te: T): Color
 
-  override def renderTileEntityAt(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
+  override def renderTileEntityInWorld(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     lastTe = te
     facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
-    GL11.glColor3f(1f, 1f, 1f)
+    GL11.glColor4f(1f, 1f, 1f, alpha)
     pass = 0
-    super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage)
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     pass = 1
     color = getColor(te)
-    super.renderTileEntityAt(te, x, y, z, partialTicks, destroyStage)
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
   }
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     facing = EnumFacing.SOUTH
+    GL11.glColor4f(1f, 1f, 1f, 1f)
+    pass = 0
     super.renderTileEntityAsItem(x, y, z, partialTicks)
-  }
-
-  override def renderTileEntityInWorld(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage)
+    pass = 1
+    color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
+    super.renderTileEntityAsItem(x, y, z, partialTicks)
   }
 
   override def preFaceRender(facing: EnumFacing): Unit = {
     if (pass == 0) {
-      GL11.glColor3f(1f, 1f, 1f)
+      GL11.glColor4f(1f, 1f, 1f, 1f)
       facing match {
         case EnumFacing.NORTH => bindTexture(frontTex)
         case _ => super.preFaceRender(facing)
@@ -63,7 +64,7 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
   override def postFaceRender(facing: EnumFacing): Unit = {
     super.postFaceRender(facing)
 
-    GL11.glColor3f(1f, 1f, 1f)
+    GL11.glColor4f(1f, 1f, 1f, 1f)
     if (facing == EnumFacing.NORTH) {
       FemtoRenderUtils.enableLightMap(lastTe)
       bindTexture(machineFront)
@@ -73,7 +74,7 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
 
   override def postRender(): Unit = {
     super.postRender()
-    GL11.glColor3f(1f, 1f, 1f)
+    GL11.glColor4f(1f, 1f, 1f, 1f)
     FemtoRenderUtils.enableLightMap(lastTe)
   }
 }

@@ -113,8 +113,8 @@ class PlayerNaniteCapabilitiesOverlay {
     val scale = 3d
     GL11.glPushMatrix()
     GL11.glScaled(1d / scale, 1d / scale, 1d / scale)
-    mc.fontRendererObj.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
-    mc.fontRendererObj.drawSplitString(capabilities.tank.nMols + " nMols", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2 + mc.fontRendererObj.FONT_HEIGHT) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRenderer.drawSplitString(capabilities.tank.volumeFilled + "/" + capabilities.tank.volume + " cm3", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
+    mc.fontRenderer.drawSplitString(capabilities.tank.nMols + " nMols", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2 + mc.fontRenderer.FONT_HEIGHT) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     //    GL11.glScaled(scale, scale, scale)
     GL11.glPopMatrix()
   }

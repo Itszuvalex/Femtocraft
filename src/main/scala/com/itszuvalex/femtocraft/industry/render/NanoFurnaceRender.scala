@@ -9,5 +9,5 @@ import com.itszuvalex.itszulib.util.Color
   * Created by Chris on 8/23/2016.
   */
 class NanoFurnaceRender extends FemtoMachineRender[TileNanoFurnace](Resources.TexBlock("nanofurnace_front.png")) {
-  override def getColor(te: TileNanoFurnace): Color = Option(te).withFilter(_.hasCapability(Capabilities.COLORABLE, null)).map(_.getCapability(Capabilities.COLORABLE, null)).getOrElse(Color(255.toByte, 0.toByte, 0.toByte, 0.toByte))
+  override def getColor(te: TileNanoFurnace): Color = Option(te).map(_.capabilityOption(Capabilities.COLORABLE, null).get).getOrElse(Color(255.toByte, 0.toByte, 0.toByte, 0.toByte))
 }
