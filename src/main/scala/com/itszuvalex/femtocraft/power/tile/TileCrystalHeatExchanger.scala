@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.Burnable
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -36,17 +37,17 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
         c.battery.storage = Math.max(0, c.battery.storage - power)
         val gen = powerPerTick
         battery.storage = Math.min(battery.maxStorage, battery.storage + gen)
-                                                                                                                      }
+      }
 
       burnTime -= 1
     }
 
     if (burnTime <= 0 && battery.storage < battery.maxStorage && storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) {
-      storage(TileCrystalHeatExchanger.FUEL_INDEX).capabilityOption(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null).foreach { f =>
-        burnTime = (f.getBurnTime * TileCrystalHeatExchanger.BURN_TIME_MULTIPLIER).toInt
+      Burnable.getBurnTime(storage(TileCrystalHeatExchanger.FUEL_INDEX).toMinecraft).foreach { f =>
+        burnTime = (f * TileCrystalHeatExchanger.BURN_TIME_MULTIPLIER).toInt
         burnMax = burnTime
         storage.split(TileCrystalHeatExchanger.FUEL_INDEX, 1)
-                                                                                                                                          }
+      }
     }
   }
 
@@ -70,7 +71,7 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
     override def canInsert(i: Int, stack: IItemStack): Boolean = {
       stack.isEmpty || (i match {
         case TileCrystalHeatExchanger.CRYSTAL_INDEX => stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
-        case TileCrystalHeatExchanger.FUEL_INDEX => stack.hasCapability(com.itszuvalex.itszulib.api.Capabilities.ITEM_BURNABLE, null)
+        case TileCrystalHeatExchanger.FUEL_INDEX => Burnable.getBurnTime(stack.toMinecraft).nonEmpty
         case _ => false
       })
     }
