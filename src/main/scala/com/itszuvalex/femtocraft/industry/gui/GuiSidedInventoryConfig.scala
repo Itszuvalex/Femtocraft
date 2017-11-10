@@ -1,11 +1,13 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
-import com.itszuvalex.femtocraft.industry.TileSideConfigurable
 import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfig
+import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.gui.GuiButton
 import net.minecraft.client.gui.Gui
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
@@ -13,20 +15,20 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 1/27/17.
   */
 
-class GuiSidedInventoryConfig(tile: TileSideConfigurable) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig) {
+class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig) {
   override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
 
-  val upButton = new GuiSideConfigButton(26, 10, tile, EnumFacing.UP)
+  val upButton    = new GuiSideConfigButton(26, 10, tile, EnumFacing.UP)
   //upButton.setShouldRender(false)
-  val leftButton = new GuiSideConfigButton(10, 26, tile, EnumFacing.EAST)
+  val leftButton  = new GuiSideConfigButton(10, 26, tile, EnumFacing.EAST)
   //leftButton.setShouldRender(false)
   val frontButton = new GuiSideConfigButton(26, 26, tile, EnumFacing.NORTH)
   //frontButton.setShouldRender(false)
   val rightButton = new GuiSideConfigButton(42, 26, tile, EnumFacing.WEST)
   //rightButton.setShouldRender(false)
-  val downButton = new GuiSideConfigButton(26, 42, tile, EnumFacing.DOWN)
+  val downButton  = new GuiSideConfigButton(26, 42, tile, EnumFacing.DOWN)
   //downButton.setShouldRender(false)
-  val backButton = new GuiSideConfigButton(42, 42, tile, EnumFacing.SOUTH)
+  val backButton  = new GuiSideConfigButton(42, 42, tile, EnumFacing.SOUTH)
   //backButton.setShouldRender(false)
 
   add(upButton, leftButton, frontButton, rightButton, downButton, backButton)
@@ -56,20 +58,18 @@ class GuiSidedInventoryConfig(tile: TileSideConfigurable) extends FemtoGuiBase(t
   }*/
 }
 
-class GuiSideConfigButton(x: Int, y: Int, tile: TileSideConfigurable, face: EnumFacing) extends GuiButton(x, y, 16, 16) {
+class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, face: EnumFacing) extends GuiButton(x, y, 16, 16) {
   private val faceID = face.ordinal()
 
   if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
 
   override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
-    if (!isDisabled && isLocationInside(mouseX, mouseY)) {
+    if (!isDisabled && isLocationInside(mouseX, mouseY) && tile.hasCapability(Capabilities.)) {
       button match {
         case 0 =>
-          tile.faceStates(faceID) += 1
-          if (tile.faceStates(faceID) > tile.maxFaceState) tile.faceStates(faceID) = 0
+          tile.faceStates(faceID) = (tile.faceStates(faceID) + 1) % tile.maxFaceState
         case 1 =>
-          tile.faceStates(faceID) -= 1
-          if (tile.faceStates(faceID) < 0) tile.faceStates(faceID) = tile.maxFaceState
+          tile.faceStates(faceID) = (tile.faceStates(faceID) - 1 + tile.maxFaceState) % tile.maxFaceState
         case 2 => tile.faceStates(faceID) = 0
       }
     }

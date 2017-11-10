@@ -3,21 +3,26 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.DemolishTask._
-import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.{DemolishTask, TASK_NBT}
+import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
+import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
-import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.TileInventory
+import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 
 object TileDemolisher {
   val TICKS_REQ      = 20 * 8
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
+
+  val INPUT_INV_KEY  = "Input"
+  val OUTPUT_INV_KEY = "Output"
+  val NONE_INV_KEY   = "None"
 
   val TASK_NBT = "Task"
 
@@ -54,7 +59,18 @@ object TileDemolisher {
 }
 
 class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNode {
-  private val task: DemolishTask = new TileDemolisher.DemolishTask(IItemStack.Empty)
+  private val task: DemolishTask = new DemolishTask(IItemStack.Empty)
+  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+    case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
+    case _ => NONE_INV_KEY
+  },
+  Map(NONE_INV_KEY -> IItemStorage.Empty,
+    INPUT_INV_KEY -> inputStorage,
+    OUTPUT_INV_KEY -> outputStorage),
+  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
 
   override def connectionRadius: Float = 8f
 
@@ -140,6 +156,22 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
   def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
+
+//  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
+//    case (_, null) => super.getCapability(capability, facing)
+//    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(getStorageForAbsoluteFace(facing)/*sidedStorageConfig.getStorageForGlobalFacing(facing)*/).asInstanceOf[T]
+//    case (cap, _) if cap == Capabilities.ITEM_STORAGE => getStorageForAbsoluteFace(facing)/*sidedStorageConfig.getStorageForGlobalFacing(facing)*/.asInstanceOf[T]
+//    case _ => super.getCapability(capability, facing)
+//  }
+//
+//  private def getStorageForAbsoluteFace(face: EnumFacing): IItemStorage = {
+//    val relFace = FacingUtil.getHorizontalRelativeFacingFromAbsolute(face, frontFace)
+//    faceStates(relFace.getIndex) match {
+//      case 0 => IItemStorage.Empty
+//      case 1 => inputStorage
+//      case 2 => outputStorage
+//    }
+//  }
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     super.deserializeNBT(nbt)
