@@ -1,19 +1,42 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfig
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.gui.GuiButton
+import com.itszuvalex.itszulib.render.RenderUtils._
+import com.itszuvalex.itszulib.util.Color
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
+import scala.collection.mutable.ListBuffer
+
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/27/17.
   */
+object GuiSidedInventoryConfig {
+  val FRONT_TEX_BASE       = Resources.TexBlock("blockmachineblock_front_base.png")
+  val FRONT_TEX_COLOR      = Resources.TexBlock("blockmachineblock_front_color.png")
+  //  val SIDE_TEX_BASE        = Resources.TexBlock("blockmachineblock_side_base.png")
+  //  val SIDE_TEX_COLOR       = Resources.TexBlock("blockmachineblock_side_color.png")
+  val SIDE_TEX_EMPTY       = Resources.TexBlock("blockmachineblock_side_empty.png")
+  val SIDE_TEX_EMPTY_LIGHT = Resources.TexBlock("blockmachineblock_side_empty_light.png")
+
+  val colors = Array(
+    Color(0.toByte, 0.toByte, 0.toByte, 0.toByte), // Transparent
+    Color(255.toByte, 255.toByte, 0.toByte, 0.toByte), // Red
+    Color(255.toByte, 0.toByte, 255.toByte, 0.toByte), // Green
+    Color(255.toByte, 0.toByte, 0.toByte, 255.toByte), // Blue
+    Color(255.toByte, 255.toByte, 255.toByte, 0.toByte), // Yellow
+    Color(255.toByte, 0.toByte, 255.toByte, 255.toByte), // Teal
+    Color(255.toByte, 255.toByte, 0.toByte, 255.toByte) // Purple
+  )
+}
 
 class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig) {
   override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
@@ -58,22 +81,31 @@ class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new C
   }*/
 }
 
-class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, face: EnumFacing) extends GuiButton(x, y, 16, 16) {
-  private val faceID = face.ordinal()
+class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
+  private val faceID        = face.ordinal()
+  private val customizeable = tile != null && tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+  private val configuration = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
 
-  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
+  //  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
 
   override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
-    if (!isDisabled && isLocationInside(mouseX, mouseY) && tile.hasCapability(Capabilities.)) {
+    if (!isDisabled && isLocationInside(mouseX, mouseY) && customizeable) {
       button match {
         case 0 =>
-          tile.faceStates(faceID) = (tile.faceStates(faceID) + 1) % tile.maxFaceState
+          configuration.cycleRelativeFacingForward(face)
         case 1 =>
-          tile.faceStates(faceID) = (tile.faceStates(faceID) - 1 + tile.maxFaceState) % tile.maxFaceState
-        case 2 => tile.faceStates(faceID) = 0
+          configuration.cycleRelativeFacingBackward(face)
+        case _ =>
       }
     }
     super.onMouseClick(mouseX, mouseY, button)
+  }
+
+  override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
+    if (!isDisabled && customizeable) {
+      tooltip += configuration.getStorageNameForRelativeFacing(face)
+    }
+    super.addTooltip(mouseX, mouseY, tooltip)
   }
 
   override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
@@ -81,10 +113,29 @@ class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, face: EnumFacing) ex
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glDisable(GL11.GL_LIGHTING)
 
-    tile.renderFace(face, screenX, screenY, partialTicks)
+    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY)
+    drawBlock(DefaultVertexFormats.POSITION_TEX) {
+      addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
+      addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
+      addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
+      addVertexUV(screenX, screenY, 0, 0, 0)
+    }
 
-    if (!isDisabled && isMousedOver)
-      Gui.drawRect(screenX, screenY, screenX + panelWidth, screenY + panelHeight, colorHighlight)
+    if (customizeable) {
+      val colorindex = configuration.storages.keySet.toArray.indexOf(configuration.getStorageNameForRelativeFacing(face))
+      val color = GuiSidedInventoryConfig.colors(colorindex % GuiSidedInventoryConfig.colors.length)
+      GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY_LIGHT)
+      drawBlock(DefaultVertexFormats.POSITION_TEX) {
+        addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
+        addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
+        addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
+        addVertexUV(screenX, screenY, 0, 0, 0)
+      }
+
+      if (!isDisabled && isMousedOver)
+        Gui.drawRect(screenX, screenY, screenX + panelWidth, screenY + panelHeight, colorHighlight)
+    }
 
     GL11.glDisable(GL11.GL_BLEND)
   }
