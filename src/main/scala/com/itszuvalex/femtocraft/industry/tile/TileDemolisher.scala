@@ -27,8 +27,8 @@ object TileDemolisher {
   val OUTPUT_INV_KEY = "Output"
   val NONE_INV_KEY   = "None"
 
-  val TASK_NBT         = "Task"
-  val SIDED_CONFIG_NBT = "ItemConfig"
+  val TASK_NBT              = "Task"
+  val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
 
   object DemolishTask {
     val DEMOLISHING_STACK_NBT   = "Demolish"
@@ -177,13 +177,14 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
     super.readFromNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
-    sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(SIDED_CONFIG_NBT))
+    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
+      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
   }
 
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(nbt)
     nbt.setTag(TASK_NBT, task.serializeNBT())
-    nbt.setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
     nbt
   }
 }

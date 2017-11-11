@@ -31,8 +31,8 @@ object TileNanoFurnace {
   val OUTPUT_INV_KEY = "Output"
   val NONE_INV_KEY   = "None"
 
-  val TASK_NBT         = "Task"
-  val SIDED_CONFIG_NBT = "ItemConfig"
+  val TASK_NBT              = "Task"
+  val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
 
   /*
   val FRONT_TEX_BASE = Resources.TexBlock("blockmachineblock_front_base.png")
@@ -197,13 +197,14 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(nbt.asInstanceOf[NBTTagCompound])
     nbt.asInstanceOf[NBTTagCompound].setTag(TASK_NBT, task.serializeNBT())
-    nbt.asInstanceOf[NBTTagCompound].setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.asInstanceOf[NBTTagCompound].setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
     nbt
   }
 
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
     super.readFromNBT(nbt.asInstanceOf[NBTTagCompound])
     task.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(TASK_NBT))
-    sidedStorageConfig.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(SIDED_CONFIG_NBT))
+    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
+      sidedStorageConfig.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(ITEM_SIDED_CONFIG_NBT))
   }
 }

@@ -6,6 +6,8 @@ import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfi
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageSidedInventoryConfigChange
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
+import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.gui.GuiButton
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.util.Color
@@ -14,6 +16,7 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
+import net.minecraftforge.items.CapabilityItemHandler
 import org.lwjgl.opengl.GL11
 
 import scala.collection.mutable.ListBuffer
@@ -25,7 +28,7 @@ object GuiSidedInventoryConfig {
   val FRONT_TEX_BASE       = Resources.TexBlock("blockmachineblock_front_base.png")
   val FRONT_TEX_COLOR      = Resources.TexBlock("blockmachineblock_front_color.png")
   //  val SIDE_TEX_BASE        = Resources.TexBlock("blockmachineblock_side_base.png")
-  //  val SIDE_TEX_COLOR       = Resources.TexBlock("blockmachineblock_side_color.png")
+  val SIDE_TEX_COLOR       = Resources.TexBlock("blockmachineblock_side_color.png")
   val SIDE_TEX_EMPTY       = Resources.TexBlock("blockmachineblock_side_empty.png")
   val SIDE_TEX_EMPTY_LIGHT = Resources.TexBlock("blockmachineblock_side_empty_light.png")
 
@@ -104,7 +107,16 @@ class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing
   }
 
   override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
+    tooltip += face.getName
     if (!isDisabled && customizeable) {
+      val loc = new Loc4(tile)
+      val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
+      val offsetLoc = loc.getOffset(offset)
+      val te = offsetLoc.getTileEntity(false)
+      if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
+        tooltip += Option(te.get.getDisplayName).map(_.getFormattedText).getOrElse("unknown")
+      }
+
       tooltip += configuration.getStorageNameForRelativeFacing(face)
     }
     super.addTooltip(mouseX, mouseY, tooltip)
@@ -124,7 +136,7 @@ class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing
     }
 
     if (customizeable) {
-      val colorindex = configuration.storages.keySet.toArray.indexOf(configuration.getStorageNameForRelativeFacing(face))
+      val colorindex = math.max(configuration.storages.keySet.toArray.indexOf(configuration.getStorageNameForRelativeFacing(face)), 0)
       val color = GuiSidedInventoryConfig.colors(colorindex % GuiSidedInventoryConfig.colors.length)
       GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
       Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY_LIGHT)
@@ -133,6 +145,21 @@ class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing
         addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
         addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
         addVertexUV(screenX, screenY, 0, 0, 0)
+      }
+
+      val loc = new Loc4(tile)
+      val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
+      val offsetLoc = loc.getOffset(offset)
+      val te = offsetLoc.getTileEntity(false)
+      if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
+        GL11.glColor4f(1, 1, 1, 1)
+        Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_COLOR)
+        drawBlock(DefaultVertexFormats.POSITION_TEX) {
+          addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
+          addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
+          addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
+          addVertexUV(screenX, screenY, 0, 0, 0)
+        }
       }
 
       if (!isDisabled && isMousedOver)
