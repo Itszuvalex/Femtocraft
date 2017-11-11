@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.industry.gui
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfig
+import com.itszuvalex.femtocraft.network.FemtoPacketHandler
+import com.itszuvalex.femtocraft.network.messages.MessageSidedInventoryConfigChange
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.gui.GuiButton
 import com.itszuvalex.itszulib.render.RenderUtils._
@@ -38,7 +40,7 @@ object GuiSidedInventoryConfig {
   )
 }
 
-class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig) {
+class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig(tile)) {
   override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
 
   val upButton    = new GuiSideConfigButton(26, 10, tile, EnumFacing.UP)
@@ -92,9 +94,9 @@ class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing
     if (!isDisabled && isLocationInside(mouseX, mouseY) && customizeable) {
       button match {
         case 0 =>
-          configuration.cycleRelativeFacingForward(face)
+          FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedInventoryConfigChange(tile, face, forward = true))
         case 1 =>
-          configuration.cycleRelativeFacingBackward(face)
+          FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedInventoryConfigChange(tile, face, forward = false))
         case _ =>
       }
     }

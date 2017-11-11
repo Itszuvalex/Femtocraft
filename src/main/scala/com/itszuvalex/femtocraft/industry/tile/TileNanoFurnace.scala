@@ -194,16 +194,16 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     case _ => super.getCapability(capability, facing)
   }
 
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    super.deserializeNBT(nbt)
-    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
-    sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(SIDED_CONFIG_NBT))
+  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
+    super.writeToNBT(nbt.asInstanceOf[NBTTagCompound])
+    nbt.asInstanceOf[NBTTagCompound].setTag(TASK_NBT, task.serializeNBT())
+    nbt.asInstanceOf[NBTTagCompound].setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt
   }
 
-  override def serializeNBT(): NBTTagCompound = {
-    val ret = super.serializeNBT()
-    ret.setTag(TASK_NBT, task.serializeNBT())
-    ret.setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    ret
+  override def readFromNBT(nbt: NBTTagCompound): Unit = {
+    super.readFromNBT(nbt.asInstanceOf[NBTTagCompound])
+    task.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(TASK_NBT))
+    sidedStorageConfig.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(SIDED_CONFIG_NBT))
   }
 }

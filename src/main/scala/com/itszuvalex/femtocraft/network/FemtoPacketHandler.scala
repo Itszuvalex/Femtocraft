@@ -16,5 +16,6 @@ object FemtoPacketHandler extends PacketHandler(Femtocraft.ID.toLowerCase) {
     register(classOf[MessageNaniteCapabilities], Side.CLIENT)
     register(classOf[MessageDrainNanite], Side.SERVER)
     register(classOf[MessageNaniteTeleport], Side.CLIENT)
+    register(classOf[MessageSidedInventoryConfigChange], Side.SERVER)
   }
 }

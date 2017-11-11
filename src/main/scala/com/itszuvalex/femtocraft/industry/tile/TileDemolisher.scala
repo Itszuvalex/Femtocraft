@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.DemolishTask._
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
@@ -14,6 +15,8 @@ import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.items.CapabilityItemHandler
 
 object TileDemolisher {
   val TICKS_REQ      = 20 * 8
@@ -24,7 +27,8 @@ object TileDemolisher {
   val OUTPUT_INV_KEY = "Output"
   val NONE_INV_KEY   = "None"
 
-  val TASK_NBT = "Task"
+  val TASK_NBT         = "Task"
+  val SIDED_CONFIG_NBT = "ItemConfig"
 
   object DemolishTask {
     val DEMOLISHING_STACK_NBT   = "Demolish"
@@ -59,7 +63,7 @@ object TileDemolisher {
 }
 
 class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNode {
-  private val task: DemolishTask = new DemolishTask(IItemStack.Empty)
+  private val task         : DemolishTask = new DemolishTask(IItemStack.Empty)
   private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
   private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
   private val sidedStorageConfig          = new SidedItemStorageConfiguration({
@@ -157,30 +161,29 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
 
   def getProgressMax = task.adjustedMax(0)
 
-//  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
-//    case (_, null) => super.getCapability(capability, facing)
-//    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(getStorageForAbsoluteFace(facing)/*sidedStorageConfig.getStorageForGlobalFacing(facing)*/).asInstanceOf[T]
-//    case (cap, _) if cap == Capabilities.ITEM_STORAGE => getStorageForAbsoluteFace(facing)/*sidedStorageConfig.getStorageForGlobalFacing(facing)*/.asInstanceOf[T]
-//    case _ => super.getCapability(capability, facing)
-//  }
-//
-//  private def getStorageForAbsoluteFace(face: EnumFacing): IItemStorage = {
-//    val relFace = FacingUtil.getHorizontalRelativeFacingFromAbsolute(face, frontFace)
-//    faceStates(relFace.getIndex) match {
-//      case 0 => IItemStorage.Empty
-//      case 1 => inputStorage
-//      case 2 => outputStorage
-//    }
-//  }
-
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    super.deserializeNBT(nbt)
-    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case _ => super.hasCapability(capability, facing)
   }
 
-  override def serializeNBT(): NBTTagCompound = {
-    val ret = super.serializeNBT()
-    ret.setTag(TASK_NBT, task.serializeNBT())
-    ret
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
+    case (_, null) => super.getCapability(capability, facing)
+    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case _ => super.getCapability(capability, facing)
+  }
+
+  override def readFromNBT(nbt: NBTTagCompound): Unit = {
+    super.readFromNBT(nbt)
+    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
+    sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(SIDED_CONFIG_NBT))
+  }
+
+  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
+    super.writeToNBT(nbt)
+    nbt.setTag(TASK_NBT, task.serializeNBT())
+    nbt.setTag(SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt
   }
 }

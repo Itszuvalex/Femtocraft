@@ -118,14 +118,14 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
 
   def getProgressMax = task.adjustedMax(0)
 
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    super.deserializeNBT(nbt)
+  override def readFromNBT(nbt: NBTTagCompound): Unit = {
+    super.readFromNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
   }
 
-  override def serializeNBT(): NBTTagCompound = {
-    val ret = super.serializeNBT()
-    ret.setTag(TASK_NBT, task.serializeNBT())
-    ret
+  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
+    super.writeToNBT(nbt)
+    nbt.setTag(TASK_NBT, task.serializeNBT())
+    nbt
   }
 }
