@@ -12,6 +12,7 @@ import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapabilities;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
+import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration;
 import com.itszuvalex.itszulib.util.Color;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -58,4 +59,7 @@ public class Capabilities {
 
     @CapabilityInject(IConnectionProvider.class)
     public static Capability<IConnectionProvider> ITEM_CONNECTION_PROVIDER = null;
+
+    @CapabilityInject(SidedItemStorageConfiguration.class)
+    public static Capability<SidedItemStorageConfiguration> ITEM_STORAGE_CONFIGURABLE = null;
 }

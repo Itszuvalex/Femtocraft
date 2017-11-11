@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.industry.TileSideConfigurable
 import com.itszuvalex.femtocraft.industry.gui._
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.gui.{GuiConduit, GuiItemRepository}
@@ -12,6 +11,7 @@ import com.itszuvalex.femtocraft.power.gui._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
@@ -36,7 +36,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new GuiDemolisher(player, player.inventory, te)
       case (GuiIDs.TilePowerNetworkID, te: TileEntityBase) => new GuiPowerNetwork(te)
       case (GuiIDs.TileConduitID, te: TileConduit) => new GuiConduit(player, player.inventory, te)
-      case (GuiIDs.TileSidedInventoryConfigID, te: TileSideConfigurable) => new GuiSidedInventoryConfig(te)
+      case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new GuiSidedInventoryConfig(te)
       case (_, _) => null
     }
   }

@@ -35,7 +35,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new ContainerDemolisher(player, player.inventory, te, true)
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(te, true)
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
-      case (GuiIDs.TileSidedInventoryConfigID, _) => new ContainerSidedInventoryConfig
+      case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new ContainerSidedInventoryConfig(te)
       case (_, _) => null
     }
   }
