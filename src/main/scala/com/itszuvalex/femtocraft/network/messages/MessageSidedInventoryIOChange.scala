@@ -9,7 +9,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
 
-class MessageSidedInventoryConfigChange(var tile: TileEntity, var side: EnumFacing, var forward: Boolean) extends MessageBase[MessageSidedInventoryConfigChange, IMessage] {
+class MessageSidedInventoryIOChange(var tile: TileEntity, var side: EnumFacing, var forward: Boolean) extends MessageBase[MessageSidedInventoryIOChange, IMessage] {
   def loc: Loc4 = new Loc4(tile)
 
   def this() = this(null, null, false)
@@ -35,7 +35,7 @@ class MessageSidedInventoryConfigChange(var tile: TileEntity, var side: EnumFaci
     forward = buf.readBoolean()
   }
 
-  override def onMessage(message: MessageSidedInventoryConfigChange, ctx: MessageContext): IMessage = {
+  override def onMessage(message: MessageSidedInventoryIOChange, ctx: MessageContext): IMessage = {
     if (message.tile == null) return null
     if (!message.tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, message.side)) return null
 
@@ -44,9 +44,9 @@ class MessageSidedInventoryConfigChange(var tile: TileEntity, var side: EnumFaci
 
     ItszuLib.proxy.addScheduledTask(() => {
       if (message.forward)
-        cap.cycleRelativeFacingStorageForward(message.side)
+        cap.cycleRelativeFacingIOForward(message.side)
       else
-        cap.cycleRelativeFacingStorageBackward(message.side)
+        cap.cycleRelativeFacingIOFackward(message.side)
 
       message.tile.markDirty()
     })
