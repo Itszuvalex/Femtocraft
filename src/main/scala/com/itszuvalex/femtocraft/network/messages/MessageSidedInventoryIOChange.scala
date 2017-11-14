@@ -46,7 +46,7 @@ class MessageSidedInventoryIOChange(var tile: TileEntity, var side: EnumFacing, 
       if (message.forward)
         cap.cycleRelativeFacingIOForward(message.side)
       else
-        cap.cycleRelativeFacingIOFackward(message.side)
+        cap.cycleRelativeFacingIOBackward(message.side)
 
       message.tile.markDirty()
     })

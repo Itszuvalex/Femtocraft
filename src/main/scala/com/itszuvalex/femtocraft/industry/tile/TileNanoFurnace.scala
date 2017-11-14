@@ -137,6 +137,23 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
 
   override def getGuiID = GuiIDs.TileFurnaceGuiID
 
+  /**
+    *
+    * @param io
+    *
+    * @return Iterable Pairs of Storages.  First is outside, second is our local.
+    */
+  def getStoragesForIO(io: EnumAutomaticIO): Iterable[(IItemStorage, IItemStorage)] = {
+    val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (getLoc.getOffset(a), a))
+    val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
+    tiles.map { pair =>
+      val inputStorage = if (pair._1.hasCapability(Capabilities.ITEM_STORAGE, pair._2.getOpposite)) pair._1.getCapability(Capabilities.ITEM_STORAGE, pair._2.getOpposite)
+      else if (pair._1.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, pair._2.getOpposite)) Converter.IItemStorageFromIItemHandler(pair._1.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, pair._2.getOpposite))
+      else null
+      (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
+    }.filterNot(_._1 == null)
+  }
+
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
@@ -144,24 +161,10 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     val isTick = ticks == 0
     // Input
     if (isTick) {
-      val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == EnumAutomaticIO.INPUT).map(a => EnumFacing.VALUES(a._2))
-      val storages = facings.map { f =>
-        val te = getLoc.getOffset(FacingUtil.getAbsoluteFacingFromHorizontalRelative(f, sidedStorageConfig.front())).getTileEntity(false)
-        (te.filter(_.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite)).map(a => Converter.IItemStorageFromIItemHandler(a.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite))).orNull, sidedStorageConfig.getStorageForRelativeFacing(f))
-      }.filterNot(_._1 == null)
-      storages.exists { case (i, n) =>
-        i.indices.exists { s =>
-          var ins: IItemStack = null
-          if (!i(s).isEmpty && n.canInsert(0, i(s)) && {
-            ins = i.split(s, 1)
-            !ins.isEmpty
-          }
-          ) {
-            n.insert(0, ins)
-            true
-          } else
-            false
-        }
+      var inputSize = 1
+      getStoragesForIO(EnumAutomaticIO.INPUT).exists { pair =>
+        inputSize = pair._1.transferIntoStorage(pair._2, inputSize)
+        inputSize <= 0
       }
     }
 
@@ -204,24 +207,10 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     }
 
     if (isTick) {
-      val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == EnumAutomaticIO.OUTPUT).map(a => EnumFacing.VALUES(a._2))
-      val storages = facings.map { f =>
-        val te = getLoc.getOffset(FacingUtil.getAbsoluteFacingFromHorizontalRelative(f, sidedStorageConfig.front())).getTileEntity(false)
-        (te.filter(_.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite)).map(a => Converter.IItemStorageFromIItemHandler(a.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, f.getOpposite))).orNull, sidedStorageConfig.getStorageForRelativeFacing(f))
-      }.filterNot(_._1 == null)
-      storages.exists { case (i, n) =>
-        n.indices.exists { s =>
-          var ins: IItemStack = null
-          if (!n(s).isEmpty && i.canInsert(0, n(s)) && {
-            ins = n.split(s, 1)
-            !ins.isEmpty
-          }
-          ) {
-            i.insert(0, ins)
-            true
-          } else
-            false
-        }
+      var outputSize = 1
+      getStoragesForIO(EnumAutomaticIO.OUTPUT).exists { pair =>
+        outputSize = pair._2.transferIntoStorage(pair._1, outputSize)
+        outputSize <= 0
       }
     }
   }
