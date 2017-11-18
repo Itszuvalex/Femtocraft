@@ -10,5 +10,7 @@ import net.minecraft.world.IBlockAccess
   * Created by Christopher on 8/27/2015.
   */
 class BlockCyberwood extends Block(Material.WOOD) {
+  setHardness(2.0f)
+
   override def canSustainLeaves(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = true
 }
