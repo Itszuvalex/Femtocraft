@@ -4,12 +4,13 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
-import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
@@ -33,6 +34,9 @@ object TileNanoFurnace {
 
   val TASK_NBT              = "Task"
   val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
+  val TICKS_NBT             = "Ticks"
+
+  val TICKS_FOR_AUTOIO = 20
 
   /*
   val FRONT_TEX_BASE = Resources.TexBlock("blockmachineblock_front_base.png")
@@ -89,6 +93,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     INPUT_INV_KEY -> inputStorage,
     OUTPUT_INV_KEY -> outputStorage),
   () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  var ticks = 0
 
   override def connectionRadius: Float = 8f
 
@@ -134,6 +139,18 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
+
+    ticks = (ticks - 1 + TileNanoFurnace.TICKS_FOR_AUTOIO) % TileNanoFurnace.TICKS_FOR_AUTOIO
+    val isTick = ticks == 0
+    // Input
+    if (isTick) {
+      var inputSize = 1
+      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.INPUT).exists { pair =>
+        inputSize = pair._1.transferIntoStorage(pair._2, inputSize)
+        inputSize <= 0
+      }
+    }
+
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty) {
@@ -171,6 +188,14 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
           task.reset()
       }
     }
+
+    if (isTick) {
+      var outputSize = 1
+      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.OUTPUT).exists { pair =>
+        outputSize = pair._2.transferIntoStorage(pair._1, outputSize)
+        outputSize <= 0
+      }
+    }
   }
 
   def setProgress(progress: Double): Unit = {
@@ -198,6 +223,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     super.writeToNBT(nbt.asInstanceOf[NBTTagCompound])
     nbt.asInstanceOf[NBTTagCompound].setTag(TASK_NBT, task.serializeNBT())
     nbt.asInstanceOf[NBTTagCompound].setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.asInstanceOf[NBTTagCompound].setInteger(TICKS_NBT, ticks)
     nbt
   }
 
@@ -206,5 +232,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
     task.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(TASK_NBT))
     if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    ticks = nbt.asInstanceOf[NBTTagCompound].getInteger(TICKS_NBT)
   }
 }
