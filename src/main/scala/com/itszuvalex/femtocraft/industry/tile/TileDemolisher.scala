@@ -5,12 +5,13 @@ import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.DemolishTask._
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
-import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -29,6 +30,7 @@ object TileDemolisher {
 
   val TASK_NBT              = "Task"
   val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
+  val TICKS_NBT             = "Ticks"
 
   object DemolishTask {
     val DEMOLISHING_STACK_NBT   = "Demolish"
@@ -75,6 +77,7 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     INPUT_INV_KEY -> inputStorage,
     OUTPUT_INV_KEY -> outputStorage),
   () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  var ticks = 0
 
   override def connectionRadius: Float = 8f
 
@@ -114,6 +117,18 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
+
+    ticks = (ticks - 1 + TileNanoFurnace.TICKS_FOR_AUTOIO) % TileNanoFurnace.TICKS_FOR_AUTOIO
+    val isTick = ticks == 0
+    // Input
+    if (isTick) {
+      var inputSize = 1
+      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.INPUT).exists { pair =>
+        inputSize = pair._1.transferIntoStorage(pair._2, inputSize)
+        inputSize <= 0
+      }
+    }
+
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty && DustRecipeRegistry.getDust(item.toMinecraft).isDefined) {
@@ -151,6 +166,14 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
           task.reset()
       }
     }
+
+    if (isTick) {
+      var outputSize = 1
+      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.OUTPUT).exists { pair =>
+        outputSize = pair._2.transferIntoStorage(pair._1, outputSize)
+        outputSize <= 0
+      }
+    }
   }
 
   def setProgress(progress: Double): Unit = {
@@ -179,12 +202,14 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
     if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    ticks = nbt.asInstanceOf[NBTTagCompound].getInteger(TICKS_NBT)
   }
 
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(nbt)
     nbt.setTag(TASK_NBT, task.serializeNBT())
     nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setInteger(TICKS_NBT, ticks)
     nbt
   }
 }

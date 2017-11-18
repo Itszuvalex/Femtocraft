@@ -173,6 +173,7 @@ class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing
     }
 
     GL11.glDisable(GL11.GL_BLEND)
+    GL11.glColor4f(1, 1, 1, 1)
   }
 }
 
@@ -247,5 +248,6 @@ class GuiSideIOButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) ex
     }
 
     GL11.glDisable(GL11.GL_BLEND)
+    GL11.glColor4f(1, 1, 1, 1)
   }
 }
