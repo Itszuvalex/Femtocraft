@@ -123,6 +123,7 @@ object FemtoItems {
     itemLogisticsFluidChipBasic.registerModel()
     itemLogisticsNaniteChipBasic.registerModel()
     itemMultiTool.registerModel()
+    itemShiftTest.registerModel()
     itemNanoLash.registerModel()
   }
 

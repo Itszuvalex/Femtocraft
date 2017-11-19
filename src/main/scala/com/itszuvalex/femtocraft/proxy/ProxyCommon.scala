@@ -20,18 +20,21 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}
+import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.Item
+import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.fml.common.registry.{EntityRegistry, GameRegistry}
 
 object ProxyCommon {
   val PARTICLE_NANITE = "nanites"
@@ -40,6 +43,7 @@ object ProxyCommon {
 
 class ProxyCommon {
   def preInit(): Unit = {
+    EntityRegistry.registerModEntity(new ResourceLocation(Femtocraft.ID.toLowerCase(), "entityNanoLash"), classOf[EntityNanoLash], "entityNanoLash", 0, Femtocraft, 30, 1, false)
   }
 
   def init(): Unit = {

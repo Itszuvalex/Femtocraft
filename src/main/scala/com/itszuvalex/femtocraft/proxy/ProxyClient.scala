@@ -26,6 +26,7 @@ import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileN
 import com.itszuvalex.femtocraft.logistics.render.{ConduitRenderer, WorkerProviderBeamRenderer}
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
+import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
@@ -44,13 +45,14 @@ import net.minecraft.client.particle.Particle
 import net.minecraft.client.renderer.ItemMeshDefinition
 import net.minecraft.client.renderer.block.model.{ModelBakery, ModelResourceLocation}
 import net.minecraft.client.renderer.color.IItemColor
+import net.minecraft.client.renderer.entity.{RenderManager, RenderSnowball}
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.obj.OBJLoader
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.client.registry.ClientRegistry
+import net.minecraftforge.fml.client.registry.{ClientRegistry, IRenderFactory, RenderingRegistry}
 
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
@@ -90,6 +92,9 @@ class ProxyClient extends ProxyCommon {
   override def preInit(): Unit = {
     super.preInit()
     FemtoItems.itemCallbacks += registerModels
+    RenderingRegistry.registerEntityRenderingHandler(classOf[EntityNanoLash], new IRenderFactory[EntityNanoLash] {
+      override def createRenderFor(manager: RenderManager) = new RenderSnowball[EntityNanoLash](manager, FemtoItems.itemShiftTest, Minecraft.getMinecraft.getRenderItem)
+    })
   }
 
   override def init(): Unit = {

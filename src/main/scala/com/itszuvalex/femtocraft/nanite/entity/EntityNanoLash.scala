@@ -8,10 +8,12 @@ import net.minecraft.util.DamageSource
 import net.minecraft.util.math.RayTraceResult
 import net.minecraft.world.World
 
-class EntityNanoLash(world: World, thrower: EntityLivingBase) extends EntityThrowable(world, thrower) {
-  var valid = true
-
-  def this(world: World) = this(world, null)
+class EntityNanoLash(world: World) extends EntityThrowable(world) {
+  def this(world: World, throwerIn: EntityLivingBase) = {
+    this(world)
+    setPosition(throwerIn.posX, throwerIn.posY + throwerIn.getEyeHeight - 0.10000000149011612D, throwerIn.posZ)
+    thrower = throwerIn
+  }
 
   def this(worldIn: World, x: Double, y: Double, z: Double) = {
     this(worldIn)
@@ -20,7 +22,7 @@ class EntityNanoLash(world: World, thrower: EntityLivingBase) extends EntityThro
 
   override def onImpact(result: RayTraceResult): Unit = {
     result.typeOfHit match {
-      case RayTraceResult.Type.ENTITY if result.entityHit != thrower && thrower != null && result.entityHit != null && valid =>
+      case RayTraceResult.Type.ENTITY if result.entityHit != thrower && thrower != null && result.entityHit != null =>
         result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, thrower), 0.0F)
         if (!world.isRemote) {
           val throwerPos = Vector3(thrower.posX, thrower.posY, thrower.posZ)
@@ -29,7 +31,7 @@ class EntityNanoLash(world: World, thrower: EntityLivingBase) extends EntityThro
           val duration = 1.5f
           dirVec /= duration
           dirVec /= 2f
-          dirVec.y = Math.min(dirVec.y, 1.0)
+          dirVec.y = Math.min(Math.abs(dirVec.y), 1.0) * Math.signum(dirVec.y)
           //          dirVec.y += .5
           result.entityHit.addVelocity(dirVec.x, dirVec.y, dirVec.z)
           setDead()
@@ -45,13 +47,12 @@ class EntityNanoLash(world: World, thrower: EntityLivingBase) extends EntityThro
     val entitylivingbase = getThrower
     if (entitylivingbase != null && entitylivingbase.isInstanceOf[EntityPlayer] && !entitylivingbase.isEntityAlive) {
       setDead()
-      valid = false
     }
     else super.onUpdate()
   }
 
   override def changeDimension(dimensionIn: Int): Entity = {
-    if (thrower.dimension != dimensionIn) valid = false
+    if (thrower.dimension != dimensionIn) thrower = null
     super.changeDimension(dimensionIn)
   }
 }
