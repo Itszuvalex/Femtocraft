@@ -228,9 +228,6 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
       }
 
       // We tried to transfer as much as we could.  Clear our amount
-      // We won't busy wait like we do for input.
-      // Input busy-wait essentially is a onTick replacement to pull the initial itemstack into itself
-      // We don't need to do that here.
       flopsToGo = flopsRequired
     }
   }

@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.cyber.item.ItemDumbDust
 import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.logistics.item.ItemLogisticsItemChip
+import com.itszuvalex.femtocraft.nanite.items.ItemNanolash
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
 import net.minecraftforge.event.RegistryEvent
@@ -51,6 +52,7 @@ object FemtoItems {
 
   var itemMultiTool: Item = _
   var itemShiftTest: Item = _
+  var itemNanoLash : Item = _
 
   val itemCallbacks = new ArrayBuffer[() => Unit]()
 
@@ -85,11 +87,12 @@ object FemtoItems {
     itemLogisticsFluidChipBasic = registerItem(registry, new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsNaniteChipBasic = registerItem(registry, new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
     itemMultiTool = registerItem(registry, new ItemMultiTool(), "itemMultiTool")
-    itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest")
+    itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest").setCreativeTab(Femtocraft.tab)
+    itemNanoLash = registerItem(registry, new ItemNanolash(), "itemNanoLash").setCreativeTab(Femtocraft.tab)
 
     FemtoBlocks.registerItemBlocks(registry)
 
-    itemCallbacks.foreach(_())
+    itemCallbacks.foreach(_ ())
     itemCallbacks.clear()
   }
 
@@ -120,6 +123,7 @@ object FemtoItems {
     itemLogisticsFluidChipBasic.registerModel()
     itemLogisticsNaniteChipBasic.registerModel()
     itemMultiTool.registerModel()
+    itemNanoLash.registerModel()
   }
 
   def postInit(): Unit = {
