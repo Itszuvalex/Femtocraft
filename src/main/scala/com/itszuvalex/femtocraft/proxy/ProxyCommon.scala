@@ -28,6 +28,7 @@ import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.tile._
+import com.itszuvalex.femtocraft.worldgen.WorldgenEventHandler
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import net.minecraft.block.Block
 import net.minecraft.item.Item
@@ -91,6 +92,7 @@ class ProxyCommon {
 
   def registerEventHandlers(): Unit = {
     MinecraftForge.EVENT_BUS.register(new PlayerEventHandler)
+    MinecraftForge.EVENT_BUS.register(new WorldgenEventHandler)
   }
 
   def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double = 0d, velY: Double = 0d, velZ: Double = 0d): Object = {

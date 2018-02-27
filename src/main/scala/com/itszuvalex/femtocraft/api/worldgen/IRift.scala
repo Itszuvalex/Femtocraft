@@ -8,5 +8,6 @@ trait IRift extends INBTSerializable[NBTTagCompound] {
 
   def location: Loc4
 
-  def displacedBlocks: IDisplacedBlocks
+  def traits: Iterable[IRiftTrait]
+
 }

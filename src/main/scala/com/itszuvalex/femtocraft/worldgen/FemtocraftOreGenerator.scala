@@ -3,10 +3,11 @@ package com.itszuvalex.femtocraft.worldgen
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
+import com.itszuvalex.femtocraft.api.worldgen.RiftTraitRegistry
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
 import com.itszuvalex.itszulib.api.core
-import com.itszuvalex.itszulib.api.core.Configurable
+import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import net.minecraft.init.Blocks
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -78,7 +79,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
     val dist = random.nextInt(distMax - distMin + 1) + distMin
     val cryst = random.nextInt(crystMax - crystMin + 1) + crystMin
 
-    //Replace in sphere
+    //Replace in cylinder
     {
       for {
         lx <- (x - dist) to (x + dist)
@@ -109,5 +110,13 @@ import net.minecraftforge.fml.common.IWorldGenerator
       while (world.getBlockState(new BlockPos(cx, cy, cz)).getBlock == Blocks.BEDROCK) cy += 1
       world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
     }
+
+    // add rift
+    val rift = new Rift(new Loc4(x, y, z, world.provider.getDimension))
+    rift.addTraits(RiftTraitRegistry.generateTraits(random))
+
+    //    I'm not sure of lifetime.  I think we probably need this, but....
+    // Also sidedness between client/server and interaction with my loc trackers versus a chunk->iterable[irift] map needs investigation
+    //    FemtocraftRiftTracker.registerRift(rift)
   }
 }
