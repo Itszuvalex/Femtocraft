@@ -7,8 +7,11 @@ import net.minecraft.nbt.{NBTTagCompound, NBTTagList, NBTTagString}
 import scala.collection.mutable
 
 object Rift {
-  val LocNbtTag    = "Loc"
-  val TraitsNbtTag = "Traits"
+  val LocNbtTag        = "Loc"
+  val TraitsNbtTag     = "Traits"
+  val defaultStability = 20
+  val maxStability     = 100
+  val minStability     = 0
 }
 
 class Rift(var loc: Loc4) extends IRift {
@@ -31,12 +34,12 @@ class Rift(var loc: Loc4) extends IRift {
     val nbt = new NBTTagCompound
     nbt.setTag(Rift.LocNbtTag, loc.serializeNBT())
     val traits = new NBTTagList
-    riftTraits.foreach { t =>
-      traits.appendTag(new NBTTagString(t.name))
-                       }
+    riftTraits.map(_.name).map(new NBTTagString(_)).foreach(traits.appendTag)
     nbt.setTag(Rift.TraitsNbtTag, traits)
     nbt
   }
 
   override def traits: Iterable[IRiftTrait] = riftTraits
+
+  override def stability: Int = Math.max(Rift.minStability, Math.min(Rift.maxStability, riftTraits.foldLeft(Rift.defaultStability)(_ + _.stabilityModifier)))
 }

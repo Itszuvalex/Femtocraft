@@ -9,4 +9,6 @@ trait IRiftTrait {
   def harvests: Map[ItemStack, Int]
 
   def genChance: Float
+
+  def stabilityModifier: Int
 }

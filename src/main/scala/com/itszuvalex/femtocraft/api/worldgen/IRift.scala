@@ -10,4 +10,6 @@ trait IRift extends INBTSerializable[NBTTagCompound] {
 
   def traits: Iterable[IRiftTrait]
 
+  def stability: Int
+
 }
