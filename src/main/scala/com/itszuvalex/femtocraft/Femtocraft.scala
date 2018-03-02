@@ -10,7 +10,7 @@ import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapability
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
-import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
+import com.itszuvalex.femtocraft.worldgen.{FemtocraftOreGenerator, FemtocraftRiftTracker}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraftforge.common.MinecraftForge
@@ -67,6 +67,7 @@ object Femtocraft {
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     PowerManager.init()
+    FemtocraftRiftTracker.init()
     LogisticsResourceRegistry.init()
     proxy.init()
   }

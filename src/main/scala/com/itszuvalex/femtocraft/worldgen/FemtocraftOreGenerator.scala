@@ -118,10 +118,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
       val rift = new Rift(new Loc4(x, y, z, world.provider.getDimension))
       rift.addTraits(RiftTraitRegistry.generateTraits(random))
       chunkRiftCapability.addRift(rift)
+      FemtocraftRiftTracker.registerRift(rift)
     }
-
-    //    I'm not sure of lifetime.  I think we probably need this, but....
-    // Also sidedness between client/server and interaction with my loc trackers versus a chunk->iterable[irift] map needs investigation
-    //    FemtocraftRiftTracker.registerRift(rift)
   }
 }

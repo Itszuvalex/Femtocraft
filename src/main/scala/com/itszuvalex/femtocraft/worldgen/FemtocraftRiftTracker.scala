@@ -1,15 +1,36 @@
 package com.itszuvalex.femtocraft.worldgen
 
+import com.itszuvalex.femtocraft.api.worldgen.IRift
 import com.itszuvalex.itszulib.logistics.LocationTracker
+import com.itszuvalex.itszulib.util.Debug
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.logging.log4j.Level
 
 object FemtocraftRiftTracker {
   private val riftLocs = new LocationTracker
 
-  def registerRift(rift: Rift): Unit = {
-      riftLocs.trackLocation(rift.loc)
+  def init(): Unit = {
+    MinecraftForge.EVENT_BUS.register(this)
   }
 
-  def deregisterRift(rift: Rift): Unit = {
-    riftLocs.removeLocation(rift.loc)
+  def registerRift(rift: IRift): Unit = {
+    riftLocs.trackLocation(rift.location)
+    Debug.log(Level.INFO, s"Adding Rift at Loc: ${rift.location}")
+  }
+
+  def deregisterRift(rift: IRift): Unit = {
+    riftLocs.removeLocation(rift.location)
+    Debug.log(Level.INFO, s"Removing Rift at Loc: ${rift.location}")
+  }
+
+  @SubscribeEvent def onWorldUnload(worldEvent: WorldEvent.Unload): Unit = {
+    val server = FMLCommonHandler.instance().getMinecraftServerInstance
+    if (server == null || !server.isServerRunning) {
+      Debug.log(Level.INFO, s"Removing Rifts due to server stopping.")
+      riftLocs.clear()
+    }
   }
 }
