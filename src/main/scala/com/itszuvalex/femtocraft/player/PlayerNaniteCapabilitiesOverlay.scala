@@ -43,10 +43,10 @@ object PlayerNaniteCapabilitiesOverlay {
 class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
-  var naniteCapabilities: IPlayerNaniteCapabilities = _
-  var player            : EntityPlayer              = _
+  var naniteCapabilities: IPlayerNaniteCapability = _
+  var player            : EntityPlayer            = _
 
-  def capabilities: IPlayerNaniteCapabilities = {
+  def capabilities: IPlayerNaniteCapability = {
     if (player != Minecraft.getMinecraft.player) {
       val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
       if (caps != naniteCapabilities)

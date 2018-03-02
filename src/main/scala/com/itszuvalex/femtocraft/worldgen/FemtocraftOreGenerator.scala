@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.worldgen
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.worldgen.RiftTraitRegistry
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
@@ -99,7 +100,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
             world.setBlockState(new BlockPos(lx, ly, lz), rblock.getStateFromMeta(rmeta), 3)
           case None =>
         }
-      }
+               }
 
     //Sprinkle in crystals
     (0 until cryst).foreach { n =>
@@ -109,11 +110,15 @@ import net.minecraftforge.fml.common.IWorldGenerator
       while (cy > 1 && world.isAirBlock(new BlockPos(cx, cy - 1, cz))) cy -= 1
       while (world.getBlockState(new BlockPos(cx, cy, cz)).getBlock == Blocks.BEDROCK) cy += 1
       world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
-    }
+                            }
 
     // add rift
-    val rift = new Rift(new Loc4(x, y, z, world.provider.getDimension))
-    rift.addTraits(RiftTraitRegistry.generateTraits(random))
+    val chunkRiftCapability = world.getChunkFromBlockCoords(new BlockPos(x, y, z)).getCapability(Capabilities.CHUNK_RIFT_CAPABILITY, null)
+    if (chunkRiftCapability != null) {
+      val rift = new Rift(new Loc4(x, y, z, world.provider.getDimension))
+      rift.addTraits(RiftTraitRegistry.generateTraits(random))
+      chunkRiftCapability.addRift(rift)
+    }
 
     //    I'm not sure of lifetime.  I think we probably need this, but....
     // Also sidedness between client/server and interaction with my loc trackers versus a chunk->iterable[irift] map needs investigation

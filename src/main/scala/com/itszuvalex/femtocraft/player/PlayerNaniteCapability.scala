@@ -17,23 +17,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 /**
   * Created by Chris on 8/21/2016.
   */
-object PlayerNaniteCapabilities {
+object PlayerNaniteCapability {
   val tankVolume = 100
 
   def register(): Unit = {
-    CapabilityManager.INSTANCE.register(classOf[IPlayerNaniteCapabilities], new PlayerNaniteCapabilitiesStorage, classOf[PlayerNaniteCapabilities])
+    CapabilityManager.INSTANCE.register(classOf[IPlayerNaniteCapability], new PlayerNaniteCapabilitiesStorage, classOf[PlayerNaniteCapability])
     MinecraftForge.EVENT_BUS.register(this)
   }
 
-  class PlayerNaniteCapabilitiesStorage extends Capability.IStorage[IPlayerNaniteCapabilities] {
-    override def writeNBT(capability: Capability[IPlayerNaniteCapabilities], instance: IPlayerNaniteCapabilities, side: EnumFacing): NBTBase = {
+  class PlayerNaniteCapabilitiesStorage extends Capability.IStorage[IPlayerNaniteCapability] {
+    override def writeNBT(capability: Capability[IPlayerNaniteCapability], instance: IPlayerNaniteCapability, side: EnumFacing): NBTBase = {
       instance match {
         case i: ICapabilitySerializable[NBTTagCompound] => i.serializeNBT()
         case _ => null
       }
     }
 
-    override def readNBT(capability: Capability[IPlayerNaniteCapabilities], instance: IPlayerNaniteCapabilities, side: EnumFacing, nbt: NBTBase): Unit = {
+    override def readNBT(capability: Capability[IPlayerNaniteCapability], instance: IPlayerNaniteCapability, side: EnumFacing, nbt: NBTBase): Unit = {
       instance match {
         case i: ICapabilitySerializable[NBTTagCompound] => i.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
         case _ =>
@@ -45,16 +45,16 @@ object PlayerNaniteCapabilities {
   def attachCapability(event: AttachCapabilitiesEvent[Entity]): Unit = {
     event.getObject match {
       case player: EntityPlayer =>
-        event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapabilities(player))
+        event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapability(player))
       case _ =>
     }
   }
 }
 
-class PlayerNaniteCapabilities(player: EntityPlayer) extends IPlayerNaniteCapabilities with ICapabilitySerializable[NBTTagCompound] {
+class PlayerNaniteCapability(player: EntityPlayer) extends IPlayerNaniteCapability with ICapabilitySerializable[NBTTagCompound] {
   def this() = this(null)
 
-  private val _tank = new NaniteTank(PlayerNaniteCapabilities.tankVolume)
+  private val _tank = new NaniteTank(PlayerNaniteCapability.tankVolume)
 
   override def tank = _tank
 

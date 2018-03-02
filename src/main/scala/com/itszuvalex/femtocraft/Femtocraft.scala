@@ -3,10 +3,11 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.api.ManagerCapabilities
 import com.itszuvalex.femtocraft.api.logistics.LogisticsResourceRegistry
 import com.itszuvalex.femtocraft.api.nanite.NaniteRegistry
+import com.itszuvalex.femtocraft.api.worldgen.ChunkRiftCapability
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
-import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilities
+import com.itszuvalex.femtocraft.player.PlayerNaniteCapability
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
@@ -35,10 +36,10 @@ object Femtocraft {
     override def getTabIconItem: ItemStack = new ItemStack(Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall))
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
-    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy   : ProxyCommon    = _
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
-    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
   var guiProxy: ProxyGuiCommon = _
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
@@ -53,7 +54,8 @@ object Femtocraft {
     FemtoPacketHandler.preInit()
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
-    PlayerNaniteCapabilities.register()
+    PlayerNaniteCapability.register()
+    ChunkRiftCapability.register()
     ManagerCapabilities.register()
     proxy.preInit()
   }

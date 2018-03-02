@@ -15,10 +15,14 @@ object Rift {
 }
 
 class Rift(var loc: Loc4) extends IRift {
-  private val riftTraits = mutable.ArrayBuffer[IRiftTrait]()
+  private val riftTraits = mutable.Set[IRiftTrait]()
 
   def addTraits(traits: Iterable[IRiftTrait]): Unit = {
-    riftTraits ++= traits.filterNot(riftTraits.contains)
+    riftTraits ++= traits
+  }
+
+  def removeTraits(traits: Iterable[IRiftTrait]): Unit = {
+    riftTraits --= traits
   }
 
   override def location: Loc4 = loc
