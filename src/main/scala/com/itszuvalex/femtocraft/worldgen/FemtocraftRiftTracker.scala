@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 
 object FemtocraftRiftTracker {
-  private val riftLocs = new LocationTracker
+  val riftLocs = new LocationTracker
 
   def init(): Unit = {
     MinecraftForge.EVENT_BUS.register(this)
