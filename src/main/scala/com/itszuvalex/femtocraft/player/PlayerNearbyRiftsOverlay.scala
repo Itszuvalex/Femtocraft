@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.player
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.worldgen.IRift
-import com.itszuvalex.femtocraft.worldgen.FemtocraftRiftTracker
+import com.itszuvalex.femtocraft.worldgen.{FemtocraftRiftTracker, Rift}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.gui.{GuiFlowLayout, GuiLabel}
 import net.minecraft.client.Minecraft
@@ -65,13 +65,19 @@ class PlayerNearbyRiftsOverlay {
     rifts.foreach { rift =>
       val traits = rift.traits
       val riftLayout = new GuiFlowLayout(0, 0, width, (traits.size + 1) * mc.fontRenderer.FONT_HEIGHT)
+      val stability = rift.stability
+      val stabilityColor = stability match {
+        case _ if stability >= (Rift.maxStability * 2f) / 3f => TextFormatting.GREEN
+        case _ if stability >= Rift.maxStability / 3f => TextFormatting.YELLOW
+        case _ => TextFormatting.RED
+      }
       val distance = getPlayerLoc.dist(rift.location)
-      val color = distance match {
+      val distColor = distance match {
         case _ if distance <= PlayerNearbyRiftsOverlay.range / 3f => TextFormatting.GREEN
         case _ if distance <= (2f * PlayerNearbyRiftsOverlay.range) / 3f => TextFormatting.BLUE
         case _ => TextFormatting.RED
       }
-      val riftText = new GuiLabel(0, 0, width, mc.fontRenderer.FONT_HEIGHT, () => f"Rift: $color$distance%.2f${TextFormatting.RESET}m", scale)
+      val riftText = new GuiLabel(0, 0, width, mc.fontRenderer.FONT_HEIGHT, () => f"Rift($stabilityColor$stability${TextFormatting.RESET}): $distColor$distance%.2f${TextFormatting.RESET}m", scale)
       riftLayout.add(riftText)
       traits.foreach { riftTrait =>
         val riftTraitText = new GuiLabel(0, 0, width, mc.fontRenderer.FONT_HEIGHT, () => s"\t${riftTrait.name}", scale)

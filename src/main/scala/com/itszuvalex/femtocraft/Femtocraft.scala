@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.api.ManagerCapabilities
 import com.itszuvalex.femtocraft.api.logistics.LogisticsResourceRegistry
 import com.itszuvalex.femtocraft.api.nanite.NaniteRegistry
-import com.itszuvalex.femtocraft.api.worldgen.ChunkRiftCapability
+import com.itszuvalex.femtocraft.api.worldgen.{ChunkRiftCapability, RiftTraitRegistry}
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
@@ -69,6 +69,7 @@ object Femtocraft {
     PowerManager.init()
     FemtocraftRiftTracker.init()
     LogisticsResourceRegistry.init()
+    RiftTraitRegistry.init()
     proxy.init()
   }
 
