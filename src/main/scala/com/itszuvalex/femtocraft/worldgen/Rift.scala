@@ -30,7 +30,7 @@ class Rift(var loc: Loc4) extends IRift {
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     loc = Loc4(nbt.getCompoundTag(Rift.LocNbtTag))
     riftTraits.clear()
-    val traits = nbt.getTagList(Rift.TraitsNbtTag, 10)
+    val traits = nbt.getTagList(Rift.TraitsNbtTag, 8)
     riftTraits ++= (0 until traits.tagCount()).map(traits.getStringTagAt).flatMap(RiftTraitRegistry.getRiftTrait)
   }
 
