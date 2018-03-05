@@ -100,7 +100,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
             world.setBlockState(new BlockPos(lx, ly, lz), rblock.getStateFromMeta(rmeta), 3)
           case None =>
         }
-               }
+      }
 
     //Sprinkle in crystals
     (0 until cryst).foreach { n =>
@@ -110,12 +110,15 @@ import net.minecraftforge.fml.common.IWorldGenerator
       while (cy > 1 && world.isAirBlock(new BlockPos(cx, cy - 1, cz))) cy -= 1
       while (world.getBlockState(new BlockPos(cx, cy, cz)).getBlock == Blocks.BEDROCK) cy += 1
       world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
-                            }
+    }
 
     // add rift
     val chunkRiftCapability = world.getChunkFromBlockCoords(new BlockPos(x, y, z)).getCapability(Capabilities.CHUNK_RIFT_CAPABILITY, null)
     if (chunkRiftCapability != null) {
-      val rift = new Rift(new Loc4(x, y, z, world.provider.getDimension))
+      var adjustedY = y
+      while (adjustedY > 1 && world.isAirBlock(new BlockPos(x, adjustedY, z))) adjustedY -= 1
+      adjustedY += random.nextInt(4)
+      val rift = new Rift(new Loc4(x, adjustedY, z, world.provider.getDimension))
       rift.addTraits(RiftTraitRegistry.generateTraits(random))
       chunkRiftCapability.addRift(rift)
       FemtocraftRiftTracker.registerRift(rift)

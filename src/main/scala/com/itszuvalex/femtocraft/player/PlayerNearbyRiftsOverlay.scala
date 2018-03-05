@@ -67,10 +67,9 @@ class PlayerNearbyRiftsOverlay {
       val riftLayout = new GuiFlowLayout(0, 0, width, (traits.size + 1) * mc.fontRenderer.FONT_HEIGHT)
       val distance = getPlayerLoc.dist(rift.location)
       val color = distance match {
-        case close if distance <= PlayerNearbyRiftsOverlay.range / 3f => TextFormatting.GREEN
-        case close if distance <= (2f * PlayerNearbyRiftsOverlay.range) / 3f => TextFormatting.BLUE
+        case _ if distance <= PlayerNearbyRiftsOverlay.range / 3f => TextFormatting.GREEN
+        case _ if distance <= (2f * PlayerNearbyRiftsOverlay.range) / 3f => TextFormatting.BLUE
         case _ => TextFormatting.RED
-        //        case close if distance <= PlayerNearbyRiftsOverlay.range  => TextFormatting.BLUE
       }
       val riftText = new GuiLabel(0, 0, width, mc.fontRenderer.FONT_HEIGHT, () => f"Rift: $color$distance%.2f${TextFormatting.RESET}m", scale)
       riftLayout.add(riftText)
