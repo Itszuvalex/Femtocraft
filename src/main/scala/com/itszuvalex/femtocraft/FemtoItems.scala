@@ -30,6 +30,7 @@ object FemtoItems {
   var itemLapisreplacementDust   : Item = _
   var itemDiamondreplacementDust : Item = _
   var itemRiftironIngotDevoid    : Item = _
+  var itemRiftironIngotActivated : Item = _
   var itemPhasemetalIngotDevoid  : Item = _
   var itemBasicCircuit           : Item = _
   var itemEnergyRegulator        : Item = _
@@ -77,6 +78,7 @@ object FemtoItems {
     itemLapisreplacementDust = registerItem(registry, new Item(), "itemLapisreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustLapisreplacement")
     itemDiamondreplacementDust = registerItem(registry, new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
     itemRiftironIngotDevoid = registerItem(registry, new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
+    itemRiftironIngotActivated = registerItem(registry, new Item(), "itemRiftironIngotActivated").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironActivated")
     itemPhasemetalIngotDevoid = registerItem(registry, new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
     itemBasicCircuit = registerItem(registry, new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
     itemEnergyRegulator = registerItem(registry, new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
@@ -110,6 +112,7 @@ object FemtoItems {
     itemGoldDust.registerModel()
     itemDiamondDust.registerModel()
     itemRiftironIngotDevoid.registerModel()
+    itemRiftironIngotActivated.registerModel()
     itemPhasemetalIngotDevoid.registerModel()
     itemRedstonereplacementDust.registerModel()
     itemLapisreplacementDust.registerModel()
