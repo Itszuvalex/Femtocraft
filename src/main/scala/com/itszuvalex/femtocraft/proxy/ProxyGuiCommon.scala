@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
-import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNaniteExtractor, TileNanoFurnace}
+import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.container.{ContainerConduit, ContainerItemRepository}
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
@@ -29,6 +29,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te, true)
       case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te, true)
+      case (GuiIDs.TileNaniteInfuserID, te: TileNaniteInfuser) => new ContainerNaniteInfuser(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalChargingArrayID, te: TileCrystalChargingArray) => new ContainerCrystalChargingArray(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new ContainerCrystalStorageArray(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new ContainerCrystalHeatExchanger(player, player.inventory, te, true)

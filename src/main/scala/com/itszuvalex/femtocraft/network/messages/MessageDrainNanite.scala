@@ -39,16 +39,18 @@ class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends Message
       message.loc.getTileEntity() match {
         case Some(tile: TileEntity) if tile.hasCapability(Capabilities.NANITE_STORAGE_TANK, null) =>
           val storageTank = tile.getCapability(Capabilities.NANITE_STORAGE_TANK, null)
-          if (storageTank == null) return null
-
-          val nanites = storageTank.nanitesInTank
-          if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
-            val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.NANITE_CAPABILITY, EnumFacing.UP)
-            val amount = storageTank.drain(nanites.head, 1, false)
-            if (amount != null) {
-              val filled = capability.tank.fill(amount, true)
-              storageTank.drain(amount.nanite, amount.volume - (if (filled != null) filled.volume else 0), true)
-              capability.sync()
+          if (storageTank != null) {
+            val nanites = storageTank.nanitesInTank
+            if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
+              val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.NANITE_CAPABILITY, EnumFacing.UP)
+              nanites.foreach { nanite =>
+                val amount = storageTank.drain(nanite, 1, false)
+                if (amount != null) {
+                  val filled = capability.tank.fill(amount, true)
+                  storageTank.drain(amount.nanite, amount.volume - (if (filled != null) filled.volume else 0), true)
+                  capability.sync()
+                }
+              }
             }
           }
         case _ =>

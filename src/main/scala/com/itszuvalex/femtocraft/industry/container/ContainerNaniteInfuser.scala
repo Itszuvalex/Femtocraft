@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
-import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.TileNaniteInfuser
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncItemStorageItemStack}

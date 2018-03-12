@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork, GuiTabSideConfig}
 import com.itszuvalex.femtocraft.industry.container.ContainerNaniteInfuser
-import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.TileNaniteInfuser
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteTank
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageFillNanite
@@ -31,7 +31,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
 
   val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Infuser"), fontRenderer.FONT_HEIGHT, () => "Nanite Infuser")
   val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
-  val drainButton = new GuiButton(103, 24, 45, 16, "Fill") {
+  val drainButton = new GuiButton(43, 42, 45, 16, "Fill") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       val ret = super.onMouseClick(mouseX, mouseY, button)
       if (ret) {
@@ -41,7 +41,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
     }
   }
 
-  val naniteTank = new GuiNaniteTank(43, 42, tile.naniteStorageTank)
+  val naniteTank = new GuiNaniteTank(25, 23, tile.naniteStorageTank)
   naniteTank.color = color
   add(naniteTank)
 

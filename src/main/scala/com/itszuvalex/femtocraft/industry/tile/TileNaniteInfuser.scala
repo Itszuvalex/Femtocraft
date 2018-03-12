@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.InfuseTask._
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.nanite.TileNaniteStorage
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -66,102 +67,102 @@ object TileNaniteInfuser {
     }
   }
 
-  class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeafNode with TileNaniteStorage {
-    private val task         : InfuseTask   = new InfuseTask(IItemStack.Empty)
-    private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-    private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-    private val sidedStorageConfig          = new SidedItemStorageConfiguration({
-      case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
-      case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
-      case _ => NONE_INV_KEY
-    },
-    Map(NONE_INV_KEY -> IItemStorage.Empty,
-      INPUT_INV_KEY -> inputStorage,
-      OUTPUT_INV_KEY -> outputStorage),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
-    var ticks = 0
+}
 
-    override def defaultBattery = new PowerBattery(4000)
+class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeafNode with TileNaniteStorage {
+  private val task         : InfuseTask   = new InfuseTask(IItemStack.Empty)
+  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+    case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
+    case _ => NONE_INV_KEY
+  },
+  Map(NONE_INV_KEY -> IItemStorage.Empty,
+    INPUT_INV_KEY -> inputStorage,
+    OUTPUT_INV_KEY -> outputStorage),
+  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  var ticks = 0
 
-    override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
+  override def defaultBattery = new PowerBattery(4000)
 
-    override def connectionRadius: Float = 8f
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-    override def leafTransferRate = 50d
+  override def connectionRadius: Float = 8f
 
-    override def getStorageLoc: Loc4 = getLoc
+  override def leafTransferRate = 50d
 
-    override def hasDescription: Boolean = false
+  override def getStorageLoc: Loc4 = getLoc
 
-    override def getMod: AnyRef = Femtocraft
+  override def hasDescription: Boolean = false
 
-    override def defaultStorage: IItemStorage = new ItemStorageArray(2)
+  override def getMod: AnyRef = Femtocraft
 
-    override def getFieldCount: Int = 0
+  override def defaultStorage: IItemStorage = new ItemStorageArray(2)
 
-    override def setField(id: Int, value: Int): Unit = {}
+  override def getFieldCount: Int = 0
 
-    override def getField(id: Int): Int = 0
+  override def setField(id: Int, value: Int): Unit = {}
 
-    override def defaultStorageTank: NaniteTank = new NaniteTank(50)
+  override def getField(id: Int): Int = 0
 
-    override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-      (slot, item) match {
-        case (_, null) => true
-        case (_, b) if b.isEmpty => true
-        case (1, _) => true
-        case (0, _) => NaniteInfusionRecipeRegistry.getMatchingRecipe(Converter.IItemStackFromItemStack(item)).isDefined
-        case _ => false
-      }
-    }
+  override def defaultStorageTank: NaniteTank = new NaniteTank(50)
 
-    override def hasGUI: Boolean = true
-
-    override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
-
-    override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-      if (hasGUI) par5EntityPlayer.openGui(getMod, getGuiID, world, pos.getX, pos.getY, pos.getZ)
-      hasGUI
-    }
-
-    def setProgress(progress: Double): Unit = {
-      task.progress = progress
-    }
-
-    def getProgress = task.progress
-
-    def getProgressMax = task.adjustedMax(0)
-
-    override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
-      case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
-      case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => true
-      case _ => super.hasCapability(capability, facing)
-    }
-
-    override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
-      case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
-      case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
-      case (_, null) => super.getCapability(capability, facing)
-      case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
-      case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
-      case _ => super.getCapability(capability, facing)
-    }
-
-    override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-      super.writeToNBT(nbt)
-      nbt.setTag(TASK_NBT, task.serializeNBT())
-      nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-      nbt.setInteger(TICKS_NBT, ticks)
-      nbt
-    }
-
-    override def readFromNBT(nbt: NBTTagCompound): Unit = {
-      super.readFromNBT(nbt)
-      task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
-      if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
-        sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-      ticks = nbt.getInteger(TICKS_NBT)
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
+    (slot, item) match {
+      case (_, null) => true
+      case (_, b) if b.isEmpty => true
+      case (1, _) => true
+      case (0, _) => NaniteInfusionRecipeRegistry.getMatchingRecipe(Converter.IItemStackFromItemStack(item)).isDefined
+      case _ => false
     }
   }
 
+  override def hasGUI: Boolean = true
+
+  override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
+
+  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
+    if (hasGUI) par5EntityPlayer.openGui(getMod, getGuiID, world, pos.getX, pos.getY, pos.getZ)
+    hasGUI
+  }
+
+  def setProgress(progress: Double): Unit = {
+    task.progress = progress
+  }
+
+  def getProgress = task.progress
+
+  def getProgressMax = task.adjustedMax(0)
+
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => true
+    case _ => super.hasCapability(capability, facing)
+  }
+
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
+    case (_, null) => super.getCapability(capability, facing)
+    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case _ => super.getCapability(capability, facing)
+  }
+
+  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
+    super.writeToNBT(nbt)
+    nbt.setTag(TASK_NBT, task.serializeNBT())
+    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setInteger(TICKS_NBT, ticks)
+    nbt
+  }
+
+  override def readFromNBT(nbt: NBTTagCompound): Unit = {
+    super.readFromNBT(nbt)
+    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
+    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
+      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    ticks = nbt.getInteger(TICKS_NBT)
+  }
 }
