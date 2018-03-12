@@ -67,7 +67,7 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
     if (stack.nanite == null) return stack
 
     val room = volume - volumeFilled
-    if (room <= 0) return null
+    if (room <= 0) return stack
     if (stack.volume <= 0) return null
 
     val storageStack =

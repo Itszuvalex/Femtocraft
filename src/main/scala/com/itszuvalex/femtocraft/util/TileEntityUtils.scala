@@ -35,4 +35,29 @@ object TileEntityUtils {
       (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
     }.filterNot(_._1 == null)
   }
+
+  def checkDoInputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, ticksToAct: Int, inputSize: Int): Int = {
+    val rticks = (ticks - 1 + ticksToAct) % ticksToAct
+    // Input
+    if (rticks == 0) {
+      var isize = inputSize
+      TileEntityUtils.getStoragesForIO(te, config, EnumAutomaticIO.INPUT).exists { pair =>
+        isize = pair._1.transferIntoStorage(pair._2, isize)
+        isize <= 0
+      }
+    }
+    rticks
+  }
+
+  def checkDoOutputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, outputSize: Int): Boolean = {
+    if (ticks == 0) {
+      var osize = outputSize
+      TileEntityUtils.getStoragesForIO(te, config, EnumAutomaticIO.OUTPUT).exists { pair =>
+        osize = pair._2.transferIntoStorage(pair._1, osize)
+        osize <= 0
+      }
+      true
+    }
+    else false
+  }
 }

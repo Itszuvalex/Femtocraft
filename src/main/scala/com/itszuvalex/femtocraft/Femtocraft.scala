@@ -36,16 +36,17 @@ object Femtocraft {
     override def getTabIconItem: ItemStack = new ItemStack(Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall))
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
-              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
+    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy   : ProxyCommon    = _
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
-              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
+    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
   var guiProxy: ProxyGuiCommon = _
 
   @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
     MinecraftForge.EVENT_BUS.register(FemtoSounds)
     MinecraftForge.EVENT_BUS.register(FemtoBlocks)
     MinecraftForge.EVENT_BUS.register(FemtoItems)
+    MinecraftForge.EVENT_BUS.register(proxy)
 
     FemtoFluids.preInit()
     FemtoRecipes.preInit()

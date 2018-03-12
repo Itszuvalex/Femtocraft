@@ -36,7 +36,7 @@ import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.femtocraft.worldgen.render.{CrystalRenderer, RiftRenderer}
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, Resources}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.Block
@@ -46,14 +46,24 @@ import net.minecraft.client.renderer.ItemMeshDefinition
 import net.minecraft.client.renderer.block.model.{ModelBakery, ModelResourceLocation}
 import net.minecraft.client.renderer.color.IItemColor
 import net.minecraft.client.renderer.entity.{RenderManager, RenderSnowball}
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 import net.minecraftforge.client.ForgeHooksClient
+import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.client.model.obj.OBJLoader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.client.registry.{ClientRegistry, IRenderFactory, RenderingRegistry}
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+@SideOnly(Side.CLIENT)
+object ProxyClient extends ProxyCommon {
+  var TEXTURE_RIFT_BILLBOARD: TextureAtlasSprite = _
+}
+
+@SideOnly(Side.CLIENT)
 class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
     val worldToUse = Minecraft.getMinecraft.world
@@ -203,5 +213,11 @@ class ProxyClient extends ProxyCommon {
 
   override def onRegisterBlock[T <: Block](block: T, name: String): Unit = {
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(Femtocraft.ID.toLowerCase() + ":" + name, "inventory"))
+  }
+
+  @SubscribeEvent
+  def handleTextureStitchPreEvent(event: TextureStitchEvent.Pre): Unit = {
+    event.getMap.getBasePath
+    ProxyClient.TEXTURE_RIFT_BILLBOARD = event.getMap.registerSprite(Resources.Femtocraft("rift_billboard"))
   }
 }

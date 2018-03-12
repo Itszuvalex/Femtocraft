@@ -10,7 +10,7 @@ import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
-import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedItemStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
@@ -140,16 +140,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = (ticks - 1 + TileNanoFurnace.TICKS_FOR_AUTOIO) % TileNanoFurnace.TICKS_FOR_AUTOIO
-    val isTick = ticks == 0
-    // Input
-    if (isTick) {
-      var inputSize = 1
-      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.INPUT).exists { pair =>
-        inputSize = pair._1.transferIntoStorage(pair._2, inputSize)
-        inputSize <= 0
-      }
-    }
+    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TileNanoFurnace.TICKS_FOR_AUTOIO, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -189,13 +180,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
       }
     }
 
-    if (isTick) {
-      var outputSize = 1
-      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.OUTPUT).exists { pair =>
-        outputSize = pair._2.transferIntoStorage(pair._1, outputSize)
-        outputSize <= 0
-      }
-    }
+    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
   def setProgress(progress: Double): Unit = {
@@ -220,18 +205,18 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   }
 
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt.asInstanceOf[NBTTagCompound])
-    nbt.asInstanceOf[NBTTagCompound].setTag(TASK_NBT, task.serializeNBT())
-    nbt.asInstanceOf[NBTTagCompound].setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    nbt.asInstanceOf[NBTTagCompound].setInteger(TICKS_NBT, ticks)
+    super.writeToNBT(nbt)
+    nbt.setTag(TASK_NBT, task.serializeNBT())
+    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setInteger(TICKS_NBT, ticks)
     nbt
   }
 
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
-    super.readFromNBT(nbt.asInstanceOf[NBTTagCompound])
-    task.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(TASK_NBT))
+    super.readFromNBT(nbt)
+    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
     if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(nbt.asInstanceOf[NBTTagCompound].getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-    ticks = nbt.asInstanceOf[NBTTagCompound].getInteger(TICKS_NBT)
+      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    ticks = nbt.getInteger(TICKS_NBT)
   }
 }

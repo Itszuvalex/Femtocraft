@@ -11,7 +11,7 @@ import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
-import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedItemStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -20,9 +20,10 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.items.CapabilityItemHandler
 
 object TileDemolisher {
-  val TICKS_REQ      = 20 * 8
-  val POWER_PER_TICK = 10
-  val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
+  val TICKS_REQ        = 20 * 8
+  val POWER_PER_TICK   = 10
+  val POWER_REQ        = TICKS_REQ * POWER_PER_TICK
+  val TICKS_FOR_AUTOIO = 20
 
   val INPUT_INV_KEY  = "Input"
   val OUTPUT_INV_KEY = "Output"
@@ -118,16 +119,7 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = (ticks - 1 + TileNanoFurnace.TICKS_FOR_AUTOIO) % TileNanoFurnace.TICKS_FOR_AUTOIO
-    val isTick = ticks == 0
-    // Input
-    if (isTick) {
-      var inputSize = 1
-      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.INPUT).exists { pair =>
-        inputSize = pair._1.transferIntoStorage(pair._2, inputSize)
-        inputSize <= 0
-      }
-    }
+    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TileDemolisher.TICKS_FOR_AUTOIO, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -167,13 +159,7 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
       }
     }
 
-    if (isTick) {
-      var outputSize = 1
-      TileEntityUtils.getStoragesForIO(this, sidedStorageConfig, EnumAutomaticIO.OUTPUT).exists { pair =>
-        outputSize = pair._2.transferIntoStorage(pair._1, outputSize)
-        outputSize <= 0
-      }
-    }
+    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
   def setProgress(progress: Double): Unit = {

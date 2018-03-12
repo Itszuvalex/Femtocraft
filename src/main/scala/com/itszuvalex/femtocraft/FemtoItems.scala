@@ -19,24 +19,25 @@ import scala.collection.mutable.ArrayBuffer
 object FemtoItems {
   var itemPowerCrystal: Item = _
 
-  var itemDumbDust               : Item = _
-  var itemCyberleaf              : Item = _
-  var itemNanoweaveThread        : Item = _
-  var itemNanoweaveSheet         : Item = _
-  var itemCracklingDust          : Item = _
-  var itemRiftironDust           : Item = _
-  var itemPhasemetalDust         : Item = _
-  var itemRedstonereplacementDust: Item = _
-  var itemLapisreplacementDust   : Item = _
-  var itemDiamondreplacementDust : Item = _
-  var itemRiftironIngotDevoid    : Item = _
-  var itemRiftironIngotActivated : Item = _
-  var itemPhasemetalIngotDevoid  : Item = _
-  var itemBasicCircuit           : Item = _
-  var itemEnergyRegulator        : Item = _
-  var itemCrystalBattery         : Item = _
-  var itemNaniteBeacon           : Item = _
-  var itemNanoChannel            : Item = _
+  var itemDumbDust                : Item = _
+  var itemCyberleaf               : Item = _
+  var itemNanoweaveThread         : Item = _
+  var itemNanoweaveSheet          : Item = _
+  var itemCracklingDust           : Item = _
+  var itemRiftironDust            : Item = _
+  var itemPhasemetalDust          : Item = _
+  var itemRedstonereplacementDust : Item = _
+  var itemLapisreplacementDust    : Item = _
+  var itemDiamondreplacementDust  : Item = _
+  var itemRiftironIngotDevoid     : Item = _
+  var itemRiftironIngotActivated  : Item = _
+  var itemPhasemetalIngotDevoid   : Item = _
+  var itemPhasemetalIngotActivated: Item = _
+  var itemBasicCircuit            : Item = _
+  var itemEnergyRegulator         : Item = _
+  var itemCrystalBattery          : Item = _
+  var itemNaniteBeacon            : Item = _
+  var itemNanoChannel             : Item = _
 
   var itemIronDust   : Item = _
   var itemGoldDust   : Item = _
@@ -80,6 +81,7 @@ object FemtoItems {
     itemRiftironIngotDevoid = registerItem(registry, new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
     itemRiftironIngotActivated = registerItem(registry, new Item(), "itemRiftironIngotActivated").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironActivated")
     itemPhasemetalIngotDevoid = registerItem(registry, new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
+    itemPhasemetalIngotActivated = registerItem(registry, new Item(), "itemPhasemetalIngotActivated").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalActivated")
     itemBasicCircuit = registerItem(registry, new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
     itemEnergyRegulator = registerItem(registry, new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
     itemCrystalBattery = registerItem(registry, new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
@@ -114,6 +116,7 @@ object FemtoItems {
     itemRiftironIngotDevoid.registerModel()
     itemRiftironIngotActivated.registerModel()
     itemPhasemetalIngotDevoid.registerModel()
+    itemPhasemetalIngotActivated.registerModel()
     itemRedstonereplacementDust.registerModel()
     itemLapisreplacementDust.registerModel()
     itemDiamondreplacementDust.registerModel()
