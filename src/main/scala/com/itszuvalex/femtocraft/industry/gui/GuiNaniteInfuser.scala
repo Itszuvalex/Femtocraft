@@ -41,7 +41,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
     }
   }
 
-  val naniteTank = new GuiNaniteTank(25, 23, tile.naniteStorageTank)
+  val naniteTank = new GuiNaniteTank(26, 23, tile.naniteStorageTank)
   naniteTank.color = color
   add(naniteTank)
 

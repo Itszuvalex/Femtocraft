@@ -31,10 +31,17 @@ object PlayerNaniteCapabilitiesOverlay {
   var xOffset    = 0
   val xOffsetEnd = texWidth
 
-  var timeOfLastInteract = System.currentTimeMillis
-  val msToShow           = 2000
-  val msToReveal         = 500
-  val msToHide           = 750
+  var timeOfLastInteract         = System.currentTimeMillis
+  var timeofStartOfInteractChain = System.currentTimeMillis
+  var timeofEndOfInteractChain   = System.currentTimeMillis
+  var timeLengthOfInteractChain  = 1000L
+  val msToShow                   = 2000
+  val msToReveal                 = 500
+  val msToHide                   = 750
+
+  def interact() = {
+    timeOfLastInteract = System.currentTimeMillis
+  }
 
   var alwaysShow = false
 }
