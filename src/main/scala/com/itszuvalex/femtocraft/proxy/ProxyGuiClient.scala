@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.gui._
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.TileNaniteInfuser
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.gui.{GuiConduit, GuiItemRepository}
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}

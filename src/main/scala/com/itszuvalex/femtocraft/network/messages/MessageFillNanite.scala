@@ -11,43 +11,39 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
 
-/**
-  * Created by Alex on 15.10.2015.
-  */
-object MessageDrainNanite {
+object MessageFillNanite {
   val LOC_KEY   = "Loc"
   val STACK_KEY = "Stack"
 }
 
-class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageUpdateNBT[MessageDrainNanite, IMessage]({
+class MessageFillNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageUpdateNBT[MessageFillNanite, IMessage]({
   val compound = new NBTTagCompound
-  compound.setTag(MessageDrainNanite.LOC_KEY, loc.serializeNBT())
+  compound.setTag(MessageFillNanite.LOC_KEY, loc.serializeNBT())
   if (nanite != null)
-    compound.setTag(MessageDrainNanite.STACK_KEY, nanite.serializeNBT())
+    compound.setTag(MessageFillNanite.STACK_KEY, nanite.serializeNBT())
   compound
 }) {
 
   def this() = this(Loc4(0, 0, 0, 0), null)
 
-  override def onMessage(message: MessageDrainNanite, ctx: MessageContext): IMessage = {
+  override def onMessage(message: MessageFillNanite, ctx: MessageContext): IMessage = {
     ItszuLib.proxy.addScheduledTask(() => {
       // Parse nbt
-      message.loc = Loc4(message.nbt.getCompoundTag(MessageDrainNanite.LOC_KEY))
-      message.nanite = if (message.nbt.hasKey(MessageDrainNanite.STACK_KEY)) NaniteStack.loadFromNBT(message.nbt.getCompoundTag(MessageDrainNanite.STACK_KEY)) else null
+      message.loc = Loc4(message.nbt.getCompoundTag(MessageFillNanite.LOC_KEY))
+      message.nanite = if (message.nbt.hasKey(MessageFillNanite.STACK_KEY)) NaniteStack.loadFromNBT(message.nbt.getCompoundTag(MessageFillNanite.STACK_KEY)) else null
 
       // Do things
       message.loc.getTileEntity() match {
         case Some(tile: TileEntity) if tile.hasCapability(Capabilities.NANITE_STORAGE_TANK, null) =>
           val storageTank = tile.getCapability(Capabilities.NANITE_STORAGE_TANK, null)
           if (storageTank == null) return null
-
           val nanites = storageTank.nanitesInTank
           if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
             val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.NANITE_CAPABILITY, EnumFacing.UP)
-            val amount = storageTank.drain(nanites.head, 1, false)
+            val amount = capability.tank.drain(nanites.head, 1, false)
             if (amount != null) {
-              val filled = capability.tank.fill(amount, true)
-              storageTank.drain(amount.nanite, amount.volume - (if (filled != null) filled.volume else 0), true)
+              val filled = storageTank.fill(amount, true)
+              capability.tank.drain(amount.nanite, amount.volume - (if (filled != null) filled.volume else 0), true)
               capability.sync()
             }
           }

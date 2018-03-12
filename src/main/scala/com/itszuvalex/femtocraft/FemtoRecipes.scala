@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft
 
-import com.itszuvalex.femtocraft.industry.{DustRecipeRegistry, SynthesizerRegistry}
+import com.itszuvalex.femtocraft.industry.{DustRecipeRegistry, NaniteInfusionRecipeRegistry, SynthesizerRegistry}
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import net.minecraft.init.Items
 import net.minecraft.item.crafting.FurnaceRecipes
@@ -34,5 +34,6 @@ object FemtoRecipes {
   def postInit() = {
     DustRecipeRegistry.postInit()
     SynthesizerRegistry.postInit()
+    NaniteInfusionRecipeRegistry.postInit()
   }
 }

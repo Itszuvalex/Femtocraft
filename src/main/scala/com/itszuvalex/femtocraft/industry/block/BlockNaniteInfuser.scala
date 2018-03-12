@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.block
 
-import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.TileNaniteInfuser
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import net.minecraft.block.material.Material

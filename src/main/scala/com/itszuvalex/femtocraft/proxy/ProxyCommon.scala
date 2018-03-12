@@ -21,6 +21,7 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.TileNaniteInfuser
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}
