@@ -98,7 +98,11 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
 
   override def getMod: AnyRef = Femtocraft
 
-  override def defaultStorage: IItemStorage = new ItemStorageArray(2)
+  override def defaultStorage: IItemStorage = new ItemStorageArray(2) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      isItemValidForSlot(i, stack.toMinecraft)
+    }
+  }
 
   override def getFieldCount: Int = 0
 

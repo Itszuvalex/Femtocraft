@@ -10,7 +10,7 @@ import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
@@ -84,7 +84,11 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
 
   override def defaultStorageTank: NaniteTank = new NaniteTank(50)
 
-  override def defaultStorage: IItemStorage = new ItemStorageArray(1)
+  override def defaultStorage: IItemStorage = new ItemStorageArray(1) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      isItemValidForSlot(i, stack.toMinecraft)
+    }
+  }
 
   override def getFieldCount: Int = 0
 
