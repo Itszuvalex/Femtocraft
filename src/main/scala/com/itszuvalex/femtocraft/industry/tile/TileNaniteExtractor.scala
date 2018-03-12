@@ -3,18 +3,22 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.api.nanite.{NaniteStack, NaniteTank}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
-import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor.ExtractTask
-import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.TASK_NBT
+import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
 import com.itszuvalex.femtocraft.nanite.TileNaniteStorage
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.PowerBattery
-import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.TileInventory
+import com.itszuvalex.itszulib.api.wrappers.{Converter, PowerBattery}
+import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.items.CapabilityItemHandler
 
 
 object TileNaniteExtractor {
@@ -22,7 +26,16 @@ object TileNaniteExtractor {
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
 
-  val TASK_NBT = "Task"
+  val TICKS_FOR_AUTOIO = 20
+
+  val INPUT_INV_KEY = "Input"
+  val NONE_KEY      = "None"
+
+  val OUTPUT_NANITE_KEY = "Output"
+
+  val TASK_NBT              = "Task"
+  val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
+  val TICKS_NBT             = "Ticks"
 
   object ExtractTask {
     val NANITES_NBT = "Nanite"
@@ -51,7 +64,15 @@ object TileNaniteExtractor {
 }
 
 class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLeafNode with TileNaniteStorage {
-  private val task: ExtractTask = new ExtractTask(null)
+  private val task: ExtractTask  = new ExtractTask(null)
+  private val sidedStorageConfig = new SidedItemStorageConfiguration({
+    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+    case _ => NONE_KEY
+  },
+  Map(NONE_KEY -> IItemStorage.Empty,
+    INPUT_INV_KEY -> storage),
+  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  var ticks = 0
 
   override def defaultBattery = new PowerBattery(5000)
 
@@ -85,6 +106,9 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
+
+    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, 1)
+
     if (task.stack == null) {
       val item = storage(0)
       if (!item.isEmpty) {
@@ -108,6 +132,8 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
         }
       }
     }
+
+    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
   def setProgress(progress: Double): Unit = {
@@ -118,14 +144,32 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
 
   def getProgressMax = task.adjustedMax(0)
 
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case _ => super.hasCapability(capability, facing)
+  }
+
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
+    case (_, null) => super.getCapability(capability, facing)
+    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case _ => super.getCapability(capability, facing)
+  }
+
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
     super.readFromNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
+    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
+      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    ticks = nbt.getInteger(TICKS_NBT)
   }
 
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(nbt)
     nbt.setTag(TASK_NBT, task.serializeNBT())
+    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setInteger(TICKS_NBT, ticks)
     nbt
   }
 }

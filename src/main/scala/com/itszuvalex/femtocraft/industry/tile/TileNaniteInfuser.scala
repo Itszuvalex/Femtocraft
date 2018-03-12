@@ -13,6 +13,10 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 
+object TileNaniteInfuser {
+  val TICKS_REQ = 20 * 8
+}
+
 class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeafNode {
 
   override def defaultBattery = new PowerBattery(4000)

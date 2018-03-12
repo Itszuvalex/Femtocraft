@@ -46,6 +46,7 @@ class RiftRenderer {
           GL11.glEnable(GL11.GL_BLEND)
           val icon = RiftRenderer.getBillboardTexture
           drawBillboard(renderX + 0.5, renderY + 0.5, renderZ + 0.5, 0, .5, icon.getMinU, icon.getMaxU, icon.getMinV, icon.getMaxV)
+          GL11.glDisable(GL11.GL_BLEND)
           GL11.glPopAttrib()
         }
 
