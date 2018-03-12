@@ -41,6 +41,13 @@ object PlayerNaniteCapabilitiesOverlay {
 
   def interact() = {
     timeOfLastInteract = System.currentTimeMillis
+    if ((timeOfLastInteract - timeofEndOfInteractChain) < timeLengthOfInteractChain) {
+      timeofEndOfInteractChain = timeOfLastInteract
+    }
+    else {
+      timeofEndOfInteractChain = timeOfLastInteract
+      timeofStartOfInteractChain = timeOfLastInteract
+    }
   }
 
   var alwaysShow = false
@@ -63,12 +70,17 @@ class PlayerNaniteCapabilitiesOverlay {
   }
 
   def updateOffset() = {
-    val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
-    timeSinceLastChange match {
-      case a if a <= msToReveal /*&& xOffset > 0 /* For incremental updates */*/ => xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceLastChange.toFloat / msToReveal.toFloat).toInt)
-      case a if a <= (msToShow + msToReveal) => xOffset = 0
-      case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
-      case _ => xOffset = xOffsetEnd
+    val timeSinceStartOfInteractChain = System.currentTimeMillis() - timeofStartOfInteractChain
+    if (timeSinceStartOfInteractChain < msToReveal) {
+      xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceStartOfInteractChain.toFloat / msToReveal.toFloat).toInt)
+    }
+    else {
+      val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
+      timeSinceLastChange match {
+        case a if a <= (msToShow + msToReveal) => xOffset = 0
+        case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
+        case _ => xOffset = xOffsetEnd
+      }
     }
   }
 
