@@ -7,6 +7,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.InfuseTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.nanite.TileNaniteStorage
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -74,14 +75,14 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
   private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
   private val sidedStorageConfig          = new SidedItemStorageConfiguration({
-    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
-    case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
-    case _ => NONE_INV_KEY
-  },
-  Map(NONE_INV_KEY -> IItemStorage.Empty,
-    INPUT_INV_KEY -> inputStorage,
-    OUTPUT_INV_KEY -> outputStorage),
-  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+                                                                                case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+                                                                                case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
+                                                                                case _ => NONE_INV_KEY
+                                                                              },
+                                                                              Map(NONE_INV_KEY -> IItemStorage.Empty,
+                                                                                  INPUT_INV_KEY -> inputStorage,
+                                                                                  OUTPUT_INV_KEY -> outputStorage),
+                                                                              () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
 
   override def defaultBattery = new PowerBattery(4000)
@@ -125,6 +126,61 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   override def hasGUI: Boolean = true
 
   override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
+
+  override def serverUpdate(): Unit = {
+    super.serverUpdate()
+
+    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, 1)
+
+    if (task.stack == null || task.stack.isEmpty) {
+      val item = storage(0)
+      if (!item.isEmpty) {
+        val recipe = NaniteInfusionRecipeRegistry.getMatchingRecipe(item)
+        if (recipe.isDefined) {
+          val r = recipe.get
+          val hasNanites = naniteStorageTank.containsNanite(r.nanitesRequired.nanite)
+          val fakeDrain = naniteStorageTank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, false)
+          if (fakeDrain.volume == r.nanitesRequired.volume) {
+            naniteStorageTank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, true)
+            val ins = storage.split(0, 1)
+            task.reset()
+            task.stack = ins
+          }
+        }
+      }
+    }
+    else {
+      battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
+      if (task.completed(0)) {
+        val item = task.stack
+        if (item == null || item.isEmpty) {
+          task.reset()
+          return
+        }
+
+        var insertItem = task.stack
+        if (!task.infused) {
+          val resultItem = NaniteInfusionRecipeRegistry.getMatchingRecipe(insertItem)
+          if (resultItem == null || resultItem.isEmpty) {
+            task.reset()
+            return
+          }
+          else {
+            insertItem = resultItem.get.output.copy()
+          }
+
+          task.infused = true
+        }
+
+        // Will clear the stack once we successfully insert the result item or set stack to the finished result
+        task.stack = storage.insert(1, insertItem)
+        if (task.stack == null || task.stack.isEmpty)
+          task.reset()
+      }
+    }
+
+    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
+  }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) par5EntityPlayer.openGui(getMod, getGuiID, world, pos.getX, pos.getY, pos.getZ)
