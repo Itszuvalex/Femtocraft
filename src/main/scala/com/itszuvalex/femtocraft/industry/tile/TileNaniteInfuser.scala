@@ -75,14 +75,14 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
   private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
   private val sidedStorageConfig          = new SidedItemStorageConfiguration({
-                                                                                case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
-                                                                                case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
-                                                                                case _ => NONE_INV_KEY
-                                                                              },
-                                                                              Map(NONE_INV_KEY -> IItemStorage.Empty,
-                                                                                  INPUT_INV_KEY -> inputStorage,
-                                                                                  OUTPUT_INV_KEY -> outputStorage),
-                                                                              () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+    case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
+    case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
+    case _ => NONE_INV_KEY
+  },
+  Map(NONE_INV_KEY -> IItemStorage.Empty,
+    INPUT_INV_KEY -> inputStorage,
+    OUTPUT_INV_KEY -> outputStorage),
+  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
 
   override def defaultBattery = new PowerBattery(4000)
@@ -138,13 +138,14 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
         val recipe = NaniteInfusionRecipeRegistry.getMatchingRecipe(item)
         if (recipe.isDefined) {
           val r = recipe.get
-          val hasNanites = naniteStorageTank.containsNanite(r.nanitesRequired.nanite)
-          val fakeDrain = naniteStorageTank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, false)
-          if (fakeDrain.volume == r.nanitesRequired.volume) {
-            naniteStorageTank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, true)
-            val ins = storage.split(0, 1)
-            task.reset()
-            task.stack = ins
+          if (naniteStorageTank.containsNanite(r.nanitesRequired.nanite)) {
+            val fakeDrain = naniteStorageTank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, false)
+            if (fakeDrain != null && fakeDrain.volume == r.nanitesRequired.volume) {
+              naniteStorageTank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, true)
+              val ins = storage.split(0, 1)
+              task.reset()
+              task.stack = ins
+            }
           }
         }
       }

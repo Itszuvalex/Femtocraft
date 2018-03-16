@@ -134,6 +134,7 @@ object FemtoBlocks {
     blockCrystals.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()
+    blockNaniteInfuser.registerModel()
     blockDemolisher.registerModel()
     blockCrystalChargingArray.registerModel()
     blockCrystalStorageArray.registerModel()
