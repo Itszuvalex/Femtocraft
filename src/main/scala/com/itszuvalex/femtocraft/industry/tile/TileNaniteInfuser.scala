@@ -95,7 +95,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
 
   override def getStorageLoc: Loc4 = getLoc
 
-  override def hasDescription: Boolean = false
+  override def hasDescription: Boolean = true
 
   override def getMod: AnyRef = Femtocraft
 
@@ -211,19 +211,19 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
     case _ => super.getCapability(capability, facing)
   }
 
-  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt)
-    nbt.setTag(TASK_NBT, task.serializeNBT())
-    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    nbt.setInteger(TICKS_NBT, ticks)
-    nbt
-  }
-
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
     super.readFromNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
     if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
     ticks = nbt.getInteger(TICKS_NBT)
+  }
+
+  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
+    super.writeToNBT(nbt)
+    nbt.setTag(TASK_NBT, task.serializeNBT())
+    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setInteger(TICKS_NBT, ticks)
+    nbt
   }
 }
