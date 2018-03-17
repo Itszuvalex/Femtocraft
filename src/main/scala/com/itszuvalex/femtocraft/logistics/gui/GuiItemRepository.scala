@@ -1,33 +1,41 @@
 package com.itszuvalex.femtocraft.logistics.gui
 
-import com.itszuvalex.femtocraft.{GuiIDs, Resources}
+import com.itszuvalex.femtocraft.GuiIDs
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabSideConfig}
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
 import com.itszuvalex.femtocraft.logistics.gui.GuiItemRepository._
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
-import com.itszuvalex.itszulib.gui.GuiBase
+import com.itszuvalex.itszulib.gui.GuiLabel
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import org.lwjgl.opengl.GL11
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object GuiItemRepository {
-  val TEXTURE_LOC    = Resources.TexGui("guiitemrepository.png")
-  val TEXTURE_HEIGHT = 211
+  val TEXTURE_HEIGHT  = 211
+  val inventoryStartX = 8
+  val inventoryStartY = 12
+
 }
 
 class GuiItemRepository(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileItemRepository)
-  extends GuiBase(new ContainerItemRepository(player, inv, tile)) {
+  extends FemtoGuiBase(tile, new ContainerItemRepository(player, inv, tile, false)) {
+  GuiTabSideConfig.addToGuiTabBar(tabBar, tile)
+
+  val fRender = Minecraft.getMinecraft.fontRenderer
+
   ySize = TEXTURE_HEIGHT
+  tile.storage.indices.foreach { i =>
+    addGuiAndSync(tile.storage, i, inventoryStartX + (i % 9) * 18, inventoryStartY + (i / 9) * 18)
+  }
+
+  addPlayerInventorySlots(inv, ContainerItemRepository.playerInventoryStartX, ContainerItemRepository.playerInventoryStartY)
+
+  val tileName  = "Item Repository"
+  val nameLabel = new GuiLabel(3, 3, fRender.getStringWidth(tileName), fRender.FONT_HEIGHT, () => tileName)
+  add(nameLabel)
 
   override def GuiID: Int = GuiIDs.TileItemRepositoryGuiID
 
-  override def drawGuiContainerBackgroundLayer(p_146976_1_ : Float, p_146976_2_ : Int, p_146976_3_ : Int): Unit = {
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-    Minecraft.getMinecraft.getTextureManager.bindTexture(TEXTURE_LOC)
-    val k = (width - xSize) / 2
-    val l = (height - ySize) / 2
-    drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
-  }
 }

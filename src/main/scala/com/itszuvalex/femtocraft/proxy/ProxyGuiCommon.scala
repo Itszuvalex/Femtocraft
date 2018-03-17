@@ -25,7 +25,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new ContainerFrameConstructing(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te, true)
-      case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
+      case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te, true)
       case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te, true)

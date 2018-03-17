@@ -37,8 +37,8 @@ object GuiSidedInventoryConfig {
 
   val colors = Array(
     Color(0.toByte, 0.toByte, 0.toByte, 0.toByte), // Transparent
-    Color(255.toByte, 255.toByte, 0.toByte, 0.toByte), // Red
     Color(255.toByte, 0.toByte, 255.toByte, 0.toByte), // Green
+    Color(255.toByte, 255.toByte, 0.toByte, 0.toByte), // Red
     Color(255.toByte, 0.toByte, 0.toByte, 255.toByte), // Blue
     Color(255.toByte, 255.toByte, 255.toByte, 0.toByte), // Yellow
     Color(255.toByte, 0.toByte, 255.toByte, 255.toByte), // Teal

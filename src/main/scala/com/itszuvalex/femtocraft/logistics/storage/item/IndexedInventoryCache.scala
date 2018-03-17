@@ -22,6 +22,7 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
 
   override def addItemStack(itemStack: ItemStack, slot: Int): Unit = {
     if (itemStack == null) return
+    if (itemStack.isEmpty) return
     rebuildCacheIfNecessary()
     idMap.getOrElseUpdate(itemStack.itemID, new mutable.HashSet[Int]()) += slot
     OreDictionary.getOreIDs(itemStack).foreach(oresMap.getOrElseUpdate(_, new mutable.HashSet[Int]()) += slot)
@@ -30,6 +31,7 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
   override def removeItemStack(slot: Int): Unit = {
     val itemStack = inventory.getStackInSlot(slot)
     if (itemStack == null) return
+    if(itemStack.isEmpty) return
     rebuildCacheIfNecessary()
     val id = itemStack.itemID
     idMap.get(id).map { set =>
@@ -37,11 +39,12 @@ class IndexedInventoryCache(private val inventory: IInventory) extends IIndexedI
       if (set.isEmpty)
         idMap.remove(id)
     }
-    OreDictionary.getOreIDs(itemStack).foreach { oid => oresMap.get(oid).map { set =>
-      set -= slot
-      if (set.isEmpty)
-        oresMap.remove(oid)
-    }
+    OreDictionary.getOreIDs(itemStack).foreach { oid =>
+      oresMap.get(oid).map { set =>
+        set -= slot
+        if (set.isEmpty)
+          oresMap.remove(oid)
+      }
     }
   }
 
