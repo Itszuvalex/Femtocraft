@@ -5,8 +5,8 @@ import java.util
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IConnectionProvider}
 import com.itszuvalex.femtocraft.logistics.connections.ItemConnection
+import com.itszuvalex.femtocraft.util.ChatHelper
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.mojang.realmsclient.gui.ChatFormatting
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -55,14 +55,15 @@ class ItemLogisticsItemChip extends Item {
           override def addTooltip(tooltip: util.List[String]): Unit = {
             val con = new ItemConnection(new Loc4, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
             val itemstack = con.ibuffer
-            tooltip += ChatFormatting.YELLOW + "Item: " + ChatFormatting.RESET + (if (itemstack.isEmpty) ChatFormatting.ITALIC + "Empty" else itemstack.toMinecraft.toString) + ChatFormatting.RESET
-            tooltip += ChatFormatting.YELLOW + "FLOPs: " + ChatFormatting.RESET + con.flopsRemaining.formatted("%,.1f") + "/" + con.flopsMaximum.formatted("%,.1f")
-            tooltip += ChatFormatting.YELLOW + "Passive FLOPs: " + ChatFormatting.RESET + con.passiveFlopGen.formatted("%,.1f")
-            tooltip += ChatFormatting.YELLOW + "Channel: " + ChatFormatting.RESET + con.channel
-            tooltip += ChatFormatting.YELLOW + "Items Per Op: " + ChatFormatting.RESET + con.itemsPerOp
-            tooltip += ChatFormatting.YELLOW + "Buffer Size: " + ChatFormatting.RESET + con.stackLimit
-            tooltip += ChatFormatting.YELLOW + "Mode: " + ChatFormatting.RESET + con.direction
-            tooltip += ChatFormatting.YELLOW + "Interface Direction: " + ChatFormatting.RESET + con.interfaceDirection.toString
+
+            tooltip += f"${ChatHelper.yellow("Item: ")}${if (itemstack.isEmpty) ChatHelper.italic("Empty") else itemstack.toMinecraft.toString}"
+            tooltip += f"${ChatHelper.yellow("FLOPs: ")}${con.flopsRemaining}%,.1f/${con.flopsMaximum}%,.1f"
+            tooltip += f"${ChatHelper.yellow("Passive FLOPs: ")}${con.passiveFlopGen}%,.1f"
+            tooltip += f"${ChatHelper.yellow("Channel: ")}${con.channel}"
+            tooltip += f"${ChatHelper.yellow("Items Per Op: ")}${con.itemsPerOp}"
+            tooltip += f"${ChatHelper.yellow("Buffer Size: ")}${con.stackLimit}"
+            tooltip += f"${ChatHelper.yellow("Mode: ")}${con.direction}"
+            tooltip += f"${ChatHelper.yellow("Interface Direction: ")}${con.interfaceDirection.toString}"
           }
         }.asInstanceOf[T]
       } else null.asInstanceOf[T]
