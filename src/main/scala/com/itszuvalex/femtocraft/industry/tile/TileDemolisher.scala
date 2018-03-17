@@ -119,7 +119,7 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TileDemolisher.TICKS_FOR_AUTOIO, 1)
+    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TileDemolisher.TICKS_FOR_AUTOIO, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -159,7 +159,7 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
       }
     }
 
-    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
+    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
   def setProgress(progress: Double): Unit = {

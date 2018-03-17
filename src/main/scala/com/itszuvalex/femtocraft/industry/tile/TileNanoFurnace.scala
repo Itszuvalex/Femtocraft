@@ -140,7 +140,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TileNanoFurnace.TICKS_FOR_AUTOIO, 1)
+    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TileNanoFurnace.TICKS_FOR_AUTOIO, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -180,7 +180,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
       }
     }
 
-    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
+    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
   def setProgress(progress: Double): Unit = {

@@ -25,7 +25,7 @@ object TileEntityUtils {
     *
     * @return Iterable Pairs of Storages.  First is outside, second is our te's.
     */
-  def getStoragesForIO(te: TileEntity, sidedStorageConfig: SidedItemStorageConfiguration, io: EnumAutomaticIO): Iterable[(IItemStorage, IItemStorage)] = {
+  def getItemStoragesForIO(te: TileEntity, sidedStorageConfig: SidedItemStorageConfiguration, io: EnumAutomaticIO): Iterable[(IItemStorage, IItemStorage)] = {
     val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (new Loc4(te).getOffset(a), a))
     val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
     tiles.map { pair =>
@@ -36,12 +36,12 @@ object TileEntityUtils {
     }.filterNot(_._1 == null)
   }
 
-  def checkDoInputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, ticksToAct: Int, inputSize: Int): Int = {
+  def checkDoItemInputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, ticksToAct: Int, inputSize: Int): Int = {
     val rticks = (ticks - 1 + ticksToAct) % ticksToAct
     // Input
     if (rticks == 0) {
       var isize = inputSize
-      TileEntityUtils.getStoragesForIO(te, config, EnumAutomaticIO.INPUT).exists { pair =>
+      TileEntityUtils.getItemStoragesForIO(te, config, EnumAutomaticIO.INPUT).exists { pair =>
         isize = pair._1.transferIntoStorage(pair._2, isize)
         isize <= 0
       }
@@ -49,10 +49,10 @@ object TileEntityUtils {
     rticks
   }
 
-  def checkDoOutputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, outputSize: Int): Boolean = {
+  def checkDoItemOutputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, outputSize: Int): Boolean = {
     if (ticks == 0) {
       var osize = outputSize
-      TileEntityUtils.getStoragesForIO(te, config, EnumAutomaticIO.OUTPUT).exists { pair =>
+      TileEntityUtils.getItemStoragesForIO(te, config, EnumAutomaticIO.OUTPUT).exists { pair =>
         osize = pair._2.transferIntoStorage(pair._1, osize)
         osize <= 0
       }

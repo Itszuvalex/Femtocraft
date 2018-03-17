@@ -130,7 +130,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, 1)
+    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -180,7 +180,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
       }
     }
 
-    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, 1)
+    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
