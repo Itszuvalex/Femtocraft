@@ -132,6 +132,7 @@ object FemtoBlocks {
     blockPowerPedestal.registerModel()
     blockNaniteHiveSmall.registerModel()
     blockCrystals.registerModel()
+    blockItemRepository.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()
     blockNaniteInfuser.registerModel()
