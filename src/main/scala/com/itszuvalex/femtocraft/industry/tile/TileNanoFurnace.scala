@@ -140,7 +140,8 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with PowerLeafNo
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TileNanoFurnace.TICKS_FOR_AUTOIO, 1)
+    ticks = TileEntityUtils.incrementTicks(ticks, TileNanoFurnace.TICKS_FOR_AUTOIO)
+    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)

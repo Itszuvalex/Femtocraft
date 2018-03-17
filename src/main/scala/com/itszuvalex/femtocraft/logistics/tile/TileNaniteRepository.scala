@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.{INanite, NaniteTank}
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository._
 import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
@@ -13,6 +14,8 @@ import net.minecraftforge.common.capabilities.Capability
 
 object TileNaniteRepository {
   val REPOSITORY_VOLUME       = 250
+  val TICKS_FOR_AUTIO         = 5
+  val VOL_PER_AUTOIO          = 1
   val TICKS_NBT               = "Ticks"
   val NANITE_SIDED_CONFIG_NBT = "NaniteConfig"
   val NANITE_TANK_KEY         = "Tank"
@@ -28,8 +31,10 @@ class TileNaniteRepository extends TileEntityBase with TileNaniteStorage {
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
-      case (cap, _) if cap == Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
       case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
+      case (cap, null) if cap == Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
+      case (_, null) => null.asInstanceOf[T]
+      case (cap, face) if cap == Capabilities.NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
       case _ => super.getCapability(capability, facing)
     }
 
@@ -48,8 +53,9 @@ class TileNaniteRepository extends TileEntityBase with TileNaniteStorage {
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    //    ticks = TileEntityUtils.checkDoInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, AMT_FOR_AUTOIO)
-    //    TileEntityUtils.checkDoOutputIO(this, sidedStorageConfig, ticks, AMT_FOR_AUTOIO)
+    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTIO)
+    TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
   }
 
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {

@@ -61,7 +61,8 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, AMT_FOR_AUTOIO)
+    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
+    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_FOR_AUTOIO)
     TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_FOR_AUTOIO)
   }
 

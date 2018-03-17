@@ -119,7 +119,8 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TileDemolisher.TICKS_FOR_AUTOIO, 1)
+    ticks = TileEntityUtils.incrementTicks(ticks, TileDemolisher.TICKS_FOR_AUTOIO)
+    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, 1)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)

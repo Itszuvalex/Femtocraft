@@ -41,6 +41,8 @@ object TileNaniteInfuser {
   val TICKS_NBT               = "Ticks"
 
   val TICKS_FOR_AUTOIO = 20
+  val AMT_PER_AUTOIO   = 1
+  val VOL_PER_AUTOIO   = 1
 
   object InfuseTask {
     val INFUSING_STACK_NBT = "Infuse"
@@ -138,7 +140,9 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, TICKS_FOR_AUTOIO, 1)
+    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
+    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
+    TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -188,7 +192,8 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
       }
     }
 
-    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, 1)
+    TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
@@ -214,10 +219,11 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
+    case (cap, null) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
     case (_, null) => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
     case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 
