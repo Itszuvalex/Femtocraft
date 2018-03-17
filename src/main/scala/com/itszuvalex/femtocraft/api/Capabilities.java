@@ -10,6 +10,7 @@ import com.itszuvalex.femtocraft.api.power.IPowerNetworkNode;
 import com.itszuvalex.femtocraft.api.power.IPowerStorageNode;
 import com.itszuvalex.femtocraft.api.worldgen.IChunkRiftCapability;
 import com.itszuvalex.femtocraft.industry.item.IMultitool;
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
@@ -63,6 +64,9 @@ public class Capabilities {
 
     @CapabilityInject(SidedItemStorageConfiguration.class)
     public static Capability<SidedItemStorageConfiguration> ITEM_STORAGE_CONFIGURABLE = null;
+
+    @CapabilityInject(SidedNaniteStorageConfiguration.class)
+    public static Capability<SidedNaniteStorageConfiguration> NANITE_STORAGE_CONFIGURABLE = null;
 
     @CapabilityInject(IChunkRiftCapability.class)
     public static Capability<IChunkRiftCapability> CHUNK_RIFT_CAPABILITY = null;

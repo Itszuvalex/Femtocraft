@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.InfuseTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
-import com.itszuvalex.femtocraft.nanite.TileNaniteStorage
+import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -32,9 +32,13 @@ object TileNaniteInfuser {
   val OUTPUT_INV_KEY = "Output"
   val NONE_INV_KEY   = "None"
 
-  val TASK_NBT              = "Task"
-  val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
-  val TICKS_NBT             = "Ticks"
+  val NANITE_TANK_KEY = "Tank"
+  val NONE_TANK_KEY   = "None"
+
+  val TASK_NBT                = "Task"
+  val ITEM_SIDED_CONFIG_NBT   = "ItemConfig"
+  val NANITE_SIDED_CONFIG_NBT = "NaniteConfig"
+  val TICKS_NBT               = "Ticks"
 
   val TICKS_FOR_AUTOIO = 20
 
@@ -83,6 +87,10 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
     INPUT_INV_KEY -> inputStorage,
     OUTPUT_INV_KEY -> outputStorage),
   () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  private val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+    Map(NONE_TANK_KEY -> null,
+      NANITE_TANK_KEY -> naniteStorageTank),
+    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
 
   override def defaultBattery = new PowerBattery(4000)
@@ -198,12 +206,14 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => true
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
+    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
     case (_, null) => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
@@ -216,6 +226,8 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
     if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    if (nbt.hasKey(NANITE_SIDED_CONFIG_NBT))
+      sidedNaniteConfig.deserializeNBT(nbt.getCompoundTag(NANITE_SIDED_CONFIG_NBT))
     ticks = nbt.getInteger(TICKS_NBT)
   }
 
@@ -223,6 +235,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
     super.writeToNBT(nbt)
     nbt.setTag(TASK_NBT, task.serializeNBT())
     nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    nbt.setTag(NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig.serializeNBT())
     nbt.setInteger(TICKS_NBT, ticks)
     nbt
   }

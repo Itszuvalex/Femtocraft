@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork, GuiTabSideConfig}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabNaniteSideConfig, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerNaniteExtractor
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteTank
@@ -20,7 +20,8 @@ import scala.collection.mutable.ListBuffer
 
 class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteExtractor) extends FemtoGuiBase(tile, new ContainerNaniteExtractor(player, inv, tile, false)) {
   GuiTabNetwork.addToGuiTabBar(tabBar, tile)
-  GuiTabSideConfig.addToGuiTabBar(tabBar, tile)
+  GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
+  GuiTabNaniteSideConfig.addToGuiTabBar(tabBar, tile)
 
   fontRenderer = Minecraft.getMinecraft.fontRenderer
   addGuiAndSync(tile.storage, 0, 43, 23)

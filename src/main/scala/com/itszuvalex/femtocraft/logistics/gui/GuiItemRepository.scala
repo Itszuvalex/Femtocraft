@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.logistics.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabSideConfig}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig}
 import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository
 import com.itszuvalex.femtocraft.logistics.gui.GuiItemRepository._
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
@@ -21,7 +21,7 @@ object GuiItemRepository {
 
 class GuiItemRepository(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileItemRepository)
   extends FemtoGuiBase(tile, new ContainerItemRepository(player, inv, tile, false)) {
-  GuiTabSideConfig.addToGuiTabBar(tabBar, tile)
+  GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
 
   val fRender = Minecraft.getMinecraft.fontRenderer
 

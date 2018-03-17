@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry.item._
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
@@ -36,6 +37,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
     CapabilityManager.INSTANCE.register(classOf[IConnectionProvider], new ConnectionProviderStorageDummy, classOf[ConnectionProviderImplDummy])
     CapabilityManager.INSTANCE.register(classOf[SidedItemStorageConfiguration], new SidedItemStorageConfigurationStorageDummy, classOf[SidedItemStorageConfiguration])
+    CapabilityManager.INSTANCE.register(classOf[SidedNaniteStorageConfiguration], new SidedNaniteStorageConfigurationStorageDummy, classOf[SidedNaniteStorageConfiguration])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -64,6 +66,16 @@ object ManagerCapabilities {
     }
 
     override def writeNBT(capability: Capability[SidedItemStorageConfiguration], instance: SidedItemStorageConfiguration, side: EnumFacing): NBTBase = {
+      instance.serializeNBT()
+    }
+  }
+
+  class SidedNaniteStorageConfigurationStorageDummy extends Capability.IStorage[SidedNaniteStorageConfiguration] {
+    override def readNBT(capability: Capability[SidedNaniteStorageConfiguration], instance: SidedNaniteStorageConfiguration, side: EnumFacing, nbt: NBTBase): Unit = {
+      instance.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
+    }
+
+    override def writeNBT(capability: Capability[SidedNaniteStorageConfiguration], instance: SidedNaniteStorageConfiguration, side: EnumFacing): NBTBase = {
       instance.serializeNBT()
     }
   }

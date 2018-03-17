@@ -2,9 +2,9 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
-import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfig
+import com.itszuvalex.femtocraft.industry.container.ContainerSidedNaniteConfig
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
-import com.itszuvalex.femtocraft.network.messages.{MessageSidedInventoryConfigChange, MessageSidedInventoryIOChange}
+import com.itszuvalex.femtocraft.network.messages.{MessageSidedNaniteConfigChange, MessageSidedNaniteIOChange}
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.utility.FacingUtil
@@ -17,7 +17,6 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.items.CapabilityItemHandler
 import org.lwjgl.opengl.GL11
 
 import scala.collection.mutable.ListBuffer
@@ -25,7 +24,7 @@ import scala.collection.mutable.ListBuffer
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/27/17.
   */
-object GuiSidedInventoryConfig {
+object GuiSidedNaniteConfig {
   val FRONT_TEX_BASE       = Resources.TexBlock("blockmachineblock_front_base.png")
   val FRONT_TEX_COLOR      = Resources.TexBlock("blockmachineblock_front_color.png")
   //  val SIDE_TEX_BASE        = Resources.TexBlock("blockmachineblock_side_base.png")
@@ -47,8 +46,8 @@ object GuiSidedInventoryConfig {
 
   class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()
-    private val customizeable = tile != null && tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
-    private val configuration = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+    private val customizeable = tile != null && tile.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)
+    private val configuration = tile.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)
 
     //  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
 
@@ -56,9 +55,9 @@ object GuiSidedInventoryConfig {
       if (!isDisabled && isLocationInside(mouseX, mouseY) && customizeable) {
         button match {
           case 0 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedInventoryConfigChange(tile, face, forward = true))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedNaniteConfigChange(tile, face, forward = true))
           case 1 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedInventoryConfigChange(tile, face, forward = false))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedNaniteConfigChange(tile, face, forward = false))
           case _ =>
         }
       }
@@ -72,7 +71,7 @@ object GuiSidedInventoryConfig {
         val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
+        if (te.nonEmpty && te.get.hasCapability(Capabilities.NANITE_STORAGE_TANK, offset.getOpposite)) {
           tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
@@ -86,7 +85,7 @@ object GuiSidedInventoryConfig {
       GL11.glEnable(GL11.GL_BLEND)
       GL11.glDisable(GL11.GL_LIGHTING)
 
-      Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedNaniteConfig.SIDE_TEX_EMPTY)
       drawBlock(DefaultVertexFormats.POSITION_TEX) {
         addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
         addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
@@ -96,9 +95,9 @@ object GuiSidedInventoryConfig {
 
       if (customizeable) {
         val colorindex = math.max(configuration.storages.keySet.toArray.indexOf(configuration.getStorageNameForRelativeFacing(face)), 0)
-        val color = GuiSidedInventoryConfig.colors(colorindex % GuiSidedInventoryConfig.colors.length)
+        val color = GuiSidedNaniteConfig.colors(colorindex % GuiSidedNaniteConfig.colors.length)
         GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
-        Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY_LIGHT)
+        Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedNaniteConfig.SIDE_TEX_EMPTY_LIGHT)
         drawBlock(DefaultVertexFormats.POSITION_TEX) {
           addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
           addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
@@ -110,9 +109,9 @@ object GuiSidedInventoryConfig {
         val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
+        if (te.nonEmpty && te.get.hasCapability(Capabilities.NANITE_STORAGE_TANK, offset.getOpposite)) {
           GL11.glColor4f(1, 1, 1, 1)
-          Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_COLOR)
+          Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedNaniteConfig.SIDE_TEX_COLOR)
           drawBlock(DefaultVertexFormats.POSITION_TEX) {
             addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
             addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
@@ -132,8 +131,8 @@ object GuiSidedInventoryConfig {
 
   class GuiSideIOButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()
-    private val customizeable = tile != null && tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
-    private val configuration = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+    private val customizeable = tile != null && tile.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)
+    private val configuration = tile.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)
 
     //  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
 
@@ -141,9 +140,9 @@ object GuiSidedInventoryConfig {
       if (!isDisabled && isLocationInside(mouseX, mouseY) && customizeable) {
         button match {
           case 0 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedInventoryIOChange(tile, face, forward = true))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedNaniteIOChange(tile, face, forward = true))
           case 1 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedInventoryIOChange(tile, face, forward = false))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedNaniteIOChange(tile, face, forward = false))
           case _ =>
         }
       }
@@ -157,7 +156,7 @@ object GuiSidedInventoryConfig {
         val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
+        if (te.nonEmpty && te.get.hasCapability(Capabilities.NANITE_STORAGE_TANK, offset.getOpposite)) {
           tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
@@ -171,7 +170,7 @@ object GuiSidedInventoryConfig {
       GL11.glEnable(GL11.GL_BLEND)
       GL11.glDisable(GL11.GL_LIGHTING)
 
-      Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedNaniteConfig.SIDE_TEX_EMPTY)
       drawBlock(DefaultVertexFormats.POSITION_TEX) {
         addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
         addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
@@ -182,8 +181,8 @@ object GuiSidedInventoryConfig {
       if (customizeable) {
         val resourceLocation = configuration.getIOForRelativeFacing(face) match {
           case EnumAutomaticIO.NONE => null
-          case EnumAutomaticIO.INPUT => GuiSidedInventoryConfig.SIDE_TEX_INPUT
-          case EnumAutomaticIO.OUTPUT => GuiSidedInventoryConfig.SIDE_TEX_OUTPUT
+          case EnumAutomaticIO.INPUT => GuiSidedNaniteConfig.SIDE_TEX_INPUT
+          case EnumAutomaticIO.OUTPUT => GuiSidedNaniteConfig.SIDE_TEX_OUTPUT
         }
 
         if (resourceLocation != null) {
@@ -207,24 +206,25 @@ object GuiSidedInventoryConfig {
 
 }
 
-class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig(tile)) {
-  override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
+class GuiSidedNaniteConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedNaniteConfig(tile)) {
+  override def GuiID: Int = GuiIDs.TileSidedNaniteConfigID
 
   val accessLabel       = new GuiLabel(10, 10, 50, 20, () => "Access")
-  val upConfigButton    = new GuiSidedInventoryConfig.GuiSideConfigButton(26, 30, tile, EnumFacing.UP)
-  val leftConfigButton  = new GuiSidedInventoryConfig.GuiSideConfigButton(10, 46, tile, EnumFacing.EAST)
-  val frontConfigButton = new GuiSidedInventoryConfig.GuiSideConfigButton(26, 46, tile, EnumFacing.NORTH)
-  val rightConfigButton = new GuiSidedInventoryConfig.GuiSideConfigButton(42, 46, tile, EnumFacing.WEST)
-  val downConfigButton  = new GuiSidedInventoryConfig.GuiSideConfigButton(26, 62, tile, EnumFacing.DOWN)
-  val backConfigButton  = new GuiSidedInventoryConfig.GuiSideConfigButton(42, 62, tile, EnumFacing.SOUTH)
+  val upConfigButton    = new GuiSidedNaniteConfig.GuiSideConfigButton(26, 30, tile, EnumFacing.UP)
+  val leftConfigButton  = new GuiSidedNaniteConfig.GuiSideConfigButton(10, 46, tile, EnumFacing.EAST)
+  val frontConfigButton = new GuiSidedNaniteConfig.GuiSideConfigButton(26, 46, tile, EnumFacing.NORTH)
+  val rightConfigButton = new GuiSidedNaniteConfig.GuiSideConfigButton(42, 46, tile, EnumFacing.WEST)
+  val downConfigButton  = new GuiSidedNaniteConfig.GuiSideConfigButton(26, 62, tile, EnumFacing.DOWN)
+  val backConfigButton  = new GuiSidedNaniteConfig.GuiSideConfigButton(42, 62, tile, EnumFacing.SOUTH)
   val automaticIOLabel  = new GuiLabel(110, 10, 50, 20, () => "Auto I/O")
-  val upIOButton        = new GuiSidedInventoryConfig.GuiSideIOButton(126, 30, tile, EnumFacing.UP)
-  val leftIOButton      = new GuiSidedInventoryConfig.GuiSideIOButton(110, 46, tile, EnumFacing.EAST)
-  val frontIOButton     = new GuiSidedInventoryConfig.GuiSideIOButton(126, 46, tile, EnumFacing.NORTH)
-  val rightIOButton     = new GuiSidedInventoryConfig.GuiSideIOButton(142, 46, tile, EnumFacing.WEST)
-  val downIOButton      = new GuiSidedInventoryConfig.GuiSideIOButton(126, 62, tile, EnumFacing.DOWN)
-  val backIOButton      = new GuiSidedInventoryConfig.GuiSideIOButton(142, 62, tile, EnumFacing.SOUTH)
+  val upIOButton        = new GuiSidedNaniteConfig.GuiSideIOButton(126, 30, tile, EnumFacing.UP)
+  val leftIOButton      = new GuiSidedNaniteConfig.GuiSideIOButton(110, 46, tile, EnumFacing.EAST)
+  val frontIOButton     = new GuiSidedNaniteConfig.GuiSideIOButton(126, 46, tile, EnumFacing.NORTH)
+  val rightIOButton     = new GuiSidedNaniteConfig.GuiSideIOButton(142, 46, tile, EnumFacing.WEST)
+  val downIOButton      = new GuiSidedNaniteConfig.GuiSideIOButton(126, 62, tile, EnumFacing.DOWN)
+  val backIOButton      = new GuiSidedNaniteConfig.GuiSideIOButton(142, 62, tile, EnumFacing.SOUTH)
 
   add(accessLabel, upConfigButton, leftConfigButton, frontConfigButton, rightConfigButton, downConfigButton, backConfigButton,
     automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)
 }
+

@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.gui._
 import com.itszuvalex.femtocraft.industry.tile._
-import com.itszuvalex.femtocraft.logistics.gui.{GuiConduit, GuiItemRepository}
-import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}
+import com.itszuvalex.femtocraft.logistics.gui.{GuiConduit, GuiItemRepository, GuiNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.gui._
@@ -26,6 +26,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new GuiItemRepository(player, player.inventory, te)
+      case (GuiIDs.TileNaniteRepositoryGuiID, te: TileNaniteRepository) => new GuiNaniteRepository(player, player.inventory, te)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new GuiCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new GuiNanoFurnace(player, player.inventory, te)
       case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new GuiNaniteExtractor(player, player.inventory, te)
@@ -37,6 +38,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TilePowerNetworkID, te: TileEntityBase) => new GuiPowerNetwork(te)
       case (GuiIDs.TileConduitID, te: TileConduit) => new GuiConduit(player, player.inventory, te)
       case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new GuiSidedInventoryConfig(te)
+      case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new GuiSidedNaniteConfig(te)
       case (_, _) => null
     }
   }
