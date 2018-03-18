@@ -275,11 +275,11 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
         FrameMultiblockRegistry.getMultiblock(multiBlock) match {
           case Some(multi) =>
             multi.getTakenLocations(getLoc).foreach { loc =>
-              getWorld.setBlockToAir(getPos)
+              getWorld.setBlockToAir(loc.getPos)
               if (TileFrame.shouldDrop) {
                 val itemStack = new ItemStack(FemtoItems.itemFrame)
                 ItemFrame.setSelection(itemStack, multiBlock)
-                InventoryUtils.dropItem(Converter.IItemStackFromItemStack(itemStack), getLoc, random)
+                InventoryUtils.dropItem(Converter.IItemStackFromItemStack(itemStack), loc, random)
               }
             }
             if (isBuilding && TileFrame.shouldDrop)
@@ -289,7 +289,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
         indInventory.getInventory.foreach(i => InventoryUtils.dropItem(Converter.IItemStackFromItemStack(i), getLoc, random))
       }
       else info.cLoc.getTileEntity() match {
-        case Some(frame: TileFrame) => world.setBlockToAir(getPos)
+        case Some(frame: TileFrame) => world.setBlockToAir(info.cLoc.getPos)
         case _ =>
       }
     }
