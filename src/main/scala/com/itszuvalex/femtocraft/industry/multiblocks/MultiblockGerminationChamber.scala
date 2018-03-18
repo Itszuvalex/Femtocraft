@@ -10,8 +10,8 @@ import net.minecraft.item.ItemStack
 
 object MultiblockGerminationChamber {
   val xSize = 2
-  val ySize = 2
-  val zSize = 3
+  val ySize = 3
+  val zSize = 2
 
 }
 
@@ -20,14 +20,14 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic")
 
-  override def canPlaceAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { loc =>
-    loc.getBlock(true).get.isAir(loc.getBlockState(true).get, loc.getWorld.get, loc.getPos) ||
-      loc.getBlock(true).get.isReplaceable(loc.getWorld.get, loc.getPos)
+  override def canPlaceAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
+    l.getWorld.get.isAirBlock(l.getPos) ||
+      l.getBlock(true).get.isReplaceable(l.getWorld.get, l.getPos)
   }
 
-  override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { loc =>
-    loc.getWorld.get.setBlockState(loc.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
-    loc.getTileEntity(true) match {
+  override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
+    l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
+    l.getTileEntity(true) match {
       case Some(te: TileGerminationChamber) =>
         // Set base Loc4
         true
@@ -42,14 +42,14 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
       x <- 0 until xSize
       y <- 0 until ySize
       z <- 0 until zSize
-    } yield Loc4(x, y, z, loc.dim)
+    } yield Loc4(loc.x + x, loc.y + y, loc.z + z, loc.dim)
   }.toSet
 
-  override def numFrames: Int = 2 * 2 * 3
+  override def numFrames: Int = xSize * ySize * zSize
 
   override def getRequiredResources: IndexedSeq[ItemStack] = Array(ItemStack.EMPTY)
 
-  override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach(loc => loc.getWorld.get.setBlockToAir(loc.getPos))
+  override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach(l => l.getWorld.get.setBlockToAir(l.getPos))
 
   override def multiblockRenderID: Int = RenderIDs.germinationChamberID
 }
