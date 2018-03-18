@@ -54,6 +54,7 @@ class GuiNaniteTank(
   override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
     GL11.glColor3f(1f, 1f, 1f)
     val mc = Minecraft.getMinecraft
+    GL11.glEnable(GL11.GL_BLEND)
     mc.renderEngine.bindTexture(textureLoc)
 
     drawBlock(DefaultVertexFormats.POSITION_TEX) {

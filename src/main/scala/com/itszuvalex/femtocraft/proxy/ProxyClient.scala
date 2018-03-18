@@ -211,6 +211,7 @@ class ProxyClient extends ProxyCommon {
     MinecraftForge.EVENT_BUS.register(new PlayerNaniteCapabilitiesOverlay)
     MinecraftForge.EVENT_BUS.register(new PlayerNearbyRiftsOverlay)
     MinecraftForge.EVENT_BUS.register(new RiftRenderer)
+    MinecraftForge.EVENT_BUS.register(OverlayRenderer)
   }
 
   override def onRegisterItem[T <: Item](item: T, name: String): Unit = {

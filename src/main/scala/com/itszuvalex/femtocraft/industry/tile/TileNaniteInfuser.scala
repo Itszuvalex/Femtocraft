@@ -127,7 +127,6 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with PowerLeaf
     (slot, item) match {
       case (_, null) => true
       case (_, b) if b.isEmpty => true
-      case (1, _) => true
       case (0, _) => NaniteInfusionRecipeRegistry.getMatchingRecipe(Converter.IItemStackFromItemStack(item)).isDefined
       case _ => false
     }
