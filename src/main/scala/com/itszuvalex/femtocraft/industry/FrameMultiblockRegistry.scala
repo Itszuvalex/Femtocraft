@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
+import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
+
 import scala.collection._
 
 /**
@@ -13,6 +15,7 @@ object FrameMultiblockRegistry {
   def getMultiblocksForFrameType(ftype: String) = frameMap.values.filter(_.getAllowedFrameTypes.contains(ftype))
 
   def init(): Unit = {
+    registerMultiblock(new MultiblockGerminationChamber)
   }
 
   def registerMultiblock(multi: IFrameMultiblock) = frameMap.put(multi.getName, multi)
