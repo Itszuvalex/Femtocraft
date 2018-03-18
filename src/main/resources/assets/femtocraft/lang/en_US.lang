@@ -30,6 +30,7 @@ tile.blockCyberBase.name=Cyber Base
 tile.blockInProgressMachine.name=In Progress Machine
 tile.blockNaniteHive_small.name=Small Nanite Hive
 tile.blockItemRepository.name=Item Repository
+tile.blockNaniteRepository.name=Nanite Repository
 tile.blockCrystalMount.name=Crystal Mount
 tile.blockPowerPedestal.name=Power Pedestal
 tile.blockNaniteExtractor.name=Nanite Extractor

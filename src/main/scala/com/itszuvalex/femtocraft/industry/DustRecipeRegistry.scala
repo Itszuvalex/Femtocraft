@@ -59,6 +59,10 @@ object DustRecipeRegistry {
     addItemStackMapping(Blocks.GRAVEL.newStack(), Blocks.SAND.newStack())
     addItemStackMapping(FemtoBlocks.blockSubstrate.newStack(), FemtoItems.itemDumbDust.newStack())
     addItemStackMapping(Items.DIAMOND.newStack(), FemtoItems.itemDiamondDust.newStack())
+    addItemStackMapping(FemtoItems.itemPhasemetalIngotActivated.newStack(), FemtoItems.itemPhasemetalDust.newStack())
+    addItemStackMapping(FemtoItems.itemPhasemetalIngotDevoid.newStack(), FemtoItems.itemPhasemetalDust.newStack())
+    addItemStackMapping(FemtoItems.itemRiftironIngotActivated.newStack(), FemtoItems.itemRiftironDust.newStack())
+    addItemStackMapping(FemtoItems.itemRiftironIngotDevoid.newStack(), FemtoItems.itemRiftironDust.newStack())
 
     addStackMatcher(new IDustRecipe {
       override def matches(item: ItemStack): Boolean = item != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
