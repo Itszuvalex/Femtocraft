@@ -5,7 +5,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 
 
 object GuiTabNaniteSideConfig {
-  val SideConfigTexLoc = Resources.TexGui("tabsideconfig.png")
+  val SideConfigTexLoc = Resources.TexGui("tabnanites.png")
 
   def addToGuiTabBar(bar: GuiTabBar, tile: TileEntityBase): Unit = {
     bar.addTab(new GuiTabNaniteSideConfig("Nanite Config", tile, bar.getActiveGuiID))

@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
-import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
+import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import net.minecraft.client.Minecraft
 import org.lwjgl.opengl.GL11
 
@@ -20,30 +20,31 @@ object FrameRenderer {
 
   def renderFrameAt(x: Double, y: Double, z: Double, partialTime: Float, marks: Set[(Int, Int, Int)]): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(frameTexLocation)
-    GL11.glPushMatrix()
-    //    GL11.glDisable(GL11.GL_LIGHTING)
-    GL11.glTranslated(x + .5, y, z + .5)
-    GL11.glEnable(GL11.GL_CULL_FACE)
-    GL11.glDisable(GL11.GL_BLEND)
-    GL11.glColor4f(1f, 1f, 1f, 1f)
+    RenderUtils.glMatrixBlock {
+      GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT)
+      //    GL11.glDisable(GL11.GL_LIGHTING)
+      GL11.glTranslated(x + .5, y, z + .5)
+      GL11.glEnable(GL11.GL_CULL_FACE)
+      GL11.glDisable(GL11.GL_BLEND)
+      GL11.glColor4f(1f, 1f, 1f, 1f)
 
-    marks.foreach { case (a, b, c) =>
-      frameModel.renderGroups(Set(
-        ((a, b, c) match {
-          case (_, 0, _) => "T"
-          case (0, 2, _) => "B"
-          case (1, 1, _) => "B"
-          case _ => ""
-        })
-          + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
-      ), bindTextures = false)
+      marks.foreach { case (a, b, c) =>
+        frameModel.renderGroups(Set(
+          ((a, b, c) match {
+            case (_, 0, _) => "T"
+            case (0, 2, _) => "B"
+            case (1, 1, _) => "B"
+            case _ => ""
+          })
+            + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
+        ), bindTextures = false)
+      }
+
+      GL11.glEnable(GL11.GL_BLEND)
+      //    GL11.glEnable(GL11.GL_LIGHTING)
+      GL11.glPopAttrib()
     }
-
-    GL11.glEnable(GL11.GL_BLEND)
-    //    GL11.glEnable(GL11.GL_LIGHTING)
-    GL11.glPopMatrix()
   }
-
 }
 
 class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
