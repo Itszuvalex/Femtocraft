@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.femtocraft.industry.container.ContainerFrameConstructing
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.util.ItemUtils
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import net.minecraft.client.Minecraft
@@ -53,5 +53,6 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
     GL11.glScaled(scaling, scaling, 1)
     multibockRender.render(0, 0, -1, -1, partialTicks)
     GL11.glPopMatrix()
+    super.drawGuiContainerBackgroundLayer(partialTicks, p_146976_2_, p_146976_3_)
   }
 }
