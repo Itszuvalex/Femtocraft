@@ -9,6 +9,7 @@ import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration
 import com.itszuvalex.itszulib.util.Color
@@ -38,6 +39,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IConnectionProvider], new ConnectionProviderStorageDummy, classOf[ConnectionProviderImplDummy])
     CapabilityManager.INSTANCE.register(classOf[SidedItemStorageConfiguration], new SidedItemStorageConfigurationStorageDummy, classOf[SidedItemStorageConfiguration])
     CapabilityManager.INSTANCE.register(classOf[SidedNaniteStorageConfiguration], new SidedNaniteStorageConfigurationStorageDummy, classOf[SidedNaniteStorageConfiguration])
+    CapabilityManager.INSTANCE.register(classOf[MultiBlockInfo], new MultiBlockInfoStorageDummy, classOf[MultiBlockInfo])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -105,6 +107,14 @@ object ManagerCapabilities {
   class LogisticsStorageDummy extends DummyStorage[ILogisticsNetworkNode]
 
   class ConnectionProviderStorageDummy extends DummyStorage[IConnectionProvider]
+
+  class MultiBlockInfoStorageDummy extends Capability.IStorage[MultiBlockInfo] {
+    override def readNBT(capability: Capability[MultiBlockInfo], instance: MultiBlockInfo, side: EnumFacing, nbt: NBTBase): Unit =
+      instance.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
+
+    override def writeNBT(capability: Capability[MultiBlockInfo], instance: MultiBlockInfo, side: EnumFacing): NBTBase =
+      instance.serializeNBT()
+  }
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 

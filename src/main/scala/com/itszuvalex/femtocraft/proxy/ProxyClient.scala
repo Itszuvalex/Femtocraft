@@ -146,7 +146,7 @@ class ProxyClient extends ProxyCommon {
 
     val germinationChamberRenderer = new MultiblockGerminationChamberRenderer
     RenderIDs.germinationChamberID = FrameMultiblockRendererRegistry.bindRenderer(germinationChamberRenderer)
-    //    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGerminationChamber], germinationChamberRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGerminationChamber], germinationChamberRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], new PowerPedestalRenderer)

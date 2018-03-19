@@ -2,9 +2,11 @@ package com.itszuvalex.femtocraft.industry.tile
 
 import java.util.Random
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -18,6 +20,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
+import net.minecraftforge.common.capabilities.Capability
 
 import scala.collection.mutable
 
@@ -32,6 +35,8 @@ object TileFrame {
 
   var shouldDrop        = true
   var shouldFullyRemove = true
+
+  val TICKS_TO_CHECK = 40
 
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
@@ -98,6 +103,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   var totalMachineBuildTime: Int                      = 10 * 20
   var inProgressData       : mutable.Map[String, Any] = mutable.Map()
   var isBuilding           : Boolean                  = false
+  var ticks                                           = 0
 
   var isModifyingInv: Boolean = false
 
@@ -109,6 +115,16 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
     renderInt = TileFrame.fullRender(true)
   }
 
+
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability match {
+    case c if capability == Capabilities.MULTIBLOCK_CAPABILITY => true
+    case _ => super.hasCapability(capability, facing)
+  }
+
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = capability match {
+    case c if capability == Capabilities.MULTIBLOCK_CAPABILITY => info.asInstanceOf[T]
+    case _ => super.getCapability(capability, facing)
+  }
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     if (isController) {
@@ -128,7 +144,12 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   override def serverUpdate(): Unit = {
     super.serverUpdate()
     if (isController) {
-      if (isBuilding) {
+      if (!isBuilding) {
+        ticks = TileEntityUtils.incrementTicks(ticks, TileFrame.TICKS_TO_CHECK)
+        if (ticks == 0)
+          checkForRequiredItems()
+      }
+      else {
         progress += 1
         if (progress >= totalMachineBuildTime) {
           FrameMultiblockRegistry.getMultiblock(multiBlock) match {
@@ -175,6 +196,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           (item, slots.filter { slot =>
             getStackInSlot(slot) match {
               case null => false
+              case i if i.isEmpty => false
               case i if IDDamageWildCardNBTComparator.compare(item, i) == 0 => true
               case _ => false
             }
@@ -201,7 +223,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
               i.setCount(i.getCount - amt)
               if (i.getCount <= 0) {
                 isModifyingInv = true
-                setInventorySlotContents(slot, null)
+                setInventorySlotContents(slot, ItemStack.EMPTY)
                 isModifyingInv = false
               }
               needed <= 0
@@ -211,7 +233,7 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
           val random = new Random()
           indInventory.getInventory.zipWithIndex.foreach { case (item, slot) =>
             if (!world.isRemote) InventoryUtils.dropItem(Converter.IItemStackFromItemStack(item), getLoc, random)
-            indInventory.setInventorySlotContents(slot, null)
+            indInventory.setInventorySlotContents(slot, ItemStack.EMPTY)
           }
           isModifyingInv = false
           isBuilding = true

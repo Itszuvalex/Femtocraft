@@ -22,7 +22,7 @@ object OBJDynamicRenderer {
     else model.asInstanceOf[OBJModel]
   }
 
-  implicit class OBjRender(model: OBJModel) {
+  implicit class ObjRender(model: OBJModel) {
     def render(bindTextures: Boolean = false): Unit = {
       if (model == null) return
 

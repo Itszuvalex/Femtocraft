@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -18,6 +19,8 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util._
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
+import net.minecraftforge.fml.relauncher.SideOnly
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/30/15.
@@ -118,4 +121,20 @@ class ItemFrame extends Item with IFrameItem {
   }
 
   override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+
+  override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
+    new ICapabilityProvider {
+      override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+        if (capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE) {
+          new IPreviewable {
+            @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
+            override def renderID: Int = RenderIDs.framePreviewableID
+          }.asInstanceOf[T]
+        }
+        else null.asInstanceOf[T]
+      }
+
+      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE
+    }
+  }
 }

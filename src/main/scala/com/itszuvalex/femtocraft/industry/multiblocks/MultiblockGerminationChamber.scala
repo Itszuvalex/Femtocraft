@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry.multiblocks
 
 import com.itszuvalex.femtocraft.FemtoBlocks
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber.{xSize, ySize, zSize}
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
@@ -13,10 +14,11 @@ object MultiblockGerminationChamber {
   val ySize = 3
   val zSize = 2
 
+  val name = "Germination Chamber"
 }
 
 class MultiblockGerminationChamber extends IFrameMultiblock {
-  override def getName: String = "Germination Chamber"
+  override def getName: String = MultiblockGerminationChamber.name
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic")
 
@@ -28,8 +30,8 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
   override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
     l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
     l.getTileEntity(true) match {
-      case Some(te: TileGerminationChamber) =>
-        // Set base Loc4
+      case Some(te: TileGerminationChamber) if te.hasCapability(Capabilities.MULTIBLOCK_CAPABILITY, null) =>
+        te.getCapability(Capabilities.MULTIBLOCK_CAPABILITY, null).formMultiBlock(loc)
         true
       case _ => false
     }
@@ -47,7 +49,7 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
 
   override def numFrames: Int = xSize * ySize * zSize
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = Array(ItemStack.EMPTY)
+  override def getRequiredResources: IndexedSeq[ItemStack] = Array[ItemStack]()
 
   override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach(l => l.getWorld.get.setBlockToAir(l.getPos))
 
