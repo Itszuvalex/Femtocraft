@@ -1,6 +1,7 @@
 itemGroup.femtocraft=Femtocraft
 
 tile.blockSubstrate.name=Substrate
+tile.blockRefinedSubstrate.name=Refined Substrate
 tile.blockCyberwood.name=Cyberwood
 tile.blockCyberleaf.name=Cyberleaf
 tile.crystalCluster.name=Crystal Cluster

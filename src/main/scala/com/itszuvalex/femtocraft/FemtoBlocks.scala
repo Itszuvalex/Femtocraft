@@ -9,6 +9,7 @@ import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
+import net.minecraft.block.material.Material
 import net.minecraft.item.{Item, ItemBlock}
 import net.minecraftforge.event.RegistryEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,9 +23,10 @@ import scala.collection.mutable.ArrayBuffer
   */
 object FemtoBlocks {
   //Cyber
-  var blockSubstrate: Block = _
-  var blockCyberwood: Block = _
-  var blockCyberleaf: Block = _
+  var blockSubstrate       : Block = _
+  var blockRefinedSubstrate: Block = _
+  var blockCyberwood       : Block = _
+  var blockCyberleaf       : Block = _
 
   var blockNanoweave          : Block = _
   var blockRiftiron           : Block = _
@@ -82,6 +84,7 @@ object FemtoBlocks {
   def registerBlocks(event: RegistryEvent.Register[Block]) {
     val registry = event.getRegistry
     blockSubstrate = registerBlock(registry, new BlockSubstrate(), "blockSubstrate").registerOre("substrate")
+    blockRefinedSubstrate = registerBlock(registry, new Block(Material.IRON).setHardness(1.2f), "blockRefinedSubstrate")
     blockCyberwood = registerBlock(registry, new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(registry, new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
 
@@ -123,6 +126,7 @@ object FemtoBlocks {
 
   def init(): Unit = {
     blockSubstrate.registerModel()
+    blockRefinedSubstrate.registerModel()
     blockFrame.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
@@ -163,12 +167,12 @@ object FemtoBlocks {
   def registerItemBlocks(registry: IForgeRegistry[Item]): Unit = {
     itemBlocksToRegister.foreach { blockname =>
       registry.register(new ItemBlock(blockname._1).setRegistryName(blockname._1.getRegistryName).setUnlocalizedName(blockname._2))
-    }
+                                 }
     itemBlocksToRegister.clear()
 
     oresToRegister.foreach { blockname =>
       OreDictionary.registerOre(blockname._2, blockname._1)
-    }
+                           }
     oresToRegister.clear()
   }
 
