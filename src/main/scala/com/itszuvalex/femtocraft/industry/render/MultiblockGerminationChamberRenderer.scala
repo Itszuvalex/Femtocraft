@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.render.OBJDynamicRenderer
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.RenderUtils
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.ItemStack
@@ -19,7 +20,8 @@ object MultiblockGerminationChamberRenderer {
   val chamberModelLoc = Resources.CustomModelBlock("growth chamber/Growth Chamber.obj")
   val chamberTexLoc   = Resources.CustomModelBlockTex("growth chamber/Growth Chamber Template.png")
   val baseModelLoc    = Resources.CustomModelBlock("cyber base/base 2x2.obj")
-  val baseTexLoc      = Resources.CustomModelBlockTex("cyber base/base 2x2 template.png")
+  val baseTexLoc      = Resources.CustomModelBlockTex("cyber base/base 2x2.png")
+  val baseTexColorLoc = Resources.CustomModelBlockTex("cyber base/base 2x2 color.png")
 }
 
 @SideOnly(Side.CLIENT)
@@ -63,7 +65,7 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
     * @param rz
     */
   override def renderAtLocation(rx: Double, ry: Double, rz: Double): Unit = {
-    renderAtLocationInternal(rx, ry, rz, 0, 0)
+    renderAtLocationInternal(rx, ry, rz, 0, Color(0, 0, 0, 0), 0)
   }
 
   /**
@@ -90,10 +92,10 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
 
   override def render(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     te match {case t: TileGerminationChamber => if (t.hasCapability(Capabilities.MULTIBLOCK_CAPABILITY, null) && !t.getCapability(Capabilities.MULTIBLOCK_CAPABILITY, null).isController(t.getLoc)) return; case _ => return}
-    renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, partialTicks)
+    renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(Capabilities.COLORABLE, null)) te.getCapability(Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
   }
 
-  private def renderAtLocationInternal(x: Double, y: Double, z: Double, worldTime: Long, partialTicks: Float) = {
+  private def renderAtLocationInternal(x: Double, y: Double, z: Double, worldTime: Long, color: Color, partialTicks: Float) = {
     RenderUtils.glMatrixBlock {
       GL11.glEnable(GL11.GL_BLEND)
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -101,6 +103,9 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
       GL11.glTranslated(x + 1, y, z + 1)
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexLoc)
       GL11.glColor4f(1f, 1f, 1f, 1f)
+      baseModel.render()
+      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexColorLoc)
+      GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
       baseModel.render()
 
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
