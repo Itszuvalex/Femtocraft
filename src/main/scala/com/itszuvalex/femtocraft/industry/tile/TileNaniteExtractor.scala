@@ -177,6 +177,20 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
     case _ => super.getCapability(capability, facing)
   }
 
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    compound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    compound.setTag(NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig.serializeNBT())
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    if (compound.hasKey(ITEM_SIDED_CONFIG_NBT))
+      sidedStorageConfig.deserializeNBT(compound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    if (compound.hasKey(NANITE_SIDED_CONFIG_NBT))
+      sidedNaniteConfig.deserializeNBT(compound.getCompoundTag(NANITE_SIDED_CONFIG_NBT))
+  }
+
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
     super.readFromNBT(nbt)
     task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
