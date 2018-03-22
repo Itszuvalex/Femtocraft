@@ -17,17 +17,17 @@ import org.lwjgl.opengl.GL11
 
 @SideOnly(Side.CLIENT)
 object MultiblockGerminationChamberRenderer {
-  val chamberModelLoc = Resources.CustomModelBlock("growth chamber/Growth Chamber.obj")
-  val chamberTexLoc   = Resources.CustomModelBlockTex("growth chamber/Growth Chamber Template.png")
-  val baseModelLoc    = Resources.CustomModelBlock("cyber base/base 2x2.obj")
-  val baseTexLoc      = Resources.CustomModelBlockTex("cyber base/base 2x2.png")
-  val baseTexColorLoc = Resources.CustomModelBlockTex("cyber base/base 2x2 color.png")
+  val chamberModelLoc = Resources.CustomModelBlock("growth chamber/growth chamber.obj")
+  val chamberTexLoc   = Resources.CustomModelBlockTex("growth chamber/growth chamber template.png")
+  //val baseModelLoc    = Resources.CustomModelBlock("cyber base/base 2x2.obj")
+  //val baseTexLoc      = Resources.CustomModelBlockTex("cyber base/base 2x2.png")
+  //val baseTexColorLoc = Resources.CustomModelBlockTex("cyber base/base 2x2 color.png")
 }
 
 @SideOnly(Side.CLIENT)
 class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[TileGerminationChamber] with IFrameMultiblockRenderer {
   val chamberModel = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.chamberModelLoc)
-  val baseModel    = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.baseModelLoc)
+  //val baseModel    = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.baseModelLoc)
 
   /**
     * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
@@ -101,50 +101,49 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
       GL11.glEnable(GL11.GL_CULL_FACE)
       GL11.glTranslated(x + 1, y, z + 1)
-      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexLoc)
-      GL11.glColor4f(1f, 1f, 1f, 1f)
-      baseModel.render()
-      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexColorLoc)
-      GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
-      baseModel.render()
+//      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexLoc)
+//      GL11.glColor4f(1f, 1f, 1f, 1f)
+//      baseModel.render()
+//      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexColorLoc)
+//      GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
+//      baseModel.render()
 
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
-      GL11.glTranslated(0, 1, 0)
       GL11.glColor4f(1f, 1f, 1f, 1f)
 
-      chamberModel.renderGroups(Set("Base", "Top"))
+      chamberModel.renderGroups(Set("Base", "Middle", "Top"))
 
-      //    val recipe = te.currentRecipe
-      //    if (recipe != null) {
-      //      recipe.renderType match {
-      //        case 0 =>
-      //        case 1 =>
-      //          recipe.renderObj match {
-      //            case rl: ResourceLocation =>
-      //              Minecraft.getMinecraft.getTextureManager.bindTexture(rl)
-      //              GL11.glDisable(GL11.GL_CULL_FACE)
-      //              GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
-      //              GL11.glEnable(GL11.GL_CULL_FACE)
-      //            case ar: Array[ResourceLocation] =>
-      //              val ind = math.max(math.ceil(ar.length * (te.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1, 0)
-      //              Minecraft.getMinecraft.getTextureManager.bindTexture(ar(ind))
-      //              GL11.glDisable(GL11.GL_CULL_FACE)
-      //              GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
-      //              GL11.glEnable(GL11.GL_CULL_FACE)
-      //          }
-      //          Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
-      //        case 2 =>
-      //          GL11.glPopMatrix()
-      //          recipe.renderObj.asInstanceOf[IRecipeRenderer].renderAtCenterLocation(x + 1, y + .2, z + 1, partialTime, te.asInstanceOf[TileGrowthChamber].progress)
-      //          Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
-      //          GL11.glPushMatrix()
-      //          GL11.glEnable(GL11.GL_BLEND)
-      //          GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-      //          GL11.glEnable(GL11.GL_CULL_FACE)
-      //          GL11.glTranslated(x + 1, y, z + 1)
-      //          GL11.glColor4f(1f, 1f, 1f, 1f)
-      //      }
-      //    }
+//          val recipe = te.currentRecipe
+//          if (recipe != null) {
+//            recipe.renderType match {
+//              case 0 =>
+//              case 1 =>
+//                recipe.renderObj match {
+//                  case rl: ResourceLocation =>
+//                    Minecraft.getMinecraft.getTextureManager.bindTexture(rl)
+//                    GL11.glDisable(GL11.GL_CULL_FACE)
+//                    GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
+//                    GL11.glEnable(GL11.GL_CULL_FACE)
+//                  case ar: Array[ResourceLocation] =>
+//                    val ind = math.max(math.ceil(ar.length * (te.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1, 0)
+//                    Minecraft.getMinecraft.getTextureManager.bindTexture(ar(ind))
+//                    GL11.glDisable(GL11.GL_CULL_FACE)
+//                    GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
+//                    GL11.glEnable(GL11.GL_CULL_FACE)
+//                }
+//                Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+//              case 2 =>
+//                GL11.glPopMatrix()
+//                recipe.renderObj.asInstanceOf[IRecipeRenderer].renderAtCenterLocation(x + 1, y + .2, z + 1, partialTime, te.asInstanceOf[TileGrowthChamber].progress)
+//                Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+//                GL11.glPushMatrix()
+//                GL11.glEnable(GL11.GL_BLEND)
+//                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+//                GL11.glEnable(GL11.GL_CULL_FACE)
+//                GL11.glTranslated(x + 1, y, z + 1)
+//                GL11.glColor4f(1f, 1f, 1f, 1f)
+//            }
+//          }
 
       if (Minecraft.getMinecraft.gameSettings.particleSetting == 0) {
         val time = worldTime + partialTicks
