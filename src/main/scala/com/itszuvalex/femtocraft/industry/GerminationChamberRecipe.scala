@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
-import com.itszuvalex.itszulib.api.wrappers.{IFluidStack, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
+import net.minecraftforge.fluids.Fluid
 
 /**
   *
@@ -12,4 +13,4 @@ import com.itszuvalex.itszulib.api.wrappers.{IFluidStack, IItemStack}
   * @param powerPerTick
   * @param results ItemStack, (min, max)
   */
-case class GerminationChamberRecipe(base: IItemStack, fluid: IFluidStack, fluidRequired: Boolean, ticks: Int, fluidPerTick: Int, powerPerTick: Int, results: Iterable[(IItemStack, (Int, Int))])
+case class GerminationChamberRecipe(base: IItemStack, fluid: Fluid, fluidRequired: Boolean, ticks: Int, fluidPerTick: Int, powerPerTick: Int, results: Iterable[(IItemStack, (Int, Int))])
