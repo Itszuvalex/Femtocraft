@@ -9,8 +9,10 @@ import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.RenderUtils
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.block.BlockCrops
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
@@ -101,49 +103,49 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
       GL11.glEnable(GL11.GL_CULL_FACE)
       GL11.glTranslated(x + 1, y, z + 1)
-//      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexLoc)
-//      GL11.glColor4f(1f, 1f, 1f, 1f)
-//      baseModel.render()
-//      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexColorLoc)
-//      GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
-//      baseModel.render()
+      //      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexLoc)
+      //      GL11.glColor4f(1f, 1f, 1f, 1f)
+      //      baseModel.render()
+      //      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.baseTexColorLoc)
+      //      GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
+      //      baseModel.render()
 
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
       GL11.glColor4f(1f, 1f, 1f, 1f)
 
       chamberModel.renderGroups(Set("Base", "Middle", "Top"))
 
-//          val recipe = te.currentRecipe
-//          if (recipe != null) {
-//            recipe.renderType match {
-//              case 0 =>
-//              case 1 =>
-//                recipe.renderObj match {
-//                  case rl: ResourceLocation =>
-//                    Minecraft.getMinecraft.getTextureManager.bindTexture(rl)
-//                    GL11.glDisable(GL11.GL_CULL_FACE)
-//                    GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
-//                    GL11.glEnable(GL11.GL_CULL_FACE)
-//                  case ar: Array[ResourceLocation] =>
-//                    val ind = math.max(math.ceil(ar.length * (te.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1, 0)
-//                    Minecraft.getMinecraft.getTextureManager.bindTexture(ar(ind))
-//                    GL11.glDisable(GL11.GL_CULL_FACE)
-//                    GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
-//                    GL11.glEnable(GL11.GL_CULL_FACE)
-//                }
-//                Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
-//              case 2 =>
-//                GL11.glPopMatrix()
-//                recipe.renderObj.asInstanceOf[IRecipeRenderer].renderAtCenterLocation(x + 1, y + .2, z + 1, partialTime, te.asInstanceOf[TileGrowthChamber].progress)
-//                Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
-//                GL11.glPushMatrix()
-//                GL11.glEnable(GL11.GL_BLEND)
-//                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-//                GL11.glEnable(GL11.GL_CULL_FACE)
-//                GL11.glTranslated(x + 1, y, z + 1)
-//                GL11.glColor4f(1f, 1f, 1f, 1f)
-//            }
-//          }
+      //          val recipe = te.currentRecipe
+      //          if (recipe != null) {
+      //            recipe.renderType match {
+      //              case 0 =>
+      //              case 1 =>
+      //                recipe.renderObj match {
+      //                  case rl: ResourceLocation =>
+      //                    Minecraft.getMinecraft.getTextureManager.bindTexture(rl)
+      //                    GL11.glDisable(GL11.GL_CULL_FACE)
+      //                    GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
+      //                    GL11.glEnable(GL11.GL_CULL_FACE)
+      //                  case ar: Array[ResourceLocation] =>
+      //                    val ind = math.max(math.ceil(ar.length * (te.asInstanceOf[TileGrowthChamber].progress / 100d)).toInt - 1, 0)
+      //                    Minecraft.getMinecraft.getTextureManager.bindTexture(ar(ind))
+      //                    GL11.glDisable(GL11.GL_CULL_FACE)
+      //                    GrowthChamberRenderer.model.renderAllExcept("Base", "Top", "Glass", "Sprinkler1", "Sprinkler2", "Sprinkler3")
+      //                    GL11.glEnable(GL11.GL_CULL_FACE)
+      //                }
+      //                Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+      //              case 2 =>
+      //                GL11.glPopMatrix()
+      //                recipe.renderObj.asInstanceOf[IRecipeRenderer].renderAtCenterLocation(x + 1, y + .2, z + 1, partialTime, te.asInstanceOf[TileGrowthChamber].progress)
+      //                Minecraft.getMinecraft.getTextureManager.bindTexture(GrowthChamberRenderer.texture)
+      //                GL11.glPushMatrix()
+      //                GL11.glEnable(GL11.GL_BLEND)
+      //                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+      //                GL11.glEnable(GL11.GL_CULL_FACE)
+      //                GL11.glTranslated(x + 1, y, z + 1)
+      //                GL11.glColor4f(1f, 1f, 1f, 1f)
+      //            }
+      //          }
 
       if (Minecraft.getMinecraft.gameSettings.particleSetting == 0) {
         val time = worldTime + partialTicks
@@ -180,6 +182,15 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
         GL11.glColor4f(1f, 1f, 1f, 1f)
       }
 
+      RenderUtils.glMatrixBlock {
+        GL11.glTranslated(-.5, 1.2, .5)
+        RenderUtils.bindBlockTextures()
+        val state = Blocks.WHEAT.getDefaultState.withProperty(BlockCrops.AGE, Integer.valueOf(7))
+        val blockmodel = Minecraft.getMinecraft.getBlockRendererDispatcher.getModelForState(state)
+        Minecraft.getMinecraft.getBlockRendererDispatcher.getBlockModelRenderer.renderModelBrightness(blockmodel, state, 1f, false)
+      }
+
+      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
       chamberModel.renderGroups(Set("Glass"))
 
     }
