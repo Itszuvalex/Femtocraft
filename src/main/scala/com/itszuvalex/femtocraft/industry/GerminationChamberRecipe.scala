@@ -13,4 +13,4 @@ import net.minecraftforge.fluids.Fluid
   * @param powerPerTick
   * @param results ItemStack, (min, max)
   */
-case class GerminationChamberRecipe(base: IItemStack, fluid: Fluid, fluidRequired: Boolean, fluidSpeedBonus: Float, ticks: Int, fluidPerTick: Int, powerPerTick: Int, results: Iterable[(IItemStack, (Int, Int))])
+case class GerminationChamberRecipe(base: IItemStack, fluid: Fluid, fluidRequired: Int, fluidSpeedBonus: Float, ticks: Int, fluidPerTick: Int, powerPerTick: Int, results: Iterable[(IItemStack, (Int, Int))])
