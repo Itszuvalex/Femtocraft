@@ -1,9 +1,11 @@
 package com.itszuvalex.femtocraft.render
 
-import com.itszuvalex.femtocraft.industry.gui.GuiSidedInventoryConfig
+import com.itszuvalex.femtocraft.industry.gui.{GuiSidedInventoryConfig, GuiSidedNaniteConfig}
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedItemStorageConfiguration}
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.{RenderUtils, Vector3}
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
@@ -75,19 +77,31 @@ object FemtoRenderUtils {
   }
 
   def renderItemConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedItemStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedInventoryConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedInventoryConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
+  }
+
+  def renderNaniteConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedNaniteStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedNaniteConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedNaniteConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
+  }
+
+  private def renderConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, colorForStorage: (EnumFacing) => Color, ioForFacing: (EnumFacing) => EnumAutomaticIO): Unit = {
     disableLightMaps()
     RenderUtils.translationBlock(x, y, z) {
       GL11.glDisable(GL11.GL_DEPTH_TEST)
       EnumFacing.VALUES.foreach { facing =>
-        val storageName = sidedConfig.getStorageNameForAbsoluteFacing(facing)
-        val index = sidedConfig.storages.keys.toArray.indexOf(storageName)
-        val color = GuiSidedInventoryConfig.colors(index % GuiSidedInventoryConfig.colors.length)
+        val color = colorForStorage(facing)
         GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
         Minecraft.getMinecraft.getTextureManager.bindTexture(CONFIG_STORAGE_TEXTURE())
         RenderUtils.drawArbitraryFace(0, 0, 0, 0, 1, 0, 1, 0, 1, facing, null, 0, 1, 0, 1)
 
         GL11.glColor4f(1f, 1f, 1f, 1f)
-        (sidedConfig.getIOForAbsoluteFacing(facing) match {
+        (ioForFacing(facing) match {
           case EnumAutomaticIO.NONE => None
           case EnumAutomaticIO.INPUT => Some(CONFIG_IO_TEXTURE_INPUT)
           case EnumAutomaticIO.OUTPUT => Some(CONFIG_IO_TEXTURE_OUTPUT)
@@ -109,5 +123,4 @@ object FemtoRenderUtils {
     }
     enableLightMap(te.getWorld, te.getPos)
   }
-
 }
