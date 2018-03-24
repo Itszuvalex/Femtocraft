@@ -52,6 +52,7 @@ object FemtoItems {
   var itemFrame     : Item = _
   var itemMultiblock: Item = _
 
+  var itemConfigurator: Item = _
   var itemMultiTool: Item = _
   var itemShiftTest: Item = _
   var itemNanoLash : Item = _
@@ -90,6 +91,7 @@ object FemtoItems {
     itemLogisticsItemChipBasic = registerItem(registry, new ItemLogisticsItemChip(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsFluidChipBasic = registerItem(registry, new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
     itemLogisticsNaniteChipBasic = registerItem(registry, new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
+    itemConfigurator = registerItem(registry, new ItemConfigurator(), "itemConfigurator")
     itemMultiTool = registerItem(registry, new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest").setCreativeTab(Femtocraft.tab)
     itemNanoLash = registerItem(registry, new ItemNanolash(), "itemNanoLash").setCreativeTab(Femtocraft.tab)
@@ -128,6 +130,7 @@ object FemtoItems {
     itemLogisticsItemChipBasic.registerModel()
     itemLogisticsFluidChipBasic.registerModel()
     itemLogisticsNaniteChipBasic.registerModel()
+    itemConfigurator.registerModel()
     itemMultiTool.registerModel()
     itemShiftTest.registerModel()
     itemNanoLash.registerModel()

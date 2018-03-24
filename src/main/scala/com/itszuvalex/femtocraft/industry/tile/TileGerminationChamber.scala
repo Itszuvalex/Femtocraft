@@ -18,12 +18,12 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
   override def getMod: AnyRef = Femtocraft
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability match {
-    case c if capability == Capabilities.MULTIBLOCK_CAPABILITY => true
+    case c if capability == Capabilities.TILE_MULTIBLOCK => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = capability match {
-    case c if capability == Capabilities.MULTIBLOCK_CAPABILITY => info.asInstanceOf[T]
+    case c if capability == Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 

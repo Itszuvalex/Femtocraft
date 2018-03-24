@@ -40,16 +40,16 @@ public class Capabilities {
     public static Capability<Color> COLORABLE = null;
 
     @CapabilityInject(IPlayerNaniteCapability.class)
-    public static Capability<IPlayerNaniteCapability> NANITE_CAPABILITY = null;
+    public static Capability<IPlayerNaniteCapability> PLAYER_NANITE_CAPABILITY = null;
 
     @CapabilityInject(IPowerCrystal.class)
     public static Capability<IPowerCrystal> ITEM_POWER_CRYSTAL = null;
 
     @CapabilityInject(INaniteTank.class)
-    public static Capability<INaniteTank> NANITE_STORAGE_TANK = null;
+    public static Capability<INaniteTank> TILE_NANITE_STORAGE_TANK = null;
 
     @CapabilityInject(INaniteUpgradeable.class)
-    public static Capability<INaniteUpgradeable> NANITE_UPGRADEABLE = null;
+    public static Capability<INaniteUpgradeable> TILE_NANITE_UPGRADEABLE = null;
 
     @CapabilityInject(IMultitool.class)
     public static Capability<IMultitool> ITEM_MULTITOOL = null;
@@ -70,8 +70,11 @@ public class Capabilities {
     public static Capability<SidedNaniteStorageConfiguration> NANITE_STORAGE_CONFIGURABLE = null;
 
     @CapabilityInject(IChunkRiftCapability.class)
-    public static Capability<IChunkRiftCapability> CHUNK_RIFT_CAPABILITY = null;
+    public static Capability<IChunkRiftCapability> CHUNK_RIFT = null;
 
     @CapabilityInject(MultiBlockInfo.class)
-    public static Capability<MultiBlockInfo> MULTIBLOCK_CAPABILITY = null;
+    public static Capability<MultiBlockInfo> TILE_MULTIBLOCK = null;
+
+    @CapabilityInject(IOverlayRenderItem.class)
+    public static Capability<IOverlayRenderItem> ITEM_OVERLAY_RENDER = null;
 }

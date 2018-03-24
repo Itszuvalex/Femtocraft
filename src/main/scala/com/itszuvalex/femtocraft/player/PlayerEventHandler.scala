@@ -12,12 +12,12 @@ class PlayerEventHandler {
   @SubscribeEvent
   def handlePlayerJoin(event: PlayerLoggedInEvent): Unit = {
     if (event.player.world.isRemote) return
-    event.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
+    event.player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH).sync()
   }
 
   @SubscribeEvent
   def handlePlayerRespawn(event: PlayerRespawnEvent): Unit = {
     if (event.player.world.isRemote) return
-    event.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).sync()
+    event.player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH).sync()
   }
 }

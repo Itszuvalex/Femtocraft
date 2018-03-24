@@ -93,7 +93,7 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
   override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
   override def render(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
-    te match {case t: TileGerminationChamber => if (t.hasCapability(Capabilities.MULTIBLOCK_CAPABILITY, null) && !t.getCapability(Capabilities.MULTIBLOCK_CAPABILITY, null).isController(t.getLoc)) return; case _ => return}
+    te match {case t: TileGerminationChamber => if (t.hasCapability(Capabilities.TILE_MULTIBLOCK, null) && !t.getCapability(Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc)) return; case _ => return}
     renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(Capabilities.COLORABLE, null)) te.getCapability(Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
   }
 

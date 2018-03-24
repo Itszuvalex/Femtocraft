@@ -32,15 +32,15 @@ class TileNaniteRepository extends TileEntityBase with TileNaniteStorage {
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
       case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
-      case (cap, null) if cap == Capabilities.NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
+      case (cap, null) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
       case (_, null) => null.asInstanceOf[T]
-      case (cap, face) if cap == Capabilities.NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
+      case (cap, face) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
       case _ => super.getCapability(capability, facing)
     }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
     (capability, facing) match {
-      case (cap, _) if cap == Capabilities.NANITE_STORAGE_TANK => true
+      case (cap, _) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => true
       case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => true
       case _ => super.hasCapability(capability, facing)
     }

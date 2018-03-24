@@ -71,7 +71,7 @@ object GuiSidedNaniteConfig {
         val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(Capabilities.NANITE_STORAGE_TANK, offset.getOpposite)) {
+        if (te.nonEmpty && te.get.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, offset.getOpposite)) {
           tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
@@ -109,7 +109,7 @@ object GuiSidedNaniteConfig {
         val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(Capabilities.NANITE_STORAGE_TANK, offset.getOpposite)) {
+        if (te.nonEmpty && te.get.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, offset.getOpposite)) {
           GL11.glColor4f(1, 1, 1, 1)
           Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedNaniteConfig.SIDE_TEX_COLOR)
           drawBlock(DefaultVertexFormats.POSITION_TEX) {
@@ -156,7 +156,7 @@ object GuiSidedNaniteConfig {
         val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(Capabilities.NANITE_STORAGE_TANK, offset.getOpposite)) {
+        if (te.nonEmpty && te.get.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, offset.getOpposite)) {
           tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 

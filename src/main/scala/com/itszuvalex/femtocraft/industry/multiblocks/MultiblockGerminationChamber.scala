@@ -30,8 +30,8 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
   override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
     l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
     l.getTileEntity(true) match {
-      case Some(te: TileGerminationChamber) if te.hasCapability(Capabilities.MULTIBLOCK_CAPABILITY, null) =>
-        te.getCapability(Capabilities.MULTIBLOCK_CAPABILITY, null).formMultiBlock(loc)
+      case Some(te: TileGerminationChamber) if te.hasCapability(Capabilities.TILE_MULTIBLOCK, null) =>
+        te.getCapability(Capabilities.TILE_MULTIBLOCK, null).formMultiBlock(loc)
         true
       case _ => false
     }

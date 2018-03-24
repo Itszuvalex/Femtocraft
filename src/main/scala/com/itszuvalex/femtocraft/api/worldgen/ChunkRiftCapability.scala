@@ -64,13 +64,13 @@ class ChunkRiftCapability(val chunk: Chunk) extends IChunkRiftCapability with IC
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.CHUNK_RIFT_CAPABILITY)
+    if (capability == Capabilities.CHUNK_RIFT)
       this.asInstanceOf[T]
     else
       null.asInstanceOf[T]
   }
 
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.CHUNK_RIFT_CAPABILITY
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.CHUNK_RIFT
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     riftBuffer.clear()

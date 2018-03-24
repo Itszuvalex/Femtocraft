@@ -40,6 +40,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[SidedItemStorageConfiguration], new SidedItemStorageConfigurationStorageDummy, classOf[SidedItemStorageConfiguration])
     CapabilityManager.INSTANCE.register(classOf[SidedNaniteStorageConfiguration], new SidedNaniteStorageConfigurationStorageDummy, classOf[SidedNaniteStorageConfiguration])
     CapabilityManager.INSTANCE.register(classOf[MultiBlockInfo], new MultiBlockInfoStorageDummy, classOf[MultiBlockInfo])
+    CapabilityManager.INSTANCE.register(classOf[IOverlayRenderItem], new OverlayRenderStorageDummy, classOf[OverlayRenderItemImplDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -107,6 +108,8 @@ object ManagerCapabilities {
   class LogisticsStorageDummy extends DummyStorage[ILogisticsNetworkNode]
 
   class ConnectionProviderStorageDummy extends DummyStorage[IConnectionProvider]
+
+  class OverlayRenderStorageDummy extends DummyStorage[IOverlayRenderItem]
 
   class MultiBlockInfoStorageDummy extends Capability.IStorage[MultiBlockInfo] {
     override def readNBT(capability: Capability[MultiBlockInfo], instance: MultiBlockInfo, side: EnumFacing, nbt: NBTBase): Unit =
@@ -264,6 +267,10 @@ object ManagerCapabilities {
     override def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
     override def addTooltip(tooltip: util.List[String]): Unit = {}
+  }
+
+  class OverlayRenderItemImplDummy extends IOverlayRenderItem {
+    override def shouldRender(overlay: OverlayRenderSwitch): Boolean = false
   }
 
 }

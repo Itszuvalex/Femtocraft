@@ -62,7 +62,7 @@ class PlayerNaniteCapabilitiesOverlay {
 
   def capabilities: IPlayerNaniteCapability = {
     if (player != Minecraft.getMinecraft.player) {
-      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
+      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH)
       if (caps != naniteCapabilities)
         naniteCapabilities = caps
     }

@@ -32,7 +32,7 @@ object TileConduit {
     Capabilities.TILE_CONDUIT,
     Capabilities.TILE_LOGISTICS_NODE,
     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-    Capabilities.NANITE_STORAGE_TANK,
+    Capabilities.TILE_NANITE_STORAGE_TANK,
     CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
   )
 

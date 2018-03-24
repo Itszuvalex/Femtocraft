@@ -37,12 +37,12 @@ class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends Message
 
       // Do things
       message.loc.getTileEntity() match {
-        case Some(tile: TileEntity) if tile.hasCapability(Capabilities.NANITE_STORAGE_TANK, null) =>
-          val storageTank = tile.getCapability(Capabilities.NANITE_STORAGE_TANK, null)
+        case Some(tile: TileEntity) if tile.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null) =>
+          val storageTank = tile.getCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null)
           if (storageTank != null) {
             val nanites = storageTank.nanitesInTank
-            if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
-              val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.NANITE_CAPABILITY, EnumFacing.UP)
+            if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)) {
+              val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)
               nanites.foreach { nanite =>
                 val amount = storageTank.drain(nanite, 1, false)
                 if (amount != null) {

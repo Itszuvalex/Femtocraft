@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.industry.render
 
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
@@ -31,6 +33,9 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
     pass = 1
     color = getColor(te)
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
+    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+    }
   }
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {

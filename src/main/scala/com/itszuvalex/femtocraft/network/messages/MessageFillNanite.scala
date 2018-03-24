@@ -34,11 +34,11 @@ class MessageFillNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageU
 
       // Do things
       message.loc.getTileEntity() match {
-        case Some(tile: TileEntity) if tile.hasCapability(Capabilities.NANITE_STORAGE_TANK, null) =>
-          val storageTank = tile.getCapability(Capabilities.NANITE_STORAGE_TANK, null)
+        case Some(tile: TileEntity) if tile.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null) =>
+          val storageTank = tile.getCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null)
           if (storageTank != null) {
-            if (ctx.getServerHandler.player.hasCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
-              val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.NANITE_CAPABILITY, EnumFacing.UP)
+            if (ctx.getServerHandler.player.hasCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)) {
+              val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)
               capability.tank.nanitesInTank.foreach { nanite =>
                 val amount = capability.tank.drain(nanite, 1, false)
                 if (amount != null) {

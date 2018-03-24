@@ -69,13 +69,13 @@ class PlayerNaniteCapability(player: EntityPlayer) extends IPlayerNaniteCapabili
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.NANITE_CAPABILITY)
+    if (capability == Capabilities.PLAYER_NANITE_CAPABILITY)
       this.asInstanceOf[T]
     else
       null.asInstanceOf[T]
   }
 
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.NANITE_CAPABILITY
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.PLAYER_NANITE_CAPABILITY
 
   override def sync() = {
     player match {

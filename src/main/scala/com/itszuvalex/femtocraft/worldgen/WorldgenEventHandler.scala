@@ -18,7 +18,7 @@ class WorldgenEventHandler {
   @SubscribeEvent
   def onChunkUnload(chunkEvent: ChunkEvent.Unload): Unit = {
     // Unload with no nbt
-    chunkEvent.getChunk.getCapability(Capabilities.CHUNK_RIFT_CAPABILITY, null) match {
+    chunkEvent.getChunk.getCapability(Capabilities.CHUNK_RIFT, null) match {
       case null =>
       case cap => cap.rifts.foreach(FemtocraftRiftTracker.deregisterRift)
     }
@@ -27,7 +27,7 @@ class WorldgenEventHandler {
   @SubscribeEvent
   def onChunkLoad(chunkEvent: ChunkEvent.Load): Unit = {
     // Load with no nbt
-    chunkEvent.getChunk.getCapability(Capabilities.CHUNK_RIFT_CAPABILITY, null) match {
+    chunkEvent.getChunk.getCapability(Capabilities.CHUNK_RIFT, null) match {
       case null =>
       case cap => cap.rifts.foreach(FemtocraftRiftTracker.registerRift)
     }

@@ -113,7 +113,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
     }
 
     // add rift
-    val chunkRiftCapability = world.getChunkFromBlockCoords(new BlockPos(x, y, z)).getCapability(Capabilities.CHUNK_RIFT_CAPABILITY, null)
+    val chunkRiftCapability = world.getChunkFromBlockCoords(new BlockPos(x, y, z)).getCapability(Capabilities.CHUNK_RIFT, null)
     if (chunkRiftCapability != null) {
       var adjustedY = y
       while (adjustedY > 1 && world.isAirBlock(new BlockPos(x, adjustedY, z))) adjustedY -= 1

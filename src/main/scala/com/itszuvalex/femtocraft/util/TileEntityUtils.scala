@@ -42,7 +42,7 @@ object TileEntityUtils {
     val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (new Loc4(te).getOffset(a), a))
     val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
     tiles.map { pair =>
-      val inputStorage = if (pair._1.hasCapability(com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK, pair._2.getOpposite)) pair._1.getCapability(com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_TANK, pair._2.getOpposite)
+      val inputStorage = if (pair._1.hasCapability(com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK, pair._2.getOpposite)) pair._1.getCapability(com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK, pair._2.getOpposite)
       else null
       (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
     }.filterNot(_._1 == null).filterNot(_._2 == null)

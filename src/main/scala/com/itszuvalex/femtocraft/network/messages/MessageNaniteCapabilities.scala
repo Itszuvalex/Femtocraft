@@ -19,7 +19,7 @@ class MessageNaniteCapabilities(cap: PlayerNaniteCapability) extends MessageUpda
     if (player == null) return null
 
     ItszuLib.proxy.addScheduledTask(() => {
-      val cap = player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH).asInstanceOf[PlayerNaniteCapability]
+      val cap = player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH).asInstanceOf[PlayerNaniteCapability]
       cap.deserializeNBT(message.nbt)
       PlayerNaniteCapabilitiesOverlay.interact()
     })
