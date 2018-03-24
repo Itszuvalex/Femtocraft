@@ -53,9 +53,9 @@ object FemtoItems {
   var itemMultiblock: Item = _
 
   var itemConfigurator: Item = _
-  var itemMultiTool: Item = _
-  var itemShiftTest: Item = _
-  var itemNanoLash : Item = _
+  var itemMultiTool   : Item = _
+  var itemShiftTest   : Item = _
+  var itemNanoLash    : Item = _
 
   val itemCallbacks = new ArrayBuffer[() => Unit]()
 
@@ -71,30 +71,30 @@ object FemtoItems {
     itemNanoweaveThread = registerItem(registry, new Item(), "itemNanoweaveThread")
     itemNanoweaveSheet = registerItem(registry, new Item(), "itemNanoweaveSheet")
     itemCracklingDust = registerItem(registry, new Item(), "itemCracklingDust")
-    itemRiftironDust = registerItem(registry, new Item(), "itemRiftironDust").setCreativeTab(Femtocraft.tab).registerOre("dustRiftiron")
-    itemPhasemetalDust = registerItem(registry, new Item(), "itemPhasemetalDust").setCreativeTab(Femtocraft.tab).registerOre("dustPhasemetal")
-    itemIronDust = registerItem(registry, new Item(), "itemIronDust").setCreativeTab(Femtocraft.tab).registerOre("dustIron")
-    itemGoldDust = registerItem(registry, new Item(), "itemGoldDust").setCreativeTab(Femtocraft.tab).registerOre("dustGold")
-    itemDiamondDust = registerItem(registry, new Item(), "itemDiamondDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamond")
-    itemRedstonereplacementDust = registerItem(registry, new Item(), "itemRedstonereplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustRedstonereplacement")
-    itemLapisreplacementDust = registerItem(registry, new Item(), "itemLapisreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustLapisreplacement")
-    itemDiamondreplacementDust = registerItem(registry, new Item(), "itemDiamondreplacementDust").setCreativeTab(Femtocraft.tab).registerOre("dustDiamondreplacement")
-    itemRiftironIngotDevoid = registerItem(registry, new Item(), "itemRiftironIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironDevoid")
-    itemRiftironIngotActivated = registerItem(registry, new Item(), "itemRiftironIngotActivated").setCreativeTab(Femtocraft.tab).registerOre("ingotRiftironActivated")
-    itemPhasemetalIngotDevoid = registerItem(registry, new Item(), "itemPhasemetalIngotDevoid").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalDevoid")
-    itemPhasemetalIngotActivated = registerItem(registry, new Item(), "itemPhasemetalIngotActivated").setCreativeTab(Femtocraft.tab).registerOre("ingotPhasemetalActivated")
-    itemBasicCircuit = registerItem(registry, new Item(), "itemBasicCircuit").setCreativeTab(Femtocraft.tab)
-    itemEnergyRegulator = registerItem(registry, new Item(), "itemEnergyRegulator").setCreativeTab(Femtocraft.tab)
-    itemCrystalBattery = registerItem(registry, new Item(), "itemCrystalBattery").setCreativeTab(Femtocraft.tab)
-    itemNaniteBeacon = registerItem(registry, new Item(), "itemNaniteBeacon").setCreativeTab(Femtocraft.tab)
-    itemNanoChannel = registerItem(registry, new Item(), "itemNanoChannel").setCreativeTab(Femtocraft.tab)
-    itemLogisticsItemChipBasic = registerItem(registry, new ItemLogisticsItemChip(), "itemLogisticsItemChipBasic").setCreativeTab(Femtocraft.tab)
-    itemLogisticsFluidChipBasic = registerItem(registry, new Item(), "itemLogisticsFluidChipBasic").setCreativeTab(Femtocraft.tab)
-    itemLogisticsNaniteChipBasic = registerItem(registry, new Item(), "itemLogisticsNaniteChipBasic").setCreativeTab(Femtocraft.tab)
+    itemRiftironDust = registerItem(registry, new Item(), "itemRiftironDust").registerOre("dustRiftiron")
+    itemPhasemetalDust = registerItem(registry, new Item(), "itemPhasemetalDust").registerOre("dustPhasemetal")
+    itemIronDust = registerItem(registry, new Item(), "itemIronDust").registerOre("dustIron")
+    itemGoldDust = registerItem(registry, new Item(), "itemGoldDust").registerOre("dustGold")
+    itemDiamondDust = registerItem(registry, new Item(), "itemDiamondDust").registerOre("dustDiamond")
+    itemRedstonereplacementDust = registerItem(registry, new Item(), "itemRedstonereplacementDust").registerOre("dustRedstonereplacement")
+    itemLapisreplacementDust = registerItem(registry, new Item(), "itemLapisreplacementDust").registerOre("dustLapisreplacement")
+    itemDiamondreplacementDust = registerItem(registry, new Item(), "itemDiamondreplacementDust").registerOre("dustDiamondreplacement")
+    itemRiftironIngotDevoid = registerItem(registry, new Item(), "itemRiftironIngotDevoid").registerOre("ingotRiftironDevoid")
+    itemRiftironIngotActivated = registerItem(registry, new Item(), "itemRiftironIngotActivated").registerOre("ingotRiftironActivated")
+    itemPhasemetalIngotDevoid = registerItem(registry, new Item(), "itemPhasemetalIngotDevoid").registerOre("ingotPhasemetalDevoid")
+    itemPhasemetalIngotActivated = registerItem(registry, new Item(), "itemPhasemetalIngotActivated").registerOre("ingotPhasemetalActivated")
+    itemBasicCircuit = registerItem(registry, new Item(), "itemBasicCircuit")
+    itemEnergyRegulator = registerItem(registry, new Item(), "itemEnergyRegulator")
+    itemCrystalBattery = registerItem(registry, new Item(), "itemCrystalBattery")
+    itemNaniteBeacon = registerItem(registry, new Item(), "itemNaniteBeacon")
+    itemNanoChannel = registerItem(registry, new Item(), "itemNanoChannel")
+    itemLogisticsItemChipBasic = registerItem(registry, new ItemLogisticsItemChip(), "itemLogisticsItemChipBasic")
+    itemLogisticsFluidChipBasic = registerItem(registry, new Item(), "itemLogisticsFluidChipBasic")
+    itemLogisticsNaniteChipBasic = registerItem(registry, new Item(), "itemLogisticsNaniteChipBasic")
     itemConfigurator = registerItem(registry, new ItemConfigurator(), "itemConfigurator")
     itemMultiTool = registerItem(registry, new ItemMultiTool(), "itemMultiTool")
-    itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest").setCreativeTab(Femtocraft.tab)
-    itemNanoLash = registerItem(registry, new ItemNanolash(), "itemNanoLash").setCreativeTab(Femtocraft.tab)
+    itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest")
+    itemNanoLash = registerItem(registry, new ItemNanolash(), "itemNanoLash")
 
     FemtoBlocks.registerItemBlocks(registry)
 

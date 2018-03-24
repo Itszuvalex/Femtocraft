@@ -1,18 +1,71 @@
 package com.itszuvalex.femtocraft.industry.item
 
 import com.itszuvalex.femtocraft.api.{Capabilities, IOverlayRenderItem, OverlayRenderSwitch}
+import net.minecraft.client.util.ITooltipFlag
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
+import net.minecraft.util._
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 
 object ItemConfigurator {
+  val storageString = "Overlay"
 
+  def getOverlaySwitch(stack: ItemStack): OverlayRenderSwitch = {
+    if (stack.hasTagCompound)
+      OverlayRenderSwitch.valueOf(stack.getTagCompound.getString(storageString))
+    else
+      OverlayRenderSwitch.ITEM
+  }
+
+  def setOverlaySwitch(stack: ItemStack, switch: OverlayRenderSwitch): Unit = {
+    if (!stack.hasTagCompound)
+      stack.setTagCompound(new NBTTagCompound)
+    stack.getTagCompound.setString(storageString, switch.toString)
+  }
 }
 
 class ItemConfigurator extends Item {
+  override def onItemRightClick(worldIn: World, playerIn: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
+    if (playerIn.isSneaking) {
+      val itemStack = playerIn.getHeldItem(hand)
+      if (itemStack != null && !itemStack.isEmpty) {
+        val current = ItemConfigurator.getOverlaySwitch(itemStack)
+        val index = OverlayRenderSwitch.values.indexOf(current)
+        val switch = OverlayRenderSwitch.values.apply((index + 1) % OverlayRenderSwitch.values.length)
+        ItemConfigurator.setOverlaySwitch(itemStack, switch)
+      }
+      new ActionResult(EnumActionResult.SUCCESS, itemStack)
+    }
+    else
+      super.onItemRightClick(worldIn, playerIn, hand)
+  }
+
+  override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
+    if (playerIn.isSneaking) {
+      val itemStack = playerIn.getHeldItem(hand)
+      if (itemStack != null && !itemStack.isEmpty) {
+        val current = ItemConfigurator.getOverlaySwitch(itemStack)
+        val index = OverlayRenderSwitch.values.indexOf(current)
+        val switch = OverlayRenderSwitch.values.apply((index + 1) % OverlayRenderSwitch.values.length)
+        ItemConfigurator.setOverlaySwitch(itemStack, switch)
+      }
+      EnumActionResult.SUCCESS
+    }
+    else
+      super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+  }
+
+  override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[String], flagIn: ITooltipFlag) = {
+    super.addInformation(stack, worldIn, tooltip, flagIn)
+    val list = tooltip.asInstanceOf[java.util.List[String]]
+    list.add("Interaction: " + ItemConfigurator.getOverlaySwitch(stack))
+  }
+
   @SideOnly(Side.CLIENT)
   override def isFull3D: Boolean = true
 
@@ -21,7 +74,7 @@ class ItemConfigurator extends Item {
       override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = if (capability == Capabilities.ITEM_OVERLAY_RENDER) {
         {
           new IOverlayRenderItem {
-            override def shouldRender(overlay: OverlayRenderSwitch): Boolean = overlay == OverlayRenderSwitch.ITEM
+            override def shouldRender(overlay: OverlayRenderSwitch): Boolean = overlay == ItemConfigurator.getOverlaySwitch(stack)
           }
         }.asInstanceOf[T]
       }

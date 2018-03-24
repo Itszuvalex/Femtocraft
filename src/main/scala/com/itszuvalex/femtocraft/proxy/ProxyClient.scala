@@ -20,8 +20,9 @@
  */
 package com.itszuvalex.femtocraft.proxy
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.{Capabilities, OverlayRenderSwitch}
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
+import com.itszuvalex.femtocraft.industry.item.ItemConfigurator
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.render.{ConduitRenderer, ItemRepositoryRender, NaniteRepositoryRender, WorkerProviderBeamRenderer}
@@ -175,7 +176,7 @@ class ProxyClient extends ProxyCommon {
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 
-//        MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
+    //        MinecraftForgeClient.registerItemRenderer(FemtoItems.itemMultiblock, new MultiblockItemRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemPowerCrystal, new CrystalItemRenderer)
 
@@ -189,26 +190,44 @@ class ProxyClient extends ProxyCommon {
       override def colorMultiplier(stack: ItemStack, tintIndex: Int): Int = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getColor()
     }, FemtoItems.itemPowerCrystal)
 
-    val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
+    val powerCrystal = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, new ItemMeshDefinition {
       override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
         val ctype = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
         val suffix = if (ctype != null && !ctype.isEmpty) {
           "_" + ctype
         } else ""
-        new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + suffix), "inventory")
+        new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"$powerCrystal$suffix"), "inventory")
+      }
+    })
+
+    val configurator = FemtoItems.itemConfigurator.getUnlocalizedName.substring(5).toLowerCase
+    Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemConfigurator, new ItemMeshDefinition {
+      override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
+        val suffix = ItemConfigurator.getOverlaySwitch(stack) match {
+          case OverlayRenderSwitch.ITEM => "_item"
+          case OverlayRenderSwitch.FLUID => "_fluid"
+          case OverlayRenderSwitch.NANITE => "_nanite"
+        }
+        new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"$configurator$suffix"), "inventory")
       }
     })
 
   }
 
   def registerModels(): Unit = {
-    val file = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
+    val powerCrystal = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "small"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "medium"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, file + "_" + "large"), "inventory"))
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, powerCrystal), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_small"), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_medium"), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_large"), "inventory"))
+    val configurator = FemtoItems.itemConfigurator.getUnlocalizedName.substring(5).toLowerCase
+    ModelBakery.registerItemVariants(FemtoItems.itemConfigurator,
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, configurator), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_item"), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_fluid"), "inventory"),
+      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_nanite"), "inventory"))
   }
 
   override def registerEventHandlers(): Unit = {
