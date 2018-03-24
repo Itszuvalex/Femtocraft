@@ -2,10 +2,11 @@ package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
 import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileGerminationChamber}
-import com.itszuvalex.femtocraft.render.OBJDynamicRenderer
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
+import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.RenderUtils
 import com.itszuvalex.itszulib.util.Color
@@ -14,6 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
+import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
@@ -93,8 +95,15 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
   override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
   override def render(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
-    te match {case t: TileGerminationChamber => if (t.hasCapability(Capabilities.TILE_MULTIBLOCK, null) && !t.getCapability(Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc)) return; case _ => return}
-    renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(Capabilities.COLORABLE, null)) te.getCapability(Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+    te match {
+      case t: TileGerminationChamber => if (t.hasCapability(Capabilities.TILE_MULTIBLOCK, null) && t.getCapability(Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
+        renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(Capabilities.COLORABLE, null)) te.getCapability(Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+      case _ => return
+    }
+
+    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+    }
   }
 
   private def renderAtLocationInternal(x: Double, y: Double, z: Double, worldTime: Long, color: Color, partialTicks: Float) = {

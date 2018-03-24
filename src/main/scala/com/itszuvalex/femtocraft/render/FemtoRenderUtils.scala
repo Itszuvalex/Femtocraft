@@ -92,8 +92,10 @@ object FemtoRenderUtils {
 
   private def renderConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, colorForStorage: (EnumFacing) => Color, ioForFacing: (EnumFacing) => EnumAutomaticIO): Unit = {
     disableLightMaps()
-    RenderUtils.translationBlock(x, y, z) {
-      GL11.glDisable(GL11.GL_DEPTH_TEST)
+    RenderUtils.glMatrixBlock { // Matrixblock even though translate because we can also scale
+      GL11.glTranslated(x, y, z)
+      //      GL11.glDisable(GL11.GL_DEPTH_TEST)
+      GL11.glScaled(1.01, 1.01, 1.01)
       EnumFacing.VALUES.foreach { facing =>
         val color = colorForStorage(facing)
         GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
@@ -119,7 +121,7 @@ object FemtoRenderUtils {
           }) (0, 0, 0, min, max, min, max, if (facing.getAxisDirection == AxisDirection.POSITIVE) 1f else 0, null, 0, 1, 0, 1)
         }
       }
-      GL11.glEnable(GL11.GL_DEPTH_TEST)
+      //      GL11.glEnable(GL11.GL_DEPTH_TEST)
     }
     enableLightMap(te.getWorld, te.getPos)
   }
