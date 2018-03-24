@@ -103,6 +103,7 @@ object FemtoItems {
   }
 
   def init(): Unit = {
+    //itemPowerCrystal.registerModel() // Don't - we do this manually in ProxyClient
     itemDumbDust.registerModel()
     itemFrame.registerModel()
     itemCyberleaf.registerModel()
@@ -130,7 +131,7 @@ object FemtoItems {
     itemLogisticsItemChipBasic.registerModel()
     itemLogisticsFluidChipBasic.registerModel()
     itemLogisticsNaniteChipBasic.registerModel()
-    itemConfigurator.registerModel()
+    //itemConfigurator.registerModel() // Don't - we do this manually in ProxyClient
     itemMultiTool.registerModel()
     itemShiftTest.registerModel()
     itemNanoLash.registerModel()
