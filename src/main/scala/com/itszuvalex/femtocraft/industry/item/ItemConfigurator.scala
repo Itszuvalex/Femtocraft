@@ -1,6 +1,8 @@
 package com.itszuvalex.femtocraft.industry.item
 
 import com.itszuvalex.femtocraft.api.{Capabilities, IOverlayRenderItem, OverlayRenderSwitch}
+import com.itszuvalex.itszulib.api.utility.FacingUtil
+import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
@@ -46,18 +48,55 @@ class ItemConfigurator extends Item {
   }
 
   override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
-    if (playerIn.isSneaking) {
-      val itemStack = playerIn.getHeldItem(hand)
-      if (itemStack != null && !itemStack.isEmpty) {
-        val current = ItemConfigurator.getOverlaySwitch(itemStack)
-        val index = OverlayRenderSwitch.values.indexOf(current)
-        val switch = OverlayRenderSwitch.values.apply((index + 1) % OverlayRenderSwitch.values.length)
-        ItemConfigurator.setOverlaySwitch(itemStack, switch)
-      }
-      EnumActionResult.SUCCESS
+    val itemStack = playerIn.getHeldItem(hand)
+    if (itemStack == null || itemStack.isEmpty) return EnumActionResult.FAIL
+
+    val tile = worldIn.getTileEntity(pos)
+    if (tile == null) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+
+    ItemConfigurator.getOverlaySwitch(itemStack) match {
+      case OverlayRenderSwitch.ITEM if tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null) =>
+        val cap = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+        val relative = FacingUtil.getHorizontalRelativeFacingFromAbsolute(facing, cap.front())
+        if (playerIn.isSneaking) {
+          cap.cycleRelativeFacingIOBackward(relative)
+          cap.getIOForAbsoluteFacing(facing) match {
+            case EnumAutomaticIO.OUTPUT =>
+              cap.cycleRelativeFacingStorageBackward(relative)
+            case _ =>
+          }
+        }
+        else {
+          cap.cycleRelativeFacingIOForward(relative)
+          cap.getIOForAbsoluteFacing(facing) match {
+            case EnumAutomaticIO.NONE =>
+              cap.cycleRelativeFacingStorageForward(relative)
+            case _ =>
+          }
+        }
+      case OverlayRenderSwitch.NANITE if tile.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null) =>
+        val cap = tile.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)
+        val relative = FacingUtil.getHorizontalRelativeFacingFromAbsolute(facing, cap.front())
+        if (playerIn.isSneaking) {
+          cap.cycleRelativeFacingIOBackward(relative)
+          cap.getIOForAbsoluteFacing(facing) match {
+            case EnumAutomaticIO.OUTPUT =>
+              cap.cycleRelativeFacingStorageBackward(relative)
+            case _ =>
+          }
+        }
+        else {
+          cap.cycleRelativeFacingIOForward(relative)
+          cap.getIOForAbsoluteFacing(facing) match {
+            case EnumAutomaticIO.NONE =>
+              cap.cycleRelativeFacingStorageForward(relative)
+            case _ =>
+          }
+        }
+      case OverlayRenderSwitch.FLUID =>
+      case _ => return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     }
-    else
-      super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
+    EnumActionResult.SUCCESS
   }
 
   override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[String], flagIn: ITooltipFlag) = {
