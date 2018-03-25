@@ -5,6 +5,7 @@ import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.init.SoundEvents
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util._
@@ -40,6 +41,7 @@ class ItemConfigurator extends Item {
         val index = OverlayRenderSwitch.values.indexOf(current)
         val switch = OverlayRenderSwitch.values.apply((index + 1) % OverlayRenderSwitch.values.length)
         ItemConfigurator.setOverlaySwitch(itemStack, switch)
+        playerIn.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1f, 1f)
       }
       new ActionResult(EnumActionResult.SUCCESS, itemStack)
     }
@@ -114,6 +116,7 @@ class ItemConfigurator extends Item {
         }
       case _ => return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     }
+    worldIn.playSound(null /* this is a filter player who won't hear sound */ , pos.getX + .5d, pos.getY + .5d, pos.getZ + .5d, SoundEvents.ENTITY_ITEMFRAME_ROTATE_ITEM, SoundCategory.PLAYERS, 1, 1)
     EnumActionResult.SUCCESS
   }
 
