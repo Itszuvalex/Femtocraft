@@ -96,6 +96,7 @@ object FemtoRenderUtils {
       GL11.glTranslated(x, y, z)
       //      GL11.glDisable(GL11.GL_DEPTH_TEST)
       GL11.glScaled(1.01, 1.01, 1.01)
+      GL11.glTranslated(-.005, -.005, -.005)
       EnumFacing.VALUES.foreach { facing =>
         val color = colorForStorage(facing)
         GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
