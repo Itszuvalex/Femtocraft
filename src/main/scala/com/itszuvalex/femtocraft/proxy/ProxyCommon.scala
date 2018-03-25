@@ -23,7 +23,7 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
-import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository, TileNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
@@ -68,6 +68,7 @@ class ProxyCommon {
     //
     GameRegistry.registerTileEntity(classOf[TileNaniteRepository], "TileNaniteRepository")
     GameRegistry.registerTileEntity(classOf[TileItemRepository], "TileItemRepository")
+    GameRegistry.registerTileEntity(classOf[TileFluidRepository], "TileFluidRepository")
     GameRegistry.registerTileEntity(classOf[TileCrystalMount], "TileCrystalMount")
     GameRegistry.registerTileEntity(classOf[TilePowerPedestal], "TilePowerPedestal")
     GameRegistry.registerTileEntity(classOf[TileCrystalChargingArray], "TileCrystalChargingArray")

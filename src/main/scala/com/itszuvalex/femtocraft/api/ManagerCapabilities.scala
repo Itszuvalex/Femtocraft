@@ -10,6 +10,7 @@ import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo
+import com.itszuvalex.itszulib.api.storage.{FluidStorageArray, IFluidStorage}
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
 import com.itszuvalex.itszulib.util.Color
@@ -30,6 +31,7 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[PowerStorageNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[PowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[Color], new ColorStorage, classOf[Color])
+    CapabilityManager.INSTANCE.register(classOf[IFluidStorage], new FluidStorageDummy, classOf[FluidStorageArray])
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
@@ -62,6 +64,12 @@ object ManagerCapabilities {
       instance.alpha = copy.alpha
       */
     }
+  }
+
+  class FluidStorageDummy extends Capability.IStorage[IFluidStorage] {
+    override def readNBT(capability: Capability[IFluidStorage], instance: IFluidStorage, side: EnumFacing, nbt: NBTBase): Unit = {}
+
+    override def writeNBT(capability: Capability[IFluidStorage], instance: IFluidStorage, side: EnumFacing): NBTBase = new NBTTagCompound
   }
 
   class SidedItemStorageConfigurationStorageDummy extends Capability.IStorage[SidedItemStorageConfiguration] {
