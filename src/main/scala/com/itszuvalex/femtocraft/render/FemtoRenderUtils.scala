@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.render
 
-import com.itszuvalex.femtocraft.industry.gui.{GuiSidedInventoryConfig, GuiSidedNaniteConfig}
+import com.itszuvalex.femtocraft.industry.gui.{GuiSidedFluidConfig, GuiSidedInventoryConfig, GuiSidedNaniteConfig}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
-import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedItemStorageConfiguration}
+import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.{RenderUtils, Vector3}
 import com.itszuvalex.itszulib.util.Color
@@ -87,6 +87,13 @@ object FemtoRenderUtils {
     renderConfigOverlay(te, x, y, z,
       (facing) =>
         GuiSidedNaniteConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedNaniteConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
+  }
+
+  def renderFluidConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedFluidStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedFluidConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedFluidConfig.colors.length),
       (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
   }
 

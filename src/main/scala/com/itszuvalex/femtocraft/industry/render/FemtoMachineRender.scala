@@ -39,6 +39,9 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
     if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)) {
       FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null))
     }
+    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+    }
   }
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {

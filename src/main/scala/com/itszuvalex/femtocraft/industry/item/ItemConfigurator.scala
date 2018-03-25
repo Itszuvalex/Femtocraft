@@ -93,7 +93,25 @@ class ItemConfigurator extends Item {
             case _ =>
           }
         }
-      case OverlayRenderSwitch.FLUID =>
+      case OverlayRenderSwitch.FLUID if tile.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null) =>
+        val cap = tile.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)
+        val relative = FacingUtil.getHorizontalRelativeFacingFromAbsolute(facing, cap.front())
+        if (playerIn.isSneaking) {
+          cap.cycleRelativeFacingIOBackward(relative)
+          cap.getIOForAbsoluteFacing(facing) match {
+            case EnumAutomaticIO.OUTPUT =>
+              cap.cycleRelativeFacingStorageBackward(relative)
+            case _ =>
+          }
+        }
+        else {
+          cap.cycleRelativeFacingIOForward(relative)
+          cap.getIOForAbsoluteFacing(facing) match {
+            case EnumAutomaticIO.NONE =>
+              cap.cycleRelativeFacingStorageForward(relative)
+            case _ =>
+          }
+        }
       case _ => return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     }
     EnumActionResult.SUCCESS

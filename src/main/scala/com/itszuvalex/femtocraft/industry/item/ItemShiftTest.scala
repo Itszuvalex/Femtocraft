@@ -59,7 +59,7 @@ class ItemShiftTest extends Item {
         lastZ = z
 
         if (player.getEntityBoundingBox != null)
-          (0 until Math.abs((player.getEntityBoundingBox.maxY - player.getEntityBoundingBox.minY).toInt)).forall(yOffset =>
+          (0 to Math.abs((player.getEntityBoundingBox.maxY - player.getEntityBoundingBox.minY).toInt)).forall(yOffset =>
             world.getBlockState(new BlockPos(x, y + yOffset, z)).getBlock.isPassable(world, new BlockPos(x, y + yOffset, z)))
         else true
       }

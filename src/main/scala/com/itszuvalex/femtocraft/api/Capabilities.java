@@ -15,6 +15,7 @@ import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
+import com.itszuvalex.itszulib.core.SidedFluidStorageConfiguration;
 import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration;
 import com.itszuvalex.itszulib.util.Color;
 import net.minecraftforge.common.capabilities.Capability;
@@ -68,6 +69,9 @@ public class Capabilities {
 
     @CapabilityInject(SidedNaniteStorageConfiguration.class)
     public static Capability<SidedNaniteStorageConfiguration> NANITE_STORAGE_CONFIGURABLE = null;
+
+    @CapabilityInject(SidedFluidStorageConfiguration.class)
+    public static Capability<SidedFluidStorageConfiguration> FLUID_STORAGE_CONFIGURABLE = null;
 
     @CapabilityInject(IChunkRiftCapability.class)
     public static Capability<IChunkRiftCapability> CHUNK_RIFT = null;
