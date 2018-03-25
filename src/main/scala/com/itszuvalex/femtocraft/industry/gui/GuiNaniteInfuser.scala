@@ -27,7 +27,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
   addGuiAndSync(tile.storage, 1, 85, 23)
   addPlayerInventorySlots(inv)
 
-  var color: Color = tile.getCapability(Capabilities.COLORABLE, EnumFacing.UP)
+  var color: Color = tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP)
 
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {

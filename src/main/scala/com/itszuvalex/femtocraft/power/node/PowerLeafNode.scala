@@ -97,17 +97,17 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode with IPowerLeaf
 
   var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 
-  def getColor = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.COLORABLE, null)).map(_.getCapability(Capabilities.COLORABLE, null)).getOrElse(color)
+  def getColor = Option(parent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).getOrElse(color)
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) this.asInstanceOf[T]
-    else if (capability == Capabilities.COLORABLE) getColor.asInstanceOf[T]
+    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) true
-    else if (capability == Capabilities.COLORABLE) true
+    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
   }
 

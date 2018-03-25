@@ -17,7 +17,7 @@ class GuiCrystalStorageArray(player: EntityPlayer, inv: InventoryPlayer, private
   )
   addPlayerInventorySlots(inv)
 
-  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(Capabilities.COLORABLE, null).toInt)
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt)
   add(powerMeter)
 
   override def GuiID: Int = GuiIDs.TileCrystalStorageArrayID

@@ -13,12 +13,9 @@ import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
-import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo;
-import com.itszuvalex.itszulib.api.storage.IFluidStorage;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
 import com.itszuvalex.itszulib.core.SidedFluidStorageConfiguration;
 import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration;
-import com.itszuvalex.itszulib.util.Color;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
@@ -37,12 +34,6 @@ public class Capabilities {
 
     @CapabilityInject(IPowerNetworkNode.class)
     public static Capability<IPowerNetworkNode> TILE_POWER_NODE = null;
-
-    @CapabilityInject(Color.class)
-    public static Capability<Color> COLORABLE = null;
-
-    @CapabilityInject(IFluidStorage.class)
-    public static Capability<IFluidStorage> FLUID_STORAGE = null;
 
     @CapabilityInject(IPlayerNaniteCapability.class)
     public static Capability<IPlayerNaniteCapability> PLAYER_NANITE_CAPABILITY = null;
@@ -79,9 +70,6 @@ public class Capabilities {
 
     @CapabilityInject(IChunkRiftCapability.class)
     public static Capability<IChunkRiftCapability> CHUNK_RIFT = null;
-
-    @CapabilityInject(MultiBlockInfo.class)
-    public static Capability<MultiBlockInfo> TILE_MULTIBLOCK = null;
 
     @CapabilityInject(IOverlayRenderItem.class)
     public static Capability<IOverlayRenderItem> ITEM_OVERLAY_RENDER = null;

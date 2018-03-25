@@ -1,16 +1,14 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
-import com.itszuvalex.femtocraft.api.{Capabilities, WrapperFluidStorageHandler}
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.storage.FluidStorageArray
-import com.itszuvalex.itszulib.api.wrappers.WrapperForgeFluidTank
+import com.itszuvalex.itszulib.api.storage.{FluidStorage, WrapperFluidStorageHandler}
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityBase}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.fluids.FluidTank
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 
@@ -25,9 +23,7 @@ object TileFluidRepository {
 }
 
 class TileFluidRepository extends TileEntityBase {
-  private val tank             = new FluidTank(TANK_SIZE)
-  private val stack            = new WrapperForgeFluidTank(tank)
-  private val storage          = new FluidStorageArray(Array(stack))
+  private val storage          = new FluidStorage(TANK_SIZE)
   private val sidedFluidConfig = new SidedFluidStorageConfiguration(_ => TANK_KEY,
     Map(NONE_KEY -> null,
       TANK_KEY -> storage),
@@ -37,10 +33,10 @@ class TileFluidRepository extends TileEntityBase {
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
       case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => sidedFluidConfig.asInstanceOf[T]
-      case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => tank.asInstanceOf[T]
+      case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => storage.asInstanceOf[T]
       case (_, null) => null.asInstanceOf[T]
       case (cap, face) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => new WrapperFluidStorageHandler(sidedFluidConfig.getStorageForGlobalFacing(face)).asInstanceOf[T]
-      case (cap, face) if cap == Capabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
+      case (cap, face) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
       case _ => super.getCapability(capability, facing)
     }
 
@@ -48,7 +44,7 @@ class TileFluidRepository extends TileEntityBase {
     (capability, facing) match {
       case (cap, _) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => true
       case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => true
-      case (cap, _) if cap == Capabilities.FLUID_STORAGE => true
+      case (cap, _) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => true
       case _ => super.hasCapability(capability, facing)
     }
 

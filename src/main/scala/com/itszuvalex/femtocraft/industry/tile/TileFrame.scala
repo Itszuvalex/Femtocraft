@@ -117,12 +117,12 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability match {
-    case c if capability == Capabilities.TILE_MULTIBLOCK => true
+    case c if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = capability match {
-    case c if capability == Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
+    case c if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 

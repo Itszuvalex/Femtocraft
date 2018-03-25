@@ -36,13 +36,13 @@ trait PowerNode extends TileEntityBase {
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.TILE_POWER_NODE) true
-    else if (capability == Capabilities.COLORABLE) true
+    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_NODE) powerDelegate.asInstanceOf[T]
-    else if (capability == Capabilities.COLORABLE) getColor.asInstanceOf[T]
+    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 

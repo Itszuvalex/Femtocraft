@@ -96,8 +96,8 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
 
   override def render(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     te match {
-      case t: TileGerminationChamber => if (t.hasCapability(Capabilities.TILE_MULTIBLOCK, null) && t.getCapability(Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
-        renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(Capabilities.COLORABLE, null)) te.getCapability(Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+      case t: TileGerminationChamber => if (t.hasCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null) && t.getCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
+        renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)) te.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
       case _ => return
     }
 

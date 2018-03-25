@@ -43,7 +43,7 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       val stateBelow = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)
       val renderAbove = stateAbove.getBlock.isSideSolid(stateAbove, te.getWorld, te.getLoc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
       val renderBelow = stateBelow.getBlock.isSideSolid(stateBelow, te.getWorld, te.getLoc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
-      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP))
     }
 
     te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).

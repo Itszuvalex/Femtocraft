@@ -41,7 +41,7 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
             pos.getX + .5 + (rand.nextDouble() * .2 - .1),
             pos.getY + .5 + (rand.nextDouble() * .2 - .1),
             pos.getZ + .5 + (rand.nextDouble() * .2 - .1),
-            mount.getCapability(Capabilities.COLORABLE, null).toInt)
+            mount.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt)
       case _ =>
     }
   }

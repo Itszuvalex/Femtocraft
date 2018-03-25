@@ -46,13 +46,13 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
   override def getMod: AnyRef = Femtocraft
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
-    case _ if capability == Capabilities.TILE_MULTIBLOCK => true
+    case _ if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => true
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
-    case _ if capability == Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
+    case _ if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
