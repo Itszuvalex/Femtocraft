@@ -21,7 +21,7 @@ class NaniteRepositoryRender extends TileEntityRenderCube[TileNaniteRepository](
   override def preFaceRender(facing: EnumFacing): Unit = {
     GL11.glColor4f(1f, 1f, 1f, 1f)
     facing match {
-      case EnumFacing.UP => bindTexture(NaniteRepositoryRender.topTex)
+      case EnumFacing.UP | EnumFacing.DOWN => bindTexture(NaniteRepositoryRender.topTex)
       case EnumFacing.NORTH => bindTexture(NaniteRepositoryRender.frontTex)
       case _ => super.preFaceRender(facing)
     }

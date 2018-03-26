@@ -2,14 +2,17 @@ package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
+import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.storage.{FluidStorage, WrapperFluidStorageHandler}
+import com.itszuvalex.itszulib.api.storage.FluidStorage
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityBase}
+import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, IFluidBlock}
 
 
 object TileFluidRepository {
@@ -29,13 +32,15 @@ class TileFluidRepository extends TileEntityBase {
       TANK_KEY -> storage),
     () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
+  private var fluidLast: Fluid = null
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
       case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => sidedFluidConfig.asInstanceOf[T]
       case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => storage.asInstanceOf[T]
+      case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => storage.asInstanceOf[T]
       case (_, null) => null.asInstanceOf[T]
-      case (cap, face) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => new WrapperFluidStorageHandler(sidedFluidConfig.getStorageForGlobalFacing(face)).asInstanceOf[T]
+      case (cap, face) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
       case (cap, face) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
       case _ => super.getCapability(capability, facing)
     }
@@ -50,14 +55,40 @@ class TileFluidRepository extends TileEntityBase {
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-//    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTIO)
-//    TileEntityUtils.checkDoFluidInputIO(this, sidedFluidConfig, ticks, VOL_PER_AUTOIO)
-//    TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, VOL_PER_AUTOIO)
+
+    getLoc.getOffset(EnumFacing.DOWN).getBlock(false) match {
+      case None =>
+      case Some(b) if b == Blocks.WATER => storage.fill(new FluidStack(FluidRegistry.WATER, 25), true)
+      case Some(b) if b.isInstanceOf[IFluidBlock] && b.asInstanceOf[IFluidBlock].getFluid == FluidRegistry.WATER => storage.fill(new FluidStack(FluidRegistry.WATER, 25), true)
+      case _ =>
+    }
+
+    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
+    TileEntityUtils.checkDoFluidInputIO(this, sidedFluidConfig, ticks, AMT_FOR_AUTOIO)
+    TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, AMT_FOR_AUTOIO)
+
+    val currentFluid = Option(storage.getStorageProperties(0).getContents).map(_.getFluid).orNull
+    if (currentFluid != fluidLast)
+      setUpdate()
+    fluidLast = currentFluid
+  }
+
+
+  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
+    super.saveToDescriptionCompound(compound)
+    compound.setTag(TANK_KEY, storage.serializeNBT())
+  }
+
+  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
+    super.handleDescriptionNBT(compound)
+    if (compound.hasKey(TANK_KEY))
+      storage.deserializeNBT(compound.getCompoundTag(TANK_KEY))
   }
 
   override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(nbt)
     nbt.setInteger(TICKS_NBT, ticks)
+    nbt.setTag(TANK_KEY, storage.serializeNBT())
     nbt.setTag(FLUID_SIDED_CONFIG_NBT, sidedFluidConfig.serializeNBT())
     nbt
   }
@@ -65,6 +96,8 @@ class TileFluidRepository extends TileEntityBase {
   override def readFromNBT(nbt: NBTTagCompound): Unit = {
     super.readFromNBT(nbt)
     ticks = nbt.getInteger(TICKS_NBT)
+    if (nbt.hasKey(TANK_KEY))
+      storage.deserializeNBT(nbt.getCompoundTag(TANK_KEY))
     if (nbt.hasKey(FLUID_SIDED_CONFIG_NBT))
       sidedFluidConfig.deserializeNBT(nbt.getCompoundTag(FLUID_SIDED_CONFIG_NBT))
   }
@@ -75,6 +108,6 @@ class TileFluidRepository extends TileEntityBase {
 
   override def getGuiID: Int = GuiIDs.TileFluidRepositoryGuiID
 
-  override def hasDescription: Boolean = false
+  override def hasDescription: Boolean = true
 
 }

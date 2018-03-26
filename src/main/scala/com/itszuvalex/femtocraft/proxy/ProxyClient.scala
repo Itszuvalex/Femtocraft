@@ -25,9 +25,9 @@ import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.item.ItemConfigurator
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile._
-import com.itszuvalex.femtocraft.logistics.render.{ConduitRenderer, ItemRepositoryRender, NaniteRepositoryRender, WorkerProviderBeamRenderer}
+import com.itszuvalex.femtocraft.logistics.render._
 import com.itszuvalex.femtocraft.logistics.test.TileWorkerProviderTest
-import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository, TileNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
@@ -126,6 +126,7 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystals), 0, classOf[TileCrystalsWorldgen])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockNaniteRepository), 0, classOf[TileNaniteRepository])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockItemRepository), 0, classOf[TileItemRepository])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFluidRepository), 0, classOf[TileFluidRepository])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockNaniteExtractor), 0, classOf[TileNaniteExtractor])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockNaniteInfuser), 0, classOf[TileNaniteInfuser])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockDemolisher), 0, classOf[TileDemolisher])
@@ -164,6 +165,7 @@ class ProxyClient extends ProxyCommon {
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteRepository], new NaniteRepositoryRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileItemRepository], new ItemRepositoryRender)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFluidRepository], new FluidRepositoryRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteExtractor], new NaniteExtractorRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteInfuser], new NaniteInfuserRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNanoFurnace], new NanoFurnaceRender)

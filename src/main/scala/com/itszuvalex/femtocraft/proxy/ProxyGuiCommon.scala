@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
 import com.itszuvalex.femtocraft.industry.tile._
-import com.itszuvalex.femtocraft.logistics.container.{ContainerConduit, ContainerItemRepository, ContainerNaniteRepository}
-import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository, TileNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.container.{ContainerConduit, ContainerFluidRepository, ContainerItemRepository, ContainerNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
@@ -27,6 +27,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te, true)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te, true)
       case (GuiIDs.TileNaniteRepositoryGuiID, te: TileNaniteRepository) => new ContainerNaniteRepository(player, player.inventory, te, true)
+      case (GuiIDs.TileFluidRepositoryGuiID, te: TileFluidRepository) => new ContainerFluidRepository(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te, true)
       case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te, true)
@@ -39,6 +40,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
       case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new ContainerSidedInventoryConfig(te)
       case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new ContainerSidedNaniteConfig(te)
+      case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new ContainerSidedFluidConfig(te)
       case (_, _) => null
     }
   }

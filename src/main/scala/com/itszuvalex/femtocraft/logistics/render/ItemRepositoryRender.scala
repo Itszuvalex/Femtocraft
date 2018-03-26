@@ -21,7 +21,7 @@ class ItemRepositoryRender extends TileEntityRenderCube[TileItemRepository](Femt
   override def preFaceRender(facing: EnumFacing): Unit = {
     GL11.glColor4f(1f, 1f, 1f, 1f)
     facing match {
-      case EnumFacing.UP => bindTexture(ItemRepositoryRender.topTex)
+      case EnumFacing.UP | EnumFacing.DOWN => bindTexture(ItemRepositoryRender.topTex)
       case EnumFacing.NORTH => bindTexture(ItemRepositoryRender.frontTex)
       case _ => super.preFaceRender(facing)
     }
