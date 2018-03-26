@@ -104,6 +104,10 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
     if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
       FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
     }
+
+    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+    }
   }
 
   private def renderAtLocationInternal(x: Double, y: Double, z: Double, worldTime: Long, color: Color, partialTicks: Float) = {

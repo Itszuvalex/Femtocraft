@@ -3,9 +3,9 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
-import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber.{INPUT_INV_KEY, ITEM_SIDED_CONFIG_NBT, NONE_INV_KEY, OUTPUT_INV_KEY}
-import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, MultiblockSidedItemStorageConfiguration}
-import com.itszuvalex.itszulib.api.storage.IItemStorage
+import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
+import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, MultiblockSidedFluidStorageConfiguration, MultiblockSidedItemStorageConfiguration}
+import com.itszuvalex.itszulib.api.storage.{IFluidStorage, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
@@ -14,23 +14,31 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.items.CapabilityItemHandler
 
 object TileGerminationChamber {
   val TICKS_FOR_AUTOIO = 20
 
+  val TANK_SIZE = 10000
+
   val INPUT_INV_KEY  = "Input"
   val OUTPUT_INV_KEY = "Output"
   val NONE_INV_KEY   = "None"
 
-  val TASK_NBT              = "Task"
-  val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
-  val TICKS_NBT             = "Ticks"
+  val TANK_KEY      = "Tank"
+  val NONE_TANK_KEY = "None"
+
+  val TASK_NBT               = "Task"
+  val ITEM_SIDED_CONFIG_NBT  = "ItemConfig"
+  val FLUID_SIDED_CONFIG_NBT = "FluidConfig"
+  val TICKS_NBT              = "Ticks"
 }
 
 class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
-  private val storage     : IItemStorage = IItemStorage.Empty
-  private val inputStorage: IItemStorage = IItemStorage.Empty //new ItemStorageSlice(storage, Array(0))
+  private val tank        : IFluidStorage = IFluidStorage.Empty
+  private val storage     : IItemStorage  = IItemStorage.Empty
+  private val inputStorage: IItemStorage  = IItemStorage.Empty //new ItemStorageSlice(storage, Array(0))
   private val outputStorage: IItemStorage = IItemStorage.Empty //new ItemStorageSlice(storage, Array(1))
   private val sidedStorageConfig = new MultiblockSidedItemStorageConfiguration(
       getLoc _, info, NONE_INV_KEY, _ => INPUT_INV_KEY,
@@ -41,6 +49,13 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
 
     }
 
+  private val sidedFluidConfig = new MultiblockSidedFluidStorageConfiguration(
+    getLoc _, info, NONE_TANK_KEY, _ => TANK_KEY,
+    Map(NONE_TANK_KEY -> IFluidStorage.Empty,
+      TANK_KEY -> tank),
+    () => EnumFacing.NORTH
+  )
+
   override def hasDescription: Boolean = true
 
   override def getMod: AnyRef = Femtocraft
@@ -48,15 +63,27 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
     case _ if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => true
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case _ if capability == Capabilities.FLUID_STORAGE_CONFIGURABLE => true
+    case _ if capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_STORAGE => true
+    case _ if capability == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => true
+    case _ if capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => true
+    case _ if capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
     case _ if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
+    case _ if capability == Capabilities.FLUID_STORAGE_CONFIGURABLE => sidedFluidConfig.asInstanceOf[T]
+    case (cap, null) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(storage).asInstanceOf[T]
+    case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.ITEM_STORAGE => storage.asInstanceOf[T]
+    case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => tank.asInstanceOf[T]
+    case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => tank.asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
     case (cap, _) if cap == com.itszuvalex.itszulib.api.Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case (cap, _) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => sidedFluidConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case (cap, _) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 
@@ -97,23 +124,29 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     compound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    compound.setTag(FLUID_SIDED_CONFIG_NBT, sidedFluidConfig.serializeNBT())
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     if (compound.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(compound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    if (compound.hasKey(FLUID_SIDED_CONFIG_NBT))
+      sidedFluidConfig.deserializeNBT(compound.getCompoundTag(FLUID_SIDED_CONFIG_NBT))
   }
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.readFromNBT(par1nbtTagCompound)
     if (par1nbtTagCompound.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(par1nbtTagCompound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+    if (par1nbtTagCompound.hasKey(FLUID_SIDED_CONFIG_NBT))
+      sidedFluidConfig.deserializeNBT(par1nbtTagCompound.getCompoundTag(FLUID_SIDED_CONFIG_NBT))
   }
 
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(par1nbtTagCompound)
     par1nbtTagCompound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    par1nbtTagCompound.setTag(FLUID_SIDED_CONFIG_NBT, sidedFluidConfig.serializeNBT())
     par1nbtTagCompound
   }
 }
