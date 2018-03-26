@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, MultiblockSidedFluidStorageConfiguration, MultiblockSidedItemStorageConfiguration}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IFluidStorage, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -60,6 +60,8 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
 
   override def getMod: AnyRef = Femtocraft
 
+  override def getGuiID: Int = GuiIDs.TileGerminationChamberID
+
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
     case _ if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => true
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => true
@@ -79,7 +81,7 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
     case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.ITEM_STORAGE => storage.asInstanceOf[T]
     case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => tank.asInstanceOf[T]
     case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => tank.asInstanceOf[T]
-    case _ => super.getCapability(capability, facing)
+    case (_, null) => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
     case (cap, _) if cap == com.itszuvalex.itszulib.api.Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
     case (cap, _) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => sidedFluidConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
@@ -112,7 +114,7 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) {
       info.cLoc.getTileEntity() match {
-        case Some(tile: TileFrame) =>
+        case Some(tile: TileGerminationChamber) =>
           par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
         case _ =>
       }
