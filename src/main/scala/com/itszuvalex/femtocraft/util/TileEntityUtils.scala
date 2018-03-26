@@ -139,7 +139,7 @@ object TileEntityUtils {
         val room = prop.getCapacity - fluid.amount
         val toDrain = Math.min(room, isize)
         val fluidToRemove = new FluidStack(fluid.getFluid, toDrain)
-        val amtFilled = pair._1.fill(pair._2.drain(fluidToRemove, false), true)
+        val amtFilled = pair._2.fill(pair._1.drain(fluidToRemove, false), true)
         pair._1.drain(amtFilled, true)
         isize -= amtFilled
         isize <= 0
@@ -149,7 +149,7 @@ object TileEntityUtils {
 
     // Generic drain
     TileEntityUtils.getFluidStoragesForIO(te, config, EnumAutomaticIO.INPUT).exists { pair =>
-      val amtFilled = pair._1.fill(pair._2.drain(isize, false), true)
+      val amtFilled = pair._2.fill(pair._1.drain(isize, false), true)
       pair._1.drain(amtFilled, true)
       isize -= amtFilled
       isize <= 0
@@ -168,7 +168,7 @@ object TileEntityUtils {
         val room = prop.getCapacity - fluid.amount
         val toDrain = Math.min(room, isize)
         val fluidToRemove = new FluidStack(fluid.getFluid, toDrain)
-        val amtFilled = pair._2.fill(pair._1.drain(fluidToRemove, false), true)
+        val amtFilled = pair._1.fill(pair._2.drain(fluidToRemove, false), true)
         pair._2.drain(amtFilled, true)
         isize -= amtFilled
         isize <= 0
@@ -178,7 +178,7 @@ object TileEntityUtils {
 
     // Generic drain
     TileEntityUtils.getFluidStoragesForIO(te, config, EnumAutomaticIO.OUTPUT).exists { pair =>
-      val amtFilled = pair._2.fill(pair._1.drain(isize, false), true)
+      val amtFilled = pair._1.fill(pair._2.drain(isize, false), true)
       pair._2.drain(amtFilled, true)
       isize -= amtFilled
       isize <= 0
