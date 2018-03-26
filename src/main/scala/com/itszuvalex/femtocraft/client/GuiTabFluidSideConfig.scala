@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
 
 object GuiTabFluidSideConfig {
-  val SideConfigTexLoc = Resources.TexGui("tabsideconfig.png")
+  val SideConfigTexLoc = Resources.TexGui("tabfluid.png")
 
   def addToGuiTabBar(bar: GuiTabBar, tile: TileEntityBase): Unit = {
     bar.addTab(new GuiTabFluidSideConfig("Fluid Config", tile, bar.getActiveGuiID))

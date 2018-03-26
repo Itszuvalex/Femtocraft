@@ -21,7 +21,7 @@ class GuiFluidRepository(player: EntityPlayer, inv: InventoryPlayer, private val
   val nameLabel = new GuiLabel(3, 3, fRender.getStringWidth(tileName), fRender.FONT_HEIGHT, () => tileName)
   add(nameLabel)
 
-  val tank = new GuiFluidTank((panelWidth + 16) / 2, fRender.FONT_HEIGHT + 2, this, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null), 0, true)
+  val tank = new GuiFluidTank((panelWidth - 18) / 2, fRender.FONT_HEIGHT + 2, this, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null), 0, true)
   add(tank)
 
   override def GuiID: Int = GuiIDs.TileFluidRepositoryGuiID

@@ -104,4 +104,16 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
     if (compound.hasKey(ITEM_SIDED_CONFIG_NBT))
       sidedStorageConfig.deserializeNBT(compound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
   }
+
+  override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
+    super.readFromNBT(par1nbtTagCompound)
+    if (par1nbtTagCompound.hasKey(ITEM_SIDED_CONFIG_NBT))
+      sidedStorageConfig.deserializeNBT(par1nbtTagCompound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
+  }
+
+  override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
+    super.writeToNBT(par1nbtTagCompound)
+    par1nbtTagCompound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
+    par1nbtTagCompound
+  }
 }
