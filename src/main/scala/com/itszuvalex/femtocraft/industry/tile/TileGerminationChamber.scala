@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, MultiblockSidedFluidStorageConfiguration, MultiblockSidedItemStorageConfiguration}
+import com.itszuvalex.femtocraft.util.data.{DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IFluidStorage, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.Converter
@@ -14,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.util.INBTSerializable
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.items.CapabilityItemHandler
 
@@ -33,9 +35,21 @@ object TileGerminationChamber {
   val ITEM_SIDED_CONFIG_NBT  = "ItemConfig"
   val FLUID_SIDED_CONFIG_NBT = "FluidConfig"
   val TICKS_NBT              = "Ticks"
+
+  class GerminationChamberState extends INBTSerializable[NBTTagCompound] {
+    var test: Int = 0
+
+    override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+      val testOne: () => Int = test _
+      val testTwo: (Int) => Unit = test_=
+    }
+
+    override def serializeNBT(): NBTTagCompound = ???
+  }
+
 }
 
-class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
+class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent {
   private val tank        : IFluidStorage = IFluidStorage.Empty
   private val storage     : IItemStorage  = IItemStorage.Empty
   private val inputStorage: IItemStorage  = IItemStorage.Empty //new ItemStorageSlice(storage, Array(0))
@@ -45,15 +59,22 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
       Map(NONE_INV_KEY -> IItemStorage.Empty,
         INPUT_INV_KEY -> inputStorage,
         OUTPUT_INV_KEY -> outputStorage),
-      () => EnumFacing.NORTH) {
-
-    }
+      () => EnumFacing.NORTH)
 
   private val sidedFluidConfig = new MultiblockSidedFluidStorageConfiguration(
     getLoc _, info, NONE_TANK_KEY, _ => TANK_KEY,
     Map(NONE_TANK_KEY -> IFluidStorage.Empty,
       TANK_KEY -> tank),
     () => EnumFacing.NORTH
+  )
+
+  descriptionDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
+    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig)
+  )
+  saveDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
+    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig)
   )
 
   override def hasDescription: Boolean = true
@@ -112,7 +133,7 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
 
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    if (hasGUI) {
+    if (hasGUI && info.isValidMultiBlock) {
       info.cLoc.getTileEntity() match {
         case Some(tile: TileGerminationChamber) =>
           par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
@@ -123,32 +144,4 @@ class TileGerminationChamber extends TileEntityBase with MultiBlockComponent {
     else false
   }
 
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    compound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    compound.setTag(FLUID_SIDED_CONFIG_NBT, sidedFluidConfig.serializeNBT())
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    if (compound.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(compound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-    if (compound.hasKey(FLUID_SIDED_CONFIG_NBT))
-      sidedFluidConfig.deserializeNBT(compound.getCompoundTag(FLUID_SIDED_CONFIG_NBT))
-  }
-
-  override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
-    super.readFromNBT(par1nbtTagCompound)
-    if (par1nbtTagCompound.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(par1nbtTagCompound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-    if (par1nbtTagCompound.hasKey(FLUID_SIDED_CONFIG_NBT))
-      sidedFluidConfig.deserializeNBT(par1nbtTagCompound.getCompoundTag(FLUID_SIDED_CONFIG_NBT))
-  }
-
-  override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(par1nbtTagCompound)
-    par1nbtTagCompound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    par1nbtTagCompound.setTag(FLUID_SIDED_CONFIG_NBT, sidedFluidConfig.serializeNBT())
-    par1nbtTagCompound
-  }
 }

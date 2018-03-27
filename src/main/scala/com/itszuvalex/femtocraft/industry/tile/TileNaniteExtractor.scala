@@ -7,6 +7,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
 import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.TileEntityUtils
+import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
@@ -67,7 +68,7 @@ object TileNaniteExtractor {
 
 }
 
-class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLeafNode with TileNaniteStorage {
+class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDataSpec with PowerLeafNode with TileNaniteStorage {
   private val task: ExtractTask  = new ExtractTask(null)
   private val sidedStorageConfig = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
@@ -81,6 +82,17 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
       NANITE_TANK_KEY -> naniteStorageTank),
     () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
+
+  descriptionDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
+    new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig)
+  )
+  saveDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
+    new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig),
+    new DataSerializable[NBTTagCompound](TASK_NBT, task),
+    new DataInt(TICKS_NBT, ticks _, ticks_=)
+  )
 
   override def defaultBattery = new PowerBattery(5000)
 
@@ -177,36 +189,4 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with PowerLe
     case _ => super.getCapability(capability, facing)
   }
 
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    compound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    compound.setTag(NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig.serializeNBT())
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    if (compound.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(compound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-    if (compound.hasKey(NANITE_SIDED_CONFIG_NBT))
-      sidedNaniteConfig.deserializeNBT(compound.getCompoundTag(NANITE_SIDED_CONFIG_NBT))
-  }
-
-  override def readFromNBT(nbt: NBTTagCompound): Unit = {
-    super.readFromNBT(nbt)
-    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
-    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-    if (nbt.hasKey(NANITE_SIDED_CONFIG_NBT))
-      sidedNaniteConfig.deserializeNBT(nbt.getCompoundTag(NANITE_SIDED_CONFIG_NBT))
-    ticks = nbt.getInteger(TICKS_NBT)
-  }
-
-  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt)
-    nbt.setTag(TASK_NBT, task.serializeNBT())
-    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    nbt.setTag(NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig.serializeNBT())
-    nbt.setInteger(TICKS_NBT, ticks)
-    nbt
-  }
 }

@@ -2,22 +2,20 @@ package com.itszuvalex.femtocraft.industry.tile
 
 import java.util.Random
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
 import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileMultiblockIndexedInventory}
 import com.itszuvalex.femtocraft.util.TileEntityUtils
+import com.itszuvalex.femtocraft.util.data.{DataBool, DataInt, DataString, TileDataSpec}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
-import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import com.itszuvalex.itszulib.util.InventoryUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.common.capabilities.Capability
@@ -94,7 +92,7 @@ object TileFrame {
 
 }
 
-class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory {
+class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockComponent with TileMultiblockIndexedInventory with IInventory {
   var renderInt                                       = TileFrame.fullRender(true)
   var multiBlock           : String                   = null
   var renderProgress       : Int                      = 0
@@ -106,6 +104,20 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
   var ticks                                           = 0
 
   var isModifyingInv: Boolean = false
+
+  descriptionDataSpec ++= Array(
+    new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
+    new DataString(TileFrame.MULTIBLOCK_KEY, multiBlock _, multiBlock_=),
+    new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
+    new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=)
+  )
+  descriptionDataSpec.onLoad = () => setRenderUpdate()
+  saveDataSpec ++= Array(
+    new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
+    new DataString(TileFrame.MULTIBLOCK_KEY, multiBlock _, multiBlock_=),
+    new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
+    new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=)
+  )
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
@@ -251,42 +263,6 @@ class TileFrame() extends TileEntityBase with MultiBlockComponent with TileMulti
 
   override def hasDescription: Boolean = isValidMultiBlock
 
-  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(compound)
-    saveFrameInfo(compound)
-    compound
-  }
-
-  def saveFrameInfo(compound: NBTTagCompound): Unit = {
-    compound.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
-    compound.setString(TileFrame.MULTIBLOCK_KEY, if (multiBlock != null) multiBlock else "")
-    compound.setInteger(TileFrame.PROGRESS_KEY, progress)
-    compound.setBoolean(TileFrame.BUILDING_KEY, isBuilding)
-  }
-
-  override def readFromNBT(compound: NBTTagCompound): Unit = {
-    super.readFromNBT(compound)
-    loadFrameInfo(compound)
-  }
-
-  def loadFrameInfo(compound: NBTTagCompound): Unit = {
-    renderInt = compound.Int(TileFrame.RENDER_SETTINGS_KEY)
-    multiBlock = compound.String(TileFrame.MULTIBLOCK_KEY)
-    if (multiBlock == "") multiBlock = null
-    renderProgress = compound.Int(TileFrame.PROGRESS_KEY)
-    isBuilding = compound.Bool(TileFrame.BUILDING_KEY)
-  }
-
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    saveFrameInfo(compound)
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    loadFrameInfo(compound)
-    setRenderUpdate()
-  }
 
   override def onBlockBreak(): Unit = {
     if (getWorld.isRemote) return

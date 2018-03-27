@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.DemolishTask._
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.TileEntityUtils
+import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
@@ -65,7 +66,7 @@ object TileDemolisher {
 
 }
 
-class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNode {
+class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory with PowerLeafNode {
   private val task         : DemolishTask = new DemolishTask(IItemStack.Empty)
   private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
   private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
@@ -79,6 +80,13 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     OUTPUT_INV_KEY -> outputStorage),
   () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
+
+  descriptionDataSpec += new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig)
+  saveDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
+    new DataSerializable[NBTTagCompound](TASK_NBT, task),
+    new DataInt(TICKS_NBT, ticks _, ticks_=)
+  )
 
   override def connectionRadius: Float = 8f
 
@@ -184,30 +192,4 @@ class TileDemolisher extends TileEntityBase with TileInventory with PowerLeafNod
     case _ => super.getCapability(capability, facing)
   }
 
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    compound.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    if (compound.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(compound.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-  }
-
-  override def readFromNBT(nbt: NBTTagCompound): Unit = {
-    super.readFromNBT(nbt)
-    task.deserializeNBT(nbt.getCompoundTag(TASK_NBT))
-    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-    ticks = nbt.asInstanceOf[NBTTagCompound].getInteger(TICKS_NBT)
-  }
-
-  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt)
-    nbt.setTag(TASK_NBT, task.serializeNBT())
-    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    nbt.setInteger(TICKS_NBT, ticks)
-    nbt
-  }
 }
