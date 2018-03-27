@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, MultiblockSidedFluidStorageConfiguration, MultiblockSidedItemStorageConfiguration}
+import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.util.data.{DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IFluidStorage, IItemStorage}
@@ -50,10 +51,10 @@ object TileGerminationChamber {
 }
 
 class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent {
-  private val tank        : IFluidStorage = IFluidStorage.Empty
-  private val storage     : IItemStorage  = IItemStorage.Empty
-  private val inputStorage: IItemStorage  = IItemStorage.Empty //new ItemStorageSlice(storage, Array(0))
-  private val outputStorage: IItemStorage = IItemStorage.Empty //new ItemStorageSlice(storage, Array(1))
+  private                   val tank        : IFluidStorage = IFluidStorage.Empty
+  private                   val storage     : IItemStorage  = IItemStorage.Empty
+  @Wrapper(storage) private val inputStorage: IItemStorage  = IItemStorage.Empty //new ItemStorageSlice(storage, Array(0))
+  @Wrapper(storage) private val outputStorage: IItemStorage = IItemStorage.Empty //new ItemStorageSlice(storage, Array(1))
   private val sidedStorageConfig = new MultiblockSidedItemStorageConfiguration(
       getLoc _, info, NONE_INV_KEY, _ => INPUT_INV_KEY,
       Map(NONE_INV_KEY -> IItemStorage.Empty,

@@ -5,8 +5,8 @@ import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher.DemolishTask._
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
@@ -67,10 +67,10 @@ object TileDemolisher {
 }
 
 class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory with PowerLeafNode {
-  private val task         : DemolishTask = new DemolishTask(IItemStack.Empty)
-  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  private                   val task         : DemolishTask = new DemolishTask(IItemStack.Empty)
+  @Wrapper(storage) private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  @Wrapper(storage) private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private                   val sidedStorageConfig          = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY

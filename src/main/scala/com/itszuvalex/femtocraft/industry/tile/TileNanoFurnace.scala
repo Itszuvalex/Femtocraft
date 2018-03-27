@@ -4,8 +4,8 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
@@ -82,10 +82,10 @@ object TileNanoFurnace {
 }
 
 class TileNanoFurnace extends TileEntityBase with TileInventory with TileDataSpec with PowerLeafNode {
-  private val task         : SmeltTask    = new SmeltTask(IItemStack.Empty)
-  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  private                   val task         : SmeltTask    = new SmeltTask(IItemStack.Empty)
+  @Wrapper(storage) private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  @Wrapper(storage) private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private                   val sidedStorageConfig          = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY

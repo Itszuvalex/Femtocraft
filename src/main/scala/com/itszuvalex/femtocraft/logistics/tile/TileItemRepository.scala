@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.logistics.tile
 import com.itszuvalex.femtocraft.logistics.storage.item.{IIndexedInventory, IndexedInventory}
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository._
 import com.itszuvalex.femtocraft.util.TileEntityUtils
+import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Saveable
@@ -34,7 +35,7 @@ object TileItemRepository {
   val NONE_KEY               = "None"
 }
 
-class TileItemRepository extends TileEntityBase with IIndexedInventory with IInventory {
+class TileItemRepository extends TileEntityBase with TileDataSpec with IIndexedInventory with IInventory {
   @Saveable val indInventory: IndexedInventory = new IndexedInventory(INVENTORY_SIZE)
             val storage     : IItemStorage     = new ItemStorageInventory(indInventory)
   private val sidedStorageConfig = new SidedItemStorageConfiguration(_ => INV_KEY,
@@ -42,6 +43,12 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
       INV_KEY -> storage),
     () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
+
+  descriptionDataSpec += new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig)
+  saveDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
+    new DataInt(TICKS_NBT, ticks _, ticks_=)
+  )
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
@@ -66,19 +73,6 @@ class TileItemRepository extends TileEntityBase with IIndexedInventory with IInv
     TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_FOR_AUTOIO)
   }
 
-  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt)
-    nbt.setInteger(TICKS_NBT, ticks)
-    nbt.setTag(ITEM_SIDED_CONFIG_NBT, sidedStorageConfig.serializeNBT())
-    nbt
-  }
-
-  override def readFromNBT(nbt: NBTTagCompound): Unit = {
-    super.readFromNBT(nbt)
-    ticks = nbt.getInteger(TICKS_NBT)
-    if (nbt.hasKey(ITEM_SIDED_CONFIG_NBT))
-      sidedStorageConfig.deserializeNBT(nbt.getCompoundTag(ITEM_SIDED_CONFIG_NBT))
-  }
 
   override def getMod = Femtocraft
 

@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.logistics.tile
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
 import com.itszuvalex.femtocraft.util.TileEntityUtils
+import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.FluidStorage
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
@@ -25,7 +26,7 @@ object TileFluidRepository {
   val NONE_KEY               = "None"
 }
 
-class TileFluidRepository extends TileEntityBase {
+class TileFluidRepository extends TileEntityBase with TileDataSpec {
   private val storage          = new FluidStorage(TANK_SIZE)
   private val sidedFluidConfig = new SidedFluidStorageConfiguration(_ => TANK_KEY,
     Map(NONE_KEY -> null,
@@ -33,6 +34,16 @@ class TileFluidRepository extends TileEntityBase {
     () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
   private var fluidLast: Fluid = null
+
+  descriptionDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
+    new DataSerializable[NBTTagCompound](TANK_KEY, storage)
+  )
+  saveDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](TANK_KEY, storage),
+    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
+    new DataInt(TICKS_NBT, ticks _, ticks_=)
+  )
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
@@ -73,34 +84,6 @@ class TileFluidRepository extends TileEntityBase {
     fluidLast = currentFluid
   }
 
-
-  override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
-    super.saveToDescriptionCompound(compound)
-    compound.setTag(TANK_KEY, storage.serializeNBT())
-  }
-
-  override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
-    super.handleDescriptionNBT(compound)
-    if (compound.hasKey(TANK_KEY))
-      storage.deserializeNBT(compound.getCompoundTag(TANK_KEY))
-  }
-
-  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt)
-    nbt.setInteger(TICKS_NBT, ticks)
-    nbt.setTag(TANK_KEY, storage.serializeNBT())
-    nbt.setTag(FLUID_SIDED_CONFIG_NBT, sidedFluidConfig.serializeNBT())
-    nbt
-  }
-
-  override def readFromNBT(nbt: NBTTagCompound): Unit = {
-    super.readFromNBT(nbt)
-    ticks = nbt.getInteger(TICKS_NBT)
-    if (nbt.hasKey(TANK_KEY))
-      storage.deserializeNBT(nbt.getCompoundTag(TANK_KEY))
-    if (nbt.hasKey(FLUID_SIDED_CONFIG_NBT))
-      sidedFluidConfig.deserializeNBT(nbt.getCompoundTag(FLUID_SIDED_CONFIG_NBT))
-  }
 
   override def getMod = Femtocraft
 

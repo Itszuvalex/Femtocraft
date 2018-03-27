@@ -11,4 +11,6 @@ trait DataSpec extends INBTSerializable[NBTTagCompound] {
   override def deserializeNBT(nbt: NBTTagCompound): Unit = dataSpec.deserializeNBT(nbt)
 
   override def serializeNBT(): NBTTagCompound = dataSpec.serializeNBT()
+
+  def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = dataSpec.writeToNBT(nbt)
 }

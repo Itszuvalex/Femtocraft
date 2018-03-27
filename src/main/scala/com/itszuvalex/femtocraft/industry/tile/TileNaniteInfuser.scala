@@ -7,8 +7,8 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser.InfuseTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -78,10 +78,10 @@ object TileNaniteInfuser {
 }
 
 class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataSpec with PowerLeafNode with TileNaniteStorage {
-  private val task         : InfuseTask   = new InfuseTask(IItemStack.Empty)
-  private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-  private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  private val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  private                   val task         : InfuseTask   = new InfuseTask(IItemStack.Empty)
+  @Wrapper(storage) private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  @Wrapper(storage) private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  private                   val sidedStorageConfig          = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY
@@ -90,7 +90,7 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
     INPUT_INV_KEY -> inputStorage,
     OUTPUT_INV_KEY -> outputStorage),
   () => world.getBlockState(pos).getValue(BlockFacing.FACING))
-  private val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+  private                   val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
     Map(NONE_TANK_KEY -> null,
       NANITE_TANK_KEY -> naniteStorageTank),
     () => world.getBlockState(pos).getValue(BlockFacing.FACING))

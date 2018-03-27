@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.api.nanite.{INanite, NaniteTank}
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository._
 import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
 import com.itszuvalex.femtocraft.util.TileEntityUtils
+import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
@@ -22,12 +23,18 @@ object TileNaniteRepository {
   val NONE_TANK_KEY           = "None"
 }
 
-class TileNaniteRepository extends TileEntityBase with TileNaniteStorage {
+class TileNaniteRepository extends TileEntityBase with TileDataSpec with TileNaniteStorage {
   private val sidedNaniteConfig = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
     Map(NONE_TANK_KEY -> null,
       NANITE_TANK_KEY -> naniteStorageTank),
     () => world.getBlockState(pos).getValue(BlockFacing.FACING))
   var ticks = 0
+
+  descriptionDataSpec += new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig)
+  saveDataSpec ++= Array(
+    new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig),
+    new DataInt(TICKS_NBT, ticks _, ticks_=)
+  )
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
@@ -56,20 +63,6 @@ class TileNaniteRepository extends TileEntityBase with TileNaniteStorage {
     ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTIO)
     TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
     TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-  }
-
-  override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(nbt)
-    nbt.setInteger(TICKS_NBT, ticks)
-    nbt.setTag(NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig.serializeNBT())
-    nbt
-  }
-
-  override def readFromNBT(nbt: NBTTagCompound): Unit = {
-    super.readFromNBT(nbt)
-    ticks = nbt.getInteger(TICKS_NBT)
-    if (nbt.hasKey(NANITE_SIDED_CONFIG_NBT))
-      sidedNaniteConfig.deserializeNBT(nbt.getCompoundTag(NANITE_SIDED_CONFIG_NBT))
   }
 
   override def getMod = Femtocraft
