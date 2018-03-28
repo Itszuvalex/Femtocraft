@@ -36,6 +36,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new ContainerCrystalStorageArray(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new ContainerCrystalHeatExchanger(player, player.inventory, te, true)
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new ContainerDemolisher(player, player.inventory, te, true)
+      case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new ContainerGerminationChamber(player, player.inventory, te, true)
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(te, true)
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
       case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new ContainerSidedInventoryConfig(te)

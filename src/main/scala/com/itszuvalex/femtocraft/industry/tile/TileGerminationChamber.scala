@@ -68,12 +68,14 @@ object TileGerminationChamber {
 }
 
 class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent {
-  private                   val tank         : IFluidStorage                   = new DynamicIFluidStorage(() => getState.map(x => x.tank).getOrElse(IFluidStorage.Empty))
-  private                   val storage      : IItemStorage                    = new DynamicIItemStorage(() => getState.map(x => x.storage).getOrElse(IItemStorage.Empty))
-  @Wrapper(storage) private val inputStorage : IItemStorage                    = new DynamicIItemStorage(() => getState.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
-  @Wrapper(storage) private val outputStorage: IItemStorage                    = new DynamicIItemStorage(() => getState.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
-  private                   var state        : Option[GerminationChamberState] = None
-  private                   val sidedStorageConfig                             = new MultiblockSidedItemStorageConfiguration(
+  private val state:
+    MultiblockStateHolder[GerminationChamberState, TileGerminationChamber] =
+    new MultiblockStateHolder[GerminationChamberState, TileGerminationChamber](this, () => new GerminationChamberState, info, getLoc _, (a) => a.state)
+  val tank   : IFluidStorage = new DynamicIFluidStorage(() => state.get.map(x => x.tank).getOrElse(IFluidStorage.Empty))
+  val storage: IItemStorage  = new DynamicIItemStorage(() => state.get.map(x => x.storage).getOrElse(IItemStorage.Empty))
+  @Wrapper(storage) private val inputStorage : IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
+  @Wrapper(storage) private val outputStorage: IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
+  private                   val sidedStorageConfig          = new MultiblockSidedItemStorageConfiguration(
     getLoc _, info, NONE_INV_KEY, _ => INPUT_INV_KEY,
     Map(NONE_INV_KEY -> IItemStorage.Empty,
       INPUT_INV_KEY -> inputStorage,
@@ -94,28 +96,10 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
-    new ConditionalData(() => isController, new DataAssignable[Option[GerminationChamberState]](STATE_NBT,
-    getState _,
-    { case None => null; case Some(a) => a.serializeNBT() }, //Writer
-    state_=, // Setter
-    {
-      case t: NBTTagCompound =>
-        val ret = new GerminationChamberState
-        ret.deserializeNBT(t)
-        Some(Some(ret))
-      case _ => Some(None)
-    }
-    )))
+    new MultiblockStateHolder.DataMultiblockState[GerminationChamberState](STATE_NBT, state)
+  )
 
-  private def getOrElseUpdateState: GerminationChamberState = {
-    state match {
-      case None => state = Some(new GerminationChamberState)
-      case Some(_) =>
-    }
-    state.get
-  }
-
-  private def getState: Option[GerminationChamberState] = new MultiblockForwarder[Option[GerminationChamberState], TileGerminationChamber](this, info, getLoc _, { case None => None; case Some(a) => Some(a.getOrElseUpdateState) }).get
+  override def hasGUI: Boolean = true
 
   override def hasDescription: Boolean = true
 
