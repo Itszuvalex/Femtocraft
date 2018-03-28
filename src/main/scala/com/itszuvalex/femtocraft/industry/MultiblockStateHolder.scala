@@ -9,8 +9,8 @@ import net.minecraftforge.common.util.INBTSerializable
 
 object MultiblockStateHolder {
 
-  class DataMultiblockState[S <: INBTSerializable[NBTTagCompound]](key: String, val holder: MultiblockStateHolder[S, _]) extends
-    ConditionalData(() => holder.info.isController(holder.loc()),
+  class DataMultiblockState[S <: INBTSerializable[NBTTagCompound]](key: String, val holder: MultiblockStateHolder[S, _ <: TileEntity]) extends
+    ConditionalData(() => holder.info.isController(new Loc4(holder.thisObj)),
       new DataLoadable[S](
       key,
       () => holder.getOrElseUpdateState,
@@ -25,7 +25,6 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
   val thisObj: T,
   val fact: () => S,
   val info: MultiBlockInfo,
-  val loc: () => Loc4,
   val getHolder: (T) => MultiblockStateHolder[S, T]) {
   private var state: Option[S] = None
 
@@ -37,5 +36,9 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
     state.get
   }
 
-  def get: Option[S] = new MultiblockForwarder[Option[S], T](thisObj, info, loc, { case None => None; case Some(a) => Some(getHolder(a).getOrElseUpdateState) }).get
+  def get: Option[S] = if (info.isController(new Loc4(thisObj))) Some(getOrElseUpdateState) else info.cLoc.getTileEntity(true) match {
+    case None => None
+    case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
+    case _ => None
+  }
 }

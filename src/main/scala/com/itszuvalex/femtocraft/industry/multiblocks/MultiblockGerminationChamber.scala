@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.industry.multiblocks
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber.{xSize, ySize, zSize}
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
@@ -32,7 +31,6 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
     l.getTileEntity(true) match {
       case Some(te: TileGerminationChamber) if te.hasCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null) =>
         te.getCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null).formMultiBlock(loc)
-        true
       case _ => false
     }
   }

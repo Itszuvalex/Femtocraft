@@ -1,14 +1,16 @@
 package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry._
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
-import com.itszuvalex.femtocraft.util.Wrapper
+import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.data._
+import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage._
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.util.Task
@@ -22,12 +24,17 @@ import net.minecraftforge.items.CapabilityItemHandler
 
 object TileGerminationChamber {
   val TICKS_FOR_AUTOIO = 20
+  val POWER_PER_TICK   = 40
 
-  val TANK_SIZE = 10000
+  val TANK_SIZE    = 10000
+  val BATTERY_SIZE = 30000
 
   val INPUT_INV_KEY  = "Input"
   val OUTPUT_INV_KEY = "Output"
   val NONE_INV_KEY   = "None"
+
+  val ITEMS_PER_AUTOIO = 1
+  val FLUID_PER_AUTOIO = 250
 
   val TANK_KEY      = "Tank"
   val NONE_TANK_KEY = "None"
@@ -39,6 +46,7 @@ object TileGerminationChamber {
   val FLUID_SIDED_CONFIG_NBT = "FluidConfig"
   val TICKS_NBT              = "Ticks"
   val STATE_NBT              = "State"
+  val BATTERY_NBT            = "Battery"
 
   class GerminationTask extends Task() {
     var stack : IItemStack               = IItemStack.Empty
@@ -52,6 +60,7 @@ object TileGerminationChamber {
   }
 
   class GerminationChamberState extends DataSpec {
+                      val battery      : IBattery        = new PowerBattery(BATTERY_SIZE)
                       val tank         : IFluidStorage   = new FluidStorage(TANK_SIZE)
                       val storage      : IItemStorage    = new ItemStorageArray(2)
     @Wrapper(storage) val inputStorage : IItemStorage    = new ItemStorageSlice(storage, Array(0))
@@ -59,6 +68,7 @@ object TileGerminationChamber {
                       val task         : GerminationTask = new GerminationTask
 
     dataSpec ++= Array(
+      new DataSerializable[NBTTagCompound](BATTERY_NBT, battery),
       new DataSerializable[NBTTagCompound](TANK_NBT, tank),
       new DataSerializable[NBTTagCompound](ITEMS_NBT, storage),
       new DataSerializable[NBTTagCompound](TASK_NBT, task)
@@ -67,14 +77,15 @@ object TileGerminationChamber {
 
 }
 
-class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent {
+class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent with PowerLeafNode {
   private val state:
     MultiblockStateHolder[GerminationChamberState, TileGerminationChamber] =
-    new MultiblockStateHolder[GerminationChamberState, TileGerminationChamber](this, () => new GerminationChamberState, info, getLoc _, (a) => a.state)
+    new MultiblockStateHolder[GerminationChamberState, TileGerminationChamber](this, () => new GerminationChamberState, info, (a) => a.state)
   val tank   : IFluidStorage = new DynamicIFluidStorage(() => state.get.map(x => x.tank).getOrElse(IFluidStorage.Empty))
   val storage: IItemStorage  = new DynamicIItemStorage(() => state.get.map(x => x.storage).getOrElse(IItemStorage.Empty))
   @Wrapper(storage) private val inputStorage : IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
   @Wrapper(storage) private val outputStorage: IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
+  private                   var ticks                       = 0
   private                   val sidedStorageConfig          = new MultiblockSidedItemStorageConfiguration(
     getLoc _, info, NONE_INV_KEY, _ => INPUT_INV_KEY,
     Map(NONE_INV_KEY -> IItemStorage.Empty,
@@ -96,8 +107,31 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
-    new MultiblockStateHolder.DataMultiblockState[GerminationChamberState](STATE_NBT, state)
+    new MultiblockStateHolder.DataMultiblockState[GerminationChamberState](STATE_NBT, state),
+    new DataInt(TICKS_NBT, ticks _, ticks_=)
   )
+
+
+  override def serverUpdate(): Unit = {
+    super.serverUpdate()
+    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
+    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, ITEMS_PER_AUTOIO)
+    TileEntityUtils.checkDoFluidInputIO(this, sidedFluidConfig, ticks, FLUID_PER_AUTOIO)
+    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, ITEMS_PER_AUTOIO)
+    TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, FLUID_PER_AUTOIO)
+  }
+
+  override def leafTransferRate: Double = 40d
+
+  override def connectionRadius: Float = 8f
+
+  override def defaultBattery: IBattery = new DynamicIBattery(() => state.get.map(x => x.battery).getOrElse(BatteryEmpty.Empty))
+
+  override def readBatteryTag(tag: NBTTagCompound): Unit = {}
+
+  override def writeBatteryTag(tag: NBTTagCompound): NBTTagCompound = new NBTTagCompound
+
+  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
   override def hasGUI: Boolean = true
 

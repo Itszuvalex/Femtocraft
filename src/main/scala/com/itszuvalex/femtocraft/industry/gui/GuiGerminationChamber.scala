@@ -1,10 +1,13 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
+import com.itszuvalex.femtocraft.logistics.gui.GuiFluidTank
 import com.itszuvalex.itszulib.gui.GuiLabel
+import com.itszuvalex.itszulib.util
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
@@ -18,8 +21,8 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
 
   fontRenderer = Minecraft.getMinecraft.fontRenderer
 
-  addGuiAndSync(tile.storage, 0, 44, 23)
-  addGuiAndSync(tile.storage, 1, 85, 23)
+  addGuiAndSync(tile.storage, 0, 48, 23)
+  addGuiAndSync(tile.storage, 1, 90, 23)
 
   addPlayerInventorySlots(inv)
 
@@ -37,15 +40,13 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
   //  progressBar.colorProgress = color.toInt
   //  add(progressBar)
 
-  val nameLabel = new GuiLabel(20, 12, fontRenderer.getStringWidth("Germination Chamber"), fontRenderer.FONT_HEIGHT, () => "Germination Chamber")
-  //  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
+  val nameLabel = new GuiLabel(3, 3, fontRenderer.getStringWidth("Germination Chamber"), fontRenderer.FONT_HEIGHT, () => "Germination Chamber")
+  add(nameLabel)
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, util.Color(0, 0, 0, 0).toInt)
+  add(powerMeter)
 
-  val elems = List(nameLabel
-    //    ,
-    //    powerMeter
-  )
-  add(elems: _*)
+  val tank = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null), 0, true)
+  add(tank)
 
-  //  elems.foreach(e => e.setShouldRender(false))
   override def GuiID: Int = GuiIDs.TileGerminationChamberID
 }

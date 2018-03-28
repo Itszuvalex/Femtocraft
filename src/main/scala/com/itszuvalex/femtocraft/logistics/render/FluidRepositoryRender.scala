@@ -50,6 +50,7 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
   }
 
   override def renderTileEntityInWorld(te: TileFluidRepository, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    GL11.glDisable(GL11.GL_BLEND)
     pass = 0
     facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
     val fluidStack = Option(te).filter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null).getStorageProperties.apply(0).getContents).orNull
