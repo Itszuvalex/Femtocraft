@@ -1,22 +1,22 @@
 package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.industry._
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
-import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, MultiblockSidedFluidStorageConfiguration, MultiblockSidedItemStorageConfiguration}
 import com.itszuvalex.femtocraft.util.Wrapper
-import com.itszuvalex.femtocraft.util.data.{DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.util.data._
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.storage.{IFluidStorage, IItemStorage}
-import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.api.storage._
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
+import com.itszuvalex.itszulib.util.Task
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.util.INBTSerializable
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.items.CapabilityItemHandler
 
@@ -33,34 +33,52 @@ object TileGerminationChamber {
   val NONE_TANK_KEY = "None"
 
   val TASK_NBT               = "Task"
+  val TANK_NBT               = "Tank"
+  val ITEMS_NBT              = "Items"
   val ITEM_SIDED_CONFIG_NBT  = "ItemConfig"
   val FLUID_SIDED_CONFIG_NBT = "FluidConfig"
   val TICKS_NBT              = "Ticks"
+  val STATE_NBT              = "State"
 
-  class GerminationChamberState extends INBTSerializable[NBTTagCompound] {
-    var test: Int = 0
+  class GerminationTask extends Task() {
+    var stack : IItemStack               = IItemStack.Empty
+    var recipe: GerminationChamberRecipe = _
 
-    override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-      val testOne: () => Int = test _
-      val testTwo: (Int) => Unit = test_=
+    override def reset(): Unit = {
+      super.reset()
+      stack = IItemStack.Empty
+      recipe = null
     }
+  }
 
-    override def serializeNBT(): NBTTagCompound = ???
+  class GerminationChamberState extends DataSpec {
+                      val tank         : IFluidStorage   = new FluidStorage(TANK_SIZE)
+                      val storage      : IItemStorage    = new ItemStorageArray(2)
+    @Wrapper(storage) val inputStorage : IItemStorage    = new ItemStorageSlice(storage, Array(0))
+    @Wrapper(storage) val outputStorage: IItemStorage    = new ItemStorageSlice(storage, Array(1))
+                      val task         : GerminationTask = new GerminationTask
+
+    dataSpec ++= Array(
+      new DataSerializable[NBTTagCompound](TANK_NBT, tank),
+      new DataSerializable[NBTTagCompound](ITEMS_NBT, storage),
+      new DataSerializable[NBTTagCompound](TASK_NBT, task)
+    )
   }
 
 }
 
 class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent {
-  private                   val tank        : IFluidStorage = IFluidStorage.Empty
-  private                   val storage     : IItemStorage  = IItemStorage.Empty
-  @Wrapper(storage) private val inputStorage: IItemStorage  = IItemStorage.Empty //new ItemStorageSlice(storage, Array(0))
-  @Wrapper(storage) private val outputStorage: IItemStorage = IItemStorage.Empty //new ItemStorageSlice(storage, Array(1))
-  private val sidedStorageConfig = new MultiblockSidedItemStorageConfiguration(
-      getLoc _, info, NONE_INV_KEY, _ => INPUT_INV_KEY,
-      Map(NONE_INV_KEY -> IItemStorage.Empty,
-        INPUT_INV_KEY -> inputStorage,
-        OUTPUT_INV_KEY -> outputStorage),
-      () => EnumFacing.NORTH)
+  private                   val tank         : IFluidStorage                   = new DynamicIFluidStorage(() => getState.map(x => x.tank).getOrElse(IFluidStorage.Empty))
+  private                   val storage      : IItemStorage                    = new DynamicIItemStorage(() => getState.map(x => x.storage).getOrElse(IItemStorage.Empty))
+  @Wrapper(storage) private val inputStorage : IItemStorage                    = new DynamicIItemStorage(() => getState.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
+  @Wrapper(storage) private val outputStorage: IItemStorage                    = new DynamicIItemStorage(() => getState.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
+  private                   var state        : Option[GerminationChamberState] = None
+  private                   val sidedStorageConfig                             = new MultiblockSidedItemStorageConfiguration(
+    getLoc _, info, NONE_INV_KEY, _ => INPUT_INV_KEY,
+    Map(NONE_INV_KEY -> IItemStorage.Empty,
+      INPUT_INV_KEY -> inputStorage,
+      OUTPUT_INV_KEY -> outputStorage),
+    () => EnumFacing.NORTH)
 
   private val sidedFluidConfig = new MultiblockSidedFluidStorageConfiguration(
     getLoc _, info, NONE_TANK_KEY, _ => TANK_KEY,
@@ -75,8 +93,29 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   )
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
-    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig)
-  )
+    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
+    new ConditionalData(() => isController, new DataAssignable[Option[GerminationChamberState]](STATE_NBT,
+    getState _,
+    { case None => null; case Some(a) => a.serializeNBT() }, //Writer
+    state_=, // Setter
+    {
+      case t: NBTTagCompound =>
+        val ret = new GerminationChamberState
+        ret.deserializeNBT(t)
+        Some(Some(ret))
+      case _ => Some(None)
+    }
+    )))
+
+  private def getOrElseUpdateState: GerminationChamberState = {
+    state match {
+      case None => state = Some(new GerminationChamberState)
+      case Some(_) =>
+    }
+    state.get
+  }
+
+  private def getState: Option[GerminationChamberState] = new MultiblockForwarder[Option[GerminationChamberState], TileGerminationChamber](this, info, getLoc _, { case None => None; case Some(a) => Some(a.getOrElseUpdateState) }).get
 
   override def hasDescription: Boolean = true
 

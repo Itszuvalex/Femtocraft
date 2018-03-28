@@ -7,10 +7,19 @@ import scala.collection.mutable.ArrayBuffer
 
 class DataSpecification(val set: ArrayBuffer[KeyedData], var onSave: () => Unit = () => Unit, var onLoad: () => Unit = () => Unit)
   extends INBTSerializable[NBTTagCompound] {
+  private var nbt: NBTTagCompound = _
+
+  /**
+    *
+    * @return Useful for conditional checks for save/load.  Only set during deserializeNBT
+    */
+  def getNBT: NBTTagCompound = nbt
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    this.nbt = nbt
     set.foreach(d => d.deserializeNBT(nbt.getTag(d.key)))
     onLoad()
+    this.nbt = null
   }
 
   override def serializeNBT(): NBTTagCompound = {
