@@ -16,15 +16,15 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
 
   def connectionRadius: Float
 
-  def leafNodes: scala.collection.Set[IPowerLeafNode]
+  def leafNodes(force: Boolean): scala.collection.Set[IPowerLeafNode]
 
-  def canAddLeafNode(node: IPowerLeafNode) : Boolean = node.getStorageLoc.distSqr(getLoc) <= connectionRadius*connectionRadius
+  def canAddLeafNode(node: IPowerLeafNode): Boolean = node.getStorageLoc.distSqr(getLoc) <= connectionRadius * connectionRadius
 
   def addLeafNode(node: IPowerLeafNode): Unit
 
   def removeLeafNode(node: IPowerLeafNode): Unit
 
-  def storageNodes: scala.collection.Set[IPowerStorageNode]
+  def storageNodes(force: Boolean): scala.collection.Set[IPowerStorageNode]
 
   def rendersConnections: Boolean
 

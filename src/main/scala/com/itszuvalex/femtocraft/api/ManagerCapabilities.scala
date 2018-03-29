@@ -108,13 +108,13 @@ object ManagerCapabilities {
 
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
-    override def leafNodes: Set[IPowerLeafNode] = Set()
+    override def leafNodes(force: Boolean): Set[IPowerLeafNode] = Set()
 
     override def addLeafNode(node: IPowerLeafNode): Unit = {}
 
     override def removeLeafNode(node: IPowerLeafNode): Unit = {}
 
-    override def storageNodes: Set[IPowerStorageNode] = Set()
+    override def storageNodes(force: Boolean): Set[IPowerStorageNode] = Set()
 
     override def leafTransferRate: Double = 0
 

@@ -71,11 +71,11 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   override def onTickStart(): Unit = {}
 
-  def producerNodes = nodeMap.values.flatMap(_.storageNodes).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
+  def producerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
 
-  def storageNodes = nodeMap.values.flatMap(_.storageNodes).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
+  def storageNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
 
-  def consumerNodes = nodeMap.values.flatMap(_.storageNodes).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
+  def consumerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
 
   override def onTickEnd(): Unit = {
     try {

@@ -65,6 +65,10 @@ object PowerManager {
     node.setNetwork(null)
   }
 
+  def onNodeBroken(node: IPowerNetworkNode): Unit = {
+    node.leafNodes(true).foreach(_.onParentBroken(node))
+  }
+
   def removeLeaf(node: IPowerLeafNode): Unit = {
     leafTracker.removeLocation(node.getStorageLoc)
   }

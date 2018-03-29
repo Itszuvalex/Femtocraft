@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.render
 
+import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.gui.{GuiSidedFluidConfig, GuiSidedInventoryConfig, GuiSidedNaniteConfig}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
@@ -23,6 +24,7 @@ object FemtoRenderUtils {
   val CONFIG_STORAGE_TEXTURE   = () => GuiSidedInventoryConfig.SIDE_TEX_COLOR
   val CONFIG_IO_TEXTURE_INPUT  = () => GuiSidedInventoryConfig.SIDE_TEX_INPUT
   val CONFIG_IO_TEXTURE_OUTPUT = () => GuiSidedInventoryConfig.SIDE_TEX_OUTPUT
+  val CONFIG_OUTLINE           = Resources.TexBlock("blockoutline.png")
 
   def drawBeam(start: Vector3,
     end: Vector3,
@@ -105,6 +107,9 @@ object FemtoRenderUtils {
       GL11.glScaled(1.01, 1.01, 1.01)
       GL11.glTranslated(-.005, -.005, -.005)
       EnumFacing.VALUES.foreach { facing =>
+        GL11.glColor4f(1,1,1,1)
+        Minecraft.getMinecraft.getTextureManager.bindTexture(CONFIG_OUTLINE)
+        RenderUtils.drawArbitraryFace(0, 0, 0, 0, 1, 0, 1, 0, 1, facing, null, 0, 1, 0, 1)
         val color = colorForStorage(facing)
         GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
         Minecraft.getMinecraft.getTextureManager.bindTexture(CONFIG_STORAGE_TEXTURE())

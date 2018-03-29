@@ -52,7 +52,7 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
         if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
       }
 
-    te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes.
+    te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes(false).
       foreach { t =>
         if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
       }
