@@ -141,6 +141,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     TileEntityUtils.checkDoFluidInputIO(this, sidedFluidConfig, ticks, FLUID_PER_AUTOIO)
     TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, ITEMS_PER_AUTOIO)
     TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, FLUID_PER_AUTOIO)
+    if (isController) state.get.foreach(_.powerStorageNodeDelegate.updateServerTick())
   }
 
   override def hasGUI: Boolean = true
@@ -160,8 +161,8 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ if capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => true
     case _ if capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => true
     case _ if capability == Capabilities.POWER_STORAGE => true
-    case _ if capability == Capabilities.TILE_POWER_LEAF_NODE => isController
-    case _ if capability == Capabilities.TILE_POWER_STORAGE_NODE => isController
+    case _ if capability == Capabilities.TILE_POWER_LEAF_NODE => true
+    case _ if capability == Capabilities.TILE_POWER_STORAGE_NODE => true
     case _ => super.hasCapability(capability, facing)
   }
 
