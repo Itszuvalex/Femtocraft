@@ -1,18 +1,18 @@
 package com.itszuvalex.femtocraft.industry.render
 
-import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
+import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileGerminationChamber}
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
 import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Resources}
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.render.RenderUtils
+import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.BlockCrops
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
@@ -29,7 +29,7 @@ object MultiblockGerminationChamberRenderer {
 }
 
 @SideOnly(Side.CLIENT)
-class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[TileGerminationChamber] with IFrameMultiblockRenderer {
+class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[TileGerminationChamber] with IFrameMultiblockRenderer {
   val chamberModel = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.chamberModelLoc)
   //val baseModel    = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.baseModelLoc)
 
@@ -82,8 +82,10 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
     */
   override def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit = {
     RenderUtils.glMatrixBlock {
-      GL11.glScalef(1f / 3f, 1f / 3f, 1f / 3f)
-      renderAtLocation(rx, ry, rz)
+      GL11.glTranslated(rx, ry, rz)
+      val max = Array(MultiblockGerminationChamber.xSize, MultiblockGerminationChamber.ySize, MultiblockGerminationChamber.zSize).max
+      GL11.glScalef(1f / max.toFloat, 1f / max.toFloat, 1f / max.toFloat)
+      renderAtLocation(0, 0, 0)
     }
 
   }
@@ -94,7 +96,12 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
     */
   override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
-  override def render(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+
+  override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    renderAsItem(new ItemStack(FemtoBlocks.blockGerminationChamber), x, y, z)
+  }
+
+  override def renderTileEntityInWorld(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     te match {
       case t: TileGerminationChamber => if (t.hasCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null) && t.getCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
         renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, if (te.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)) te.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
@@ -124,7 +131,7 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
       //      baseModel.render()
 
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
-//      GL11.glColor4f(1f, 1f, 1f, 1f)
+      //      GL11.glColor4f(1f, 1f, 1f, 1f)
 
       chamberModel.renderGroups(Set("Base", "Middle", "Top"))
 
