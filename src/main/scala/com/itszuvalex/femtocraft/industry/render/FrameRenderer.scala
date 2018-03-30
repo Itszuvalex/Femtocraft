@@ -73,6 +73,7 @@ class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
               RenderUtils.glMatrixBlock {
                 GL11.glTranslated(x + .0005, y + .0005, z + .0005)
                 GL11.glScaled(.999, .999, .999)
+                GL11.glColor3f(0, 1, 0)
                 render.renderInProgressAt(0, 0, 0, partialTicks, te)
               }
             case _ =>

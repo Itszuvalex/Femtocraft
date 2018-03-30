@@ -124,7 +124,7 @@ class MultiblockGerminationChamberRenderer extends TileEntitySpecialRenderer[Til
       //      baseModel.render()
 
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
-      GL11.glColor4f(1f, 1f, 1f, 1f)
+//      GL11.glColor4f(1f, 1f, 1f, 1f)
 
       chamberModel.renderGroups(Set("Base", "Middle", "Top"))
 
