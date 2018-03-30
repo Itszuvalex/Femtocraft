@@ -37,7 +37,7 @@ object PowerManager {
 
     val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
     if (nodes.isEmpty) {
-      val network = PowerNetwork.createFromTile(node)
+      val network = PowerNetwork.createFromNode(node)
       network.register()
     }
     else {

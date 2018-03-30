@@ -37,6 +37,7 @@ trait PowerStorageNode extends TileEntityBase {
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
+    delegate.updateServerTick()
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {

@@ -137,6 +137,8 @@ object ManagerCapabilities {
     override def transferRate: Double = 0
 
     override def getStorageLoc: Loc4 = Loc4(0, 0, 0, 0)
+
+    override def changeForLastTick: Double = 0d
   }
 
   class PowerLeafNodeImplementationDummy extends PowerStorageNodeImplementationDummy with IPowerLeafNode {

@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Level
 object PowerNetwork {
   val TICKS_TO_AVERAGE_POWER_OVER: Int = 20 * 10
 
-  def createFromTile(tile: IPowerNetworkNode): PowerNetwork = {
+  def createFromNode(tile: IPowerNetworkNode): PowerNetwork = {
     val network = new PowerNetwork
     network.addNode(tile)
     network
@@ -34,7 +34,7 @@ object PowerNetwork {
     var consumerNodeCount     = 0
     var storageNodeCount      = 0
 
-    def startNewTick() = {
+    def startNewTick(): Unit = {
       lastTickProducerGen = 0d
       lastTickConsumerReq = 0d
       lastTickStorageChange = 0d
@@ -71,14 +71,14 @@ object PowerNetwork {
 
     def averagePowerTrend: Double = if (powerAverageCount == 0) 0d else powerAverageCache.map(_ / powerAverageCount).sum
 
-    def addConsumer(node: IPowerStorageNode) = {
+    def addConsumer(node: IPowerStorageNode): Unit = {
       lastTickConsumerReq += node.changeForLastTick
       consumerNodeCount += 1
       lastTickTotalStored += node.battery.storage
       lastTickTotalStorage += node.battery.maxStorage
     }
 
-    def addStorage(node: IPowerStorageNode) = {
+    def addStorage(node: IPowerStorageNode): Unit = {
       lastTickStored += node.battery.storage
       lastTickStorageMax += node.battery.maxStorage
       lastTickStorageChange += node.changeForLastTick
@@ -87,14 +87,14 @@ object PowerNetwork {
       storageNodeCount += 1
     }
 
-    def addProducer(node: IPowerStorageNode) = {
+    def addProducer(node: IPowerStorageNode): Unit = {
       lastTickProducerGen += node.changeForLastTick
       producerNodeCount += 1
       lastTickTotalStored += node.battery.storage
       lastTickTotalStorage += node.battery.maxStorage
     }
 
-    def updatePowerTrend() = {
+    def updatePowerTrend(): Unit = {
       lastTickNetChange = lastTickProducerGen + lastTickConsumerReq
       trackPowerTrend(lastTickNetChange)
     }

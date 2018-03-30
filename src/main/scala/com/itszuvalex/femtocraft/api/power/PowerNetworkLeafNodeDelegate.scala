@@ -21,7 +21,8 @@ class PowerNetworkLeafNodeDelegate(
   radius: () => Float,
   getBattery: () => IBattery,
   stype: PowerStorageNodeType,
-  transfer: () => Double
+  transfer: () => Double,
+  change: () => Double
 ) extends IPowerLeafNode with DataSpec {
   var parentLoc: Option[Loc4] = None
 
@@ -58,4 +59,6 @@ class PowerNetworkLeafNodeDelegate(
   override def transferRate: Double = transfer()
 
   override def getStorageLoc: Loc4 = new Loc4(tileEntity)
+
+  override def changeForLastTick: Double = change()
 }

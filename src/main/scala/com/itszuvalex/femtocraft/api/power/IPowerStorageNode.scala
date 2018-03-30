@@ -16,5 +16,5 @@ trait IPowerStorageNode {
 
   def getStorageLoc: Loc4
 
-  def changeForLastTick: Double = 0d
+  def changeForLastTick: Double
 }

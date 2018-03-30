@@ -21,7 +21,8 @@ object PowerLeafNode {
 
 trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
   val leafDelegate: PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(this, connectionRadius _, battery _, powerStorageNodeType,
-    PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(leafDelegate, powerTransferRateDefault))
+    PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(leafDelegate, powerTransferRateDefault),
+    () => delegate.changeForLastTick)
   leafDelegate.dataSpec.onLoad = () => setRenderUpdate()
 
   def connectionRadius: Float = PowerLeafNode.DEFAULT_RADIUS
