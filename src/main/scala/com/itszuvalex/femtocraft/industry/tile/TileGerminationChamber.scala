@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.industry._
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.femtocraft.power.render.TileBeamRenderOffset
 import com.itszuvalex.femtocraft.util.data._
 import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -15,6 +16,7 @@ import com.itszuvalex.itszulib.api.storage._
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
+import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
@@ -86,7 +88,7 @@ object TileGerminationChamber {
 
 }
 
-class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent with IPowerLeafNode with IPowerStorageNode {
+class TileGerminationChamber extends TileEntityBase with TileDataSpec with MultiBlockComponent with IPowerLeafNode with IPowerStorageNode with TileBeamRenderOffset {
   override val info: MultiBlockInfo = new MultiBlockInfo {
     override def formMultiBlock(loc: Loc4): Boolean = {
       val ret = super.formMultiBlock(loc)
@@ -255,4 +257,5 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     else false
   }
 
+  override def offset: Vector3 = Vector3(.5d, 0, .5d)
 }
