@@ -52,4 +52,6 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
   override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach(l => l.getWorld.get.setBlockToAir(l.getPos))
 
   override def multiblockRenderID: Int = RenderIDs.germinationChamberID
+
+  override def size: (Int, Int, Int) = (xSize, ySize, zSize)
 }

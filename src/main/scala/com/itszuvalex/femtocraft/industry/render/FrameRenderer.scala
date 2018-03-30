@@ -70,7 +70,11 @@ class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
         case Some(mb) =>
           FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
             case Some(render) =>
-              render.renderInProgressAt(x, y, z, partialTicks, te)
+              RenderUtils.glMatrixBlock {
+                GL11.glTranslated(x + .0005, y + .0005, z + .0005)
+                GL11.glScaled(.999, .999, .999)
+                render.renderInProgressAt(0, 0, 0, partialTicks, te)
+              }
             case _ =>
           }
         case _ =>

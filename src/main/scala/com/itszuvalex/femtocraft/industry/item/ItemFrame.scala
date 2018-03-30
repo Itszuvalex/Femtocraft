@@ -106,12 +106,15 @@ class ItemFrame extends Item with IFrameItem {
     if (!playerIn.capabilities.isCreativeMode && stack.getCount < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     else if (!playerIn.capabilities.isCreativeMode) stack.setCount(stack.getCount - multi.numFrames)
 
+    val controllerLoc = new Loc4(worldIn, bpos)
     locations.foreach { loc =>
       worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)
       worldIn.getTileEntity(loc.getPos) match {
         case frame: TileFrame =>
-          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
-          frame.formMultiBlock(new Loc4(worldIn, bpos))
+          val offset: (Int, Int, Int) = (loc.x - controllerLoc.x, loc.y - controllerLoc.y, loc.z - controllerLoc.z)
+          frame.calculateRendering(multi.size._1, multi.size._2, multi.size._3, offset._1, offset._2, offset._3)
+          //          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
+          frame.formMultiBlock(controllerLoc)
           frame.multiBlock = multiString
         case _ =>
       }

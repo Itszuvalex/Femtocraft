@@ -27,6 +27,8 @@ trait IFrameMultiblock {
 
   def onMultiblockBroken(loc: Loc4)
 
+  def size: (Int, Int, Int)
+
   @SideOnly(Side.CLIENT)
   def multiblockRenderID: Int
 }

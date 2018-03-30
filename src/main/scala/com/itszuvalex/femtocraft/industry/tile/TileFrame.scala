@@ -66,26 +66,26 @@ object TileFrame {
     val MaxY = sizeY - 1
     val MaxZ = sizeZ - 1
     (locX, locY, locZ) match {
-      case (0, 0, 0) => setRenderMarks(true, 0, 4, 8, 11, 12, 16, 17, 19)
-      case (`MaxX`, 0, 0) => setRenderMarks(true, 0, 5, 8, 9, 13, 16, 17, 18)
-      case (0, `MaxY`, 0) => setRenderMarks(true, 0, 0, 3, 4, 12, 13, 15, 16)
-      case (0, 0, `MaxZ`) => setRenderMarks(true, 0, 7, 10, 11, 15, 16, 18, 19)
-      case (`MaxX`, `MaxY`, 0) => setRenderMarks(true, 0, 0, 1, 5, 12, 13, 14, 17)
-      case (0, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 3, 7, 12, 14, 15, 19)
-      case (`MaxX`, 0, `MaxZ`) => setRenderMarks(true, 0, 6, 9, 10, 14, 17, 18, 19)
-      case (`MaxX`, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 1, 2, 6, 13, 14, 15, 18)
-      case (0, 0, _) => setRenderMarks(true, 0, 11, 16, 19)
-      case (0, `MaxY`, _) => setRenderMarks(true, 0, 3, 12, 15)
-      case (`MaxX`, 0, _) => setRenderMarks(true, 0, 9, 17, 18)
-      case (`MaxX`, `MaxY`, _) => setRenderMarks(true, 0, 1, 13, 14)
-      case (0, _, 0) => setRenderMarks(true, 0, 4, 12, 16)
-      case (0, _, `MaxZ`) => setRenderMarks(true, 0, 7, 15, 19)
-      case (`MaxX`, _, 0) => setRenderMarks(true, 0, 5, 13, 17)
-      case (`MaxX`, _, `MaxZ`) => setRenderMarks(true, 0, 6, 14, 18)
-      case (_, 0, 0) => setRenderMarks(true, 0, 8, 16, 17)
-      case (_, 0, `MaxZ`) => setRenderMarks(true, 0, 10, 18, 19)
-      case (_, `MaxY`, 0) => setRenderMarks(true, 0, 0, 12, 13)
-      case (_, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 14, 15)
+      case (0, 0, 0) => setRenderMarks(true, 0, 4, 8, 11, 12, 16, 17, 19) // Corner
+      case (`MaxX`, 0, 0) => setRenderMarks(true, 0, 5, 8, 9, 13, 16, 17, 18) // Corner
+      case (0, `MaxY`, 0) => setRenderMarks(true, 0, 0, 3, 4, 12, 13, 15, 16) // Corner
+      case (0, 0, `MaxZ`) => setRenderMarks(true, 0, 7, 10, 11, 15, 16, 18, 19) // Corner
+      case (`MaxX`, `MaxY`, 0) => setRenderMarks(true, 0, 0, 1, 5, 12, 13, 14, 17) // Corner
+      case (0, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 3, 7, 12, 14, 15, 19) // Corner
+      case (`MaxX`, 0, `MaxZ`) => setRenderMarks(true, 0, 6, 9, 10, 14, 17, 18, 19) // Corner
+      case (`MaxX`, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 1, 2, 6, 13, 14, 15, 18) // Corner
+      case (0, 0, _) => setRenderMarks(true, 0, 11, 16, 19) // East/West, N/S?, Down Edge
+      case (0, `MaxY`, _) => setRenderMarks(true, 0, 3, 12, 15) // East/West, N/S?, Top Edge
+      case (`MaxX`, 0, _) => setRenderMarks(true, 0, 9, 17, 18) // East/West, !N/S?, Down Edge
+      case (`MaxX`, `MaxY`, _) => setRenderMarks(true, 0, 1, 13, 14) // East/West, !N/S, Top Edge
+      case (0, _, 0) => setRenderMarks(true, 0, 4, 12, 16) // Vertical
+      case (0, _, `MaxZ`) => setRenderMarks(true, 0, 7, 15, 19) // Vertical
+      case (`MaxX`, _, 0) => setRenderMarks(true, 0, 5, 13, 17) // Vertical
+      case (`MaxX`, _, `MaxZ`) => setRenderMarks(true, 0, 6, 14, 18) // Vertical
+      case (_, 0, 0) => setRenderMarks(true, 0, 8, 16, 17)// Horiz
+      case (_, 0, `MaxZ`) => setRenderMarks(true, 0, 10, 18, 19) // Horiz
+      case (_, `MaxY`, 0) => setRenderMarks(true, 0, 0, 12, 13) // Horiz
+      case (_, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 14, 15) // Horiz
       case _ => fullRender(false)
     }
   }
