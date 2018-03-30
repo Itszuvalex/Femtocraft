@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.power.{PowerStorageNodeDelegate, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.{IPowerStorageNode, PowerStorageNodeDelegate, PowerStorageNodeType}
 import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -17,8 +17,10 @@ object PowerStorageNode {
 }
 
 trait PowerStorageNode extends TileEntityBase {
-  var battery: IBattery = defaultBattery
-  val delegate          = new PowerStorageNodeDelegate(this, battery _, powerStorageNodeType, () => powerStorageTransferRate)
+  var battery : IBattery          = defaultBattery
+  val delegate: IPowerStorageNode = defaultStorageDelegate
+
+  def defaultStorageDelegate: IPowerStorageNode = new PowerStorageNodeDelegate(this, battery _, powerStorageNodeType, () => powerStorageTransferRate)
 
   def defaultBattery: IBattery
 
@@ -37,7 +39,7 @@ trait PowerStorageNode extends TileEntityBase {
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    delegate.updateServerTick()
+    delegate match {case a: PowerStorageNodeDelegate => a.updateServerTick(); case _ =>}
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {

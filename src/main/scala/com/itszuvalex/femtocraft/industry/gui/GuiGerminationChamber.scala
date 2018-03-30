@@ -42,7 +42,7 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
 
   val nameLabel = new GuiLabel(3, 3, fontRenderer.getStringWidth("Germination Chamber"), fontRenderer.FONT_HEIGHT, () => "Germination Chamber")
   add(nameLabel)
-  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, util.Color(0, 0, 0, 0).toInt)
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), util.Color(0, 0, 0, 0).toInt)
   add(powerMeter)
 
   val tank = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null), 0, true)

@@ -1,8 +1,9 @@
 package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.power.PowerNetworkLeafNodeDelegate
+import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, PowerNetworkLeafNodeDelegate}
 import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.femtocraft.util.data.DataSpec
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
@@ -20,10 +21,15 @@ object PowerLeafNode {
 }
 
 trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
-  val leafDelegate: PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(this, connectionRadius _, battery _, powerStorageNodeType,
-    PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(leafDelegate, powerTransferRateDefault),
-    () => delegate.changeForLastTick)
-  leafDelegate.dataSpec.onLoad = () => setRenderUpdate()
+  val leafDelegate: IPowerLeafNode = defaultLeafDelegate
+
+  def defaultLeafDelegate: IPowerLeafNode = {
+    val del: PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(this, connectionRadius _, battery _, powerStorageNodeType,
+      PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(leafDelegate.asInstanceOf[PowerNetworkLeafNodeDelegate], powerTransferRateDefault),
+      () => delegate.changeForLastTick)
+    del.dataSpec.onLoad = () => setRenderUpdate()
+    del
+  }
 
   def connectionRadius: Float = PowerLeafNode.DEFAULT_RADIUS
 
@@ -67,7 +73,7 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
 
   var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 
-  def getColor = leafDelegate.parentLoc.flatMap(_.getTileEntity()).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).getOrElse(color)
+  def getColor = Option(leafDelegate.getParent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).getOrElse(color)
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) leafDelegate.asInstanceOf[T]
@@ -81,27 +87,40 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
     else super.hasCapability(capability, facing)
   }
 
+  def writeLeafTag(compound: NBTTagCompound): Unit = {
+    leafDelegate match {
+      case a: DataSpec => a.writeToNBT(compound)
+    }
+  }
+
+  def readLeafTag(compound: NBTTagCompound): Unit = {
+    leafDelegate match {
+      case a: DataSpec => a.deserializeNBT(compound)
+    }
+  }
+
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
-    leafDelegate.writeToNBT(compound)
+    writeLeafTag(compound)
     writeColorTag(compound)
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
-    leafDelegate.deserializeNBT(compound)
+    readLeafTag(compound)
     readColorTag(compound)
   }
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
     super.readFromNBT(par1nbtTagCompound)
-    leafDelegate.deserializeNBT(par1nbtTagCompound)
+    readLeafTag(par1nbtTagCompound)
     setRenderUpdate()
   }
 
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
-    super.writeToNBT(par1nbtTagCompound)
-    leafDelegate.writeToNBT(par1nbtTagCompound)
+    val ret = super.writeToNBT(par1nbtTagCompound)
+    writeLeafTag(par1nbtTagCompound)
+    ret
   }
 
 }
