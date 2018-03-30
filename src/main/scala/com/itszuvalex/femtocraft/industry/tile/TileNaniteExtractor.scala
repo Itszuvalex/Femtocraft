@@ -96,11 +96,9 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
 
   override def defaultBattery = new PowerBattery(5000)
 
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-  override def leafTransferRate: Double = 50d
-
-  override def connectionRadius: Float = 8f
+  override def powerStorageTransferRate: Double = 50d
 
   override def defaultStorageTank: NaniteTank = new NaniteTank(50)
 

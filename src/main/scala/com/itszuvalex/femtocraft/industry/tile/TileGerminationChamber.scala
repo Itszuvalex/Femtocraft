@@ -121,17 +121,15 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, FLUID_PER_AUTOIO)
   }
 
-  override def leafTransferRate: Double = 40d
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-  override def connectionRadius: Float = 8f
+  override def powerStorageTransferRate: Double = 50d
 
   override def defaultBattery: IBattery = new DynamicIBattery(() => state.get.map(x => x.battery).getOrElse(BatteryEmpty.Empty))
 
   override def readBatteryTag(tag: NBTTagCompound): Unit = {}
 
   override def writeBatteryTag(tag: NBTTagCompound): NBTTagCompound = new NBTTagCompound
-
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
   override def hasGUI: Boolean = true
 

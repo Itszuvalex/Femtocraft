@@ -24,11 +24,9 @@ import net.minecraft.nbt.NBTTagCompound
 
   override def defaultBattery: IBattery = new PowerBattery(5000)
 
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
-  override def leafTransferRate: Double = 50d
-
-  override def connectionRadius: Float = 8f
+  override def powerStorageTransferRate: Double = 50d
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
@@ -44,7 +42,6 @@ import net.minecraft.nbt.NBTTagCompound
   override def getGuiID: Int = GuiIDs.TileNaniteHiveGuiID
 
   override def hasGUI: Boolean = true
-
 
   override def hasDescription = true
 

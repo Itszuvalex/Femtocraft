@@ -2,12 +2,13 @@ package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
+import com.itszuvalex.femtocraft.industry.{BatteryEmpty, DynamicIBattery}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -28,36 +29,16 @@ object TileCrystalMount {
 }
 
 class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with TileInventory {
-  override def defaultBattery: IBattery = new IBattery {
-    override def maxStorage: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery.maxStorage)
-      .getOrElse(0d)
+  override def defaultBattery: IBattery = new DynamicIBattery(() => crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(BatteryEmpty.Empty))
 
-    override def clear(): Unit = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { a => a.battery.storage = 0; setModified() }
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
-    override def copy() = new PowerBattery(storage, maxStorage)
-
-    override def writeToNBT(nbt: NBTTagCompound): Unit = {}
-
-    override def maxStorage_=(max: Double): Unit = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { a => a.battery.maxStorage = max; setModified() }
-
-    override def storage_=(amt: Double): Unit = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { a => a.battery.storage = amt; setModified() }
-
-    override def storage: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery.storage)
-      .getOrElse(0d)
-
-    override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
-
-    override def serializeNBT() = new NBTTagCompound
-  }
-
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
-
-  override def transferRate: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
+  override def powerStorageTransferRate: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
     .getOrElse(0d)
 
   override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
-  override def powerTransfer: Double = transferRate
+  override def powerTransfer: Double = powerStorageTransferRate
 
   override def rendersPower: Boolean = true
 

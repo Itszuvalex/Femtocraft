@@ -73,6 +73,10 @@ object PowerManager {
     leafTracker.removeLocation(node.getStorageLoc)
   }
 
+  def onLeafBroken(node: IPowerLeafNode): Unit = {
+    Option(node.getParent).flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null)).foreach(_.removeLeafNode(node))
+  }
+
   def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
     val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.TILE_POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
     leafs.view.filter(_.getParent == null).

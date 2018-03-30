@@ -39,7 +39,9 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
     }
   }
 
-  override def leafTransferRate: Double = 50d
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
+
+  override def powerStorageTransferRate: Double = 50d
 
   override def hasDescription: Boolean = true
 
@@ -58,6 +60,4 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
       istorage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((sum, crystal) => sum + crystal.battery.maxStorage) * TileCrystalStorageArray.STORAGE_MULTIPLIER
     }
   }
-
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 }

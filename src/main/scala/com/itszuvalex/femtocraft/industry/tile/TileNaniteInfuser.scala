@@ -11,7 +11,6 @@ import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataS
 import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Capabilities
-import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
@@ -109,13 +108,9 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
 
   override def defaultBattery = new PowerBattery(4000)
 
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-  override def connectionRadius: Float = 8f
-
-  override def leafTransferRate = 50d
-
-  override def getStorageLoc: Loc4 = getLoc
+  override def powerStorageTransferRate: Double = 50d
 
   override def hasDescription: Boolean = true
 

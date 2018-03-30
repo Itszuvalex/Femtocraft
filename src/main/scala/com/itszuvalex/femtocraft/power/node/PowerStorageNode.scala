@@ -1,8 +1,7 @@
 package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.power.IPowerStorageNode
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.femtocraft.api.power.{PowerStorageNodeDelegate, PowerStorageNodeType}
 import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -17,13 +16,15 @@ object PowerStorageNode {
   val BATTERY_TAG = "battery"
 }
 
-trait PowerStorageNode extends TileEntityBase with IPowerStorageNode {
-  var battery        : IBattery      = defaultBattery
-  var lastPowerAmount: Array[Double] = Array(0d, 0d)
+trait PowerStorageNode extends TileEntityBase {
+  var battery: IBattery = defaultBattery
+  val delegate          = new PowerStorageNodeDelegate(this, battery _, powerStorageNodeType, () => powerStorageTransferRate)
 
   def defaultBattery: IBattery
 
-  override def getStorageLoc: Loc4 = getLoc
+  def powerStorageNodeType: PowerStorageNodeType
+
+  def powerStorageTransferRate: Double
 
   def readBatteryTag(tag: NBTTagCompound): Unit = {
     battery.deserializeNBT(tag.getCompoundTag(PowerStorageNode.BATTERY_TAG))
@@ -35,15 +36,11 @@ trait PowerStorageNode extends TileEntityBase with IPowerStorageNode {
   }
 
   override def serverUpdate(): Unit = {
-    lastPowerAmount(1) = lastPowerAmount(0)
-    lastPowerAmount(0) = battery.storage //TODO: This may not actually be correct, might need to track two, current and prev.
     super.serverUpdate()
   }
 
-  override def changeForLastTick: Double = battery.storage - lastPowerAmount(1)
-
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.TILE_POWER_STORAGE_NODE) this.asInstanceOf[T]
+    if (capability == Capabilities.TILE_POWER_STORAGE_NODE) delegate.asInstanceOf[T]
     else if (capability == Capabilities.POWER_STORAGE) battery.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }

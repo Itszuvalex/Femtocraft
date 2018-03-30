@@ -88,13 +88,11 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
     new DataInt(TICKS_NBT, ticks _, ticks_=)
   )
 
-  override def connectionRadius: Float = 8f
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
-  override def leafTransferRate = 50d
+  override def powerStorageTransferRate: Double = 50d
 
   override def defaultBattery: IBattery = new PowerBattery(5000)
-
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(2) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = {
