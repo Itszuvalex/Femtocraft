@@ -3,9 +3,11 @@ package com.itszuvalex.femtocraft.industry
 import com.itszuvalex.femtocraft.util.data.{ConditionalData, DataLoadable}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo
+import com.itszuvalex.itszulib.util.Debug
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.common.util.INBTSerializable
+import org.apache.logging.log4j.Level
 
 object MultiblockStateHolder {
 
@@ -30,7 +32,9 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
 
   private def getOrElseUpdateState: S = {
     state match {
-      case None => state = Some(fact())
+      case None =>
+        state = Some(fact())
+        Debug.log(Level.INFO, s"Created MultiblockState $state")
       case Some(_) =>
     }
     state.get
@@ -41,4 +45,6 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
     case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
     case _ => None
   }
+
+  def hasState: Boolean = state.isDefined
 }

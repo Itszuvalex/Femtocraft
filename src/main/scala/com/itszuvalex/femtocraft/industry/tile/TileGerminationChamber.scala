@@ -26,6 +26,8 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.items.CapabilityItemHandler
 
+import scala.collection.mutable.ArrayBuffer
+
 object TileGerminationChamber {
   val TICKS_FOR_AUTOIO = 20
   val POWER_PER_TICK   = 40
@@ -84,6 +86,10 @@ object TileGerminationChamber {
       new DataSerializable[NBTTagCompound](TASK_NBT, task),
       new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
     )
+
+    val descriptionSpec = new DataSpecification(ArrayBuffer(
+      new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
+    ))
   }
 
 }
@@ -125,7 +131,8 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   descriptionDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
-    new DataSerializable[NBTTagCompound](MULTIBLOCK_INFO_NBT, info)
+    new DataSerializable[NBTTagCompound](MULTIBLOCK_INFO_NBT, info),
+    new ConditionalData(() => state.hasState, new DataSerializable[NBTTagCompound](STATE_NBT, () => state.get.get.descriptionSpec))
   )
   descriptionDataSpec.onLoad = () => setRenderUpdate()
   saveDataSpec ++= Array(
