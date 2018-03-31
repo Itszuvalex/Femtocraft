@@ -6,6 +6,8 @@ import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamb
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
+import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import net.minecraft.item.ItemStack
 
 object MultiblockGerminationChamber {
@@ -54,4 +56,6 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
   override def multiblockRenderID: Int = RenderIDs.germinationChamberID
 
   override def size: (Int, Int, Int) = (xSize, ySize, zSize)
+
+  override def getRenderItemStack: IItemStack = FemtoBlocks.blockGerminationChamber.newIStack()
 }

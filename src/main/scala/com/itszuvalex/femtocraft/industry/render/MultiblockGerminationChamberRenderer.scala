@@ -16,22 +16,20 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.model.obj.OBJModel
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
 @SideOnly(Side.CLIENT)
 object MultiblockGerminationChamberRenderer {
-  val chamberModelLoc = Resources.CustomModelBlock("growth chamber/growth chamber.obj")
-  val chamberTexLoc   = Resources.CustomModelBlockTex("growth chamber/growth chamber template.png")
-  //val baseModelLoc    = Resources.CustomModelBlock("cyber base/base 2x2.obj")
-  //val baseTexLoc      = Resources.CustomModelBlockTex("cyber base/base 2x2.png")
-  //val baseTexColorLoc = Resources.CustomModelBlockTex("cyber base/base 2x2 color.png")
+  val chamberModelLoc: ResourceLocation = Resources.CustomModelBlock("growth chamber/growth chamber.obj")
+  val chamberTexLoc  : ResourceLocation = Resources.CustomModelBlockTex("growth chamber/growth chamber template.png")
 }
 
 @SideOnly(Side.CLIENT)
 class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[TileGerminationChamber] with IFrameMultiblockRenderer {
-  val chamberModel = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.chamberModelLoc)
-  //val baseModel    = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.baseModelLoc)
+  val chamberModel: OBJModel = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.chamberModelLoc)
 
   /**
     * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
@@ -85,7 +83,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
       GL11.glTranslated(rx, ry, rz)
       val max = Array(MultiblockGerminationChamber.xSize, MultiblockGerminationChamber.ySize, MultiblockGerminationChamber.zSize).max
       GL11.glScalef(1f / max.toFloat, 1f / max.toFloat, 1f / max.toFloat)
-      renderAtLocation(0, 0, 0)
+      renderAtLocation(1, 0, 0)
     }
 
   }
