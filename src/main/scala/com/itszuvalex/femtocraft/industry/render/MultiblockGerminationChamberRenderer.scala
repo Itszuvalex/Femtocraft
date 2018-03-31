@@ -23,8 +23,9 @@ import org.lwjgl.opengl.GL11
 
 @SideOnly(Side.CLIENT)
 object MultiblockGerminationChamberRenderer {
-  val chamberModelLoc: ResourceLocation = Resources.CustomModelBlock("growth chamber/growth chamber.obj")
-  val chamberTexLoc  : ResourceLocation = Resources.CustomModelBlockTex("growth chamber/growth chamber template.png")
+  val chamberModelLoc   : ResourceLocation = Resources.CustomModelBlock("growth chamber/growth chamber.obj")
+  val chamberTexLoc     : ResourceLocation = Resources.CustomModelBlockTex("growth chamber/growth chamber.png")
+  val chamberColorTexLoc: ResourceLocation = Resources.CustomModelBlockTex("growth chamber/growth chamber_color.png")
 }
 
 @SideOnly(Side.CLIENT)
@@ -133,6 +134,12 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
 
       chamberModel.renderGroups(Set("Base", "Middle", "Top"))
 
+      GL11.glPushAttrib(GL11.GL_CURRENT_BIT)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberColorTexLoc)
+      GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
+      chamberModel.renderGroups(Set("Base", "Middle", "Top"))
+      GL11.glPopAttrib()
+
       //          val recipe = te.currentRecipe
       //          if (recipe != null) {
       //            recipe.renderType match {
@@ -166,38 +173,13 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
       //          }
 
       if (Minecraft.getMinecraft.gameSettings.particleSetting == 0) {
-        val time = worldTime + partialTicks
-
-        GL11.glTranslated(0, 2.9, .6)
-        GL11.glRotated((1 + math.sin(time * .05)) * 20, 1, 0, 0)
-        GL11.glTranslated(0, -2.9, -.6)
-        chamberModel.renderGroups(Set("Sprinkler1"))
-        GL11.glTranslated(0, 2.9, .6)
-        GL11.glRotated((1 + math.sin(time * .05)) * -20, 1, 0, 0)
-        GL11.glTranslated(0, -2.9, -.6)
-        GL11.glTranslated(-.5196, 2.9, -.3)
-        GL11.glRotated((1 + math.sin(time * .05 + 1)) * 20, -.577350269189626, 0, 1)
-        GL11.glTranslated(.5196, -2.9, .3)
-        chamberModel.renderGroups(Set("Sprinkler2"))
-        GL11.glTranslated(-.5196, 2.9, -.3)
-        GL11.glRotated((1 + math.sin(time * .05 + 1)) * -20, -.577350269189626, 0, 1)
-        GL11.glTranslated(.5196, -2.9, .3)
-        GL11.glTranslated(.5196, 2.9, -.3)
-        GL11.glRotated((1 + math.sin(time * .05 + 2)) * -20, .577350269189626, 0, 1)
-        GL11.glTranslated(-.5196, -2.9, .3)
-        chamberModel.renderGroups(Set("Sprinkler3"))
-        GL11.glTranslated(.5196, 2.9, -.3)
-        GL11.glRotated((1 + math.sin(time * .05 + 2)) * 20, .577350269189626, 0, 1)
-        GL11.glTranslated(-.5196, -2.9, .3)
-
-        GL11.glTranslated(-(x + 1), -y, -(z + 1))
-        Minecraft.getMinecraft.effectRenderer.renderParticles(Minecraft.getMinecraft.getRenderViewEntity, partialTicks)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
-        GL11.glEnable(GL11.GL_BLEND)
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        GL11.glEnable(GL11.GL_CULL_FACE)
-        GL11.glTranslated(x + 1, y, z + 1)
-        GL11.glColor4f(1f, 1f, 1f, 1f)
+        renderSprinklers(x, y, z, worldTime, partialTicks)
+        GL11.glPushAttrib(GL11.GL_CURRENT_BIT)
+        Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberColorTexLoc)
+        GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
+        renderSprinklers(x, y, z, worldTime, partialTicks)
+        GL11.glPopAttrib()
       }
 
       RenderUtils.glMatrixBlock {
@@ -211,6 +193,42 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
       Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
       chamberModel.renderGroups(Set("Glass"))
 
+    }
+  }
+
+  private def renderSprinklers(x: Double, y: Double, z: Double, worldTime: Long, partialTicks: Float) = {
+    val time = worldTime + partialTicks
+    RenderUtils.glMatrixBlock {
+      GL11.glTranslated(0, 2.9, .6)
+      GL11.glRotated((1 + math.sin(time * .05)) * 20, 1, 0, 0)
+      GL11.glTranslated(0, -2.9, -.6)
+      chamberModel.renderGroups(Set("Sprinkler1"))
+      GL11.glTranslated(0, 2.9, .6)
+      GL11.glRotated((1 + math.sin(time * .05)) * -20, 1, 0, 0)
+      GL11.glTranslated(0, -2.9, -.6)
+      GL11.glTranslated(-.5196, 2.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 1)) * 20, -.577350269189626, 0, 1)
+      GL11.glTranslated(.5196, -2.9, .3)
+      chamberModel.renderGroups(Set("Sprinkler2"))
+      GL11.glTranslated(-.5196, 2.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 1)) * -20, -.577350269189626, 0, 1)
+      GL11.glTranslated(.5196, -2.9, .3)
+      GL11.glTranslated(.5196, 2.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 2)) * -20, .577350269189626, 0, 1)
+      GL11.glTranslated(-.5196, -2.9, .3)
+      chamberModel.renderGroups(Set("Sprinkler3"))
+      GL11.glTranslated(.5196, 2.9, -.3)
+      GL11.glRotated((1 + math.sin(time * .05 + 2)) * 20, .577350269189626, 0, 1)
+      GL11.glTranslated(-.5196, -2.9, .3)
+
+      GL11.glTranslated(-(x + 1), -y, -(z + 1))
+      Minecraft.getMinecraft.effectRenderer.renderParticles(Minecraft.getMinecraft.getRenderViewEntity, partialTicks)
+      Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
+      GL11.glEnable(GL11.GL_BLEND)
+      GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+      GL11.glEnable(GL11.GL_CULL_FACE)
+      GL11.glTranslated(x + 1, y, z + 1)
+      GL11.glColor4f(1f, 1f, 1f, 1f)
     }
   }
 }

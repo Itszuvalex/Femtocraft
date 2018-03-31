@@ -7,7 +7,7 @@ import com.itszuvalex.femtocraft.industry.container.ContainerGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.femtocraft.logistics.gui.GuiFluidTank
 import com.itszuvalex.itszulib.gui.GuiLabel
-import com.itszuvalex.itszulib.util
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
@@ -26,7 +26,7 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
 
   addPlayerInventorySlots(inv)
 
-  //  var color: Color = tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP)
+  var color: Color = tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)
 
   //  val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
   override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
@@ -42,7 +42,7 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
 
   val nameLabel = new GuiLabel(3, 3, fontRenderer.getStringWidth("Germination Chamber"), fontRenderer.FONT_HEIGHT, () => "Germination Chamber")
   add(nameLabel)
-  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), util.Color(0, 0, 0, 0).toInt)
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   add(powerMeter)
 
   val tank = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null), 0, true)
