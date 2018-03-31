@@ -17,7 +17,7 @@ import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, Po
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.render.Vector3
-import com.itszuvalex.itszulib.util.Task
+import com.itszuvalex.itszulib.util.{Color, Task}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -154,6 +154,8 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   override def getGuiID: Int = GuiIDs.TileGerminationChamberID
 
+  def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getTileEntity()).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
+
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
     case _ if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => true
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => true
@@ -165,6 +167,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ if capability == Capabilities.POWER_STORAGE => true
     case _ if capability == Capabilities.TILE_POWER_LEAF_NODE => true
     case _ if capability == Capabilities.TILE_POWER_STORAGE_NODE => true
+    case _ if capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE => true
     case _ => super.hasCapability(capability, facing)
   }
 
@@ -175,6 +178,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ if capability == Capabilities.POWER_STORAGE => state.get.map(x => x.battery).getOrElse(BatteryEmpty.Empty).asInstanceOf[T]
     case _ if capability == Capabilities.TILE_POWER_LEAF_NODE => state.get.map(x => x.powerLeafNodeDelegate).get.asInstanceOf[T]
     case _ if capability == Capabilities.TILE_POWER_STORAGE_NODE => state.get.map(x => x.powerStorageNodeDelegate).get.asInstanceOf[T]
+    case _ if capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE => getColor.asInstanceOf[T]
     case (cap, null) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(storage).asInstanceOf[T]
     case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.ITEM_STORAGE => storage.asInstanceOf[T]
     case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => tank.asInstanceOf[T]
