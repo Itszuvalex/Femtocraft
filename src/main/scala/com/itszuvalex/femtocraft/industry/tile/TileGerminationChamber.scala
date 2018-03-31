@@ -161,6 +161,8 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   override def getGuiID: Int = GuiIDs.TileGerminationChamberID
 
+  override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
+
   def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getTileEntity()).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
