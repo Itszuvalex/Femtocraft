@@ -10,6 +10,7 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
@@ -172,6 +173,7 @@ object TileConduit {
 
 class TileConduit extends TileEntityBase {
   val conduit = new ConduitImpl(this)
+  var color   = Color(0, 0, 0, 0)
 
   override def hasDescription: Boolean = true
 
@@ -261,6 +263,31 @@ class TileConduit extends TileEntityBase {
     }
   }
 
+
+  override def update(): Unit = {
+    super.update()
+    var red: Int = 0
+    var green: Int = 0
+    var blue: Int = 0
+    var numBlocks = 0
+    EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getTileEntity(false))
+      .withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).foreach { c =>
+      numBlocks += 1
+      red += c.red.toInt & 255
+      green += c.green.toInt & 255
+      blue += c.blue.toInt & 255
+    }
+    color = if (numBlocks > 0) Color(255.toByte,
+      ((red / numBlocks) & 255).toByte,
+      ((green / numBlocks) & 255).toByte,
+      ((blue / numBlocks) & 255).toByte)
+    else Color(0, 0, 0, 0)
+  }
+
+  override def clientUpdate(): Unit = {
+    super.clientUpdate()
+  }
+
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
     super.saveToDescriptionCompound(compound)
     val con = new NBTTagCompound
@@ -291,12 +318,15 @@ class TileConduit extends TileEntityBase {
       conduit.asInstanceOf[T]
     else if (capability == Capabilities.TILE_LOGISTICS_NODE)
       conduit.asInstanceOf[T]
+    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE)
+      color.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     capability == Capabilities.TILE_CONDUIT ||
       capability == Capabilities.TILE_LOGISTICS_NODE ||
+      capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE ||
       super.hasCapability(capability, facing)
   }
 
