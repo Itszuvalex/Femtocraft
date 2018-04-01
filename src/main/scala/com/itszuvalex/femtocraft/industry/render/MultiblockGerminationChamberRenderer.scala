@@ -199,7 +199,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
       if (renderGlass) {
         GL11.glPushAttrib(GL11.GL_CURRENT_BIT)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberColorTexLoc)
-        GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
+        GL11.glColor4ub(color.red, color.green, color.blue, 30.toByte)
         chamberModel.renderGroups(Set("Glass"))
         GL11.glColor3f(1, 1, 1)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)

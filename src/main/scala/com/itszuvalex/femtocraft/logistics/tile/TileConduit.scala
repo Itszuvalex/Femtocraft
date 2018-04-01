@@ -14,7 +14,7 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.items.CapabilityItemHandler
@@ -263,6 +263,7 @@ class TileConduit extends TileEntityBase {
     }
   }
 
+  override def getRenderBoundingBox: AxisAlignedBB = new AxisAlignedBB(getPos, getPos.add(1, 1, 1))
 
   override def update(): Unit = {
     super.update()
@@ -282,10 +283,6 @@ class TileConduit extends TileEntityBase {
       ((green / numBlocks) & 255).toByte,
       ((blue / numBlocks) & 255).toByte)
     else Color(0, 0, 0, 0)
-  }
-
-  override def clientUpdate(): Unit = {
-    super.clientUpdate()
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
