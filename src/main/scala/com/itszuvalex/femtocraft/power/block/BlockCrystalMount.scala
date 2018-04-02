@@ -4,9 +4,9 @@ import java.util
 import java.util.Random
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileContainer
 import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
@@ -41,7 +41,7 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
             pos.getX + .5 + (rand.nextDouble() * .2 - .1),
             pos.getY + .5 + (rand.nextDouble() * .2 - .1),
             pos.getZ + .5 + (rand.nextDouble() * .2 - .1),
-            mount.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt)
+            mount.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
       case _ =>
     }
   }

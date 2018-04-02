@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.logistics.storage.item.{IndexedInventory, TileM
 import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataBool, DataInt, DataString, TileDataSpec}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
@@ -82,7 +83,7 @@ object TileFrame {
       case (0, _, `MaxZ`) => setRenderMarks(true, 0, 7, 15, 19) // Vertical
       case (`MaxX`, _, 0) => setRenderMarks(true, 0, 5, 13, 17) // Vertical
       case (`MaxX`, _, `MaxZ`) => setRenderMarks(true, 0, 6, 14, 18) // Vertical
-      case (_, 0, 0) => setRenderMarks(true, 0, 8, 16, 17)// Horiz
+      case (_, 0, 0) => setRenderMarks(true, 0, 8, 16, 17) // Horiz
       case (_, 0, `MaxZ`) => setRenderMarks(true, 0, 10, 18, 19) // Horiz
       case (_, `MaxY`, 0) => setRenderMarks(true, 0, 0, 12, 13) // Horiz
       case (_, `MaxY`, `MaxZ`) => setRenderMarks(true, 0, 2, 14, 15) // Horiz
@@ -129,12 +130,12 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
 
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability match {
-    case c if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => true
+    case c if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = capability match {
-    case c if capability == com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
+    case c if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 

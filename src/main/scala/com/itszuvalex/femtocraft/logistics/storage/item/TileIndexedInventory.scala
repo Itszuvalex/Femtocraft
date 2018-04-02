@@ -1,6 +1,5 @@
 package com.itszuvalex.femtocraft.logistics.storage.item
 
-import com.itszuvalex.itszulib.api.core.Saveable
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.item.ItemStack
 
@@ -10,7 +9,7 @@ import scala.collection.Set
   * Created by Christopher on 8/29/2015.
   */
 trait TileIndexedInventory extends TileEntityBase with IIndexedInventory {
-  @Saveable val indInventory = defaultInventory
+  val indInventory = defaultInventory
 
   def defaultInventory: IndexedInventory
 

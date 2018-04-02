@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalStorageArray
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
 class GuiCrystalStorageArray(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCrystalStorageArray)
@@ -17,7 +18,7 @@ class GuiCrystalStorageArray(player: EntityPlayer, inv: InventoryPlayer, private
   )
   addPlayerInventorySlots(inv)
 
-  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt)
+  val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
   add(powerMeter)
 
   override def GuiID: Int = GuiIDs.TileCrystalStorageArrayID

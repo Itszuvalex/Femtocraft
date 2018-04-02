@@ -8,7 +8,7 @@ import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.Capabilities
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
@@ -186,7 +186,7 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
     case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
     case (_, null) => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
-    case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case (cap, _) if cap == ItszuLibCapabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 

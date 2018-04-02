@@ -40,8 +40,9 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
     state.get
   }
 
-  def get: Option[S] = if (info().isController(new Loc4(thisObj))) Some(getOrElseUpdateState) else info().cLoc.getTileEntity(true) match {
+  def get: Option[S] = info().cLoc.getTileEntity(true) match {
     case None => None
+    case Some(a: T) if a == thisObj => Some(getOrElseUpdateState)
     case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
     case _ => None
   }

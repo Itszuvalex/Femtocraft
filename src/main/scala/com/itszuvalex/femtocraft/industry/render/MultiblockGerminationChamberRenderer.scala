@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileGerminationChambe
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
 import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
 import com.itszuvalex.femtocraft.{FemtoBlocks, Resources}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
@@ -101,12 +102,12 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
 
   override def renderTileEntityInWorld(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     te match {
-      case t: TileGerminationChamber => if (t.hasCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null) && t.getCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
+      case t: TileGerminationChamber => if (t.hasCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null) && t.getCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
         if (MinecraftForgeClient.getRenderPass == 0) {
-          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = true, renderGlass = false, if (te.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)) te.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = true, renderGlass = false, if (te.hasCapability(ItszuLibCapabilities.COLORABLE, null)) te.getCapability(ItszuLibCapabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
         }
         else if (MinecraftForgeClient.getRenderPass == 1) {
-          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = false, renderGlass = true, if (te.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)) te.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = false, renderGlass = true, if (te.hasCapability(ItszuLibCapabilities.COLORABLE, null)) te.getCapability(ItszuLibCapabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
         }
       case _ => return
     }

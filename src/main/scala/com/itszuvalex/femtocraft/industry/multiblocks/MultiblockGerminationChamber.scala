@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber.{xSize, ySize, zSize}
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.femtocraft.render.RenderIDs
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
@@ -31,8 +32,8 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
   override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
     l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
     l.getTileEntity(true) match {
-      case Some(te: TileGerminationChamber) if te.hasCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null) =>
-        te.getCapability(com.itszuvalex.itszulib.api.Capabilities.TILE_MULTIBLOCK, null).formMultiBlock(loc)
+      case Some(te: TileGerminationChamber) if te.hasCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null) =>
+        te.getCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null).formMultiBlock(l, loc)
       case _ => false
     }
   }

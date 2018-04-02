@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.industry.container
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.itszulib.container.ContainerBase
+import com.itszuvalex.itszulib.container.sync.{SyncEnumAutomaticIOArray, SyncStringArray}
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity

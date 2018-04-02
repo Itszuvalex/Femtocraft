@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalChargingArray
 import com.itszuvalex.femtocraft.power.tile.TileCrystalChargingArray
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.gui.GuiLabel
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -19,7 +20,7 @@ class GuiCrystalChargingArray(player: EntityPlayer, inv: InventoryPlayer, privat
   )
   addPlayerInventorySlots(inv)
 
-  val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt)
+  val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
   val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT, labelText)
   add(powerReading, powerMeter)
 

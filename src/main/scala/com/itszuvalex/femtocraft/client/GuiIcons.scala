@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.itszulib.gui.GuiPanelTexture
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.mutable.ListBuffer

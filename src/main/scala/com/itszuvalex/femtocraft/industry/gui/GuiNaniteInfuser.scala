@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteTank
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageFillNanite
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.gui.{GuiButton, GuiLabel, GuiProgress}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -27,7 +28,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
   addGuiAndSync(tile.storage, 1, 85, 23)
   addPlayerInventorySlots(inv)
 
-  var color: Color = tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP)
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
 
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {

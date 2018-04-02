@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.power.node
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerNetworkNodeDelegate
 import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.util.Color
@@ -34,13 +35,13 @@ trait PowerNode extends TileEntityBase {
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.TILE_POWER_NODE) true
-    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) true
+    else if (capability == ItszuLibCapabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_NODE) powerDelegate.asInstanceOf[T]
-    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) getColor.asInstanceOf[T]
+    else if (capability == ItszuLibCapabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
