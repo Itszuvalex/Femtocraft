@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.util.data.{ConditionalData, DataLoadable}
-import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo
 import com.itszuvalex.itszulib.util.Debug
 import net.minecraft.nbt.NBTTagCompound
@@ -12,7 +11,7 @@ import org.apache.logging.log4j.Level
 object MultiblockStateHolder {
 
   class DataMultiblockState[S <: INBTSerializable[NBTTagCompound]](key: String, val holder: MultiblockStateHolder[S, _ <: TileEntity]) extends
-    ConditionalData(() => holder.info().isController(new Loc4(holder.thisObj)),
+    ConditionalData(() => holder.info().isController,
       new DataLoadable[S](
       key,
       () => holder.getOrElseUpdateState,
@@ -40,12 +39,14 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
     state.get
   }
 
-  def get: Option[S] = info().cLoc.getTileEntity(true) match {
-    case None => None
-    case Some(a: T) if a == thisObj => Some(getOrElseUpdateState)
-    case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
-    case _ => None
-  }
+  def get: Option[S] =
+    if (info().isController) Some(getOrElseUpdateState)
+    else
+      info().cLoc.getTileEntity(true) match {
+        case None => None
+        case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
+        case _ => None
+      }
 
   def hasState: Boolean = state.isDefined
 }
