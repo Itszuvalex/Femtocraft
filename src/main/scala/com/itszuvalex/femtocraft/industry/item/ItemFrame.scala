@@ -99,7 +99,7 @@ class ItemFrame extends Item with IFrameItem {
       dir = facing
     }
 
-    val bpos = pos.offset(dir)
+    val bpos = if (dir != null) pos.offset(dir) else pos
     if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
     val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))

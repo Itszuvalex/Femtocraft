@@ -18,6 +18,7 @@ class ContainerGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, ti
   addSync(new SyncDouble(GuiID, () => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.maxStorage = a))
   addSync(new SyncDouble(GuiID, () => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery.storage = a))
   addSync(new SyncDouble(GuiID, () => tile.getProgress, (a: Double) => tile.setProgress(a)))
+  addSync(new SyncDouble(GuiID, () => tile.getBaseGoal, (a: Double) => tile.setBaseGoal(a)))
   addSync(new SyncInt(GuiID, () => tile.getTicksMax, (a: Int) => tile.setTicksMax(a)))
   addSync(new SyncIFluidStorage(tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null),
     GuiID,

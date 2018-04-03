@@ -5,8 +5,8 @@ import java.util.Random
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame.TileFrameState
 import com.itszuvalex.femtocraft.industry.{DynamicIItemStorage, FrameMultiblockRegistry, FrameMultiblockRendererRegistry, MultiblockStateHolder}
-import com.itszuvalex.femtocraft.util.TileEntityUtils
-import com.itszuvalex.femtocraft.util.data.{DataBool, DataInt, DataString, TileDataSpec}
+import com.itszuvalex.femtocraft.util.data._
+import com.itszuvalex.femtocraft.util.{StorageUtils, TileEntityUtils}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, industry}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
@@ -33,6 +33,7 @@ object TileFrame {
   val MULTIBLOCK_KEY      = "Multiblock"
   val PROGRESS_KEY        = "BuildProgress"
   val STATE_KEY           = "State"
+  val INFO_KEY            = "Info"
 
   var shouldDrop        = true
   var shouldFullyRemove = true
@@ -132,7 +133,8 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
     new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
     new DataString(TileFrame.MULTIBLOCK_KEY, multiBlock _, multiBlock_=),
     new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
-    new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=)
+    new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=),
+    new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
   )
   descriptionDataSpec.onLoad = () => setRenderUpdate()
   saveDataSpec ++= Array(
@@ -140,7 +142,8 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
     new DataString(TileFrame.MULTIBLOCK_KEY, multiBlock _, multiBlock_=),
     new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
     new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=),
-    new industry.MultiblockStateHolder.DataMultiblockState[TileFrameState](TileFrame.STATE_KEY, state)
+    new industry.MultiblockStateHolder.DataMultiblockState[TileFrameState](TileFrame.STATE_KEY, state),
+    new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
   )
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
@@ -227,11 +230,13 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
       case Some(multi) =>
         val items = multi.getRequiredResources
         val random = new Random
-        state.get.foreach(_.storage.zipWithIndex.foreach { case (item, slot) =>
-          if (!world.isRemote) InventoryUtils.dropItem(item, getLoc, random)
-        })
-        isBuilding = true
-        setUpdate()
+        if (StorageUtils.removeItemsFromStorage(state.get.get.storage, items.map(Converter.IItemStackFromItemStack), false)) {
+          state.get.foreach(_.storage.foreach { item =>
+            if (!world.isRemote) InventoryUtils.dropItem(item, getLoc, random)
+          })
+          isBuilding = true
+          setUpdate()
+        }
       case _ =>
     }
   }

@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.industry.multiblocks
 
-import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber.{xSize, ySize, zSize}
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.femtocraft.render.RenderIDs
+import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
@@ -50,7 +50,7 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
 
   override def numFrames: Int = xSize * ySize * zSize
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = Array[ItemStack]()
+  override def getRequiredResources: IndexedSeq[ItemStack] = Array[ItemStack](FemtoItems.itemRiftironIngotActivated.newStack(10))
 
   override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach(l => l.getWorld.get.setBlockToAir(l.getPos))
 

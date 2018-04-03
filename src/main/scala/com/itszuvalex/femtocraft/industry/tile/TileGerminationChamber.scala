@@ -279,6 +279,10 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   def getProgressMax = state.get.map(_.task.adjustedMax(0)).getOrElse(0d)
 
+  def getBaseGoal: Double = state.get.map(_.task.baseGoal).getOrElse(0d)
+
+  def setBaseGoal(goal: Double): Unit = state.get.foreach(_.task.baseGoal = goal)
+
   def setTicksMax(ticks: Int) = state.get.foreach(_.task.minTicks = ticks)
 
   def getTicksMax: Int = state.get.map(_.task.minTicks).getOrElse(0)

@@ -16,9 +16,9 @@ import net.minecraftforge.common.capabilities.Capability
   */
 object PowerNode {
   val POWER_COMPOUND_KEY = "PowerNode"
-  val POWER_STORAGE_KEY  = "Storage"
+  val POWER_STORAGE_KEY  = "PowerStorage"
   //TODO: Fix this up
-  val NODE_PARENT_KEY    = "Parent"
+  val NODE_PARENT_KEY    = "PowerParent"
   val COLOR_KEY          = "Color"
 }
 
