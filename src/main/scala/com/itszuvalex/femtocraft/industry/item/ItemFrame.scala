@@ -6,8 +6,8 @@ import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.{IPreviewable, ItszuLibCapabilities}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.block.BlockSnow
@@ -99,7 +99,7 @@ class ItemFrame extends Item with IFrameItem {
       dir = facing
     }
 
-    val bpos = pos.offset(dir)
+    val bpos = if (dir != null) pos.offset(dir) else pos
     if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
     val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
@@ -114,7 +114,7 @@ class ItemFrame extends Item with IFrameItem {
           val offset: (Int, Int, Int) = (loc.x - controllerLoc.x, loc.y - controllerLoc.y, loc.z - controllerLoc.z)
           frame.calculateRendering(multi.size._1, multi.size._2, multi.size._3, offset._1, offset._2, offset._3)
           //          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
-          frame.formMultiBlock(controllerLoc)
+          frame.formMultiBlock(loc, controllerLoc)
           frame.multiBlock = multiString
         case _ =>
       }
@@ -128,7 +128,7 @@ class ItemFrame extends Item with IFrameItem {
   override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
     new ICapabilityProvider {
       override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-        if (capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE) {
+        if (capability == ItszuLibCapabilities.ITEM_PREVIEWABLE) {
           new IPreviewable {
             @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
             override def renderID: Int = RenderIDs.framePreviewableID
@@ -137,7 +137,7 @@ class ItemFrame extends Item with IFrameItem {
         else null.asInstanceOf[T]
       }
 
-      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE
+      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == ItszuLibCapabilities.ITEM_PREVIEWABLE
     }
   }
 }

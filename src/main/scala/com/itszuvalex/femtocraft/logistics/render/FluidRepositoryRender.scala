@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityRenderCube}
 import net.minecraft.tileentity.TileEntity
@@ -53,7 +54,7 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
     GL11.glDisable(GL11.GL_BLEND)
     pass = 0
     facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
-    val fluidStack = Option(te).filter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE, null).getStorageProperties.apply(0).getContents).orNull
+    val fluidStack = Option(te).filter(_.hasCapability(ItszuLibCapabilities.FLUID_STORAGE, null)).map(_.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null).getStorageProperties.apply(0).getContents).orNull
     if (fluidStack != null) {
       RenderUtils.bindBlockTextures()
       val block = fluidStack.getFluid.getBlock

@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteTeleport
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.itszulib.api.IPreviewable
+import com.itszuvalex.itszulib.api.{IPreviewable, ItszuLibCapabilities}
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
@@ -72,7 +72,7 @@ class ItemShiftTest extends Item {
   override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
     new ICapabilityProvider {
       override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-        if (capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE) {
+        if (capability == ItszuLibCapabilities.ITEM_PREVIEWABLE) {
           new IPreviewable {
             @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
             override def renderID: Int = RenderIDs.itemShiftPreviewableID
@@ -81,7 +81,7 @@ class ItemShiftTest extends Item {
         else null.asInstanceOf[T]
       }
 
-      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == com.itszuvalex.itszulib.api.Capabilities.ITEM_PREVIEWABLE
+      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == ItszuLibCapabilities.ITEM_PREVIEWABLE
     }
   }
 }

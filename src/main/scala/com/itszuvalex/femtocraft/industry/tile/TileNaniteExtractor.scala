@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.{NaniteStack, NaniteTank}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
@@ -9,7 +10,7 @@ import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.Capabilities
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, PowerBattery}
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
@@ -170,20 +171,20 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
   def getProgressMax = task.adjustedMax(0)
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => true
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK => true
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => true
+    case (cap, _) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => true
     case _ => super.hasCapability(capability, facing)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
-    case (cap, null) if cap == com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
+    case (cap, null) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
     case (_, null) => super.getCapability(capability, facing)
     case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
-    case (cap, _) if cap == Capabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case (cap, _) if cap == ItszuLibCapabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
+    case (cap, _) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
     case _ => super.getCapability(capability, facing)
   }
 

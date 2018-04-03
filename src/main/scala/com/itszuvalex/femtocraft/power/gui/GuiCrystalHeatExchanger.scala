@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalHeatExchanger
 import com.itszuvalex.femtocraft.power.tile.TileCrystalHeatExchanger
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiProgress}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -20,10 +21,10 @@ class GuiCrystalHeatExchanger(player: EntityPlayer, inv: InventoryPlayer, privat
   addPlayerInventorySlots(inv)
 
   val progressGui = new GuiProgress(58, 23, 3, 18, () => tile.getBurnTime.toFloat / tile.getBurnMax.toFloat, direction = GuiProgress.BottomUp)
-  progressGui.colorProgress = tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt
+  progressGui.colorProgress = tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt
   add(progressGui)
 
-  val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null).toInt)
+  val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
   val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT, labelText)
   add(powerReading, powerMeter)
 

@@ -20,7 +20,6 @@ class ContainerNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, tile: T
   if (shouldSync) {
     addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 0))
     addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 1))
-    //    addSlotToContainer(new FilteredSlot(tile, 0, 45, 24))
 
     addPlayerInventorySlots(inv, 5, 76)
   }

@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.gui.GuiPanelTexture
 
 object GuiTabFluidSideConfig {
   val SideConfigTexLoc = Resources.TexGui("tabfluid.png")

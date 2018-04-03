@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
 import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.storage.FluidStorage
 import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityBase}
@@ -49,10 +50,10 @@ class TileFluidRepository extends TileEntityBase with TileDataSpec {
     (capability, facing) match {
       case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => sidedFluidConfig.asInstanceOf[T]
       case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => storage.asInstanceOf[T]
-      case (cap, null) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => storage.asInstanceOf[T]
+      case (cap, null) if cap == ItszuLibCapabilities.FLUID_STORAGE => storage.asInstanceOf[T]
       case (_, null) => null.asInstanceOf[T]
       case (cap, face) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
-      case (cap, face) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
+      case (cap, face) if cap == ItszuLibCapabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
       case _ => super.getCapability(capability, facing)
     }
 
@@ -60,7 +61,7 @@ class TileFluidRepository extends TileEntityBase with TileDataSpec {
     (capability, facing) match {
       case (cap, _) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => true
       case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => true
-      case (cap, _) if cap == com.itszuvalex.itszulib.api.Capabilities.FLUID_STORAGE => true
+      case (cap, _) if cap == ItszuLibCapabilities.FLUID_STORAGE => true
       case _ => super.hasCapability(capability, facing)
     }
 

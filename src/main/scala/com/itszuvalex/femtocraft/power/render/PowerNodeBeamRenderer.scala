@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.power.render
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.node.PowerNode
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -23,7 +24,7 @@ object PowerNodeBeamRenderer extends PowerBeamRenderer {
     renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte))
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamColorLocation)
     FemtoRenderUtils.disableLightMaps()
-    renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, node.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP))
+    renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, node.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP))
     FemtoRenderUtils.enableLightMap(node)
   }
 
@@ -32,7 +33,7 @@ object PowerNodeBeamRenderer extends PowerBeamRenderer {
     renderBeamToChild(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte), child)
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamColorLocation)
     FemtoRenderUtils.disableLightMaps()
-    renderBeamToChild(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, node.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP), child)
+    renderBeamToChild(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, node.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP), child)
     FemtoRenderUtils.enableLightMap(node)
   }
 }

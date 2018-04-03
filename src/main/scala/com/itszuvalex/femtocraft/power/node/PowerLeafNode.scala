@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, PowerNetworkLeafNodeDelegate}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.util.data.DataSpec
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
@@ -73,17 +74,17 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
 
   var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 
-  def getColor = Option(leafDelegate.getParent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).getOrElse(color)
+  def getColor = Option(leafDelegate.getParent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(color)
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) leafDelegate.asInstanceOf[T]
-    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) getColor.asInstanceOf[T]
+    else if (capability == ItszuLibCapabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) true
-    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE) true
+    else if (capability == ItszuLibCapabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
   }
 

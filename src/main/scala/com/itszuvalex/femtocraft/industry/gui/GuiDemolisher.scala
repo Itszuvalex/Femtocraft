@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerDemolisher
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiProgress}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -28,7 +29,7 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
   override def GuiID: Int = GuiIDs.TileDemolisherGuiID
 
   //TODO: Make actual "machine color"
-  var color: Color = tile.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, EnumFacing.UP)
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
 
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {

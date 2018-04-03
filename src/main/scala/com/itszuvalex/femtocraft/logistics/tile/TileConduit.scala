@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
@@ -272,7 +273,7 @@ class TileConduit extends TileEntityBase {
     var blue: Int = 0
     var numBlocks = 0
     EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getTileEntity(false))
-      .withFilter(_.hasCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).map(_.getCapability(com.itszuvalex.itszulib.api.Capabilities.COLORABLE, null)).foreach { c =>
+      .withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).foreach { c =>
       numBlocks += 1
       red += c.red.toInt & 255
       green += c.green.toInt & 255
@@ -315,7 +316,7 @@ class TileConduit extends TileEntityBase {
       conduit.asInstanceOf[T]
     else if (capability == Capabilities.TILE_LOGISTICS_NODE)
       conduit.asInstanceOf[T]
-    else if (capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE)
+    else if (capability == ItszuLibCapabilities.COLORABLE)
       color.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
@@ -323,7 +324,7 @@ class TileConduit extends TileEntityBase {
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     capability == Capabilities.TILE_CONDUIT ||
       capability == Capabilities.TILE_LOGISTICS_NODE ||
-      capability == com.itszuvalex.itszulib.api.Capabilities.COLORABLE ||
+      capability == ItszuLibCapabilities.COLORABLE ||
       super.hasCapability(capability, facing)
   }
 

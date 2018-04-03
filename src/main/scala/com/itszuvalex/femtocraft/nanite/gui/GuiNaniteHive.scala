@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.nanite.gui
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -28,21 +27,21 @@ import org.lwjgl.opengl.GL11
   xSize = GuiNaniteHive.WIDTH
   ySize = GuiNaniteHive.HEIGHT
 
-  {
-    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
-
-    (0 until 3).foreach { i =>
-      (0 until 9).foreach { j =>
-        addGuiAndSync(storage, j + i * 9, GuiNaniteHive.inventoryXStart + j * 18, GuiNaniteHive.inventoryYStart + i * 18)
-      }
-    }
-
-    addGuiAndSync(storage, 27, 204, 20)
-    addGuiAndSync(storage, 28, 204, 38)
-    addGuiAndSync(storage, 29, 204, 56)
-  }
-
-  addPlayerInventorySlots(inv, 32, 83)
+//  {
+//    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
+//
+//    (0 until 3).foreach { i =>
+//      (0 until 9).foreach { j =>
+//        addGuiAndSync(storage, j + i * 9, GuiNaniteHive.inventoryXStart + j * 18, GuiNaniteHive.inventoryYStart + i * 18)
+//      }
+//    }
+//
+//    addGuiAndSync(storage, 27, 204, 20)
+//    addGuiAndSync(storage, 28, 204, 38)
+//    addGuiAndSync(storage, 29, 204, 56)
+//  }
+//
+//  addPlayerInventorySlots(inv, 32, 83)
 
   override def GuiID: Int = GuiIDs.TileNaniteHiveGuiID
 

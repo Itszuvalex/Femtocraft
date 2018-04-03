@@ -2,9 +2,7 @@ package com.itszuvalex.femtocraft.nanite.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
-import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerInv
-import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.item.ItemStack
 
@@ -20,20 +18,20 @@ object ContainerNaniteHive {
 class ContainerNaniteHive(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteHiveSmall, shouldSync: Boolean) extends ContainerInv[TileNaniteHiveSmall](player, tile, 0, 0, GuiIDs.TileNaniteHiveGuiID, shouldSync) {
   //  addSync(new SyncDouble(() => inventory.battery.storage, (a: Double) => inventory.battery.storage = a))
 
-  if (shouldSync) {
-    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
-
-    (0 until 3).foreach { i =>
-      (0 until 9).foreach { j =>
-        addSync(new SyncItemStorageItemStack(GuiID, storage, j + i * 9))
-      }
-    }
-
-    addSync(new SyncItemStorageItemStack(GuiID, storage, 27))
-    addSync(new SyncItemStorageItemStack(GuiID, storage, 28))
-    addSync(new SyncItemStorageItemStack(GuiID, storage, 29))
-    addPlayerInventorySlots(inv, 32, 83)
-  }
+//  if (shouldSync) {
+//    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
+//
+//    (0 until 3).foreach { i =>
+//      (0 until 9).foreach { j =>
+//        addSync(new SyncItemStorageItemStack(GuiID, storage, j + i * 9))
+//      }
+//    }
+//
+//    addSync(new SyncItemStorageItemStack(GuiID, storage, 27))
+//    addSync(new SyncItemStorageItemStack(GuiID, storage, 28))
+//    addSync(new SyncItemStorageItemStack(GuiID, storage, 29))
+//    addPlayerInventorySlots(inv, 32, 83)
+//  }
 
 
   override def eligibleForInput(item: ItemStack): Boolean = false

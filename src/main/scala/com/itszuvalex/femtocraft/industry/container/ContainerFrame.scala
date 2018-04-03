@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -16,7 +15,7 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   if (doAddSync) {
     (0 until 9).foreach { i =>
-      addSync(new SyncItemStorageItemStack(GuiID, Converter.IItemStorageFromIInventory(tile.indInventory), i))
+      addSync(new SyncItemStorageItemStack(GuiID, tile.storage, i))
     }
 
     addPlayerInventorySlots(inv)
