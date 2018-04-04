@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.gui._
 import com.itszuvalex.femtocraft.industry.tile._
-import com.itszuvalex.femtocraft.logistics.gui.{GuiConduit, GuiFluidRepository, GuiItemRepository, GuiNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.gui._
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
@@ -12,6 +12,7 @@ import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCryst
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
@@ -19,7 +20,8 @@ import net.minecraft.world.World
   * Created by Christopher Harris (Itszuvalex) on 11/21/14.
   */
 class ProxyGuiClient extends ProxyGuiCommon {
-  override def getClientGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
+
+  override def getClientGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, player.getHeldItemMainhand)
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
@@ -39,6 +41,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new GuiGerminationChamber(player, player.inventory, te)
       case (GuiIDs.TilePowerNetworkID, te: TileEntityBase) => new GuiPowerNetwork(te)
       case (GuiIDs.TileConduitID, te: TileConduit) => new GuiConduit(player, player.inventory, te)
+      case (GuiIDs.TileConduitSideID, te: TileConduit) => new GuiConduitSide(player, player.inventory, te, EnumFacing.getFront(data))
       case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new GuiSidedInventoryConfig(te)
       case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new GuiSidedNaniteConfig(te)
       case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new GuiSidedFluidConfig(te)

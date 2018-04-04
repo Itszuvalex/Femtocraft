@@ -3,23 +3,24 @@ package com.itszuvalex.femtocraft.proxy
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
 import com.itszuvalex.femtocraft.industry.tile._
-import com.itszuvalex.femtocraft.logistics.container.{ContainerConduit, ContainerFluidRepository, ContainerItemRepository, ContainerNaniteRepository}
+import com.itszuvalex.femtocraft.logistics.container._
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
+import com.itszuvalex.itszulib.gui.ItszuGuiHandler
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraftforge.fml.common.network.IGuiHandler
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 11/21/14.
   */
-class ProxyGuiCommon extends IGuiHandler {
-  override def getServerGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
+class ProxyGuiCommon extends ItszuGuiHandler {
+  override def getServerGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te, true)
@@ -39,6 +40,7 @@ class ProxyGuiCommon extends IGuiHandler {
       case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new ContainerGerminationChamber(player, player.inventory, te, true)
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(te, true)
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
+      case (GuiIDs.TileConduitSideID, te: TileConduit) => new ContainerConduitSide(player, player.inventory, te, EnumFacing.getFront(data), true)
       case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new ContainerSidedInventoryConfig(te)
       case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new ContainerSidedNaniteConfig(te)
       case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new ContainerSidedFluidConfig(te)
@@ -46,5 +48,5 @@ class ProxyGuiCommon extends IGuiHandler {
     }
   }
 
-  override def getClientGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = null
+  override def getClientGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = null
 }

@@ -76,8 +76,8 @@ object TileGerminationChamber {
       stack = IItemStack.Empty
       completed = false
       results = IItemStorage.Empty
-      baseGoal = 0d
-      minTicks = 0
+      baseGoal = 1d
+      minTicks = 1
     }
 
     def generateResults(germinationChamberRecipe: GerminationChamberRecipe): Unit = {
