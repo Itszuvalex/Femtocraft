@@ -22,7 +22,7 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
 
   EnumFacing.VALUES.foreach { f =>
     val labelName: String = f.getName.charAt(0).toUpper.toString + ' '
-    val faceButton = new GuiButton(3 + (f.getIndex / 3) * 90, 14 + (f.getIndex % 3) * 20, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, labelName) {
+    val faceButton = new GuiButton(2 + (f.getIndex / 3) * 90, 10 + (f.getIndex % 3) * 20, fontRenderer.getStringWidth(labelName) + 1, 18, labelName) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
         super.addTooltip(mouseX, mouseY, tooltip)
         if (tile.getCapability(Capabilities.TILE_CONDUIT, f).isConnected(f))

@@ -23,5 +23,7 @@ object FemtoPacketHandler extends PacketHandler(Femtocraft.ID.toLowerCase) {
     register(classOf[MessageSidedNaniteIOChange], Side.SERVER)
     register(classOf[MessageSidedFluidConfigChange], Side.SERVER)
     register(classOf[MessageSidedFluidIOChange], Side.SERVER)
+    register(classOf[MessageConduitFacingChange], Side.SERVER)
+    register(classOf[MessageConduitInputOutputChange], Side.SERVER)
   }
 }
