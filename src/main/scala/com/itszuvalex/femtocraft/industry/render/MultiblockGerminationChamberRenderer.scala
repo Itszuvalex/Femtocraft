@@ -31,6 +31,7 @@ object MultiblockGerminationChamberRenderer {
 @SideOnly(Side.CLIENT)
 class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[TileGerminationChamber] with IFrameMultiblockRenderer {
   val chamberModel: OBJModel = OBJDynamicRenderer.LoadObj(MultiblockGerminationChamberRenderer.chamberModelLoc)
+  var lastTe: TileGerminationChamber     = _
 
   /**
     * Coordinates are the location to render at.  This is usually the facing off-set location that, if the player right-clicked, a block would be placed at.
@@ -101,6 +102,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
   }
 
   override def renderTileEntityInWorld(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    lastTe = te
     te match {
       case t: TileGerminationChamber => if (t.hasCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null) && t.getCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
         if (MinecraftForgeClient.getRenderPass == 0) {
@@ -141,10 +143,12 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
         chamberModel.renderGroups(Set("Base", "Middle", "Top"))
 
         GL11.glPushAttrib(GL11.GL_CURRENT_BIT)
+        FemtoRenderUtils.disableLightMaps()
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberColorTexLoc)
         GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
         chamberModel.renderGroups(Set("Base", "Middle", "Top"))
         GL11.glPopAttrib()
+        FemtoRenderUtils.enableLightMap(lastTe)
 
         //          val recipe = te.currentRecipe
         //          if (recipe != null) {
@@ -182,10 +186,12 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
           Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
           renderSprinklers(x, y, z, worldTime, partialTicks)
           GL11.glPushAttrib(GL11.GL_CURRENT_BIT)
+          FemtoRenderUtils.disableLightMaps()
           Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberColorTexLoc)
           GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
           renderSprinklers(x, y, z, worldTime, partialTicks)
           GL11.glPopAttrib()
+          FemtoRenderUtils.enableLightMap(lastTe)
         }
 
         //        RenderUtils.glMatrixBlock {
@@ -200,8 +206,10 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
       if (renderGlass) {
         GL11.glPushAttrib(GL11.GL_CURRENT_BIT)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberColorTexLoc)
+        FemtoRenderUtils.disableLightMaps()
         GL11.glColor4ub(color.red, color.green, color.blue, 30.toByte)
         chamberModel.renderGroups(Set("Glass"))
+        FemtoRenderUtils.enableLightMap(lastTe)
         GL11.glColor3f(1, 1, 1)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
         chamberModel.renderGroups(Set("Glass"))

@@ -117,10 +117,11 @@ object TileGerminationChamber {
   }
 
   class GerminationChamberState(val tile: TileEntityBase) extends DataSpec {
+                      var insertingOutput         : Boolean                      = false
                       val battery                 : IBattery                     = new PowerBattery(BATTERY_SIZE)
                       val tank                    : IFluidStorage                = new FluidStorage(TANK_SIZE)
                       val storage                 : IItemStorage                 = new ItemStorageArray(4) {
-                        override def canInsert(i: Int, stack: IItemStack): Boolean = (i == 0 && GerminationChamberRecipeRegistry.findMatchingRecipe(stack).isDefined) || i > 0
+                        override def canInsert(i: Int, stack: IItemStack): Boolean = insertingOutput || (i == 0 && GerminationChamberRecipeRegistry.findMatchingRecipe(stack).isDefined)
                       }
     @Wrapper(storage) val inputStorage            : IItemStorage                 = new ItemStorageSlice(storage, Array(0))
     @Wrapper(storage) val outputStorage           : IItemStorage                 = new ItemStorageSlice(storage, Array(1, 2, 3))
@@ -247,8 +248,12 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
                 task.stack = IItemStack.Empty
                 task.generateResults(recipe)
               }
+            }
 
+            if (task.completed && task.results.exists(!_.isEmpty)) {
+              actualState.insertingOutput = true
               task.results.transferIntoStorage(actualState.outputStorage, Int.MaxValue)
+              actualState.insertingOutput = false
 
               // Will clear the stack once we successfully insert the result item or set stack to the finished result
               if (task.results.forall(_.isEmpty))
@@ -352,9 +357,10 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
     if (isController) {
       if (!world.isRemote) {
-        state.get.foreach { a =>
-          PowerManager.onLeafBroken(a.powerLeafNodeDelegate)
-          PowerManager.removeLeaf(a.powerLeafNodeDelegate)
+        state.get.foreach {
+          a =>
+            PowerManager.onLeafBroken(a.powerLeafNodeDelegate)
+            PowerManager.removeLeaf(a.powerLeafNodeDelegate)
         }
       }
       FrameMultiblockRegistry.getMultiblock(MultiblockGerminationChamber.name)
