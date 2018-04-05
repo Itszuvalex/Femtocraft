@@ -40,12 +40,14 @@ class ItemLogisticsItemChip extends Item {
             * @return Set of Connections provided by this provider
             */
           override def getConnections[V](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[V]] = {
+            var created = false
             if (!stack.hasTagCompound) {
               stack.setTagCompound(new NBTTagCompound)
+              created = true
             }
             val inbt = stack.getTagCompound
             val con = new ItemConnection(loc, facing, inbt, 5000d, 1, 16)
-            if (facing != null) {
+            if (created && facing != null) {
               con.setDirection(if (facing.getIndex % 2 == 0) ConnectionDirection.INPUT else ConnectionDirection.OUTPUT)
               con.interfaceDirection = facing.getOpposite
             }

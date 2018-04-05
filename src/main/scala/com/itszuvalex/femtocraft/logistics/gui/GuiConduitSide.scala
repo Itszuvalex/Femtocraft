@@ -4,10 +4,10 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnectionProvider}
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.logistics.container.ContainerConduitSide
-import com.itszuvalex.femtocraft.logistics.gui.GuiConduitSide.GuiInputOutputButton
+import com.itszuvalex.femtocraft.logistics.gui.GuiConduitSide.{GuiInputFacingButton, GuiInputOutputButton}
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
-import com.itszuvalex.femtocraft.network.messages.MessageConduitInputOutputChange
+import com.itszuvalex.femtocraft.network.messages.{MessageConduitFacingChange, MessageConduitInputOutputChange}
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
@@ -31,94 +31,38 @@ object GuiConduitSide {
   val TEX_INPUT  = Resources.TexBlock("blockmachineblock_side_input.png")
   val TEX_OUTPUT = Resources.TexBlock("blockmachineblock_side_output.png")
 
-  //  class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
-  //    private val faceID        = face.ordinal()
-  //    private val customizeable = tile != null && tile.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)
-  //    private val configuration = tile.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)
-  //
-  //    //  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
-  //
-  //    override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
-  //      if (!isDisabled && isLocationInside(mouseX, mouseY) && customizeable) {
-  //        button match {
-  //          case 0 =>
-  //            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedFluidConfigChange(tile, face, forward = true))
-  //          case 1 =>
-  //            FemtoPacketHandler.INSTANCE.sendToServer(new MessageSidedFluidConfigChange(tile, face, forward = false))
-  //          case _ =>
-  //        }
-  //      }
-  //      super.onMouseClick(mouseX, mouseY, button)
-  //    }
-  //
-  //    override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
-  //      tooltip += face.getName
-  //      if (!isDisabled && customizeable) {
-  //        val loc = new Loc4(tile)
-  //        val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
-  //        val offsetLoc = loc.getOffset(offset)
-  //        val te = offsetLoc.getTileEntity(false)
-  //        if (te.nonEmpty && te.get.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, offset.getOpposite)) {
-  //          tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
-  //        }
-  //
-  //        tooltip += configuration.getStorageNameForRelativeFacing(face)
-  //      }
-  //      super.addTooltip(mouseX, mouseY, tooltip)
-  //    }
-  //
-  //    override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
-  //      GL11.glColor4f(1, 1, 1, 1)
-  //      GL11.glEnable(GL11.GL_BLEND)
-  //      GL11.glDisable(GL11.GL_LIGHTING)
-  //
-  //      Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedFluidConfig.SIDE_TEX_EMPTY)
-  //      drawBlock(DefaultVertexFormats.POSITION_TEX) {
-  //        addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
-  //        addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
-  //        addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
-  //        addVertexUV(screenX, screenY, 0, 0, 0)
-  //      }
-  //
-  //      if (customizeable) {
-  //        val colorindex = math.max(configuration.storages.keySet.toArray.indexOf(configuration.getStorageNameForRelativeFacing(face)), 0)
-  //        val color = GuiSidedFluidConfig.colors(colorindex % GuiSidedFluidConfig.colors.length)
-  //        GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
-  //        Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedFluidConfig.SIDE_TEX_EMPTY_LIGHT)
-  //        drawBlock(DefaultVertexFormats.POSITION_TEX) {
-  //          addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
-  //          addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
-  //          addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
-  //          addVertexUV(screenX, screenY, 0, 0, 0)
-  //        }
-  //
-  //        val loc = new Loc4(tile)
-  //        val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
-  //        val offsetLoc = loc.getOffset(offset)
-  //        val te = offsetLoc.getTileEntity(false)
-  //        if (te.nonEmpty && te.get.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, offset.getOpposite)) {
-  //          GL11.glColor4f(1, 1, 1, 1)
-  //          Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedFluidConfig.SIDE_TEX_COLOR)
-  //          drawBlock(DefaultVertexFormats.POSITION_TEX) {
-  //            addVertexUV(screenX, screenY + panelHeight, 0, 0, 1f)
-  //            addVertexUV(screenX + panelWidth, screenY + panelHeight, 0, 1f, 1f)
-  //            addVertexUV(screenX + panelWidth, screenY, 0, 1f, 0)
-  //            addVertexUV(screenX, screenY, 0, 0, 0)
-  //          }
-  //        }
-  //
-  //        if (!isDisabled && isMousedOver)
-  //          Gui.drawRect(screenX, screenY, screenX + panelWidth, screenY + panelHeight, colorHighlight)
-  //      }
-  //
-  //      GL11.glDisable(GL11.GL_BLEND)
-  //      GL11.glColor4f(1, 1, 1, 1)
-  //    }
-  //  }
+  class GuiInputFacingButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 18, 18) {
+    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
 
-  class GuiInputOutputButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 16, 16) {
-    private val faceID = face.ordinal()
+    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
 
+    override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
+      if (!isDisabled && isLocationInside(mouseX, mouseY)) {
+        button match {
+          case 0 =>
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitFacingChange(tile, face, index, forward = true))
+          case 1 =>
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitFacingChange(tile, face, index, forward = false))
+          case _ =>
+        }
+      }
+      super.onMouseClick(mouseX, mouseY, button)
+    }
+
+    override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
+      if (!isDisabled) {
+        tooltip += connection.map(_.interfaceDirection.toString).getOrElse("None")
+      }
+      super.addTooltip(mouseX, mouseY, tooltip)
+    }
+
+    override def renderUpdate(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
+      super.renderUpdate(screenX, screenY, mouseX, mouseY, partialTicks)
+      text = connection.map(c => f"${c.interfaceDirection.toString.charAt(0).toUpper} ").getOrElse("NA")
+    }
+  }
+
+  class GuiInputOutputButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 18, 18) {
     private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
 
     private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
@@ -137,9 +81,8 @@ object GuiConduitSide {
     }
 
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
-      tooltip += face.getName
       if (!isDisabled) {
-
+        tooltip += connection.map(_.direction.toString).getOrElse("Disabled")
       }
       super.addTooltip(mouseX, mouseY, tooltip)
     }
@@ -203,7 +146,7 @@ class GuiConduitSide(player: EntityPlayer, inv: InventoryPlayer, private val til
     storage.indices.foreach { i =>
       addGuiAndSync(storage, i, 40 + i * 18, 10)
       add(new GuiInputOutputButton(40 + i * 18, 10 + 18, tile, facing, () => storage(i), i))
-
+      add(new GuiInputFacingButton(40 + i * 18, 10 + 18 * 2, tile, facing, () => storage(i), i))
     }
 
     addPlayerInventorySlots(inv)

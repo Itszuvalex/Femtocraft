@@ -116,7 +116,7 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     EnumFacing.VALUES(nbt.getInteger(ItemConnection.INTERFACE_DIRECTION_KEY))
   }
 
-  override def canSetInterfaceDirection(facing: EnumFacing): Boolean = false
+  override def canSetInterfaceDirection(facing: EnumFacing): Boolean = facing != null
 
   override def setInterfaceDirection(facing: EnumFacing): Unit =
     nbt.setInteger(ItemConnection.INTERFACE_DIRECTION_KEY, facing.getIndex)

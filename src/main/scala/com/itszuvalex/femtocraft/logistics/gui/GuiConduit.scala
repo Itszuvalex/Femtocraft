@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageOpenGui
 import com.itszuvalex.itszulib.gui.{GuiButton, GuiLabel}
+import com.mojang.realmsclient.gui.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.util.EnumFacing
@@ -32,6 +33,11 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
             case Some(t) =>
               tooltip += Option(t.getBlockType).map(_.getLocalizedName).getOrElse("")
           }
+      }
+
+      override def update(): Unit = {
+        text =
+          (if (tile.getCapability(Capabilities.TILE_CONDUIT, f).isConnected(f)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET + ' '
       }
 
       override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
