@@ -29,6 +29,8 @@ object TileCrystalMount {
 }
 
 class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with TileInventory {
+  var lastCrystal: ItemStack = _
+
   override def defaultBattery: IBattery = new DynamicIBattery(() => crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(BatteryEmpty.Empty))
 
   override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
@@ -61,6 +63,10 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     }
 
     crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())
+    val stack = getCrystalStack
+    if (stack != lastCrystal)
+      setUpdate()
+    lastCrystal = stack
   }
 
   /**
