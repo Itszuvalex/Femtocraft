@@ -17,8 +17,9 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
   */
 object FemtoItems {
-  var itemPowerCrystal: Item = _
 
+  val itemCallbacks = new ArrayBuffer[() => Unit]()
+  var itemPowerCrystal: Item = _
   var itemDumbDust                : Item = _
   var itemCyberleaf               : Item = _
   var itemNanoweaveThread         : Item = _
@@ -38,26 +39,19 @@ object FemtoItems {
   var itemCrystalBattery          : Item = _
   var itemNaniteBeacon            : Item = _
   var itemNanoChannel             : Item = _
-
   var itemIronDust   : Item = _
   var itemGoldDust   : Item = _
   var itemDiamondDust: Item = _
-
   var itemSolarPanel: Item = _
-
   var itemLogisticsItemChipBasic  : Item = _
   var itemLogisticsFluidChipBasic : Item = _
   var itemLogisticsNaniteChipBasic: Item = _
-
   var itemFrame     : Item = _
   var itemMultiblock: Item = _
-
   var itemConfigurator: Item = _
   var itemMultiTool   : Item = _
   var itemShiftTest   : Item = _
   var itemNanoLash    : Item = _
-
-  val itemCallbacks = new ArrayBuffer[() => Unit]()
 
   @SubscribeEvent
   def registerItems(event: RegistryEvent.Register[Item]): Unit = {
@@ -102,6 +96,12 @@ object FemtoItems {
     itemCallbacks.clear()
   }
 
+  def registerItem[T <: Item](registry: IForgeRegistry[Item], item: T, name: String): T = {
+    item.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase(), name).setUnlocalizedName(name)
+    registry.register(item)
+    item
+  }
+
   def init(): Unit = {
     //itemPowerCrystal.registerModel() // Don't - we do this manually in ProxyClient
     itemDumbDust.registerModel()
@@ -139,12 +139,6 @@ object FemtoItems {
 
   def postInit(): Unit = {
 
-  }
-
-  def registerItem[T <: Item](registry: IForgeRegistry[Item], item: T, name: String): T = {
-    item.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase(), name).setUnlocalizedName(name)
-    registry.register(item)
-    item
   }
 
   implicit class ItemHelpers[T <: Item](item: T) {

@@ -53,24 +53,6 @@ object FemtoRenderUtils {
     }
   }
 
-  def disableLightMaps(): Unit = {
-    GL11.glDisable(GL11.GL_LIGHTING)
-    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f)
-  }
-
-  def enableLightMap(world: World, pos: BlockPos): Unit = {
-    GL11.glEnable(GL11.GL_LIGHTING)
-    RenderHelper.enableStandardItemLighting()
-    val i = world.getCombinedLight(pos, 0)
-    setLightmapTexCoords(i)
-  }
-
-  private def setLightmapTexCoords(i: Int): Unit = {
-    val j = i % 65536
-    val k = i / 65536
-    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j, k)
-  }
-
   def enableLightMap(te: TileEntity): Unit = {
     GL11.glEnable(GL11.GL_LIGHTING)
     RenderHelper.enableStandardItemLighting()
@@ -85,20 +67,6 @@ object FemtoRenderUtils {
       (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
   }
 
-  def renderNaniteConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedNaniteStorageConfiguration): Unit = {
-    renderConfigOverlay(te, x, y, z,
-      (facing) =>
-        GuiSidedNaniteConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedNaniteConfig.colors.length),
-      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
-  }
-
-  def renderFluidConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedFluidStorageConfiguration): Unit = {
-    renderConfigOverlay(te, x, y, z,
-      (facing) =>
-        GuiSidedFluidConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedFluidConfig.colors.length),
-      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
-  }
-
   private def renderConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, colorForStorage: (EnumFacing) => Color, ioForFacing: (EnumFacing) => EnumAutomaticIO): Unit = {
     disableLightMaps()
     RenderUtils.glMatrixBlock { // Matrixblock even though translate because we can also scale
@@ -107,7 +75,7 @@ object FemtoRenderUtils {
       GL11.glScaled(1.01, 1.01, 1.01)
       GL11.glTranslated(-.005, -.005, -.005)
       EnumFacing.VALUES.foreach { facing =>
-        GL11.glColor4f(1,1,1,1)
+        GL11.glColor4f(1, 1, 1, 1)
         Minecraft.getMinecraft.getTextureManager.bindTexture(CONFIG_OUTLINE)
         RenderUtils.drawArbitraryFace(0, 0, 0, 0, 1, 0, 1, 0, 1, facing, null, 0, 1, 0, 1)
         val color = colorForStorage(facing)
@@ -137,5 +105,37 @@ object FemtoRenderUtils {
       //      GL11.glEnable(GL11.GL_DEPTH_TEST)
     }
     enableLightMap(te.getWorld, te.getPos)
+  }
+
+  def disableLightMaps(): Unit = {
+    GL11.glDisable(GL11.GL_LIGHTING)
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f)
+  }
+
+  def enableLightMap(world: World, pos: BlockPos): Unit = {
+    GL11.glEnable(GL11.GL_LIGHTING)
+    RenderHelper.enableStandardItemLighting()
+    val i = world.getCombinedLight(pos, 0)
+    setLightmapTexCoords(i)
+  }
+
+  private def setLightmapTexCoords(i: Int): Unit = {
+    val j = i % 65536
+    val k = i / 65536
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j, k)
+  }
+
+  def renderNaniteConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedNaniteStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedNaniteConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedNaniteConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
+  }
+
+  def renderFluidConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedFluidStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedFluidConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedFluidConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
   }
 }

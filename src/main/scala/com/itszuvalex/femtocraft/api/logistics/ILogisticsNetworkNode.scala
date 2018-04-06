@@ -13,10 +13,10 @@ import scala.collection.JavaConversions._
 trait ILogisticsNetworkNode extends TileNetworkNode[ILogisticsNetworkNode, LogisticsNetwork] {
   def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]]
 
-  def getConnectionsForResource[T](facing: EnumFacing, resource: IResource[T]): util.Collection[IConnection[T]] =
-    getConnections[T](facing).filter(_.resource == resource)
-
   def getConnectionsForResourceForChannel[T](facing: EnumFacing, resource: IResource[T], channel: String): util.Collection[IConnection[T]]
   = getConnectionsForResource(facing, resource).filter(_.channel == channel)
+
+  def getConnectionsForResource[T](facing: EnumFacing, resource: IResource[T]): util.Collection[IConnection[T]] =
+    getConnections[T](facing).filter(_.resource == resource)
 
 }

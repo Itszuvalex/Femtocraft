@@ -18,7 +18,6 @@ import net.minecraft.util.text.TextFormatting
 
 import scala.collection.mutable.ListBuffer
 
-
 class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteExtractor) extends FemtoGuiBase(tile, new ContainerNaniteExtractor(player, inv, tile, false)) {
   GuiTabNetwork.addToGuiTabBar(tabBar, tile)
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
@@ -28,8 +27,6 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   addGuiAndSync(tile.storage, 0, 43, 23)
   addPlayerInventorySlots(inv)
 
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
-
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       super.addTooltip(mouseX, mouseY, tooltip)
@@ -38,10 +35,9 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
       tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${TileNaniteExtractor.POWER_PER_TICK}"
     }
   }
+  val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Extractor"), fontRenderer.FONT_HEIGHT, () => "Nanite Extractor")
   progressBar.colorProgress = color.toInt
   add(progressBar)
-
-  val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Extractor"), fontRenderer.FONT_HEIGHT, () => "Nanite Extractor")
   val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   val drainButton = new GuiButton(103, 24, 45, 16, "Drain") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
@@ -52,12 +48,11 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
       ret
     }
   }
-
   val naniteTank = new GuiNaniteTank(85, 16, tile.naniteStorageTank)
+  val elems = List(nameLabel, powerMeter, drainButton)
   naniteTank.color = color
   add(naniteTank)
-
-  val elems = List(nameLabel, powerMeter, drainButton)
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   add(elems: _*)
 
   override def GuiID: Int = GuiIDs.TileNaniteExtractorID

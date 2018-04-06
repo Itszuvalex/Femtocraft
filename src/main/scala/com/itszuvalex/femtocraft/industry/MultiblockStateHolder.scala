@@ -29,6 +29,15 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
   val getHolder: (T) => MultiblockStateHolder[S, T]) {
   private var state: Option[S] = None
 
+  def get: Option[S] =
+    if (info().isController) Some(getOrElseUpdateState)
+    else
+      info().cLoc.getTileEntity(true) match {
+        case None => None
+        case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
+        case _ => None
+      }
+
   private def getOrElseUpdateState: S = {
     state match {
       case None =>
@@ -38,15 +47,6 @@ class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEnti
     }
     state.get
   }
-
-  def get: Option[S] =
-    if (info().isController) Some(getOrElseUpdateState)
-    else
-      info().cLoc.getTileEntity(true) match {
-        case None => None
-        case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
-        case _ => None
-      }
 
   def hasState: Boolean = state.isDefined
 }

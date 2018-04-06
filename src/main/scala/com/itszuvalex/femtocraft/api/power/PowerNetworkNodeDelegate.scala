@@ -23,8 +23,8 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
   transfer: => Double,
   renders: => Boolean
 ) extends IPowerNetworkNode with INBTSerializable[NBTTagCompound] {
-  var renderLocs  : scala.collection.Set[Loc4] = Set()
   val leafNodeLocs: mutable.HashSet[Loc4]      = new mutable.HashSet[Loc4]()
+  var renderLocs  : scala.collection.Set[Loc4] = Set()
 
   override def addLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs += node.getStorageLoc

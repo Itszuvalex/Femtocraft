@@ -59,13 +59,6 @@ object TileGerminationChamber {
   val LEAF_NODE_NBT          = "LeafNode"
   val MULTIBLOCK_INFO_NBT    = "Multiblock"
 
-  object GerminationTask {
-    val ITEM_NBT         = "Item"
-    val COMPLETED_NBT    = "Completed"
-    val RESULTS_SIZE_NBT = "ResultsSize"
-    val RESULTS_NBT      = "Results"
-  }
-
   class GerminationTask extends Task() {
     var stack    : IItemStack   = IItemStack.Empty
     var results  : IItemStorage = IItemStorage.Empty
@@ -117,7 +110,6 @@ object TileGerminationChamber {
   }
 
   class GerminationChamberState(val tile: TileEntityBase) extends DataSpec {
-                      var insertingOutput         : Boolean                      = false
                       val battery                 : IBattery                     = new PowerBattery(BATTERY_SIZE)
                       val tank                    : IFluidStorage                = new FluidStorage(TANK_SIZE)
                       val storage                 : IItemStorage                 = new ItemStorageArray(4) {
@@ -130,6 +122,9 @@ object TileGerminationChamber {
                       val powerLeafNodeDelegate   : PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(tile, () => 8f, battery _, PowerStorageNodeType.CONSUMER,
                         PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(powerLeafNodeDelegate, 40d), () => powerStorageNodeDelegate.changeForLastTick
                       )
+    val descriptionSpec = new DataSpecification(ArrayBuffer(
+      new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
+    ))
 
     dataSpec ++= Array(
       new DataSerializable[NBTTagCompound](BATTERY_NBT, battery),
@@ -138,10 +133,14 @@ object TileGerminationChamber {
       new DataSerializable[NBTTagCompound](TASK_NBT, task),
       new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
     )
+                      var insertingOutput         : Boolean                      = false
+  }
 
-    val descriptionSpec = new DataSpecification(ArrayBuffer(
-      new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
-    ))
+  object GerminationTask {
+    val ITEM_NBT         = "Item"
+    val COMPLETED_NBT    = "Completed"
+    val RESULTS_SIZE_NBT = "ResultsSize"
+    val RESULTS_NBT      = "Results"
   }
 
 }
@@ -157,29 +156,26 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
       ret
     }
   }
-
+  val tank   : IFluidStorage = new DynamicIFluidStorage(() => state.get.map(x => x.tank).getOrElse(IFluidStorage.Empty))
+  val storage: IItemStorage  = new DynamicIItemStorage(() => state.get.map(x => x.storage).getOrElse(IItemStorage.Empty))
   private val state:
     MultiblockStateHolder[GerminationChamberState, TileGerminationChamber] =
     new MultiblockStateHolder[GerminationChamberState, TileGerminationChamber](this, () => new GerminationChamberState(this), info _, (a) => a.state)
-  val tank   : IFluidStorage = new DynamicIFluidStorage(() => state.get.map(x => x.tank).getOrElse(IFluidStorage.Empty))
-  val storage: IItemStorage  = new DynamicIItemStorage(() => state.get.map(x => x.storage).getOrElse(IItemStorage.Empty))
   @Wrapper(storage) private val inputStorage : IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
   @Wrapper(storage) private val outputStorage: IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
-  private                   var ticks                       = 0
-
   private val sidedStorageConfig = new MultiblockSidedItemStorageConfiguration(
     getLoc _, info _, NONE_INV_KEY, _ => INPUT_INV_KEY,
     Map(NONE_INV_KEY -> IItemStorage.Empty,
       INPUT_INV_KEY -> inputStorage,
       OUTPUT_INV_KEY -> outputStorage),
     () => EnumFacing.NORTH)
-
   private val sidedFluidConfig = new MultiblockSidedFluidStorageConfiguration(
     getLoc _, info _, NONE_TANK_KEY, _ => TANK_KEY,
     Map(NONE_TANK_KEY -> IFluidStorage.Empty,
       TANK_KEY -> tank),
     () => EnumFacing.NORTH
   )
+  private                   var ticks                       = 0
 
   descriptionDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
@@ -264,7 +260,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     }
   }
 
-  override def hasGUI: Boolean = true
+  override def battery: IBattery = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery
 
   override def hasDescription: Boolean = true
 
@@ -274,13 +270,11 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
 
-  def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
+  def getProgress = state.get.map(_.task.progress).getOrElse(0d)
 
   def setProgress(progress: Double): Unit = {
     state.get.foreach(_.task.progress = progress)
   }
-
-  def getProgress = state.get.map(_.task.progress).getOrElse(0d)
 
   def getProgressMax = state.get.map(_.task.adjustedMax(0)).getOrElse(0d)
 
@@ -288,9 +282,9 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   def setBaseGoal(goal: Double): Unit = state.get.foreach(_.task.baseGoal = goal)
 
-  def setTicksMax(ticks: Int) = state.get.foreach(_.task.minTicks = ticks)
-
   def getTicksMax: Int = state.get.map(_.task.minTicks).getOrElse(0)
+
+  def setTicksMax(ticks: Int) = state.get.foreach(_.task.minTicks = ticks)
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
     case _ if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => true
@@ -306,6 +300,12 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ if capability == ItszuLibCapabilities.COLORABLE => true
     case _ => super.hasCapability(capability, facing)
   }
+
+  override def storageType: PowerStorageNodeType = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).storageType
+
+  override def transferRate: Double = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).transferRate
+
+  override def getStorageLoc: Loc4 = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).getStorageLoc
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
     case _ if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
@@ -327,13 +327,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ => super.getCapability(capability, facing)
   }
 
-  override def battery: IBattery = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery
-
-  override def storageType: PowerStorageNodeType = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).storageType
-
-  override def transferRate: Double = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).transferRate
-
-  override def getStorageLoc: Loc4 = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).getStorageLoc
+  def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
 
   override def changeForLastTick: Double = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).changeForLastTick
 
@@ -397,6 +391,8 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     }
     else false
   }
+
+  override def hasGUI: Boolean = true
 
   override def offset: Vector3 = Vector3(.5d, 0, .5d)
 

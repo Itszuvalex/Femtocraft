@@ -11,7 +11,6 @@ import com.itszuvalex.itszulib.gui.{GuiButton, GuiLabel}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
-
 class GuiNaniteRepository(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNaniteRepository)
   extends FemtoGuiBase(tile, new ContainerNaniteRepository(player, inv, tile, false)) {
   GuiTabNaniteSideConfig.addToGuiTabBar(tabBar, tile)

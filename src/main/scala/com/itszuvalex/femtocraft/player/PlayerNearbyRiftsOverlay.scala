@@ -25,14 +25,6 @@ object PlayerNearbyRiftsOverlay {
 class PlayerNearbyRiftsOverlay {
   lazy val mc = Minecraft.getMinecraft
 
-  def getPlayerLoc = new Loc4(mc.player.getPosition, mc.world.provider.getDimension)
-
-  def getRifts: mutable.Buffer[IRift] = {
-    val locs = FemtocraftRiftTracker.riftLocs.getLocationsInRange(getPlayerLoc, PlayerNearbyRiftsOverlay.range)
-    val rifts = locs.flatMap(l => l.getChunk(false).map(_.getCapability(Capabilities.CHUNK_RIFT, null)).flatMap(_.getRiftAtLocation(l)))
-    rifts.toBuffer
-  }
-
   @SubscribeEvent
   def renderOverlay(event: RenderGameOverlayEvent.Post): Unit = {
     if (event.isCanceled || event.getType != ElementType.EXPERIENCE)
@@ -90,4 +82,12 @@ class PlayerNearbyRiftsOverlay {
     layout.render(0, 0, 0, 0, 0)
     GL11.glPopMatrix()
   }
+
+  def getRifts: mutable.Buffer[IRift] = {
+    val locs = FemtocraftRiftTracker.riftLocs.getLocationsInRange(getPlayerLoc, PlayerNearbyRiftsOverlay.range)
+    val rifts = locs.flatMap(l => l.getChunk(false).map(_.getCapability(Capabilities.CHUNK_RIFT, null)).flatMap(_.getRiftAtLocation(l)))
+    rifts.toBuffer
+  }
+
+  def getPlayerLoc = new Loc4(mc.player.getPosition, mc.world.provider.getDimension)
 }

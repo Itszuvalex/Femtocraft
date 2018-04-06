@@ -27,17 +27,16 @@ object PlayerNaniteCapabilitiesOverlay {
   val textureFillLoc       = Resources.TexGui("naniteoverlay_fill.png")
   val textureFillBotOffset = 2
   val textureFillTopOffset = 2
-
-  var xOffset    = 0
   val xOffsetEnd = texWidth
-
+  val msToShow                   = 2000
+  val msToReveal                 = 500
+  val msToHide                   = 750
+  var xOffset    = 0
   var timeOfLastInteract         = System.currentTimeMillis
   var timeofStartOfInteractChain = System.currentTimeMillis
   var timeofEndOfInteractChain   = System.currentTimeMillis
   var timeLengthOfInteractChain  = 1000L
-  val msToShow                   = 2000
-  val msToReveal                 = 500
-  val msToHide                   = 750
+  var alwaysShow = false
 
   def interact() = {
     timeOfLastInteract = System.currentTimeMillis
@@ -49,8 +48,6 @@ object PlayerNaniteCapabilitiesOverlay {
       timeofStartOfInteractChain = timeOfLastInteract
     }
   }
-
-  var alwaysShow = false
 }
 
 @SideOnly(Side.CLIENT)
@@ -59,30 +56,6 @@ class PlayerNaniteCapabilitiesOverlay {
 
   var naniteCapabilities: IPlayerNaniteCapability = _
   var player            : EntityPlayer            = _
-
-  def capabilities: IPlayerNaniteCapability = {
-    if (player != Minecraft.getMinecraft.player) {
-      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH)
-      if (caps != naniteCapabilities)
-        naniteCapabilities = caps
-    }
-    naniteCapabilities
-  }
-
-  def updateOffset() = {
-    val timeSinceStartOfInteractChain = System.currentTimeMillis() - timeofStartOfInteractChain
-    if (timeSinceStartOfInteractChain < msToReveal) {
-      xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceStartOfInteractChain.toFloat / msToReveal.toFloat).toInt)
-    }
-    else {
-      val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
-      timeSinceLastChange match {
-        case a if a <= (msToShow + msToReveal) => xOffset = 0
-        case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
-        case _ => xOffset = xOffsetEnd
-      }
-    }
-  }
 
   @SubscribeEvent
   def renderOverlay(event: RenderGameOverlayEvent.Post): Unit = {
@@ -136,6 +109,30 @@ class PlayerNaniteCapabilitiesOverlay {
     mc.fontRenderer.drawSplitString(capabilities.tank.nMols + " nMols", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2 + mc.fontRenderer.FONT_HEIGHT) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     //    GL11.glScaled(scale, scale, scale)
     GL11.glPopMatrix()
+  }
+
+  def capabilities: IPlayerNaniteCapability = {
+    if (player != Minecraft.getMinecraft.player) {
+      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH)
+      if (caps != naniteCapabilities)
+        naniteCapabilities = caps
+    }
+    naniteCapabilities
+  }
+
+  def updateOffset() = {
+    val timeSinceStartOfInteractChain = System.currentTimeMillis() - timeofStartOfInteractChain
+    if (timeSinceStartOfInteractChain < msToReveal) {
+      xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceStartOfInteractChain.toFloat / msToReveal.toFloat).toInt)
+    }
+    else {
+      val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
+      timeSinceLastChange match {
+        case a if a <= (msToShow + msToReveal) => xOffset = 0
+        case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
+        case _ => xOffset = xOffsetEnd
+      }
+    }
   }
 
   private def HeightVFromFillPercent(fillAmt: Float): (Int, Float) = {

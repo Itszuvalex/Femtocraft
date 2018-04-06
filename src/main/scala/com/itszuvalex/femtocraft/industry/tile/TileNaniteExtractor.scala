@@ -22,7 +22,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.items.CapabilityItemHandler
 
-
 object TileNaniteExtractor {
   val TICKS_REQ      = 20 * 8
   val POWER_PER_TICK = 10
@@ -43,10 +42,6 @@ object TileNaniteExtractor {
   val NANITE_SIDED_CONFIG_NBT = "NaniteConfig"
   val TICKS_NBT               = "Ticks"
 
-  object ExtractTask {
-    val NANITES_NBT = "Nanite"
-  }
-
   class ExtractTask(var stack: NaniteStack) extends Task(POWER_REQ, TICKS_REQ) {
 
     override def deserializeNBT(t: NBTTagCompound): Unit = {
@@ -65,6 +60,10 @@ object TileNaniteExtractor {
       super.reset()
       stack = null
     }
+  }
+
+  object ExtractTask {
+    val NANITES_NBT = "Nanite"
   }
 
 }
@@ -109,6 +108,10 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
     }
   }
 
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
+    CybermaterialRegistry.getNaniteFromItem(item.getItem, item.getItemDamage).isDefined
+  }
+
   override def getFieldCount: Int = 0
 
   override def getField(id: Int): Int = 0
@@ -118,10 +121,6 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
   override def getMod: AnyRef = Femtocraft
 
   override def hasDescription: Boolean = true
-
-  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    CybermaterialRegistry.getNaniteFromItem(item.getItem, item.getItemDamage).isDefined
-  }
 
   override def hasGUI = true
 
@@ -162,11 +161,11 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
     TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
   }
 
+  def getProgress = task.progress
+
   def setProgress(progress: Double): Unit = {
     task.progress = progress
   }
-
-  def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
 

@@ -10,8 +10,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
 
 class MessageSidedNaniteIOChange(var tile: TileEntity, var side: EnumFacing, var forward: Boolean) extends MessageBase[MessageSidedNaniteIOChange, IMessage] {
-  def loc: Loc4 = new Loc4(tile)
-
   def this() = this(null, null, false)
 
   override def toBytes(buf: ByteBuf): Unit = {
@@ -23,6 +21,8 @@ class MessageSidedNaniteIOChange(var tile: TileEntity, var side: EnumFacing, var
     buf.writeInt(side.ordinal())
     buf.writeBoolean(forward)
   }
+
+  def loc: Loc4 = new Loc4(tile)
 
   override def fromBytes(buf: ByteBuf): Unit = {
     val x = buf.readInt()

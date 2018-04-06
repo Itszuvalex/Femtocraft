@@ -9,13 +9,15 @@ object Resources {
 
   def Sound(loc: String) = Femtocraft(loc)
 
-  def TexBlock(name: String) = Texture("blocks/" + name)
+  def Femtocraft(loc: String) = new ResourceLocation(com.itszuvalex.femtocraft.Femtocraft.ID.toLowerCase, loc)
 
-  def Texture(name: String) = Femtocraft("textures/" + name)
+  def TexBlock(name: String) = Texture("blocks/" + name)
 
   def TexGui(name: String) = Texture("guis/" + name)
 
   def TexItem(name: String) = Texture("items/" + name)
+
+  def Texture(name: String) = Femtocraft("textures/" + name)
 
   def Particle(name: String) = Texture("particles/" + name)
 
@@ -24,6 +26,4 @@ object Resources {
   def CustomModelBlockTex(name: String) = Femtocraft("models/block/" + name)
 
   def ModelItem(name: String) = Femtocraft("item/" + name)
-
-  def Femtocraft(loc: String) = new ResourceLocation(com.itszuvalex.femtocraft.Femtocraft.ID.toLowerCase, loc)
 }

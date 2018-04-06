@@ -23,6 +23,20 @@ object TileEntityUtils {
     }
   }
 
+  def incrementTicks(ticks: Int, ticksToAct: Int): Int = {
+    (ticks - 1 + ticksToAct) % ticksToAct
+  }
+
+  def checkDoItemInputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, inputSize: Int): Unit = {
+    if (ticks != 0) return
+
+    var isize = inputSize
+    TileEntityUtils.getItemStoragesForIO(te, config, EnumAutomaticIO.INPUT).exists { pair =>
+      isize = pair._1.transferIntoStorage(pair._2, isize)
+      isize <= 0
+    }
+  }
+
   /**
     *
     * @param io
@@ -38,41 +52,6 @@ object TileEntityUtils {
       else null
       (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
     }.filterNot(_._1 == null).filterNot(_._2 == null)
-  }
-
-  def getNaniteTanksForIO(te: TileEntity, sidedStorageConfig: SidedNaniteStorageConfiguration, io: EnumAutomaticIO): Iterable[(INaniteTank, INaniteTank)] = {
-    val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (new Loc4(te).getOffset(a), a))
-    val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
-    tiles.map { pair =>
-      val inputStorage = if (pair._1.hasCapability(com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK, pair._2.getOpposite)) pair._1.getCapability(com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK, pair._2.getOpposite)
-      else null
-      (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
-    }.filterNot(_._1 == null).filterNot(_._2 == null)
-  }
-
-  def getFluidStoragesForIO(te: TileEntity, sidedStorageConfig: SidedFluidStorageConfiguration, io: EnumAutomaticIO): Iterable[(IFluidStorage, IFluidStorage)] = {
-    val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (new Loc4(te).getOffset(a), a))
-    val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
-    tiles.map { pair =>
-      val inputStorage = if (pair._1.hasCapability(ItszuLibCapabilities.FLUID_STORAGE, pair._2.getOpposite)) pair._1.getCapability(ItszuLibCapabilities.FLUID_STORAGE, pair._2.getOpposite)
-      else if (pair._1.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, pair._2.getOpposite)) new WrapperFluidStorageHandler(pair._1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, pair._2.getOpposite))
-      else null
-      (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
-    }.filterNot(_._1 == null).filterNot(_._2 == null)
-  }
-
-  def incrementTicks(ticks: Int, ticksToAct: Int): Int = {
-    (ticks - 1 + ticksToAct) % ticksToAct
-  }
-
-  def checkDoItemInputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, inputSize: Int): Unit = {
-    if (ticks != 0) return
-
-    var isize = inputSize
-    TileEntityUtils.getItemStoragesForIO(te, config, EnumAutomaticIO.INPUT).exists { pair =>
-      isize = pair._1.transferIntoStorage(pair._2, isize)
-      isize <= 0
-    }
   }
 
   def checkDoItemOutputIO(te: TileEntity, config: SidedItemStorageConfiguration, ticks: Int, outputSize: Int): Unit = {
@@ -104,6 +83,16 @@ object TileEntityUtils {
       }
       isize <= 0
     }
+  }
+
+  def getNaniteTanksForIO(te: TileEntity, sidedStorageConfig: SidedNaniteStorageConfiguration, io: EnumAutomaticIO): Iterable[(INaniteTank, INaniteTank)] = {
+    val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (new Loc4(te).getOffset(a), a))
+    val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
+    tiles.map { pair =>
+      val inputStorage = if (pair._1.hasCapability(com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK, pair._2.getOpposite)) pair._1.getCapability(com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK, pair._2.getOpposite)
+      else null
+      (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
+    }.filterNot(_._1 == null).filterNot(_._2 == null)
   }
 
   def checkDoNaniteOutputIO(te: TileEntity, config: SidedNaniteStorageConfiguration, ticks: Int, outputSize: Int): Unit = {
@@ -154,6 +143,17 @@ object TileEntityUtils {
       isize -= amtFilled
       isize <= 0
     }
+  }
+
+  def getFluidStoragesForIO(te: TileEntity, sidedStorageConfig: SidedFluidStorageConfiguration, io: EnumAutomaticIO): Iterable[(IFluidStorage, IFluidStorage)] = {
+    val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (new Loc4(te).getOffset(a), a))
+    val tiles = facings.map(pair => (pair._1.getTileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
+    tiles.map { pair =>
+      val inputStorage = if (pair._1.hasCapability(ItszuLibCapabilities.FLUID_STORAGE, pair._2.getOpposite)) pair._1.getCapability(ItszuLibCapabilities.FLUID_STORAGE, pair._2.getOpposite)
+      else if (pair._1.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, pair._2.getOpposite)) new WrapperFluidStorageHandler(pair._1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, pair._2.getOpposite))
+      else null
+      (inputStorage, sidedStorageConfig.getStorageForGlobalFacing(pair._2))
+    }.filterNot(_._1 == null).filterNot(_._2 == null)
   }
 
   def checkDoFluidOutputIO(te: TileEntity, config: SidedFluidStorageConfiguration, ticks: Int, inputSize: Int): Unit = {

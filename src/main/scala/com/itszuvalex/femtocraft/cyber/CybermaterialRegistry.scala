@@ -21,21 +21,6 @@ object CybermaterialRegistry {
 
   private val blockTypeToReplacement = mutable.HashMap[(Block, Int), (Block, Int)]()
 
-  def registerBlockWithItem(block: Block, damage: Int, nanites: NaniteStack) = {
-    registerBlock(block, damage, nanites)
-    registerItem(Item.getItemFromBlock(block), damage, nanites)
-  }
-
-  def registerBlock(block: Block, damage: Int, nanites: NaniteStack) = {
-    blockMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Block, Int), NaniteStack]()).put((block, damage), nanites)
-    blockMap.put((block, damage), nanites)
-  }
-
-  def registerItem(item: Item, damage: Int, nanites: NaniteStack) = {
-    itemMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Item, Int), NaniteStack]()).put((item, damage), nanites)
-    itemMap.put((item, damage), nanites)
-  }
-
   def getReplacement(block: Block, damage: Int) = blockTypeToReplacement.get((block, damage))
 
   def getBlocksOfNanite(nanite: INanite) = blockMassTypeMap.get(nanite)
@@ -45,7 +30,6 @@ object CybermaterialRegistry {
   def getNaniteFromBlock(block: Block, damage: Int) = blockMap.get((block, damage))
 
   def getNaniteFromItem(item: Item, damage: Int) = itemMap.get((item, damage))
-
 
   def postInit(): Unit = {
     registerReplacements()
@@ -62,6 +46,21 @@ object CybermaterialRegistry {
     registerBlockWithItem(FemtoBlocks.blockDiamondreplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
     registerBlockWithItem(FemtoBlocks.blockRedstonereplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
     registerBlockWithItem(FemtoBlocks.blockLapisreplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
+  }
+
+  def registerBlockWithItem(block: Block, damage: Int, nanites: NaniteStack) = {
+    registerBlock(block, damage, nanites)
+    registerItem(Item.getItemFromBlock(block), damage, nanites)
+  }
+
+  def registerBlock(block: Block, damage: Int, nanites: NaniteStack) = {
+    blockMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Block, Int), NaniteStack]()).put((block, damage), nanites)
+    blockMap.put((block, damage), nanites)
+  }
+
+  def registerItem(item: Item, damage: Int, nanites: NaniteStack) = {
+    itemMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Item, Int), NaniteStack]()).put((item, damage), nanites)
+    itemMap.put((item, damage), nanites)
   }
 
   private def registerReplacements(): Unit = {

@@ -26,6 +26,10 @@ object PowerNode {
 trait PowerNode extends TileEntityBase {
   var powerDelegate: PowerNetworkNodeDelegate =
     new PowerNetworkNodeDelegate(this, powerRadius, powerTransfer, rendersPower)
+  var color = Color(255.toByte,
+    0.toByte,
+    0.toByte,
+    0.toByte)
 
   def powerRadius: Float
 
@@ -45,11 +49,6 @@ trait PowerNode extends TileEntityBase {
     else super.getCapability(capability, facing)
   }
 
-  var color = Color(255.toByte,
-    0.toByte,
-    0.toByte,
-    0.toByte)
-
   def getColor = color
 
   override def invalidate(): Unit = {
@@ -66,6 +65,10 @@ trait PowerNode extends TileEntityBase {
     super.saveToDescriptionCompound(compound)
     savePowerChildrenInfo(compound)
     compound.setInteger(PowerNode.COLOR_KEY, color.toInt)
+  }
+
+  def savePowerChildrenInfo(compound: NBTTagCompound): Unit = {
+    compound(PowerNode.POWER_STORAGE_KEY -> powerDelegate.serializeNBT())
   }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
@@ -85,10 +88,6 @@ trait PowerNode extends TileEntityBase {
     super.writeToNBT(compound)
     savePowerChildrenInfo(compound)
     compound
-  }
-
-  def savePowerChildrenInfo(compound: NBTTagCompound): Unit = {
-    compound(PowerNode.POWER_STORAGE_KEY -> powerDelegate.serializeNBT())
   }
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {

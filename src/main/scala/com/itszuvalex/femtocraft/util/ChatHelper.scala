@@ -31,6 +31,8 @@ object ChatHelper {
 
   def darkblue(str: String): String = wrap(str, ChatFormatting.DARK_BLUE)
 
+  def wrap(str: String, chatFormatting: ChatFormatting): String = s"$chatFormatting$str${ChatFormatting.RESET}"
+
   def darkgreen(str: String): String = wrap(str, ChatFormatting.DARK_GREEN)
 
   def darkaqua(str: String): String = wrap(str, ChatFormatting.DARK_AQUA)
@@ -68,8 +70,6 @@ object ChatHelper {
   def underline(str: String): String = wrap(str, ChatFormatting.UNDERLINE)
 
   def italic(str: String): String = wrap(str, ChatFormatting.ITALIC)
-
-  def wrap(str: String, chatFormatting: ChatFormatting): String = s"$chatFormatting$str${ChatFormatting.RESET}"
 
   // Reset will be added by innermost wrap
   def wrap(str: String, chatFormatting: List[ChatFormatting]): String = chatFormatting match {

@@ -100,6 +100,8 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     */
   override def passiveFlopGen: Double = flopsMaximum / (20 * 10)
 
+  override def flopsMaximum: Double = flopsRequired
+
   def flopsToGo: Double = {
     if (!nbt.hasKey(ItemConnection.FLOPS_KEY)) {
       flopsToGo = flopsRequired
@@ -116,12 +118,12 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     EnumFacing.VALUES(nbt.getInteger(ItemConnection.INTERFACE_DIRECTION_KEY))
   }
 
-  override def canSetInterfaceDirection(facing: EnumFacing): Boolean = facing != null
+  def interfaceDirection_=(facing: EnumFacing): Unit = setInterfaceDirection(facing)
 
   override def setInterfaceDirection(facing: EnumFacing): Unit =
     nbt.setInteger(ItemConnection.INTERFACE_DIRECTION_KEY, facing.getIndex)
 
-  def interfaceDirection_=(facing: EnumFacing): Unit = setInterfaceDirection(facing)
+  override def canSetInterfaceDirection(facing: EnumFacing): Boolean = facing != null
 
   override def resource: IResource[ItemStack] = LogisticsResourceRegistry.RESOURCE_ITEMS
 
@@ -153,13 +155,7 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
       case _ => !isEmpty
     })
 
-  private def canAcceptMoreInput: Boolean = {
-    isEmpty || (ibuffer.stackSize < stackLimit && ibuffer.stackSize < ibuffer.stackSizeMax)
-  }
-
   override def flopsRemaining: Double = flopsToGo
-
-  override def flopsMaximum: Double = flopsRequired
 
   override def direction: ConnectionDirection = {
     if (!nbt.hasKey(ItemConnection.CONNECTION_DIRECTION_KEY))
@@ -168,19 +164,19 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     if (isPaused) ConnectionDirection.DISABLED else ConnectionDirection.valueOf(nbt.getString(ItemConnection.CONNECTION_DIRECTION_KEY))
   }
 
-  override def setDirection(dir: ConnectionDirection): Unit = nbt.setString(ItemConnection.CONNECTION_DIRECTION_KEY, dir.toString)
-
   def direction_=(dir: ConnectionDirection): Unit = setDirection(dir)
 
-  def pause(): Unit = isPaused = true
-
-  def unpause(): Unit = isPaused = false
+  override def setDirection(dir: ConnectionDirection): Unit = nbt.setString(ItemConnection.CONNECTION_DIRECTION_KEY, dir.toString)
 
   def togglePause(): Unit = if (isPaused) unpause() else pause()
+
+  def pause(): Unit = isPaused = true
 
   def isPaused: Boolean = {
     nbt.getBoolean(ItemConnection.PAUSED_KEY)
   }
+
+  def unpause(): Unit = isPaused = false
 
   def isPaused_=(b: Boolean): Unit = nbt.setBoolean(ItemConnection.PAUSED_KEY, b)
 
@@ -204,32 +200,6 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     }
 
     ret
-  }
-
-  private def inputItem(): Unit = {
-    if (canAcceptMoreInput) {
-      // We received computation because we no longer have an item in our uploaded buffer.
-      // Do not reset computation until we have found an item, (unless we want to delay checks until computation completes, as a timeout)
-      // This will however put greater computational load on the system and slow down reaction time to new items entering it.
-      // Find new item to upload
-      storage.foreach { s =>
-        s.transferIntoStorage(bufferStorage, Math.min(itemsPerOp, stackLimit))
-      }
-
-      // Reset computation, wait till next cycle to check again.
-      flopsToGo = flopsRequired
-    }
-  }
-
-  private def outputItem(): Unit = {
-    if (!isEmpty) {
-      storage.foreach { s =>
-        bufferStorage.transferIntoStorage(s, Math.min(buffer.getCount, itemsPerOp))
-      }
-
-      // We tried to transfer as much as we could.  Clear our amount
-      flopsToGo = flopsRequired
-    }
   }
 
   override def buffer: ItemStack = ibuffer.toMinecraft
@@ -259,6 +229,36 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     */
   override def isEmpty: Boolean = {
     ibuffer.isEmpty
+  }
+
+  private def canAcceptMoreInput: Boolean = {
+    isEmpty || (ibuffer.stackSize < stackLimit && ibuffer.stackSize < ibuffer.stackSizeMax)
+  }
+
+  private def inputItem(): Unit = {
+    if (canAcceptMoreInput) {
+      // We received computation because we no longer have an item in our uploaded buffer.
+      // Do not reset computation until we have found an item, (unless we want to delay checks until computation completes, as a timeout)
+      // This will however put greater computational load on the system and slow down reaction time to new items entering it.
+      // Find new item to upload
+      storage.foreach { s =>
+        s.transferIntoStorage(bufferStorage, Math.min(itemsPerOp, stackLimit))
+      }
+
+      // Reset computation, wait till next cycle to check again.
+      flopsToGo = flopsRequired
+    }
+  }
+
+  private def outputItem(): Unit = {
+    if (!isEmpty) {
+      storage.foreach { s =>
+        bufferStorage.transferIntoStorage(s, Math.min(buffer.getCount, itemsPerOp))
+      }
+
+      // We tried to transfer as much as we could.  Clear our amount
+      flopsToGo = flopsRequired
+    }
   }
 
 }

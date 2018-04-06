@@ -32,10 +32,6 @@ object GuiConduitSide {
   val TEX_OUTPUT = Resources.TexBlock("blockmachineblock_side_output.png")
 
   class GuiInputFacingButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 18, 18) {
-    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
-
-    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
-
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       if (!isDisabled && isLocationInside(mouseX, mouseY)) {
         button match {
@@ -56,6 +52,10 @@ object GuiConduitSide {
       super.addTooltip(mouseX, mouseY, tooltip)
     }
 
+    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
+
+    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
+
     override def renderUpdate(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
       super.renderUpdate(screenX, screenY, mouseX, mouseY, partialTicks)
       text = connection.map(c => f"${c.interfaceDirection.toString.charAt(0).toUpper} ").getOrElse("NA")
@@ -63,10 +63,6 @@ object GuiConduitSide {
   }
 
   class GuiInputOutputButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 18, 18) {
-    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
-
-    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
-
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       if (!isDisabled && isLocationInside(mouseX, mouseY)) {
         button match {
@@ -86,6 +82,10 @@ object GuiConduitSide {
       }
       super.addTooltip(mouseX, mouseY, tooltip)
     }
+
+    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
+
+    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
 
     override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
       super.render(screenX, screenY, mouseX, mouseY, partialTicks)

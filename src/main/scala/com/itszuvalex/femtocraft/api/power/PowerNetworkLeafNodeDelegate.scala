@@ -8,7 +8,6 @@ import com.itszuvalex.itszulib.api.wrappers.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 
-
 object PowerNetworkLeafNodeDelegate {
   val PARENT_TAG = "parent"
 

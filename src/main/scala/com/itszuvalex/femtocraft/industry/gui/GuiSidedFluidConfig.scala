@@ -205,8 +205,6 @@ object GuiSidedFluidConfig {
 }
 
 class GuiSidedFluidConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedFluidConfig(tile)) {
-  override def GuiID: Int = GuiIDs.TileSidedNaniteConfigID
-
   val accessLabel       = new GuiLabel(10, 10, 50, 20, () => "Access")
   val upConfigButton    = new GuiSidedFluidConfig.GuiSideConfigButton(26, 30, tile, EnumFacing.UP)
   val leftConfigButton  = new GuiSidedFluidConfig.GuiSideConfigButton(10, 46, tile, EnumFacing.EAST)
@@ -221,6 +219,8 @@ class GuiSidedFluidConfig(tile: TileEntity) extends FemtoGuiBase(tile, new Conta
   val rightIOButton     = new GuiSidedFluidConfig.GuiSideIOButton(142, 46, tile, EnumFacing.WEST)
   val downIOButton      = new GuiSidedFluidConfig.GuiSideIOButton(126, 62, tile, EnumFacing.DOWN)
   val backIOButton      = new GuiSidedFluidConfig.GuiSideIOButton(142, 62, tile, EnumFacing.SOUTH)
+
+  override def GuiID: Int = GuiIDs.TileSidedNaniteConfigID
 
   add(accessLabel, upConfigButton, leftConfigButton, frontConfigButton, rightConfigButton, downConfigButton, backConfigButton,
     automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)

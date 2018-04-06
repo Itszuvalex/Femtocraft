@@ -9,7 +9,6 @@ import com.itszuvalex.itszulib.container.sync.SyncIFluidStorage
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.item.ItemStack
 
-
 class ContainerFluidRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileFluidRepository, shouldSync: Boolean) extends ContainerInv[TileFluidRepository](parPlayer, te, 0, 0, GuiIDs.TileFluidRepositoryGuiID, shouldSync) {
   addSync(new SyncIFluidStorage(te.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null),
     GuiID,

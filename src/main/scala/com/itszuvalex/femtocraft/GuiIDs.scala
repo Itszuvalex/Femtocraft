@@ -30,18 +30,17 @@ object GuiIDs {
   val TileConduitID                    = nextID
 
   val TileConduitSideID = nextID
+  val TileSidedInventoryConfigID = nextID
+  val TileSidedNaniteConfigID    = nextID
+  val TileSidedFluidConfigID     = nextID
+  val TileGerminationChamberID   = nextID
+  private var n = 0
 
   def getTileConduitSideID(facing: EnumFacing): Int = (facing.getIndex << 16) + TileConduitSideID
 
   def isTileConduitGUI(id: Int): Boolean = (id & 0xFFFF) == TileConduitSideID
 
   def getTileConduitSide(id: Int): EnumFacing = EnumFacing.getFront((id & 0xFFFF0000) >> 16)
-
-  val TileSidedInventoryConfigID = nextID
-  val TileSidedNaniteConfigID    = nextID
-  val TileSidedFluidConfigID     = nextID
-  val TileGerminationChamberID   = nextID
-  private var n = 0
 
   private def nextID = {
     n += 1

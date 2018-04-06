@@ -14,7 +14,6 @@ import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-
 object ItemConfigurator {
   val storageString = "Overlay"
 

@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Level
 
 import scala.collection.mutable.ArrayBuffer
 
-
 @SideOnly(Side.CLIENT)
 object OverlayRenderer {
   val overlays: ArrayBuffer[IOverlay] = ArrayBuffer[IOverlay]()

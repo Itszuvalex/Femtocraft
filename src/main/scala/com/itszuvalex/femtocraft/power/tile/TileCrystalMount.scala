@@ -35,12 +35,14 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
 
   override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 
-  override def powerStorageTransferRate: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
-    .getOrElse(0d)
-
   override def powerRadius: Float = TileCrystalMount.PEDESTAL_RANGE
 
   override def powerTransfer: Double = powerStorageTransferRate
+
+  override def powerStorageTransferRate: Double = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
+    .getOrElse(0d)
+
+  private def crystalStack = storage(0)
 
   override def rendersPower: Boolean = true
 
@@ -55,7 +57,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def getColor: Color = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(c => new Color(c.getColor()))
     .getOrElse(super.getColor)
 
-
   override def serverUpdate(): Unit = {
     super.serverUpdate()
     if (powerDelegate.network == null && !isInvalid) {
@@ -68,14 +69,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
       setUpdate()
     lastCrystal = stack
   }
-
-  /**
-    *
-    * @return Crystal ItemStack.  Null if no crystal.
-    */
-  def getCrystalStack: ItemStack = getStackInSlot(0)
-
-  private def crystalStack = storage(0)
 
   override def hasDescription: Boolean = true
 
@@ -100,6 +93,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
     saveConnectionInfo(compound)
   }
 
+  /**
+    *
+    * @return Crystal ItemStack.  Null if no crystal.
+    */
+  def getCrystalStack: ItemStack = getStackInSlot(0)
+
   //  override def setInventorySlotContents(slot: Int, item: ItemStack): Unit = {
   //    item match {
   //      case null =>
@@ -114,6 +113,12 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   //    }
   //    super.setInventorySlotContents(slot, item)
   //  }
+
+  def saveConnectionInfo(compound: NBTTagCompound): NBTTagCompound = {
+    compound(
+      TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
+    )
+  }
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
@@ -130,12 +135,6 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(compound)
     compound
-  }
-
-  def saveConnectionInfo(compound: NBTTagCompound): NBTTagCompound = {
-    compound(
-      TileCrystalMount.LOCS_KEY -> NBTList(powerDelegate.renderLocs.map(NBTCompound))
-    )
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = {

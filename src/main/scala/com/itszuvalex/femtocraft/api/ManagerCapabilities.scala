@@ -159,11 +159,15 @@ object ManagerCapabilities {
 
     override def getName(): String = ""
 
+    override def setName(name: String): Unit = {}
+
     /**
       *
       * @return Color of the crystal.
       */
     override def getColor(): Int = 0
+
+    override def setColor(color: Int): Unit = {}
 
     /**
       *
@@ -171,11 +175,15 @@ object ManagerCapabilities {
       */
     override def getPassiveGen(): Double = 0d
 
+    override def setPassiveGen(passiveGen: Float): Unit = {}
+
     /**
       *
       * @return Amount of power in crystal that is less than current storage.  Used for passive trickle charging.
       */
     override def getStoragePartial(): Double = 0d
+
+    override def setStoragePartial(amount: Double): Unit = {}
 
     /**
       *
@@ -183,23 +191,15 @@ object ManagerCapabilities {
       */
     override def getTransferRate(): Double = 0d
 
+    override def setTransferRate(rate: Double): Unit = {}
+
     /**
       *
       * @return Size of the crystal.
       */
     override def getType(): String = ""
 
-    override def setColor(color: Int): Unit = {}
-
-    override def setTransferRate(rate: Double): Unit = {}
-
     override def setType(ctype: String): Unit = {}
-
-    override def setPassiveGen(passiveGen: Float): Unit = {}
-
-    override def setName(name: String): Unit = {}
-
-    override def setStoragePartial(amount: Double): Unit = {}
 
     override def battery: IBattery = null
   }

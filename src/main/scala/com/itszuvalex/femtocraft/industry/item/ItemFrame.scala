@@ -78,6 +78,8 @@ class ItemFrame extends Item with IFrameItem {
 
   override def getFrameType(stack: ItemStack) = "Basic"
 
+  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+
   override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
     val stack = playerIn.getHeldItem(hand)
     if (playerIn.isSneaking) {
@@ -122,8 +124,6 @@ class ItemFrame extends Item with IFrameItem {
     worldIn.playSound(null, bpos, SoundEvent.REGISTRY.getObject(new ResourceLocation("block.stone.break")), SoundCategory.BLOCKS, 1f, 1f / 5f)
     EnumActionResult.SUCCESS
   }
-
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
 
   override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
     new ICapabilityProvider {

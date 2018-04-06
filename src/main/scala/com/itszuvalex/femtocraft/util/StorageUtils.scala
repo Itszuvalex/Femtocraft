@@ -8,9 +8,6 @@ object StorageUtils {
   def storageContainsItems(storage: IItemStorage, items: Iterable[IItemStack]): Boolean =
     removeItemsFromStorageInternal(storage, items, doRemove = false, removeIfNotAllFound = false)
 
-  def removeItemsFromStorage(storage: IItemStorage, items: Iterable[IItemStack], removeIfNotAllFound: Boolean = false): Boolean =
-    removeItemsFromStorageInternal(storage, items, doRemove = true, removeIfNotAllFound = removeIfNotAllFound)
-
   private def removeItemsFromStorageInternal(storage: IItemStorage, items: Iterable[IItemStack], doRemove: Boolean, removeIfNotAllFound: Boolean): Boolean = {
     val removed = new Array[Int](storage.length)
     var removedAll = true
@@ -47,5 +44,8 @@ object StorageUtils {
 
     removedAll || removeIfNotAllFound
   }
+
+  def removeItemsFromStorage(storage: IItemStorage, items: Iterable[IItemStack], removeIfNotAllFound: Boolean = false): Boolean =
+    removeItemsFromStorageInternal(storage, items, doRemove = true, removeIfNotAllFound = removeIfNotAllFound)
 
 }

@@ -23,6 +23,7 @@ object PowerLeafNode {
 
 trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
   val leafDelegate: IPowerLeafNode = defaultLeafDelegate
+  var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 
   def defaultLeafDelegate: IPowerLeafNode = {
     val del: PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(this, connectionRadius _, battery _, powerStorageNodeType,
@@ -62,42 +63,18 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
     PowerManager.removeLeaf(leafDelegate)
   }
 
-  def writeColorTag(tag: NBTTagCompound): NBTTagCompound = {
-    tag.setInteger(PowerLeafNode.COLOR_TAG, color.toInt)
-    tag
-  }
-
-  def readColorTag(tag: NBTTagCompound): Unit = {
-    color = new Color(tag.getInteger(PowerLeafNode.COLOR_TAG))
-    setRenderUpdate()
-  }
-
-  var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
-
-  def getColor = Option(leafDelegate.getParent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(color)
-
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) leafDelegate.asInstanceOf[T]
     else if (capability == ItszuLibCapabilities.COLORABLE) getColor.asInstanceOf[T]
     else super.getCapability(capability, facing)
   }
 
+  def getColor = Option(leafDelegate.getParent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(color)
+
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) true
     else if (capability == ItszuLibCapabilities.COLORABLE) true
     else super.hasCapability(capability, facing)
-  }
-
-  def writeLeafTag(compound: NBTTagCompound): Unit = {
-    leafDelegate match {
-      case a: DataSpec => a.writeToNBT(compound)
-    }
-  }
-
-  def readLeafTag(compound: NBTTagCompound): Unit = {
-    leafDelegate match {
-      case a: DataSpec => a.deserializeNBT(compound)
-    }
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
@@ -106,10 +83,20 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
     writeColorTag(compound)
   }
 
+  def writeColorTag(tag: NBTTagCompound): NBTTagCompound = {
+    tag.setInteger(PowerLeafNode.COLOR_TAG, color.toInt)
+    tag
+  }
+
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
     readLeafTag(compound)
     readColorTag(compound)
+  }
+
+  def readColorTag(tag: NBTTagCompound): Unit = {
+    color = new Color(tag.getInteger(PowerLeafNode.COLOR_TAG))
+    setRenderUpdate()
   }
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
@@ -118,10 +105,22 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
     setRenderUpdate()
   }
 
+  def readLeafTag(compound: NBTTagCompound): Unit = {
+    leafDelegate match {
+      case a: DataSpec => a.deserializeNBT(compound)
+    }
+  }
+
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
     val ret = super.writeToNBT(par1nbtTagCompound)
     writeLeafTag(par1nbtTagCompound)
     ret
+  }
+
+  def writeLeafTag(compound: NBTTagCompound): Unit = {
+    leafDelegate match {
+      case a: DataSpec => a.writeToNBT(compound)
+    }
   }
 
 }

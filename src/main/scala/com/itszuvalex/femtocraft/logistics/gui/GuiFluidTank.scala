@@ -36,8 +36,6 @@ class GuiFluidTank(
   var colorFluidBack  = GuiFluidTank.DEFAULT_FLUID_BACK_COLOR
   var colorScale      = GuiFluidTank.DEFAULT_SCALE_COLOR
 
-  def getInfo: IFluidStorageProperties = storage.getStorageProperties.apply(tankID)
-
   override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
     super.addTooltip(mouseX, mouseY, tooltip)
     tooltip ++= getTooltip
@@ -102,6 +100,8 @@ class GuiFluidTank(
 
     RenderUtils.renderLiquidInGUI(gui, 0, icon, screenX + 1, topPx, 16, height)
   }
+
+  def getInfo: IFluidStorageProperties = storage.getStorageProperties.apply(tankID)
 
 }
 

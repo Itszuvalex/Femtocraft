@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.tech
 
 class TechBase(val name: String, val parent: TechBase, val cost: Int) {
-  if(parent != null) {
+  if (parent != null) {
     parent.addChild(this)
   }
 
@@ -10,7 +10,7 @@ class TechBase(val name: String, val parent: TechBase, val cost: Int) {
   def addChild(techBase: TechBase): Boolean = {
     if (children(1) != null) {
       false
-    } else if(children(0) == null) {
+    } else if (children(0) == null) {
       children(0) = techBase
       true
     } else {

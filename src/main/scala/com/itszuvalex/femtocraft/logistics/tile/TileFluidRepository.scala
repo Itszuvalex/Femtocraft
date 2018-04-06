@@ -16,7 +16,6 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, IFluidBlock}
 
-
 object TileFluidRepository {
   val TANK_SIZE              = 5000
   val TICKS_FOR_AUTOIO       = 20

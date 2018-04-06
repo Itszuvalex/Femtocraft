@@ -34,11 +34,9 @@ object TileFrame {
   val PROGRESS_KEY        = "BuildProgress"
   val STATE_KEY           = "State"
   val INFO_KEY            = "Info"
-
+  val TICKS_TO_CHECK = 40
   var shouldDrop        = true
   var shouldFullyRemove = true
-
-  val TICKS_TO_CHECK = 40
 
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
@@ -94,10 +92,6 @@ object TileFrame {
     }
   }
 
-  object TileFrameState {
-    val STORAGE_NBT = "Storage"
-  }
-
   class TileFrameState() extends INBTSerializable[NBTTagCompound] {
     val storage = new ItemStorageArray(9)
 
@@ -112,9 +106,16 @@ object TileFrame {
     }
   }
 
+  object TileFrameState {
+    val STORAGE_NBT = "Storage"
+  }
+
 }
 
 class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockComponent {
+  private val state:
+    MultiblockStateHolder[TileFrameState, TileFrame] =
+    new MultiblockStateHolder[TileFrameState, TileFrame](this, () => new TileFrameState(), info _, (a) => a.state)
   var renderInt                                       = TileFrame.fullRender(true)
   var multiBlock           : String                   = null
   var renderProgress       : Int                      = 0
@@ -124,9 +125,6 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
   var inProgressData       : mutable.Map[String, Any] = mutable.Map()
   var isBuilding           : Boolean                  = false
   var ticks                                           = 0
-  private val state:
-    MultiblockStateHolder[TileFrameState, TileFrame] =
-    new MultiblockStateHolder[TileFrameState, TileFrame](this, () => new TileFrameState(), info _, (a) => a.state)
   var storage: IItemStorage = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
 
   descriptionDataSpec ++= Array(
@@ -204,6 +202,21 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
     }
   }
 
+  def checkForRequiredItems(): Unit = {
+    FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+      case Some(multi) =>
+        val items = multi.getRequiredResources
+        val random = new Random
+        if (StorageUtils.removeItemsFromStorage(state.get.get.storage, items.map(Converter.IItemStackFromItemStack), false)) {
+          state.get.foreach(_.storage.foreach { item =>
+            if (!world.isRemote) InventoryUtils.dropItem(item, getLoc, random)
+          })
+          isBuilding = true
+          setUpdate()
+        }
+      case _ =>
+    }
+  }
 
   override def clientUpdate(): Unit = {
     super.clientUpdate()
@@ -223,22 +236,6 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
       }
     }
     else false
-  }
-
-  def checkForRequiredItems(): Unit = {
-    FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-      case Some(multi) =>
-        val items = multi.getRequiredResources
-        val random = new Random
-        if (StorageUtils.removeItemsFromStorage(state.get.get.storage, items.map(Converter.IItemStackFromItemStack), false)) {
-          state.get.foreach(_.storage.foreach { item =>
-            if (!world.isRemote) InventoryUtils.dropItem(item, getLoc, random)
-          })
-          isBuilding = true
-          setUpdate()
-        }
-      case _ =>
-    }
   }
 
   def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)

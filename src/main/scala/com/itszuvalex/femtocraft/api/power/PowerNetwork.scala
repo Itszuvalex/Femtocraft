@@ -19,6 +19,7 @@ object PowerNetwork {
   }
 
   class Statistics {
+    val powerAverageCache     = new Array[Double](PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
     var lastTickProducerGen   = 0d
     var lastTickConsumerReq   = 0d
     var lastTickStored        = 0d
@@ -27,7 +28,6 @@ object PowerNetwork {
     var lastTickTotalStored   = 0d
     var lastTickTotalStorage  = 0d
     var lastTickNetChange     = 0d
-    val powerAverageCache     = new Array[Double](PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
     var powerAverageCount     = 0
     var powerAverageInd       = 0
     var producerNodeCount     = 0
@@ -140,12 +140,6 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
   override def create(): PowerNetwork = new PowerNetwork
 
   override def onTickStart(): Unit = {}
-
-  def producerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
-
-  def storageNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
-
-  def consumerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
 
   override def onTickEnd(): Unit = {
     try {
@@ -268,6 +262,12 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       case e: Throwable => Debug.log(Level.ERROR, e.toString)
     }
   }
+
+  def producerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
+
+  def storageNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
+
+  def consumerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
 
   override def onTakeover(iNetwork: PowerNetwork): Unit = {}
 

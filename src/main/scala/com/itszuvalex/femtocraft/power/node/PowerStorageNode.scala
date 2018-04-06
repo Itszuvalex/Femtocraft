@@ -17,8 +17,8 @@ object PowerStorageNode {
 }
 
 trait PowerStorageNode extends TileEntityBase {
-  var battery : IBattery          = defaultBattery
   val delegate: IPowerStorageNode = defaultStorageDelegate
+  var battery : IBattery          = defaultBattery
 
   def defaultStorageDelegate: IPowerStorageNode = new PowerStorageNodeDelegate(this, battery _, powerStorageNodeType, () => powerStorageTransferRate)
 
@@ -27,15 +27,6 @@ trait PowerStorageNode extends TileEntityBase {
   def powerStorageNodeType: PowerStorageNodeType
 
   def powerStorageTransferRate: Double
-
-  def readBatteryTag(tag: NBTTagCompound): Unit = {
-    battery.deserializeNBT(tag.getCompoundTag(PowerStorageNode.BATTERY_TAG))
-  }
-
-  def writeBatteryTag(tag: NBTTagCompound): NBTTagCompound = {
-    tag(PowerStorageNode.BATTERY_TAG -> battery.serializeNBT())
-    tag
-  }
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
@@ -59,8 +50,17 @@ trait PowerStorageNode extends TileEntityBase {
     readBatteryTag(par1nbtTagCompound)
   }
 
+  def readBatteryTag(tag: NBTTagCompound): Unit = {
+    battery.deserializeNBT(tag.getCompoundTag(PowerStorageNode.BATTERY_TAG))
+  }
+
   override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
     super.writeToNBT(par1nbtTagCompound)
     writeBatteryTag(par1nbtTagCompound)
+  }
+
+  def writeBatteryTag(tag: NBTTagCompound): NBTTagCompound = {
+    tag(PowerStorageNode.BATTERY_TAG -> battery.serializeNBT())
+    tag
   }
 }

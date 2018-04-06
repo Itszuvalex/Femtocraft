@@ -208,8 +208,6 @@ object GuiSidedInventoryConfig {
 }
 
 class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig(tile)) {
-  override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
-
   val accessLabel       = new GuiLabel(10, 10, 50, 20, () => "Access")
   val upConfigButton    = new GuiSidedInventoryConfig.GuiSideConfigButton(26, 30, tile, EnumFacing.UP)
   val leftConfigButton  = new GuiSidedInventoryConfig.GuiSideConfigButton(10, 46, tile, EnumFacing.EAST)
@@ -224,6 +222,8 @@ class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new C
   val rightIOButton     = new GuiSidedInventoryConfig.GuiSideIOButton(142, 46, tile, EnumFacing.WEST)
   val downIOButton      = new GuiSidedInventoryConfig.GuiSideIOButton(126, 62, tile, EnumFacing.DOWN)
   val backIOButton      = new GuiSidedInventoryConfig.GuiSideIOButton(142, 62, tile, EnumFacing.SOUTH)
+
+  override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
 
   add(accessLabel, upConfigButton, leftConfigButton, frontConfigButton, rightConfigButton, downConfigButton, backConfigButton,
     automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)

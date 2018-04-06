@@ -14,9 +14,9 @@ object MultitoolUpgradeRegistry {
     upgradeMap(provider.getUpgradeName) = provider
   }
 
-  def getProvider(name: String): Option[IMultitoolUpgradeProvider] = upgradeMap.get(name)
-
   def getMultitoolUpgrade(name: String, comp: NBTTagCompound): Option[IMultitoolUpgrade] = getProvider(name).map(_.getMultitoolUpgrade(comp))
+
+  def getProvider(name: String): Option[IMultitoolUpgradeProvider] = upgradeMap.get(name)
 
   def init(): Unit = {
 

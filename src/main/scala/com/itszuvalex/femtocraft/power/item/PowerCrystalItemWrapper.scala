@@ -32,8 +32,6 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
     stack.setTagCompound(new NBTTagCompound)
   val batWrapper = new WrapperNBTBattery(stack.getTagCompound)
 
-  override def battery: IBattery = batWrapper
-
   override def onTick(): Unit = {
     if (stack == null) return
 
@@ -42,6 +40,36 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
       setStoragePartial(getStoragePartial() - 1)
       battery.storage = Math.min(battery.storage + 1, battery.maxStorage)
     }
+  }
+
+  override def battery: IBattery = batWrapper
+
+  override def getPassiveGen(): Double = {
+    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+      return comp.Float(PASSIVE_GEN_KEY)
+    }
+  }
+
+  override def setPassiveGen(passiveGen: Float): Unit = {
+    stack.forceTag.merge(NBT_COMPOUND_KEY ->
+      NBTCompound(
+        PASSIVE_GEN_KEY -> passiveGen)
+    )
+  }
+
+  override def getStoragePartial(): Double = {
+    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+      return comp.Double(STORAGE_PARTIAL_KEY)
+    }
+  }
+
+  override def setStoragePartial(amount: Double): Unit = {
+    stack.forceTag.merge(NBT_COMPOUND_KEY ->
+      NBTCompound(
+        STORAGE_PARTIAL_KEY -> amount
+      )
+    )
+
   }
 
   def addInformation(tooltipList: java.util.List[_]): Unit = {
@@ -53,49 +81,10 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
     //        tlist += "Partial Power:" + crystal.getStoragePartial(stack)
   }
 
-  override def getColor(): Int = {
-    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-      return comp.Int(COLOR_KEY)
-    }
-    Color(0.toByte, 255.toByte, 255.toByte, 255.toByte).toInt
-  }
-
   override def getTransferRate(): Double = {
     stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
       return comp.Double(TRANSFER_KEY)
     }
-  }
-
-  override def getPassiveGen(): Double = {
-    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-      return comp.Float(PASSIVE_GEN_KEY)
-    }
-  }
-
-  override def getType(): String = {
-    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-      return comp.String(TYPE_KEY)
-    }
-  }
-
-  override def getName(): String = {
-    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-      return comp.String(NAME_KEY)
-    }
-  }
-
-  override def getStoragePartial(): Double = {
-    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
-      return comp.Double(STORAGE_PARTIAL_KEY)
-    }
-  }
-
-  override def setColor(color: Int): Unit = {
-    stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        COLOR_KEY -> color
-      )
-    )
   }
 
   override def setTransferRate(rate: Double): Unit = {
@@ -106,6 +95,12 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
     )
   }
 
+  override def getType(): String = {
+    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+      return comp.String(TYPE_KEY)
+    }
+  }
+
   override def setType(ctype: String): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
       NBTCompound(
@@ -114,11 +109,25 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
     )
   }
 
-  override def setPassiveGen(passiveGen: Float): Unit = {
+  override def getColor(): Int = {
+    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+      return comp.Int(COLOR_KEY)
+    }
+    Color(0.toByte, 255.toByte, 255.toByte, 255.toByte).toInt
+  }
+
+  override def setColor(color: Int): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
       NBTCompound(
-        PASSIVE_GEN_KEY -> passiveGen)
+        COLOR_KEY -> color
+      )
     )
+  }
+
+  override def getName(): String = {
+    stack.getTagCompound.NBTCompound(NBT_COMPOUND_KEY) { comp =>
+      return comp.String(NAME_KEY)
+    }
   }
 
   override def setName(name: String): Unit = {
@@ -127,15 +136,6 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
         NAME_KEY -> name
       )
     )
-  }
-
-  override def setStoragePartial(amount: Double): Unit = {
-    stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        STORAGE_PARTIAL_KEY -> amount
-      )
-    )
-
   }
 
   def updateDamage(): Unit = {

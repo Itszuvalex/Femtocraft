@@ -9,7 +9,6 @@ import com.itszuvalex.itszulib.gui.GuiLabel
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
-
 class GuiFluidRepository(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFluidRepository)
   extends FemtoGuiBase(tile, new ContainerFluidRepository(player, inv, tile, false)) {
   GuiTabFluidSideConfig.addToGuiTabBar(tabBar, tile)

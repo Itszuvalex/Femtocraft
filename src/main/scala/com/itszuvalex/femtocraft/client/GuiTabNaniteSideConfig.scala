@@ -4,7 +4,6 @@ import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.gui.GuiPanelTexture
 
-
 object GuiTabNaniteSideConfig {
   val SideConfigTexLoc = Resources.TexGui("tabnanites.png")
 

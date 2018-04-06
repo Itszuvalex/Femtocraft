@@ -52,6 +52,13 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
     getBoundingBoxes(worldIn, pos).withFilter(entityBox.intersects).foreach(collidingBoxes.add)
   }
 
+  def getBoundingBoxes(worldIn: World, pos: BlockPos): util.List[AxisAlignedBB] = {
+    val list = new util.ArrayList[AxisAlignedBB]()
+    list += new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
+    if (renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, .6, 2f / 16f, 14f / 16f, 1, 14f / 16f)
+    if (renderBelow(worldIn, pos) || !renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, 0, 2f / 16f, 14f / 16f, .4, 14f / 16f)
+    list
+  }
 
   def renderAbove(worldIn: World, pos: BlockPos): Boolean = {
     val loc = new Loc4(worldIn, pos)
@@ -63,14 +70,6 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
     val loc = new Loc4(worldIn, pos)
     val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.DOWN).getPos)
     stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
-  }
-
-  def getBoundingBoxes(worldIn: World, pos: BlockPos): util.List[AxisAlignedBB] = {
-    val list = new util.ArrayList[AxisAlignedBB]()
-    list += new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
-    if (renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, .6, 2f / 16f, 14f / 16f, 1, 14f / 16f)
-    if (renderBelow(worldIn, pos) || !renderAbove(worldIn, pos)) list += new AxisAlignedBB(2f / 16f, 0, 2f / 16f, 14f / 16f, .4, 14f / 16f)
-    list
   }
 
   override def collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult = {

@@ -27,6 +27,18 @@ class ItemLogisticsItemChip extends Item {
     getDamage(stack) != getMaxDamage(stack)
   }
 
+  override def getMaxDamage(stack: ItemStack): Int = {
+    var sum = 0d
+    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsMaximum)
+    sum.toInt
+  }
+
+  override def getDamage(stack: ItemStack): Int = {
+    var sum = 0d
+    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsRemaining)
+    getMaxDamage(stack) - sum.toInt
+  }
+
   override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
     new ICapabilityProvider {
       override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = if (capability == Capabilities.ITEM_CONNECTION_PROVIDER) {
@@ -72,18 +84,6 @@ class ItemLogisticsItemChip extends Item {
 
       override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == Capabilities.ITEM_CONNECTION_PROVIDER
     }
-  }
-
-  override def getMaxDamage(stack: ItemStack): Int = {
-    var sum = 0d
-    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsMaximum)
-    sum.toInt
-  }
-
-  override def getDamage(stack: ItemStack): Int = {
-    var sum = 0d
-    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsRemaining)
-    getMaxDamage(stack) - sum.toInt
   }
 
   override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag) = {

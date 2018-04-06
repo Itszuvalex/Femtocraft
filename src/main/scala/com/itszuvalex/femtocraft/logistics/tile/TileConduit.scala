@@ -28,8 +28,6 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Chris on 2/16/2017.
   */
 object TileConduit {
-  val CONDUIT_KEY = "conduit"
-
   lazy val connectionCapabilities: ArrayBuffer[Capability[_]] = mutable.ArrayBuffer[Capability[_]](
     Capabilities.TILE_CONDUIT,
     Capabilities.TILE_LOGISTICS_NODE,
@@ -37,15 +35,10 @@ object TileConduit {
     Capabilities.TILE_NANITE_STORAGE_TANK,
     CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
   )
+  val CONDUIT_KEY = "conduit"
 
   def addConnectionCapability(cap: Capability[_]): Unit = {
     connectionCapabilities += cap
-  }
-
-  object ConduitImpl {
-    val CONNECTION_KEY = "connections"
-    val BLOCKED_KEY    = "blocked"
-    val STORAGE_KEY    = "storage"
   }
 
   class ConduitStorage(size: Int) extends ItemStorageArray(size) {
@@ -57,8 +50,8 @@ object TileConduit {
   class ConduitImpl(val conduit: TileConduit) extends IConduit with ILogisticsNetworkNode {
     val connections       = new Array[Boolean](6)
     val blocked           = new Array[Boolean](6)
-    var seek              = true
     val connectionStorage = Array(new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4), new ConduitStorage(4))
+    var seek              = true
 
     override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = {
       if (facing == null) return Set[IConnection[T]]()
@@ -67,8 +60,6 @@ object TileConduit {
         f.getConnections[T](getLoc, facing)
       }
     }
-
-    override def getLoc: Loc4 = conduit.getLoc
 
     override def canConnect(loc: Loc4): Boolean = {
       if (!super.canConnect(loc)) return false
@@ -80,6 +71,25 @@ object TileConduit {
     }
 
     override def isConnected(facing: EnumFacing): Boolean = !blocked(facing.getIndex) && connections(facing.getIndex)
+
+    def addConnectionInternal(facing: EnumFacing): Unit = {
+      if (connections(facing.getIndex)) return
+      if (!canAddConnection(facing)) return
+
+      addConnection(facing)
+
+      if (!connections(facing.getIndex)) return
+
+      getLoc.getOffset(facing).getTileEntity(false).foreach { t =>
+        if (!t.hasCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)) return
+        val cap = t.getCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)
+        if (!cap.canAddConnection(facing.getOpposite)) return
+
+        cap.addConnection(facing.getOpposite)
+      }
+    }
+
+    override def getLoc: Loc4 = conduit.getLoc
 
     override def canAddConnection(facing: EnumFacing): Boolean = !blocked(facing.getIndex)
 
@@ -99,20 +109,13 @@ object TileConduit {
       conduit.setUpdate()
     }
 
-    def addConnectionInternal(facing: EnumFacing): Unit = {
-      if (connections(facing.getIndex)) return
-      if (!canAddConnection(facing)) return
-
-      addConnection(facing)
-
-      if (!connections(facing.getIndex)) return
-
-      getLoc.getOffset(facing).getTileEntity(false).foreach { t =>
-        if (!t.hasCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)) return
-        val cap = t.getCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)
-        if (!cap.canAddConnection(facing.getOpposite)) return
-
-        cap.addConnection(facing.getOpposite)
+    def connectToNetwork(loc: Loc4, facing: EnumFacing): Unit = {
+      loc.getTileEntity(false) match {
+        case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
+          val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
+          val network = if (cap.getNetwork != null) cap.getNetwork else getNetwork
+          network.addConnection(getLoc, cap.getLoc)
+        case _ =>
       }
     }
 
@@ -123,16 +126,6 @@ object TileConduit {
       disconnectFromNetwork(getLoc.getOffset(facing), facing.getOpposite)
       conduit.setModified()
       conduit.setUpdate()
-    }
-
-    def connectToNetwork(loc: Loc4, facing: EnumFacing): Unit = {
-      loc.getTileEntity(false) match {
-        case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
-          val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
-          val network = if (cap.getNetwork != null) cap.getNetwork else getNetwork
-          network.addConnection(getLoc, cap.getLoc)
-        case _ =>
-      }
     }
 
     def disconnectFromNetwork(loc: Loc4, facing: EnumFacing): Unit = {
@@ -170,6 +163,12 @@ object TileConduit {
     }
   }
 
+  object ConduitImpl {
+    val CONNECTION_KEY = "connections"
+    val BLOCKED_KEY    = "blocked"
+    val STORAGE_KEY    = "storage"
+  }
+
 }
 
 class TileConduit extends TileEntityBase {
@@ -194,16 +193,6 @@ class TileConduit extends TileEntityBase {
     EnumFacing.VALUES.withFilter(getLoc.getOffset(_) == nloc).foreach(checkFacingForConnection)
   }
 
-  def onBlockPlaced(): Unit = {
-    if (getWorld.isRemote) return
-
-    val network = new LogisticsNetwork
-    network.addNode(conduit)
-    network.register()
-
-    EnumFacing.VALUES.foreach(checkFacingForConnection)
-  }
-
   private def checkFacingForConnection(f: EnumFacing) = {
     val loc = getLoc
     val floc = getLoc.getOffset(f)
@@ -220,6 +209,16 @@ class TileConduit extends TileEntityBase {
         case _ =>
       }
     }
+  }
+
+  def onBlockPlaced(): Unit = {
+    if (getWorld.isRemote) return
+
+    val network = new LogisticsNetwork
+    network.addNode(conduit)
+    network.register()
+
+    EnumFacing.VALUES.foreach(checkFacingForConnection)
   }
 
   override def onBlockBreak(): Unit = {

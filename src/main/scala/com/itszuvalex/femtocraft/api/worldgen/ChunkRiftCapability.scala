@@ -22,6 +22,11 @@ object ChunkRiftCapability {
     MinecraftForge.EVENT_BUS.register(this)
   }
 
+  @SubscribeEvent
+  def attachCapability(event: AttachCapabilitiesEvent[Chunk]): Unit = {
+    event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "ChunkRiftCapability"), new ChunkRiftCapability(event.getObject))
+  }
+
   class ChunkRiftCapabilityStorage extends Capability.IStorage[IChunkRiftCapability] {
     override def writeNBT(capability: Capability[IChunkRiftCapability], instance: IChunkRiftCapability, side: EnumFacing): NBTBase = {
       instance match {
@@ -36,11 +41,6 @@ object ChunkRiftCapability {
         case _ =>
       }
     }
-  }
-
-  @SubscribeEvent
-  def attachCapability(event: AttachCapabilitiesEvent[Chunk]): Unit = {
-    event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "ChunkRiftCapability"), new ChunkRiftCapability(event.getObject))
   }
 }
 

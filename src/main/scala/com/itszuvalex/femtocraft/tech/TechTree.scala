@@ -6,7 +6,7 @@ class TechTree(val name: String) {
   var techs: ArrayBuffer[TechBase] = ArrayBuffer[TechBase]()
 
   def getTech(tName: String): TechBase = {
-    techs.foreach(t => if(t.name.equals(tName)) return t)
+    techs.foreach(t => if (t.name.equals(tName)) return t)
     null
   }
 }

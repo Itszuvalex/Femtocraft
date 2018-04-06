@@ -29,8 +29,6 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
 
   addPlayerInventorySlots(inv)
 
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
-
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       super.addTooltip(mouseX, mouseY, tooltip)
@@ -39,13 +37,12 @@ class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val til
       tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${TileNanoFurnace.POWER_PER_TICK}"
     }
   }
+  val nameLabel  = new GuiLabel(20, 12, fontRenderer.getStringWidth("Nano Furnace"), fontRenderer.FONT_HEIGHT, () => "Nano Furnace")
   progressBar.colorProgress = color.toInt
   add(progressBar)
-
-  val nameLabel  = new GuiLabel(20, 12, fontRenderer.getStringWidth("Nano Furnace"), fontRenderer.FONT_HEIGHT, () => "Nano Furnace")
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
-
   val elems = List(nameLabel, powerMeter)
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   add(elems: _*)
 
   //  elems.foreach(e => e.setShouldRender(false))

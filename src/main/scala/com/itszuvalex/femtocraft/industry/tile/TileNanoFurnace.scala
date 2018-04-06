@@ -50,11 +50,6 @@ object TileNanoFurnace {
   val SIDE_TEX_EMPTY_LIGHT = Resources.TexBlock("blockmachineblock_side_empty_light.png")
   */
 
-  object SmeltTask {
-    val SMELTING_STACK_NBT   = "Smelt"
-    val SMELTING_SMELTED_NBT = "Smelted"
-  }
-
   class SmeltTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
     var smelted = false
 
@@ -78,6 +73,11 @@ object TileNanoFurnace {
       stack = IItemStack.Empty
       smelted = false
     }
+  }
+
+  object SmeltTask {
+    val SMELTING_STACK_NBT   = "Smelt"
+    val SMELTING_SMELTED_NBT = "Smelted"
   }
 
 }
@@ -116,6 +116,14 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with TileDataSpe
     }
   }
 
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
+    if (slot == 0) {
+      val result = FurnaceRecipes.instance().getSmeltingResult(item)
+      result != null && !result.isEmpty
+    }
+    else false
+  }
+
   override def getFieldCount: Int = 0
 
   override def getField(id: Int): Int = 0
@@ -125,14 +133,6 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with TileDataSpe
   override def getMod: AnyRef = Femtocraft
 
   override def hasDescription: Boolean = true
-
-  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    if (slot == 0) {
-      val result = FurnaceRecipes.instance().getSmeltingResult(item)
-      result != null && !result.isEmpty
-    }
-    else false
-  }
 
   override def canInsertItem(index: Int, itemStackIn: ItemStack, direction: EnumFacing): Boolean =
     index == 0 && sidedStorageConfig.getStorageForGlobalFacing(direction) == inputStorage && isItemValidForSlot(0, itemStackIn)
@@ -191,11 +191,11 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with TileDataSpe
     TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
+  def getProgress = task.progress
+
   def setProgress(progress: Double): Unit = {
     task.progress = progress
   }
-
-  def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
 

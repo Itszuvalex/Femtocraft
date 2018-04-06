@@ -34,11 +34,6 @@ object TileDemolisher {
   val ITEM_SIDED_CONFIG_NBT = "ItemConfig"
   val TICKS_NBT             = "Ticks"
 
-  object DemolishTask {
-    val DEMOLISHING_STACK_NBT   = "Demolish"
-    val DEMOLISHING_SMELTED_NBT = "Demolished"
-  }
-
   class DemolishTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
     var demolished = false
 
@@ -62,6 +57,11 @@ object TileDemolisher {
       stack = IItemStack.Empty
       demolished = false
     }
+  }
+
+  object DemolishTask {
+    val DEMOLISHING_STACK_NBT   = "Demolish"
+    val DEMOLISHING_SMELTED_NBT = "Demolished"
   }
 
 }
@@ -100,6 +100,14 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
     }
   }
 
+  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
+    if (slot == 0) {
+      val result = DustRecipeRegistry.getDust(item).getOrElse(ItemStack.EMPTY)
+      result != null && !result.isEmpty
+    }
+    else false
+  }
+
   override def getFieldCount: Int = 0
 
   override def getField(id: Int): Int = 0
@@ -109,14 +117,6 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
   override def getMod: AnyRef = Femtocraft
 
   override def hasDescription: Boolean = true
-
-  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    if (slot == 0) {
-      val result = DustRecipeRegistry.getDust(item).getOrElse(ItemStack.EMPTY)
-      result != null && !result.isEmpty
-    }
-    else false
-  }
 
   override def hasGUI = true
 
@@ -169,11 +169,11 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
     TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, 1)
   }
 
+  def getProgress = task.progress
+
   def setProgress(progress: Double): Unit = {
     task.progress = progress
   }
-
-  def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
 

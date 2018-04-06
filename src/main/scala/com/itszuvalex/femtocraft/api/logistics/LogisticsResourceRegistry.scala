@@ -78,8 +78,6 @@ object LogisticsResourceRegistry {
 
   val resources = new ArrayBuffer[IResource[_]]()
 
-  def addResource(resource: IResource[_]): Unit = resources += resource
-
   def getResources: util.Collection[IResource[_]] = resources
 
   def init(): Unit = {
@@ -87,6 +85,8 @@ object LogisticsResourceRegistry {
     addResource(RESOURCE_ITEMS)
     addResource(RESOURCE_NANITES)
   }
+
+  def addResource(resource: IResource[_]): Unit = resources += resource
 
   def getResource(key: String): Option[IResource[_]] = resources.find(_.resourceKey == key)
 

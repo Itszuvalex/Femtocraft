@@ -8,7 +8,6 @@ import com.itszuvalex.itszulib.container.ContainerInv
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.item.ItemStack
 
-
 class ContainerNaniteRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileNaniteRepository, shouldSync: Boolean) extends ContainerInv[TileNaniteRepository](parPlayer, te, 0, 0, GuiIDs.TileNaniteRepositoryGuiID, shouldSync) {
   addSync(new SyncNaniteTank(GuiID, () => te.naniteStorageTank.copy(), (a: NaniteTank) => te.naniteStorageTank.deserializeNBT(a.serializeNBT())))
 

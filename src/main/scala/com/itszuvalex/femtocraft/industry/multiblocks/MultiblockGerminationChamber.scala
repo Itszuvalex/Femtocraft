@@ -29,6 +29,8 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
       l.getBlock(true).get.isReplaceable(l.getWorld.get, l.getPos)
   }
 
+  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = formAtLocation(loc) // TODO: NBT Item
+
   override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
     l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
     l.getTileEntity(true) match {
@@ -37,8 +39,6 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
       case _ => false
     }
   }
-
-  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = formAtLocation(loc) // TODO: NBT Item
 
   override def getTakenLocations(loc: Loc4): collection.Set[Loc4] = {
     for {

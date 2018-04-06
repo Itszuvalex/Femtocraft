@@ -51,6 +51,8 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
     }
   }
 
+  def powerPerTick: Double = storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
+
   def getBurnMax: Int = burnMax
 
   def setBurnMax(i: Int): Unit = burnMax = i
@@ -58,8 +60,6 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
   def getBurnTime: Int = burnTime
 
   def setBurnTime(i: Int): Unit = burnTime = i
-
-  def powerPerTick: Double = storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
 
   override def getMod: AnyRef = Femtocraft
 

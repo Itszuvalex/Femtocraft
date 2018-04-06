@@ -11,8 +11,6 @@ import scala.util.Random
 object RiftTraitRegistry {
   private val traits = mutable.HashMap[String, IRiftTrait]()
 
-  def registerRiftTrait(riftTrait: IRiftTrait): Unit = traits(riftTrait.name) = riftTrait
-
   def getRiftTrait(name: String): Option[IRiftTrait] = traits.get(name)
 
   def generateTraits(rand: Random): Iterable[IRiftTrait] = {
@@ -23,7 +21,6 @@ object RiftTraitRegistry {
     }
     ret
   }
-
 
   def init(): Unit = {
     registerRiftTrait(DefaultTraits.TRAIT_STABLE)
@@ -36,6 +33,8 @@ object RiftTraitRegistry {
     registerRiftTrait(DefaultTraits.TRAIT_FAUNA)
     registerRiftTrait(DefaultTraits.TRAIT_CYBER)
   }
+
+  def registerRiftTrait(riftTrait: IRiftTrait): Unit = traits(riftTrait.name) = riftTrait
 
   object DefaultTraits {
     val TRAIT_STABLE_GEN_CHANCE     : Float      = .1f

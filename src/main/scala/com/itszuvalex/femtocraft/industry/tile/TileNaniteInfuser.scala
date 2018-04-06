@@ -45,11 +45,6 @@ object TileNaniteInfuser {
   val AMT_PER_AUTOIO   = 1
   val VOL_PER_AUTOIO   = 1
 
-  object InfuseTask {
-    val INFUSING_STACK_NBT = "Infuse"
-    val INFUSED_NBT        = "Infused"
-  }
-
   class InfuseTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
     var infused = false
 
@@ -73,6 +68,11 @@ object TileNaniteInfuser {
       stack = IItemStack.Empty
       infused = false
     }
+  }
+
+  object InfuseTask {
+    val INFUSING_STACK_NBT = "Infuse"
+    val INFUSED_NBT        = "Infused"
   }
 
 }
@@ -115,21 +115,11 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
 
   override def hasDescription: Boolean = true
 
-  override def getMod: AnyRef = Femtocraft
-
   override def defaultStorage: IItemStorage = new ItemStorageArray(2) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = {
       isItemValidForSlot(i, stack.toMinecraft)
     }
   }
-
-  override def getFieldCount: Int = 0
-
-  override def setField(id: Int, value: Int): Unit = {}
-
-  override def getField(id: Int): Int = 0
-
-  override def defaultStorageTank: NaniteTank = new NaniteTank(50)
 
   override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
     (slot, item) match {
@@ -140,9 +130,13 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
     }
   }
 
-  override def hasGUI: Boolean = true
+  override def getFieldCount: Int = 0
 
-  override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
+  override def setField(id: Int, value: Int): Unit = {}
+
+  override def getField(id: Int): Int = 0
+
+  override def defaultStorageTank: NaniteTank = new NaniteTank(50)
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
@@ -208,11 +202,17 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
     hasGUI
   }
 
+  override def getMod: AnyRef = Femtocraft
+
+  override def hasGUI: Boolean = true
+
+  override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
+
+  def getProgress = task.progress
+
   def setProgress(progress: Double): Unit = {
     task.progress = progress
   }
-
-  def getProgress = task.progress
 
   def getProgressMax = task.adjustedMax(0)
 

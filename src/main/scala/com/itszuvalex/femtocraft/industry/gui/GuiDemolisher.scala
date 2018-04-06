@@ -26,11 +26,6 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
 
   addPlayerInventorySlots(inv)
 
-  override def GuiID: Int = GuiIDs.TileDemolisherGuiID
-
-  //TODO: Make actual "machine color"
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
-
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       super.addTooltip(mouseX, mouseY, tooltip)
@@ -39,13 +34,15 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
       tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${TileDemolisher.POWER_PER_TICK}"
     }
   }
-  progressBar.colorProgress = color.toInt
-  add(progressBar)
-
   val nameLabel  = new GuiLabel(20, 12, fontRenderer.getStringWidth("Demolisher"), fontRenderer.FONT_HEIGHT, () => "Demolisher")
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
-
+  progressBar.colorProgress = color.toInt
+  add(progressBar)
   val elems = List(nameLabel, powerMeter)
+  //TODO: Make actual "machine color"
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
+
+  override def GuiID: Int = GuiIDs.TileDemolisherGuiID
   add(elems: _*)
   //  elems.foreach(e => e.setShouldRender(false))
 }

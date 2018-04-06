@@ -35,15 +35,6 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
     renderConduitAt(x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Color(0, 0, 0, 0), util.EnumSet.noneOf(classOf[EnumFacing]))
   }
 
-  override def renderTileEntityInWorld(te: TileConduit, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    val cap = te.getCapability(Capabilities.TILE_CONDUIT, null)
-    val color = te.getCapability(ItszuLibCapabilities.COLORABLE, null)
-    val facings = EnumFacing.VALUES.filter(cap.isConnected)
-    val enumSet = if (facings.isEmpty) util.EnumSet.noneOf(classOf[EnumFacing]) else util.EnumSet.copyOf(facings.toSet)
-    renderConduitAt(x, y, z, partialTicks, color, enumSet)
-  }
-
   def renderConduitAt(x: Double, y: Double, z: Double, partialTicks: Float, color: Color, connections: util.EnumSet[EnumFacing]): Unit = {
     GL11.glPushMatrix()
 
@@ -73,5 +64,14 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_CULL_FACE)
+  }
+
+  override def renderTileEntityInWorld(te: TileConduit, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
+    val cap = te.getCapability(Capabilities.TILE_CONDUIT, null)
+    val color = te.getCapability(ItszuLibCapabilities.COLORABLE, null)
+    val facings = EnumFacing.VALUES.filter(cap.isConnected)
+    val enumSet = if (facings.isEmpty) util.EnumSet.noneOf(classOf[EnumFacing]) else util.EnumSet.copyOf(facings.toSet)
+    renderConduitAt(x, y, z, partialTicks, color, enumSet)
   }
 }

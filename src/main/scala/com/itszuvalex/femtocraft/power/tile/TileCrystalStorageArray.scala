@@ -17,6 +17,8 @@ object TileCrystalStorageArray {
 }
 
 class TileCrystalStorageArray extends TileEntityBase with TileInventory with PowerLeafNode {
+  val istorage = storage // need to rename due to naming conflict
+
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
@@ -52,8 +54,6 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
   override def getField(id: Int): Int = 0
 
   override def setField(id: Int, value: Int): Unit = {}
-
-  val istorage = storage // need to rename due to naming conflict
 
   override def defaultBattery: IBattery = new PowerBattery(0) {
     override def maxStorage: Double = {

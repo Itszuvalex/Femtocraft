@@ -28,8 +28,6 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
   addGuiAndSync(tile.storage, 1, 85, 23)
   addPlayerInventorySlots(inv)
 
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
-
   val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       super.addTooltip(mouseX, mouseY, tooltip)
@@ -38,10 +36,9 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
       tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${TileNaniteInfuser.POWER_PER_TICK}"
     }
   }
+  val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Infuser"), fontRenderer.FONT_HEIGHT, () => "Nanite Infuser")
   progressBar.colorProgress = color.toInt
   add(progressBar)
-
-  val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Infuser"), fontRenderer.FONT_HEIGHT, () => "Nanite Infuser")
   val powerMeter  = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   val drainButton = new GuiButton(43, 42, 45, 16, "Fill") {
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
@@ -52,12 +49,11 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
       ret
     }
   }
-
   val naniteTank = new GuiNaniteTank(26, 23, tile.naniteStorageTank)
+  val elems = List(nameLabel, powerMeter, drainButton)
   naniteTank.color = color
   add(naniteTank)
-
-  val elems = List(nameLabel, powerMeter, drainButton)
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   add(elems: _*)
 
   override def GuiID: Int = GuiIDs.TileNaniteInfuserID

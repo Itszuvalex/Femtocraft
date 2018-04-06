@@ -25,6 +25,15 @@ object PlayerNaniteCapability {
     MinecraftForge.EVENT_BUS.register(this)
   }
 
+  @SubscribeEvent
+  def attachCapability(event: AttachCapabilitiesEvent[Entity]): Unit = {
+    event.getObject match {
+      case player: EntityPlayer =>
+        event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapability(player))
+      case _ =>
+    }
+  }
+
   class PlayerNaniteCapabilitiesStorage extends Capability.IStorage[IPlayerNaniteCapability] {
     override def writeNBT(capability: Capability[IPlayerNaniteCapability], instance: IPlayerNaniteCapability, side: EnumFacing): NBTBase = {
       instance match {
@@ -40,27 +49,18 @@ object PlayerNaniteCapability {
       }
     }
   }
-
-  @SubscribeEvent
-  def attachCapability(event: AttachCapabilitiesEvent[Entity]): Unit = {
-    event.getObject match {
-      case player: EntityPlayer =>
-        event.addCapability(new ResourceLocation(Femtocraft.ID.toLowerCase(), "PlayerNaniteCapabilities"), new PlayerNaniteCapability(player))
-      case _ =>
-    }
-  }
 }
 
 class PlayerNaniteCapability(player: EntityPlayer) extends IPlayerNaniteCapability with ICapabilitySerializable[NBTTagCompound] {
-  def this() = this(null)
-
   private val _tank = new NaniteTank(PlayerNaniteCapability.tankVolume)
 
-  override def tank = _tank
+  def this() = this(null)
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     tank.deserializeNBT(nbt.getCompoundTag("tank"))
   }
+
+  override def tank = _tank
 
   override def serializeNBT(): NBTTagCompound = {
     val nbt = new NBTTagCompound
