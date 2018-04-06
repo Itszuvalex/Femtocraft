@@ -23,6 +23,7 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
   GuiTabNaniteSideConfig.addToGuiTabBar(tabBar, tile)
 
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   fontRenderer = Minecraft.getMinecraft.fontRenderer
   addGuiAndSync(tile.storage, 0, 43, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
@@ -49,11 +50,10 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
       ret
     }
   }
-  val naniteTank = new GuiNaniteTank(26, 23, tile.naniteStorageTank)
-  val elems = List(nameLabel, powerMeter, drainButton)
+  val naniteTank  = new GuiNaniteTank(26, 23, tile.naniteStorageTank)
+  val elems       = List(nameLabel, powerMeter, drainButton)
   naniteTank.color = color
   add(naniteTank)
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   add(elems: _*)
 
   override def GuiID: Int = GuiIDs.TileNaniteInfuserID

@@ -38,15 +38,15 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
       tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${TileGerminationChamber.POWER_PER_TICK}"
     }
   }
-  val nameLabel = new GuiLabel(3, 3, fontRenderer.getStringWidth("Germination Chamber"), fontRenderer.FONT_HEIGHT, () => "Germination Chamber")
+  val nameLabel   = new GuiLabel(3, 3, fontRenderer.getStringWidth("Germination Chamber"), fontRenderer.FONT_HEIGHT, () => "Germination Chamber")
 
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, null)
   progressBar.colorProgress = color.toInt
   add(progressBar)
   val powerMeter = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.POWER_STORAGE, null), color.toInt)
   add(nameLabel)
   val tank = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null), 0, true)
   add(powerMeter)
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, null)
   add(tank)
 
   override def GuiID: Int = GuiIDs.TileGerminationChamberID

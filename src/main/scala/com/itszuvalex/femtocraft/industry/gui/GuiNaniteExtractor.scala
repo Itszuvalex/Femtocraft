@@ -23,6 +23,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
   GuiTabNaniteSideConfig.addToGuiTabBar(tabBar, tile)
 
+  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   fontRenderer = Minecraft.getMinecraft.fontRenderer
   addGuiAndSync(tile.storage, 0, 43, 23)
   addPlayerInventorySlots(inv)
@@ -48,11 +49,10 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
       ret
     }
   }
-  val naniteTank = new GuiNaniteTank(85, 16, tile.naniteStorageTank)
-  val elems = List(nameLabel, powerMeter, drainButton)
+  val naniteTank  = new GuiNaniteTank(85, 16, tile.naniteStorageTank)
+  val elems       = List(nameLabel, powerMeter, drainButton)
   naniteTank.color = color
   add(naniteTank)
-  var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
   add(elems: _*)
 
   override def GuiID: Int = GuiIDs.TileNaniteExtractorID
