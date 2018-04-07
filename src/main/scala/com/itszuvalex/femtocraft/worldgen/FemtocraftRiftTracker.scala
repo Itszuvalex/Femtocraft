@@ -19,9 +19,6 @@ object FemtocraftRiftTracker {
   def registerRift(rift: IRift): Unit = {
     val loc = rift.location
     riftLocs.trackLocation(loc)
-    loc.getWorld.foreach{world =>
-      world.playSound(loc.x + .5, loc.y + .5, loc.z + .5, )
-    }
     Debug.log(Level.INFO, s"Adding Rift at Loc: ${rift.location}")
   }
 
