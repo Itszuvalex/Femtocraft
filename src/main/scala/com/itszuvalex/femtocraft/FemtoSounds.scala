@@ -11,14 +11,16 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Chris on 1/12/2017.
   */
 object FemtoSounds {
-  val soundCallbacks = new ArrayBuffer[() => Unit]()
+  val soundCallbacks                = new ArrayBuffer[() => Unit]()
   var shiftSound       : SoundEvent = _
   var crystalBreakSound: SoundEvent = _
+  var riftLoopSound    : SoundEvent = _
 
   @SubscribeEvent def RegisterSound(event: RegistryEvent.Register[SoundEvent]): Unit = {
     val registry = event.getRegistry
     shiftSound = registerSound(registry, "shiftsound")
     crystalBreakSound = registerSound(registry, "crystalbreak")
+    crystalBreakSound = registerSound(registry, "riftloop")
 
     soundCallbacks.foreach(_ ())
     soundCallbacks.clear()

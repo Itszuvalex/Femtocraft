@@ -226,5 +226,7 @@ class GuiSidedNaniteConfig(tile: TileEntity) extends FemtoGuiBase(tile, new Cont
 
   add(accessLabel, upConfigButton, leftConfigButton, frontConfigButton, rightConfigButton, downConfigButton, backConfigButton,
     automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)
+
+  panelHeight /= 2
 }
 

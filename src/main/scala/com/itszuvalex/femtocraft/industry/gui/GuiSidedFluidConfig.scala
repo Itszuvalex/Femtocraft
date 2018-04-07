@@ -224,5 +224,7 @@ class GuiSidedFluidConfig(tile: TileEntity) extends FemtoGuiBase(tile, new Conta
 
   add(accessLabel, upConfigButton, leftConfigButton, frontConfigButton, rightConfigButton, downConfigButton, backConfigButton,
     automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)
+
+  panelHeight /= 2
 }
 

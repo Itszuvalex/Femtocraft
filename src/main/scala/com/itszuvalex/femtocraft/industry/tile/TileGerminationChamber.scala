@@ -122,9 +122,9 @@ object TileGerminationChamber {
                       val powerLeafNodeDelegate   : PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(tile, () => 8f, battery _, PowerStorageNodeType.CONSUMER,
                         PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(powerLeafNodeDelegate, 40d), () => powerStorageNodeDelegate.changeForLastTick
                       )
-    val descriptionSpec = new DataSpecification(ArrayBuffer(
-      new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
-    ))
+                      val descriptionSpec                                        = new DataSpecification(ArrayBuffer(
+                        new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
+                      ))
 
     dataSpec ++= Array(
       new DataSerializable[NBTTagCompound](BATTERY_NBT, battery),
@@ -133,7 +133,7 @@ object TileGerminationChamber {
       new DataSerializable[NBTTagCompound](TASK_NBT, task),
       new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
     )
-                      var insertingOutput         : Boolean                      = false
+    var insertingOutput: Boolean = false
   }
 
   object GerminationTask {
@@ -158,24 +158,24 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   }
   val tank   : IFluidStorage = new DynamicIFluidStorage(() => state.get.map(x => x.tank).getOrElse(IFluidStorage.Empty))
   val storage: IItemStorage  = new DynamicIItemStorage(() => state.get.map(x => x.storage).getOrElse(IItemStorage.Empty))
-  private val state:
+  private                   val state        :
     MultiblockStateHolder[GerminationChamberState, TileGerminationChamber] =
     new MultiblockStateHolder[GerminationChamberState, TileGerminationChamber](this, () => new GerminationChamberState(this), info _, (a) => a.state)
-  @Wrapper(storage) private val inputStorage : IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
-  @Wrapper(storage) private val outputStorage: IItemStorage = new DynamicIItemStorage(() => state.get.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
-  private val sidedStorageConfig = new MultiblockSidedItemStorageConfiguration(
+  @Wrapper(storage) private val inputStorage : IItemStorage                = new DynamicIItemStorage(() => state.get.map(x => x.inputStorage).getOrElse(IItemStorage.Empty))
+  @Wrapper(storage) private val outputStorage: IItemStorage                = new DynamicIItemStorage(() => state.get.map(x => x.outputStorage).getOrElse(IItemStorage.Empty))
+  private                   val sidedStorageConfig                         = new MultiblockSidedItemStorageConfiguration(
     getLoc _, info _, NONE_INV_KEY, _ => INPUT_INV_KEY,
     Map(NONE_INV_KEY -> IItemStorage.Empty,
       INPUT_INV_KEY -> inputStorage,
       OUTPUT_INV_KEY -> outputStorage),
     () => EnumFacing.NORTH)
-  private val sidedFluidConfig = new MultiblockSidedFluidStorageConfiguration(
+  private                   val sidedFluidConfig                           = new MultiblockSidedFluidStorageConfiguration(
     getLoc _, info _, NONE_TANK_KEY, _ => TANK_KEY,
     Map(NONE_TANK_KEY -> IFluidStorage.Empty,
       TANK_KEY -> tank),
     () => EnumFacing.NORTH
   )
-  private                   var ticks                       = 0
+  private                   var ticks                                      = 0
 
   descriptionDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
@@ -229,7 +229,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
           task.reset()
         case Some(recipe) =>
           val fakeRemoval = actualState.tank.drain(new FluidStack(recipe.fluid, recipe.fluidPerTick), false)
-          if (fakeRemoval.amount == recipe.fluidPerTick) {
+          if (fakeRemoval != null && fakeRemoval.amount == recipe.fluidPerTick) {
             actualState.tank.drain(new FluidStack(recipe.fluid, recipe.fluidPerTick), true)
             battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
             if (task.completed(0)) {
