@@ -31,7 +31,7 @@ class RiftRenderer {
     val px = player.prevPosX + (player.posX - player.prevPosX) * event.getPartialTicks
     val py = player.prevPosY + (player.posY - player.prevPosY) * event.getPartialTicks
     val pz = player.prevPosZ + (player.posZ - player.prevPosZ) * event.getPartialTicks
-    val locs = FemtocraftRiftTracker.riftLocs.getLocationsInRange(playerLoc, RiftRenderer.renderRadius)
+    val locs = FemtocraftRiftTracker.instance.riftLocs.getLocationsInRange(playerLoc, RiftRenderer.renderRadius)
     locs.foreach { loc =>
       glMatrixBlock {
         val renderX = loc.x - px

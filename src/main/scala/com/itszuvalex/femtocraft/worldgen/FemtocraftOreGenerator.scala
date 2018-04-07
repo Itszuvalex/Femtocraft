@@ -121,7 +121,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
       val rift = new Rift(new Loc4(x, adjustedY, z, world.provider.getDimension))
       rift.addTraits(RiftTraitRegistry.generateTraits(random))
       chunkRiftCapability.addRift(rift)
-      FemtocraftRiftTracker.registerRift(rift)
+      FemtocraftRiftTracker.instance.registerRift(rift)
     }
   }
 }

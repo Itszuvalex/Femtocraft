@@ -28,8 +28,8 @@ import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.tile._
-import com.itszuvalex.femtocraft.worldgen.WorldgenEventHandler
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
+import com.itszuvalex.femtocraft.worldgen.{FemtocraftRiftTracker, WorldgenEventHandler}
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.util.ResourceLocation
@@ -43,6 +43,8 @@ object ProxyCommon {
 }
 
 class ProxyCommon {
+  val riftTracker = new FemtocraftRiftTracker
+
   def preInit(): Unit = {
     EntityRegistry.registerModEntity(new ResourceLocation(Femtocraft.ID.toLowerCase(), "entityNanoLash"), classOf[EntityNanoLash], "entityNanoLash", 0, Femtocraft, 30, 1, false)
   }

@@ -20,7 +20,7 @@ class WorldgenEventHandler {
     // Unload with no nbt
     chunkEvent.getChunk.getCapability(Capabilities.CHUNK_RIFT, null) match {
       case null =>
-      case cap => cap.rifts.foreach(FemtocraftRiftTracker.deregisterRift)
+      case cap => cap.rifts.foreach(FemtocraftRiftTracker.instance.deregisterRift)
     }
   }
 
@@ -29,7 +29,7 @@ class WorldgenEventHandler {
     // Load with no nbt
     chunkEvent.getChunk.getCapability(Capabilities.CHUNK_RIFT, null) match {
       case null =>
-      case cap => cap.rifts.foreach(FemtocraftRiftTracker.registerRift)
+      case cap => cap.rifts.foreach(FemtocraftRiftTracker.instance.registerRift)
     }
   }
 }

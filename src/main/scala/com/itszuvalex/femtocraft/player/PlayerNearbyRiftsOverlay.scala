@@ -84,7 +84,7 @@ class PlayerNearbyRiftsOverlay {
   }
 
   def getRifts: mutable.Buffer[IRift] = {
-    val locs = FemtocraftRiftTracker.riftLocs.getLocationsInRange(getPlayerLoc, PlayerNearbyRiftsOverlay.range)
+    val locs = FemtocraftRiftTracker.instance.riftLocs.getLocationsInRange(getPlayerLoc, PlayerNearbyRiftsOverlay.range)
     val rifts = locs.flatMap(l => l.getChunk(false).map(_.getCapability(Capabilities.CHUNK_RIFT, null)).flatMap(_.getRiftAtLocation(l)))
     rifts.toBuffer
   }
