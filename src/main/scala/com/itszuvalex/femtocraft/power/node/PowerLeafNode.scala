@@ -23,7 +23,7 @@ object PowerLeafNode {
 
 trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
   val leafDelegate: IPowerLeafNode = defaultLeafDelegate
-  var color = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
+  var color                        = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 
   def defaultLeafDelegate: IPowerLeafNode = {
     val del: PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(this, connectionRadius _, battery _, powerStorageNodeType,
@@ -40,27 +40,27 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
   override def onLoad(): Unit = {
     super.onLoad()
     if (getWorld.isRemote) return
-    PowerManager.addLeaf(leafDelegate)
+    PowerManager.instance.addLeaf(leafDelegate)
   }
 
   override def validate(): Unit = {
     super.validate()
     if (getWorld.isRemote) return
-    PowerManager.addLeaf(leafDelegate)
+    PowerManager.instance.addLeaf(leafDelegate)
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
     if (getWorld.isRemote) return
-    PowerManager.removeLeaf(leafDelegate)
+    PowerManager.instance.removeLeaf(leafDelegate)
   }
 
   override def onBlockBreak(): Unit = {
     super.onBlockBreak()
     if (getWorld.isRemote) return
 
-    PowerManager.onLeafBroken(leafDelegate)
-    PowerManager.removeLeaf(leafDelegate)
+    PowerManager.instance.onLeafBroken(leafDelegate)
+    PowerManager.instance.removeLeaf(leafDelegate)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {

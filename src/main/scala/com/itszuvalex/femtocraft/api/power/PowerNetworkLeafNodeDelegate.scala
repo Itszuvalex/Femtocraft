@@ -48,7 +48,7 @@ class PowerNetworkLeafNodeDelegate(
     tileEntity.setModified()
 
     if (tileEntity.getWorld.isRemote) return
-    PowerManager.refreshLeaf(this)
+    PowerManager.instance.refreshLeaf(this)
   }
 
   override def battery: IBattery = getBattery()

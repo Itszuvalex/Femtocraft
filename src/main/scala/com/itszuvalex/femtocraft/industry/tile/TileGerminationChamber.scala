@@ -151,7 +151,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     override def formMultiBlock(loc: Loc4, cloc: Loc4): Boolean = {
       val ret = super.formMultiBlock(loc, cloc)
       if (isController)
-        PowerManager.addLeaf(getCapability(Capabilities.TILE_POWER_LEAF_NODE, null))
+        PowerManager.instance.addLeaf(getCapability(Capabilities.TILE_POWER_LEAF_NODE, null))
       setUpdate()
       ret
     }
@@ -353,8 +353,8 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
       if (!world.isRemote) {
         state.get.foreach {
           a =>
-            PowerManager.onLeafBroken(a.powerLeafNodeDelegate)
-            PowerManager.removeLeaf(a.powerLeafNodeDelegate)
+            PowerManager.instance.onLeafBroken(a.powerLeafNodeDelegate)
+            PowerManager.instance.removeLeaf(a.powerLeafNodeDelegate)
         }
       }
       FrameMultiblockRegistry.getMultiblock(MultiblockGerminationChamber.name)
@@ -370,19 +370,19 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   override def onLoad(): Unit = {
     super.onLoad()
     if (getWorld.isRemote) return
-    if (isController) state.get.foreach(a => PowerManager.addLeaf(a.powerLeafNodeDelegate))
+    if (isController) state.get.foreach(a => PowerManager.instance.addLeaf(a.powerLeafNodeDelegate))
   }
 
   override def validate(): Unit = {
     super.validate()
     if (getWorld.isRemote) return
-    if (isController) state.get.foreach(a => PowerManager.addLeaf(a.powerLeafNodeDelegate))
+    if (isController) state.get.foreach(a => PowerManager.instance.addLeaf(a.powerLeafNodeDelegate))
   }
 
   override def invalidate(): Unit = {
     super.invalidate()
     if (getWorld.isRemote) return
-    if (isController) state.get.foreach(a => PowerManager.removeLeaf(a.powerLeafNodeDelegate))
+    if (isController) state.get.foreach(a => PowerManager.instance.removeLeaf(a.powerLeafNodeDelegate))
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {

@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, PowerNetwork}
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -14,6 +15,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object PowerManager {
+  def instance: PowerManager = Femtocraft.proxy.powerManager
+}
+
+class PowerManager {
   val nodeTracker = new LocationTracker
   val leafTracker = new LocationTracker
 

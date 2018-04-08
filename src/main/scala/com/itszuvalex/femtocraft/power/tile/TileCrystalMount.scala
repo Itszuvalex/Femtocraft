@@ -60,7 +60,7 @@ class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNo
   override def serverUpdate(): Unit = {
     super.serverUpdate()
     if (powerDelegate.network == null && !isInvalid) {
-      PowerManager.addNode(powerDelegate)
+      PowerManager.instance.addNode(powerDelegate)
     }
 
     crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())

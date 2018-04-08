@@ -67,7 +67,7 @@ object Femtocraft {
     FemtoFluids.init()
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
-    PowerManager.init()
+    PowerManager.instance.init()
     FemtocraftRiftTracker.instance.init()
     LogisticsResourceRegistry.init()
     RiftTraitRegistry.init()

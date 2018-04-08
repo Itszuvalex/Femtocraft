@@ -26,7 +26,7 @@ object PowerNode {
 trait PowerNode extends TileEntityBase {
   var powerDelegate: PowerNetworkNodeDelegate =
     new PowerNetworkNodeDelegate(this, powerRadius, powerTransfer, rendersPower)
-  var color = Color(255.toByte,
+  var color                                   = Color(255.toByte,
     0.toByte,
     0.toByte,
     0.toByte)
@@ -53,12 +53,12 @@ trait PowerNode extends TileEntityBase {
 
   override def invalidate(): Unit = {
     super.invalidate()
-    if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
+    if (!getWorld.isRemote) PowerManager.instance.removeNode(powerDelegate)
   }
 
   override def onChunkUnload(): Unit = {
     super.onChunkUnload()
-    if (!getWorld.isRemote) PowerManager.removeNode(powerDelegate)
+    if (!getWorld.isRemote) PowerManager.instance.removeNode(powerDelegate)
   }
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {
@@ -80,8 +80,8 @@ trait PowerNode extends TileEntityBase {
 
   override def onBlockBreak(): Unit = {
     super.onBlockBreak()
-    PowerManager.removeNode(powerDelegate)
-    PowerManager.onNodeBroken(powerDelegate)
+    PowerManager.instance.removeNode(powerDelegate)
+    PowerManager.instance.onNodeBroken(powerDelegate)
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {

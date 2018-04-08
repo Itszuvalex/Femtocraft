@@ -36,7 +36,7 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
     leafNodeLocs -= node.getStorageLoc
     tileEntity.setUpdate()
     tileEntity.setModified()
-    PowerManager.refreshLeafsOnMain(this)
+    PowerManager.instance.refreshLeafsOnMain(this)
   }
 
   override def leafTransferRate: Double = transfer
