@@ -20,7 +20,7 @@ object FemtoSounds {
     val registry = event.getRegistry
     shiftSound = registerSound(registry, "shiftsound")
     crystalBreakSound = registerSound(registry, "crystalbreak")
-    crystalBreakSound = registerSound(registry, "riftloop")
+    riftLoopSound = registerSound(registry, "riftloop")
 
     soundCallbacks.foreach(_ ())
     soundCallbacks.clear()
