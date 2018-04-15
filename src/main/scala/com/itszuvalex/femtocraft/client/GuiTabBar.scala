@@ -14,9 +14,9 @@ class GuiTabBar(anchorX: Int, anchorY: Int, height: Int, currentGuiID: Int, tile
   GuiFlowLayout(anchorX, anchorY, GuiTabBar.WIDTH, height) {
   primaryFlow = GuiFlowLayout.FlowDirection.Vertical
 
-  def addTab(tab: GuiTab): GuiPanel = add(tab)
-
   def addTab(name: String, iconRender: GuiPanel, guiID: Int): GuiPanel = addTab(new GuiTab(name, iconRender, tile, guiID, getActiveGuiID))
+
+  def addTab(tab: GuiTab): GuiPanel = add(tab)
 
   def getActiveGuiID(): Int = currentGuiID
 

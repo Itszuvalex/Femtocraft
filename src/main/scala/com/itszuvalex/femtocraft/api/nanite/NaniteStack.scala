@@ -24,13 +24,13 @@ object NaniteStack {
 
 case class NaniteStack(private[nanite] var nan: INanite, private[nanite] var vol: Int) extends INBTSerializable[NBTTagCompound] {
 
-  def nanite = nan
-
   def strain = nan.strain
 
-  def volume = vol
-
   def nMol = Option(nanite).map(_.density * volume).getOrElse(0)
+
+  def nanite = nan
+
+  def volume = vol
 
   def copy() = NaniteStack(nan, vol)
 

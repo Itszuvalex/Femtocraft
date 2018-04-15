@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.worldgen.render
 
 import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
 import com.itszuvalex.itszulib.render.RenderUtils._
@@ -19,7 +20,8 @@ object CrystalRenderer {
 }
 
 class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
-  val crystalModel = LoadObj(CrystalRenderer.crystalModelLocation)
+  val crystalModel                 = LoadObj(CrystalRenderer.crystalModelLocation)
+  var lastTe: TileCrystalsWorldgen = _
 
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
@@ -28,6 +30,7 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
   }
 
   override def renderTileEntityInWorld(te: TileCrystalsWorldgen, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    lastTe = te
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     renderCrystalAt(x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, new Color(te.color), te.colorOffsets)
   }
@@ -36,6 +39,7 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
     this.bindTexture(CrystalRenderer.crystalTexLocation)
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_LIGHTING)
+    FemtoRenderUtils.disableLightMaps()
     GL11.glPushMatrix()
 
     translationBlock(x + .5, y, z + .5) {
@@ -58,6 +62,7 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
       }
     }
     GL11.glPopMatrix() // Stop leaking scaling change, idiot!
+    FemtoRenderUtils.enableLightMap(lastTe)
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_CULL_FACE)

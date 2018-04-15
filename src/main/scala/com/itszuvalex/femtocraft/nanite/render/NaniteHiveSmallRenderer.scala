@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.nanite.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -30,7 +30,7 @@ class NaniteHiveSmallRenderer extends TileEntityCombinedRenderer[TileNaniteHiveS
 
   override def renderTileEntityInWorld(te: TileNaniteHiveSmall, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    renderAtLocWithColor(x, y, z, partialTicks, destroyStage, te.getWorld.getTotalWorldTime.toFloat, te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
+    renderAtLocWithColor(x, y, z, partialTicks, destroyStage, te.getWorld.getTotalWorldTime.toFloat, te.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP))
     //    DiffusionNodeBeamRenderer.renderDiffuseBeams(te, x, y, z, partialTicks)
   }
 

@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.client
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.core.TileEntityBase
@@ -61,8 +61,8 @@ abstract class FemtoGuiBase(tile: TileEntity, c: ContainerBase) extends GuiBase(
     Gui.drawRect(k, l, k + xSize, l + ySize, blackColor)
 
     var offset = 1
-    if (tile.hasCapability(Capabilities.COLORABLE, null)) {
-      val color = tile.getCapability(Capabilities.COLORABLE, null).toInt
+    if (tile.hasCapability(ItszuLibCapabilities.COLORABLE, null)) {
+      val color = tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt
       Gui.drawRect(k + offset, l + offset, k + xSize - offset, l + ySize - offset, color)
       offset += 1
     }

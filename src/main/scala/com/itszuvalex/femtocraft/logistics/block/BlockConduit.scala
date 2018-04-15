@@ -52,6 +52,16 @@ class BlockConduit extends TileContainer(Material.IRON) {
     getBoundingBoxes(worldIn, pos).withFilter(entityBox.intersects).foreach(collidingBoxes.add)
   }
 
+  override def collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult = {
+    val results = getBoundingBoxes(worldIn, pos).map(box => (box, rayTrace(pos, start, end, box))).filter(a => a._2 != null).sortWith { (a, b) =>
+      start.squareDistanceTo(a._2.hitVec) < start.squareDistanceTo(b._2.hitVec)
+    }
+    results.headOption.map { r =>
+      renderBox = r._1
+      r._2
+    }.orNull
+  }
+
   def getBoundingBoxes(worldIn: World, pos: BlockPos): util.List[AxisAlignedBB] = {
     val list = new util.ArrayList[AxisAlignedBB]()
     list += new AxisAlignedBB(.25, .25, .25, .75, .75, .75) // Default
@@ -71,16 +81,6 @@ class BlockConduit extends TileContainer(Material.IRON) {
         }
     }
     list
-  }
-
-  override def collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult = {
-    val results = getBoundingBoxes(worldIn, pos).map(box => (box, rayTrace(pos, start, end, box))).filter(a => a._2 != null).sortWith { (a, b) =>
-      start.squareDistanceTo(a._2.hitVec) < start.squareDistanceTo(b._2.hitVec)
-    }
-    results.headOption.map { r =>
-      renderBox = r._1
-      r._2
-    }.orNull
   }
 
   override protected def rayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, boundingBox: AxisAlignedBB): RayTraceResult = {

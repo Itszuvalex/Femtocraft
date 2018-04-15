@@ -8,11 +8,14 @@ import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
 import com.itszuvalex.femtocraft.api.power.IPowerLeafNode;
 import com.itszuvalex.femtocraft.api.power.IPowerNetworkNode;
 import com.itszuvalex.femtocraft.api.power.IPowerStorageNode;
+import com.itszuvalex.femtocraft.api.worldgen.IChunkRiftCapability;
 import com.itszuvalex.femtocraft.industry.item.IMultitool;
-import com.itszuvalex.femtocraft.player.IPlayerNaniteCapabilities;
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
+import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.wrappers.IBattery;
-import com.itszuvalex.itszulib.util.Color;
+import com.itszuvalex.itszulib.core.SidedFluidStorageConfiguration;
+import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
@@ -32,20 +35,17 @@ public class Capabilities {
     @CapabilityInject(IPowerNetworkNode.class)
     public static Capability<IPowerNetworkNode> TILE_POWER_NODE = null;
 
-    @CapabilityInject(Color.class)
-    public static Capability<Color> COLORABLE = null;
-
-    @CapabilityInject(IPlayerNaniteCapabilities.class)
-    public static Capability<IPlayerNaniteCapabilities> NANITE_CAPABILITY = null;
+    @CapabilityInject(IPlayerNaniteCapability.class)
+    public static Capability<IPlayerNaniteCapability> PLAYER_NANITE_CAPABILITY = null;
 
     @CapabilityInject(IPowerCrystal.class)
     public static Capability<IPowerCrystal> ITEM_POWER_CRYSTAL = null;
 
     @CapabilityInject(INaniteTank.class)
-    public static Capability<INaniteTank> NANITE_STORAGE_TANK = null;
+    public static Capability<INaniteTank> TILE_NANITE_STORAGE_TANK = null;
 
     @CapabilityInject(INaniteUpgradeable.class)
-    public static Capability<INaniteUpgradeable> NANITE_UPGRADEABLE = null;
+    public static Capability<INaniteUpgradeable> TILE_NANITE_UPGRADEABLE = null;
 
     @CapabilityInject(IMultitool.class)
     public static Capability<IMultitool> ITEM_MULTITOOL = null;
@@ -58,4 +58,19 @@ public class Capabilities {
 
     @CapabilityInject(IConnectionProvider.class)
     public static Capability<IConnectionProvider> ITEM_CONNECTION_PROVIDER = null;
+
+    @CapabilityInject(SidedItemStorageConfiguration.class)
+    public static Capability<SidedItemStorageConfiguration> ITEM_STORAGE_CONFIGURABLE = null;
+
+    @CapabilityInject(SidedNaniteStorageConfiguration.class)
+    public static Capability<SidedNaniteStorageConfiguration> NANITE_STORAGE_CONFIGURABLE = null;
+
+    @CapabilityInject(SidedFluidStorageConfiguration.class)
+    public static Capability<SidedFluidStorageConfiguration> FLUID_STORAGE_CONFIGURABLE = null;
+
+    @CapabilityInject(IChunkRiftCapability.class)
+    public static Capability<IChunkRiftCapability> CHUNK_RIFT = null;
+
+    @CapabilityInject(IOverlayRenderItem.class)
+    public static Capability<IOverlayRenderItem> ITEM_OVERLAY_RENDER = null;
 }

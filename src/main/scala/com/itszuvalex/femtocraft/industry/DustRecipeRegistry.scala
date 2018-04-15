@@ -23,24 +23,14 @@ import scala.collection.mutable
   */
 object DustRecipeRegistry {
   val defaultDust = 2
-
-  private trait IDustRecipe {
-    def matches(item: ItemStack): Boolean
-
-    def result(item: ItemStack): ItemStack
-  }
-
   private val itemStackOverrides                                          = new util.TreeMap[ItemStack, ItemStack](new Comparator[ItemStack] {
     override def compare(x: ItemStack, y: ItemStack): Int = IDDamageWildCardNBTComparator.compare(x, y)
   }).asScala
   private val itemStackMatcherOverrides: mutable.ArrayBuffer[IDustRecipe] = new mutable.ArrayBuffer[IDustRecipe]()
-
   private val validOres  = mutable.Set[String]()
   private val oreDustNum = mutable.HashMap[String, Int]()
-
   private val oreGroupName  = "ore"
   private val dustGroupName = "dust"
-
   private val orePattern  = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
   private val dustPattern = Pattern.compile("dust(?<" + dustGroupName + ">.*)")
 
@@ -59,6 +49,10 @@ object DustRecipeRegistry {
     addItemStackMapping(Blocks.GRAVEL.newStack(), Blocks.SAND.newStack())
     addItemStackMapping(FemtoBlocks.blockSubstrate.newStack(), FemtoItems.itemDumbDust.newStack())
     addItemStackMapping(Items.DIAMOND.newStack(), FemtoItems.itemDiamondDust.newStack())
+    addItemStackMapping(FemtoItems.itemPhasemetalIngotActivated.newStack(), FemtoItems.itemPhasemetalDust.newStack())
+    addItemStackMapping(FemtoItems.itemPhasemetalIngotDevoid.newStack(), FemtoItems.itemPhasemetalDust.newStack())
+    addItemStackMapping(FemtoItems.itemRiftironIngotActivated.newStack(), FemtoItems.itemRiftironDust.newStack())
+    addItemStackMapping(FemtoItems.itemRiftironIngotDevoid.newStack(), FemtoItems.itemRiftironDust.newStack())
 
     addStackMatcher(new IDustRecipe {
       override def matches(item: ItemStack): Boolean = item != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
@@ -168,6 +162,12 @@ object DustRecipeRegistry {
       }
     }
     None
+  }
+
+  private trait IDustRecipe {
+    def matches(item: ItemStack): Boolean
+
+    def result(item: ItemStack): ItemStack
   }
 
 }

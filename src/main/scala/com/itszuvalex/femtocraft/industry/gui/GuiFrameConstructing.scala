@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.{GuiIDs, Resources}
+import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrameConstructing
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
-import com.itszuvalex.femtocraft.util.ItemUtils
-import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.femtocraft.{GuiIDs, Resources}
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack, GuiLabel}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -22,7 +22,7 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
   val multiblockNameString = if (tile.multiBlock == null) "Undefined" else tile.multiBlock
   val nameLabel            = new GuiLabel((panelWidth - frender.getStringWidth(multiblockNameString)) / 2, 10, frender.getStringWidth(multiblockNameString), frender.FONT_HEIGHT, () => multiblockNameString)
   val multibockRender      = new GuiItemStack(0, 0, () => false) {
-    override def itemStack = Converter.IItemStackFromItemStack(ItemUtils.makeMultiblockItem(tile.multiBlock))
+    override def itemStack = FrameMultiblockRegistry.getMultiblock(tile.multiBlock).map(_.getRenderItemStack).getOrElse(IItemStack.Empty)
   }
   val constructingString   = "Constructing..."
   val constructingLabel    = new GuiLabel((panelWidth - frender.getStringWidth(constructingString)) / 2, panelHeight - 30, frender.getStringWidth(constructingString), frender.FONT_HEIGHT, () => constructingString)
@@ -53,5 +53,6 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
     GL11.glScaled(scaling, scaling, 1)
     multibockRender.render(0, 0, -1, -1, partialTicks)
     GL11.glPopMatrix()
+    super.drawGuiContainerBackgroundLayer(partialTicks, p_146976_2_, p_146976_3_)
   }
 }

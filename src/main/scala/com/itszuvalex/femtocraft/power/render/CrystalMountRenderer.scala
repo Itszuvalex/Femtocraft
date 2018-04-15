@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.render.{RenderUtils, ShaderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -34,28 +35,6 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
     super.renderTileEntityAsItem(x, y, z, partialTicks)
     renderCrystalMountAt(null, x, y, z, Minecraft.getMinecraft.getRenderPartialTicks, Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f), hasTop = false, hasBottom = true, hasCrystal = false, Color(0, 0, 0, 0))
-  }
-
-  override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
-    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    if (MinecraftForgeClient.getRenderPass == 0) {
-      val stateAbove = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.UP).getPos)
-      val stateBelow = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)
-      val renderAbove = stateAbove.getBlock.isSideSolid(stateAbove, te.getWorld, te.getLoc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
-      val renderBelow = stateBelow.getBlock.isSideSolid(stateBelow, te.getWorld, te.getLoc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
-      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(Capabilities.COLORABLE, EnumFacing.UP))
-    }
-
-    te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).
-      foreach { t =>
-        val cap = t.getCapability(Capabilities.TILE_POWER_NODE, null)
-        if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
-      }
-
-    te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes.
-      foreach { t =>
-        if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
-      }
   }
 
   def renderCrystalMountAt(tile: TileCrystalMount, renderX: Double, renderY: Double, renderZ: Double, partialTicks: Float, time: Float, hasTop: Boolean, hasBottom: Boolean, hasCrystal: Boolean, color: Color): Unit = {
@@ -102,6 +81,28 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       FemtoRenderUtils.enableLightMap(tile)
     }
     GL11.glColor3f(1f, 1f, 1f)
+  }
+
+  override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+    super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
+    if (MinecraftForgeClient.getRenderPass == 0) {
+      val stateAbove = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.UP).getPos)
+      val stateBelow = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)
+      val renderAbove = stateAbove.getBlock.isSideSolid(stateAbove, te.getWorld, te.getLoc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
+      val renderBelow = stateBelow.getBlock.isSideSolid(stateBelow, te.getWorld, te.getLoc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP))
+    }
+
+    te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).
+      foreach { t =>
+        val cap = t.getCapability(Capabilities.TILE_POWER_NODE, null)
+        if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
+      }
+
+    te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes(false).
+      foreach { t =>
+        if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
+      }
   }
 
   //  override def renderInventoryBlock(block: Block, metadata: Int, modelId: Int, renderer: RenderBlocks): Unit = {

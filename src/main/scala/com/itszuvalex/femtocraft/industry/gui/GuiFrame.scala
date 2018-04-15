@@ -1,26 +1,26 @@
 package com.itszuvalex.femtocraft.industry.gui
 
+import com.itszuvalex.femtocraft.GuiIDs
+import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
-import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui._
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import org.lwjgl.opengl.GL11
 
 /**
   * Created by Christopher on 9/21/2015.
   */
-object GuiFrame {
-  val texture = Resources.TexGui("guiinventorybase.png")
-}
 
-class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrame(player, inv, tile)) {
-
+class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends FemtoGuiBase(tile, new ContainerFrame(player, inv, tile, false)) {
   fontRenderer = Minecraft.getMinecraft.fontRenderer
+
+  (0 until 9).foreach { i =>
+    addGuiAndSync(tile.storage, i, 7 + 18 * i, 61)
+  }
+  addPlayerInventorySlots(inv)
 
   val nameLabel     = new GuiLabel((panelWidth - fontRenderer.getStringWidth(tile.multiBlock)) / 2, 7,
     fontRenderer.getStringWidth(tile.multiBlock), fontRenderer.FONT_HEIGHT,
@@ -39,33 +39,12 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
     case None => Seq[GuiElement]()
   }
   val layout        = new GuiFlowLayout(7, 11 + fontRenderer.FONT_HEIGHT * 2, panelWidth - 14, 18, reqItems: _*)
-  val itemSlots     =
-    (0 until 9).map { i =>
-      new GuiItemStack(7 + 18 * i, 61, null) {
-        override def itemStack = null
-      }
-    }.toSeq
-
-  itemSlots.foreach(_.setShouldRender(false))
 
   {
-    val elements = List(nameLabel, requiredLabel, layout) ++ itemSlots
+    val elements = List(nameLabel, requiredLabel, layout)
 
-    add(
-      elements: _*
-    )
+    add(elements: _*)
   }
 
   override def GuiID: Int = GuiIDs.TileFrameMultiblockGuiID
-
-  override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
-    Minecraft.getMinecraft.getTextureManager.bindTexture(GuiFrame.texture)
-    val k = (width - xSize) / 2
-    val l = (height - ySize) / 2
-    drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
-    RenderHelper.enableGUIStandardItemLighting()
-
-    itemSlots.foreach(gui => gui.render(anchorX + gui.anchorX, anchorY + gui.anchorY, mouseX - anchorX - gui.anchorX, mouseY - anchorY - gui.anchorY, partialTicks))
-  }
 }

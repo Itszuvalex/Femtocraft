@@ -10,7 +10,7 @@ object RenderIDs {
   var framePreviewableID      = 0
   var seedPreviewableID       = 0
   var multiblockPreviewableID = 0
-  var itemShiftPreviewableID = 0
+  var itemShiftPreviewableID  = 0
 
   //Multiblock IDs
   var multiblockArcFurnaceID   = 0
@@ -19,7 +19,7 @@ object RenderIDs {
   var multiblockFurnaceID      = 0
 
   //Cyber Machine IDs
-  var growthChamberID         = 0
+  var germinationChamberID    = 0
   var bioBeaconID             = 0
   var condensationArrayID     = 0
   var cybermatDisintegratorID = 0

@@ -9,7 +9,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.{IBlockAccess, World}
 
-class BlockNaniteInfuser extends TileContainer(Material.IRON) with BlockFacing{
+class BlockNaniteInfuser extends TileContainer(Material.IRON) with BlockFacing {
   override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileNaniteInfuser
 
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false

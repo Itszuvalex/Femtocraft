@@ -25,6 +25,7 @@ trait IMultitoolPrimaryUpgrade extends IMultitoolUpgrade {
     * @param toolClass
     * @param player
     * @param blockState
+    *
     * @return
     */
   def getHarvestLevel(stack: IItemStack, toolClass: String, @javax.annotation.Nullable player: EntityPlayer, @javax.annotation.Nullable blockState: IBlockState): Int

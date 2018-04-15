@@ -7,7 +7,7 @@ object TechTreeRegistry {
 
   def preInit() = {
     val arcFurnaceTree = new TechTree("arcFurnaceTree")
-    val power1 =  new TechBase("power1", null, 10)
+    val power1 = new TechBase("power1", null, 10)
     val power2 = new TechBase("power2", power1, 10)
     val efficiency1 = new TechBase("efficiency1", power1, 10)
     arcFurnaceTree.techs += power1

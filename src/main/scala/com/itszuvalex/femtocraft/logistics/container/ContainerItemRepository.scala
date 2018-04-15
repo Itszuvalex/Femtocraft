@@ -1,33 +1,26 @@
 package com.itszuvalex.femtocraft.logistics.container
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.logistics.container.ContainerItemRepository._
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.itszulib.container.ContainerInv
+import com.itszuvalex.itszulib.container.sync.SyncItemStorageItemStack
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
-import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 12/20/2015.
   */
 object ContainerItemRepository {
-  val inventoryStartX = 8
-  val inventoryStartY = 12
-
   val playerInventoryStartX = 8
   val playerInventoryStartY = 129
 }
 
-class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0, GuiIDs.TileItemRepositoryGuiID, true) {
+class ContainerItemRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileItemRepository, shouldSync: Boolean) extends ContainerInv[TileItemRepository](parPlayer, te, 0, 0, GuiIDs.TileItemRepositoryGuiID, shouldSync) {
 
-  (0 until TileItemRepository.INVENTORY_SIZE).
-    foreach { i =>
-      addSlotToContainer(new Slot(te, i, inventoryStartX + (i % 9) * 18, inventoryStartY + (i / 9) * 18))
-    }
+  if (shouldSync) {
+    te.storage.indices.foreach { i => addSync(new SyncItemStorageItemStack(GuiID, te.storage, i)) }
+    addPlayerInventorySlots(parPlayer.inventory, ContainerItemRepository.playerInventoryStartX, ContainerItemRepository.playerInventoryStartY)
+  }
 
-  addPlayerInventorySlots(parPlayer.inventory, playerInventoryStartX, playerInventoryStartY)
-
-
-  override def eligibleForInput(item: ItemStack): Boolean = false
+  override def eligibleForInput(item: ItemStack): Boolean = true
 }

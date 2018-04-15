@@ -2,12 +2,12 @@ package com.itszuvalex.femtocraft.network.messages
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.NaniteStack
-import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
-import com.itszuvalex.femtocraft.player.IPlayerNaniteCapabilities
+import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
 import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.network.messages.MessageUpdateNBT
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
 
@@ -37,17 +37,20 @@ class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends Message
 
       // Do things
       message.loc.getTileEntity() match {
-        case Some(tile: TileNaniteExtractor) =>
-          // TODO: Take Nanite to drain and amount to drain from nanite stack
-          val storageTank = tile.naniteStorageTank
-          val nanites = storageTank.nanitesInTank
-          if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.UP)) {
-            val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapabilities](Capabilities.NANITE_CAPABILITY, EnumFacing.UP)
-            val amount = storageTank.drain(nanites.head, 1, false)
-            if (amount != null) {
-              val filled = capability.tank.fill(amount, true)
-              storageTank.drain(amount.nanite, amount.volume - (if (filled != null) filled.volume else 0), true)
-              capability.sync()
+        case Some(tile: TileEntity) if tile.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null) =>
+          val storageTank = tile.getCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null)
+          if (storageTank != null) {
+            val nanites = storageTank.nanitesInTank
+            if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)) {
+              val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)
+              nanites.foreach { nanite =>
+                val amount = storageTank.drain(nanite, 1, false)
+                if (amount != null) {
+                  val filled = capability.tank.fill(amount, true)
+                  storageTank.drain(amount.nanite, amount.volume - (if (filled != null) filled.volume else 0), true)
+                  capability.sync()
+                }
+              }
             }
           }
         case _ =>

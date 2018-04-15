@@ -1,9 +1,12 @@
 package com.itszuvalex.femtocraft
 
+import net.minecraft.util.EnumFacing
+
 /**
   * Created by Christopher on 9/1/2015.
   */
 object GuiIDs {
+
 
   val TileCrystalMountGuiID            = nextID
   val TileMaterialProcessorGuiID       = nextID
@@ -14,6 +17,8 @@ object GuiIDs {
   val TileFrameMultiblockGuiID         = nextID
   val TileFrameConstructingGuiID       = nextID
   val TileItemRepositoryGuiID          = nextID
+  val TileNaniteRepositoryGuiID        = nextID
+  val TileFluidRepositoryGuiID         = nextID
   val TileFurnaceGuiID                 = nextID
   val TileDemolisherGuiID              = nextID
   val TileNaniteExtractorID            = nextID
@@ -23,9 +28,19 @@ object GuiIDs {
   val TileCrystalHeatExchangerID       = nextID
   val TilePowerNetworkID               = nextID
   val TileConduitID                    = nextID
-  val TileConduiConfigID               = nextID
-  val TileSidedInventoryConfigID       = nextID
+
+  val TileConduitSideID = nextID
+  val TileSidedInventoryConfigID = nextID
+  val TileSidedNaniteConfigID    = nextID
+  val TileSidedFluidConfigID     = nextID
+  val TileGerminationChamberID   = nextID
   private var n = 0
+
+  def getTileConduitSideID(facing: EnumFacing): Int = (facing.getIndex << 16) + TileConduitSideID
+
+  def isTileConduitGUI(id: Int): Boolean = (id & 0xFFFF) == TileConduitSideID
+
+  def getTileConduitSide(id: Int): EnumFacing = EnumFacing.getFront((id & 0xFFFF0000) >> 16)
 
   private def nextID = {
     n += 1

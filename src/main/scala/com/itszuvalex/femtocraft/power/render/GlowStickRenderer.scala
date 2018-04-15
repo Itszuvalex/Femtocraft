@@ -43,7 +43,6 @@ abstract class GlowStickRenderer extends TileEntitySpecialRenderer[TileGlowStick
   //    }
   //  }
 
-
   //  override def renderTileEntityAt(te: TileGlowStick, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int): Unit = {
   //    val ccolor = new Color(te.color)
   //    Tessellator.instance.setColorOpaque(0xff & ccolor.red.toInt, 0xff & ccolor.green.toInt, 0xff & ccolor.blue.toInt)

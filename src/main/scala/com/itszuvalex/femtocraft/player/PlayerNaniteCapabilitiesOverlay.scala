@@ -27,43 +27,35 @@ object PlayerNaniteCapabilitiesOverlay {
   val textureFillLoc       = Resources.TexGui("naniteoverlay_fill.png")
   val textureFillBotOffset = 2
   val textureFillTopOffset = 2
-
-  var xOffset    = 0
   val xOffsetEnd = texWidth
-
-  var timeOfLastInteract = System.currentTimeMillis
-  val msToShow           = 2000
-  val msToReveal         = 500
-  val msToHide           = 750
-
+  val msToShow                   = 2000
+  val msToReveal                 = 500
+  val msToHide                   = 750
+  var xOffset    = 0
+  var timeOfLastInteract         = System.currentTimeMillis
+  var timeofStartOfInteractChain = System.currentTimeMillis
+  var timeofEndOfInteractChain   = System.currentTimeMillis
+  var timeLengthOfInteractChain  = 1000L
   var alwaysShow = false
+
+  def interact() = {
+    timeOfLastInteract = System.currentTimeMillis
+    if ((timeOfLastInteract - timeofEndOfInteractChain) < timeLengthOfInteractChain) {
+      timeofEndOfInteractChain = timeOfLastInteract
+    }
+    else {
+      timeofEndOfInteractChain = timeOfLastInteract
+      timeofStartOfInteractChain = timeOfLastInteract
+    }
+  }
 }
 
 @SideOnly(Side.CLIENT)
 class PlayerNaniteCapabilitiesOverlay {
   lazy val mc = Minecraft.getMinecraft
 
-  var naniteCapabilities: IPlayerNaniteCapabilities = _
-  var player            : EntityPlayer              = _
-
-  def capabilities: IPlayerNaniteCapabilities = {
-    if (player != Minecraft.getMinecraft.player) {
-      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.NANITE_CAPABILITY, EnumFacing.NORTH)
-      if (caps != naniteCapabilities)
-        naniteCapabilities = caps
-    }
-    naniteCapabilities
-  }
-
-  def updateOffset() = {
-    val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
-    timeSinceLastChange match {
-      case a if a <= msToReveal /*&& xOffset > 0 /* For incremental updates */*/ => xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceLastChange.toFloat / msToReveal.toFloat).toInt)
-      case a if a <= (msToShow + msToReveal) => xOffset = 0
-      case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
-      case _ => xOffset = xOffsetEnd
-    }
-  }
+  var naniteCapabilities: IPlayerNaniteCapability = _
+  var player            : EntityPlayer            = _
 
   @SubscribeEvent
   def renderOverlay(event: RenderGameOverlayEvent.Post): Unit = {
@@ -117,6 +109,30 @@ class PlayerNaniteCapabilitiesOverlay {
     mc.fontRenderer.drawSplitString(capabilities.tank.nMols + " nMols", (scale * (x + xOffset)).toInt, (scale * (y + (texHeight + 2 + mc.fontRenderer.FONT_HEIGHT) * factor).toInt).toInt, (scale * texWidth * factor).toInt, Color(255.toByte, 255.toByte, 255.toByte, 255.toByte).toInt)
     //    GL11.glScaled(scale, scale, scale)
     GL11.glPopMatrix()
+  }
+
+  def capabilities: IPlayerNaniteCapability = {
+    if (player != Minecraft.getMinecraft.player) {
+      val caps = Minecraft.getMinecraft.player.getCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.NORTH)
+      if (caps != naniteCapabilities)
+        naniteCapabilities = caps
+    }
+    naniteCapabilities
+  }
+
+  def updateOffset() = {
+    val timeSinceStartOfInteractChain = System.currentTimeMillis() - timeofStartOfInteractChain
+    if (timeSinceStartOfInteractChain < msToReveal) {
+      xOffset = Math.min(xOffset, xOffsetEnd - (xOffsetEnd.toFloat * timeSinceStartOfInteractChain.toFloat / msToReveal.toFloat).toInt)
+    }
+    else {
+      val timeSinceLastChange = System.currentTimeMillis - timeOfLastInteract
+      timeSinceLastChange match {
+        case a if a <= (msToShow + msToReveal) => xOffset = 0
+        case a if a <= (msToShow + msToReveal + msToHide) /*&& xOffset < xOffsetEnd /* For incremental updates */ */ => xOffset = Math.ceil(xOffsetEnd.toFloat * (timeSinceLastChange - msToShow - msToReveal).toFloat / msToHide.toFloat).toInt
+        case _ => xOffset = xOffsetEnd
+      }
+    }
   }
 
   private def HeightVFromFillPercent(fillAmt: Float): (Int, Float) = {

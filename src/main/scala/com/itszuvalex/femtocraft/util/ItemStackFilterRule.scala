@@ -7,7 +7,6 @@ import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
-
 /**
   * Created by Christopher Harris (Itszuvalex) on 2/1/2016.
   */
@@ -65,21 +64,10 @@ class ItemStackFilterRule extends IItemFilterRule {
   override def deserializeNBT(compound: NBTTagCompound): Unit = {
     setDamageSensitive(compound.Bool(ItemStackFilterRule.DAMAGE_SENSITIVE_KEY))
     setNBTSensitive(compound.Bool(ItemStackFilterRule.NBT_SENSITIVE_KEY))
-    compound.NBTCompound(ItemStackFilterRule.STACK_KEY) { comp => stack = new ItemStack(comp)
+    compound.NBTCompound(ItemStackFilterRule.STACK_KEY) { comp =>
+      stack = new ItemStack(comp)
       Unit
     }
-  }
-
-  def setDamageSensitive(sensitive: Boolean) = {
-    damageSensitive = sensitive
-    if (isNBTSensitive)
-      setNBTSensitive(false)
-  }
-
-  def setNBTSensitive(sensitive: Boolean) = {
-    nbtSensitive = sensitive
-    if (isNBTSensitive)
-      damageSensitive = true
   }
 
   override def serializeNBT(): NBTTagCompound = {
@@ -95,5 +83,17 @@ class ItemStackFilterRule extends IItemFilterRule {
 
   def isDamageSensitive = damageSensitive
 
+  def setDamageSensitive(sensitive: Boolean) = {
+    damageSensitive = sensitive
+    if (isNBTSensitive)
+      setNBTSensitive(false)
+  }
+
   def isNBTSensitive = nbtSensitive
+
+  def setNBTSensitive(sensitive: Boolean) = {
+    nbtSensitive = sensitive
+    if (isNBTSensitive)
+      damageSensitive = true
+  }
 }

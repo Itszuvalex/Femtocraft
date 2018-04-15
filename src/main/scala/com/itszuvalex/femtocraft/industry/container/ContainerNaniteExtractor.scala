@@ -21,7 +21,6 @@ class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile:
 
   if (shouldSync) {
     addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 0))
-    //    addSlotToContainer(new FilteredSlot(tile, 0, 45, 24))
 
     addPlayerInventorySlots(inv, 5, 76)
   }

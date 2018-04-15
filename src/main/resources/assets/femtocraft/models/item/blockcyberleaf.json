@@ -1,5 +1,5 @@
 {
-  "parent":"femtocraft:block/blockCyberleaf",
+  "parent":"femtocraft:block/blockcyberleaf",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170],

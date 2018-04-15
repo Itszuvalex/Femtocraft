@@ -1,4 +1,23 @@
 {
-  "shiftsound": { "category": "player", "sounds" : ["femtocraft:shiftsound"], "subtitle":"femtocraft.subtitle.shiftsound" },
-  "crystalbreak": { "category": "blocks", "sounds" : ["femtocraft:crystalbreak"], "subtitle":"femtocraft.subtitle.crystalbreak" }
+  "shiftsound": {
+    "category": "player",
+    "sounds": [
+      "femtocraft:shiftsound"
+    ],
+    "subtitle": "femtocraft.subtitle.shiftsound"
+  },
+  "crystalbreak": {
+    "category": "blocks",
+    "sounds": [
+      "femtocraft:crystalbreak"
+    ],
+    "subtitle": "femtocraft.subtitle.crystalbreak"
+  },
+  "riftloop": {
+    "category": "blocks",
+    "sounds": [
+      "femtocraft:riftloop"
+    ],
+    "subtitle": "femtocraft.subtitle.riftloop"
+  }
 }

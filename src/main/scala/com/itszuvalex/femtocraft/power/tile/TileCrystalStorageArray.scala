@@ -17,6 +17,8 @@ object TileCrystalStorageArray {
 }
 
 class TileCrystalStorageArray extends TileEntityBase with TileInventory with PowerLeafNode {
+  val istorage = storage // need to rename due to naming conflict
+
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
@@ -39,7 +41,9 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
     }
   }
 
-  override def leafTransferRate: Double = 50d
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
+
+  override def powerStorageTransferRate: Double = 50d
 
   override def hasDescription: Boolean = true
 
@@ -51,13 +55,9 @@ class TileCrystalStorageArray extends TileEntityBase with TileInventory with Pow
 
   override def setField(id: Int, value: Int): Unit = {}
 
-  val istorage = storage // need to rename due to naming conflict
-
   override def defaultBattery: IBattery = new PowerBattery(0) {
     override def maxStorage: Double = {
       istorage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((sum, crystal) => sum + crystal.battery.maxStorage) * TileCrystalStorageArray.STORAGE_MULTIPLIER
     }
   }
-
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 }

@@ -13,8 +13,6 @@ import scala.collection.mutable.ArrayBuffer
 object SynthesizerRegistry {
   val recipes: ArrayBuffer[SynthesizerRecipe] = new ArrayBuffer[SynthesizerRecipe]()
 
-  def addRecipe(recipe: SynthesizerRecipe): Unit = recipes += recipe
-
   def getMatchingRecipesForOutput(item: IItemStack): java.util.Collection[SynthesizerRecipe] = recipes.filter(_.output.isItemEqual(item))
 
   def preInit(): Unit = {
@@ -26,6 +24,8 @@ object SynthesizerRegistry {
       WrapperVanillaItemStack(new ItemStack(FemtoItems.itemNanoweaveThread, 9))), 400
     ))
   }
+
+  def addRecipe(recipe: SynthesizerRecipe): Unit = recipes += recipe
 
   def postInit(): Unit = {
 

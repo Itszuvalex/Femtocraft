@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.nanite.gui
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.gui.GuiBase
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -28,32 +27,23 @@ import org.lwjgl.opengl.GL11
   xSize = GuiNaniteHive.WIDTH
   ySize = GuiNaniteHive.HEIGHT
 
-  {
-    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
-
-    (0 until 3).foreach { i =>
-      (0 until 9).foreach { j =>
-        addGuiAndSync(storage, j + i * 9, GuiNaniteHive.inventoryXStart + j * 18, GuiNaniteHive.inventoryYStart + i * 18)
-      }
-    }
-
-    addGuiAndSync(storage, 27, 204, 20)
-    addGuiAndSync(storage, 28, 204, 38)
-    addGuiAndSync(storage, 29, 204, 56)
-  }
-
-  addPlayerInventorySlots(inv, 32, 83)
+  //  {
+  //    val storage = Converter.IItemStorageFromIInventory(tile.indInventory)
+  //
+  //    (0 until 3).foreach { i =>
+  //      (0 until 9).foreach { j =>
+  //        addGuiAndSync(storage, j + i * 9, GuiNaniteHive.inventoryXStart + j * 18, GuiNaniteHive.inventoryYStart + i * 18)
+  //      }
+  //    }
+  //
+  //    addGuiAndSync(storage, 27, 204, 20)
+  //    addGuiAndSync(storage, 28, 204, 38)
+  //    addGuiAndSync(storage, 29, 204, 56)
+  //  }
+  //
+  //  addPlayerInventorySlots(inv, 32, 83)
 
   override def GuiID: Int = GuiIDs.TileNaniteHiveGuiID
-
-  /**
-    * Draw the foreground layer for the GuiContainer (everything in front of the items)
-    */
-  protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
-    val s = "Small Nanite Hive"
-    fontRenderer.drawString(s, xSize / 2 - fontRenderer.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
-    fontRenderer.drawString("container.inventory", 30, ySize - 96 + 4, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
-  }
 
   /**
     * Draw the background layer for the GuiContainer (everything behind the items)
@@ -70,6 +60,15 @@ import org.lwjgl.opengl.GL11
     //    drawTexturedModalRect(k + 73, l + 34, 176, 13, i1, 18)
     //    i1 = 0 /*(furnaceInventory.currentPower * 60) / furnaceInventory.getMaxPower*/
     //    drawTexturedModalRect(k + 18, l + 12 + (60 - i1), 176, 32 + (60 - i1), 16 + (60 - i1), 60)
+  }
+
+  /**
+    * Draw the foreground layer for the GuiContainer (everything in front of the items)
+    */
+  protected override def drawGuiContainerForegroundLayer(par1: Int, par2: Int) {
+    val s = "Small Nanite Hive"
+    fontRenderer.drawString(s, xSize / 2 - fontRenderer.getStringWidth(s) / 2, 6, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
+    fontRenderer.drawString("container.inventory", 30, ySize - 96 + 4, Color(0, 255.toByte, 255.toByte, 255.toByte).toInt)
   }
 
 }

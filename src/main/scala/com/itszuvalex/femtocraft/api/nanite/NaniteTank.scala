@@ -11,10 +11,6 @@ import scala.collection.mutable.ArrayBuffer
 class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable[NBTTagCompound] {
   private val nanites = ArrayBuffer[NaniteStack]()
 
-  override def volume: Int = vol
-
-  override def volumeFilled: Int = nanites.map(_.volume).sum
-
   override def nMols: Int = nanites.map(_.nMol).sum
 
   override def canDrain(nanite: INanite, vol: Int): Boolean = nanites.exists(_.nanite == nanite)
@@ -31,6 +27,30 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
     val ret = new NaniteTank(vol)
     ret.deserializeNBT(serializeNBT())
     ret
+  }
+
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    nanites.clear()
+    vol = nbt.getInteger("vol")
+    val size = nbt.getInteger("size")
+    nanites.sizeHint(size)
+    (0 until size).forall { i =>
+      if (nbt.hasKey(i.toString)) {
+        nanites += NaniteStack.loadFromNBT(nbt.getCompoundTag(i.toString))
+        true
+      }
+      else false
+    }
+  }
+
+  override def serializeNBT(): NBTTagCompound = {
+    val nbt = new NBTTagCompound()
+    nbt.setInteger("vol", vol)
+    nbt.setInteger("size", nanites.size)
+    nanites.zipWithIndex.view.filterNot { case (a, b) => a == null }.foreach { case (a, b) =>
+      nbt.setTag(b.toString, a.serializeNBT())
+    }
+    nbt
   }
 
   /**
@@ -67,7 +87,7 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
     if (stack.nanite == null) return stack
 
     val room = volume - volumeFilled
-    if (room <= 0) return null
+    if (room <= 0) return stack
     if (stack.volume <= 0) return null
 
     val storageStack =
@@ -91,35 +111,15 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
       NaniteStack(stack.nanite, stack.volume - lowest)
   }
 
+  override def volume: Int = vol
+
+  override def volumeFilled: Int = nanites.map(_.volume).sum
+
   private def findStack(nanite: INanite): Option[Int] = {
     nanites.zipWithIndex.foreach { case (stack: NaniteStack, i: Int) =>
       if (stack.nanite == nanite)
         return Some(i)
     }
     None
-  }
-
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    nanites.clear()
-    vol = nbt.getInteger("vol")
-    val size = nbt.getInteger("size")
-    nanites.sizeHint(size)
-    (0 until size).forall { i =>
-      if (nbt.hasKey(i.toString)) {
-        nanites += NaniteStack.loadFromNBT(nbt.getCompoundTag(i.toString))
-        true
-      }
-      else false
-    }
-  }
-
-  override def serializeNBT(): NBTTagCompound = {
-    val nbt = new NBTTagCompound()
-    nbt.setInteger("vol", vol)
-    nbt.setInteger("size", nanites.size)
-    nanites.zipWithIndex.view.filterNot { case (a, b) => a == null }.foreach { case (a, b) =>
-      nbt.setTag(b.toString, a.serializeNBT())
-    }
-    nbt
   }
 }

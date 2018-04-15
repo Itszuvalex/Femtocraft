@@ -27,7 +27,7 @@ class TileCrystalChargingArray extends TileEntityBase with TileInventory with Po
       c.battery.storage = Math.max(0, c.battery.storage - power)
       val gen = c.getPassiveGen() * TileCrystalChargingArray.PASSIVE_GEN_MULTIPLIER
       battery.storage = Math.min(battery.maxStorage, battery.storage + gen)
-                                                                                       }
+    }
   }
 
   def powerPerTick: Double = storage.flatMap(_.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((s, c) => s + c.getPassiveGen() * TileCrystalChargingArray.PASSIVE_GEN_MULTIPLIER)
@@ -46,11 +46,9 @@ class TileCrystalChargingArray extends TileEntityBase with TileInventory with Po
 
   override def hasDescription: Boolean = true
 
-  override def leafTransferRate: Double = 50d
+  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.PRODUCER
 
-  override def connectionRadius: Float = 8f
-
-  override def storageType: PowerStorageNodeType = PowerStorageNodeType.PRODUCER
+  override def powerStorageTransferRate: Double = 50d
 
   override def getFieldCount: Int = 0
 

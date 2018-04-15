@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
@@ -26,6 +27,10 @@ trait IFrameMultiblock {
   def getRequiredResources: scala.collection.IndexedSeq[ItemStack]
 
   def onMultiblockBroken(loc: Loc4)
+
+  def size: (Int, Int, Int)
+
+  def getRenderItemStack: IItemStack
 
   @SideOnly(Side.CLIENT)
   def multiblockRenderID: Int

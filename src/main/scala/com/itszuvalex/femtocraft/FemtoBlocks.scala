@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft
 
-
 import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block._
-import com.itszuvalex.femtocraft.logistics.block.{BlockConduit, BlockItemRepository}
+import com.itszuvalex.femtocraft.logistics.block.{BlockConduit, BlockFluidRepository, BlockItemRepository, BlockNaniteRepository}
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
 import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
+import net.minecraft.block.material.Material
 import net.minecraft.item.{Item, ItemBlock}
 import net.minecraftforge.event.RegistryEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,65 +21,58 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Christopher Harris (Itszuvalex) on 5/3/15.
   */
 object FemtoBlocks {
-  //Cyber
-  var blockSubstrate: Block = _
-  var blockCyberwood: Block = _
-  var blockCyberleaf: Block = _
 
+  val blockCallbacks = new ArrayBuffer[() => Unit]()
+  private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
+  private val oresToRegister       = new ArrayBuffer[(Block, String)]
+  //Cyber
+  var blockSubstrate       : Block = _
+  var blockRefinedSubstrate: Block = _
+  var blockCyberwood       : Block = _
+  var blockCyberleaf       : Block = _
   var blockNanoweave          : Block = _
   var blockRiftiron           : Block = _
   var blockPhasemetal         : Block = _
   var blockRedstonereplacement: Block = _
   var blockLapisreplacement   : Block = _
   var blockDiamondreplacement : Block = _
-
   var blockCrystals: Block = _
-
-  var blockItemRepository: Block = _
-  var blockNanoFurnace   : Block = _
-  var blockNaniteInfuser : Block = _
-
+  var blockNaniteRepository: Block = _
+  var blockItemRepository  : Block = _
+  var blockFluidRepository : Block = _
+  var blockNanoFurnace     : Block = _
+  var blockNaniteInfuser   : Block = _
   var blockFrame                 : Block = _
   var blockCyberBase             : Block = _
   var blockCyberMachineInProgress: Block = _
-
   var blockNaniteHiveSmall     : Block = _
   var blockCrystalMount        : Block = _
   var blockPowerPedestal       : Block = _
   var blockCrystalChargingArray: Block = _
   var blockCrystalStorageArray : Block = _
   var blockCrystalHeatExchanger: Block = _
-
-  var blockNaniteExtractor: Block = _
-  var blockDemolisher     : Block = _
-
-  var blockConduit: Block = _
-
-  var blockGlowStick: Block = _
+  var blockGerminationChamber: Block = _
+  var blockNaniteExtractor   : Block = _
 
   //Tests
-
+  var blockDemolisher        : Block = _
+  var blockConduit: Block = _
+  var blockGlowStick: Block = _
   var testBlock       : Block = _
   var testNetworkBlock: Block = _
-
-
   var testDiffusionNode      : Block = _
   var testDiffusionTargetNode: Block = _
   var testDirectNode         : Block = _
   var testGenerationNode     : Block = _
   var testTransferNode       : Block = _
-
   var testTaskProvider  : Block = _
   var testWorkerProvider: Block = _
-
-  private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
-  private val oresToRegister       = new ArrayBuffer[(Block, String)]
-  val blockCallbacks = new ArrayBuffer[() => Unit]()
 
   @SubscribeEvent
   def registerBlocks(event: RegistryEvent.Register[Block]) {
     val registry = event.getRegistry
     blockSubstrate = registerBlock(registry, new BlockSubstrate(), "blockSubstrate").registerOre("substrate")
+    blockRefinedSubstrate = registerBlock(registry, new Block(Material.IRON).setHardness(1.2f), "blockRefinedSubstrate")
     blockCyberwood = registerBlock(registry, new BlockCyberwood(), "blockCyberwood").registerOre("logWood")
     blockCyberleaf = registerBlock(registry, new BlockCyberleaf(), "blockCyberleaf").registerOre("treeLeaves")
 
@@ -95,7 +88,9 @@ object FemtoBlocks {
     blockNaniteInfuser = registerBlock(registry, new BlockNaniteInfuser, "blockNaniteInfuser")
     blockFrame = registerBlock(registry, new BlockFrame(), "blockFrame")
     blockNaniteHiveSmall = registerBlock(registry, new BlockNaniteHiveSmall(), "blockNaniteHive_small")
+    blockNaniteRepository = registerBlock(registry, new BlockNaniteRepository(), "blockNaniteRepository")
     blockItemRepository = registerBlock(registry, new BlockItemRepository(), "blockItemRepository")
+    blockFluidRepository = registerBlock(registry, new BlockFluidRepository(), "blockFluidRepository")
     blockCrystalMount = registerBlock(registry, new BlockCrystalMount(), "blockCrystalMount")
     blockPowerPedestal = registerBlock(registry, new BlockPowerPedestal(), "blockPowerPedestal")
     blockCrystalChargingArray = registerBlock(registry, new BlockCrystalChargingArray(), "blockCrystalChargingArray")
@@ -104,6 +99,7 @@ object FemtoBlocks {
     blockNaniteExtractor = registerBlock(registry, new BlockNaniteExtractor(), "blockNaniteExtractor")
     blockDemolisher = registerBlock(registry, new BlockDemolisher(), "blockDemolisher")
     blockConduit = registerBlock(registry, new BlockConduit(), "blockConduit")
+    blockGerminationChamber = registerBlock(registry, new BlockGerminationChamber(), "blockGerminationChamber")
     blockGlowStick = registerBlock(registry, new BlockGlowStick(), "blockGlowStick")
 
     //tests
@@ -117,8 +113,16 @@ object FemtoBlocks {
     blockCallbacks.clear()
   }
 
+  def registerBlock[T <: Block](registry: IForgeRegistry[Block], block: T, name: String): T = {
+    block.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase, name).setUnlocalizedName(name)
+    registry.register(block)
+    itemBlocksToRegister += ((block, name))
+    block
+  }
+
   def init(): Unit = {
     blockSubstrate.registerModel()
+    blockRefinedSubstrate.registerModel()
     blockFrame.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
@@ -132,24 +136,22 @@ object FemtoBlocks {
     blockPowerPedestal.registerModel()
     blockNaniteHiveSmall.registerModel()
     blockCrystals.registerModel()
+    blockNaniteRepository.registerModel()
+    blockItemRepository.registerModel()
+    blockFluidRepository.registerModel()
     blockNanoFurnace.registerModel()
     blockNaniteExtractor.registerModel()
+    blockNaniteInfuser.registerModel()
     blockDemolisher.registerModel()
     blockCrystalChargingArray.registerModel()
     blockCrystalStorageArray.registerModel()
     blockCrystalHeatExchanger.registerModel()
     blockConduit.registerModel()
+    blockGerminationChamber.registerModel()
   }
 
   def postInit(): Unit = {
 
-  }
-
-  def registerBlock[T <: Block](registry: IForgeRegistry[Block], block: T, name: String): T = {
-    block.setCreativeTab(Femtocraft.tab).setRegistryName(Femtocraft.ID.toLowerCase, name).setUnlocalizedName(name)
-    registry.register(block)
-    itemBlocksToRegister += ((block, name))
-    block
   }
 
   def registerItemBlocks(registry: IForgeRegistry[Item]): Unit = {

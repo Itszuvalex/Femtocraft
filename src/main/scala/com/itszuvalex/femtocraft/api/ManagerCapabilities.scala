@@ -6,11 +6,14 @@ import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable, NaniteTank}
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry.item._
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
+import com.itszuvalex.itszulib.api.ManagerCapabilities.DummyStorage
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.storage.IFluidStorage
 import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
-import com.itszuvalex.itszulib.util.Color
-import net.minecraft.nbt.{NBTBase, NBTTagCompound, NBTTagInt}
+import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
+import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager}
 
@@ -26,7 +29,6 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[PowerStorageNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[PowerLeafNodeImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[Color], new ColorStorage, classOf[Color])
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
@@ -34,6 +36,10 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[ILogisticsNetworkNode], new LogisticsStorageDummy, classOf[LogisticsImplDummy])
     CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
     CapabilityManager.INSTANCE.register(classOf[IConnectionProvider], new ConnectionProviderStorageDummy, classOf[ConnectionProviderImplDummy])
+    CapabilityManager.INSTANCE.register(classOf[SidedItemStorageConfiguration], new SidedItemStorageConfigurationStorageDummy, classOf[SidedItemStorageConfiguration])
+    CapabilityManager.INSTANCE.register(classOf[SidedNaniteStorageConfiguration], new SidedNaniteStorageConfigurationStorageDummy, classOf[SidedNaniteStorageConfiguration])
+    CapabilityManager.INSTANCE.register(classOf[SidedFluidStorageConfiguration], new SidedFluidStorageConfigurationStorageDummy, classOf[SidedFluidStorageConfiguration])
+    CapabilityManager.INSTANCE.register(classOf[IOverlayRenderItem], new OverlayRenderStorageDummy, classOf[OverlayRenderItemImplDummy])
   }
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
@@ -42,29 +48,45 @@ object ManagerCapabilities {
     override def readNBT(capability: Capability[IBattery], instance: IBattery, side: EnumFacing, nbt: NBTBase): Unit = instance.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
   }
 
-  class ColorStorage extends Capability.IStorage[Color] {
-    override def writeNBT(capability: Capability[Color], instance: Color, side: EnumFacing): NBTBase = new NBTTagInt(instance.toInt)
+  class FluidStorageDummy extends Capability.IStorage[IFluidStorage] {
+    override def readNBT(capability: Capability[IFluidStorage], instance: IFluidStorage, side: EnumFacing, nbt: NBTBase): Unit = {}
 
-    override def readNBT(capability: Capability[Color], instance: Color, side: EnumFacing, nbt: NBTBase): Unit = {
-      val copy = new Color(nbt.asInstanceOf[NBTTagInt].getInt)
-      /*
-      instance.red = copy.red
-      instance.green = copy.green
-      instance.blue = copy.blue
-      instance.alpha = copy.alpha
-      */
+    override def writeNBT(capability: Capability[IFluidStorage], instance: IFluidStorage, side: EnumFacing): NBTBase = new NBTTagCompound
+  }
+
+  class SidedItemStorageConfigurationStorageDummy extends Capability.IStorage[SidedItemStorageConfiguration] {
+    override def readNBT(capability: Capability[SidedItemStorageConfiguration], instance: SidedItemStorageConfiguration, side: EnumFacing, nbt: NBTBase): Unit = {
+      instance.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
+    }
+
+    override def writeNBT(capability: Capability[SidedItemStorageConfiguration], instance: SidedItemStorageConfiguration, side: EnumFacing): NBTBase = {
+      instance.serializeNBT()
+    }
+  }
+
+  class SidedNaniteStorageConfigurationStorageDummy extends Capability.IStorage[SidedNaniteStorageConfiguration] {
+    override def readNBT(capability: Capability[SidedNaniteStorageConfiguration], instance: SidedNaniteStorageConfiguration, side: EnumFacing, nbt: NBTBase): Unit = {
+      instance.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
+    }
+
+    override def writeNBT(capability: Capability[SidedNaniteStorageConfiguration], instance: SidedNaniteStorageConfiguration, side: EnumFacing): NBTBase = {
+      instance.serializeNBT()
+    }
+  }
+
+  class SidedFluidStorageConfigurationStorageDummy extends Capability.IStorage[SidedFluidStorageConfiguration] {
+    override def readNBT(capability: Capability[SidedFluidStorageConfiguration], instance: SidedFluidStorageConfiguration, side: EnumFacing, nbt: NBTBase): Unit = {
+      instance.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
+    }
+
+    override def writeNBT(capability: Capability[SidedFluidStorageConfiguration], instance: SidedFluidStorageConfiguration, side: EnumFacing): NBTBase = {
+      instance.serializeNBT()
     }
   }
 
   class NaniteTankStorage extends DummyStorage[INaniteTank]
 
   class NaniteUpgradeableStorage extends DummyStorage[INaniteUpgradeable]
-
-  abstract class DummyStorage[T] extends Capability.IStorage[T] {
-    override def writeNBT(capability: Capability[T], instance: T, side: EnumFacing): NBTBase = {new NBTTagCompound}
-
-    override def readNBT(capability: Capability[T], instance: T, side: EnumFacing, nbt: NBTBase): Unit = {}
-  }
 
   class PowerNetworkNodeStorageDummy extends DummyStorage[IPowerNetworkNode]
 
@@ -82,15 +104,17 @@ object ManagerCapabilities {
 
   class ConnectionProviderStorageDummy extends DummyStorage[IConnectionProvider]
 
+  class OverlayRenderStorageDummy extends DummyStorage[IOverlayRenderItem]
+
   class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
 
-    override def leafNodes: Set[IPowerLeafNode] = Set()
+    override def leafNodes(force: Boolean): Set[IPowerLeafNode] = Set()
 
     override def addLeafNode(node: IPowerLeafNode): Unit = {}
 
     override def removeLeafNode(node: IPowerLeafNode): Unit = {}
 
-    override def storageNodes: Set[IPowerStorageNode] = Set()
+    override def storageNodes(force: Boolean): Set[IPowerStorageNode] = Set()
 
     override def leafTransferRate: Double = 0
 
@@ -113,6 +137,8 @@ object ManagerCapabilities {
     override def transferRate: Double = 0
 
     override def getStorageLoc: Loc4 = Loc4(0, 0, 0, 0)
+
+    override def changeForLastTick: Double = 0d
   }
 
   class PowerLeafNodeImplementationDummy extends PowerStorageNodeImplementationDummy with IPowerLeafNode {
@@ -133,11 +159,15 @@ object ManagerCapabilities {
 
     override def getName(): String = ""
 
+    override def setName(name: String): Unit = {}
+
     /**
       *
       * @return Color of the crystal.
       */
     override def getColor(): Int = 0
+
+    override def setColor(color: Int): Unit = {}
 
     /**
       *
@@ -145,11 +175,15 @@ object ManagerCapabilities {
       */
     override def getPassiveGen(): Double = 0d
 
+    override def setPassiveGen(passiveGen: Float): Unit = {}
+
     /**
       *
       * @return Amount of power in crystal that is less than current storage.  Used for passive trickle charging.
       */
     override def getStoragePartial(): Double = 0d
+
+    override def setStoragePartial(amount: Double): Unit = {}
 
     /**
       *
@@ -157,23 +191,15 @@ object ManagerCapabilities {
       */
     override def getTransferRate(): Double = 0d
 
+    override def setTransferRate(rate: Double): Unit = {}
+
     /**
       *
       * @return Size of the crystal.
       */
     override def getType(): String = ""
 
-    override def setColor(color: Int): Unit = {}
-
-    override def setTransferRate(rate: Double): Unit = {}
-
     override def setType(ctype: String): Unit = {}
-
-    override def setPassiveGen(passiveGen: Float): Unit = {}
-
-    override def setName(name: String): Unit = {}
-
-    override def setStoragePartial(amount: Double): Unit = {}
 
     override def battery: IBattery = null
   }
@@ -230,6 +256,10 @@ object ManagerCapabilities {
     override def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
     override def addTooltip(tooltip: util.List[String]): Unit = {}
+  }
+
+  class OverlayRenderItemImplDummy extends IOverlayRenderItem {
+    override def shouldRender(overlay: OverlayRenderSwitch): Boolean = false
   }
 
 }

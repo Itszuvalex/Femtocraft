@@ -39,6 +39,17 @@ class OreNameFilterRule extends IItemFilterRule {
     updateRegexp()
   }
 
+  private def updateRegexp() = {
+    try {
+      regexp = Pattern.compile(oreName.trim)
+    }
+    catch {
+      case ignored: Throwable =>
+        ignored.printStackTrace()
+        regexp = null
+    }
+  }
+
   override def itemMatches(item: ItemStack) = {
     if (!hasValidRegexp) false
     else OreDictionary.getOreIDs(item).map(OreDictionary.getOreName).exists(regexp.matcher(_).matches())
@@ -51,14 +62,14 @@ class OreNameFilterRule extends IItemFilterRule {
     else getAllOreNamesMatching.flatMap(OreDictionary.getOres(_).asScala).toBuffer
   }
 
-  def getAllOreNamesMatching = {
-    if (!hasValidRegexp) ArrayBuffer[String]().toArray
-    else OreDictionary.getOreNames.filter(regexp.matcher(_).matches())
-  }
-
   def getALlItemStackMatchingOrganizedByOreName = {
     if (!hasValidRegexp) Map[String, scala.collection.mutable.Buffer[ItemStack]]()
     else getAllOreNamesMatching.map(name => name -> OreDictionary.getOres(name).asScala)(collection.breakOut): Map[String, scala.collection.mutable.Buffer[ItemStack]]
+  }
+
+  def getAllOreNamesMatching = {
+    if (!hasValidRegexp) ArrayBuffer[String]().toArray
+    else OreDictionary.getOreNames.filter(regexp.matcher(_).matches())
   }
 
   override def ruleType = OreNameFilterRule.filterType
@@ -66,17 +77,6 @@ class OreNameFilterRule extends IItemFilterRule {
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     oreName = nbt.getString(OreNameFilterRule.ORE_NAME_KEY)
     updateRegexp()
-  }
-
-  private def updateRegexp() = {
-    try {
-      regexp = Pattern.compile(oreName.trim)
-    }
-    catch {
-      case ignored: Throwable =>
-        ignored.printStackTrace()
-        regexp = null
-    }
   }
 
   override def serializeNBT(): NBTTagCompound = {

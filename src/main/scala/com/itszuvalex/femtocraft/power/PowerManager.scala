@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, PowerNetwork}
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -14,16 +15,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
   * Created by Christopher Harris (Itszuvalex) on 8/3/15.
   */
 object PowerManager {
+  def instance: PowerManager = Femtocraft.proxy.powerManager
+}
+
+class PowerManager {
   val nodeTracker = new LocationTracker
   val leafTracker = new LocationTracker
 
   def init(): Unit = {
     MinecraftForge.EVENT_BUS.register(this)
-  }
-
-  def clear() = {
-    nodeTracker.clear()
-    leafTracker.clear()
   }
 
   /**
@@ -37,7 +37,7 @@ object PowerManager {
 
     val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
     if (nodes.isEmpty) {
-      val network = PowerNetwork.createFromTile(node)
+      val network = PowerNetwork.createFromNode(node)
       network.register()
     }
     else {
@@ -53,22 +53,6 @@ object PowerManager {
     nodeTracker.trackLocation(loc)
   }
 
-  def addLeaf(node: IPowerLeafNode): Unit = {
-    refreshLeaf(node)
-    leafTracker.trackLocation(node.getStorageLoc)
-  }
-
-  def removeNode(node: IPowerNetworkNode): Unit = {
-    nodeTracker.removeLocation(node.getLoc)
-    if (node.getNetwork != null)
-      node.getNetwork.removeNode(node)
-    node.setNetwork(null)
-  }
-
-  def removeLeaf(node: IPowerLeafNode): Unit = {
-    leafTracker.removeLocation(node.getStorageLoc)
-  }
-
   def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
     val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.TILE_POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
     leafs.view.filter(_.getParent == null).
@@ -79,6 +63,11 @@ object PowerManager {
         node.addLeafNode(l)
         l.setParent(node)
       }
+  }
+
+  def addLeaf(node: IPowerLeafNode): Unit = {
+    refreshLeaf(node)
+    leafTracker.trackLocation(node.getStorageLoc)
   }
 
   def refreshLeaf(node: IPowerLeafNode): Unit = {
@@ -102,12 +91,35 @@ object PowerManager {
       .map(_.getCapability(capability, null))
   }
 
+  def removeNode(node: IPowerNetworkNode): Unit = {
+    nodeTracker.removeLocation(node.getLoc)
+    if (node.getNetwork != null)
+      node.getNetwork.removeNode(node)
+    node.setNetwork(null)
+  }
+
+  def onNodeBroken(node: IPowerNetworkNode): Unit = {
+    node.leafNodes(true).foreach(_.onParentBroken(node))
+  }
+
+  def removeLeaf(node: IPowerLeafNode): Unit = {
+    leafTracker.removeLocation(node.getStorageLoc)
+  }
+
+  def onLeafBroken(node: IPowerLeafNode): Unit = {
+    Option(node.getParent).flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null)).foreach(_.removeLeafNode(node))
+  }
 
   @SubscribeEvent def onWorldUnload(worldEvent: WorldEvent.Unload): Unit = {
     val server = FMLCommonHandler.instance().getMinecraftServerInstance
     if (server == null || !server.isServerRunning) {
       clear()
     }
+  }
+
+  def clear() = {
+    nodeTracker.clear()
+    leafTracker.clear()
   }
 
 }

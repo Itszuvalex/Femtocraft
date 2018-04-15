@@ -11,15 +11,15 @@ import scala.collection.mutable.ListBuffer
   * Created by Christopher Harris (Itszuvalex) on 1/26/17.
   */
 object GuiTab {
-  val WIDTH = 20
+  val WIDTH  = 20
   val HEIGHT = 20
 }
 
 class GuiTab(text: String,
-             var iconRender: GuiPanel,
-             var tile: TileEntityBase,
-             var guiID: Int,
-             var activeGuid: () => Int) extends GuiButton(0, 0, GuiTab.WIDTH, GuiTab.HEIGHT, "") {
+  var iconRender: GuiPanel,
+  var tile: TileEntityBase,
+  var guiID: Int,
+  var activeGuid: () => Int) extends GuiButton(0, 0, GuiTab.WIDTH, GuiTab.HEIGHT, "") {
   iconRender.anchorX = (panelWidth - iconRender.panelWidth) / 2
   iconRender.anchorY = (panelHeight - iconRender.panelHeight) / 2
   add(iconRender)

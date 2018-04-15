@@ -2,43 +2,51 @@ package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.container._
-import com.itszuvalex.femtocraft.industry.tile.{TileDemolisher, TileFrame, TileNaniteExtractor, TileNanoFurnace}
-import com.itszuvalex.femtocraft.logistics.container.{ContainerConduit, ContainerItemRepository}
-import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileItemRepository}
+import com.itszuvalex.femtocraft.industry.tile._
+import com.itszuvalex.femtocraft.logistics.container._
+import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
+import com.itszuvalex.itszulib.gui.ItszuGuiHandler
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraftforge.fml.common.network.IGuiHandler
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 11/21/14.
   */
-class ProxyGuiCommon extends IGuiHandler {
-  override def getServerGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
+class ProxyGuiCommon extends ItszuGuiHandler {
+  override def getServerGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new ContainerMultiblockSelection
-      case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te)
+      case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te, true)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new ContainerFrameConstructing(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te, true)
-      case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te)
+      case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te, true)
+      case (GuiIDs.TileNaniteRepositoryGuiID, te: TileNaniteRepository) => new ContainerNaniteRepository(player, player.inventory, te, true)
+      case (GuiIDs.TileFluidRepositoryGuiID, te: TileFluidRepository) => new ContainerFluidRepository(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalMountGuiID, te: TileCrystalMount) => new ContainerCrystalMount(player, player.inventory, te)
       case (GuiIDs.TileFurnaceGuiID, te: TileNanoFurnace) => new ContainerNanoFurnace(player, player.inventory, te, true)
       case (GuiIDs.TileNaniteExtractorID, te: TileNaniteExtractor) => new ContainerNaniteExtractor(player, player.inventory, te, true)
+      case (GuiIDs.TileNaniteInfuserID, te: TileNaniteInfuser) => new ContainerNaniteInfuser(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalChargingArrayID, te: TileCrystalChargingArray) => new ContainerCrystalChargingArray(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new ContainerCrystalStorageArray(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new ContainerCrystalHeatExchanger(player, player.inventory, te, true)
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new ContainerDemolisher(player, player.inventory, te, true)
+      case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new ContainerGerminationChamber(player, player.inventory, te, true)
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(te, true)
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
-      case (GuiIDs.TileSidedInventoryConfigID, _) => new ContainerSidedInventoryConfig
+      case (GuiIDs.TileConduitSideID, te: TileConduit) => new ContainerConduitSide(player, player.inventory, te, EnumFacing.getFront(data), true)
+      case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new ContainerSidedInventoryConfig(te)
+      case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new ContainerSidedNaniteConfig(te)
+      case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new ContainerSidedFluidConfig(te)
       case (_, _) => null
     }
   }
 
-  override def getClientGuiElement(ID: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = null
+  override def getClientGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = null
 }

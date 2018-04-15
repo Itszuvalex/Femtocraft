@@ -1,11 +1,18 @@
 package com.itszuvalex.femtocraft.render
 
+import com.itszuvalex.femtocraft.Resources
+import com.itszuvalex.femtocraft.industry.gui.{GuiSidedFluidConfig, GuiSidedInventoryConfig, GuiSidedNaniteConfig}
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
 import com.itszuvalex.itszulib.render.RenderUtils._
-import com.itszuvalex.itszulib.render.Vector3
+import com.itszuvalex.itszulib.render.{RenderUtils, Vector3}
+import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumFacing.AxisDirection
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import org.lwjgl.opengl.GL11
@@ -14,6 +21,10 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 8/4/15.
   */
 object FemtoRenderUtils {
+  val CONFIG_STORAGE_TEXTURE   = () => GuiSidedInventoryConfig.SIDE_TEX_COLOR
+  val CONFIG_IO_TEXTURE_INPUT  = () => GuiSidedInventoryConfig.SIDE_TEX_INPUT
+  val CONFIG_IO_TEXTURE_OUTPUT = () => GuiSidedInventoryConfig.SIDE_TEX_OUTPUT
+  val CONFIG_OUTLINE           = Resources.TexBlock("blockoutline.png")
 
   def drawBeam(start: Vector3,
     end: Vector3,
@@ -42,6 +53,60 @@ object FemtoRenderUtils {
     }
   }
 
+  def enableLightMap(te: TileEntity): Unit = {
+    GL11.glEnable(GL11.GL_LIGHTING)
+    RenderHelper.enableStandardItemLighting()
+    val i = Option(te).map(_.getWorld.getCombinedLight(te.getPos, 0)).getOrElse(15 << 20 | 15 << 4)
+    setLightmapTexCoords(i)
+  }
+
+  def renderItemConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedItemStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedInventoryConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedInventoryConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
+  }
+
+  private def renderConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, colorForStorage: (EnumFacing) => Color, ioForFacing: (EnumFacing) => EnumAutomaticIO): Unit = {
+    disableLightMaps()
+    RenderUtils.glMatrixBlock { // Matrixblock even though translate because we can also scale
+      GL11.glTranslated(x, y, z)
+      //      GL11.glDisable(GL11.GL_DEPTH_TEST)
+      GL11.glScaled(1.01, 1.01, 1.01)
+      GL11.glTranslated(-.005, -.005, -.005)
+      EnumFacing.VALUES.foreach { facing =>
+        GL11.glColor4f(1, 1, 1, 1)
+        Minecraft.getMinecraft.getTextureManager.bindTexture(CONFIG_OUTLINE)
+        RenderUtils.drawArbitraryFace(0, 0, 0, 0, 1, 0, 1, 0, 1, facing, null, 0, 1, 0, 1)
+        val color = colorForStorage(facing)
+        GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
+        Minecraft.getMinecraft.getTextureManager.bindTexture(CONFIG_STORAGE_TEXTURE())
+        RenderUtils.drawArbitraryFace(0, 0, 0, 0, 1, 0, 1, 0, 1, facing, null, 0, 1, 0, 1)
+
+        GL11.glColor4f(1f, 1f, 1f, 1f)
+        (ioForFacing(facing) match {
+          case EnumAutomaticIO.NONE => None
+          case EnumAutomaticIO.INPUT => Some(CONFIG_IO_TEXTURE_INPUT)
+          case EnumAutomaticIO.OUTPUT => Some(CONFIG_IO_TEXTURE_OUTPUT)
+        }).foreach { loc =>
+          Minecraft.getMinecraft.getTextureManager.bindTexture(loc())
+          val min = 4 / 16f
+          val max = 12 / 16f
+          (facing match {
+            case EnumFacing.UP => RenderUtils.drawTopFace _
+            case EnumFacing.DOWN => RenderUtils.drawBottomFace _
+            case EnumFacing.NORTH => RenderUtils.drawNorthFace _
+            case EnumFacing.EAST => RenderUtils.drawEastFace _
+            case EnumFacing.SOUTH => RenderUtils.drawSouthFace _
+            case EnumFacing.WEST => RenderUtils.drawWestFace _
+          }) (0, 0, 0, min, max, min, max, if (facing.getAxisDirection == AxisDirection.POSITIVE) 1f else 0, null, 0, 1, 0, 1)
+        }
+      }
+      //      GL11.glEnable(GL11.GL_DEPTH_TEST)
+    }
+    enableLightMap(te.getWorld, te.getPos)
+  }
+
   def disableLightMaps(): Unit = {
     GL11.glDisable(GL11.GL_LIGHTING)
     OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f)
@@ -60,11 +125,17 @@ object FemtoRenderUtils {
     OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j, k)
   }
 
-  def enableLightMap(te: TileEntity): Unit = {
-    GL11.glEnable(GL11.GL_LIGHTING)
-    RenderHelper.enableStandardItemLighting()
-    val i = Option(te).map(_.getWorld.getCombinedLight(te.getPos, 0)).getOrElse(15 << 20 | 15 << 4)
-    setLightmapTexCoords(i)
+  def renderNaniteConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedNaniteStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedNaniteConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedNaniteConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
   }
 
+  def renderFluidConfigOverlay(te: TileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedFluidStorageConfiguration): Unit = {
+    renderConfigOverlay(te, x, y, z,
+      (facing) =>
+        GuiSidedFluidConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedFluidConfig.colors.length),
+      (facing) => sidedConfig.getIOForAbsoluteFacing(facing))
+  }
 }

@@ -3,10 +3,12 @@ package com.itszuvalex.femtocraft.worldgen
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
+import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.worldgen.RiftTraitRegistry
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
 import com.itszuvalex.itszulib.api.core
-import com.itszuvalex.itszulib.api.core.Configurable
+import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
 import net.minecraft.init.Blocks
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -78,7 +80,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
     val dist = random.nextInt(distMax - distMin + 1) + distMin
     val cryst = random.nextInt(crystMax - crystMin + 1) + crystMin
 
-    //Replace in sphere
+    //Replace in cylinder
     {
       for {
         lx <- (x - dist) to (x + dist)
@@ -108,6 +110,18 @@ import net.minecraftforge.fml.common.IWorldGenerator
       while (cy > 1 && world.isAirBlock(new BlockPos(cx, cy - 1, cz))) cy -= 1
       while (world.getBlockState(new BlockPos(cx, cy, cz)).getBlock == Blocks.BEDROCK) cy += 1
       world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
+    }
+
+    // add rift
+    val chunkRiftCapability = world.getChunkFromBlockCoords(new BlockPos(x, y, z)).getCapability(Capabilities.CHUNK_RIFT, null)
+    if (chunkRiftCapability != null) {
+      var adjustedY = y
+      while (adjustedY > 1 && world.isAirBlock(new BlockPos(x, adjustedY, z))) adjustedY -= 1
+      adjustedY += random.nextInt(4)
+      val rift = new Rift(new Loc4(x, adjustedY, z, world.provider.getDimension))
+      rift.addTraits(RiftTraitRegistry.generateTraits(random))
+      chunkRiftCapability.addRift(rift)
+      FemtocraftRiftTracker.instance.registerRift(rift)
     }
   }
 }

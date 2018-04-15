@@ -23,8 +23,8 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
   transfer: => Double,
   renders: => Boolean
 ) extends IPowerNetworkNode with INBTSerializable[NBTTagCompound] {
-  var renderLocs  : scala.collection.Set[Loc4] = Set()
   val leafNodeLocs: mutable.HashSet[Loc4]      = new mutable.HashSet[Loc4]()
+  var renderLocs  : scala.collection.Set[Loc4] = Set()
 
   override def addLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs += node.getStorageLoc
@@ -36,19 +36,19 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
     leafNodeLocs -= node.getStorageLoc
     tileEntity.setUpdate()
     tileEntity.setModified()
-    PowerManager.refreshLeafsOnMain(this)
+    PowerManager.instance.refreshLeafsOnMain(this)
   }
 
   override def leafTransferRate: Double = transfer
 
-  override def leafNodes: Set[IPowerLeafNode] = leafNodeLocs.flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null))
+  override def leafNodes(force: Boolean): Set[IPowerLeafNode] = leafNodeLocs.flatMap(_.getTileEntity(force)).withFilter(_.hasCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null))
 
-  override def storageNodes: Set[IPowerStorageNode] = {
+  override def storageNodes(force: Boolean): Set[IPowerStorageNode] = {
     val set = if (tileEntity.hasCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
       Set(tileEntity.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
     else Set()
 
-    set ++ leafNodeLocs.flatMap(_.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_STORAGE_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
+    set ++ leafNodeLocs.flatMap(_.getTileEntity(force)).withFilter(_.hasCapability(Capabilities.TILE_POWER_STORAGE_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
   }
 
   override def connectionRadius: Float = radius

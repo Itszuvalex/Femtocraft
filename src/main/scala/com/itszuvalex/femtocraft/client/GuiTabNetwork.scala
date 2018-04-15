@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.gui.GuiPanelTexture
 
 /**
   * Created by Chris on 1/29/2017.

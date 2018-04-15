@@ -7,6 +7,7 @@ import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.{IPreviewable, ItszuLibCapabilities}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.block.BlockSnow
@@ -18,6 +19,8 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util._
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
+import net.minecraftforge.fml.relauncher.SideOnly
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/30/15.
@@ -75,6 +78,8 @@ class ItemFrame extends Item with IFrameItem {
 
   override def getFrameType(stack: ItemStack) = "Basic"
 
+  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+
   override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
     val stack = playerIn.getHeldItem(hand)
     if (playerIn.isSneaking) {
@@ -96,19 +101,22 @@ class ItemFrame extends Item with IFrameItem {
       dir = facing
     }
 
-    val bpos = pos.offset(dir)
+    val bpos = if (dir != null) pos.offset(dir) else pos
     if (!multi.canPlaceAtLocation(new Loc4(worldIn, bpos))) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
     val locations = multi.getTakenLocations(new Loc4(worldIn, bpos))
     if (!playerIn.capabilities.isCreativeMode && stack.getCount < multi.numFrames) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     else if (!playerIn.capabilities.isCreativeMode) stack.setCount(stack.getCount - multi.numFrames)
 
+    val controllerLoc = new Loc4(worldIn, bpos)
     locations.foreach { loc =>
       worldIn.setBlockState(loc.getPos, FemtoBlocks.blockFrame.getDefaultState)
       worldIn.getTileEntity(loc.getPos) match {
         case frame: TileFrame =>
-          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
-          frame.formMultiBlock(new Loc4(worldIn, bpos))
+          val offset: (Int, Int, Int) = (loc.x - controllerLoc.x, loc.y - controllerLoc.y, loc.z - controllerLoc.z)
+          frame.calculateRendering(multi.size._1, multi.size._2, multi.size._3, offset._1, offset._2, offset._3)
+          //          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
+          frame.formMultiBlock(loc, controllerLoc)
           frame.multiBlock = multiString
         case _ =>
       }
@@ -117,5 +125,19 @@ class ItemFrame extends Item with IFrameItem {
     EnumActionResult.SUCCESS
   }
 
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+  override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
+    new ICapabilityProvider {
+      override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+        if (capability == ItszuLibCapabilities.ITEM_PREVIEWABLE) {
+          new IPreviewable {
+            @SideOnly(value = net.minecraftforge.fml.relauncher.Side.CLIENT)
+            override def renderID: Int = RenderIDs.framePreviewableID
+          }.asInstanceOf[T]
+        }
+        else null.asInstanceOf[T]
+      }
+
+      override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability == ItszuLibCapabilities.ITEM_PREVIEWABLE
+    }
+  }
 }
