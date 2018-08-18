@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.cyber.item.ItemDumbDust
 import com.itszuvalex.femtocraft.industry.item._
-import com.itszuvalex.femtocraft.logistics.item.ItemLogisticsItemChip
+import com.itszuvalex.femtocraft.logistics.item.{ItemLogisticsItemChip, ItemNanoPack}
 import com.itszuvalex.femtocraft.nanite.items.ItemNanolash
 import com.itszuvalex.femtocraft.power.item.ItemPowerCrystal
 import net.minecraft.item.Item
@@ -52,6 +52,7 @@ object FemtoItems {
   var itemMultiTool   : Item = _
   var itemShiftTest   : Item = _
   var itemNanoLash    : Item = _
+  var itemNanoPack : Item = _
 
   @SubscribeEvent
   def registerItems(event: RegistryEvent.Register[Item]): Unit = {
@@ -89,6 +90,7 @@ object FemtoItems {
     itemMultiTool = registerItem(registry, new ItemMultiTool(), "itemMultiTool")
     itemShiftTest = registerItem(registry, new ItemShiftTest(), "itemShiftTest")
     itemNanoLash = registerItem(registry, new ItemNanolash(), "itemNanoLash")
+    itemNanoPack = registerItem(registry, new ItemNanoPack(), "itemNanoPack")
 
     FemtoBlocks.registerItemBlocks(registry)
 
@@ -135,6 +137,7 @@ object FemtoItems {
     itemMultiTool.registerModel()
     itemShiftTest.registerModel()
     itemNanoLash.registerModel()
+    itemNanoPack.registerModel()
   }
 
   def postInit(): Unit = {

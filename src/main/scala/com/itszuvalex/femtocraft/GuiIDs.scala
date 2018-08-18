@@ -34,6 +34,9 @@ object GuiIDs {
   val TileSidedNaniteConfigID    = nextID
   val TileSidedFluidConfigID     = nextID
   val TileGerminationChamberID   = nextID
+
+  val ItemNanoPackID = nextID
+
   private var n = 0
 
   def getTileConduitSideID(facing: EnumFacing): Int = (facing.getIndex << 16) + TileConduitSideID

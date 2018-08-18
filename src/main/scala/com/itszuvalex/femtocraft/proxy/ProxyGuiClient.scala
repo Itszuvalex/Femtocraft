@@ -9,6 +9,7 @@ import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.gui._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity
@@ -24,6 +25,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
   override def getClientGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, player.getHeldItemMainhand)
+      case (GuiIDs.ItemNanoPackID, _) => new GuiNanoPack(player, player.inventory, Converter.IItemStackFromItemStack(player.getHeldItemMainhand))
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)

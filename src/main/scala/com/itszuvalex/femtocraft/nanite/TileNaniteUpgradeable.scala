@@ -5,7 +5,7 @@ import com.itszuvalex.itszulib.core.TileEntityBase
 import net.minecraft.nbt.NBTTagCompound
 
 object TileNaniteUpgradeable {
-  val NANITE_TANK_KEY = "NaniteUpgradeTank'"
+  val NANITE_TANK_KEY = "NaniteUpgradeTank"
 }
 
 trait TileNaniteUpgradeable extends TileEntityBase with INaniteStorageTile {
