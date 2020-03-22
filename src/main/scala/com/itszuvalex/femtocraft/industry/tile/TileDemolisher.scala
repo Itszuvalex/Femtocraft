@@ -9,9 +9,9 @@ import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataS
 import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
-import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.api.storage._
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
@@ -75,10 +75,10 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY
   },
-  Map(NONE_INV_KEY -> IItemStorage.Empty,
-    INPUT_INV_KEY -> inputStorage,
-    OUTPUT_INV_KEY -> outputStorage),
-  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+   Map(NONE_INV_KEY -> IItemStorage.Empty,
+       INPUT_INV_KEY -> inputStorage,
+       OUTPUT_INV_KEY -> outputStorage),
+   () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
 
   descriptionDataSpec += new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig)
@@ -86,7 +86,7 @@ class TileDemolisher extends TileEntityBase with TileDataSpec with TileInventory
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](TASK_NBT, task),
     new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+    )
 
   override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
 

@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.api.power.PowerNetwork
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiIcons}
 import com.itszuvalex.femtocraft.power.container.ContainerPowerNetwork
 import com.itszuvalex.femtocraft.util.ChatHelper
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiSpacingPanel}
 import net.minecraft.client.Minecraft
@@ -13,7 +14,7 @@ import net.minecraft.client.Minecraft
   * Created by Christopher Harris (Itszuvalex) on 1/27/17.
   */
 
-class GuiPowerNetwork(tile: TileEntityBase) extends FemtoGuiBase(tile, new ContainerPowerNetwork(tile, false)) {
+class GuiPowerNetwork(tile: ITileEntity) extends FemtoGuiBase(tile, new ContainerPowerNetwork(tile, false)) {
   val network = inventorySlots.asInstanceOf[ContainerPowerNetwork]
   val numbersPanel       = new GuiSpacingPanel(5, 5, panelWidth, HEIGHT)
   val nodeCountString    = "Node Count"

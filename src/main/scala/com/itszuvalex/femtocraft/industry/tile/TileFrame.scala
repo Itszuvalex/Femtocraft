@@ -5,15 +5,15 @@ import java.util.Random
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame.TileFrameState
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, MultiblockStateHolder}
+import com.itszuvalex.femtocraft.util.StorageUtils
 import com.itszuvalex.femtocraft.util.data._
-import com.itszuvalex.femtocraft.util.{StorageUtils, TileEntityUtils}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, industry}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
+import com.itszuvalex.itszulib.api.storage.{DynamicIItemStorage, IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
-import com.itszuvalex.itszulib.util.InventoryUtils
+import com.itszuvalex.itszulib.util.{InventoryUtils, TileEntityUtils}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -34,9 +34,9 @@ object TileFrame {
   val PROGRESS_KEY        = "BuildProgress"
   val STATE_KEY           = "State"
   val INFO_KEY            = "Info"
-  val TICKS_TO_CHECK = 40
-  var shouldDrop        = true
-  var shouldFullyRemove = true
+  val TICKS_TO_CHECK      = 40
+  var shouldDrop          = true
+  var shouldFullyRemove   = true
 
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
@@ -52,7 +52,7 @@ object TileFrame {
 
   def setRenderMark(bool: Boolean, i: Int, j: Int, k: Int, marker: Int): Int = {
     val num = marker
-    val i1 = 1 << getSaveableIndentation(i, j, k)
+    val i1  = 1 << getSaveableIndentation(i, j, k)
     if (bool) num | i1
     else num & ~i1
   }
@@ -125,7 +125,7 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
   var inProgressData       : mutable.Map[String, Any] = mutable.Map()
   var isBuilding           : Boolean                  = false
   var ticks                                           = 0
-  var storage: IItemStorage = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
+  var storage              : IItemStorage             = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
 
   descriptionDataSpec ++= Array(
     new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
@@ -133,7 +133,7 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
     new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
     new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=),
     new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
-  )
+    )
   descriptionDataSpec.onLoad = () => setRenderUpdate()
   saveDataSpec ++= Array(
     new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
@@ -142,7 +142,7 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
     new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=),
     new industry.MultiblockStateHolder.DataMultiblockState[TileFrameState](TileFrame.STATE_KEY, state),
     new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
-  )
+    )
 
   def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
@@ -205,9 +205,9 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
   def checkForRequiredItems(): Unit = {
     FrameMultiblockRegistry.getMultiblock(multiBlock) match {
       case Some(multi) =>
-        val items = multi.getRequiredResources
+        val items  = multi.getRequiredResources
         val random = new Random
-        if (StorageUtils.removeItemsFromStorage(state.get.get.storage, items.map(Converter.IItemStackFromItemStack), false)) {
+        if (StorageUtils.removeItemsFromStorage(state.get.get.storage, items, false)) {
           state.get.foreach(_.storage.foreach { item =>
             if (!world.isRemote) InventoryUtils.dropItem(item, getLoc, random)
           })
@@ -230,7 +230,7 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
   def isCurrentlyBuilding: Boolean = {
     if (isController) isBuilding
     else if (isValidMultiBlock) {
-      info.cLoc.getTileEntity() match {
+      info.cLoc.getITileEntity() match {
         case Some(i: TileFrame) if i.isController => i.isBuilding
         case _ => false
       }
@@ -258,19 +258,19 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
             multi.getTakenLocations(getLoc).foreach { loc =>
               getWorld.setBlockToAir(loc.getPos)
               if (TileFrame.shouldDrop) {
-                val itemStack = new ItemStack(FemtoItems.itemFrame)
+                val itemStack = Converter.IItemStackFromItemStack(new ItemStack(FemtoItems.itemFrame))
                 ItemFrame.setSelection(itemStack, multiBlock)
-                InventoryUtils.dropItem(Converter.IItemStackFromItemStack(itemStack), loc, random)
+                InventoryUtils.dropItem(itemStack, loc, random)
               }
             }
             if (isBuilding && TileFrame.shouldDrop)
-              multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(Converter.IItemStackFromItemStack(i), getLoc, random))
+              multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(i, getLoc, random))
           case _ =>
         }
         state.get.foreach(_.storage.foreach(i => InventoryUtils.dropItem(i, getLoc, random)))
       }
-      else info.cLoc.getTileEntity() match {
-        case Some(frame: TileFrame) => world.setBlockToAir(info.cLoc.getPos)
+      else info.cLoc.getITileEntity() match {
+        case Some(_: TileFrame) => world.setBlockToAir(info.cLoc.getPos)
         case _ =>
       }
     }
@@ -279,7 +279,7 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
     if (hasGUI) {
-      info.cLoc.getTileEntity() match {
+      info.cLoc.getITileEntity() match {
         case Some(tile: TileFrame) =>
           par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
         case _ =>

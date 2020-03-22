@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex._
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.NaniteTank
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
@@ -12,8 +13,9 @@ import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataS
 import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
+import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice, PowerBattery}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, PowerBattery}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
@@ -89,11 +91,11 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
   Map(NONE_INV_KEY -> IItemStorage.Empty,
     INPUT_INV_KEY -> inputStorage,
     OUTPUT_INV_KEY -> outputStorage),
-  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   private                   val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
     Map(NONE_TANK_KEY -> null,
       NANITE_TANK_KEY -> naniteStorageTank),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
 
   descriptionDataSpec ++= Array(
@@ -141,9 +143,9 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
-    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
-    TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    ticks = itszulib.util.TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
+    itszulib.util.TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
+    femtocraft.util.TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
@@ -193,8 +195,8 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
       }
     }
 
-    TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
+    femtocraft.util.TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    itszulib.util.TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
   }
 
   override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
@@ -217,9 +219,9 @@ class TileNaniteInfuser extends TileEntityBase with TileInventory with TileDataS
   def getProgressMax = task.adjustedMax(0)
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => true
-    case (cap, _) if cap == com.itszuvalex.femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK => true
+    case (cap, _) if cap == femtocraft.api.Capabilities.ITEM_STORAGE_CONFIGURABLE => true
+    case (cap, _) if cap == femtocraft.api.Capabilities.NANITE_STORAGE_CONFIGURABLE => true
+    case (cap, _) if cap == femtocraft.api.Capabilities.TILE_NANITE_STORAGE_TANK => true
     case _ => super.hasCapability(capability, facing)
   }
 

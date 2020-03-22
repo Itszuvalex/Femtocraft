@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.gui
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnectionProvider}
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.logistics.container.ContainerConduitSide
@@ -54,7 +54,7 @@ object GuiConduitSide {
 
     private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
 
-    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
+    private def configuration: IConnectionProvider = stack().getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
     override def renderUpdate(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
       super.renderUpdate(screenX, screenY, mouseX, mouseY, partialTicks)
@@ -85,7 +85,7 @@ object GuiConduitSide {
 
     private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
 
-    private def configuration: IConnectionProvider = stack().getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
+    private def configuration: IConnectionProvider = stack().getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
     override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
       super.render(screenX, screenY, mouseX, mouseY, partialTicks)
@@ -126,16 +126,16 @@ class GuiConduitSide(player: EntityPlayer, inv: InventoryPlayer, private val til
   if (facing != null) {
     val labelName: String = facing.getName.charAt(0).toUpper.toString
     val faceLabel = new GuiLabel(30, 14, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, () => {
-      (if (tile.getCapability(Capabilities.TILE_CONDUIT, facing).isConnected(facing)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
+      (if (tile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
     }) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
         super.addTooltip(mouseX, mouseY, tooltip)
-        if (tile.getCapability(Capabilities.TILE_CONDUIT, facing).isConnected(facing))
-          tile.getLoc.getOffset(facing).getTileEntity(false) match {
+        if (tile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing))
+          tile.getLoc.getOffset(facing).getITileEntity(false) match {
             case None =>
             case Some(null) =>
             case Some(t) =>
-              tooltip += Option(t.getBlockType).map(_.getLocalizedName).getOrElse("")
+              tooltip += Option(t.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
           }
       }
     }

@@ -5,11 +5,10 @@ import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamb
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
-import net.minecraft.item.ItemStack
 
 object MultiblockGerminationChamber {
   val xSize = 2
@@ -26,16 +25,16 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
 
   override def canPlaceAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
     l.getWorld.get.isAirBlock(l.getPos) ||
-      l.getBlock(true).get.isReplaceable(l.getWorld.get, l.getPos)
+    l.getBlock(true).get.isReplaceable(l.getWorld.get.toMinecraft, l.getPos)
   }
 
-  override def formAtLocationFromItem(loc: Loc4, item: ItemStack): Boolean = formAtLocation(loc) // TODO: NBT Item
+  override def formAtLocationFromItem(loc: Loc4, item: IItemStack): Boolean = formAtLocation(loc) // TODO: NBT Item
 
   override def formAtLocation(loc: Loc4): Boolean = getTakenLocations(loc).forall { l =>
     l.getWorld.get.setBlockState(l.getPos, FemtoBlocks.blockGerminationChamber.getDefaultState)
-    l.getTileEntity(true) match {
-      case Some(te: TileGerminationChamber) if te.hasCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null) =>
-        te.getCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null).formMultiBlock(l, loc)
+    l.getITileEntity(true) match {
+      case Some(te: TileGerminationChamber) if te.hasModule(ItszuLibModules.TILE_MULTIBLOCK, null) =>
+        te.getModule(ItszuLibModules.TILE_MULTIBLOCK, null).formMultiBlock(l, loc)
       case _ => false
     }
   }
@@ -50,7 +49,7 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
 
   override def numFrames: Int = xSize * ySize * zSize
 
-  override def getRequiredResources: IndexedSeq[ItemStack] = Array[ItemStack](FemtoItems.itemRiftironIngotActivated.newStack(10))
+  override def getRequiredResources: IndexedSeq[IItemStack] = Array[IItemStack](FemtoItems.itemRiftironIngotActivated.newIStack(10))
 
   override def onMultiblockBroken(loc: Loc4): Unit = getTakenLocations(loc).foreach(l => l.getWorld.get.setBlockToAir(l.getPos))
 

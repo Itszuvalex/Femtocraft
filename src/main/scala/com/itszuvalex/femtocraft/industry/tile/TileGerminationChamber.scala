@@ -7,18 +7,18 @@ import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamb
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.render.TileBeamRenderOffset
+import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.util.data._
-import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.multiblock.MultiBlockInfo
 import com.itszuvalex.itszulib.api.storage._
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.api.{ItszuLibCapabilities, ItszuLibModules}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
 import com.itszuvalex.itszulib.render.Vector3
-import com.itszuvalex.itszulib.util.{Color, Task}
+import com.itszuvalex.itszulib.util.{Color, Task, TileEntityUtils}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -78,7 +78,7 @@ object TileGerminationChamber {
       results = new ItemStorageArray(size)
       germinationChamberRecipe.results.zipWithIndex.foreach { result =>
         val resultStack = result._1._1.copy()
-        val range = result._1._2
+        val range       = result._1._2
         resultStack.stackSize = Random.nextInt(range._2 - range._1) + range._1
         results(result._2) = resultStack
       }
@@ -120,11 +120,11 @@ object TileGerminationChamber {
                       val task                    : GerminationTask              = new GerminationTask
                       val powerStorageNodeDelegate: PowerStorageNodeDelegate     = new PowerStorageNodeDelegate(tile, battery _, PowerStorageNodeType.CONSUMER, () => 40d)
                       val powerLeafNodeDelegate   : PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(tile, () => 8f, battery _, PowerStorageNodeType.CONSUMER,
-                        PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(powerLeafNodeDelegate, 40d), () => powerStorageNodeDelegate.changeForLastTick
-                      )
+                                                                                                                    PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(powerLeafNodeDelegate, 40d), () => powerStorageNodeDelegate.changeForLastTick
+                                                                                                                    )
                       val descriptionSpec                                        = new DataSpecification(ArrayBuffer(
                         new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
-                      ))
+                        ))
 
     dataSpec ++= Array(
       new DataSerializable[NBTTagCompound](BATTERY_NBT, battery),
@@ -132,7 +132,7 @@ object TileGerminationChamber {
       new DataSerializable[NBTTagCompound](ITEMS_NBT, storage),
       new DataSerializable[NBTTagCompound](TASK_NBT, task),
       new DataSerializable[NBTTagCompound](LEAF_NODE_NBT, powerLeafNodeDelegate)
-    )
+      )
     var insertingOutput: Boolean = false
   }
 
@@ -166,23 +166,23 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
   private                   val sidedStorageConfig                         = new MultiblockSidedItemStorageConfiguration(
     getLoc _, info _, NONE_INV_KEY, _ => INPUT_INV_KEY,
     Map(NONE_INV_KEY -> IItemStorage.Empty,
-      INPUT_INV_KEY -> inputStorage,
-      OUTPUT_INV_KEY -> outputStorage),
+        INPUT_INV_KEY -> inputStorage,
+        OUTPUT_INV_KEY -> outputStorage),
     () => EnumFacing.NORTH)
   private                   val sidedFluidConfig                           = new MultiblockSidedFluidStorageConfiguration(
     getLoc _, info _, NONE_TANK_KEY, _ => TANK_KEY,
     Map(NONE_TANK_KEY -> IFluidStorage.Empty,
-      TANK_KEY -> tank),
+        TANK_KEY -> tank),
     () => EnumFacing.NORTH
-  )
-  private                   var ticks                                      = 0
+    )
+  private var ticks                                                        = 0
 
   descriptionDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
     new DataSerializable[NBTTagCompound](MULTIBLOCK_INFO_NBT, info),
     new ConditionalData(() => state.hasState, new DataSerializable[NBTTagCompound](STATE_NBT, () => state.get.get.descriptionSpec))
-  )
+    )
   descriptionDataSpec.onLoad = () => setRenderUpdate()
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
@@ -190,7 +190,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     new MultiblockStateHolder.DataMultiblockState[GerminationChamberState](STATE_NBT, state),
     new DataSerializable[NBTTagCompound](MULTIBLOCK_INFO_NBT, info),
     new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+    )
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
@@ -207,14 +207,14 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   private def controllerUpdate(): Unit = {
     val actualState = state.get.get
-    val task = actualState.task
+    val task        = actualState.task
 
     if (task.stack == null || task.stack.isEmpty) {
       val item = storage(0)
       if (!item.isEmpty) {
         val recipe = GerminationChamberRecipeRegistry.findMatchingRecipe(item)
         if (recipe.isDefined) {
-          val r = recipe.get
+          val r   = recipe.get
           val ins = storage.split(0, 1)
           task.reset()
           task.stack = ins
@@ -228,9 +228,9 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
         case None =>
           task.reset()
         case Some(recipe) =>
-          val fakeRemoval = actualState.tank.drain(new FluidStack(recipe.fluid, recipe.fluidPerTick), false)
+          val fakeRemoval = actualState.tank.drain(Converter.IFluidStackFromFluidStack(new FluidStack(recipe.fluid, recipe.fluidPerTick)), false)
           if (fakeRemoval != null && fakeRemoval.amount == recipe.fluidPerTick) {
-            actualState.tank.drain(new FluidStack(recipe.fluid, recipe.fluidPerTick), true)
+            actualState.tank.drain(Converter.IFluidStackFromFluidStack(new FluidStack(recipe.fluid, recipe.fluidPerTick)), true)
             battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
             if (task.completed(0)) {
               val item = task.stack
@@ -327,7 +327,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ => super.getCapability(capability, facing)
   }
 
-  def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
+  def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getITileEntity()).withFilter(_.hasModule(ItszuLibModules.COLORABLE, null)).map(_.getModule(ItszuLibModules.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
 
   override def changeForLastTick: Double = getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).changeForLastTick
 
@@ -358,9 +358,9 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
         }
       }
       FrameMultiblockRegistry.getMultiblock(MultiblockGerminationChamber.name)
-        .foreach {
-          _.onMultiblockBroken(getLoc)
-        }
+                             .foreach {
+                               _.onMultiblockBroken(getLoc)
+                             }
     }
     else {
       getInfo.cLoc.getWorld.foreach(_.setBlockToAir(getInfo.cLoc.getPos))

@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex._
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.{NaniteStack, NaniteTank}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
@@ -7,13 +8,12 @@ import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
 import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, PowerBattery}
-import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.ItemStack
@@ -74,25 +74,25 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case _ => NONE_KEY
   },
-  Map(NONE_KEY -> IItemStorage.Empty,
-    INPUT_INV_KEY -> storage),
-  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+   Map(NONE_KEY -> IItemStorage.Empty,
+       INPUT_INV_KEY -> storage),
+   () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   private val sidedNaniteConfig  = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-    Map(NONE_TANK_KEY -> null,
-      NANITE_TANK_KEY -> naniteStorageTank),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+                                                                       Map(NONE_TANK_KEY -> null,
+                                                                           NANITE_TANK_KEY -> naniteStorageTank),
+                                                                       () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
 
   descriptionDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig)
-  )
+    )
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig),
     new DataSerializable[NBTTagCompound](TASK_NBT, task),
     new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+    )
 
   override def defaultBattery = new PowerBattery(5000)
 
@@ -129,9 +129,9 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
   override def serverUpdate(): Unit = {
     super.serverUpdate()
 
-    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
-    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
-    TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    ticks = itszulib.util.TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
+    itszulib.util.TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
+    femtocraft.util.TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
 
     if (task.stack == null) {
       val item = storage(0)
@@ -157,8 +157,8 @@ class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDat
       }
     }
 
-    TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
+    femtocraft.util.TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    itszulib.util.TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
   }
 
   def getProgress = task.progress

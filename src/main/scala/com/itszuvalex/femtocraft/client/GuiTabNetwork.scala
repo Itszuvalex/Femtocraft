@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.gui.GuiPanelTexture
 
 /**
@@ -10,12 +10,12 @@ import com.itszuvalex.itszulib.gui.GuiPanelTexture
 object GuiTabNetwork {
   val NetworkTexLoc = Resources.TexGui("tabnetwork.png")
 
-  def addToGuiTabBar(bar: GuiTabBar, tile: TileEntityBase): Unit = {
+  def addToGuiTabBar(bar: GuiTabBar, tile: ITileEntity): Unit = {
     bar.addTab(new GuiTabNetwork("Network", tile, bar.getActiveGuiID))
   }
 }
 
 class GuiTabNetwork(text: String,
-  tile: TileEntityBase,
-  activeGuiID: () => Int)
+                    tile: ITileEntity,
+                    activeGuiID: () => Int)
   extends GuiTab(text, new GuiPanelTexture(2, 2, 18, 18, GuiTabNetwork.NetworkTexLoc), tile, GuiIDs.TilePowerNetworkID, activeGuiID)

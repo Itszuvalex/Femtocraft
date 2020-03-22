@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository._
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.Converter
-import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.util.TileEntityUtils
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
@@ -30,16 +30,16 @@ object TileItemRepository {
 
 class TileItemRepository extends TileEntityBase with TileInventory with TileDataSpec {
   private val sidedStorageConfig = new SidedItemStorageConfiguration(_ => INV_KEY,
-    Map(NONE_KEY -> IItemStorage.Empty,
-      INV_KEY -> storage),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+                                                                     Map(NONE_KEY -> IItemStorage.Empty,
+                                                                         INV_KEY -> storage),
+                                                                     () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
 
   descriptionDataSpec += new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig)
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
     new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+    )
 
   override def defaultStorage: IItemStorage = new ItemStorageArray(INVENTORY_SIZE)
 

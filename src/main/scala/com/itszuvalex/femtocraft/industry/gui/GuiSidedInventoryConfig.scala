@@ -1,13 +1,14 @@
 package com.itszuvalex.femtocraft.industry.gui
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfig
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.{MessageSidedInventoryConfigChange, MessageSidedInventoryIOChange}
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.utility.FacingUtil
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import com.itszuvalex.itszulib.gui.{GuiButton, GuiLabel}
 import com.itszuvalex.itszulib.render.RenderUtils._
@@ -15,9 +16,7 @@ import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.items.CapabilityItemHandler
 import org.lwjgl.opengl.GL11
 
 import scala.collection.mutable.ListBuffer
@@ -43,12 +42,12 @@ object GuiSidedInventoryConfig {
     Color(255.toByte, 255.toByte, 255.toByte, 0.toByte), // Yellow
     Color(255.toByte, 0.toByte, 255.toByte, 255.toByte), // Teal
     Color(255.toByte, 255.toByte, 0.toByte, 255.toByte) // Purple
-  )
+    )
 
-  class GuiSideConfigButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
+  class GuiSideConfigButton(x: Int, y: Int, tile: ITileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()
-    private val customizeable = tile != null && tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
-    private val configuration = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+    private val customizeable = tile != null && tile.hasModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)
+    private val configuration = tile.getModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)
 
     //  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
 
@@ -68,12 +67,12 @@ object GuiSidedInventoryConfig {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       tooltip += face.getName
       if (!isDisabled && customizeable) {
-        val loc = new Loc4(tile)
-        val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
+        val loc       = new Loc4(tile)
+        val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
-        val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
-          tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
+        val te        = offsetLoc.getITileEntity(false)
+        if (te.nonEmpty && te.get.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, offset.getOpposite)) {
+          tooltip += Option(te.get.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
         tooltip += configuration.getStorageNameForRelativeFacing(face)
@@ -96,7 +95,7 @@ object GuiSidedInventoryConfig {
 
       if (customizeable) {
         val colorindex = math.max(configuration.storages.keySet.toArray.indexOf(configuration.getStorageNameForRelativeFacing(face)), 0)
-        val color = GuiSidedInventoryConfig.colors(colorindex % GuiSidedInventoryConfig.colors.length)
+        val color      = GuiSidedInventoryConfig.colors(colorindex % GuiSidedInventoryConfig.colors.length)
         GL11.glColor4ub(color.red, color.green, color.blue, color.alpha)
         Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_EMPTY_LIGHT)
         drawBlock(DefaultVertexFormats.POSITION_TEX) {
@@ -106,11 +105,11 @@ object GuiSidedInventoryConfig {
           addVertexUV(screenX, screenY, 0, 0, 0)
         }
 
-        val loc = new Loc4(tile)
-        val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
+        val loc       = new Loc4(tile)
+        val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
-        val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
+        val te        = offsetLoc.getITileEntity(false)
+        if (te.nonEmpty && te.get.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, offset.getOpposite)) {
           GL11.glColor4f(1, 1, 1, 1)
           Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_COLOR)
           drawBlock(DefaultVertexFormats.POSITION_TEX) {
@@ -130,10 +129,10 @@ object GuiSidedInventoryConfig {
     }
   }
 
-  class GuiSideIOButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
+  class GuiSideIOButton(x: Int, y: Int, tile: ITileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()
-    private val customizeable = tile != null && tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
-    private val configuration = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+    private val customizeable = tile != null && tile.hasModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)
+    private val configuration = tile.getModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)
 
     //  if (face == EnumFacing.NORTH && !tile.frontConfigurable) disabled = true
 
@@ -153,12 +152,12 @@ object GuiSidedInventoryConfig {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       tooltip += face.getName
       if (!isDisabled && customizeable) {
-        val loc = new Loc4(tile)
-        val offset = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
+        val loc       = new Loc4(tile)
+        val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
-        val te = offsetLoc.getTileEntity(false)
-        if (te.nonEmpty && te.get.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, offset.getOpposite)) {
-          tooltip += Option(te.get.getBlockType).map(_.getLocalizedName).getOrElse("")
+        val te        = offsetLoc.getITileEntity(false)
+        if (te.nonEmpty && te.get.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, offset.getOpposite)) {
+          tooltip += Option(te.get.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
         tooltip += configuration.getIOForRelativeFacing(face).toString
@@ -207,7 +206,7 @@ object GuiSidedInventoryConfig {
 
 }
 
-class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig(tile)) {
+class GuiSidedInventoryConfig(tile: ITileEntity) extends FemtoGuiBase(tile, new ContainerSidedInventoryConfig(tile)) {
   val accessLabel       = new GuiLabel(10, 10, 50, 20, () => "Access")
   val upConfigButton    = new GuiSidedInventoryConfig.GuiSideConfigButton(26, 30, tile, EnumFacing.UP)
   val leftConfigButton  = new GuiSidedInventoryConfig.GuiSideConfigButton(10, 46, tile, EnumFacing.EAST)
@@ -226,7 +225,7 @@ class GuiSidedInventoryConfig(tile: TileEntity) extends FemtoGuiBase(tile, new C
   override def GuiID: Int = GuiIDs.TileSidedInventoryConfigID
 
   add(accessLabel, upConfigButton, leftConfigButton, frontConfigButton, rightConfigButton, downConfigButton, backConfigButton,
-    automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)
+      automaticIOLabel, upIOButton, leftIOButton, frontIOButton, rightIOButton, downIOButton, backIOButton)
 
   panelHeight /= 2
 }

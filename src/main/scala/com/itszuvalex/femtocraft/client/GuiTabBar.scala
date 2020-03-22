@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.client
 
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.gui.{GuiFlowLayout, GuiPanel}
 
 /**
@@ -10,7 +10,7 @@ object GuiTabBar {
   val WIDTH = GuiTab.WIDTH
 }
 
-class GuiTabBar(anchorX: Int, anchorY: Int, height: Int, currentGuiID: Int, tile: TileEntityBase) extends
+class GuiTabBar(anchorX: Int, anchorY: Int, height: Int, currentGuiID: Int, tile: ITileEntity) extends
   GuiFlowLayout(anchorX, anchorY, GuiTabBar.WIDTH, height) {
   primaryFlow = GuiFlowLayout.FlowDirection.Vertical
 

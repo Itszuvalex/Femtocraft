@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageOpenGui
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.gui.{GuiButton, GuiPanel}
 
 import scala.collection.mutable.ListBuffer
@@ -16,10 +16,10 @@ object GuiTab {
 }
 
 class GuiTab(text: String,
-  var iconRender: GuiPanel,
-  var tile: TileEntityBase,
-  var guiID: Int,
-  var activeGuid: () => Int) extends GuiButton(0, 0, GuiTab.WIDTH, GuiTab.HEIGHT, "") {
+             var iconRender: GuiPanel,
+             var tile: ITileEntity,
+             var guiID: Int,
+             var activeGuid: () => Int) extends GuiButton(0, 0, GuiTab.WIDTH, GuiTab.HEIGHT, "") {
   iconRender.anchorX = (panelWidth - iconRender.panelWidth) / 2
   iconRender.anchorY = (panelHeight - iconRender.panelHeight) / 2
   add(iconRender)

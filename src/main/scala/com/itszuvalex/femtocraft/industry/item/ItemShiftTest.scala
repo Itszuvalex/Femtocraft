@@ -4,7 +4,8 @@ import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteTeleport
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.itszulib.api.{IPreviewable, ItszuLibCapabilities}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.client.IPreviewable
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
@@ -27,7 +28,7 @@ class ItemShiftTest extends Item {
   override def onItemRightClick(world: World, player: EntityPlayer, hand: EnumHand): ActionResult[ItemStack] = {
     if (!world.isRemote) {
       val look = player.getLookVec
-      val vec = Vector3(look.x, look.y, look.z).normalize()
+      val vec  = Vector3(look.x, look.y, look.z).normalize()
       getDestination(world, player, vec, 8d) match {
         case Some(a) =>
           val old = player.getPosition
@@ -60,7 +61,7 @@ class ItemShiftTest extends Item {
 
         if (player.getEntityBoundingBox != null)
           (0 to Math.abs((player.getEntityBoundingBox.maxY - player.getEntityBoundingBox.minY).toInt)).forall(yOffset =>
-            world.getBlockState(new BlockPos(x, y + yOffset, z)).getBlock.isPassable(world, new BlockPos(x, y + yOffset, z)))
+                                                                                                                world.getBlockState(new BlockPos(x, y + yOffset, z)).getBlock.isPassable(world, new BlockPos(x, y + yOffset, z)))
         else true
       }
     }

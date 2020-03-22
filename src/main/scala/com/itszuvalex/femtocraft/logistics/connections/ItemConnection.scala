@@ -2,15 +2,14 @@ package com.itszuvalex.femtocraft.logistics.connections
 
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IResource, LogisticsResourceRegistry}
 import com.itszuvalex.femtocraft.logistics.connections.ItemConnection.{InternalIItemStack, InternalStorage}
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.core.{IModule, ItemIdentifier, Loc4}
 import com.itszuvalex.itszulib.api.storage.IItemStorage
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.items.CapabilityItemHandler
 
 object ItemConnection {
   val FLOPS_KEY                = "flops"
@@ -75,6 +74,12 @@ object ItemConnection {
     override def serializeNBT(): NBTTagCompound = itemStack.serializeNBT()
 
     override def deserializeNBT(nbt: NBTTagCompound): Unit = itemStack.deserializeNBT(nbt)
+
+    override def identifier: ItemIdentifier = itemStack.identifier
+
+    override def hasModule(mod: IModule[_], facing: EnumFacing): Boolean = itemStack.hasModule(mod, facing)
+
+    override def getModule[T](mod: IModule[T], facing: EnumFacing): T = itemStack.getModule(mod, facing)
   }
 
 }
@@ -86,9 +91,9 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
   val bufferStorage = new InternalStorage(this, () => stackLimit)
 
   def storage: Option[IItemStorage] = {
-    loc.getOffset(facing).getTileEntity(false) match {
-      case Some(i: TileEntity) if i.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, interfaceDirection) =>
-        Some(Converter.IItemStorageFromIItemHandler(i.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, interfaceDirection)))
+    loc.getOffset(facing).getITileEntity(false) match {
+      case Some(i: ITileEntity) if i.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, interfaceDirection) =>
+        Some(Converter.IItemStorageFromIItemHandler(i.getModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, interfaceDirection)))
       case _ => None
     }
   }
@@ -150,10 +155,10 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
     * @return
     */
   override def active: Boolean = !isPaused &&
-    (direction match {
-      case ConnectionDirection.INPUT => canAcceptMoreInput
-      case _ => !isEmpty
-    })
+                                 (direction match {
+                                   case ConnectionDirection.INPUT => canAcceptMoreInput
+                                   case _ => !isEmpty
+                                 })
 
   override def flopsRemaining: Double = flopsToGo
 
@@ -183,7 +188,6 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
   /**
     *
     * @param flops Amount of flops that can be contributed.
-    *
     * @return Amount of FLOPs from FLOPs that are unused.
     */
   override def contributeFlops(flops: Double): Double = {
@@ -215,7 +219,6 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
   /**
     *
     * @param t Stack to insert
-    *
     * @return Remains of insert that are unused.
     */
   override def insert(t: ItemStack): ItemStack = {

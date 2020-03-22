@@ -6,14 +6,15 @@ import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace.SmeltTask._
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
-import com.itszuvalex.femtocraft.util.{TileEntityUtils, Wrapper}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray, ItemStorageSlice}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBattery, IItemStack, PowerBattery}
+import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, ItemStorageSlice, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
-import com.itszuvalex.itszulib.util.Task
+import com.itszuvalex.itszulib.util
+import com.itszuvalex.itszulib.util.{Task, TileEntityUtils}
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
@@ -94,7 +95,7 @@ class TileNanoFurnace extends TileEntityBase with TileInventory with TileDataSpe
   Map(NONE_INV_KEY -> IItemStorage.Empty,
     INPUT_INV_KEY -> inputStorage,
     OUTPUT_INV_KEY -> outputStorage),
-  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+  () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
 
   descriptionDataSpec += new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig)

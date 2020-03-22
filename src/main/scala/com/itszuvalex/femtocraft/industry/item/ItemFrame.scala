@@ -6,8 +6,10 @@ import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, IFrameItem}
 import com.itszuvalex.femtocraft.render.RenderIDs
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.client.IPreviewable
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.{IPreviewable, ItszuLibCapabilities}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.block.BlockSnow
@@ -29,31 +31,31 @@ object ItemFrame {
   val FRAME_COMPOUND = "Frame"
   val SELECTION_TAG  = "Selection"
 
-  def getSelection(stack: ItemStack): String = {
+  def getSelection(stack: IItemStack): String = {
     if (stack != null) {
-      if (stack.getTagCompound == null) return null
-      stack.getTagCompound.NBTCompound(FRAME_COMPOUND) { comp =>
+      if (!stack.hasNbt) return null
+      stack.nbt.NBTCompound(FRAME_COMPOUND) { comp =>
         return comp.String(SELECTION_TAG)
       }
     }
     null
   }
 
-  def setSelection(stack: ItemStack, name: String) = {
+  def setSelection(stack: IItemStack, name: String) = {
     if (stack != null) {
-      if (stack.getTagCompound == null) stack.setTagCompound(new NBTTagCompound())
-      stack.getTagCompound()(
+      if (!stack.hasNbt) stack.nbt = new NBTTagCompound()
+      stack.nbt(
         FRAME_COMPOUND -> NBTCompound(
           SELECTION_TAG -> name
+          )
         )
-      )
     }
   }
 }
 
 
 class ItemFrame extends Item with IFrameItem {
-  override def setSelectedMultiblock(stack: ItemStack, name: String) = ItemFrame.setSelection(stack, name)
+  override def setSelectedMultiblock(stack: IItemStack, name: String) = ItemFrame.setSelection(stack, name)
 
   override def renderID: Int = RenderIDs.framePreviewableID
 
@@ -70,15 +72,16 @@ class ItemFrame extends Item with IFrameItem {
 
   override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag) = {
     super.addInformation(stack, worldIn, tooltip, flagIn)
-    val list = tooltip.asInstanceOf[util.List[String]]
-    list.add("Frame: " + getFrameType(stack))
-    val selected = getSelectedMultiblock(stack)
+    val istack = Converter.IItemStackFromItemStack(stack)
+    val list   = tooltip.asInstanceOf[util.List[String]]
+    list.add("Frame: " + getFrameType(istack))
+    val selected = getSelectedMultiblock(istack)
     list.add("Selected: " + (if (selected == null || selected.isEmpty) "none" else selected))
   }
 
-  override def getFrameType(stack: ItemStack) = "Basic"
+  override def getFrameType(stack: IItemStack) = "Basic"
 
-  override def getSelectedMultiblock(stack: ItemStack) = ItemFrame.getSelection(stack)
+  override def getSelectedMultiblock(stack: IItemStack) = ItemFrame.getSelection(stack)
 
   override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
     val stack = playerIn.getHeldItem(hand)
@@ -86,7 +89,8 @@ class ItemFrame extends Item with IFrameItem {
       playerIn.openGui(Femtocraft, GuiIDs.TileFrameMultiblockSelectorGuiID, worldIn, 0, 0, 0)
       return EnumActionResult.SUCCESS
     }
-    val multiString = getSelectedMultiblock(stack)
+    val istack      = Converter.IItemStackFromItemStack(stack)
+    val multiString = getSelectedMultiblock(istack)
     if (multiString == null || multiString.isEmpty) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
     if (multi == null) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
@@ -97,7 +101,7 @@ class ItemFrame extends Item with IFrameItem {
     if (block == Blocks.SNOW_LAYER && (worldIn.getBlockState(pos).getValue(BlockSnow.LAYERS).toInt & 7) < 1) {
       dir = EnumFacing.UP
     } else if (block != Blocks.VINE && block != Blocks.TALLGRASS && block != Blocks.DEADBUSH
-      && !block.isReplaceable(worldIn, pos)) {
+               && !block.isReplaceable(worldIn, pos)) {
       dir = facing
     }
 

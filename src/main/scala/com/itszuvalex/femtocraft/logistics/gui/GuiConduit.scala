@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.logistics.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.logistics.container.ContainerConduit
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
@@ -26,18 +26,18 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
     val faceButton = new GuiButton(2 + (f.getIndex / 3) * 90, 10 + (f.getIndex % 3) * 20, fontRenderer.getStringWidth(labelName) + 1, 18, labelName) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
         super.addTooltip(mouseX, mouseY, tooltip)
-        if (tile.getCapability(Capabilities.TILE_CONDUIT, f).isConnected(f))
-          tile.getLoc.getOffset(f).getTileEntity(false) match {
+        if (tile.getModule(ManagerModules.TILE_CONDUIT, f).isConnected(f))
+          tile.getLoc.getOffset(f).getITileEntity(false) match {
             case None =>
             case Some(null) =>
             case Some(t) =>
-              tooltip += Option(t.getBlockType).map(_.getLocalizedName).getOrElse("")
+              tooltip += Option(t.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
           }
       }
 
       override def update(): Unit = {
         text =
-          (if (tile.getCapability(Capabilities.TILE_CONDUIT, f).isConnected(f)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET + ' '
+          (if (tile.getModule(ManagerModules.TILE_CONDUIT, f).isConnected(f)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET + ' '
       }
 
       override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {

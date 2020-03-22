@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter._
-import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.api.storage.IBattery
 import com.itszuvalex.itszulib.gui.GuiPanel
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -32,7 +32,7 @@ object GuiPowerMeter {
   * @param colorAccent Custom accent color for the scale (defaults to blue).
   */
 class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var battery: IBattery,
-  var colorAccent: Int = DEFAULT_ACCENT_COLOR) extends GuiPanel {
+                    var colorAccent: Int = DEFAULT_ACCENT_COLOR) extends GuiPanel {
 
   override var _panelWidth : Int = 18
   override var _panelHeight: Int = 52
@@ -45,7 +45,7 @@ class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var ba
     tooltip ++= List[String](
       "Energy:",
       "%,.1f".format(battery.storage) + "/" + "%,.1f".format(battery.maxStorage) + " DE"
-    )
+      )
   }
 
   override def render(screenX: Int, screenY: Int, mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
@@ -87,9 +87,9 @@ class GuiPowerMeter(override var anchorX: Int, override var anchorY: Int, var ba
   }
 
   private def rgbFloatsFromColor(color: Int): (Float, Float, Float) = {
-    val red = (color & 0xFF0000) >>> 16
+    val red   = (color & 0xFF0000) >>> 16
     val green = (color & 0xFF00) >>> 8
-    val blue = color & 0xFF
+    val blue  = color & 0xFF
     (red / 255f, green / 255f, blue / 255f)
   }
 

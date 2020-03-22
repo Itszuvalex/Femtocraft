@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityRenderCube}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.tileentity.TileEntity
@@ -26,7 +26,7 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
 
   override def renderTileEntityInWorld(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     lastTe = te
-    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
+    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
     GL11.glColor4f(1f, 1f, 1f, alpha)
     pass = 0
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
