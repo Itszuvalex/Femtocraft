@@ -27,7 +27,7 @@ object PowerBeamRenderer {
     val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
     val f3: Float = -f2 * 0.2F - MathHelper.floor(-f2 * 0.1F).toFloat
     val nloc = node.getLoc
-    val extraOffset = loc.getTileEntity(false) match {
+    val extraOffset = loc.getITileEntity(false) match {
       case Some(t: TileBeamRenderOffset) => t.offset
       case _ => Vector3(0, 0, 0)
     }

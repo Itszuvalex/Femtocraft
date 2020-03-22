@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerStorageNode, PowerStorageNodeDelegate, PowerStorageNodeType}
-import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.api.storage.IBattery
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import net.minecraft.nbt.NBTTagCompound

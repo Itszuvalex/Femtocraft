@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
@@ -93,13 +93,13 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP))
     }
 
-    te.getCapability(Capabilities.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getTileEntity()).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).
+    te.getModule(ManagerModules.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getITileEntity()).withFilter(_.hasModule(ManagerModules.TILE_POWER_NODE, null)).
       foreach { t =>
-        val cap = t.getCapability(Capabilities.TILE_POWER_NODE, null)
+        val cap = t.getModule(ManagerModules.TILE_POWER_NODE, null)
         if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
       }
 
-    te.getCapability(Capabilities.TILE_POWER_NODE, null).leafNodes(false).
+    te.getModule(ManagerModules.TILE_POWER_NODE, null).leafNodes(false).
       foreach { t =>
         if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
       }

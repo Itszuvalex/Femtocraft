@@ -2,7 +2,8 @@ package com.itszuvalex.femtocraft.industry.item
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.render.RenderIDs
-import com.itszuvalex.itszulib.api.IPreviewable
+import com.itszuvalex.itszulib.api.client.IPreviewable
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -27,25 +28,25 @@ class ItemMultiblock extends Item with IPreviewable {
   }
 
   override def getItemStackDisplayName(itemStack: ItemStack): String = {
-    val multi = getMultiblock(itemStack)
+    val multi = getMultiblock(Converter.IItemStackFromItemStack(itemStack))
     if (multi == null || multi.isEmpty)
       "Invalid Multiblock"
     else multi
   }
 
   @SideOnly(Side.CLIENT)
-  override def renderID = RenderIDs.multiblockPreviewableID
+  override def renderID: Int = RenderIDs.multiblockPreviewableID
 
   override def onItemUse(playerIn: EntityPlayer, worldIn: World, pos: BlockPos, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): EnumActionResult = {
-    val stack = playerIn.getHeldItem(hand)
-    val multiString = getMultiblock(stack)
+    val stack       = playerIn.getHeldItem(hand)
+    val multiString = getMultiblock(Converter.IItemStackFromItemStack(stack))
     if (multiString == null || multiString.isEmpty) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
     val multi = FrameMultiblockRegistry.getMultiblock(multiString).orNull
     if (multi == null) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
 
     var hitSide = facing
-    val block = worldIn.getBlockState(pos).getBlock
+    val block   = worldIn.getBlockState(pos).getBlock
 
     //    var dir = ForgeDirection.UNKNOWN
     //    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
@@ -78,8 +79,8 @@ class ItemMultiblock extends Item with IPreviewable {
     EnumActionResult.SUCCESS
   }
 
-  def getMultiblock(item: ItemStack): String = {
-    if (!item.hasTagCompound) null
-    else item.getTagCompound.getString(ItemMultiblock.MULTIBLOCK_KEY)
+  def getMultiblock(item: IItemStack): String = {
+    if (!item.hasNbt) null
+    else item.nbt.getString(ItemMultiblock.MULTIBLOCK_KEY)
   }
 }

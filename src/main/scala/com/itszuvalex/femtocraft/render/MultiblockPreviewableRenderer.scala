@@ -2,10 +2,10 @@ package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.industry.item.ItemMultiblock
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
-import com.itszuvalex.itszulib.api.IPreviewableRenderer
+import com.itszuvalex.itszulib.api.client.IPreviewableRenderer
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
@@ -15,10 +15,10 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 class MultiblockPreviewableRenderer extends IPreviewableRenderer {
   lazy val generic = new GenericFrameMultiblockRenderer
 
-  override def render(stack: ItemStack, player: EntityPlayer): Unit = {}
+  override def render(stack: IItemStack, player: EntityPlayer): Unit = {}
 
-  override def renderAtLocation(stack: ItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
-    stack.getItem match {
+  override def renderAtLocation(stack: IItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+    stack.toMinecraft.getItem match {
       case frame: ItemMultiblock =>
         frame.getMultiblock(stack) match {
           case multi: String =>

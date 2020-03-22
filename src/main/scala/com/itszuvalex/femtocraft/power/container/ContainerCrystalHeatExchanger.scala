@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.power.container
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.tile.TileCrystalHeatExchanger
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncInt, SyncItemStorageItemStack}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -18,7 +20,8 @@ class ContainerCrystalHeatExchanger(parPlayer: EntityPlayer, inv: InventoryPlaye
   addSync(new SyncInt(GuiID, () => te.getBurnMax, (i: Int) => te.setBurnMax(i)))
 
   if (addSyncs) {
-    te.storage.indices.foreach(i => addSync(new SyncItemStorageItemStack(GuiID, te.storage, i)))
+    val storage: IItemStorage = te.getModule(ItszuLibModules.ITEM_STORAGE, null)
+    storage.indices.foreach(i => addSync(new SyncItemStorageItemStack(GuiID, storage, i)))
     addPlayerInventorySlots(inv)
   }
 

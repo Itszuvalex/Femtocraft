@@ -10,8 +10,7 @@ import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.ManagerCapabilities.DummyStorage
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.storage.IFluidStorage
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.api.storage.{IBattery, IFluidStorage, PowerBattery}
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.EnumFacing
@@ -250,7 +249,6 @@ object ManagerCapabilities {
       *
       * @param loc    Loc holding this connection provider
       * @param facing Facing
-      *
       * @return Set of Connections provided by this provider
       */
     override def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()

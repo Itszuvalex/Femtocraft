@@ -13,7 +13,7 @@ import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
-import com.itszuvalex.itszulib.api.wrappers.IBattery;
+import com.itszuvalex.itszulib.api.storage.IBattery;
 import com.itszuvalex.itszulib.core.SidedFluidStorageConfiguration;
 import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration;
 import net.minecraftforge.common.capabilities.Capability;

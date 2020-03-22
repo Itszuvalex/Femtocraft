@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.api.core.Loc4
-import net.minecraft.item.ItemStack
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
@@ -19,7 +19,7 @@ trait IFrameMultiblockRenderer {
     * @param ry    Y Render location
     * @param rz    Z Render location
     */
-  def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit
+  def previewRenderAtWorldLocation(stack: IItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit
 
   /**
     * Render function for machine in-progress rendering.
@@ -51,7 +51,7 @@ trait IFrameMultiblockRenderer {
     * @param ry
     * @param rz
     */
-  def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit
+  def renderAsItem(stack: IItemStack, rx: Double, ry: Double, rz: Double): Unit
 
   /**
     *

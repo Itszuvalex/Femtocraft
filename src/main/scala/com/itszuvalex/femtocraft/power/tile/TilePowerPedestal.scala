@@ -33,10 +33,10 @@ class TilePowerPedestal extends TileEntityBase {
 
   def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
     par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
-      NBTCompound(
-        TilePowerPedestal.MOUNT_KEY -> mountLocation
-      )
-    )
+                       NBTCompound(
+                         TilePowerPedestal.MOUNT_KEY -> mountLocation
+                         )
+                       )
   }
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
@@ -64,7 +64,7 @@ class TilePowerPedestal extends TileEntityBase {
 
   override def onBlockBreak() = {
     if (mountLoc != null)
-      mountLoc.getTileEntity(true) match {
+      mountLoc.getITileEntity(true) match {
         case Some(m: ICrystalMount) =>
           m.removePedestal(getLoc)
         case _ =>
@@ -84,7 +84,7 @@ class TilePowerPedestal extends TileEntityBase {
   }
 
   def checkAndAddMount(dir: EnumFacing): Boolean = {
-    getLoc.getOffset(dir).getTileEntity(true) match {
+    getLoc.getOffset(dir).getITileEntity(true) match {
       case Some(i: ICrystalMount) =>
         if (i.canAcceptPedestal(getLoc) && canSetMount(getLoc.getOffset(dir))) {
           i.addPedestal(getLoc)
@@ -99,7 +99,6 @@ class TilePowerPedestal extends TileEntityBase {
   /**
     *
     * @param loc Location to accept mount connection at.
-    *
     * @return True if mount can be added to this location.
     */
   def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(EnumFacing.UP) == loc || getLoc.getOffset(EnumFacing.DOWN) == loc

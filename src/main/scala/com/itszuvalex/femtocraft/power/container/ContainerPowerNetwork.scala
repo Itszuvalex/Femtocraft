@@ -1,17 +1,17 @@
 package com.itszuvalex.femtocraft.power.container
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power.PowerNetwork
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncInt}
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.tileentity.TileEntity
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/27/17.
   */
-class ContainerPowerNetwork(tile: TileEntity, registerSyncs: Boolean) extends ContainerBase(GuiIDs.TilePowerNetworkID, registerSyncs) {
+class ContainerPowerNetwork(tile: ITileEntity, registerSyncs: Boolean) extends ContainerBase(GuiIDs.TilePowerNetworkID, registerSyncs) {
   var producerCount: Int = 0
   var consumerCount: Int = 0
   var storageCount : Int = 0
@@ -43,14 +43,14 @@ class ContainerPowerNetwork(tile: TileEntity, registerSyncs: Boolean) extends Co
   addSync(new SyncDouble(GuiID, () => getNetwork.map(_.totalPowerStorage).getOrElse(0d), networkTotalStorage = _))
 
   def getNetwork: Option[PowerNetwork] = {
-    if (tile.hasCapability(Capabilities.TILE_POWER_NODE, null)) {
-      Option(tile.getCapability(Capabilities.TILE_POWER_NODE, null).getNetwork)
+    if (tile.hasModule(ManagerModules.TILE_POWER_NODE, null)) {
+      Option(tile.getModule(ManagerModules.TILE_POWER_NODE, null).getNetwork)
     }
-    else if (tile.hasCapability(Capabilities.TILE_POWER_LEAF_NODE, null)) {
-      val parentTile = Option(tile.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).flatMap(x => Option(x.getParent)).flatMap(_.getTileEntity(false))
+    else if (tile.hasModule(ManagerModules.TILE_POWER_LEAF_NODE, null)) {
+      val parentTile = Option(tile.getModule(ManagerModules.TILE_POWER_LEAF_NODE, null)).flatMap(x => Option(x.getParent)).flatMap(_.getITileEntity(false))
       if (parentTile.isEmpty) None
       else {
-        val cap = parentTile.withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null))
+        val cap = parentTile.withFilter(_.hasModule(ManagerModules.TILE_POWER_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_NODE, null))
         cap.flatMap(x => Option(x.getNetwork))
       }
     }

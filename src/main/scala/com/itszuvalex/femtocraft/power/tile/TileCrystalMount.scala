@@ -7,8 +7,8 @@ import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.storage.ItemStorageArray
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack}
+import com.itszuvalex.itszulib.api.storage.{IBattery, ItemStorageArray}
+import com.itszuvalex.itszulib.api.wrappers.{IBattery, IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityBase
 import com.itszuvalex.itszulib.core.traits.tile.TileInventory
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -28,7 +28,7 @@ object TileCrystalMount {
   val PEDESTAL_RANGE = 8f
 }
 
-class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with TileInventory {
+class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with TileInventory with ITileEntity {
   var lastCrystal: ItemStack = _
 
   override def defaultBattery: IBattery = new DynamicIBattery(() => crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(BatteryEmpty.Empty))

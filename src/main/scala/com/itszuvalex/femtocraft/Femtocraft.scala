@@ -11,11 +11,10 @@ import com.itszuvalex.femtocraft.player.PlayerNaniteCapability
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.{FemtocraftOreGenerator, FemtocraftRiftTracker}
+import com.itszuvalex.itszulib.initialization.{InitializationStage, ModInit}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Mod.EventHandler
-import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.common.registry.GameRegistry
 import net.minecraftforge.fml.common.{Mod, SidedProxy}
@@ -24,25 +23,30 @@ import org.apache.logging.log4j.LogManager
 /**
   * Created by Christopher on 4/5/2015.
   */
-@Mod(modid = Femtocraft.ID, name = "Femtocraft", version = Femtocraft.VERSION, modLanguage = "scala", dependencies = "required-after:itszulib")
-object Femtocraft {
-  final val ID      = "femtocraft"
-  final val VERSION = Version.FULL_VERSION
-  final val logger  = LogManager.getLogger(ID)
-  final val blocks  = FemtoBlocks
-  final val items   = FemtoItems
-  final val fluids  = FemtoFluids
+@Mod(modid = Femtocraft.ID, name = Femtocraft.NAME, version = Femtocraft.VERSION, modLanguage = Femtocraft.MOD_LANGUAGE, dependencies = Femtocraft.DEPENDENCIES)
+object Femtocraft extends ModInit {
+  final val ID           = "femtocraft"
+  final val NAME         = "Femtocraft"
+  final val VERSION      = Version.FULL_VERSION
+  final val MOD_LANGUAGE = "scala"
+  final val DEPENDENCIES = "required-after:itszulib"
+  final val logger       = LogManager.getLogger(ID)
+  final val blocks       = FemtoBlocks
+  final val items        = FemtoItems
+  final val fluids       = FemtoFluids
+
+
   val tab                      = new CreativeTabs(Femtocraft.ID) {
     override def getTabIconItem: ItemStack = new ItemStack(Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall))
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
-    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")
   var proxy   : ProxyCommon    = _
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiClient",
-    serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
+              serverSide = "com.itszuvalex.femtocraft.proxy.ProxyGuiCommon")
   var guiProxy: ProxyGuiCommon = _
 
-  @EventHandler def preInit(event: FMLPreInitializationEvent): Unit = {
+  initializationManager.addInitStage(InitializationStage.Pre, () => {
     MinecraftForge.EVENT_BUS.register(FemtoSounds)
     MinecraftForge.EVENT_BUS.register(FemtoBlocks)
     MinecraftForge.EVENT_BUS.register(FemtoItems)
@@ -59,9 +63,9 @@ object Femtocraft {
     ChunkRiftCapability.register()
     ManagerCapabilities.register()
     proxy.preInit()
-  }
+  })
 
-  @EventHandler def init(event: FMLInitializationEvent): Unit = {
+  initializationManager.addInitStage(InitializationStage.Main, () => {
     FemtoBlocks.init()
     FemtoItems.init()
     FemtoFluids.init()
@@ -72,14 +76,14 @@ object Femtocraft {
     LogisticsResourceRegistry.init()
     RiftTraitRegistry.init()
     proxy.init()
-  }
+  })
 
-  @EventHandler def postInit(event: FMLPostInitializationEvent): Unit = {
+  initializationManager.addInitStage(InitializationStage.Post, () => {
     FemtoBlocks.postInit()
     FemtoItems.postInit()
     FemtoFluids.postInit()
     FemtoRecipes.postInit()
     CybermaterialRegistry.postInit()
     proxy.postInit()
-  }
+  })
 }
