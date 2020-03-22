@@ -12,27 +12,27 @@ object MultiblockStateHolder {
 
   class DataMultiblockState[S <: INBTSerializable[NBTTagCompound]](key: String, val holder: MultiblockStateHolder[S, _ <: TileEntity]) extends
     ConditionalData(() => holder.info().isController,
-      new DataLoadable[S](
-      key,
-      () => holder.getOrElseUpdateState,
-      _.serializeNBT(),
-      { case t: NBTTagCompound => holder.getOrElseUpdateState.deserializeNBT(t);
-      case _ =>
-      }))
+                    new DataLoadable[S](
+                      key,
+                      () => holder.getOrElseUpdateState,
+                      _.serializeNBT(),
+                      { case t: NBTTagCompound => holder.getOrElseUpdateState.deserializeNBT(t);
+                      case _ =>
+                      }))
 
 }
 
 class MultiblockStateHolder[S <: INBTSerializable[NBTTagCompound], T <: TileEntity](
-  val thisObj: T,
-  val fact: () => S,
-  val info: () => MultiBlockInfo,
-  val getHolder: (T) => MultiblockStateHolder[S, T]) {
+                                                                                     val thisObj: T,
+                                                                                     val fact: () => S,
+                                                                                     val info: () => MultiBlockInfo,
+                                                                                     val getHolder: (T) => MultiblockStateHolder[S, T]) {
   private var state: Option[S] = None
 
   def get: Option[S] =
     if (info().isController) Some(getOrElseUpdateState)
     else
-      info().cLoc.getTileEntity(true) match {
+      info().cLoc.getITileEntity(true) match {
         case None => None
         case Some(a: T) => Option(getHolder(a).getOrElseUpdateState)
         case _ => None

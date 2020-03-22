@@ -8,12 +8,13 @@ import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.core.TileContainer
-import com.itszuvalex.itszulib.core.traits.block.DroppableInventory
+import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
+import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
+import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult, Vec3d}
 import net.minecraft.world.{IBlockAccess, World}
@@ -23,11 +24,9 @@ import scala.collection.JavaConversions._
 /**
   * Created by Christopher on 8/30/2015.
   */
-class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInventory {
+class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockCrystalMountContainerDelegate(this), BlockBehaviors.DEFAULT) {
   var renderBox = new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
   setCreativeTab(Femtocraft.tab)
-
-  override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TileCrystalMount
 
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
 
@@ -38,10 +37,10 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
       case mount: TileCrystalMount =>
         if (mount.getCrystalStack != null && !mount.getCrystalStack.isEmpty)
           Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_POWER,
-            pos.getX + .5 + (rand.nextDouble() * .2 - .1),
-            pos.getY + .5 + (rand.nextDouble() * .2 - .1),
-            pos.getZ + .5 + (rand.nextDouble() * .2 - .1),
-            mount.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
+                                         pos.getX + .5 + (rand.nextDouble() * .2 - .1),
+                                         pos.getY + .5 + (rand.nextDouble() * .2 - .1),
+                                         pos.getZ + .5 + (rand.nextDouble() * .2 - .1),
+                                         mount.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
       case _ =>
     }
   }
@@ -61,13 +60,13 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
   }
 
   def renderAbove(worldIn: World, pos: BlockPos): Boolean = {
-    val loc = new Loc4(worldIn, pos)
+    val loc        = new Loc4(worldIn, pos)
     val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.UP).getPos)
     stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
   }
 
   def renderBelow(worldIn: World, pos: BlockPos): Boolean = {
-    val loc = new Loc4(worldIn, pos)
+    val loc        = new Loc4(worldIn, pos)
     val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.DOWN).getPos)
     stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
   }
@@ -83,8 +82,8 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
   }
 
   override protected def rayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, boundingBox: AxisAlignedBB): RayTraceResult = {
-    val vec3d: Vec3d = start.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
-    val vec3d1: Vec3d = end.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
+    val vec3d         : Vec3d          = start.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
+    val vec3d1        : Vec3d          = end.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
     val raytraceresult: RayTraceResult = boundingBox.calculateIntercept(vec3d, vec3d1)
     if (raytraceresult == null) null
     else new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble), raytraceresult.sideHit, pos)
@@ -98,3 +97,8 @@ class BlockCrystalMount extends TileContainer(Material.IRON) with DroppableInven
     renderBox.offset(pos)
   }
 }
+
+class BlockCrystalMountContainerDelegate(block: Block) extends BlockTileContainer(block) {
+  override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileCrystalMount
+}
+

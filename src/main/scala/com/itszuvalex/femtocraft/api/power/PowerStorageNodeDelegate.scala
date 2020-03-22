@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.api.power
 
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.api.storage.IBattery
 import net.minecraft.tileentity.TileEntity
 
 class PowerStorageNodeDelegate(tileEntity: TileEntity,
-  getBattery: () => IBattery,
-  storageT: PowerStorageNodeType,
-  transfer: () => Double)
+                               getBattery: () => IBattery,
+                               storageT: PowerStorageNodeType,
+                               transfer: () => Double)
   extends IPowerStorageNode {
   val lastPowerAmount: Array[Double] = Array(0d, 0d)
 

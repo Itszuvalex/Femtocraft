@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
+import com.itszuvalex._
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.{INanite, NaniteTank}
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository._
 import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
@@ -25,16 +25,16 @@ object TileNaniteRepository {
 
 class TileNaniteRepository extends TileEntityBase with TileDataSpec with TileNaniteStorage {
   private val sidedNaniteConfig = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-    Map(NONE_TANK_KEY -> null,
-      NANITE_TANK_KEY -> naniteStorageTank),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+                                                                      Map(NONE_TANK_KEY -> null,
+                                                                          NANITE_TANK_KEY -> naniteStorageTank),
+                                                                      () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
 
   descriptionDataSpec += new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig)
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig),
     new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+    )
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
@@ -60,9 +60,9 @@ class TileNaniteRepository extends TileEntityBase with TileDataSpec with TileNan
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
-    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTIO)
-    TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-    TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    ticks = itszulib.util.TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTIO)
+    femtocraft.util.TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
+    femtocraft.util.TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
   }
 
   override def getMod = Femtocraft

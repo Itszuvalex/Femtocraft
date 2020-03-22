@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.TileEntityRenderCube
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
@@ -33,7 +33,7 @@ class NaniteRepositoryRender extends TileEntityRenderCube[TileNaniteRepository](
   }
 
   override def renderTileEntityInWorld(te: TileNaniteRepository, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
-    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
+    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)) {
       FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null))

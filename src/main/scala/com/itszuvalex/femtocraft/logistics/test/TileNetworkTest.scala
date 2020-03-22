@@ -29,7 +29,7 @@ class TileNetworkTest extends TileEntityBase with TileNetworkNode[TileNetworkTes
     if (seek) {
       seek = false
       val locs = EnumFacing.VALUES.map(getLoc.getOffset(_))
-      EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getTileEntity(false)).collect { case i: TileNetworkTest => i }.
+      EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getITileEntity(false)).collect { case i: TileNetworkTest => i }.
         foreach { i =>
           getNetwork.addConnection(getLoc, i.getLoc)
         }

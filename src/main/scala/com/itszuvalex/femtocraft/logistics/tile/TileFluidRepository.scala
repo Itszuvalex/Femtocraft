@@ -2,13 +2,14 @@ package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
-import com.itszuvalex.femtocraft.util.TileEntityUtils
 import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.storage.FluidStorage
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityBase}
+import com.itszuvalex.itszulib.util.TileEntityUtils
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -26,24 +27,24 @@ object TileFluidRepository {
   val NONE_KEY               = "None"
 }
 
-class TileFluidRepository extends TileEntityBase with TileDataSpec {
+class TileFluidRepository extends TileEntityBase with TileDataSpec with ITileEntity {
   private val storage          = new FluidStorage(TANK_SIZE)
   private val sidedFluidConfig = new SidedFluidStorageConfiguration(_ => TANK_KEY,
-    Map(NONE_KEY -> null,
-      TANK_KEY -> storage),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
+                                                                    Map(NONE_KEY -> null,
+                                                                        TANK_KEY -> storage),
+                                                                    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   var ticks = 0
   private var fluidLast: Fluid = null
 
   descriptionDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
     new DataSerializable[NBTTagCompound](TANK_KEY, storage)
-  )
+    )
   saveDataSpec ++= Array(
     new DataSerializable[NBTTagCompound](TANK_KEY, storage),
     new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
     new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+    )
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
     (capability, facing) match {
@@ -78,7 +79,7 @@ class TileFluidRepository extends TileEntityBase with TileDataSpec {
     TileEntityUtils.checkDoFluidInputIO(this, sidedFluidConfig, ticks, AMT_FOR_AUTOIO)
     TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, AMT_FOR_AUTOIO)
 
-    val currentFluid = Option(storage.getStorageProperties(0).getContents).map(_.getFluid).orNull
+    val currentFluid = Option(storage.getTankProperties()(0).getContents).map(_.getFluid).orNull
     if (currentFluid != fluidLast)
       setUpdate()
     fluidLast = currentFluid

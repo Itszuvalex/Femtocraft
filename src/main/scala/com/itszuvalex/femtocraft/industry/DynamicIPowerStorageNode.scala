@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.api.power.{IPowerStorageNode, PowerStorageNodeType}
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.api.storage.IBattery
 
 class DynamicIPowerStorageNode(getter: () => IPowerStorageNode) extends IPowerStorageNode {
   override def battery: IBattery = getter().battery

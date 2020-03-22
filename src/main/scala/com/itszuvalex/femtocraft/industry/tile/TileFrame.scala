@@ -4,7 +4,7 @@ import java.util.Random
 
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame.TileFrameState
-import com.itszuvalex.femtocraft.industry.{DynamicIItemStorage, FrameMultiblockRegistry, FrameMultiblockRendererRegistry, MultiblockStateHolder}
+import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, MultiblockStateHolder}
 import com.itszuvalex.femtocraft.util.data._
 import com.itszuvalex.femtocraft.util.{StorageUtils, TileEntityUtils}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, industry}

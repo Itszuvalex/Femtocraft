@@ -2,7 +2,6 @@ package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
-import com.itszuvalex.femtocraft.industry.{BatteryEmpty, DynamicIBattery}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.node._
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -31,7 +30,7 @@ object TileCrystalMount {
 class TileCrystalMount extends TileEntityBase with PowerNode with PowerStorageNode with TileInventory with ITileEntity {
   var lastCrystal: ItemStack = _
 
-  override def defaultBattery: IBattery = new DynamicIBattery(() => crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(BatteryEmpty.Empty))
+  override def defaultBattery: IBattery = new DynamicIBattery(() => crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(IBattery.Empty))
 
   override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.STORAGE
 

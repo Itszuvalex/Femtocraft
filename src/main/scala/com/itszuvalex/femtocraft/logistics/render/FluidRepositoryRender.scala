@@ -1,12 +1,11 @@
 package com.itszuvalex.femtocraft.logistics.render
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityRenderCube}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
@@ -53,17 +52,17 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
   override def renderTileEntityInWorld(te: TileFluidRepository, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     GL11.glDisable(GL11.GL_BLEND)
     pass = 0
-    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
-    val fluidStack = Option(te).filter(_.hasCapability(ItszuLibCapabilities.FLUID_STORAGE, null)).map(_.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null).getStorageProperties.apply(0).getContents).orNull
+    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
+    val fluidStack = Option(te).filter(_.hasModule(ItszuLibModules.FLUID_STORAGE, null)).map(_.getModule(ItszuLibModules.FLUID_STORAGE, null).head).orNull
     if (fluidStack != null) {
       RenderUtils.bindBlockTextures()
-      val block = fluidStack.getFluid.getBlock
+      val block = fluidStack.fluid.getBlock
       RenderUtils.glMatrixBlock {
         val sprite = RenderUtils.getDefaultTextureForBlock(block)
         GL11.glColor4f(1f, 1f, 1f, 1f)
         EnumFacing.VALUES.foreach { face =>
           RenderUtils.drawArbitraryFace(x.toFloat, y.toFloat, z.toFloat,
-            .001f, .999f, .001f, .999f, .001f, .999f, face, sprite, sprite.getMinU, sprite.getMaxU, sprite.getMinV, sprite.getMaxV)
+                                        .001f, .999f, .001f, .999f, .001f, .999f, face, sprite, sprite.getMinU, sprite.getMaxU, sprite.getMinV, sprite.getMaxV)
         }
         //        Minecraft.getMinecraft.getBlockRendererDispatcher.getBlockModelRenderer.renderModelBrightness(blockmodel, state, 1f, false)
       }
@@ -73,8 +72,8 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
       pass = 1
       super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     }
-    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null))
     }
   }
 }

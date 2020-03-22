@@ -311,7 +311,7 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
     case _ if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
     case _ if capability == Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
     case _ if capability == Capabilities.FLUID_STORAGE_CONFIGURABLE => sidedFluidConfig.asInstanceOf[T]
-    case _ if capability == Capabilities.POWER_STORAGE => state.get.map(x => x.battery).getOrElse(BatteryEmpty.Empty).asInstanceOf[T]
+    case _ if capability == Capabilities.POWER_STORAGE => state.get.map(x => x.battery).getOrElse(IBattery.Empty).asInstanceOf[T]
     case _ if capability == Capabilities.TILE_POWER_LEAF_NODE => state.get.map(x => x.powerLeafNodeDelegate).get.asInstanceOf[T]
     case _ if capability == Capabilities.TILE_POWER_STORAGE_NODE => state.get.map(x => x.powerStorageNodeDelegate).get.asInstanceOf[T]
     case _ if capability == ItszuLibCapabilities.COLORABLE => getColor.asInstanceOf[T]

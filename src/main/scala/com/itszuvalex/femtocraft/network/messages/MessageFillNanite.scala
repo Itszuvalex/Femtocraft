@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.network.messages
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.nanite.NaniteStack
+import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
 import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.network.messages.MessageUpdateNBT
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
 
@@ -33,9 +33,9 @@ class MessageFillNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageU
       message.nanite = if (message.nbt.hasKey(MessageFillNanite.STACK_KEY)) NaniteStack.loadFromNBT(message.nbt.getCompoundTag(MessageFillNanite.STACK_KEY)) else null
 
       // Do things
-      message.loc.getTileEntity() match {
-        case Some(tile: TileEntity) if tile.hasCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null) =>
-          val storageTank = tile.getCapability(Capabilities.TILE_NANITE_STORAGE_TANK, null)
+      message.loc.getITileEntity() match {
+        case Some(tile: ITileEntity) if tile.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK, null) =>
+          val storageTank = tile.getModule(ManagerModules.TILE_NANITE_STORAGE_TANK, null)
           if (storageTank != null) {
             if (ctx.getServerHandler.player.hasCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)) {
               val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)
