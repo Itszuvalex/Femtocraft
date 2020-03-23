@@ -9,7 +9,7 @@ import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.gui.ItszuGuiHandler
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity
@@ -43,8 +43,8 @@ class ProxyGuiCommon extends ItszuGuiHandler {
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(Converter.ITileEntityFromTileEntity(te), true)
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
       case (GuiIDs.TileConduitSideID, te: TileConduit) => new ContainerConduitSide(player, player.inventory, te, EnumFacing.getFront(data), true)
-      case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new ContainerSidedInventoryConfig(te)
-      case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new ContainerSidedNaniteConfig(te)
+      case (GuiIDs.TileSidedInventoryConfigID, te: ITileEntity) => new ContainerSidedInventoryConfig(te)
+      case (GuiIDs.TileSidedNaniteConfigID, te: ITileEntity) => new ContainerSidedNaniteConfig(te)
       case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new ContainerSidedFluidConfig(te)
       case (_, _) => null
     }

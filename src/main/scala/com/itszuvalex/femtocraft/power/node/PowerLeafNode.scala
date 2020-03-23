@@ -39,28 +39,6 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
 
   override def onLoad(): Unit = {
     super.onLoad()
-    if (getWorld.isRemote) return
-    PowerManager.instance.addLeaf(leafDelegate)
-  }
-
-  override def validate(): Unit = {
-    super.validate()
-    if (getWorld.isRemote) return
-    PowerManager.instance.addLeaf(leafDelegate)
-  }
-
-  override def invalidate(): Unit = {
-    super.invalidate()
-    if (getWorld.isRemote) return
-    PowerManager.instance.removeLeaf(leafDelegate)
-  }
-
-  override def onBlockBreak(): Unit = {
-    super.onBlockBreak()
-    if (getWorld.isRemote) return
-
-    PowerManager.instance.onLeafBroken(leafDelegate)
-    PowerManager.instance.removeLeaf(leafDelegate)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {

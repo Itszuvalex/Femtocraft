@@ -10,6 +10,7 @@ import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
 import com.itszuvalex.femtocraft.{FemtoBlocks, Resources}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -42,7 +43,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
     * @param ry    Y Render location
     * @param rz    Z Render location
     */
-  override def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+  override def previewRenderAtWorldLocation(stack: IItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
     renderAtLocation(rx, ry, rz)
   }
 
@@ -68,7 +69,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
   override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
-    renderAsItem(new ItemStack(FemtoBlocks.blockGerminationChamber), x, y, z)
+    renderAsItem(Converter.IItemStackFromItemStack(new ItemStack(FemtoBlocks.blockGerminationChamber)), x, y, z)
   }
 
   /**
@@ -79,7 +80,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
     * @param ry
     * @param rz
     */
-  override def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit = {
+  override def renderAsItem(stack: IItemStack, rx: Double, ry: Double, rz: Double): Unit = {
     RenderUtils.glMatrixBlock {
       GL11.glTranslated(rx, ry, rz)
       val max = Array(MultiblockGerminationChamber.xSize, MultiblockGerminationChamber.ySize, MultiblockGerminationChamber.zSize).max

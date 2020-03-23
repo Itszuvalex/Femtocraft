@@ -9,8 +9,11 @@ import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
+import com.itszuvalex.itszulib.api.storage.IBattery
 
 object ManagerModules {
+
+  val POWER_STORAGE: IModule[IBattery] = Module.registerModule("PowerStorage", () => Capabilities.POWER_STORAGE)
 
   val TILE_POWER_STORAGE_NODE: IModule[IPowerStorageNode] = Module.registerModule("TilePowerStorageNode", () => Capabilities.TILE_POWER_STORAGE_NODE)
 
