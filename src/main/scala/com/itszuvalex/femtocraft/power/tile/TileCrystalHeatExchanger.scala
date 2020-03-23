@@ -1,72 +1,92 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
-import com.itszuvalex.femtocraft.power.node.PowerLeafNode
+import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
+import com.itszuvalex.femtocraft.power.tile.TileCrystalHeatExchanger.CrystalHeatExchangerModule
+import com.itszuvalex.femtocraft.power.{ModulePowerLeafNode, ModulePowerStorage}
+import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Burnable
+import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
-import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity, IWorld}
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
+import com.itszuvalex.itszulib.core.modules.{ModuleIItemHandlerConverter, ModuleIItemStorage}
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 object TileCrystalHeatExchanger {
-  val POWER_STORAGE        = 10000
-  val CHARGING_MULTIPLIER  = 10d
-  val BURN_TIME_MULTIPLIER = .5d
+  val MODULE: IModule[CrystalHeatExchangerModule] = Module.registerModule("CrystalHeatExchangerModule", null)
+  val POWER_STORAGE                               = 10000
+  val CHARGING_MULTIPLIER                         = 10d
+  val BURN_TIME_MULTIPLIER                        = .5d
 
   val FUEL_INDEX    = 0
   val CRYSTAL_INDEX = 1
 
-  val BURN_TIME_KEY = "Burn"
-  val BURN_MAX_KEY  = "BurnMax"
-}
+  class CrystalHeatExchangerModule(val storage: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[CrystalHeatExchangerModule] {
+    var burnTime = 0
+    var burnMax  = 0
 
-class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with PowerLeafNode {
-  var burnTime = 0
-  var burnMax  = 0
+    override def module: IModule[CrystalHeatExchangerModule] = MODULE
 
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
+    override def hasWorldNBT: Boolean = true
 
-    if (burnTime > 0) {
-      storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { c =>
-        val power = Math.min(c.battery.storage, c.getTransferRate())
-        battery.storage = Math.min(battery.maxStorage, battery.storage + power)
-        c.battery.storage = Math.max(0, c.battery.storage - power)
-        val gen = powerPerTick
-        battery.storage = Math.min(battery.maxStorage, battery.storage + gen)
-      }
-
-      burnTime -= 1
+    override def writeWorldNBT(tag: NBTTagCompound): Unit = {
+      tag.setInteger(CrystalHeatExchangerModule.BURN_TIME_KEY, burnTime)
+      tag.setInteger(CrystalHeatExchangerModule.BURN_MAX_KEY, burnMax)
     }
 
-    if (burnTime <= 0 && battery.storage < battery.maxStorage && storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) {
-      Burnable.getBurnTime(storage(TileCrystalHeatExchanger.FUEL_INDEX).toMinecraft).foreach { f =>
-        burnTime = (f * TileCrystalHeatExchanger.BURN_TIME_MULTIPLIER).toInt
-        burnMax = burnTime
-        storage.split(TileCrystalHeatExchanger.FUEL_INDEX, 1)
+    override def readWorldNBT(tagCompound: NBTTagCompound): Unit = {
+      burnTime = tagCompound.getInteger(CrystalHeatExchangerModule.BURN_TIME_KEY)
+      burnMax = tagCompound.getInteger(CrystalHeatExchangerModule.BURN_MAX_KEY)
+    }
+
+    override def serverUpdate(tile: ITileEntity): Unit = {
+      if (burnTime > 0) {
+        storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach { c =>
+          val power = Math.min(c.battery.storage, c.getTransferRate())
+          battery.storage = Math.min(battery.maxStorage, battery.storage + power)
+          c.battery.storage = Math.max(0, c.battery.storage - power)
+          val gen = powerPerTick
+          battery.storage = Math.min(battery.maxStorage, battery.storage + gen)
+        }
+
+        burnTime -= 1
+      }
+
+      if (burnTime <= 0 && battery.storage < battery.maxStorage && storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) {
+        Burnable.getBurnTime(storage(TileCrystalHeatExchanger.FUEL_INDEX).toMinecraft).foreach { f =>
+          burnTime = (f * TileCrystalHeatExchanger.BURN_TIME_MULTIPLIER).toInt
+          burnMax = burnTime
+          storage.split(TileCrystalHeatExchanger.FUEL_INDEX, 1)
+        }
       }
     }
+
+    def powerPerTick: Double = storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
+
+    def getBurnMax: Int = burnMax
+
+    def setBurnMax(i: Int): Unit = burnMax = i
+
+    def getBurnTime: Int = burnTime
+
+    def setBurnTime(i: Int): Unit = burnTime = i
   }
 
-  def powerPerTick: Double = storage(TileCrystalHeatExchanger.CRYSTAL_INDEX).capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(_.getPassiveGen() * TileCrystalHeatExchanger.CHARGING_MULTIPLIER).getOrElse(0d)
+  object CrystalHeatExchangerModule {
+    val BURN_TIME_KEY = "Burn"
+    val BURN_MAX_KEY  = "BurnMax"
+  }
 
-  def getBurnMax: Int = burnMax
+}
 
-  def setBurnMax(i: Int): Unit = burnMax = i
-
-  def getBurnTime: Int = burnTime
-
-  def setBurnTime(i: Int): Unit = burnTime = i
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = true
-
-  override def getGuiID: Int = GuiIDs.TileCrystalHeatExchangerID
-
-  override def defaultStorage: IItemStorage = new ItemStorageArray(2) {
+class TileCrystalHeatExchanger extends TileEntityCoreTickable {
+  val storage: IItemStorage = new ItemStorageArray(2) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = {
       stack.isEmpty || (i match {
         case TileCrystalHeatExchanger.CRYSTAL_INDEX => stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
@@ -75,32 +95,24 @@ class TileCrystalHeatExchanger extends TileEntityBase with TileInventory with Po
       })
     }
   }
+  val battery: IBattery     = new PowerBattery(TileCrystalHeatExchanger.POWER_STORAGE)
 
-  override def hasDescription: Boolean = true
+  val internal = new CrystalHeatExchangerModule(storage, battery)
 
+  addTileEntityModule(new ModuleIItemStorage(storage))
+  addTileEntityModule(new ModuleIItemHandlerConverter)
+  addTileEntityModule(new ModulePowerStorage(battery))
+  addTileEntityModule(new ModulePowerLeafNode(this, battery, PowerStorageNodeType.PRODUCER, transRate = () => 50d))
 
-  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.PRODUCER
+  override def getMod: AnyRef = Femtocraft
 
-  override def powerStorageTransferRate: Double = 50d
+  override def hasGUI: Boolean = true
 
-  override def getFieldCount: Int = 0
+  override def getGuiID: Int = GuiIDs.TileCrystalHeatExchangerID
 
-  override def getField(id: Int): Int = 0
+  // TODO
 
-  override def setField(id: Int, value: Int): Unit = {}
+  override def hasDescription: Boolean = false
 
-  override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
-    super.readFromNBT(par1nbtTagCompound)
-    burnTime = par1nbtTagCompound.getInteger(TileCrystalHeatExchanger.BURN_TIME_KEY)
-    burnMax = par1nbtTagCompound.getInteger(TileCrystalHeatExchanger.BURN_MAX_KEY)
-  }
-
-  override def writeToNBT(par1nbtTagCompound: NBTTagCompound): NBTTagCompound = {
-    val ret = super.writeToNBT(par1nbtTagCompound)
-    par1nbtTagCompound.setInteger(TileCrystalHeatExchanger.BURN_TIME_KEY, burnTime)
-    par1nbtTagCompound.setInteger(TileCrystalHeatExchanger.BURN_MAX_KEY, burnMax)
-    ret
-  }
-
-  override def defaultBattery: IBattery = new PowerBattery(TileCrystalHeatExchanger.POWER_STORAGE)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
 }

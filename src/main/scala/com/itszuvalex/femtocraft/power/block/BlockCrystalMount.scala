@@ -3,9 +3,9 @@ package com.itszuvalex.femtocraft.power.block
 import java.util
 import java.util.Random
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
@@ -24,7 +24,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Christopher on 8/30/2015.
   */
-class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockCrystalMountContainerDelegate(this), BlockBehaviors.DEFAULT) {
+class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockCrystalMountContainerDelegate(), BlockBehaviors.DEFAULT) {
   var renderBox = new AxisAlignedBB(.4, .3, .4, .6, .7, .6)
   setCreativeTab(Femtocraft.tab)
 
@@ -98,7 +98,9 @@ class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockC
   }
 }
 
-class BlockCrystalMountContainerDelegate(block: Block) extends BlockTileContainer(block) {
+class BlockCrystalMountContainerDelegate() extends BlockTileContainer(null) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileCrystalMount
+
+  override def toMinecraft: Block = FemtoBlocks.blockCrystalMount
 }
 

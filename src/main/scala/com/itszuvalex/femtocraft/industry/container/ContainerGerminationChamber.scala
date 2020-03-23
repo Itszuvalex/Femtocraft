@@ -4,9 +4,9 @@ import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.IFluidStorage
+import com.itszuvalex.itszulib.api.storage.IFluidStorageModifiable
 import com.itszuvalex.itszulib.container.ContainerInv
-import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncIFluidStorage, SyncInt, SyncItemStorageItemStack}
+import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncFluidStorageFluidStack, SyncInt, SyncItemStorageItemStack}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.FurnaceRecipes
@@ -20,13 +20,7 @@ class ContainerGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, ti
   addSync(new SyncDouble(GuiID, () => tile.getProgress, (a: Double) => tile.setProgress(a)))
   addSync(new SyncDouble(GuiID, () => tile.getBaseGoal, (a: Double) => tile.setBaseGoal(a)))
   addSync(new SyncInt(GuiID, () => tile.getTicksMax, (a: Int) => tile.setTicksMax(a)))
-  addSync(new SyncIFluidStorage(tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null),
-    GuiID,
-    () => tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null),
-    (storage: IFluidStorage) => {
-      tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null).deserializeNBT(storage.serializeNBT())
-      Unit
-    }))
+  tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null).indices.foreach(i => addSync(new SyncFluidStorageFluidStack(GuiID, tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE, null).asInstanceOf[IFluidStorageModifiable], i)))
 
   if (shouldSync) {
     addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 0))

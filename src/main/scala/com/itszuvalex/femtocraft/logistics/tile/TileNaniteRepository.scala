@@ -1,69 +1,38 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
-import com.itszuvalex._
-import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.nanite.{INanite, NaniteTank}
+import com.itszuvalex.femtocraft.api.nanite.{INanite, INaniteTank, NaniteTank}
+import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration}
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository._
-import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
-import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.IWorld
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
-import net.minecraftforge.common.capabilities.Capability
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 object TileNaniteRepository {
-  val REPOSITORY_VOLUME       = 250
-  val TICKS_FOR_AUTIO         = 5
-  val VOL_PER_AUTOIO          = 1
-  val TICKS_NBT               = "Ticks"
-  val NANITE_SIDED_CONFIG_NBT = "NaniteConfig"
-  val NANITE_TANK_KEY         = "Tank"
-  val NONE_TANK_KEY           = "None"
+  val REPOSITORY_VOLUME = 250
+  val NANITE_TANK_KEY   = "Tank"
+  val NONE_TANK_KEY     = "None"
 }
 
-class TileNaniteRepository extends TileEntityBase with TileDataSpec with TileNaniteStorage {
-  private val sidedNaniteConfig = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-                                                                      Map(NONE_TANK_KEY -> null,
-                                                                          NANITE_TANK_KEY -> naniteStorageTank),
-                                                                      () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  var ticks = 0
-
-  descriptionDataSpec += new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig)
-  saveDataSpec ++= Array(
-    new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig),
-    new DataInt(TICKS_NBT, ticks _, ticks_=)
-    )
-
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
-    (capability, facing) match {
-      case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
-      case (cap, null) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
-      case (_, null) => null.asInstanceOf[T]
-      case (cap, face) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
-      case _ => super.getCapability(capability, facing)
-    }
-
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
-    (capability, facing) match {
-      case (cap, _) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => true
-      case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => true
-      case _ => super.hasCapability(capability, facing)
-    }
-
-  override def defaultStorageTank: NaniteTank = new NaniteTank(REPOSITORY_VOLUME) {
+class TileNaniteRepository extends TileEntityCoreTickable {
+  val storage: INaniteTank = new NaniteTank(REPOSITORY_VOLUME) {
     override def canFill(nanite: INanite, vol: Int): Boolean = {
       nanitesInTank.isEmpty || containsNanite(nanite)
     }
   }
+  val sidedNaniteConfig    = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+                                                                 Map(NONE_TANK_KEY -> INaniteTank.Empty,
+                                                                     NANITE_TANK_KEY -> storage),
+                                                                 () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
 
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
-    ticks = itszulib.util.TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTIO)
-    femtocraft.util.TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-    femtocraft.util.TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-  }
+  addTileEntityModule(new ModuleINaniteTank(storage))
+  addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
+  addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
 
   override def getMod = Femtocraft
 
@@ -73,4 +42,6 @@ class TileNaniteRepository extends TileEntityBase with TileDataSpec with TileNan
 
   override def hasDescription: Boolean = false
 
+  // TODO
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
 }

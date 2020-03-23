@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.logistics.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.logistics.container.ContainerNanoPack
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiLabel}
 import com.itszuvalex.itszulib.util.Color
@@ -16,7 +16,7 @@ class GuiNanoPack(player: EntityPlayer, inv: InventoryPlayer, stack: IItemStack)
 
   val fRender = Minecraft.getMinecraft.fontRenderer
 
-  val storage = stack.getCapability(ItszuLibCapabilities.ITEM_STORAGE, null)
+  val storage = stack.getModule(ItszuLibModules.ITEM_STORAGE, null)
   (0 until 18).foreach { i =>
     addGuiAndSync(storage, i, 8 + (i % 9) * 18, 12 + (i / 9) * 18)
   }
@@ -39,8 +39,8 @@ class GuiNanoPack(player: EntityPlayer, inv: InventoryPlayer, stack: IItemStack)
   }
 
   private def drawBackgroundLayers(): Unit = {
-    val k = (width - xSize) / 2
-    val l = (height - ySize) / 2
+    val k          = (width - xSize) / 2
+    val l          = (height - ySize) / 2
     val blackColor = Color(255.toByte, 0, 0, 0).toInt
     Gui.drawRect(k, l, k + xSize, l + ySize, blackColor)
 

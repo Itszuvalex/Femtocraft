@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.power.block
 
+import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
@@ -13,12 +14,14 @@ import net.minecraft.world.IBlockAccess
 /**
   * Created by Chris on 1/8/2017.
   */
-class BlockCrystalStorageArray extends TileBlockContainerCore(Material.IRON, new BlockCrystalStorageArrayContainerDelegate(this), BlockBehaviors.FACING_HORIZONTAL) {
+class BlockCrystalStorageArray extends TileBlockContainerCore(Material.IRON, new BlockCrystalStorageArrayContainerDelegate(), BlockBehaviors.FACING_HORIZONTAL) {
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockCrystalStorageArrayContainerDelegate(block: Block) extends BlockTileContainer(block) {
+class BlockCrystalStorageArrayContainerDelegate() extends BlockTileContainer(null) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileCrystalStorageArray
+
+  override def toMinecraft: Block = FemtoBlocks.blockCrystalStorageArray
 }

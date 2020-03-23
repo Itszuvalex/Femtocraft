@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.gui
 
-import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnectionProvider}
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.logistics.container.ContainerConduitSide
@@ -10,7 +10,7 @@ import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.{MessageConduitFacingChange, MessageConduitInputOutputChange}
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.IItemStack
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import com.itszuvalex.itszulib.gui.{GuiButton, GuiLabel}
 import com.itszuvalex.itszulib.render.RenderUtils.{addVertexUV, drawBlock}
 import com.mojang.realmsclient.gui.ChatFormatting
@@ -32,13 +32,15 @@ object GuiConduitSide {
   val TEX_OUTPUT = Resources.TexBlock("blockmachineblock_side_output.png")
 
   class GuiInputFacingButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 18, 18) {
+    val itile = Converter.ITileEntityFromTileEntity(tile)
+
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       if (!isDisabled && isLocationInside(mouseX, mouseY)) {
         button match {
           case 0 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitFacingChange(tile, face, index, forward = true))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitFacingChange(itile, face, index, forward = true))
           case 1 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitFacingChange(tile, face, index, forward = false))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitFacingChange(itile, face, index, forward = false))
           case _ =>
         }
       }
@@ -63,13 +65,15 @@ object GuiConduitSide {
   }
 
   class GuiInputOutputButton(x: Int, y: Int, tile: TileEntity, val face: EnumFacing, stack: () => IItemStack, index: Int) extends GuiButton(x, y, 18, 18) {
+    val itile = Converter.ITileEntityFromTileEntity(tile)
+
     override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
       if (!isDisabled && isLocationInside(mouseX, mouseY)) {
         button match {
           case 0 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitInputOutputChange(tile, face, index, forward = true))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitInputOutputChange(itile, face, index, forward = true))
           case 1 =>
-            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitInputOutputChange(tile, face, index, forward = false))
+            FemtoPacketHandler.INSTANCE.sendToServer(new MessageConduitInputOutputChange(itile, face, index, forward = false))
           case _ =>
         }
       }
@@ -120,17 +124,18 @@ object GuiConduitSide {
 
 }
 
-class GuiConduitSide(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit, facing: EnumFacing) extends FemtoGuiBase(tile, new ContainerConduitSide(player, inv, tile, facing, false)) {
+class GuiConduitSide(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit, facing: EnumFacing) extends FemtoGuiBase(Converter.ITileEntityFromTileEntity(tile), new ContainerConduitSide(player, inv, tile, facing, false)) {
   fontRenderer = Minecraft.getMinecraft.fontRenderer
+  val itile = Converter.ITileEntityFromTileEntity(tile)
 
   if (facing != null) {
     val labelName: String = facing.getName.charAt(0).toUpper.toString
-    val faceLabel = new GuiLabel(30, 14, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, () => {
-      (if (tile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
+    val faceLabel         = new GuiLabel(30, 14, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, () => {
+      (if (itile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
     }) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
         super.addTooltip(mouseX, mouseY, tooltip)
-        if (tile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing))
+        if (itile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing))
           tile.getLoc.getOffset(facing).getITileEntity(false) match {
             case None =>
             case Some(null) =>

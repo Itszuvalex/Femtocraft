@@ -1,90 +1,76 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
-import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.temp.{ModuleIFluidAutoIO, ModuleIFluidSidedConfiguration, TileEntityInternalModuleTickable}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.FluidStorage
-import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
+import com.itszuvalex.itszulib.api.storage.{FluidStorage, IFluidStorage}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityBase}
-import com.itszuvalex.itszulib.util.TileEntityUtils
+import com.itszuvalex.itszulib.core.modules.{ModuleIFluidHandlerConverter, ModuleIFluidStorage}
+import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityCoreTickable}
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, IFluidBlock}
 
 object TileFluidRepository {
-  val TANK_SIZE              = 5000
-  val TICKS_FOR_AUTOIO       = 20
-  val AMT_FOR_AUTOIO         = 250
-  val TICKS_NBT              = "Ticks"
-  val FLUID_SIDED_CONFIG_NBT = "FluidConfig"
-  val TANK_KEY               = "Tank"
-  val NONE_KEY               = "None"
-}
+  val MODULE: IModule[FluidRepositoryModule] = Module.registerModule("FluidRepositoryModule", null)
 
-class TileFluidRepository extends TileEntityBase with TileDataSpec with ITileEntity {
-  private val storage          = new FluidStorage(TANK_SIZE)
-  private val sidedFluidConfig = new SidedFluidStorageConfiguration(_ => TANK_KEY,
-                                                                    Map(NONE_KEY -> null,
-                                                                        TANK_KEY -> storage),
-                                                                    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  var ticks = 0
-  private var fluidLast: Fluid = null
+  val TANK_SIZE = 5000
+  val TANK_KEY  = "Tank"
+  val NONE_KEY  = "None"
 
-  descriptionDataSpec ++= Array(
-    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
-    new DataSerializable[NBTTagCompound](TANK_KEY, storage)
-    )
-  saveDataSpec ++= Array(
-    new DataSerializable[NBTTagCompound](TANK_KEY, storage),
-    new DataSerializable[NBTTagCompound](FLUID_SIDED_CONFIG_NBT, sidedFluidConfig),
-    new DataInt(TICKS_NBT, ticks _, ticks_=)
-    )
+  class FluidRepositoryModule(val storage: IFluidStorage) extends TileEntityInternalModuleTickable[FluidRepositoryModule] {
+    var fluidLast: Option[Fluid] = None
 
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T =
-    (capability, facing) match {
-      case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => sidedFluidConfig.asInstanceOf[T]
-      case (cap, null) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => storage.asInstanceOf[T]
-      case (cap, null) if cap == ItszuLibCapabilities.FLUID_STORAGE => storage.asInstanceOf[T]
-      case (_, null) => null.asInstanceOf[T]
-      case (cap, face) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
-      case (cap, face) if cap == ItszuLibCapabilities.FLUID_STORAGE => sidedFluidConfig.getStorageForGlobalFacing(face).asInstanceOf[T]
-      case _ => super.getCapability(capability, facing)
+    override def module: IModule[FluidRepositoryModule] = TileFluidRepository.MODULE
+
+    override def serverUpdate(tile: ITileEntity): Unit = {
+      new Loc4(tile).getOffset(EnumFacing.DOWN).getBlock(false) match {
+        case None =>
+        case Some(b) if b == Blocks.WATER => storage.fill(Converter.IFluidStackFromFluidStack(new FluidStack(FluidRegistry.WATER, 25)), true)
+        case Some(b) if b.isInstanceOf[IFluidBlock] && b.asInstanceOf[IFluidBlock].getFluid == FluidRegistry.WATER => storage.fill(Converter.IFluidStackFromFluidStack(new FluidStack(FluidRegistry.WATER, 25)), true)
+        case _ =>
+      }
+
+      val currentFluid = if (storage.head.isEmpty) None else Option(storage.head.fluid)
+      if (currentFluid != fluidLast) {
+        // TODO Change to setUpdate
+        tile.getIWorld.toMinecraft.notifyBlockUpdate(tile.getPos, tile.getIWorld.getBlockState(tile.getPos), tile.getIWorld.getBlockState(tile.getPos), 3)
+      }
+      fluidLast = currentFluid
     }
 
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
-    (capability, facing) match {
-      case (cap, _) if cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY => true
-      case (cap, _) if cap == Capabilities.FLUID_STORAGE_CONFIGURABLE => true
-      case (cap, _) if cap == ItszuLibCapabilities.FLUID_STORAGE => true
-      case _ => super.hasCapability(capability, facing)
+    override def hasDescriptionNBT: Boolean = true
+
+    override def writeDescriptionNBT(tag: NBTTagCompound): Unit = {
+      tag.setTag(TANK_KEY, storage.serializeNBT())
     }
 
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
-
-    getLoc.getOffset(EnumFacing.DOWN).getBlock(false) match {
-      case None =>
-      case Some(b) if b == Blocks.WATER => storage.fill(new FluidStack(FluidRegistry.WATER, 25), true)
-      case Some(b) if b.isInstanceOf[IFluidBlock] && b.asInstanceOf[IFluidBlock].getFluid == FluidRegistry.WATER => storage.fill(new FluidStack(FluidRegistry.WATER, 25), true)
-      case _ =>
+    override def readDescriptionNBT(tag: NBTTagCompound): Unit = {
+      storage.deserializeNBT(tag.getCompoundTag(TANK_KEY))
     }
-
-    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
-    TileEntityUtils.checkDoFluidInputIO(this, sidedFluidConfig, ticks, AMT_FOR_AUTOIO)
-    TileEntityUtils.checkDoFluidOutputIO(this, sidedFluidConfig, ticks, AMT_FOR_AUTOIO)
-
-    val currentFluid = Option(storage.getTankProperties()(0).getContents).map(_.getFluid).orNull
-    if (currentFluid != fluidLast)
-      setUpdate()
-    fluidLast = currentFluid
   }
 
+}
+
+class TileFluidRepository extends TileEntityCoreTickable {
+  val storage: IFluidStorage = new FluidStorage(TANK_SIZE)
+  val sidedFluidConfig       = new SidedFluidStorageConfiguration(_ => TANK_KEY,
+                                                                  Map(NONE_KEY -> IFluidStorage.Empty,
+                                                                      TANK_KEY -> storage),
+                                                                  () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
+  val internal               = new FluidRepositoryModule(storage)
+
+  addTileEntityModule(new ModuleIFluidStorage(storage))
+  addTileEntityModule(new ModuleIFluidHandlerConverter)
+  addTileEntityModule(new ModuleIFluidSidedConfiguration(sidedFluidConfig))
+  addTileEntityModuleTickable(new ModuleIFluidAutoIO(sidedFluidConfig))
+  addTileEntityModuleTickable(internal)
 
   override def getMod = Femtocraft
 
@@ -94,4 +80,6 @@ class TileFluidRepository extends TileEntityBase with TileDataSpec with ITileEnt
 
   override def hasDescription: Boolean = true
 
+  // TODO
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
 }
