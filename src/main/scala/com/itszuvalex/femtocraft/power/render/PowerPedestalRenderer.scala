@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.power.tile.TilePowerPedestal
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -52,7 +53,7 @@ class PowerPedestalRenderer extends TileEntityCombinedRenderer[TilePowerPedestal
       FemtoRenderUtils.disableLightMaps()
       Minecraft.getMinecraft.getTextureManager.bindTexture(PowerPedestalRenderer.pedestalColoredTexLocation)
       pedestalModel.render()
-      FemtoRenderUtils.enableLightMap(te)
+      FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(te))
     }
 
     GL11.glPopMatrix()

@@ -6,8 +6,8 @@ import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
-import com.itszuvalex.femtocraft.power.{ModulePowerLeafNode, ModulePowerStorage}
-import com.itszuvalex.femtocraft.temp.{ModuleColorable, ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
+import com.itszuvalex.femtocraft.temp.{ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
@@ -49,6 +49,7 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
                                                                                                     NANITE_TANK_KEY -> naniteTank),
                                                                                                 () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   val battery           : IBattery                        = new PowerBattery(5000)
+  val leafNode                                            = new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, transRate = () => 80d)
 
   val internal = new NaniteExtractorModule(storage, battery, naniteTank)
 
@@ -57,10 +58,11 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
   addTileEntityModule(new ModuleDropInventory)
   addTileEntityModule(new ModulePowerStorage(battery))
-  addTileEntityModule(new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, transRate = () => 80d))
+  addTileEntityModule(leafNode)
   addTileEntityModule(new ModuleINaniteTank(naniteTank))
   addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
-  addTileEntityModule(new ModuleColorable)
+  addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
   addTileEntityModuleTickable(internal)

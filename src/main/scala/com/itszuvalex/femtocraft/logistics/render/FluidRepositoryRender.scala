@@ -5,9 +5,9 @@ import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
 import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityRenderCube}
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
@@ -73,7 +73,7 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
       super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     }
     if (FemtoRenderSwitches.renderFluidConfiguration && te.hasModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null))
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null))
     }
   }
 }

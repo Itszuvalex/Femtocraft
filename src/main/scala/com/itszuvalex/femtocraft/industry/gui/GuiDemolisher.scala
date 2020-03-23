@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerDemolisher
 import com.itszuvalex.femtocraft.industry.tile.{DemolisherModule, TileDemolisher}
@@ -36,7 +36,7 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
   }
   var color: Color = tile.getModule(ItszuLibModules.COLORABLE, EnumFacing.UP)
   val nameLabel    = new GuiLabel(20, 12, fontRenderer.getStringWidth("Demolisher"), fontRenderer.FONT_HEIGHT, () => "Demolisher")
-  val powerMeter   = new GuiPowerMeter(6, 22, tile.getModule(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
+  val powerMeter   = new GuiPowerMeter(6, 22, tile.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null).battery, color.toInt)
   progressBar.colorProgress = color.toInt
   add(progressBar)
   val elems = List(nameLabel, powerMeter)

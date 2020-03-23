@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.tile.TileCrystalHeatExchanger.CrystalHeatExchangerModule
-import com.itszuvalex.femtocraft.power.{ModulePowerLeafNode, ModulePowerStorage}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
 import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Burnable
@@ -96,13 +96,16 @@ class TileCrystalHeatExchanger extends TileEntityCoreTickable {
     }
   }
   val battery: IBattery     = new PowerBattery(TileCrystalHeatExchanger.POWER_STORAGE)
+  val leafNode              = new ModulePowerLeafNode(this, battery, PowerStorageNodeType.PRODUCER, transRate = () => 50d)
 
   val internal = new CrystalHeatExchangerModule(storage, battery)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
   addTileEntityModule(new ModulePowerStorage(battery))
-  addTileEntityModule(new ModulePowerLeafNode(this, battery, PowerStorageNodeType.PRODUCER, transRate = () => 50d))
+  addTileEntityModule(leafNode)
+  addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
 
   override def getMod: AnyRef = Femtocraft
 

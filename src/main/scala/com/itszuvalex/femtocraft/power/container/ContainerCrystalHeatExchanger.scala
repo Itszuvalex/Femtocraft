@@ -16,8 +16,8 @@ import net.minecraft.item.ItemStack
 class ContainerCrystalHeatExchanger(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileCrystalHeatExchanger, addSyncs: Boolean = true) extends ContainerInv[TileCrystalHeatExchanger](parPlayer, te, 0, 0, GuiIDs.TileCrystalHeatExchangerID, addSyncs) {
   addSync(new SyncDouble(GuiID, () => te.battery.maxStorage, (max) => te.battery.maxStorage = max))
   addSync(new SyncDouble(GuiID, () => te.battery.storage, (storage) => te.battery.storage = storage))
-  addSync(new SyncInt(GuiID, () => te.getBurnTime, (i: Int) => te.setBurnTime(i)))
-  addSync(new SyncInt(GuiID, () => te.getBurnMax, (i: Int) => te.setBurnMax(i)))
+  addSync(new SyncInt(GuiID, () => te.internal.getBurnTime, (i: Int) => te.internal.setBurnTime(i)))
+  addSync(new SyncInt(GuiID, () => te.internal.getBurnMax, (i: Int) => te.internal.setBurnMax(i)))
 
   if (addSyncs) {
     val storage: IItemStorage = te.getModule(ItszuLibModules.ITEM_STORAGE, null)

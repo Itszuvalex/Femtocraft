@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.power.node.PowerNode
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntity
@@ -19,7 +20,7 @@ object PowerNodeBeamRenderer extends PowerBeamRenderer {
   private val beamOuterLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_outer.png")
   private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/power_beam_colored.png")
 
-  def renderPowerBeams(node: TileEntity with PowerNode, x: Double, y: Double, z: Double, partialTime: Float) = {
+  def renderPowerBeams(node: ITileEntity, x: Double, y: Double, z: Double, partialTime: Float) = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamOuterLocation)
     renderBeamsToAllChildren(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte))
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamColorLocation)
@@ -28,7 +29,7 @@ object PowerNodeBeamRenderer extends PowerBeamRenderer {
     FemtoRenderUtils.enableLightMap(node)
   }
 
-  def renderPowerBeamToChild(node: TileEntity with PowerNode, x: Double, y: Double, z: Double, partialTime: Float, child: Loc4): Unit = {
+  def renderPowerBeamToChild(node: ITileEntity, x: Double, y: Double, z: Double, partialTime: Float, child: Loc4): Unit = {
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamOuterLocation)
     renderBeamToChild(x, y, z, partialTime, node, PowerNodeBeamRenderer.BEAM_WIDTH, Color(180.toByte, 255.toByte, 255.toByte, 255.toByte), child)
     Minecraft.getMinecraft.getTextureManager.bindTexture(PowerNodeBeamRenderer.beamColorLocation)

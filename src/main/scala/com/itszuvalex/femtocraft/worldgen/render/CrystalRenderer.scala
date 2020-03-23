@@ -4,6 +4,7 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import com.itszuvalex.itszulib.util.Color
@@ -62,7 +63,7 @@ class CrystalRenderer extends TileEntityCombinedRenderer[TileCrystalsWorldgen] {
       }
     }
     GL11.glPopMatrix() // Stop leaking scaling change, idiot!
-    FemtoRenderUtils.enableLightMap(lastTe)
+    FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe)) // TODO?
     GL11.glColor4f(1f, 1f, 1f, 1f)
     GL11.glEnable(GL11.GL_LIGHTING)
     GL11.glEnable(GL11.GL_CULL_FACE)

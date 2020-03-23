@@ -35,7 +35,7 @@ class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockC
   override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit = {
     worldIn.getTileEntity(pos) match {
       case mount: TileCrystalMount =>
-        if (mount.getCrystalStack != null && !mount.getCrystalStack.isEmpty)
+        if (mount.storage.head != null && !mount.storage.head.isEmpty)
           Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_POWER,
                                          pos.getX + .5 + (rand.nextDouble() * .2 - .1),
                                          pos.getY + .5 + (rand.nextDouble() * .2 - .1),

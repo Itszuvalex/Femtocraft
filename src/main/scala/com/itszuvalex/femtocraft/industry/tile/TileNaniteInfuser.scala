@@ -5,8 +5,8 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration, NaniteInfusionRecipeRegistry}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
-import com.itszuvalex.femtocraft.power.{ModulePowerLeafNode, ModulePowerStorage}
-import com.itszuvalex.femtocraft.temp.{ModuleColorable, ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
+import com.itszuvalex.femtocraft.temp.{ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
@@ -37,8 +37,6 @@ object TileNaniteInfuser {
   val TICKS_FOR_AUTOIO = 20
   val AMT_PER_AUTOIO   = 1
   val VOL_PER_AUTOIO   = 1
-
-
 }
 
 class TileNaniteInfuser extends TileEntityCoreTickable {
@@ -69,6 +67,7 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
                                                                             NANITE_TANK_KEY -> naniteTank),
                                                                         () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   val battery      : IBattery     = new PowerBattery(4000)
+  val leafNode                    = new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, 8, () => 50d)
 
   val internal = new NaniteInfuserModule(inputStorage, outputStorage, battery, naniteTank)
 
@@ -77,10 +76,11 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
   addTileEntityModule(new ModuleDropInventory)
   addTileEntityModule(new ModulePowerStorage(battery))
-  addTileEntityModule(new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, 8, () => 50d))
+  addTileEntityModule(leafNode)
   addTileEntityModule(new ModuleINaniteTank(naniteTank))
   addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
-  addTileEntityModule(new ModuleColorable)
+  addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
   addTileEntityModuleTickable(internal)

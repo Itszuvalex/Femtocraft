@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.power.render.CrystalMountRenderer._
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.render.{RenderUtils, ShaderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
@@ -86,11 +86,11 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
   override def renderTileEntityInWorld(te: TileCrystalMount, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     if (MinecraftForgeClient.getRenderPass == 0) {
-      val stateAbove = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.UP).getPos)
-      val stateBelow = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)
+      val stateAbove  = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.UP).getPos)
+      val stateBelow  = te.getWorld.getBlockState(te.getLoc.getOffset(EnumFacing.DOWN).getPos)
       val renderAbove = stateAbove.getBlock.isSideSolid(stateAbove, te.getWorld, te.getLoc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
       val renderBelow = stateBelow.getBlock.isSideSolid(stateBelow, te.getWorld, te.getLoc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
-      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.getCrystalStack != null && !te.getCrystalStack.isEmpty, te.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP))
+      renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.storage.head != null && !te.storage.head.isEmpty, te.getModule(ItszuLibModules.COLORABLE, EnumFacing.UP))
     }
 
     te.getModule(ManagerModules.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getITileEntity()).withFilter(_.hasModule(ManagerModules.TILE_POWER_NODE, null)).
