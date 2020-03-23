@@ -4,9 +4,10 @@ import java.util
 import java.util.Comparator
 import java.util.regex.Pattern
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal
 import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import com.itszuvalex.itszulib.util.Comparators.ItemStack._
 import net.minecraft.init.{Blocks, Items}
@@ -23,16 +24,16 @@ import scala.collection.mutable
   */
 object DustRecipeRegistry {
   val defaultDust = 2
-  private val itemStackOverrides                                          = new util.TreeMap[ItemStack, ItemStack](new Comparator[ItemStack] {
-    override def compare(x: ItemStack, y: ItemStack): Int = IDDamageWildCardNBTComparator.compare(x, y)
+  private val itemStackOverrides                                          = new util.TreeMap[IItemStack, IItemStack](new Comparator[IItemStack] {
+    override def compare(x: IItemStack, y: IItemStack): Int = IDDamageWildCardNBTComparator.compare(x.toMinecraft, y.toMinecraft)
   }).asScala
   private val itemStackMatcherOverrides: mutable.ArrayBuffer[IDustRecipe] = new mutable.ArrayBuffer[IDustRecipe]()
-  private val validOres  = mutable.Set[String]()
-  private val oreDustNum = mutable.HashMap[String, Int]()
-  private val oreGroupName  = "ore"
-  private val dustGroupName = "dust"
-  private val orePattern  = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
-  private val dustPattern = Pattern.compile("dust(?<" + dustGroupName + ">.*)")
+  private val validOres                                                   = mutable.Set[String]()
+  private val oreDustNum                                                  = mutable.HashMap[String, Int]()
+  private val oreGroupName                                                = "ore"
+  private val dustGroupName                                               = "dust"
+  private val orePattern                                                  = Pattern.compile("ore(?<" + oreGroupName + ">.*)")
+  private val dustPattern                                                 = Pattern.compile("dust(?<" + dustGroupName + ">.*)")
 
   def registeredOres = validOres
 
@@ -44,26 +45,26 @@ object DustRecipeRegistry {
     extractOresFromOreDictionary()
     registerDustOverrides()
 
-    addItemStackMapping(Blocks.STONE.newStack(), Blocks.GRAVEL.newStack())
-    addItemStackMapping(Blocks.COBBLESTONE.newStack(), Blocks.GRAVEL.newStack())
-    addItemStackMapping(Blocks.GRAVEL.newStack(), Blocks.SAND.newStack())
-    addItemStackMapping(FemtoBlocks.blockSubstrate.newStack(), FemtoItems.itemDumbDust.newStack())
-    addItemStackMapping(Items.DIAMOND.newStack(), FemtoItems.itemDiamondDust.newStack())
-    addItemStackMapping(FemtoItems.itemPhasemetalIngotActivated.newStack(), FemtoItems.itemPhasemetalDust.newStack())
-    addItemStackMapping(FemtoItems.itemPhasemetalIngotDevoid.newStack(), FemtoItems.itemPhasemetalDust.newStack())
-    addItemStackMapping(FemtoItems.itemRiftironIngotActivated.newStack(), FemtoItems.itemRiftironDust.newStack())
-    addItemStackMapping(FemtoItems.itemRiftironIngotDevoid.newStack(), FemtoItems.itemRiftironDust.newStack())
+    addItemStackMapping(Blocks.STONE.newIStack(), Blocks.GRAVEL.newIStack())
+    addItemStackMapping(Blocks.COBBLESTONE.newIStack(), Blocks.GRAVEL.newIStack())
+    addItemStackMapping(Blocks.GRAVEL.newIStack(), Blocks.SAND.newIStack())
+    addItemStackMapping(FemtoBlocks.blockSubstrate.newIStack(), FemtoItems.itemDumbDust.newIStack())
+    addItemStackMapping(Items.DIAMOND.newIStack(), FemtoItems.itemDiamondDust.newIStack())
+    addItemStackMapping(FemtoItems.itemPhasemetalIngotActivated.newIStack(), FemtoItems.itemPhasemetalDust.newIStack())
+    addItemStackMapping(FemtoItems.itemPhasemetalIngotDevoid.newIStack(), FemtoItems.itemPhasemetalDust.newIStack())
+    addItemStackMapping(FemtoItems.itemRiftironIngotActivated.newIStack(), FemtoItems.itemRiftironDust.newIStack())
+    addItemStackMapping(FemtoItems.itemRiftironIngotDevoid.newIStack(), FemtoItems.itemRiftironDust.newIStack())
 
     addStackMatcher(new IDustRecipe {
-      override def matches(item: ItemStack): Boolean = item != null && item.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
+      override def matches(item: IItemStack): Boolean = item != null && item.hasModule(ManagerModules.ITEM_POWER_CRYSTAL, null)
 
-      override def result(item: ItemStack): ItemStack = {
-        val amt = item.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType() match {
+      override def result(item: IItemStack): IItemStack = {
+        val amt = item.getModule(ManagerModules.ITEM_POWER_CRYSTAL, null).getType() match {
           case IPowerCrystal.TYPE_SMALL => 1
           case IPowerCrystal.TYPE_MEDIUM => 2
           case IPowerCrystal.TYPE_LARGE => 3
         }
-        FemtoItems.itemCracklingDust.newStack(amt)
+        FemtoItems.itemCracklingDust.newIStack(amt)
       }
     })
   }
@@ -75,7 +76,7 @@ object DustRecipeRegistry {
 
   def overrideDustMapping(ore: String, num: Int) = oreDustNum(ore) = num
 
-  def addItemStackMapping(ore: ItemStack, dust: ItemStack) = {
+  def addItemStackMapping(ore: IItemStack, dust: IItemStack) = {
     itemStackOverrides += ((ore, dust))
   }
 
@@ -89,7 +90,7 @@ object DustRecipeRegistry {
     OreDictionary.getOreNames.foreach { name =>
       val oreMatcher = orePattern.matcher(name)
       if (oreMatcher.matches()) {
-        val ore = oreMatcher.group(oreGroupName)
+        val ore  = oreMatcher.group(oreGroupName)
         val prev = oreOreToDustMap.get(ore)
         oreOreToDustMap(ore) = (true, prev.exists(_._2))
       }
@@ -108,8 +109,8 @@ object DustRecipeRegistry {
     validOres.foreach { ore => Femtocraft.logger.log(Level.INFO, "Registered ore->dust mapping for Ore:\t%s".format(ore)) }
   }
 
-  def getDust(item: ItemStack): Option[ItemStack] = {
-    itemStackOverrides.find(p => ItemStack.areItemsEqual(item, p._1) && ItemStack.areItemStackTagsEqual(item, p._1)) match {
+  def getDust(item: IItemStack): Option[IItemStack] = {
+    itemStackOverrides.find(p => ItemStack.areItemsEqual(item.toMinecraft, p._1.toMinecraft) && ItemStack.areItemStackTagsEqual(item.toMinecraft, p._1.toMinecraft)) match {
       case Some(a) =>
         return Some(a._2.copy())
       case None =>
@@ -120,22 +121,22 @@ object DustRecipeRegistry {
       case None =>
     }
 
-    OreDictionary.getOreIDs(item).map(OreDictionary.getOreName).foreach { ore =>
+    OreDictionary.getOreIDs(item.toMinecraft).map(OreDictionary.getOreName).foreach { ore =>
       getDustForOre(ore) match {
         case None =>
         case Some(grind) =>
           val ret = grind.copy()
-          ret.setCount(oreDustNum.getOrElse(ore, defaultDust))
+          ret.stackSize = oreDustNum.getOrElse(ore, defaultDust)
           return Some(ret)
       }
     }
     None
   }
 
-  def getDustForOre(ore: String): Option[ItemStack] = {
+  def getDustForOre(ore: String): Option[IItemStack] = {
     getDustOreForOre(ore) match {
       case None => None
-      case Some(dust) => OreDictionary.getOres(dust).headOption
+      case Some(dust) => OreDictionary.getOres(dust).map(Converter.IItemStackFromItemStack).headOption
     }
   }
 
@@ -151,8 +152,8 @@ object DustRecipeRegistry {
     else None
   }
 
-  def getDustOre(item: ItemStack): Option[String] = {
-    OreDictionary.getOreIDs(item).map(OreDictionary.getOreName).foreach { ore =>
+  def getDustOre(item: IItemStack): Option[String] = {
+    OreDictionary.getOreIDs(item.toMinecraft).map(OreDictionary.getOreName).foreach { ore =>
       val oreMatcher = orePattern.matcher(ore)
       if (oreMatcher.matches()) {
         val og = oreMatcher.group(oreGroupName)
@@ -165,9 +166,9 @@ object DustRecipeRegistry {
   }
 
   private trait IDustRecipe {
-    def matches(item: ItemStack): Boolean
+    def matches(item: IItemStack): Boolean
 
-    def result(item: ItemStack): ItemStack
+    def result(item: IItemStack): IItemStack
   }
 
 }

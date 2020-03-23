@@ -1,14 +1,13 @@
 package com.itszuvalex.femtocraft.api.nanite
 
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.common.util.INBTSerializable
 
 import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by Chris on 8/18/2016.
   */
-class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable[NBTTagCompound] {
+class NaniteTank(private var vol: Int) extends INaniteTank {
   private val nanites = ArrayBuffer[NaniteStack]()
 
   override def nMols: Int = nanites.map(_.nMol).sum
@@ -58,14 +57,13 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
     * @param nanite  Nanite to drain
     * @param vol     Volume to drain
     * @param doDrain True to actually modify the tank
-    *
     * @return Stack containing the results of the drain
     */
   override def drain(nanite: INanite, vol: Int, doDrain: Boolean): NaniteStack = {
     if (nanite == null) return null
 
     findStack(nanite).map { index =>
-      val stack = nanites(index)
+      val stack  = nanites(index)
       val lowest = Math.min(vol, stack.volume)
       if (doDrain) {
         stack.vol -= lowest
@@ -80,7 +78,6 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
     *
     * @param stack  Stack to fill.  This is not modified.
     * @param doFill True to actually modify the tank
-    *
     * @return Copy of NaniteStack containing the remainder, or null
     */
   override def fill(stack: NaniteStack, doFill: Boolean): NaniteStack = {
@@ -92,13 +89,13 @@ class NaniteTank(private var vol: Int) extends INaniteTank with INBTSerializable
 
     val storageStack =
       findStack(stack.nanite).map(nanites(_)).
-        getOrElse {
-          val add = NaniteStack(stack.nanite, 0)
-          if (doFill) {
-            nanites += add
-          }
-          add
-        }
+                             getOrElse {
+                               val add = NaniteStack(stack.nanite, 0)
+                               if (doFill) {
+                                 nanites += add
+                               }
+                               add
+                             }
 
     val lowest = Math.min(stack.volume, room)
     if (doFill) {

@@ -4,7 +4,7 @@ import java.util.Random
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.proxy.ProxyCommon
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft}
+import com.itszuvalex.femtocraft.{FemtoBlocks, FemtoItems, Femtocraft}
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
@@ -20,7 +20,7 @@ import net.minecraft.world.{IBlockAccess, World}
 /**
   * Created by Christopher on 8/27/2015.
   */
-class BlockFrame extends TileBlockContainerCore(Material.IRON, new BlockFrameContainerDelegate(this), BlockBehaviors.DEFAULT) {
+class BlockFrame extends TileBlockContainerCore(Material.IRON, new BlockFrameContainerDelegate(), BlockBehaviors.DEFAULT) {
 
   override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack = new ItemStack(FemtoItems.itemFrame)
 
@@ -47,6 +47,9 @@ class BlockFrame extends TileBlockContainerCore(Material.IRON, new BlockFrameCon
   }
 }
 
-class BlockFrameContainerDelegate(block: Block) extends BlockTileContainer(block) {
+class BlockFrameContainerDelegate() extends BlockTileContainer(null) {
+
+  override def toMinecraft: Block = FemtoBlocks.blockFrame
+
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileFrame()
 }

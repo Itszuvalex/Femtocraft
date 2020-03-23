@@ -1,58 +1,55 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.industry.tile.NanoFurnaceModule.SmeltTask
-import com.itszuvalex.femtocraft.industry.tile.NanoFurnaceModule.SmeltTask._
+import com.itszuvalex.femtocraft.api.nanite.INaniteTank
+import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
+import com.itszuvalex.femtocraft.industry.tile.NaniteInfuserModule.InfuseTask
+import com.itszuvalex.femtocraft.industry.tile.NaniteInfuserModule.InfuseTask._
 import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.util.Task
-import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
 
-object NanoFurnaceModule {
-  val TASK_NBT = "Task"
-
-  val TICKS_REQ      = 20 * 8
+object NaniteInfuserModule {
+  val TICKS_REQ      = 20 * 20
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
 
-  class SmeltTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
-    var smelted = false
+  class InfuseTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
+    var infused = false
 
     override def deserializeNBT(t: NBTTagCompound): Unit = {
       super.deserializeNBT(t)
-      if (t.hasKey(SMELTING_STACK_NBT))
-        stack = IItemStack.createFromNBT(t.getCompoundTag(SMELTING_STACK_NBT))
-      smelted = t.getBoolean(SMELTING_SMELTED_NBT)
+      if (t.hasKey(INFUSING_STACK_NBT))
+        stack = IItemStack.createFromNBT(t.getCompoundTag(INFUSING_STACK_NBT))
+      infused = t.getBoolean(INFUSED_NBT)
     }
 
     override def serializeNBT(): NBTTagCompound = {
       val ret = super.serializeNBT()
       if (stack != null)
-        ret.setTag(SMELTING_STACK_NBT, stack.serializeNBT())
-      ret.setBoolean(SMELTING_SMELTED_NBT, smelted)
+        ret.setTag(INFUSING_STACK_NBT, stack.serializeNBT())
+      ret.setBoolean(INFUSED_NBT, infused)
       ret
     }
 
     override def reset(): Unit = {
       super.reset()
       stack = IItemStack.Empty
-      smelted = false
+      infused = false
     }
   }
 
-  object SmeltTask {
-    val SMELTING_STACK_NBT   = "Smelt"
-    val SMELTING_SMELTED_NBT = "Smelted"
+  object InfuseTask {
+    val INFUSING_STACK_NBT = "Infuse"
+    val INFUSED_NBT        = "Infused"
   }
 
 }
 
-class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[NanoFurnaceModule] {
-  private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
-
-  override def module: IModule[NanoFurnaceModule] = TileNanoFurnace.MODULE
+class NaniteInfuserModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery, val ntank: INaniteTank) extends TileEntityInternalModuleTickable[NaniteInfuserModule] {
+  private val task: InfuseTask = new InfuseTask(IItemStack.Empty)
 
   override def hasWorldNBT: Boolean = true
 
@@ -67,10 +64,20 @@ class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val b
   override def serverUpdate(tile: ITileEntity): Unit = {
     if (task.stack == null || task.stack.isEmpty) {
       val item = input.head
-      if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty) {
-        val ins = input.split(0, 1)
-        task.reset()
-        task.stack = ins
+      if (!item.isEmpty) {
+        val recipe = NaniteInfusionRecipeRegistry.getMatchingRecipe(item)
+        if (recipe.isDefined) {
+          val r = recipe.get
+          if (ntank.containsNanite(r.nanitesRequired.nanite)) {
+            val fakeDrain = ntank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, false)
+            if (fakeDrain != null && fakeDrain.volume == r.nanitesRequired.volume) {
+              ntank.drain(r.nanitesRequired.nanite, r.nanitesRequired.volume, true)
+              val ins = input.split(0, 1)
+              task.reset()
+              task.stack = ins
+            }
+          }
+        }
       }
     }
     else {
@@ -83,17 +90,17 @@ class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val b
         }
 
         var insertItem = task.stack
-        if (!task.smelted) {
-          val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
+        if (!task.infused) {
+          val resultItem = NaniteInfusionRecipeRegistry.getMatchingRecipe(insertItem)
           if (resultItem == null || resultItem.isEmpty) {
             task.reset()
             return
           }
           else {
-            insertItem = Converter.IItemStackFromItemStack(resultItem.copy())
+            insertItem = resultItem.get.output.copy()
           }
 
-          task.smelted = true
+          task.infused = true
         }
 
         // Will clear the stack once we successfully insert the result item or set stack to the finished result
@@ -112,4 +119,5 @@ class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val b
 
   def getProgressMax: Double = task.adjustedMax(0)
 
+  override def module: IModule[NaniteInfuserModule] = TileNaniteInfuser.MODULE
 }

@@ -1,73 +1,63 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.industry.tile.NanoFurnaceModule.SmeltTask
-import com.itszuvalex.femtocraft.industry.tile.NanoFurnaceModule.SmeltTask._
+import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
+import com.itszuvalex.femtocraft.industry.tile.DemolisherModule.DemolishTask
+import com.itszuvalex.femtocraft.industry.tile.DemolisherModule.DemolishTask._
 import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.util.Task
-import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
 
-object NanoFurnaceModule {
-  val TASK_NBT = "Task"
-
+object DemolisherModule {
   val TICKS_REQ      = 20 * 8
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
 
-  class SmeltTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
-    var smelted = false
+  val TASK_NBT = "Task"
+
+  class DemolishTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
+    var demolished = false
 
     override def deserializeNBT(t: NBTTagCompound): Unit = {
       super.deserializeNBT(t)
-      if (t.hasKey(SMELTING_STACK_NBT))
-        stack = IItemStack.createFromNBT(t.getCompoundTag(SMELTING_STACK_NBT))
-      smelted = t.getBoolean(SMELTING_SMELTED_NBT)
+      if (t.hasKey(DEMOLISHING_STACK_NBT))
+        stack = IItemStack.createFromNBT(t.getCompoundTag(DEMOLISHING_STACK_NBT))
+      demolished = t.getBoolean(DEMOLISHING_SMELTED_NBT)
     }
 
     override def serializeNBT(): NBTTagCompound = {
       val ret = super.serializeNBT()
       if (stack != null)
-        ret.setTag(SMELTING_STACK_NBT, stack.serializeNBT())
-      ret.setBoolean(SMELTING_SMELTED_NBT, smelted)
+        ret.setTag(DEMOLISHING_STACK_NBT, stack.serializeNBT())
+      ret.setBoolean(DEMOLISHING_SMELTED_NBT, demolished)
       ret
     }
 
     override def reset(): Unit = {
       super.reset()
       stack = IItemStack.Empty
-      smelted = false
+      demolished = false
     }
   }
 
-  object SmeltTask {
-    val SMELTING_STACK_NBT   = "Smelt"
-    val SMELTING_SMELTED_NBT = "Smelted"
+  object DemolishTask {
+    val DEMOLISHING_STACK_NBT   = "Demolish"
+    val DEMOLISHING_SMELTED_NBT = "Demolished"
   }
 
 }
 
-class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[NanoFurnaceModule] {
-  private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
+class DemolisherModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[DemolisherModule] {
+  private val task: DemolishTask = new DemolishTask(IItemStack.Empty)
 
-  override def module: IModule[NanoFurnaceModule] = TileNanoFurnace.MODULE
-
-  override def hasWorldNBT: Boolean = true
-
-  override def writeWorldNBT(tag: NBTTagCompound): Unit = {
-    tag.setTag(NanoFurnaceModule.TASK_NBT, task.serializeNBT())
-  }
-
-  override def readWorldNBT(tagCompound: NBTTagCompound): Unit = {
-    task.deserializeNBT(tagCompound.getCompoundTag(NanoFurnaceModule.TASK_NBT))
-  }
+  override def module: IModule[DemolisherModule] = TileDemolisher.MODULE
 
   override def serverUpdate(tile: ITileEntity): Unit = {
     if (task.stack == null || task.stack.isEmpty) {
       val item = input.head
-      if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty) {
+      if (!item.isEmpty && DustRecipeRegistry.getDust(item).isDefined) {
         val ins = input.split(0, 1)
         task.reset()
         task.stack = ins
@@ -83,17 +73,17 @@ class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val b
         }
 
         var insertItem = task.stack
-        if (!task.smelted) {
-          val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
+        if (!task.demolished) {
+          val resultItem = DustRecipeRegistry.getDust(item).getOrElse(IItemStack.Empty)
           if (resultItem == null || resultItem.isEmpty) {
             task.reset()
             return
           }
           else {
-            insertItem = Converter.IItemStackFromItemStack(resultItem.copy())
+            insertItem = resultItem.copy()
           }
 
-          task.smelted = true
+          task.demolished = true
         }
 
         // Will clear the stack once we successfully insert the result item or set stack to the finished result
@@ -112,4 +102,13 @@ class NanoFurnaceModule(val input: IItemStorage, val output: IItemStorage, val b
 
   def getProgressMax: Double = task.adjustedMax(0)
 
+  override def hasWorldNBT: Boolean = true
+
+  override def writeWorldNBT(tag: NBTTagCompound): Unit = {
+    tag.setTag(DemolisherModule.TASK_NBT, task.serializeNBT())
+  }
+
+  override def readWorldNBT(tagCompound: NBTTagCompound): Unit = {
+    task.deserializeNBT(tagCompound.getCompoundTag(DemolisherModule.TASK_NBT))
+  }
 }
