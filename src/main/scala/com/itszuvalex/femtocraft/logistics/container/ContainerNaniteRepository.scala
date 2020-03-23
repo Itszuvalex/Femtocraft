@@ -2,14 +2,14 @@ package com.itszuvalex.femtocraft.logistics.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.nanite.NaniteTank
-import com.itszuvalex.femtocraft.industry.container.SyncNaniteTank
+import com.itszuvalex.femtocraft.industry.container.SyncINaniteTank
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository
 import com.itszuvalex.itszulib.container.ContainerInv
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 import net.minecraft.item.ItemStack
 
 class ContainerNaniteRepository(parPlayer: EntityPlayer, inv: InventoryPlayer, te: TileNaniteRepository, shouldSync: Boolean) extends ContainerInv[TileNaniteRepository](parPlayer, te, 0, 0, GuiIDs.TileNaniteRepositoryGuiID, shouldSync) {
-  addSync(new SyncNaniteTank(GuiID, () => te.naniteStorageTank.copy(), (a: NaniteTank) => te.naniteStorageTank.deserializeNBT(a.serializeNBT())))
+  addSync(new SyncINaniteTank(GuiID, () => te.naniteStorageTank.copy(), (a: NaniteTank) => te.naniteStorageTank.deserializeNBT(a.serializeNBT())))
 
   if (shouldSync) {
     addPlayerInventorySlots(parPlayer.inventory)

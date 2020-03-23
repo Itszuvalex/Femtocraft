@@ -7,7 +7,6 @@ import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.{ModulePowerLeafNode, ModulePowerStorage}
 import com.itszuvalex.femtocraft.temp.{ModuleColorable, ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
-import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
@@ -43,7 +42,7 @@ object TileNaniteInfuser {
 }
 
 class TileNaniteInfuser extends TileEntityCoreTickable {
-  private                   val storage      : IItemStorage = new ItemStorageArray(2) {
+  val storage      : IItemStorage = new ItemStorageArray(2) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = {
       (i, stack) match {
         case (_, null) => true
@@ -53,9 +52,9 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
       }
     }
   }
-  @Wrapper(storage) private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-  @Wrapper(storage) private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  private                   val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  val sidedStorageConfig          = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY
@@ -64,12 +63,14 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
        INPUT_INV_KEY -> inputStorage,
        OUTPUT_INV_KEY -> outputStorage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  private                   val naniteTank   : INaniteTank  = new NaniteTank(50)
-  private                   val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-                                                                                                  Map(NONE_TANK_KEY -> INaniteTank.Empty,
-                                                                                                      NANITE_TANK_KEY -> naniteTank),
-                                                                                                  () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  private                   val battery      : IBattery     = new PowerBattery(4000)
+  val naniteTank   : INaniteTank  = new NaniteTank(50)
+  val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+                                                                        Map(NONE_TANK_KEY -> INaniteTank.Empty,
+                                                                            NANITE_TANK_KEY -> naniteTank),
+                                                                        () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
+  val battery      : IBattery     = new PowerBattery(4000)
+
+  val internal = new NaniteInfuserModule(inputStorage, outputStorage, battery, naniteTank)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
@@ -82,7 +83,7 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleColorable)
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
-  addTileEntityModuleTickable(new NaniteInfuserModule(inputStorage, outputStorage, battery, naniteTank))
+  addTileEntityModuleTickable(internal)
 
   override def hasDescription: Boolean = true
 

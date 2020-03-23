@@ -4,7 +4,6 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.{ModulePowerLeafNode, ModulePowerStorage}
 import com.itszuvalex.femtocraft.temp.{ModuleColorable, ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
-import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{ItemStorageArray, _}
@@ -42,7 +41,7 @@ object TileNanoFurnace {
 }
 
 class TileNanoFurnace extends TileEntityCoreTickable {
-  private                   val storage      : IItemStorage = new ItemStorageArray(2) {
+  val storage      : IItemStorage = new ItemStorageArray(2) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = i match {
       case 0 =>
         val result = FurnaceRecipes.instance().getSmeltingResult(Converter.ItemStackFromIItemStack(stack))
@@ -50,9 +49,9 @@ class TileNanoFurnace extends TileEntityCoreTickable {
       case _ => false
     }
   }
-  @Wrapper(storage) private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-  @Wrapper(storage) private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  private                   val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  val sidedStorageConfig          = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY
@@ -61,7 +60,9 @@ class TileNanoFurnace extends TileEntityCoreTickable {
        INPUT_INV_KEY -> inputStorage,
        OUTPUT_INV_KEY -> outputStorage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  private                   val battery      : IBattery     = new PowerBattery(5000)
+  val battery      : IBattery     = new PowerBattery(5000)
+
+  val internal = new NanoFurnaceModule(inputStorage, outputStorage, battery)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
@@ -71,7 +72,7 @@ class TileNanoFurnace extends TileEntityCoreTickable {
   addTileEntityModule(new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, transRate = () => 50d))
   addTileEntityModule(new ModuleColorable)
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
-  addTileEntityModuleTickable(new NanoFurnaceModule(inputStorage, outputStorage, battery))
+  addTileEntityModuleTickable(internal)
 
   override def getMod: AnyRef = Femtocraft
 

@@ -45,7 +45,7 @@ class ProxyGuiCommon extends ItszuGuiHandler {
       case (GuiIDs.TileConduitSideID, te: TileConduit) => new ContainerConduitSide(player, player.inventory, te, EnumFacing.getFront(data), true)
       case (GuiIDs.TileSidedInventoryConfigID, te: ITileEntity) => new ContainerSidedInventoryConfig(te)
       case (GuiIDs.TileSidedNaniteConfigID, te: ITileEntity) => new ContainerSidedNaniteConfig(te)
-      case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new ContainerSidedFluidConfig(te)
+      case (GuiIDs.TileSidedFluidConfigID, te: ITileEntity) => new ContainerSidedFluidConfig(te)
       case (_, _) => null
     }
   }

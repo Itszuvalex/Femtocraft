@@ -44,6 +44,8 @@ object INaniteTank {
     override def serializeNBT(): NBTTagCompound = {new NBTTagCompound}
 
     override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
+
+    override def copy(): INaniteTank = INaniteTank.Empty
   }
 }
 
@@ -81,4 +83,6 @@ trait INaniteTank extends INBTSerializable[NBTTagCompound] {
     * @return Copy of NaniteStack containing the remainder, or null
     */
   def fill(stack: NaniteStack, doFill: Boolean): NaniteStack
+
+  def copy(): INaniteTank
 }

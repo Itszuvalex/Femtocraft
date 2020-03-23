@@ -5,7 +5,6 @@ import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.ModulePowerLeafNode
 import com.itszuvalex.femtocraft.temp.{ModuleColorable, ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
-import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
@@ -27,7 +26,7 @@ object TileDemolisher {
 }
 
 class TileDemolisher extends TileEntityCoreTickable {
-  val storage: IItemStorage = new ItemStorageArray(2) {
+  val storage      : IItemStorage = new ItemStorageArray(2) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = i match {
       case 0 =>
         val result = DustRecipeRegistry.getDust(stack).getOrElse(IItemStack.Empty)
@@ -35,9 +34,9 @@ class TileDemolisher extends TileEntityCoreTickable {
       case _ => false
     }
   }
-  @Wrapper(storage) private val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
-  @Wrapper(storage) private val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  private                   val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
+  val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
+  val sidedStorageConfig          = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY
@@ -46,7 +45,7 @@ class TileDemolisher extends TileEntityCoreTickable {
        INPUT_INV_KEY -> inputStorage,
        OUTPUT_INV_KEY -> outputStorage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  private                   val battery      : IBattery     = new PowerBattery(5000)
+  val battery      : IBattery     = new PowerBattery(5000)
 
   val internal = new DemolisherModule(inputStorage, outputStorage, battery)
 

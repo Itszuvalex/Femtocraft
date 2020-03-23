@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.core.{TileEntityBase, TileEntityCore}
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
@@ -13,11 +13,11 @@ import org.lwjgl.opengl.GL11
 /**
   * Created by Chris on 1/15/2017.
   */
-abstract class FemtoGuiBase(tile: TileEntityCore, c: ContainerBase) extends GuiBase(c) {
+abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase(c) {
   val tabBar: GuiTabBar = new GuiTabBar(-GuiTabBar.WIDTH, 0,
                                         ySize, GuiID, tile.asInstanceOf[TileEntityCore])
-  tabBar.addTab(Option(tile.getDisplayName).map(_.getFormattedText).getOrElse("Inventory"), new GuiItemStack(0, 0, () => false, "") {
-    val item = Converter.IItemStackFromItemStack(new ItemStack(tile.getBlockType))
+  tabBar.addTab("Inventory", new GuiItemStack(0, 0, () => false, "") {
+    val item = Converter.IItemStackFromItemStack(new ItemStack(tile.toMinecraft.getBlockType))
 
     override def itemStack = item
   }, tile.asInstanceOf[TileEntityBase].getGuiID)
