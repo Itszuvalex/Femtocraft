@@ -144,7 +144,7 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
     new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
     )
 
-  def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int) = {
+  def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int): Unit = {
     renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
   }
 

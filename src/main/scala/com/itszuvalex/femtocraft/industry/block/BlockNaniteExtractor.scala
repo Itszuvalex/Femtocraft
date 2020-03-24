@@ -5,7 +5,6 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
-import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.math.BlockPos
@@ -20,9 +19,7 @@ class BlockNaniteExtractor extends TileBlockContainerCore(Material.IRON, new Blo
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockNaniteExtractorContainerDelegate() extends BlockTileContainer(null) {
-
-  override def toMinecraft: Block = FemtoBlocks.blockNaniteExtractor
+class BlockNaniteExtractorContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockNaniteExtractor) {
 
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileNaniteExtractor
 }

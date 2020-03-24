@@ -5,7 +5,6 @@ import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
-import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 
@@ -19,8 +18,6 @@ class BlockNaniteRepository extends TileBlockContainerCore(Material.IRON, new Bl
   override def isNormalCube(state: IBlockState): Boolean = false
 }
 
-class BlockNaniteRepositoryContainerDelegate() extends BlockTileContainer(null) {
+class BlockNaniteRepositoryContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockNaniteRepository) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileNaniteRepository
-
-  override def toMinecraft: Block = FemtoBlocks.blockNaniteRepository
 }
