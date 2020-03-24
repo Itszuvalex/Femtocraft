@@ -9,7 +9,6 @@ import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
 import com.itszuvalex.itszulib.util.Color
-import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
@@ -47,9 +46,7 @@ class BlockFrame extends TileBlockContainerCore(Material.IRON, new BlockFrameCon
   }
 }
 
-class BlockFrameContainerDelegate() extends BlockTileContainer(null) {
-
-  override def toMinecraft: Block = FemtoBlocks.blockFrame
+class BlockFrameContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockFrame) {
 
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileFrame()
 }

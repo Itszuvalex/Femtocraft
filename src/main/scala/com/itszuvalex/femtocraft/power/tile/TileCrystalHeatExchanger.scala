@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.tile.TileCrystalHeatExchanger.CrystalHeatExchangerModule
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
+import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.Burnable
 import com.itszuvalex.itszulib.api.core.{IModule, Module}

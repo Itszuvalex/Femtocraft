@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.industry.tile.NanoFurnaceModule.SmeltTask
 import com.itszuvalex.femtocraft.industry.tile.NanoFurnaceModule.SmeltTask._
-import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
+import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}

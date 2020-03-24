@@ -1,20 +1,16 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
-import com.itszuvalex.femtocraft.temp.{ModuleIFluidAutoIO, ModuleIFluidSidedConfiguration, TileEntityInternalModuleTickable}
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
 import com.itszuvalex.itszulib.api.storage.{FluidStorage, IFluidStorage}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity, IWorld}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, ITileEntity}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import com.itszuvalex.itszulib.core.modules.{ModuleIFluidHandlerConverter, ModuleIFluidStorage}
-import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityCoreTickable}
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
+import com.itszuvalex.itszulib.core.modules.{ModuleIFluidAutoIO, ModuleIFluidHandlerConverter, ModuleIFluidSidedConfiguration, ModuleIFluidStorage}
+import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityCoreTickable, TileEntityInternalModuleTickable}
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{EnumFacing, EnumHand}
+import net.minecraft.util.EnumFacing
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, IFluidBlock}
 
 object TileFluidRepository {
@@ -81,5 +77,5 @@ class TileFluidRepository extends TileEntityCoreTickable {
   override def hasDescription: Boolean = true
 
   // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
+  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockFluidRepository)
 }

@@ -3,9 +3,9 @@ package com.itszuvalex.femtocraft.industry
 import com.itszuvalex._
 import com.itszuvalex.femtocraft.industry.ModuleNaniteAutoIO._
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
-import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
 import net.minecraft.nbt.NBTTagCompound
 
 object ModuleNaniteAutoIO {

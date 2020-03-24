@@ -3,10 +3,10 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteStack}
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.NaniteExtractorModule.ExtractTask
-import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.util.Task
 import net.minecraft.nbt.NBTTagCompound
 

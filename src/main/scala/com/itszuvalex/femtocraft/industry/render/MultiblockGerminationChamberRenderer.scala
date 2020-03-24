@@ -10,12 +10,11 @@ import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
 import com.itszuvalex.femtocraft.{FemtoBlocks, Resources}
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.MinecraftForgeClient
 import net.minecraftforge.client.model.obj.OBJModel
@@ -126,7 +125,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
         GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
         chamberModel.renderGroups(Set("Base", "Middle", "Top"))
         GL11.glPopAttrib()
-        FemtoRenderUtils.enableLightMap(lastTe)
+        FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe))
 
         //          val recipe = te.currentRecipe
         //          if (recipe != null) {
@@ -169,7 +168,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
           GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
           renderSprinklers(x, y, z, worldTime, partialTicks)
           GL11.glPopAttrib()
-          FemtoRenderUtils.enableLightMap(lastTe)
+          FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe))
         }
 
         //        RenderUtils.glMatrixBlock {
@@ -187,7 +186,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
         FemtoRenderUtils.disableLightMaps()
         GL11.glColor4ub(color.red, color.green, color.blue, 30.toByte)
         chamberModel.renderGroups(Set("Glass"))
-        FemtoRenderUtils.enableLightMap(lastTe)
+        FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe))
         GL11.glColor3f(1, 1, 1)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
         chamberModel.renderGroups(Set("Glass"))
@@ -246,11 +245,11 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
     }
 
     if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
     }
 
     if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
     }
   }
 }

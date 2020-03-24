@@ -3,19 +3,15 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.femtocraft.temp.{ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{ItemStorageArray, _}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, IWorld}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import com.itszuvalex.itszulib.core.modules.{ModuleDropInventory, ModuleIItemHandlerConverter, ModuleIItemStorage}
+import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.crafting.FurnaceRecipes
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{EnumFacing, EnumHand}
+import net.minecraft.util.EnumFacing
 
 /**
   * Created by Chris on 8/14/2016.
@@ -68,7 +64,7 @@ class TileNanoFurnace extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
   addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
-  addTileEntityModule(new ModuleDropInventory) //TODO Fix with new constructor
+  addTileEntityModule(new ModuleDropInventory(storage))
   addTileEntityModule(new ModulePowerStorage(battery))
   addTileEntityModule(leafNode)
   addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
@@ -85,5 +81,5 @@ class TileNanoFurnace extends TileEntityCoreTickable {
   override def getGuiID: Int = GuiIDs.TileFurnaceGuiID
 
   //TODO: Remove this once ItszuLib bumped again
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
+  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockNanoFurnace)
 }

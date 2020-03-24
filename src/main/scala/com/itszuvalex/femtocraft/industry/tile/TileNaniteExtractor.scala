@@ -7,13 +7,12 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.femtocraft.temp.{ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
-import com.itszuvalex.itszulib.api.wrappers.{IItemStack, IWorld}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import com.itszuvalex.itszulib.core.modules.{ModuleDropInventory, ModuleIItemHandlerConverter, ModuleIItemStorage}
+import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
@@ -56,7 +55,7 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
   addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
-  addTileEntityModule(new ModuleDropInventory)
+  addTileEntityModule(new ModuleDropInventory(storage))
   addTileEntityModule(new ModulePowerStorage(battery))
   addTileEntityModule(leafNode)
   addTileEntityModule(new ModuleINaniteTank(naniteTank))
@@ -76,5 +75,5 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
   override def getGuiID: Int = GuiIDs.TileNaniteExtractorID
 
   // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
+  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockNaniteExtractor)
 }

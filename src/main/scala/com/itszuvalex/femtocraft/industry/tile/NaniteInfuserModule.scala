@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.api.nanite.INaniteTank
 import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.NaniteInfuserModule.InfuseTask
 import com.itszuvalex.femtocraft.industry.tile.NaniteInfuserModule.InfuseTask._
-import com.itszuvalex.femtocraft.temp.TileEntityInternalModuleTickable
+import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}

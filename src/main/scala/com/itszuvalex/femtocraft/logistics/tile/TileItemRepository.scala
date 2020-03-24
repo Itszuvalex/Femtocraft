@@ -1,17 +1,12 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository._
-import com.itszuvalex.femtocraft.temp.{ModuleIItemAutoIO, ModuleIItemSidedConfiguration}
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.IWorld
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import com.itszuvalex.itszulib.core.modules.{ModuleIItemHandlerConverter, ModuleIItemStorage}
+import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{EnumFacing, EnumHand}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 12/20/15.
@@ -32,6 +27,7 @@ class TileItemRepository extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
   addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
+  addTileEntityModule(new ModuleDropInventory(storage))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
 
   override def getMod = Femtocraft
@@ -40,9 +36,8 @@ class TileItemRepository extends TileEntityCoreTickable {
 
   override def getGuiID: Int = GuiIDs.TileItemRepositoryGuiID
 
-  // TODO
-
   override def hasDescription: Boolean = false
 
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
+  // TODO
+  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockItemRepository)
 }
