@@ -6,17 +6,14 @@ import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration, NaniteInfusionRecipeRegistry}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack, IWorld}
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.{EnumFacing, EnumHand}
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.EnumFacing
 
 object TileNaniteInfuser {
   val MODULE: IModule[NaniteInfuserModule] = Module.registerModule("NaniteInfuserModule", null)
@@ -80,23 +77,8 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
   addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileNaniteInfuserID _))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
   addTileEntityModuleTickable(internal)
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = true
-
-  override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
-
-  // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
-    if (!ret && hasGUI) {
-      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
-      return true
-    }
-    ret
-  }
 }

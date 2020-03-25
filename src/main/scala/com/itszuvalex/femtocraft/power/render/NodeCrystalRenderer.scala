@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.power.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
@@ -28,7 +28,7 @@ trait NodeCrystalRenderer[T <: TileEntity with ITileEntity] extends TileEntitySp
   }
 
   def renderCrystal(x: Double, y: Double, z: Double, node: ITileEntity, partialTime: Float): Unit = {
-    val color = node.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
+    val color = node.getModule(ItszuLibModules.COLORABLE, EnumFacing.UP)
     GL11.glPushMatrix()
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glTranslated(x + .5, y, z + .5)

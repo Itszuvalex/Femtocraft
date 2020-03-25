@@ -2,10 +2,13 @@ package com.itszuvalex.femtocraft.logistics.test
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed._
+import com.itszuvalex.itszulib.api.wrappers.IWorld
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.util.PlayerUtils
+import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 import scala.collection._
 
@@ -32,8 +35,6 @@ class TileTaskProviderTest extends TileEntityCoreTickable with ITaskProvider {
     */
   override def getActiveTasks = tasks
 
-  override def getMod = Femtocraft
-
   /**
     *
     * @return Location of this provider, for use in distance calculations.
@@ -46,8 +47,6 @@ class TileTaskProviderTest extends TileEntityCoreTickable with ITaskProvider {
     *         (distance/16)&#94;2
     */
   override def getWorkerConnectionRadius = 30f
-
-  override def hasDescription = false
 
   override def invalidate(): Unit = {
     super.invalidate()
@@ -62,14 +61,14 @@ class TileTaskProviderTest extends TileEntityCoreTickable with ITaskProvider {
   }
 
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    val ret = super.onSideActivate(par5EntityPlayer, side)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     if (world.isRemote) return ret
-    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Tasks(" + tasks.size + "):")
+    PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "Tasks(" + tasks.size + "):")
     tasks.collect { case task: TestTask =>
-      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap + "   progress:" + task.progress + "-" + task.progressToFinish)
+      PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "    Task:  workers:" + task.getWorkers.size + "-" + task.getWorkerCap + "   progress:" + task.progress + "-" + task.progressToFinish)
       task.getWorkers.foreach { worker =>
-        PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "       Worker:" + worker.getProvider.getProviderLocation)
+        PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "       Worker:" + worker.getProvider.getProviderLocation)
       }
     }
     ret

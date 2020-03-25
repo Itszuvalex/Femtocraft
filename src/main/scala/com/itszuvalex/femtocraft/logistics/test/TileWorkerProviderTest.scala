@@ -3,15 +3,17 @@ package com.itszuvalex.femtocraft.logistics.test
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, IWorker, IWorkerProvider}
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IWorld
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.PlayerUtils
+import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.math.AxisAlignedBB
+import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 import scala.collection._
 
@@ -27,8 +29,6 @@ class TileWorkerProviderTest extends TileEntityCoreTickable with IWorkerProvider
     if (world.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
   }
-
-  override def getMod = Femtocraft
 
   /**
     *
@@ -98,12 +98,13 @@ class TileWorkerProviderTest extends TileEntityCoreTickable with IWorkerProvider
       connections ++= comp.NBTList("tagList").map(Loc4(_))
     }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    val ret = super.onSideActivate(par5EntityPlayer, side)
+
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     if (world.isRemote) return ret
-    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
+    PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>
-      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
+      PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
     }
     ret
   }

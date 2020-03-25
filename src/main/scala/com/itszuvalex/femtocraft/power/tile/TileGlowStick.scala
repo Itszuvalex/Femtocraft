@@ -16,8 +16,6 @@ class TileGlowStick extends TileEntityCore {
                          (Random.nextInt(125) + 130).toByte,
                          (Random.nextInt(125) + 130).toByte).toInt
 
-  override def getMod = Femtocraft
-
   override def hasDescription = true
 
   override def saveToDescriptionCompound(compound: NBTTagCompound): Unit = {

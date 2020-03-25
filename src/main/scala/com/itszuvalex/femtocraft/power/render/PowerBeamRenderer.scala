@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.render
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
@@ -61,7 +61,7 @@ object PowerBeamRenderer {
 
   def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
-    node.getCapability(Capabilities.TILE_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
+    node.getModule(ManagerModules.TILE_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
       renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
     }
     beamRenderTeardown()

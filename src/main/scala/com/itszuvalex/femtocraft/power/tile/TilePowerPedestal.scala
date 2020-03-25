@@ -1,6 +1,5 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityCore
@@ -21,8 +20,6 @@ object TilePowerPedestal {
 class TilePowerPedestal extends TileEntityCore {
   var mountLocation: Loc4 = null
   var stored       : Long = 0
-
-  override def getMod: AnyRef = Femtocraft
 
   override def hasDescription: Boolean = true
 

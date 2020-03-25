@@ -33,11 +33,6 @@ class ModulePowerLeafNode(tile: ITileEntity,
     PowerManager.instance.removeLeaf(this)
   }
 
-  override def validate(tile: ITileEntity): Unit = {
-    if (tile.getIWorld.isRemote) return
-    PowerManager.instance.addLeaf(this)
-  }
-
   override def onBlockBreak(core: ITileEntity, state: IBlockState): Unit = {
     if (tile.getIWorld.isRemote) return
 

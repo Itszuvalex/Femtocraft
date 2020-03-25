@@ -7,15 +7,12 @@ import com.itszuvalex.femtocraft.power.{ModuleColorableFromICrystal, ModulePower
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{DynamicIBattery, IBattery, IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity, IWorld}
-import com.itszuvalex.itszulib.core.modules.{ModuleIItemHandlerConverter, ModuleIItemStorage}
+import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.core.modules.{ModuleGui, ModuleIItemHandlerConverter, ModuleIItemStorage}
 import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityInternalModuleTickable}
 import com.itszuvalex.itszulib.render.Vector3
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
-import net.minecraft.util.{EnumFacing, EnumHand}
+import net.minecraft.util.math.AxisAlignedBB
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/27/15.
@@ -54,14 +51,14 @@ object TileCrystalMount {
 }
 
 class TileCrystalMount extends TileEntityCoreTickable {
-  val storage    : IItemStorage = new ItemStorageArray(1) {
+  val storage: IItemStorage = new ItemStorageArray(1) {
     override def canInsert(i: Int, stack: IItemStack): Boolean = {
       stack == null || stack.isEmpty || stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
     }
   }
-  val battery    : IBattery     = new DynamicIBattery(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(IBattery.Empty))
-  val powerNetworkNode          = new ModulePowerNode(this, () => TileCrystalMount.PEDESTAL_RANGE, () => powerStorageTransferRate, () => true)
-  val internal                  = new CrystalMountModule(this, storage)
+  val battery: IBattery     = new DynamicIBattery(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(IBattery.Empty))
+  val powerNetworkNode      = new ModulePowerNode(this, () => TileCrystalMount.PEDESTAL_RANGE, () => powerStorageTransferRate, () => true)
+  val internal              = new CrystalMountModule(this, storage)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
@@ -71,16 +68,11 @@ class TileCrystalMount extends TileEntityCoreTickable {
   addTileEntityModule(new ModulePowerStorageNode(this, battery, PowerStorageNodeType.STORAGE, () => powerStorageTransferRate))
   addTileEntityModule(powerNetworkNode)
   addTileEntityModule(new ModuleColorableFromICrystal(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null)))
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileCrystalMountGuiID _))
   addTileEntityModuleTickable(internal)
 
   def powerStorageTransferRate: Double = storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
                                                 .getOrElse(0d)
-
-  override def hasGUI = true
-
-  override def getGuiID: Int = GuiIDs.TileCrystalMountGuiID
-
-  override def getMod: AnyRef = Femtocraft
 
   override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
 
@@ -92,16 +84,5 @@ class TileCrystalMount extends TileEntityCoreTickable {
                       center.x + powerNetworkNode.connectionRadius,
                       center.y + powerNetworkNode.connectionRadius,
                       center.z + powerNetworkNode.connectionRadius)
-  }
-
-  // TODO
-
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
-    if (!ret && hasGUI) {
-      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
-      return true
-    }
-    ret
   }
 }

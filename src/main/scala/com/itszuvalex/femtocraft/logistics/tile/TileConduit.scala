@@ -2,22 +2,21 @@ package com.itszuvalex.femtocraft.logistics.tile
 
 import java.util
 
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.logistics._
-import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers._
-import com.itszuvalex.itszulib.api.{ItszuLibCapabilities, ItszuLibModules}
-import com.itszuvalex.itszulib.core.TileEntityCoreTickable
+import com.itszuvalex.itszulib.core.modules.ModuleGui
+import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityModule}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.{EnumFacing, EnumHand}
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
-import net.minecraftforge.common.capabilities.Capability
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -30,8 +29,10 @@ object TileConduit {
   lazy val connectionModules: ArrayBuffer[IModule[_]] = mutable.ArrayBuffer[IModule[_]](
     ManagerModules.TILE_CONDUIT,
     ManagerModules.TILE_LOGISTICS_NODE,
+    ItszuLibModules.ITEM_STORAGE,
     ItszuLibModules.ITEM_MINECRAFT_INVENTORY,
     ManagerModules.TILE_NANITE_STORAGE_TANK,
+    ItszuLibModules.FLUID_STORAGE,
     ItszuLibModules.FLUID_MINECRAFT_HANDLER
     )
   val CONDUIT_KEY = "conduit"
@@ -41,7 +42,7 @@ object TileConduit {
   }
 
   class ConduitStorage(size: Int) extends ItemStorageArray(size) {
-    override def canInsert(i: Int, stack: IItemStack): Boolean = stack.hasCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
+    override def canInsert(i: Int, stack: IItemStack): Boolean = stack.hasModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
     override def maxStackSize(i: Int): Int = 1
   }
@@ -55,7 +56,7 @@ object TileConduit {
     override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = {
       if (facing == null) return Set[IConnection[T]]()
 
-      connectionStorage(facing.getIndex).withFilter(f => !f.isEmpty && f.hasCapability(Capabilities.ITEM_CONNECTION_PROVIDER, facing)).map(_.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, facing)).flatMap { f =>
+      connectionStorage(facing.getIndex).withFilter(f => !f.isEmpty && f.hasModule(ManagerModules.ITEM_CONNECTION_PROVIDER, facing)).map(_.getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, facing)).flatMap { f =>
         f.getConnections[T](getLoc, facing)
       }
     }
@@ -174,13 +175,24 @@ class TileConduit extends TileEntityCoreTickable {
   val conduit = new ConduitImpl(this)
   var color   = Color(0, 0, 0, 0)
 
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileConduitID _))
+  addTileEntityModule(new TileEntityModule[IConduit] {
+    override def module: IModule[IConduit] = ManagerModules.TILE_CONDUIT
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[IConduit] = _ => Some(conduit)
+  })
+  addTileEntityModule(new TileEntityModule[ILogisticsNetworkNode] {
+    override def module: IModule[ILogisticsNetworkNode] = ManagerModules.TILE_LOGISTICS_NODE
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[ILogisticsNetworkNode] = _ => Some(conduit)
+  })
+  addTileEntityModule(new TileEntityModule[Color] {
+    override def module: IModule[Color] = ItszuLibModules.COLORABLE
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ => Some(color)
+  })
+
   override def hasDescription: Boolean = true
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = true
-
-  override def getGuiID: Int = GuiIDs.TileConduitID
 
   def getStorage(facing: EnumFacing): IItemStorage = conduit.connectionStorage(facing.getIndex)
 
@@ -310,30 +322,6 @@ class TileConduit extends TileEntityCoreTickable {
     par1nbtTagCompound
   }
 
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.TILE_CONDUIT)
-      conduit.asInstanceOf[T]
-    else if (capability == Capabilities.TILE_LOGISTICS_NODE)
-      conduit.asInstanceOf[T]
-    else if (capability == ItszuLibCapabilities.COLORABLE)
-      color.asInstanceOf[T]
-    else super.getCapability(capability, facing)
-  }
-
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    capability == Capabilities.TILE_CONDUIT ||
-    capability == Capabilities.TILE_LOGISTICS_NODE ||
-    capability == ItszuLibCapabilities.COLORABLE ||
-    super.hasCapability(capability, facing)
-  }
-
-  // TODO : Fix?  Or leave as is on base
-
-
-  override def hasModule(mod: IModule[_], facing: EnumFacing): Boolean = if(mod.hasCapability) hasCapability(mod.capability, facing) else false
-
-  override def getModule[T](mod: IModule[T], facing: EnumFacing): T = if(mod.hasCapability) getCapability(mod.capability, facing) else null.asInstanceOf[T]
-
   override def invalidate(): Unit = {
     super.invalidate()
     if (getWorld.isRemote) return
@@ -347,15 +335,4 @@ class TileConduit extends TileEntityCoreTickable {
 
     conduit.network.removeNode(conduit)
   }
-
-  // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
-    if (!ret && hasGUI) {
-      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
-      return true
-    }
-    ret
-  }
-
 }

@@ -1,12 +1,13 @@
 package com.itszuvalex.femtocraft.industry.gui
 
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerSidedInventoryConfig
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.{MessageSidedInventoryConfigChange, MessageSidedInventoryIOChange}
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
 import com.itszuvalex.itszulib.api.ItszuLibModules
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
@@ -44,6 +45,8 @@ object GuiSidedInventoryConfig {
     Color(255.toByte, 255.toByte, 0.toByte, 255.toByte) // Purple
     )
 
+  val connectableModules = Array[IModule[_]](ItszuLibModules.ITEM_MINECRAFT_INVENTORY, ManagerModules.TILE_CONDUIT)
+
   class GuiSideConfigButton(x: Int, y: Int, tile: ITileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()
     private val customizeable = tile != null && tile.hasModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)
@@ -71,7 +74,7 @@ object GuiSidedInventoryConfig {
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
-        if (te.nonEmpty && te.get.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, offset.getOpposite)) {
+        if (te.nonEmpty && connectableModules.exists(te.get.hasModule(_, offset.getOpposite))) {
           tooltip += Option(te.get.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
@@ -109,7 +112,7 @@ object GuiSidedInventoryConfig {
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
-        if (te.nonEmpty && te.get.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, offset.getOpposite)) {
+        if (te.nonEmpty && connectableModules.exists(te.get.hasModule(_, offset.getOpposite))) {
           GL11.glColor4f(1, 1, 1, 1)
           Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedInventoryConfig.SIDE_TEX_COLOR)
           drawBlock(DefaultVertexFormats.POSITION_TEX) {
@@ -156,7 +159,7 @@ object GuiSidedInventoryConfig {
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
-        if (te.nonEmpty && te.get.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, offset.getOpposite)) {
+        if (te.nonEmpty && connectableModules.exists(te.get.hasModule(_, offset.getOpposite))) {
           tooltip += Option(te.get.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 

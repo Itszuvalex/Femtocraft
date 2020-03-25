@@ -3,10 +3,12 @@ package com.itszuvalex.femtocraft.industry.gui
 import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
 import com.itszuvalex.femtocraft.industry.container.ContainerSidedNaniteConfig
+import com.itszuvalex.femtocraft.industry.gui.GuiSidedInventoryConfig.connectableModules
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.{MessageSidedNaniteConfigChange, MessageSidedNaniteIOChange}
 import com.itszuvalex.femtocraft.{GuiIDs, Resources}
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
@@ -44,6 +46,8 @@ object GuiSidedNaniteConfig {
     Color(255.toByte, 255.toByte, 0.toByte, 255.toByte) // Purple
     )
 
+  val connectableModules = Array[IModule[_]](ManagerModules.TILE_NANITE_STORAGE_TANK, ManagerModules.TILE_CONDUIT)
+
   class GuiSideConfigButton(x: Int, y: Int, tile: ITileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()
     private val customizeable = tile != null && tile.hasModule(ManagerModules.NANITE_STORAGE_CONFIGURABLE, null)
@@ -71,7 +75,7 @@ object GuiSidedNaniteConfig {
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
-        if (te.nonEmpty && te.get.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK, offset.getOpposite)) {
+        if (te.nonEmpty && connectableModules.exists(te.get.hasModule(_, offset.getOpposite))) {
           tooltip += Option(te.get.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 
@@ -109,7 +113,7 @@ object GuiSidedNaniteConfig {
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
-        if (te.nonEmpty && te.get.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK, offset.getOpposite)) {
+        if (te.nonEmpty && connectableModules.exists(te.get.hasModule(_, offset.getOpposite))) {
           GL11.glColor4f(1, 1, 1, 1)
           Minecraft.getMinecraft.getTextureManager.bindTexture(GuiSidedNaniteConfig.SIDE_TEX_COLOR)
           drawBlock(DefaultVertexFormats.POSITION_TEX) {
@@ -156,7 +160,7 @@ object GuiSidedNaniteConfig {
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
-        if (te.nonEmpty && te.get.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK, offset.getOpposite)) {
+        if (te.nonEmpty && connectableModules.exists(te.get.hasModule(_, offset.getOpposite))) {
           tooltip += Option(te.get.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse("")
         }
 

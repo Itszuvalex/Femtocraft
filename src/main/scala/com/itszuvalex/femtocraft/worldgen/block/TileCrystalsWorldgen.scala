@@ -1,6 +1,5 @@
 package com.itszuvalex.femtocraft.worldgen.block
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -66,8 +65,6 @@ class TileCrystalsWorldgen extends TileEntityCore {
     super.readFromNBT(compound)
     readColorData(compound)
   }
-
-  override def getMod: AnyRef = Femtocraft
 
   override def hasDescription: Boolean = true
 }

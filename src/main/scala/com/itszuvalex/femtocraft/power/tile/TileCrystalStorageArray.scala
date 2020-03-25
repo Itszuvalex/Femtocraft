@@ -4,16 +4,12 @@ import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray.CrystalStorageArrayModule
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack, ITileEntity, IWorld}
+import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.core.modules.{ModuleGui, ModuleIItemHandlerConverter, ModuleIItemStorage}
 import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityInternalModuleTickable}
-import com.itszuvalex.itszulib.core.modules.{ModuleIItemHandlerConverter, ModuleIItemStorage}
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{EnumFacing, EnumHand}
 
 /**
   * Created by Chris on 1/9/2017.
@@ -60,21 +56,6 @@ class TileCrystalStorageArray extends TileEntityCoreTickable {
   addTileEntityModule(leafNode)
   addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileCrystalStorageArrayID _))
   addTileEntityModuleTickable(internal)
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = true
-
-  override def getGuiID: Int = GuiIDs.TileCrystalStorageArrayID
-
-  // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
-    if (!ret && hasGUI) {
-      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
-      return true
-    }
-    ret
-  }
 }

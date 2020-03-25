@@ -1,11 +1,14 @@
 package com.itszuvalex.femtocraft.logistics.test
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.itszulib.api.wrappers.IWorld
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
 import com.itszuvalex.itszulib.util.PlayerUtils
+import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/30/2016.
@@ -18,11 +21,6 @@ class TileNetworkTest extends TileEntityCoreTickable with TileNetworkNode[TileNe
   var seek = true
   network = ManagerTestNetwork.NewNetwork()
   network.register()
-
-  override def getMod = Femtocraft
-
-  override def hasDescription = false
-
 
   override def serverUpdate(): Unit = {
     super.serverUpdate()
@@ -48,10 +46,11 @@ class TileNetworkTest extends TileEntityCoreTickable with TileNetworkNode[TileNe
     ManagerTestNetwork.tracker.removeLocation(getLoc)
   }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    super.onSideActivate(par5EntityPlayer, side)
+
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     if (!world.isRemote)
-      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Network ID:" + getNetwork.id)
-    true
+      PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "Network ID:" + getNetwork.id)
+    ret
   }
 }

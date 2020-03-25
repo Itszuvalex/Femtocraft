@@ -3,17 +3,14 @@ package com.itszuvalex.femtocraft.logistics.tile
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
-import com.itszuvalex.itszulib.api.storage.{FluidStorage, IFluidStorage}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity, IWorld}
+import com.itszuvalex.itszulib.api.storage.{FluidStorageArray, IFluidStorage}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
-import com.itszuvalex.itszulib.core.modules.{ModuleIFluidAutoIO, ModuleIFluidHandlerConverter, ModuleIFluidSidedConfiguration, ModuleIFluidStorage}
+import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityCoreTickable, TileEntityInternalModuleTickable}
-import net.minecraft.block.state.IBlockState
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{EnumFacing, EnumHand}
+import net.minecraft.util.EnumFacing
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, IFluidBlock}
 
 object TileFluidRepository {
@@ -58,7 +55,7 @@ object TileFluidRepository {
 }
 
 class TileFluidRepository extends TileEntityCoreTickable {
-  val storage: IFluidStorage = new FluidStorage(TANK_SIZE)
+  val storage: IFluidStorage = new FluidStorageArray(1, TANK_SIZE)
   val sidedFluidConfig       = new SidedFluidStorageConfiguration(_ => TANK_KEY,
                                                                   Map(NONE_KEY -> IFluidStorage.Empty,
                                                                       TANK_KEY -> storage),
@@ -68,22 +65,7 @@ class TileFluidRepository extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIFluidStorage(storage))
   addTileEntityModule(new ModuleIFluidHandlerConverter)
   addTileEntityModule(new ModuleIFluidSidedConfiguration(sidedFluidConfig))
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileFluidRepositoryGuiID _))
   addTileEntityModuleTickable(new ModuleIFluidAutoIO(sidedFluidConfig))
   addTileEntityModuleTickable(internal)
-
-  override def getMod = Femtocraft
-
-  override def hasGUI: Boolean = true
-
-  override def getGuiID: Int = GuiIDs.TileFluidRepositoryGuiID
-
-  // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
-    if (!ret && hasGUI) {
-      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
-      return true
-    }
-    ret
-  }
 }

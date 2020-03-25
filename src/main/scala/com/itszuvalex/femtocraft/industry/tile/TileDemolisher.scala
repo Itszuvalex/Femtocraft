@@ -4,10 +4,10 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
@@ -53,17 +53,7 @@ class TileDemolisher extends TileEntityCoreTickable {
   addTileEntityModule(leafNode)
   addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileDemolisherGuiID _))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(internal)
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasDescription: Boolean = true
-
-  override def hasGUI = true
-
-  override def getGuiID: Int = GuiIDs.TileDemolisherGuiID
-
-  // TODO
-  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockDemolisher)
 }
