@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.render
+/*package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, IFrameItem}
 import com.itszuvalex.itszulib.api.client.IPreviewableRenderer
@@ -44,3 +44,5 @@ class FramePreviewableRenderer extends IPreviewableRenderer {
     GL11.glColor3f(1, 1, 1)
   }
 }
+
+ */

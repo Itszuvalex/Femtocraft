@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.gui
+/*package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrameConstructing
@@ -56,3 +56,5 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
     super.drawGuiContainerBackgroundLayer(partialTicks, p_146976_2_, p_146976_3_)
   }
 }
+
+ */

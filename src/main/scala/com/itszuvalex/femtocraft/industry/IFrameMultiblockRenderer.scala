@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry
+/*package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.itszulib.api.core.Loc4
@@ -59,3 +59,5 @@ trait IFrameMultiblockRenderer {
     */
   def boundingBox: (Int, Int, Int)
 }
+
+ */

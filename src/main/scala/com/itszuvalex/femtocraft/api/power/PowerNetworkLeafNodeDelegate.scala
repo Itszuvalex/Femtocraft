@@ -5,7 +5,8 @@ import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.util.data.{DataAssignable, DataSpec}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.IBattery
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.nbt.NBTTagCompound
 
 object PowerNetworkLeafNodeDelegate {
@@ -16,7 +17,7 @@ object PowerNetworkLeafNodeDelegate {
 }
 
 class PowerNetworkLeafNodeDelegate(
-                                    tileEntity: TileEntityBase,
+                                    tileEntity: TileEntityCore,
                                     radius: () => Float,
                                     getBattery: () => IBattery,
                                     stype: PowerStorageNodeType,
@@ -39,13 +40,13 @@ class PowerNetworkLeafNodeDelegate(
   override def setParent(node: IPowerNetworkNode): Unit = {
     parentLoc = Option(node.getLoc)
     tileEntity.setUpdate()
-    tileEntity.setModified()
+    tileEntity.markDirtyForSave()
   }
 
   override def onParentBroken(node: IPowerNetworkNode): Unit = {
     parentLoc = None
     tileEntity.setUpdate()
-    tileEntity.setModified()
+    tileEntity.markDirtyForSave()
 
     if (tileEntity.getWorld.isRemote) return
     PowerManager.instance.refreshLeaf(this)
@@ -57,7 +58,7 @@ class PowerNetworkLeafNodeDelegate(
 
   override def transferRate: Double = transfer()
 
-  override def getStorageLoc: Loc4 = new Loc4(tileEntity)
+  override def getStorageLoc: Loc4 = new Loc4(tileEntity.asInstanceOf[ITileEntity])
 
   override def changeForLastTick: Double = change()
 }

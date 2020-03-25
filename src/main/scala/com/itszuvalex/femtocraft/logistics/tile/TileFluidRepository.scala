@@ -1,16 +1,19 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
 import com.itszuvalex.femtocraft.logistics.tile.TileFluidRepository._
-import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
 import com.itszuvalex.itszulib.api.storage.{FluidStorage, IFluidStorage}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, ITileEntity}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.modules.{ModuleIFluidAutoIO, ModuleIFluidHandlerConverter, ModuleIFluidSidedConfiguration, ModuleIFluidStorage}
 import com.itszuvalex.itszulib.core.{SidedFluidStorageConfiguration, TileEntityCoreTickable, TileEntityInternalModuleTickable}
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 import net.minecraftforge.fluids.{Fluid, FluidRegistry, FluidStack, IFluidBlock}
 
 object TileFluidRepository {
@@ -20,7 +23,7 @@ object TileFluidRepository {
   val TANK_KEY  = "Tank"
   val NONE_KEY  = "None"
 
-  class FluidRepositoryModule(val storage: IFluidStorage) extends TileEntityInternalModuleTickable[FluidRepositoryModule] {
+  class FluidRepositoryModule(val tile: TileFluidRepository, val storage: IFluidStorage) extends TileEntityInternalModuleTickable[FluidRepositoryModule] {
     var fluidLast: Option[Fluid] = None
 
     override def module: IModule[FluidRepositoryModule] = TileFluidRepository.MODULE
@@ -35,8 +38,7 @@ object TileFluidRepository {
 
       val currentFluid = if (storage.head.isEmpty) None else Option(storage.head.fluid)
       if (currentFluid != fluidLast) {
-        // TODO Change to setUpdate
-        tile.getIWorld.toMinecraft.notifyBlockUpdate(tile.getPos, tile.getIWorld.getBlockState(tile.getPos), tile.getIWorld.getBlockState(tile.getPos), 3)
+        tile.setUpdate()
       }
       fluidLast = currentFluid
     }
@@ -49,6 +51,7 @@ object TileFluidRepository {
 
     override def readDescriptionNBT(tag: NBTTagCompound): Unit = {
       storage.deserializeNBT(tag.getCompoundTag(TANK_KEY))
+      tile.setRenderUpdate()
     }
   }
 
@@ -60,7 +63,7 @@ class TileFluidRepository extends TileEntityCoreTickable {
                                                                   Map(NONE_KEY -> IFluidStorage.Empty,
                                                                       TANK_KEY -> storage),
                                                                   () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  val internal               = new FluidRepositoryModule(storage)
+  val internal               = new FluidRepositoryModule(this, storage)
 
   addTileEntityModule(new ModuleIFluidStorage(storage))
   addTileEntityModule(new ModuleIFluidHandlerConverter)
@@ -74,8 +77,13 @@ class TileFluidRepository extends TileEntityCoreTickable {
 
   override def getGuiID: Int = GuiIDs.TileFluidRepositoryGuiID
 
-  override def hasDescription: Boolean = true
-
   // TODO
-  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockFluidRepository)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
 }

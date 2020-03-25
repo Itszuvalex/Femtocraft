@@ -1,3 +1,4 @@
+import com.itszuvalex.itszulib.api.core.{IModule, ItemIdentifier}
 import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -84,5 +85,9 @@ class TestableItemStack(var testItem: Int, var testStack: Int, var testDamage: I
     true
   }
 
-//  override def identifier: ItemIdentifier = ItemIdentifier("test", testItem.toString)
+  override def identifier: ItemIdentifier = ItemIdentifier("test", testItem.toString)
+
+  override def hasModule(mod: IModule[_], facing: EnumFacing): Boolean = false
+
+  override def getModule[T](mod: IModule[T], facing: EnumFacing): T = null.asInstanceOf[T]
 }

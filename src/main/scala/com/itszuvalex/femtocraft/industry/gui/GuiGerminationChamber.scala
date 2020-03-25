@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.gui
+/*package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
@@ -51,3 +51,5 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
 
   override def GuiID: Int = GuiIDs.TileGerminationChamberID
 }
+
+ */

@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.client
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.container.ContainerBase
-import com.itszuvalex.itszulib.core.{TileEntityBase, TileEntityCore}
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.gui.Gui
@@ -20,7 +20,7 @@ abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase
     val item = Converter.IItemStackFromItemStack(new ItemStack(tile.toMinecraft.getBlockType))
 
     override def itemStack = item
-  }, tile.asInstanceOf[TileEntityBase].getGuiID)
+  }, tile.asInstanceOf[TileEntityCore].getGuiID)
   add(tabBar)
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {

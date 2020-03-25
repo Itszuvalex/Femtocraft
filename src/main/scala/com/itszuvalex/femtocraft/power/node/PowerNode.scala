@@ -4,9 +4,10 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.PowerNetworkNodeDelegate
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
@@ -23,13 +24,13 @@ object PowerNode {
 }
 
 
-trait PowerNode extends TileEntityBase {
+trait PowerNode extends TileEntityCore {
   var powerDelegate: PowerNetworkNodeDelegate =
     new PowerNetworkNodeDelegate(this, powerRadius, powerTransfer, rendersPower)
   var color                                   = Color(255.toByte,
-    0.toByte,
-    0.toByte,
-    0.toByte)
+                                                      0.toByte,
+                                                      0.toByte,
+                                                      0.toByte)
 
   def powerRadius: Float
 
@@ -78,8 +79,8 @@ trait PowerNode extends TileEntityBase {
     setRenderUpdate()
   }
 
-  override def onBlockBreak(): Unit = {
-    super.onBlockBreak()
+  override def onBlockBreak(state: IBlockState): Unit = {
+    super.onBlockBreak(state)
     PowerManager.instance.removeNode(powerDelegate)
     PowerManager.instance.onNodeBroken(powerDelegate)
   }

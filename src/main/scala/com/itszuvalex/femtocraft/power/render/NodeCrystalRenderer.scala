@@ -6,6 +6,7 @@ import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
@@ -18,7 +19,7 @@ object NodeCrystalRenderer {
   val crystalTexLocation   = Resources.CustomModelBlockTex("crystal cluster/crystals texture 64x64.png")
 }
 
-trait NodeCrystalRenderer[T <: ITileEntity] extends TileEntitySpecialRenderer[T] {
+trait NodeCrystalRenderer[T <: TileEntity with ITileEntity] extends TileEntitySpecialRenderer[T] {
   val crystalModel = LoadObj(NodeCrystalRenderer.crystalModelLocation)
 
   def renderNode(node: ITileEntity, x: Double, y: Double, z: Double, partialTime: Float) = {

@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.tile
+/*package com.itszuvalex.femtocraft.industry.tile
 
 import java.util.Random
 
@@ -295,3 +295,4 @@ class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockCompon
 
   override def getGuiID: Int = if (isBuilding) GuiIDs.TileFrameConstructingGuiID else GuiIDs.TileFrameMultiblockGuiID
 }
+ */

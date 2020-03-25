@@ -2,10 +2,9 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, PowerNetworkLeafNodeDelegate}
-import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.util.data.DataSpec
 import com.itszuvalex.itszulib.api.{ItszuLibCapabilities, ItszuLibModules}
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -21,7 +20,7 @@ object PowerLeafNode {
   val DEFAULT_RADIUS = 8f
 }
 
-trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
+trait PowerLeafNode extends TileEntityCoreTickable with PowerStorageNode {
   val leafDelegate: IPowerLeafNode = defaultLeafDelegate
   var color                        = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 

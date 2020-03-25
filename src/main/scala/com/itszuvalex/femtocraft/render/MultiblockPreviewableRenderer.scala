@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.render
+/*package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.industry.item.ItemMultiblock
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
@@ -38,3 +38,5 @@ class MultiblockPreviewableRenderer extends IPreviewableRenderer {
     }
   }
 }
+
+ */

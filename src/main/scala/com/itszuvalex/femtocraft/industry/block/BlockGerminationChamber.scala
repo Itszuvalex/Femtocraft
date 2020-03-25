@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.block
+/*package com.itszuvalex.femtocraft.industry.block
 
 import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
@@ -19,3 +19,5 @@ class BlockGerminationChamber extends TileBlockContainerCore(Material.IRON, new 
 class BlockGerminationChamberContainerCore() extends BlockTileContainer(() => FemtoBlocks.blockGerminationChamber) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileGerminationChamber
 }
+
+ */

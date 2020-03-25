@@ -6,12 +6,15 @@ import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, Module
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{ItemStorageArray, _}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.crafting.FurnaceRecipes
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 /**
   * Created by Chris on 8/14/2016.
@@ -74,12 +77,17 @@ class TileNanoFurnace extends TileEntityCoreTickable {
 
   override def getMod: AnyRef = Femtocraft
 
-  override def hasDescription: Boolean = true
-
   override def hasGUI = true
 
   override def getGuiID: Int = GuiIDs.TileFurnaceGuiID
 
-  //TODO: Remove this once ItszuLib bumped again
-  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockNanoFurnace)
+  // TODO
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
 }

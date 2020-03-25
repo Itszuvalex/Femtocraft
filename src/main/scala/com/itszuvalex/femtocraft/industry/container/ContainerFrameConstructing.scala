@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.container
+/*package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
@@ -41,3 +41,5 @@ class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, til
     }
   }
 }
+
+ */

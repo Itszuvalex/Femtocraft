@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.render
+/*package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
@@ -253,3 +253,5 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
     }
   }
 }
+
+ */

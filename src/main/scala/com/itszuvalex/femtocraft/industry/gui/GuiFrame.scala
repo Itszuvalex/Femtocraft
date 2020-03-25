@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.gui
+/*package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
@@ -48,3 +48,5 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
 
   override def GuiID: Int = GuiIDs.TileFrameMultiblockGuiID
 }
+
+ */

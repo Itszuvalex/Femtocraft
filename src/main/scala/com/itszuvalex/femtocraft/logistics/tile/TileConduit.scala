@@ -8,12 +8,14 @@ import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.api.wrappers._
 import com.itszuvalex.itszulib.api.{ItszuLibCapabilities, ItszuLibModules}
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.{EnumFacing, EnumHand}
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
 import net.minecraftforge.common.capabilities.Capability
 
@@ -102,7 +104,7 @@ object TileConduit {
 
       connections(facing.getIndex) = true
       connectToNetwork(getLoc.getOffset(facing), facing.getOpposite)
-      conduit.setModified()
+      conduit.markDirtyForSave()
       conduit.setUpdate()
     }
 
@@ -121,7 +123,7 @@ object TileConduit {
 
       connections(facing.getIndex) = false
       disconnectFromNetwork(getLoc.getOffset(facing), facing.getOpposite)
-      conduit.setModified()
+      conduit.markDirtyForSave()
       conduit.setUpdate()
     }
 
@@ -168,7 +170,7 @@ object TileConduit {
 
 }
 
-class TileConduit extends TileEntityBase {
+class TileConduit extends TileEntityCoreTickable {
   val conduit = new ConduitImpl(this)
   var color   = Color(0, 0, 0, 0)
 
@@ -218,8 +220,8 @@ class TileConduit extends TileEntityBase {
     EnumFacing.VALUES.foreach(checkFacingForConnection)
   }
 
-  override def onBlockBreak(): Unit = {
-    super.onBlockBreak()
+  override def onBlockBreak(state: IBlockState): Unit = {
+    super.onBlockBreak(state)
 
     if (getWorld.isRemote) return
 
@@ -261,6 +263,7 @@ class TileConduit extends TileEntityBase {
   }
 
   override def getRenderBoundingBox: AxisAlignedBB = new AxisAlignedBB(getPos, getPos.add(1, 1, 1))
+
 
   override def update(): Unit = {
     super.update()
@@ -324,6 +327,13 @@ class TileConduit extends TileEntityBase {
     super.hasCapability(capability, facing)
   }
 
+  // TODO : Fix?  Or leave as is on base
+
+
+  override def hasModule(mod: IModule[_], facing: EnumFacing): Boolean = if(mod.hasCapability) hasCapability(mod.capability, facing) else false
+
+  override def getModule[T](mod: IModule[T], facing: EnumFacing): T = if(mod.hasCapability) getCapability(mod.capability, facing) else null.asInstanceOf[T]
+
   override def invalidate(): Unit = {
     super.invalidate()
     if (getWorld.isRemote) return
@@ -337,4 +347,15 @@ class TileConduit extends TileEntityBase {
 
     conduit.network.removeNode(conduit)
   }
+
+  // TODO
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
+
 }

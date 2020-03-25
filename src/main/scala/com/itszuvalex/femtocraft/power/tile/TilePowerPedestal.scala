@@ -3,9 +3,10 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 
@@ -17,7 +18,7 @@ object TilePowerPedestal {
   val MOUNT_KEY         = "Mount"
 }
 
-class TilePowerPedestal extends TileEntityBase {
+class TilePowerPedestal extends TileEntityCore {
   var mountLocation: Loc4 = null
   var stored       : Long = 0
 
@@ -62,7 +63,7 @@ class TilePowerPedestal extends TileEntityBase {
     setRenderUpdate()
   }
 
-  override def onBlockBreak() = {
+  override def onBlockBreak(state: IBlockState): Unit = {
     if (mountLoc != null)
       mountLoc.getITileEntity(true) match {
         case Some(m: ICrystalMount) =>

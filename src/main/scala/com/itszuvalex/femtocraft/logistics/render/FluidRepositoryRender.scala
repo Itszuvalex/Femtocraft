@@ -54,7 +54,7 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
     pass = 0
     facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
     val fluidStack = Option(te).filter(_.hasModule(ItszuLibModules.FLUID_STORAGE, null)).map(_.getModule(ItszuLibModules.FLUID_STORAGE, null).head).orNull
-    if (fluidStack != null) {
+    if (fluidStack != null && !fluidStack.isEmpty) {
       RenderUtils.bindBlockTextures()
       val block = fluidStack.fluid.getBlock
       RenderUtils.glMatrixBlock {
@@ -68,7 +68,7 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
       }
     }
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    if (fluidStack == null) {
+    if (fluidStack == null || fluidStack.isEmpty) {
       pass = 1
       super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     }

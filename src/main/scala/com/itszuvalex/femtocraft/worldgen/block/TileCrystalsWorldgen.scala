@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.worldgen.block
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.util.Color
@@ -13,21 +13,21 @@ import scala.util.Random
   * Created by Alex on 08.08.2015.
   */
 
-class TileCrystalsWorldgen extends TileEntityBase {
+class TileCrystalsWorldgen extends TileEntityCore {
   val COLOR_KEY          = "Color"
   val COLOR_OFFSET_KEY   = "ColorOffsets"
   val COLOR_COMPOUND_KEY = "ColorSettings"
 
   var color: Int = new Color(255.toByte,
-    (Random.nextInt(125) + 115).toByte,
-    (Random.nextInt(125) + 115).toByte,
-    (Random.nextInt(125) + 115).toByte).toInt
+                             (Random.nextInt(125) + 115).toByte,
+                             (Random.nextInt(125) + 115).toByte,
+                             (Random.nextInt(125) + 115).toByte).toInt
 
   var colorOffsets: Array[Int] = new Array[Int](11)
   (1 to 10).foreach(num => colorOffsets(num) = new Color(225.toByte,
-    Random.nextInt(30).toByte,
-    Random.nextInt(30).toByte,
-    Random.nextInt(30).toByte).toInt)
+                                                         Random.nextInt(30).toByte,
+                                                         Random.nextInt(30).toByte,
+                                                         Random.nextInt(30).toByte).toInt)
 
   override def handleDescriptionNBT(compound: NBTTagCompound): Unit = {
     super.handleDescriptionNBT(compound)
@@ -56,11 +56,11 @@ class TileCrystalsWorldgen extends TileEntityBase {
   private def writeColorData(compound: NBTTagCompound) =
     compound(
       COLOR_COMPOUND_KEY ->
-        NBTCompound(
-          COLOR_KEY -> color,
-          COLOR_OFFSET_KEY -> colorOffsets
+      NBTCompound(
+        COLOR_KEY -> color,
+        COLOR_OFFSET_KEY -> colorOffsets
         )
-    )
+      )
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)

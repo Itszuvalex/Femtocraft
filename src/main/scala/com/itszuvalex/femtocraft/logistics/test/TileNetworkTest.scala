@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.logistics.test
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
@@ -14,7 +14,7 @@ object TileNetworkTest {
   val range = 32f
 }
 
-class TileNetworkTest extends TileEntityBase with TileNetworkNode[TileNetworkTest, TestTrackingNetwork] {
+class TileNetworkTest extends TileEntityCoreTickable with TileNetworkNode[TileNetworkTest, TestTrackingNetwork] {
   var seek = true
   network = ManagerTestNetwork.NewNetwork()
   network.register()
@@ -30,9 +30,9 @@ class TileNetworkTest extends TileEntityBase with TileNetworkNode[TileNetworkTes
       seek = false
       val locs = EnumFacing.VALUES.map(getLoc.getOffset(_))
       EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getITileEntity(false)).collect { case i: TileNetworkTest => i }.
-        foreach { i =>
-          getNetwork.addConnection(getLoc, i.getLoc)
-        }
+                foreach { i =>
+                  getNetwork.addConnection(getLoc, i.getLoc)
+                }
     }
   }
 

@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.logistics.test
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed._
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EnumFacing
@@ -12,7 +12,7 @@ import scala.collection._
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/15/15.
   */
-class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
+class TileTaskProviderTest extends TileEntityCoreTickable with ITaskProvider {
   val tasks = new mutable.HashSet[ITask]()
 
   override def update(): Unit = {
@@ -88,7 +88,6 @@ class TileTaskProviderTest extends TileEntityBase with ITaskProvider {
     /**
       *
       * @param worker Worker to add.
-      *
       * @return True if worker successfully assigned, false otherwise (incompatible type, storage is full.)
       */
     override def addWorker(worker: IWorker): Boolean = {

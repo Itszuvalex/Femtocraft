@@ -5,7 +5,6 @@ import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
-import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.math.BlockPos
@@ -20,8 +19,6 @@ class BlockCrystalStorageArray extends TileBlockContainerCore(Material.IRON, new
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockCrystalStorageArrayContainerDelegate() extends BlockTileContainer(null) {
+class BlockCrystalStorageArrayContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockCrystalStorageArray) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileCrystalStorageArray
-
-  override def toMinecraft: Block = FemtoBlocks.blockCrystalStorageArray
 }

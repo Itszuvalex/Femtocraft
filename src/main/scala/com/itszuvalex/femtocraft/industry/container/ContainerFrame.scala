@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.container
+/*package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -33,3 +33,5 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   override def eligibleForInput(item: ItemStack): Boolean = false
 }
+
+ */

@@ -3,14 +3,13 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount.CrystalMountModule
-import com.itszuvalex.femtocraft.power.{ModulePowerNode, ModulePowerStorage, ModulePowerStorageNode}
-import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromICrystal, ModulePowerNode, ModulePowerStorage, ModulePowerStorageNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{DynamicIBattery, IBattery, IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity, IWorld}
-import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.core.modules.{ModuleIItemHandlerConverter, ModuleIItemStorage}
+import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityInternalModuleTickable}
 import com.itszuvalex.itszulib.render.Vector3
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
@@ -26,7 +25,7 @@ object TileCrystalMount {
   val CRYSTAL_KEY                         = "Crystal"
   val PEDESTAL_RANGE                      = 8f
 
-  class CrystalMountModule(val storage: IItemStorage) extends TileEntityInternalModuleTickable[CrystalMountModule] {
+  class CrystalMountModule(val tile: TileCrystalMount, val storage: IItemStorage) extends TileEntityInternalModuleTickable[CrystalMountModule] {
     private var lastCrystal: IItemStack = IItemStack.Empty
 
     override def module: IModule[CrystalMountModule] = MODULE
@@ -35,12 +34,12 @@ object TileCrystalMount {
       storage.head.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())
       val stack = storage.head
       if (stack != lastCrystal) {
-        //  tile.setUpdate() // TODO setUpdate and/or make this event-driven from the itemstorage
+        tile.setUpdate()
       }
       lastCrystal = stack
     }
 
-    override def hasDescriptionNBT: Boolean = super.hasDescriptionNBT
+    override def hasDescriptionNBT: Boolean = true
 
     override def writeDescriptionNBT(tag: NBTTagCompound): Unit = {
       tag.setTag(CRYSTAL_KEY, storage.serializeNBT())
@@ -48,8 +47,7 @@ object TileCrystalMount {
 
     override def readDescriptionNBT(tag: NBTTagCompound): Unit = {
       storage.deserializeNBT(tag.getCompoundTag(CRYSTAL_KEY))
-      // TODO SetUpdate
-      // tile.setUpdate()
+      tile.setUpdate()
     }
   }
 
@@ -63,8 +61,7 @@ class TileCrystalMount extends TileEntityCoreTickable {
   }
   val battery    : IBattery     = new DynamicIBattery(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(IBattery.Empty))
   val powerNetworkNode          = new ModulePowerNode(this, () => TileCrystalMount.PEDESTAL_RANGE, () => powerStorageTransferRate, () => true)
-  val internal                  = new CrystalMountModule(storage)
-  var lastCrystal: IItemStack   = IItemStack.Empty
+  val internal                  = new CrystalMountModule(this, storage)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)
@@ -73,6 +70,7 @@ class TileCrystalMount extends TileEntityCoreTickable {
   })
   addTileEntityModule(new ModulePowerStorageNode(this, battery, PowerStorageNodeType.STORAGE, () => powerStorageTransferRate))
   addTileEntityModule(powerNetworkNode)
+  addTileEntityModule(new ModuleColorableFromICrystal(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null)))
   addTileEntityModuleTickable(internal)
 
   def powerStorageTransferRate: Double = storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())
@@ -80,19 +78,11 @@ class TileCrystalMount extends TileEntityCoreTickable {
 
   override def hasGUI = true
 
-  override def getGuiID = GuiIDs.TileCrystalMountGuiID
+  override def getGuiID: Int = GuiIDs.TileCrystalMountGuiID
 
   override def getMod: AnyRef = Femtocraft
 
   override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
-
-  // def getColor: Color = crystalStack.capabilityOption(Capabilities.ITEM_POWER_CRYSTAL, null).map(c => new Color(c.getColor())).getOrElse(super.getColor)
-
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
-  }
-
-  override def hasDescription: Boolean = true
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
@@ -105,5 +95,13 @@ class TileCrystalMount extends TileEntityCoreTickable {
   }
 
   // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
+
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
 }

@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.item
+/*package com.itszuvalex.femtocraft.industry.item
 
 import java.util
 
@@ -145,3 +145,5 @@ class ItemFrame extends Item with IFrameItem {
     }
   }
 }
+
+ */

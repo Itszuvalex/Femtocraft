@@ -34,15 +34,15 @@ class ModulePowerNode(val tile: ITileEntity, var conRad: () => Float, var tranRa
 
   override def addLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs += node.getStorageLoc
-    // TODO tileEntity.setUpdate()
+    tile.setUpdate()
     tile.markDirtyForSave()
   }
 
   override def removeLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs -= node.getStorageLoc
-    //TODO: tile.setUpdate()
-    tile.markDirtyForSave()
     PowerManager.instance.refreshLeafsOnMain(this)
+    tile.setUpdate()
+    tile.markDirtyForSave()
   }
 
   override def storageNodes(force: Boolean): collection.Set[IPowerStorageNode] = {
@@ -57,7 +57,7 @@ class ModulePowerNode(val tile: ITileEntity, var conRad: () => Float, var tranRa
 
   override def setRenderLocations(set: collection.Set[Loc4]): Unit = {
     renderLocs = set
-    //TODO tileEntity.setUpdate()
+    tile.setUpdate()
   }
 
   override def renderLocations: collection.Set[Loc4] = renderLocs
@@ -83,7 +83,7 @@ class ModulePowerNode(val tile: ITileEntity, var conRad: () => Float, var tranRa
 
 
   override def onLoad(tile: ITileEntity): Unit = {
-    if (network == null && !tile.toMinecraft.isInvalid) { // TODO remove toMinecraft
+    if (network == null && !tile.isInvalid) {
       PowerManager.instance.addNode(this)
     }
   }
@@ -99,17 +99,24 @@ class ModulePowerNode(val tile: ITileEntity, var conRad: () => Float, var tranRa
     if (locs != null) {
       leafNodeLocs ++= locs.map(Loc4(_))
     }
-    // TODO tile.setRenderUpdate()
+    tile.setUpdate()
+    tile.setRenderUpdate()
   }
 
   override def hasDescriptionNBT: Boolean = true
 
   override def writeDescriptionNBT(tag: NBTTagCompound): Unit = {
+    tag.setTag(ModulePowerNode.LEAF_NODE_TAG, NBTList(leafNodeLocs.map(_.serializeNBT())))
     tag.setTag(ModulePowerNode.RENDER_LOCS_TAG, NBTList(renderLocs.map(NBTCompound)))
   }
 
   override def readDescriptionNBT(tag: NBTTagCompound): Unit = {
     renderLocs = tag.NBTList(ModulePowerNode.RENDER_LOCS_TAG).map(Loc4(_)).toSet
-    //TODO tile.setRenderUpdate()
+    leafNodeLocs.clear()
+    val locs = tag.NBTList(ModulePowerNode.LEAF_NODE_TAG)
+    if (locs != null) {
+      leafNodeLocs ++= locs.map(Loc4(_))
+    }
+    tile.setRenderUpdate()
   }
 }

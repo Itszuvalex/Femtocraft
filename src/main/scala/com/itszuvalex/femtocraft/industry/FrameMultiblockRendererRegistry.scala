@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry
+/*package com.itszuvalex.femtocraft.industry
 
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
@@ -22,3 +22,5 @@ object FrameMultiblockRendererRegistry {
   def getRenderer(id: Int) = renderMap.get(id)
 
 }
+
+ */

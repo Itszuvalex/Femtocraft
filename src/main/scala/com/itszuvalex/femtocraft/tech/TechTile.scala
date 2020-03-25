@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.tech
 
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.JavaConversions._
@@ -10,7 +10,7 @@ object TechTile {
   val TECH_COMPOUND_KEY = "techCompound"
 }
 
-trait TechTile extends TileEntityBase with ITechTile {
+trait TechTile extends TileEntityCore with ITechTile {
   override val techs: ArrayBuffer[(String, Int)] = ArrayBuffer[(String, Int)]()
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {

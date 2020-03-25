@@ -68,12 +68,17 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
 
   override def getMod: AnyRef = Femtocraft
 
-  override def hasDescription: Boolean = true
-
   override def hasGUI = true
 
   override def getGuiID: Int = GuiIDs.TileNaniteExtractorID
 
   // TODO
-  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockNaniteExtractor)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
 }

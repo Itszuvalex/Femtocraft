@@ -58,7 +58,7 @@ object FemtoItems {
   def registerItems(event: RegistryEvent.Register[Item]): Unit = {
     val registry = event.getRegistry
     itemPowerCrystal = registerItem(registry, new ItemPowerCrystal, "itemPowerCrystal").registerOre("itemCrystal")
-    itemFrame = registerItem(registry, new ItemFrame(), "itemFrame")
+    //itemFrame = registerItem(registry, new ItemFrame(), "itemFrame")
     itemMultiblock = registerItem(registry, new ItemMultiblock(), "itemMultiblock")
     itemDumbDust = registerItem(registry, new ItemDumbDust(), "itemDumbDust")
     itemCyberleaf = registerItem(registry, new Item, "itemCyberleaf")
@@ -107,7 +107,7 @@ object FemtoItems {
   def init(): Unit = {
     //itemPowerCrystal.registerModel() // Don't - we do this manually in ProxyClient
     itemDumbDust.registerModel()
-    itemFrame.registerModel()
+    //itemFrame.registerModel()
     itemCyberleaf.registerModel()
     itemSolarPanel.registerModel()
     itemNanoweaveSheet.registerModel()

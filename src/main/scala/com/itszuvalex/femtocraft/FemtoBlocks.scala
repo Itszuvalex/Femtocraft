@@ -86,7 +86,7 @@ object FemtoBlocks {
     blockCrystals = registerBlock(registry, new BlockCrystalsWorldgen(), "crystalCluster")
     blockNanoFurnace = registerBlock(registry, new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(registry, new BlockNaniteInfuser, "blockNaniteInfuser")
-    blockFrame = registerBlock(registry, new BlockFrame(), "blockFrame")
+    //blockFrame = registerBlock(registry, new BlockFrame(), "blockFrame")
     blockNaniteHiveSmall = registerBlock(registry, new BlockNaniteHiveSmall(), "blockNaniteHive_small")
     blockNaniteRepository = registerBlock(registry, new BlockNaniteRepository(), "blockNaniteRepository")
     blockItemRepository = registerBlock(registry, new BlockItemRepository(), "blockItemRepository")
@@ -99,7 +99,7 @@ object FemtoBlocks {
     blockNaniteExtractor = registerBlock(registry, new BlockNaniteExtractor(), "blockNaniteExtractor")
     blockDemolisher = registerBlock(registry, new BlockDemolisher(), "blockDemolisher")
     blockConduit = registerBlock(registry, new BlockConduit(), "blockConduit")
-    blockGerminationChamber = registerBlock(registry, new BlockGerminationChamber(), "blockGerminationChamber")
+    //blockGerminationChamber = registerBlock(registry, new BlockGerminationChamber(), "blockGerminationChamber")
     blockGlowStick = registerBlock(registry, new BlockGlowStick(), "blockGlowStick")
 
     //tests
@@ -123,7 +123,7 @@ object FemtoBlocks {
   def init(): Unit = {
     blockSubstrate.registerModel()
     blockRefinedSubstrate.registerModel()
-    blockFrame.registerModel()
+//    blockFrame.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
     blockNanoweave.registerModel()
@@ -147,7 +147,7 @@ object FemtoBlocks {
     blockCrystalStorageArray.registerModel()
     blockCrystalHeatExchanger.registerModel()
     blockConduit.registerModel()
-    blockGerminationChamber.registerModel()
+    //blockGerminationChamber.registerModel()
   }
 
   def postInit(): Unit = {

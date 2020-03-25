@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.tile
+/*package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power._
@@ -398,3 +398,4 @@ class TileGerminationChamber extends TileEntityBase with TileDataSpec with Multi
 
   override def isController(loc: Loc4): Boolean = info.isController(loc)
 }
+ */

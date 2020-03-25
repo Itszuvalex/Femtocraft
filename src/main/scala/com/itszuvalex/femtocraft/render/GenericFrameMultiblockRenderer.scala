@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.render
+/*package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{IFrameMultiblock, IFrameMultiblockRenderer}
@@ -92,3 +92,4 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     */
   override def boundingBox: (Int, Int, Int) = (2, 2, 2)
 }
+ */

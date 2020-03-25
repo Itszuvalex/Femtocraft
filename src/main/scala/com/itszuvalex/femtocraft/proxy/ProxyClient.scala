@@ -21,7 +21,6 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.api.{Capabilities, OverlayRenderSwitch}
-import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.item.ItemConfigurator
 import com.itszuvalex.femtocraft.industry.render._
 import com.itszuvalex.femtocraft.industry.tile._
@@ -70,12 +69,12 @@ class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
     val worldToUse = Minecraft.getMinecraft.world
 
-    val mc = Minecraft.getMinecraft
-    val deltaX = mc.getRenderViewEntity.posX - x
-    val deltaY = mc.getRenderViewEntity.posY - y
-    val deltaZ = mc.getRenderViewEntity.posZ - z
+    val mc             = Minecraft.getMinecraft
+    val deltaX         = mc.getRenderViewEntity.posX - x
+    val deltaY         = mc.getRenderViewEntity.posY - y
+    val deltaZ         = mc.getRenderViewEntity.posZ - z
     val renderDistance = 16D
-    var fx: Particle = null
+    var fx: Particle   = null
     if ((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) > (renderDistance * renderDistance)) {
       return null
     }
@@ -84,16 +83,16 @@ class ProxyClient extends ProxyCommon {
     name match {
       case ProxyCommon.PARTICLE_POWER =>
         fx = new EntityFxPower(worldToUse, x, y, z,
-          (col.red.toInt & 255).toFloat / 255f,
-          (col.green.toInt & 255).toFloat / 255f,
-          (col.blue.toInt & 255).toFloat / 255f
-        )
+                               (col.red.toInt & 255).toFloat / 255f,
+                               (col.green.toInt & 255).toFloat / 255f,
+                               (col.blue.toInt & 255).toFloat / 255f
+                               )
       case ProxyCommon.PARTICLE_NANITE =>
         fx = new EntityFxNanites(worldToUse, x, y, z,
-          (col.red.toInt & 255).toFloat / 255f,
-          (col.green.toInt & 255).toFloat / 255f,
-          (col.blue.toInt & 255).toFloat / 255f,
-          velX, velY, velZ)
+                                 (col.red.toInt & 255).toFloat / 255f,
+                                 (col.green.toInt & 255).toFloat / 255f,
+                                 (col.blue.toInt & 255).toFloat / 255f,
+                                 velX, velY, velZ)
       case _ =>
         return null
     }
@@ -112,16 +111,16 @@ class ProxyClient extends ProxyCommon {
   def registerModels(): Unit = {
     val powerCrystal = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, powerCrystal), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_small"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_medium"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_large"), "inventory"))
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, powerCrystal), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_small"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_medium"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_large"), "inventory"))
     val configurator = FemtoItems.itemConfigurator.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemConfigurator,
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, configurator), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_item"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_fluid"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_nanite"), "inventory"))
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, configurator), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_item"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_fluid"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_nanite"), "inventory"))
   }
 
   override def init(): Unit = {
@@ -138,7 +137,7 @@ class ProxyClient extends ProxyCommon {
     val powerCrystal = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, new ItemMeshDefinition {
       override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
-        val ctype = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
+        val ctype  = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
         val suffix = if (ctype != null && !ctype.isEmpty) {
           "_" + ctype
         } else ""
@@ -179,24 +178,24 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalChargingArray), 0, classOf[TileCrystalChargingArray])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalStorageArray), 0, classOf[TileCrystalStorageArray])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalHeatExchanger), 0, classOf[TileCrystalHeatExchanger])
-    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
-    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockGerminationChamber), 0, classOf[TileGerminationChamber])
-    ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
-    ForgeHooksClient.registerTESRItemStack(FemtoItems.itemMultiblock, 0, classOf[TileFrame])
+    //ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
+    //ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockGerminationChamber), 0, classOf[TileGerminationChamber])
+    //ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
+    //ForgeHooksClient.registerTESRItemStack(FemtoItems.itemMultiblock, 0, classOf[TileFrame])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockConduit), 0, classOf[TileConduit])
 
     //
-    RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
-    RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
+    //RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
+    //RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
     RenderIDs.itemShiftPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiToolPreviewableRenderer)
 
     //    val furnaceRenderer = new FurnaceRenderer
     //    RenderIDs.multiblockFurnaceID = FrameMultiblockRendererRegistry.bindRenderer(furnaceRenderer)
     //    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileMaterialProcessor], furnaceRenderer)
 
-    val germinationChamberRenderer = new MultiblockGerminationChamberRenderer
-    RenderIDs.germinationChamberID = FrameMultiblockRendererRegistry.bindRenderer(germinationChamberRenderer)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGerminationChamber], germinationChamberRenderer)
+    //val germinationChamberRenderer = new MultiblockGerminationChamberRenderer
+    //RenderIDs.germinationChamberID = FrameMultiblockRendererRegistry.bindRenderer(germinationChamberRenderer)
+    //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGerminationChamber], germinationChamberRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileNaniteHiveSmall], new NaniteHiveSmallRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerPedestal], new PowerPedestalRenderer)
@@ -220,7 +219,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalChargingArray], new CrystalChargingArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalStorageArray], new CrystalStorageArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalHeatExchanger], new CrystalHeatExchangeRender)
-    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
+    //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileConduit], new ConduitRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)

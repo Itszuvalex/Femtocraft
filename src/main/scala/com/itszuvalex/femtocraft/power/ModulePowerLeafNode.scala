@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, P
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.storage.IBattery
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
-import com.itszuvalex.itszulib.core.{TileEntityCore, TileEntityModule}
+import com.itszuvalex.itszulib.core.TileEntityModule
 import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -56,14 +56,13 @@ class ModulePowerLeafNode(tile: ITileEntity,
 
   override def setParent(node: IPowerNetworkNode): Unit = {
     parentLoc = Option(node.getLoc)
-    tile.asInstanceOf[TileEntityCore].setUpdate()
+    tile.setUpdate()
     tile.markDirtyForSave()
   }
 
   override def onParentBroken(node: IPowerNetworkNode): Unit = {
     parentLoc = None
-    // TODO: Fix when ITileEntity has this
-    tile.asInstanceOf[TileEntityCore].setUpdate()
+    tile.setUpdate()
     tile.markDirtyForSave()
 
     if (tile.getIWorld.isRemote) return
@@ -100,5 +99,6 @@ class ModulePowerLeafNode(tile: ITileEntity,
     parentLoc = if (t.hasKey(ModulePowerLeafNode.PARENT_LOC_NBT)) {
       Option(Loc4(t.getCompoundTag(ModulePowerLeafNode.PARENT_LOC_NBT)))
     } else None
+    tile.setRenderUpdate()
   }
 }

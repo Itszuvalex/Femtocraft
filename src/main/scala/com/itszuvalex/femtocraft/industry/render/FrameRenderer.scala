@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.render
+/*package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
@@ -83,3 +83,5 @@ class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
     }
   }
 }
+
+ */

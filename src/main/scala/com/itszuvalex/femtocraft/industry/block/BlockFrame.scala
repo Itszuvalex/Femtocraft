@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.block
+/*package com.itszuvalex.femtocraft.industry.block
 
 import java.util.Random
 
@@ -50,3 +50,5 @@ class BlockFrameContainerDelegate() extends BlockTileContainer(() => FemtoBlocks
 
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileFrame()
 }
+
+ */

@@ -4,12 +4,11 @@ import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray.CrystalStorageArrayModule
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
-import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
-import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity, IWorld}
-import com.itszuvalex.itszulib.core.TileEntityCoreTickable
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack, ITileEntity, IWorld}
+import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityInternalModuleTickable}
 import com.itszuvalex.itszulib.core.modules.{ModuleIItemHandlerConverter, ModuleIItemStorage}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
@@ -69,8 +68,13 @@ class TileCrystalStorageArray extends TileEntityCoreTickable {
 
   override def getGuiID: Int = GuiIDs.TileCrystalStorageArrayID
 
-  override def hasDescription: Boolean = false
-
   // TODO
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = false
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
 }

@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.api.nanite.{INanite, INaniteTank, NaniteStack}
+import net.minecraft.nbt.NBTTagCompound
 
 class DynamicINaniteTank(val getter: () => INaniteTank) extends INaniteTank {
   override def volume: Int = getter().volume
@@ -37,4 +38,10 @@ class DynamicINaniteTank(val getter: () => INaniteTank) extends INaniteTank {
     * @return Copy of NaniteStack containing the remainder, or null
     */
   override def fill(stack: NaniteStack, doFill: Boolean): NaniteStack = getter().fill(stack, doFill)
+
+  override def copy(): INaniteTank = getter().copy()
+
+  override def serializeNBT(): NBTTagCompound = getter().serializeNBT()
+
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = getter().deserializeNBT(nbt)
 }

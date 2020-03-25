@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.tile
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 
@@ -10,11 +10,11 @@ import scala.util.Random
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/29/2016.
   */
-class TileGlowStick extends TileEntityBase {
+class TileGlowStick extends TileEntityCore {
   var color: Int = Color(255.toByte,
-    (Random.nextInt(125) + 130).toByte,
-    (Random.nextInt(125) + 130).toByte,
-    (Random.nextInt(125) + 130).toByte).toInt
+                         (Random.nextInt(125) + 130).toByte,
+                         (Random.nextInt(125) + 130).toByte,
+                         (Random.nextInt(125) + 130).toByte).toInt
 
   override def getMod = Femtocraft
 

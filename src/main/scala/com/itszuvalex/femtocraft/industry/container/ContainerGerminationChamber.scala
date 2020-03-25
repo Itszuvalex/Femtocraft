@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.industry.container
+/*package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
@@ -34,3 +34,5 @@ class ContainerGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, ti
 
   override def eligibleForInput(item: ItemStack): Boolean = FurnaceRecipes.instance().getSmeltingResult(item) != null
 }
+
+ */

@@ -9,11 +9,14 @@ import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, Module
 import com.itszuvalex.femtocraft.{FemtoBlocks, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
-import net.minecraft.util.EnumFacing
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.{EnumFacing, EnumHand}
+import net.minecraft.util.math.BlockPos
 
 object TileNaniteInfuser {
   val MODULE: IModule[NaniteInfuserModule] = Module.registerModule("NaniteInfuserModule", null)
@@ -81,8 +84,6 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
   addTileEntityModuleTickable(internal)
 
-  override def hasDescription: Boolean = true
-
   override def getMod: AnyRef = Femtocraft
 
   override def hasGUI: Boolean = true
@@ -90,5 +91,12 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   override def getGuiID: Int = GuiIDs.TileNaniteInfuserID
 
   // TODO
-  override def getBlock: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockNaniteInfuser)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    if (!ret && hasGUI) {
+      playerIn.openGui(getMod, getGuiID, getWorld, getPos.getX, getPos.getY, getPos.getZ)
+      return true
+    }
+    ret
+  }
 }
