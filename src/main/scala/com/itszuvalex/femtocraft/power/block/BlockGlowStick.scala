@@ -13,7 +13,7 @@ import net.minecraft.world.IBlockAccess
 /**
   * Created by Christopher Harris (Itszuvalex) on 1/29/2016.
   */
-class BlockGlowStick extends TileBlockContainerCore(Material.CIRCUITS, new BlockTileContainer(() => FemtoBlocks.blockGlowStick) {
+class BlockGlowStick extends TileBlockContainerCore(Material.CIRCUITS, new BlockTileContainer(FemtoBlocks.blockGlowStick _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileGlowStick
 }, BlockBehaviors.DEFAULT) {
   setCreativeTab(Femtocraft.tab)

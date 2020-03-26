@@ -11,7 +11,6 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
-import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.Entity
@@ -98,9 +97,7 @@ class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockC
   }
 }
 
-class BlockCrystalMountContainerDelegate() extends BlockTileContainer(null) {
+class BlockCrystalMountContainerDelegate() extends BlockTileContainer(FemtoBlocks.blockCrystalMount _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileCrystalMount
-
-  override def toMinecraft: Block = FemtoBlocks.blockCrystalMount
 }
 

@@ -18,6 +18,6 @@ class BlockNaniteRepository extends TileBlockContainerCore(Material.IRON, new Bl
   override def isNormalCube(state: IBlockState): Boolean = false
 }
 
-class BlockNaniteRepositoryContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockNaniteRepository) {
+class BlockNaniteRepositoryContainerDelegate() extends BlockTileContainer(FemtoBlocks.blockNaniteRepository _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileNaniteRepository
 }

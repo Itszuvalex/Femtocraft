@@ -5,8 +5,8 @@ import java.util
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IConnectionProvider}
 import com.itszuvalex.femtocraft.logistics.connections.ItemConnection
-import com.itszuvalex.femtocraft.util.ChatHelper
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.util.ChatHelper
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -48,7 +48,6 @@ class ItemLogisticsItemChip extends Item {
             *
             * @param loc    Loc holding this connection provider
             * @param facing Facing
-            *
             * @return Set of Connections provided by this provider
             */
           override def getConnections[V](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[V]] = {
@@ -58,7 +57,7 @@ class ItemLogisticsItemChip extends Item {
               created = true
             }
             val inbt = stack.getTagCompound
-            val con = new ItemConnection(loc, facing, inbt, 5000d, 1, 16)
+            val con  = new ItemConnection(loc, facing, inbt, 5000d, 1, 16)
             if (created && facing != null) {
               con.setDirection(if (facing.getIndex % 2 == 0) ConnectionDirection.INPUT else ConnectionDirection.OUTPUT)
               con.interfaceDirection = facing.getOpposite
@@ -67,7 +66,7 @@ class ItemLogisticsItemChip extends Item {
           }
 
           override def addTooltip(tooltip: util.List[String]): Unit = {
-            val con = new ItemConnection(new Loc4, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
+            val con       = new ItemConnection(new Loc4, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
             val itemstack = con.ibuffer
 
             tooltip += f"${ChatHelper.yellow("Item: ")}${if (itemstack.isEmpty) ChatHelper.italic("Empty") else itemstack.toMinecraft.toString}"

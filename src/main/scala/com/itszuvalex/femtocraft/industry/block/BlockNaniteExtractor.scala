@@ -19,7 +19,7 @@ class BlockNaniteExtractor extends TileBlockContainerCore(Material.IRON, new Blo
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockNaniteExtractorContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockNaniteExtractor) {
+class BlockNaniteExtractorContainerDelegate() extends BlockTileContainer(FemtoBlocks.blockNaniteExtractor _) {
 
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileNaniteExtractor
 }

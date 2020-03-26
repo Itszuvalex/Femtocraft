@@ -19,6 +19,6 @@ class BlockCrystalStorageArray extends TileBlockContainerCore(Material.IRON, new
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockCrystalStorageArrayContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockCrystalStorageArray) {
+class BlockCrystalStorageArrayContainerDelegate() extends BlockTileContainer(FemtoBlocks.blockCrystalStorageArray _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileCrystalStorageArray
 }

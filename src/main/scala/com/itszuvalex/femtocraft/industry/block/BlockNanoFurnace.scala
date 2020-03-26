@@ -20,6 +20,6 @@ class BlockNanoFurnace extends TileBlockContainerCore(Material.IRON, new BlockNa
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockNanoFurnaceDelegate() extends BlockTileContainer(() => FemtoBlocks.blockNanoFurnace) {
+class BlockNanoFurnaceDelegate() extends BlockTileContainer(FemtoBlocks.blockNanoFurnace _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileNanoFurnace
 }

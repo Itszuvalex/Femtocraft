@@ -4,9 +4,9 @@ import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.power.PowerNetwork
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiIcons}
 import com.itszuvalex.femtocraft.power.container.ContainerPowerNetwork
-import com.itszuvalex.femtocraft.util.ChatHelper
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiSpacingPanel}
+import com.itszuvalex.itszulib.util.ChatHelper
 import net.minecraft.client.Minecraft
 
 /**

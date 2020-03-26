@@ -21,7 +21,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Chris on 2/16/2017.
   */
-class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileContainer(() => FemtoBlocks.blockConduit) {
+class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileContainer(FemtoBlocks.blockConduit _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileConduit
 }, BlockBehaviors.DEFAULT) {
   var renderBox = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)

@@ -17,6 +17,6 @@ class BlockNaniteInfuser extends TileBlockContainerCore(Material.IRON, new Block
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockNaniteInfuserContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockNaniteInfuser) {
+class BlockNaniteInfuserContainerDelegate() extends BlockTileContainer(FemtoBlocks.blockNaniteInfuser _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileNaniteInfuser
 }

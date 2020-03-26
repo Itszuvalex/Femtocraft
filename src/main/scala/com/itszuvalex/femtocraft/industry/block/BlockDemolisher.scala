@@ -19,7 +19,7 @@ class BlockDemolisher extends TileBlockContainerCore(Material.IRON, new BlockDem
   override def isOpaqueCube(state: IBlockState): Boolean = false
 }
 
-class BlockDemolisherContainerDelegate() extends BlockTileContainer(() => FemtoBlocks.blockDemolisher) {
+class BlockDemolisherContainerDelegate() extends BlockTileContainer(FemtoBlocks.blockDemolisher _) {
 
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileDemolisher
 }
