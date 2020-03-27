@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.container
+package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
@@ -23,9 +23,13 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
-    if (tile.isBuilding) {
-      player.closeScreen()
-      player.openGui(Femtocraft, GuiIDs.TileFrameConstructingGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
+    tile.state.get match {
+      case None =>
+      case Some(s) =>
+        if (s.isBuilding) {
+          player.closeScreen()
+          player.openGui(Femtocraft, GuiIDs.TileFrameConstructingGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
+        }
     }
   }
 
@@ -33,5 +37,3 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   override def eligibleForInput(item: ItemStack): Boolean = false
 }
-
- */

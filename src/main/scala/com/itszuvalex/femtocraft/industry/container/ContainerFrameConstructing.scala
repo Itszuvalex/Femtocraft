@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.container
+package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
@@ -23,12 +23,16 @@ class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, til
       player.closeScreen()
     }
     else {
-      listeners.foreach { crafter: IContainerListener =>
-        if (tile.progress != lastProgress) {
-          sendUpdateToListener(this, crafter, 0, tile.progress)
-        }
+      tile.state.get match {
+        case None =>
+        case Some(s) =>
+          listeners.foreach { crafter: IContainerListener =>
+            if (s.progress != lastProgress) {
+              sendUpdateToListener(this, crafter, 0, s.progress)
+            }
 
-        lastProgress = tile.progress
+            lastProgress = s.progress
+          }
       }
     }
   }
@@ -36,10 +40,12 @@ class ContainerFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, til
   override def updateProgressBar(slot: Int, value: Int): Unit = {
     slot match {
       case 0 =>
-        tile.progress = value
+        tile.state.get match {
+          case None =>
+          case Some(s) =>
+            s.progress = value
+        }
       case _ =>
     }
   }
 }
-
- */

@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.block
+package com.itszuvalex.femtocraft.industry.block
 
 import java.util.Random
 
@@ -30,17 +30,21 @@ class BlockFrame extends TileBlockContainerCore(Material.IRON, new BlockFrameCon
   override def randomDisplayTick(stateIn: IBlockState, worldIn: World, pos: BlockPos, rand: Random): Unit = {
     worldIn.getTileEntity(pos) match {
       case null =>
-      case i: TileFrame if i.isCurrentlyBuilding =>
-        if (worldIn.isRemote)
-          if (rand.nextInt(3) == 1)
-            (0 until 1).foreach { _ =>
-              val px    = pos.getX + rand.nextFloat()
-              val py    = pos.getY + rand.nextFloat()
-              val pz    = pos.getZ + rand.nextFloat()
-              val half  = 255f / 2f
-              val color = new Color(0, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte)
-              Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
-            }
+      case i: TileFrame =>
+        i.state.get match {
+          case None =>
+          case Some(s) =>
+            if (worldIn.isRemote)
+              if (rand.nextInt(3) == 1)
+                (0 until 1).foreach { _ =>
+                  val px    = pos.getX + rand.nextFloat()
+                  val py    = pos.getY + rand.nextFloat()
+                  val pz    = pos.getZ + rand.nextFloat()
+                  val half  = 255f / 2f
+                  val color = new Color(0, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte)
+                  Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
+                }
+        }
       case _ =>
     }
   }
@@ -51,4 +55,3 @@ class BlockFrameContainerDelegate() extends BlockTileContainer(() => FemtoBlocks
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileFrame()
 }
 
- */

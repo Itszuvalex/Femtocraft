@@ -26,47 +26,47 @@ object FemtoBlocks {
   private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
   private val oresToRegister       = new ArrayBuffer[(Block, String)]
   //Cyber
-  var blockSubstrate       : Block = _
-  var blockRefinedSubstrate: Block = _
-  var blockCyberwood       : Block = _
-  var blockCyberleaf       : Block = _
-  var blockNanoweave          : Block = _
-  var blockRiftiron           : Block = _
-  var blockPhasemetal         : Block = _
-  var blockRedstonereplacement: Block = _
-  var blockLapisreplacement   : Block = _
-  var blockDiamondreplacement : Block = _
-  var blockCrystals: Block = _
-  var blockNaniteRepository: Block = _
-  var blockItemRepository  : Block = _
-  var blockFluidRepository : Block = _
-  var blockNanoFurnace     : Block = _
-  var blockNaniteInfuser   : Block = _
+  var blockSubstrate             : Block = _
+  var blockRefinedSubstrate      : Block = _
+  var blockCyberwood             : Block = _
+  var blockCyberleaf             : Block = _
+  var blockNanoweave             : Block = _
+  var blockRiftiron              : Block = _
+  var blockPhasemetal            : Block = _
+  var blockRedstonereplacement   : Block = _
+  var blockLapisreplacement      : Block = _
+  var blockDiamondreplacement    : Block = _
+  var blockCrystals              : Block = _
+  var blockNaniteRepository      : Block = _
+  var blockItemRepository        : Block = _
+  var blockFluidRepository       : Block = _
+  var blockNanoFurnace           : Block = _
+  var blockNaniteInfuser         : Block = _
   var blockFrame                 : Block = _
   var blockCyberBase             : Block = _
   var blockCyberMachineInProgress: Block = _
-  var blockNaniteHiveSmall     : Block = _
-  var blockCrystalMount        : Block = _
-  var blockPowerPedestal       : Block = _
-  var blockCrystalChargingArray: Block = _
-  var blockCrystalStorageArray : Block = _
-  var blockCrystalHeatExchanger: Block = _
-  var blockGerminationChamber: Block = _
-  var blockNaniteExtractor   : Block = _
+  var blockNaniteHiveSmall       : Block = _
+  var blockCrystalMount          : Block = _
+  var blockPowerPedestal         : Block = _
+  var blockCrystalChargingArray  : Block = _
+  var blockCrystalStorageArray   : Block = _
+  var blockCrystalHeatExchanger  : Block = _
+  var blockGerminationChamber    : Block = _
+  var blockNaniteExtractor       : Block = _
 
   //Tests
   var blockDemolisher        : Block = _
-  var blockConduit: Block = _
-  var blockGlowStick: Block = _
-  var testBlock       : Block = _
-  var testNetworkBlock: Block = _
+  var blockConduit           : Block = _
+  var blockGlowStick         : Block = _
+  var testBlock              : Block = _
+  var testNetworkBlock       : Block = _
   var testDiffusionNode      : Block = _
   var testDiffusionTargetNode: Block = _
   var testDirectNode         : Block = _
   var testGenerationNode     : Block = _
   var testTransferNode       : Block = _
-  var testTaskProvider  : Block = _
-  var testWorkerProvider: Block = _
+  var testTaskProvider       : Block = _
+  var testWorkerProvider     : Block = _
 
   @SubscribeEvent
   def registerBlocks(event: RegistryEvent.Register[Block]) {
@@ -86,7 +86,7 @@ object FemtoBlocks {
     blockCrystals = registerBlock(registry, new BlockCrystalsWorldgen(), "crystalCluster")
     blockNanoFurnace = registerBlock(registry, new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(registry, new BlockNaniteInfuser, "blockNaniteInfuser")
-    //blockFrame = registerBlock(registry, new BlockFrame(), "blockFrame")
+    blockFrame = registerBlock(registry, new BlockFrame(), "blockFrame")
     blockNaniteHiveSmall = registerBlock(registry, new BlockNaniteHiveSmall(), "blockNaniteHive_small")
     blockNaniteRepository = registerBlock(registry, new BlockNaniteRepository(), "blockNaniteRepository")
     blockItemRepository = registerBlock(registry, new BlockItemRepository(), "blockItemRepository")
@@ -123,7 +123,7 @@ object FemtoBlocks {
   def init(): Unit = {
     blockSubstrate.registerModel()
     blockRefinedSubstrate.registerModel()
-//    blockFrame.registerModel()
+    blockFrame.registerModel()
     blockCyberleaf.registerModel()
     blockCyberwood.registerModel()
     blockNanoweave.registerModel()

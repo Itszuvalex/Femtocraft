@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.gui
+package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.client.FemtoGuiBase
@@ -22,13 +22,15 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
   }
   addPlayerInventorySlots(inv)
 
-  val nameLabel     = new GuiLabel((panelWidth - fontRenderer.getStringWidth(tile.multiBlock)) / 2, 7,
-                                   fontRenderer.getStringWidth(tile.multiBlock), fontRenderer.FONT_HEIGHT,
-                                   () => tile.multiBlock)
+  private def state: Option[TileFrame.TileFrameState] = tile.state.get
+
+  val nameLabel     = new GuiLabel((panelWidth - fontRenderer.getStringWidth(state.map(_.multiBlock).getOrElse(""))) / 2, 7,
+                                   fontRenderer.getStringWidth(state.map(_.multiBlock).getOrElse("")), fontRenderer.FONT_HEIGHT,
+                                   () => state.map(_.multiBlock).getOrElse(""))
   val requiredLabel = new GuiLabel((panelWidth - fontRenderer.getStringWidth("Required")) / 2, 9 + fontRenderer.FONT_HEIGHT,
                                    fontRenderer.getStringWidth("Required"), fontRenderer.FONT_HEIGHT,
                                    () => "Required")
-  val multiblock    = FrameMultiblockRegistry.getMultiblock(tile.multiBlock)
+  val multiblock    = FrameMultiblockRegistry.getMultiblock(state.map(_.multiBlock).getOrElse(""))
   val reqItems      = multiblock match {
     case Some(m) =>
       m.getRequiredResources.map { item =>
@@ -49,4 +51,3 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
   override def GuiID: Int = GuiIDs.TileFrameMultiblockGuiID
 }
 
- */

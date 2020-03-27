@@ -1,25 +1,24 @@
-/*package com.itszuvalex.femtocraft.industry.tile
+package com.itszuvalex.femtocraft.industry.tile
 
 import java.util.Random
 
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
-import com.itszuvalex.femtocraft.industry.tile.TileFrame.TileFrameState
-import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, MultiblockStateHolder}
-import com.itszuvalex.femtocraft.util.StorageUtils
-import com.itszuvalex.femtocraft.util.data._
-import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs, industry}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.femtocraft.industry.tile.TileFrame.{ModuleFrame, TileFrameState}
+import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
+import com.itszuvalex.femtocraft.temp.ModuleMultiblockGui
+import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
+import com.itszuvalex.itszulib.api.multiblock.{MultiBlockInfo, MultiblockStateHolder}
 import com.itszuvalex.itszulib.api.storage.{DynamicIItemStorage, IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.Converter
-import com.itszuvalex.itszulib.core.TileEntityBase
-import com.itszuvalex.itszulib.core.traits.tile.MultiBlockComponent
-import com.itszuvalex.itszulib.util.{InventoryUtils, TileEntityUtils}
-import net.minecraft.entity.player.EntityPlayer
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
+import com.itszuvalex.itszulib.core.modules.{ModuleIItemStorage, ModuleMultiblockInfo, TileEntityMultiblockTickableModule}
+import com.itszuvalex.itszulib.util.{InventoryUtils, StorageUtils, TileEntityUtils}
+import net.minecraft.block.state.IBlockState
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
-import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.INBTSerializable
 
 import scala.collection.mutable
@@ -28,15 +27,16 @@ import scala.collection.mutable
   * Created by Christopher on 8/29/2015.
   */
 object TileFrame {
-  val BUILDING_KEY        = "Building"
-  val RENDER_SETTINGS_KEY = "RenderSettings"
-  val MULTIBLOCK_KEY      = "Multiblock"
-  val PROGRESS_KEY        = "BuildProgress"
-  val STATE_KEY           = "State"
-  val INFO_KEY            = "Info"
-  val TICKS_TO_CHECK      = 40
-  var shouldDrop          = true
-  var shouldFullyRemove   = true
+  val MODULE: IModule[ModuleFrame] = Module.registerModule("ModuleFrame", null)
+  val BUILDING_KEY                 = "Building"
+  val RENDER_SETTINGS_KEY          = "RenderSettings"
+  val MULTIBLOCK_KEY               = "Multiblock"
+  val PROGRESS_KEY                 = "BuildProgress"
+  val STATE_KEY                    = "State"
+  val INFO_KEY                     = "Info"
+  val TICKS_TO_CHECK               = 40
+  var shouldDrop                   = true
+  var shouldFullyRemove            = true
 
   def fullRender(bool: Boolean) = setRenderMarks(bool, 0, 0 until 20: _*)
 
@@ -92,17 +92,49 @@ object TileFrame {
     }
   }
 
-  class TileFrameState() extends INBTSerializable[NBTTagCompound] {
-    val storage = new ItemStorageArray(9)
+  class TileFrameState(tile: ITileEntity) extends INBTSerializable[NBTTagCompound] {
+    val storage                                         = new ItemStorageArray(9)
+    var multiBlock           : String                   = null
+    var renderProgress       : Int                      = 0
+    var progress             : Int                      = 0
+    // # of seconds * 20tps
+    var totalMachineBuildTime: Int                      = 10 * 20
+    var inProgressData       : mutable.Map[String, Any] = mutable.Map()
+    var isBuilding           : Boolean                  = false
+    var ticks                                           = 0
+
+    def checkForRequiredItems(): Unit = {
+      FrameMultiblockRegistry.getMultiblock(multiBlock) match {
+        case Some(multi) =>
+          val items  = multi.getRequiredResources
+          val random = new Random
+          if (StorageUtils.removeItemsFromStorage(storage, items, false)) {
+            storage.foreach { item =>
+              if (!tile.getIWorld.isRemote) InventoryUtils.dropItem(item, new Loc4(tile), random)
+            }
+            isBuilding = true
+            tile.setUpdate()
+          }
+        case _ =>
+      }
+    }
+
+    def isCurrentlyBuilding: Boolean = isBuilding
 
     override def serializeNBT(): NBTTagCompound = {
       val nbt = new NBTTagCompound
       nbt.setTag(TileFrameState.STORAGE_NBT, storage.serializeNBT())
+      nbt.setString(TileFrame.MULTIBLOCK_KEY, multiBlock)
+      nbt.setInteger(TileFrame.PROGRESS_KEY, renderProgress)
+      nbt.setBoolean(TileFrame.BUILDING_KEY, isBuilding)
       nbt
     }
 
     override def deserializeNBT(nbt: NBTTagCompound): Unit = {
       storage.deserializeNBT(nbt.getCompoundTag(TileFrameState.STORAGE_NBT))
+      multiBlock = nbt.getString(TileFrame.MULTIBLOCK_KEY)
+      renderProgress = nbt.getInteger(TileFrame.PROGRESS_KEY)
+      isBuilding = nbt.getBoolean(TileFrame.BUILDING_KEY)
     }
   }
 
@@ -110,189 +142,158 @@ object TileFrame {
     val STORAGE_NBT = "Storage"
   }
 
+  class ModuleFrame(tile: ITileEntity, info: MultiBlockInfo, state: MultiblockStateHolder[TileFrameState, TileFrame]) extends TileEntityMultiblockTickableModule[ModuleFrame](info) {
+    var renderInt: Int = TileFrame.fullRender(true)
+
+    def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int): Unit = {
+      renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
+    }
+
+    def calculateRendering(connectedDirs: Array[EnumFacing]): Unit = {
+      renderInt = TileFrame.fullRender(true)
+    }
+
+    def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)
+
+    def setRenderMark(bool: Boolean, i: Int, j: Int, k: Int): Unit = {
+      renderInt = TileFrame.setRenderMark(bool, i, j, k, renderInt)
+    }
+
+    override def serverControllerUpdate(tile: ITileEntity): Unit = {
+      state.get match {
+        case None =>
+        case Some(s) =>
+          if (!s.isBuilding) {
+            s.ticks = TileEntityUtils.incrementTicks(s.ticks, TileFrame.TICKS_TO_CHECK)
+            if (s.ticks == 0)
+              s.checkForRequiredItems()
+          }
+          else {
+            s.progress += 1
+            if (s.progress >= s.totalMachineBuildTime) {
+              FrameMultiblockRegistry.getMultiblock(s.multiBlock) match {
+                case Some(multi) =>
+                  TileFrame.shouldDrop = false
+                  TileFrame.shouldFullyRemove = false
+                  multi.formAtLocation(new Loc4(tile))
+                  TileFrame.shouldFullyRemove = true
+                  TileFrame.shouldDrop = true
+                case _ =>
+              }
+            }
+          }
+      }
+    }
+
+    override def clientControllerUpdate(tile: ITileEntity): Unit = {
+      state.get match {
+        case None =>
+        case Some(s) =>
+          if (s.isBuilding) {
+            s.renderProgress += 1
+          }
+      }
+    }
+
+    override def onBlockBreak(core: ITileEntity, sta: IBlockState): Unit = {
+      if (core.getIWorld.isRemote) return
+
+      if (TileFrame.shouldFullyRemove) {
+        if (info.isController) {
+          state.get match {
+            case None =>
+            case Some(s) =>
+              val random = new Random
+              FrameMultiblockRegistry.getMultiblock(s.multiBlock) match {
+                case Some(multi) =>
+                  multi.getTakenLocations(new Loc4(tile)).foreach { loc =>
+                    tile.getIWorld.setBlockToAir(loc.getPos)
+                    if (TileFrame.shouldDrop) {
+                      val itemStack = Converter.IItemStackFromItemStack(new ItemStack(FemtoItems.itemFrame))
+                      ItemFrame.setSelection(itemStack, s.multiBlock)
+                      InventoryUtils.dropItem(itemStack, loc, random)
+                    }
+                  }
+                  if (s.isBuilding && TileFrame.shouldDrop)
+                    multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(i, new Loc4(core), random))
+                case _ =>
+              }
+              state.get.foreach(_.storage.foreach(i => InventoryUtils.dropItem(i, new Loc4(core), random)))
+          }
+        }
+        else info.controller.flatMap(_.getITileEntity(true)) match {
+          case Some(_: TileFrame) => tile.getIWorld.setBlockToAir(info.controller.get.getPos)
+          case _ =>
+        }
+      }
+    }
+
+    override def module: IModule[ModuleFrame] = TileFrame.MODULE
+
+    override def hasDescriptionNBT: Boolean = true
+
+    override def hasWorldNBT: Boolean = true
+
+    override def writeDescriptionNBT(tag: NBTTagCompound): Unit = saveToNBT(tag)
+
+    override def readDescriptionNBT(tag: NBTTagCompound): Unit = {
+      loadFromNBT(tag)
+      tile.setRenderUpdate()
+    }
+
+    override def writeWorldNBT(tag: NBTTagCompound): Unit = saveToNBT(tag)
+
+    override def readWorldNBT(tagCompound: NBTTagCompound): Unit = loadFromNBT(tagCompound)
+
+    def saveToNBT(tag: NBTTagCompound): Unit = {
+      tag.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
+      if (info.isController) {
+        tag.setTag(TileFrame.STATE_KEY, state.get.get.serializeNBT())
+      }
+    }
+
+    def loadFromNBT(tag: NBTTagCompound): Unit = {
+      renderInt = tag.getInteger(TileFrame.RENDER_SETTINGS_KEY)
+      if (info.isController) {
+        state.get.get.deserializeNBT(tag.getCompoundTag(TileFrame.STATE_KEY))
+      }
+    }
+  }
+
 }
 
-class TileFrame() extends TileEntityBase with TileDataSpec with MultiBlockComponent {
-  private val state:
+class TileFrame() extends TileEntityCoreTickable {
+  var storage: IItemStorage   = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
+  var info   : MultiBlockInfo = new MultiBlockInfo
+  val state:
     MultiblockStateHolder[TileFrameState, TileFrame] =
-    new MultiblockStateHolder[TileFrameState, TileFrame](this, () => new TileFrameState(), info _, (a) => a.state)
-  var renderInt                                       = TileFrame.fullRender(true)
-  var multiBlock           : String                   = null
-  var renderProgress       : Int                      = 0
-  var progress             : Int                      = 0
-  // # of seconds * 20tps
-  var totalMachineBuildTime: Int                      = 10 * 20
-  var inProgressData       : mutable.Map[String, Any] = mutable.Map()
-  var isBuilding           : Boolean                  = false
-  var ticks                                           = 0
-  var storage              : IItemStorage             = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
+    new MultiblockStateHolder[TileFrameState, TileFrame](this, () => new TileFrameState(this), info _, _.state)
 
-  descriptionDataSpec ++= Array(
-    new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
-    new DataString(TileFrame.MULTIBLOCK_KEY, multiBlock _, multiBlock_=),
-    new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
-    new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=),
-    new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
-    )
-  descriptionDataSpec.onLoad = () => setRenderUpdate()
-  saveDataSpec ++= Array(
-    new DataInt(TileFrame.RENDER_SETTINGS_KEY, renderInt _, renderInt_=),
-    new DataString(TileFrame.MULTIBLOCK_KEY, multiBlock _, multiBlock_=),
-    new DataInt(TileFrame.PROGRESS_KEY, renderProgress _, renderProgress_=),
-    new DataBool(TileFrame.BUILDING_KEY, isBuilding _, isBuilding_=),
-    new industry.MultiblockStateHolder.DataMultiblockState[TileFrameState](TileFrame.STATE_KEY, state),
-    new DataSerializable[NBTTagCompound](TileFrame.INFO_KEY, info)
-    )
+  val internal = new ModuleFrame(this, info, state)
 
-  def calculateRendering(sizeX: Int, sizeY: Int, sizeZ: Int, locX: Int, locY: Int, locZ: Int): Unit = {
-    renderInt = TileFrame.renderPieces(sizeX, sizeY, sizeZ, locX, locY, locZ)
-  }
-
-  def calculateRendering(connectedDirs: Array[EnumFacing]): Unit = {
-    renderInt = TileFrame.fullRender(true)
-  }
-
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = capability match {
-    case c if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => true
-    case _ => super.hasCapability(capability, facing)
-  }
-
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = capability match {
-    case c if capability == ItszuLibCapabilities.TILE_MULTIBLOCK => info.asInstanceOf[T]
-    case _ => super.getCapability(capability, facing)
-  }
+  addTileEntityModule(new ModuleIItemStorage(storage) {
+    override def hasWorldNBT: Boolean = false
+  })
+  addTileEntityModule(new ModuleMultiblockInfo(info))
+  addTileEntityModule(new ModuleMultiblockGui(info, Femtocraft, () => if (state.get.exists(_.isBuilding)) GuiIDs.TileFrameConstructingGuiID else GuiIDs.TileFrameMultiblockGuiID))
+  addTileEntityModuleTickable(internal)
 
   override def getRenderBoundingBox: AxisAlignedBB = {
-    if (isController) {
-      FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-        case Some(m) =>
-          FrameMultiblockRendererRegistry.getRenderer(m.multiblockRenderID) match {
-            case Some(r) =>
-              return new AxisAlignedBB(getPos, getPos.add(r.boundingBox._1, r.boundingBox._2, r.boundingBox._3))
+    if (info.isController) {
+      state.get match {
+        case None =>
+        case Some(s) =>
+          FrameMultiblockRegistry.getMultiblock(s.multiBlock) match {
+            case Some(m) =>
+              FrameMultiblockRendererRegistry.getRenderer(m.multiblockRenderID) match {
+                case Some(r) =>
+                  return new AxisAlignedBB(getPos, getPos.add(r.boundingBox._1, r.boundingBox._2, r.boundingBox._3))
+                case _ =>
+              }
             case _ =>
           }
-        case _ =>
       }
     }
     super.getRenderBoundingBox
   }
-
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
-    if (isController) {
-      if (!isBuilding) {
-        ticks = TileEntityUtils.incrementTicks(ticks, TileFrame.TICKS_TO_CHECK)
-        if (ticks == 0)
-          checkForRequiredItems()
-      }
-      else {
-        progress += 1
-        if (progress >= totalMachineBuildTime) {
-          FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-            case Some(multi) =>
-              TileFrame.shouldDrop = false
-              TileFrame.shouldFullyRemove = false
-              multi.formAtLocation(getLoc)
-              TileFrame.shouldFullyRemove = true
-              TileFrame.shouldDrop = true
-            case _ =>
-          }
-        }
-      }
-    }
-  }
-
-  def checkForRequiredItems(): Unit = {
-    FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-      case Some(multi) =>
-        val items  = multi.getRequiredResources
-        val random = new Random
-        if (StorageUtils.removeItemsFromStorage(state.get.get.storage, items, false)) {
-          state.get.foreach(_.storage.foreach { item =>
-            if (!world.isRemote) InventoryUtils.dropItem(item, getLoc, random)
-          })
-          isBuilding = true
-          setUpdate()
-        }
-      case _ =>
-    }
-  }
-
-  override def clientUpdate(): Unit = {
-    super.clientUpdate()
-    if (isController) {
-      if (isBuilding) {
-        renderProgress += 1
-      }
-    }
-  }
-
-  def isCurrentlyBuilding: Boolean = {
-    if (isController) isBuilding
-    else if (isValidMultiBlock) {
-      info.cLoc.getITileEntity() match {
-        case Some(i: TileFrame) if i.isController => i.isBuilding
-        case _ => false
-      }
-    }
-    else false
-  }
-
-  def getRenderMark(i: Int, j: Int, k: Int) = TileFrame.getRenderMark(i, j, k, renderInt)
-
-  def setRenderMark(bool: Boolean, i: Int, j: Int, k: Int): Unit = {
-    renderInt = TileFrame.setRenderMark(bool, i, j, k, renderInt)
-  }
-
-  override def hasDescription: Boolean = isValidMultiBlock
-
-
-  override def onBlockBreak(): Unit = {
-    if (getWorld.isRemote) return
-
-    if (TileFrame.shouldFullyRemove) {
-      if (isController) {
-        val random = new Random
-        FrameMultiblockRegistry.getMultiblock(multiBlock) match {
-          case Some(multi) =>
-            multi.getTakenLocations(getLoc).foreach { loc =>
-              getWorld.setBlockToAir(loc.getPos)
-              if (TileFrame.shouldDrop) {
-                val itemStack = Converter.IItemStackFromItemStack(new ItemStack(FemtoItems.itemFrame))
-                ItemFrame.setSelection(itemStack, multiBlock)
-                InventoryUtils.dropItem(itemStack, loc, random)
-              }
-            }
-            if (isBuilding && TileFrame.shouldDrop)
-              multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(i, getLoc, random))
-          case _ =>
-        }
-        state.get.foreach(_.storage.foreach(i => InventoryUtils.dropItem(i, getLoc, random)))
-      }
-      else info.cLoc.getITileEntity() match {
-        case Some(_: TileFrame) => world.setBlockToAir(info.cLoc.getPos)
-        case _ =>
-      }
-    }
-  }
-
-
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    if (hasGUI) {
-      info.cLoc.getITileEntity() match {
-        case Some(tile: TileFrame) =>
-          par5EntityPlayer.openGui(tile.getMod, tile.getGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
-        case _ =>
-      }
-      true
-    }
-    else false
-  }
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = isValidMultiBlock
-
-  override def getGuiID: Int = if (isBuilding) GuiIDs.TileFrameConstructingGuiID else GuiIDs.TileFrameMultiblockGuiID
 }
- */

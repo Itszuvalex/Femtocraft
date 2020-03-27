@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.gui
+package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.industry.container.ContainerFrameConstructing
@@ -19,10 +19,12 @@ object GuiFrameConstructing {
 }
 
 class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends GuiBase(new ContainerFrameConstructing(player, inv, tile)) {
-  val multiblockNameString = if (tile.multiBlock == null) "Undefined" else tile.multiBlock
+  private def state: Option[TileFrame.TileFrameState] = tile.state.get
+
+  val multiblockNameString = if (state.map(_.multiBlock).orNull == null) "Undefined" else state.map(_.multiBlock).getOrElse("")
   val nameLabel            = new GuiLabel((panelWidth - frender.getStringWidth(multiblockNameString)) / 2, 10, frender.getStringWidth(multiblockNameString), frender.FONT_HEIGHT, () => multiblockNameString)
   val multibockRender      = new GuiItemStack(0, 0, () => false) {
-    override def itemStack = FrameMultiblockRegistry.getMultiblock(tile.multiBlock).map(_.getRenderItemStack).getOrElse(IItemStack.Empty)
+    override def itemStack = FrameMultiblockRegistry.getMultiblock(state.map(_.multiBlock).getOrElse("")).map(_.getRenderItemStack).getOrElse(IItemStack.Empty)
   }
   val constructingString   = "Constructing..."
   val constructingLabel    = new GuiLabel((panelWidth - frender.getStringWidth(constructingString)) / 2, panelHeight - 30, frender.getStringWidth(constructingString), frender.FONT_HEIGHT, () => constructingString)
@@ -42,7 +44,7 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
     val l = (height - ySize) / 2
     drawTexturedModalRect(k, l, 0, 0, xSize, ySize)
 
-    val xProg = (tile.progress * 152) / tile.totalMachineBuildTime
+    val xProg = (state.map(_.progress).getOrElse(0) * 152) / state.map(_.totalMachineBuildTime).getOrElse(1)
 
     drawTexturedModalRect(k + 12, l + 149, 0, 166, xProg, 5)
 
@@ -57,4 +59,3 @@ class GuiFrameConstructing(player: EntityPlayer, inv: InventoryPlayer, private v
   }
 }
 
- */

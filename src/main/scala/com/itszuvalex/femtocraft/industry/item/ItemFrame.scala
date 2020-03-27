@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.item
+package com.itszuvalex.femtocraft.industry.item
 
 import java.util
 
@@ -118,10 +118,14 @@ class ItemFrame extends Item with IFrameItem {
       worldIn.getTileEntity(loc.getPos) match {
         case frame: TileFrame =>
           val offset: (Int, Int, Int) = (loc.x - controllerLoc.x, loc.y - controllerLoc.y, loc.z - controllerLoc.z)
-          frame.calculateRendering(multi.size._1, multi.size._2, multi.size._3, offset._1, offset._2, offset._3)
+          frame.internal.calculateRendering(multi.size._1, multi.size._2, multi.size._3, offset._1, offset._2, offset._3)
           //          frame.calculateRendering(EnumFacing.VALUES.filter(dir => locations.contains(new Loc4(bpos, worldIn.provider.getDimension).getOffset(dir))))
-          frame.formMultiBlock(loc, controllerLoc)
-          frame.multiBlock = multiString
+          frame.info.formMultiBlock(loc, controllerLoc)
+          frame.state.get match {
+            case None =>
+            case Some(s) =>
+              s.multiBlock = multiString
+          }
         case _ =>
       }
     }
@@ -146,4 +150,3 @@ class ItemFrame extends Item with IFrameItem {
   }
 }
 
- */

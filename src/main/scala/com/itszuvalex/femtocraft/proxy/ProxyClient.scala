@@ -178,15 +178,15 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalChargingArray), 0, classOf[TileCrystalChargingArray])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalStorageArray), 0, classOf[TileCrystalStorageArray])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalHeatExchanger), 0, classOf[TileCrystalHeatExchanger])
-    //ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockFrame), 0, classOf[TileFrame])
     //ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockGerminationChamber), 0, classOf[TileGerminationChamber])
-    //ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
-    //ForgeHooksClient.registerTESRItemStack(FemtoItems.itemMultiblock, 0, classOf[TileFrame])
+    ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
+    ForgeHooksClient.registerTESRItemStack(FemtoItems.itemMultiblock, 0, classOf[TileFrame])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockConduit), 0, classOf[TileConduit])
 
     //
-    //RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
-    //RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
+    RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
+    // RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
     RenderIDs.itemShiftPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiToolPreviewableRenderer)
 
     //    val furnaceRenderer = new FurnaceRenderer
@@ -219,7 +219,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalChargingArray], new CrystalChargingArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalStorageArray], new CrystalStorageArrayRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalHeatExchanger], new CrystalHeatExchangeRender)
-    //ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileConduit], new ConduitRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)

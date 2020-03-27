@@ -26,8 +26,8 @@ class ProxyGuiClient extends ProxyGuiCommon {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
       case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, Converter.IItemStackFromItemStack(player.getHeldItemMainhand))
       case (GuiIDs.ItemNanoPackID, _) => new GuiNanoPack(player, player.inventory, Converter.IItemStackFromItemStack(player.getHeldItemMainhand))
-      //case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
-      //case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
+      case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
+      case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
       case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new GuiItemRepository(player, player.inventory, te)
       case (GuiIDs.TileNaniteRepositoryGuiID, te: TileNaniteRepository) => new GuiNaniteRepository(player, player.inventory, te)
