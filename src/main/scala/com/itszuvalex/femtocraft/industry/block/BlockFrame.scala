@@ -31,20 +31,21 @@ class BlockFrame extends TileBlockContainerCore(Material.IRON, new BlockFrameCon
     worldIn.getTileEntity(pos) match {
       case null =>
       case i: TileFrame =>
-        i.state.get match {
-          case None =>
-          case Some(s) =>
-            if (worldIn.isRemote)
-              if (rand.nextInt(3) == 1)
-                (0 until 1).foreach { _ =>
-                  val px    = pos.getX + rand.nextFloat()
-                  val py    = pos.getY + rand.nextFloat()
-                  val pz    = pos.getZ + rand.nextFloat()
-                  val half  = 255f / 2f
-                  val color = new Color(0, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte)
-                  Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
-                }
-        }
+        if (i.info.isValidMultiBlock && i.info.controller.flatMap(_.getITileEntity(true)).exists(_.isInstanceOf[TileFrame]))
+          i.state.get match {
+            case None =>
+            case Some(s) =>
+              if (worldIn.isRemote && s.isBuilding)
+                if (rand.nextInt(3) == 1)
+                  (0 until 1).foreach { _ =>
+                    val px    = pos.getX + rand.nextFloat()
+                    val py    = pos.getY + rand.nextFloat()
+                    val pz    = pos.getZ + rand.nextFloat()
+                    val half  = 255f / 2f
+                    val color = new Color(0, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte, (rand.nextFloat() * half + half).toByte)
+                    Femtocraft.proxy.spawnParticle(worldIn, ProxyCommon.PARTICLE_NANITE, px, py, pz, color.toInt);
+                  }
+          }
       case _ =>
     }
   }

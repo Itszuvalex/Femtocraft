@@ -39,7 +39,7 @@ class ProxyGuiCommon extends ItszuGuiHandler {
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new ContainerCrystalStorageArray(player, player.inventory, te, true)
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new ContainerCrystalHeatExchanger(player, player.inventory, te, true)
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new ContainerDemolisher(player, player.inventory, te, true)
-      //case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new ContainerGerminationChamber(player, player.inventory, te, true)
+      case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new ContainerGerminationChamber(player, player.inventory, te, true)
       case (GuiIDs.TilePowerNetworkID, te: TileEntity) => new ContainerPowerNetwork(Converter.ITileEntityFromTileEntity(te), true)
       case (GuiIDs.TileConduitID, te: TileConduit) => new ContainerConduit(player, player.inventory, te, true)
       case (GuiIDs.TileConduitSideID, te: TileConduit) => new ContainerConduitSide(player, player.inventory, te, EnumFacing.getFront(data), true)

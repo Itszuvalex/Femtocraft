@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.client
 
+import com.itszuvalex.femtocraft.temp.TempInternal
 import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.container.ContainerBase
@@ -21,7 +22,11 @@ abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase
     val item = Converter.IItemStackFromItemStack(new ItemStack(tile.toMinecraft.getBlockType))
 
     override def itemStack = item
-  }, tile.getModule(InternalModules.MODULE_GUI, null).guiId())
+  }, if (tile.hasModule(InternalModules.MODULE_GUI, null))
+                  tile.getModule(InternalModules.MODULE_GUI, null).guiId()
+                else if (tile.hasModule(TempInternal.MODULE_MULTIBLOCK_GUI, null))
+    tile.getModule(TempInternal.MODULE_MULTIBLOCK_GUI, null).guiId()
+                else 0)
   add(tabBar)
 
   override def GuiID: Int = tile.getModule(InternalModules.MODULE_GUI, null).guiId()

@@ -1,6 +1,5 @@
-/*package com.itszuvalex.femtocraft.industry.render
+package com.itszuvalex.femtocraft.industry.render
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
@@ -8,7 +7,7 @@ import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileGerminationChambe
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
 import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
 import com.itszuvalex.femtocraft.{FemtoBlocks, Resources}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
@@ -234,24 +233,23 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
   override def renderTileEntityInWorld(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     lastTe = te
     te match {
-      case t: TileGerminationChamber => if (t.hasCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null) && t.getCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
+      case t: TileGerminationChamber => if (t.hasModule(ItszuLibModules.TILE_MULTIBLOCK, null) && t.getModule(ItszuLibModules.TILE_MULTIBLOCK, null).isController)
         if (MinecraftForgeClient.getRenderPass == 0) {
-          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = true, renderGlass = false, if (te.hasCapability(ItszuLibCapabilities.COLORABLE, null)) te.getCapability(ItszuLibCapabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = true, renderGlass = false, if (te.hasModule(ItszuLibModules.COLORABLE, null)) te.getModule(ItszuLibModules.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
         }
         else if (MinecraftForgeClient.getRenderPass == 1) {
-          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = false, renderGlass = true, if (te.hasCapability(ItszuLibCapabilities.COLORABLE, null)) te.getCapability(ItszuLibCapabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = false, renderGlass = true, if (te.hasModule(ItszuLibModules.COLORABLE, null)) te.getModule(ItszuLibModules.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
         }
       case _ => return
     }
 
-    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderItemConfiguration && te.hasModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null))
     }
 
-    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null))
     }
   }
 }
 
- */

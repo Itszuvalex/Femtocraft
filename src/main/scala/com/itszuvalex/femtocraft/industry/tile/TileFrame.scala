@@ -12,7 +12,7 @@ import com.itszuvalex.itszulib.api.multiblock.{MultiBlockInfo, MultiblockStateHo
 import com.itszuvalex.itszulib.api.storage.{DynamicIItemStorage, IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
-import com.itszuvalex.itszulib.core.modules.{ModuleIItemStorage, ModuleMultiblockInfo, TileEntityMultiblockTickableModule}
+import com.itszuvalex.itszulib.core.modules.{ModuleMultiblockInfo, TileEntityMultiblockTickableModule}
 import com.itszuvalex.itszulib.util.{InventoryUtils, StorageUtils, TileEntityUtils}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.item.ItemStack
@@ -120,6 +120,20 @@ object TileFrame {
     }
 
     def isCurrentlyBuilding: Boolean = isBuilding
+
+    def serializeDescriptionNBT(): NBTTagCompound = {
+      val nbt = new NBTTagCompound
+      nbt.setString(TileFrame.MULTIBLOCK_KEY, multiBlock)
+      nbt.setInteger(TileFrame.PROGRESS_KEY, renderProgress)
+      nbt.setBoolean(TileFrame.BUILDING_KEY, isBuilding)
+      nbt
+    }
+
+    def deserializeDescriptionNBT(tag: NBTTagCompound): Unit = {
+      multiBlock = tag.getString(TileFrame.MULTIBLOCK_KEY)
+      renderProgress = tag.getInteger(TileFrame.PROGRESS_KEY)
+      isBuilding = tag.getBoolean(TileFrame.BUILDING_KEY)
+    }
 
     override def serializeNBT(): NBTTagCompound = {
       val nbt = new NBTTagCompound
@@ -234,25 +248,29 @@ object TileFrame {
 
     override def hasWorldNBT: Boolean = true
 
-    override def writeDescriptionNBT(tag: NBTTagCompound): Unit = saveToNBT(tag)
+    override def writeDescriptionNBT(tag: NBTTagCompound): Unit = {
+      tag.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
+      if (info.isController) {
+        tag.setTag(TileFrame.STATE_KEY, state.get.get.serializeDescriptionNBT())
+      }
+    }
 
     override def readDescriptionNBT(tag: NBTTagCompound): Unit = {
-      loadFromNBT(tag)
+      renderInt = tag.getInteger(TileFrame.RENDER_SETTINGS_KEY)
+      if (info.isController) {
+        state.get.get.deserializeDescriptionNBT(tag.getCompoundTag(TileFrame.STATE_KEY))
+      }
       tile.setRenderUpdate()
     }
 
-    override def writeWorldNBT(tag: NBTTagCompound): Unit = saveToNBT(tag)
-
-    override def readWorldNBT(tagCompound: NBTTagCompound): Unit = loadFromNBT(tagCompound)
-
-    def saveToNBT(tag: NBTTagCompound): Unit = {
+    override def writeWorldNBT(tag: NBTTagCompound): Unit = {
       tag.setInteger(TileFrame.RENDER_SETTINGS_KEY, renderInt)
       if (info.isController) {
         tag.setTag(TileFrame.STATE_KEY, state.get.get.serializeNBT())
       }
     }
 
-    def loadFromNBT(tag: NBTTagCompound): Unit = {
+    override def readWorldNBT(tag: NBTTagCompound): Unit = {
       renderInt = tag.getInteger(TileFrame.RENDER_SETTINGS_KEY)
       if (info.isController) {
         state.get.get.deserializeNBT(tag.getCompoundTag(TileFrame.STATE_KEY))
@@ -263,17 +281,18 @@ object TileFrame {
 }
 
 class TileFrame() extends TileEntityCoreTickable {
-  var storage: IItemStorage   = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
-  var info   : MultiBlockInfo = new MultiBlockInfo
-  val state:
+  var storage: IItemStorage                          = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
+  var info   : MultiBlockInfo                        = new MultiBlockInfo
+  val state  :
     MultiblockStateHolder[TileFrameState, TileFrame] =
     new MultiblockStateHolder[TileFrameState, TileFrame](this, () => new TileFrameState(this), info _, _.state)
 
   val internal = new ModuleFrame(this, info, state)
 
-  addTileEntityModule(new ModuleIItemStorage(storage) {
+  // Don't think I want to expose this
+  /*addTileEntityModule(new ModuleIItemStorage(storage) {
     override def hasWorldNBT: Boolean = false
-  })
+  })*/
   addTileEntityModule(new ModuleMultiblockInfo(info))
   addTileEntityModule(new ModuleMultiblockGui(info, Femtocraft, () => if (state.get.exists(_.isBuilding)) GuiIDs.TileFrameConstructingGuiID else GuiIDs.TileFrameMultiblockGuiID))
   addTileEntityModuleTickable(internal)

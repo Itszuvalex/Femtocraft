@@ -1,4 +1,4 @@
-/*package com.itszuvalex.femtocraft.industry.multiblocks
+package com.itszuvalex.femtocraft.industry.multiblocks
 
 import com.itszuvalex.femtocraft.industry.IFrameMultiblock
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber.{xSize, ySize, zSize}
@@ -60,4 +60,4 @@ class MultiblockGerminationChamber extends IFrameMultiblock {
   override def getRenderItemStack: IItemStack = FemtoBlocks.blockGerminationChamber.newIStack()
 }
 
- */
+

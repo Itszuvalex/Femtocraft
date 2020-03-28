@@ -40,7 +40,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileCrystalStorageArrayID, te: TileCrystalStorageArray) => new GuiCrystalStorageArray(player, player.inventory, te)
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new GuiCrystalHeatExchanger(player, player.inventory, te)
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new GuiDemolisher(player, player.inventory, te)
-      //case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new GuiGerminationChamber(player, player.inventory, te)
+      case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new GuiGerminationChamber(player, player.inventory, te)
       case (GuiIDs.TilePowerNetworkID, te: TileEntityCore) => new GuiPowerNetwork(te)
       case (GuiIDs.TileConduitID, te: TileConduit) => new GuiConduit(player, player.inventory, te)
       case (GuiIDs.TileConduitSideID, te: TileConduit) => new GuiConduitSide(player, player.inventory, te, EnumFacing.getFront(data))
