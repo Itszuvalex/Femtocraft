@@ -23,10 +23,10 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
 
   fontRenderer = Minecraft.getMinecraft.fontRenderer
 
-  addGuiAndSync(tile.storage, 0, 48, 23)
-  addGuiAndSync(tile.storage, 1, 90, 23)
-  addGuiAndSync(tile.storage, 2, 90 + 18, 23)
-  addGuiAndSync(tile.storage, 3, 90 + 18 * 2, 23)
+  addGuiAndSync(tile.multiblockStorageModule.storage, 0, 48, 23)
+  addGuiAndSync(tile.multiblockStorageModule.storage, 1, 90, 23)
+  addGuiAndSync(tile.multiblockStorageModule.storage, 2, 90 + 18, 23)
+  addGuiAndSync(tile.multiblockStorageModule.storage, 3, 90 + 18 * 2, 23)
 
   addPlayerInventorySlots(inv)
 
@@ -45,7 +45,7 @@ class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private 
   add(progressBar)
   val powerMeter = new GuiPowerMeter(6, 22, tile.getModule(ManagerModules.POWER_STORAGE, null), color.toInt)
   add(nameLabel)
-  val tank = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.tank, 0, true)
+  val tank = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.multiblockFluidModule.storage, 0, true)
   add(powerMeter)
   add(tank)
 

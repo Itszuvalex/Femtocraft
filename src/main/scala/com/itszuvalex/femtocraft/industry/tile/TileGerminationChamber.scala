@@ -6,13 +6,14 @@ import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamb
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.power._
 import com.itszuvalex.femtocraft.power.render.TileBeamRenderOffset
-import com.itszuvalex.femtocraft.temp.ModuleMultiblockGui
+import com.itszuvalex.femtocraft.temp._
 import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
 import com.itszuvalex.itszulib.api.multiblock.{MultiBlockInfo, MultiblockSidedFluidStorageConfiguration, MultiblockSidedItemStorageConfiguration, MultiblockStateHolder}
 import com.itszuvalex.itszulib.api.storage._
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IFluidStack, IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.core.modules._
 import com.itszuvalex.itszulib.render.Vector3
@@ -289,7 +290,7 @@ object TileGerminationChamber {
 }
 
 class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderOffset {
-  val info   : MultiBlockInfo                                              = new MultiBlockInfo {
+  val info                   : MultiBlockInfo                                                         = new MultiBlockInfo {
 
     override def breakMultiBlock(loc: Loc4): Boolean = {
       val ret = super.breakMultiBlock(loc)
@@ -307,68 +308,39 @@ class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderO
       ret
     }
   }
-  // TODO
-  val tank   : IFluidStorageModifiable                                     = new DynamicIFluidStorageModifiable(() => state.get.map(_.tank).getOrElse(
-    new IFluidStorageModifiable {
-      override def deserializeNBT(nbt: NBTTagCompound): Unit = {}
-
-      override def serializeNBT(): NBTTagCompound = new NBTTagCompound
-
-      override def fill(resource: IFluidStack, doFill: Boolean): Int = 0
-
-      override def drain(resource: IFluidStack, doDrain: Boolean): IFluidStack = IFluidStack.Empty
-
-      override def drainIStack(maxDrain: Int, doDrain: Boolean): IFluidStack = IFluidStack.Empty
-
-      override def canFillFluidType(index: Int, resource: IFluidStack): Boolean = false
-
-      override def canDrainFluidType(index: Int, resource: IFluidStack): Boolean = false
-
-      override def length: Int = 0
-
-      override def apply(idx: Int): IFluidStack = IFluidStack.Empty
-
-      override def update(i: Int, s: IFluidStack): Unit = {}
-    }
-    ))
-  val storage: IItemStorage                                                = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
-  val battery: IBattery                                                    = new DynamicIBattery(() => state.get.map(_.battery).getOrElse(IBattery.Empty))
-  val state  :
-    MultiblockStateHolder[GerminationChamberState, TileGerminationChamber] =
+  val state                  : MultiblockStateHolder[GerminationChamberState, TileGerminationChamber] =
     new MultiblockStateHolder[GerminationChamberState, TileGerminationChamber](this, () => new GerminationChamberState(this), info _, _.state)
-  @Wrapper(storage) private val inputStorage : IItemStorage = new DynamicIItemStorage(() => state.get.map(_.inputStorage).getOrElse(IItemStorage.Empty))
-  @Wrapper(storage) private val outputStorage: IItemStorage = new DynamicIItemStorage(() => state.get.map(_.outputStorage).getOrElse(IItemStorage.Empty))
-  private                   val sidedStorageConfig          = new MultiblockSidedItemStorageConfiguration(
+  val multiblockStorageModule: ModuleMultiblockIItemStorage                                           = new ModuleMultiblockIItemStorage(() => state.get.map(_.storage))
+  private val inputStorage : IItemStorage = new DynamicIItemStorage(() => state.get.map(_.inputStorage).getOrElse(IItemStorage.Empty))
+  private val outputStorage: IItemStorage = new DynamicIItemStorage(() => state.get.map(_.outputStorage).getOrElse(IItemStorage.Empty))
+  private val sidedStorageConfig          = new MultiblockSidedItemStorageConfiguration(
     getLoc _, info _, NONE_INV_KEY, _ => INPUT_INV_KEY,
     Map(NONE_INV_KEY -> IItemStorage.Empty,
         INPUT_INV_KEY -> inputStorage,
         OUTPUT_INV_KEY -> outputStorage),
     () => EnumFacing.NORTH)
-  private                   val sidedFluidConfig            = new MultiblockSidedFluidStorageConfiguration(
+  val multiblockFluidModule: ModuleMultiblockIFluidStorage = new ModuleMultiblockIFluidStorage(() => state.get.map(_.tank))
+  private val sidedFluidConfig = new MultiblockSidedFluidStorageConfiguration(
     getLoc _, info _, NONE_TANK_KEY, _ => TANK_KEY,
     Map(NONE_TANK_KEY -> IFluidStorage.Empty,
-        TANK_KEY -> tank),
+        TANK_KEY -> multiblockFluidModule.storage),
     () => EnumFacing.NORTH
     )
+  val multiblockBatteryModule: ModuleMultiblockIBattery = new ModuleMultiblockIBattery(() => state.get.map(_.battery))
 
   val internal = new ModuleGerminationChamber(info, state)
 
   addTileEntityModule(new ModuleMultiblockInfo(info))
-  addTileEntityModule(new ModuleIItemStorage(storage) {
-    override def hasWorldNBT: Boolean = false
-  })
+  addTileEntityModule(multiblockStorageModule)
   addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
   addTileEntityModule(new ModuleIItemHandlerConverter)
-  addTileEntityModule(new ModuleIFluidStorage(tank) {
-    override def hasWorldNBT: Boolean = false
-  })
+  addTileEntityModule(multiblockFluidModule)
   addTileEntityModule(new ModuleIFluidSidedConfiguration(sidedFluidConfig))
   addTileEntityModule(new ModuleIFluidHandlerConverter)
-  addTileEntityModule(new ModulePowerStorage(battery) {
-    override def hasWorldNBT: Boolean = false
-  })
+  addTileEntityModule(multiblockBatteryModule)
   addTileEntityModule(new ModuleMultiblockGui(info, Femtocraft, () => GuiIDs.TileGerminationChamberID))
-  addTileEntityModule(new ModuleColorable)
+  addTileEntityModule(new ModuleMultiblockColor(() => state.get.map(_.powerLeafNodeModule).
+                                                           flatMap(_.parentLoc).flatMap(_.getITileEntity()).flatMap(_.moduleOption(ItszuLibModules.COLORABLE, null))))
   addTileEntityModule(new ModuleMultiblockPowerLeafNode(info, () => state.get.get.powerLeafNodeModule))
   addTileEntityModule(new ModuleMultiblockPowerStorageNode(info, () => state.get.get.powerStorageNodeModule))
   addTileEntityModuleTickable(internal)
@@ -376,8 +348,6 @@ class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderO
   addTileEntityModuleTickable(new ModuleIFluidAutoIO(sidedFluidConfig))
 
   override def shouldRenderInPass(pass: Int): Boolean = pass == 0 || pass == 1
-
-  // def getColor: Color = state.get.map(_.powerLeafNodeDelegate).flatMap(_.parentLoc).flatMap(_.getITileEntity()).withFilter(_.hasModule(ItszuLibModules.COLORABLE, null)).map(_.getModule(ItszuLibModules.COLORABLE, null)).getOrElse(Color(0, 0, 0, 0))
 
   override def getRenderBoundingBox: AxisAlignedBB = {
     if (info.isController) {

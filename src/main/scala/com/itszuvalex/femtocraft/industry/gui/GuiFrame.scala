@@ -18,7 +18,7 @@ class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: Til
   fontRenderer = Minecraft.getMinecraft.fontRenderer
 
   (0 until 9).foreach { i =>
-    addGuiAndSync(tile.storage, i, 7 + 18 * i, 61)
+    addGuiAndSync(tile.multiblockStorageModule.storage, i, 7 + 18 * i, 61)
   }
   addPlayerInventorySlots(inv)
 

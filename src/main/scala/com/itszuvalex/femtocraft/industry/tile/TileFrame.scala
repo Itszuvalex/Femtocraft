@@ -5,11 +5,11 @@ import java.util.Random
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame.{ModuleFrame, TileFrameState}
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
-import com.itszuvalex.femtocraft.temp.ModuleMultiblockGui
+import com.itszuvalex.femtocraft.temp.{ModuleMultiblockGui, ModuleMultiblockIItemStorage}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
 import com.itszuvalex.itszulib.api.multiblock.{MultiBlockInfo, MultiblockStateHolder}
-import com.itszuvalex.itszulib.api.storage.{DynamicIItemStorage, IItemStorage, ItemStorageArray}
+import com.itszuvalex.itszulib.api.storage.ItemStorageArray
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.core.modules.{ModuleMultiblockInfo, TileEntityMultiblockTickableModule}
@@ -281,18 +281,19 @@ object TileFrame {
 }
 
 class TileFrame() extends TileEntityCoreTickable {
-  var storage: IItemStorage                          = new DynamicIItemStorage(() => state.get.map(_.storage).getOrElse(IItemStorage.Empty))
-  var info   : MultiBlockInfo                        = new MultiBlockInfo
-  val state  :
+  var info : MultiBlockInfo                          = new MultiBlockInfo
+  val state:
     MultiblockStateHolder[TileFrameState, TileFrame] =
     new MultiblockStateHolder[TileFrameState, TileFrame](this, () => new TileFrameState(this), info _, _.state)
 
-  val internal = new ModuleFrame(this, info, state)
+  val multiblockStorageModule = new ModuleMultiblockIItemStorage(() => state.get.map(_.storage))
+  val internal                = new ModuleFrame(this, info, state)
 
   // Don't think I want to expose this
   /*addTileEntityModule(new ModuleIItemStorage(storage) {
     override def hasWorldNBT: Boolean = false
   })*/
+  addTileEntityModule(multiblockStorageModule)
   addTileEntityModule(new ModuleMultiblockInfo(info))
   addTileEntityModule(new ModuleMultiblockGui(info, Femtocraft, () => if (state.get.exists(_.isBuilding)) GuiIDs.TileFrameConstructingGuiID else GuiIDs.TileFrameMultiblockGuiID))
   addTileEntityModuleTickable(internal)

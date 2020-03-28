@@ -15,7 +15,7 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   if (doAddSync) {
     (0 until 9).foreach { i =>
-      addSync(new SyncItemStorageItemStack(GuiID, tile.storage, i))
+      addSync(new SyncItemStorageItemStack(GuiID, tile.multiblockStorageModule.storage, i))
     }
 
     addPlayerInventorySlots(inv)
