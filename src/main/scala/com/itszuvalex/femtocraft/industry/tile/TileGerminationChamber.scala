@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry._
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber._
 import com.itszuvalex.femtocraft.power._
 import com.itszuvalex.femtocraft.power.render.TileBeamRenderOffset
-import com.itszuvalex.femtocraft.temp._
 import com.itszuvalex.femtocraft.util.Wrapper
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibModules
@@ -326,7 +326,9 @@ class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderO
         TANK_KEY -> multiblockFluidModule.storage),
     () => EnumFacing.NORTH
     )
-  val multiblockBatteryModule: ModuleMultiblockIBattery = new ModuleMultiblockIBattery(() => state.get.map(_.battery))
+  val multiblockBatteryModule: ModuleMultiblockIBattery = new ModuleMultiblockIBattery(() => state.get.map(_.battery)) {
+    override def module: IModule[IBattery] = ManagerModules.POWER_STORAGE
+  }
 
   val internal = new ModuleGerminationChamber(info, state)
 

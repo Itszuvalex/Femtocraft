@@ -1,11 +1,10 @@
 package com.itszuvalex.femtocraft.client
 
-import com.itszuvalex.femtocraft.temp.TempInternal
 import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.core.TileEntityCore
-import com.itszuvalex.itszulib.core.modules.InternalModules
+import com.itszuvalex.itszulib.core.modules.{InternalModules, TempInternal}
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.gui.Gui

@@ -5,14 +5,13 @@ import java.util.Random
 import com.itszuvalex.femtocraft.industry.item.ItemFrame
 import com.itszuvalex.femtocraft.industry.tile.TileFrame.{ModuleFrame, TileFrameState}
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry}
-import com.itszuvalex.femtocraft.temp.{ModuleMultiblockGui, ModuleMultiblockIItemStorage}
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4, Module}
 import com.itszuvalex.itszulib.api.multiblock.{MultiBlockInfo, MultiblockStateHolder}
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityCoreTickable
-import com.itszuvalex.itszulib.core.modules.{ModuleMultiblockInfo, TileEntityMultiblockTickableModule}
+import com.itszuvalex.itszulib.core.modules.{ModuleMultiblockGui, ModuleMultiblockIItemStorage, ModuleMultiblockInfo, TileEntityMultiblockTickableModule}
 import com.itszuvalex.itszulib.util.{InventoryUtils, StorageUtils, TileEntityUtils}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.item.ItemStack
