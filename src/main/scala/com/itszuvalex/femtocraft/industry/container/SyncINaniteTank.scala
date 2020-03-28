@@ -1,14 +1,14 @@
 package com.itszuvalex.femtocraft.industry.container
 
-import com.itszuvalex.femtocraft.api.nanite.NaniteTank
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteTank}
 import com.itszuvalex.itszulib.container.sync.SyncBase
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 
 /**
   * Created by Chris on 1/31/2017.
   */
-object SyncNaniteTank {
-  def tankEquals(a: NaniteTank, b: NaniteTank): Boolean = {
+object SyncINaniteTank {
+  def tankEquals(a: INaniteTank, b: INaniteTank): Boolean = {
     if (a == null && b == null) return true
     if ((a == null) != (b == null)) return false
     if (a.volume != b.volume) return false
@@ -22,9 +22,9 @@ object SyncNaniteTank {
   }
 }
 
-class SyncNaniteTank
-(gui: Int, valFunc: () => NaniteTank, setValFunc: (NaniteTank) => Unit)
-  extends SyncBase[NaniteTank](gui, valFunc, setValFunc, SyncNaniteTank.tankEquals) {
+class SyncINaniteTank
+(gui: Int, valFunc: () => INaniteTank, setValFunc: (INaniteTank) => Unit)
+  extends SyncBase[INaniteTank](gui, valFunc, setValFunc, SyncINaniteTank.tankEquals) {
   override def writeNBT(): NBTBase = {
     value.serializeNBT()
   }

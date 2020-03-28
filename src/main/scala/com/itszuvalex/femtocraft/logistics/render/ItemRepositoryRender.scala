@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.logistics.render
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.logistics.tile.TileItemRepository
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.TileEntityRenderCube
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
@@ -33,10 +33,10 @@ class ItemRepositoryRender extends TileEntityRenderCube[TileItemRepository](Femt
   }
 
   override def renderTileEntityInWorld(te: TileItemRepository, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
-    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
+    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null))
     }
   }
 }

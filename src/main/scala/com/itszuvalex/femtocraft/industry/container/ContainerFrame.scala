@@ -15,7 +15,7 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   if (doAddSync) {
     (0 until 9).foreach { i =>
-      addSync(new SyncItemStorageItemStack(GuiID, tile.storage, i))
+      addSync(new SyncItemStorageItemStack(GuiID, tile.multiblockStorageModule.storage, i))
     }
 
     addPlayerInventorySlots(inv)
@@ -23,9 +23,13 @@ class ContainerFrame(player: EntityPlayer, inv: InventoryPlayer, tile: TileFrame
 
   override def detectAndSendChanges(): Unit = {
     super.detectAndSendChanges()
-    if (tile.isBuilding) {
-      player.closeScreen()
-      player.openGui(Femtocraft, GuiIDs.TileFrameConstructingGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
+    tile.state.get match {
+      case None =>
+      case Some(s) =>
+        if (s.isBuilding) {
+          player.closeScreen()
+          player.openGui(Femtocraft, GuiIDs.TileFrameConstructingGuiID, tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
+        }
     }
   }
 

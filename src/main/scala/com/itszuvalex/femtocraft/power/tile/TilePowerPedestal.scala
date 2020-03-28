@@ -1,11 +1,11 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.ICrystalMount
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
+import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 
@@ -17,11 +17,9 @@ object TilePowerPedestal {
   val MOUNT_KEY         = "Mount"
 }
 
-class TilePowerPedestal extends TileEntityBase {
+class TilePowerPedestal extends TileEntityCore {
   var mountLocation: Loc4 = null
   var stored       : Long = 0
-
-  override def getMod: AnyRef = Femtocraft
 
   override def hasDescription: Boolean = true
 
@@ -33,10 +31,10 @@ class TilePowerPedestal extends TileEntityBase {
 
   def savePowerInfo(par1nbtTagCompound: NBTTagCompound): Unit = {
     par1nbtTagCompound(TilePowerPedestal.PEDESTAL_COMPOUND ->
-      NBTCompound(
-        TilePowerPedestal.MOUNT_KEY -> mountLocation
-      )
-    )
+                       NBTCompound(
+                         TilePowerPedestal.MOUNT_KEY -> mountLocation
+                         )
+                       )
   }
 
   override def readFromNBT(par1nbtTagCompound: NBTTagCompound): Unit = {
@@ -62,9 +60,9 @@ class TilePowerPedestal extends TileEntityBase {
     setRenderUpdate()
   }
 
-  override def onBlockBreak() = {
+  override def onBlockBreak(state: IBlockState): Unit = {
     if (mountLoc != null)
-      mountLoc.getTileEntity(true) match {
+      mountLoc.getITileEntity(true) match {
         case Some(m: ICrystalMount) =>
           m.removePedestal(getLoc)
         case _ =>
@@ -84,7 +82,7 @@ class TilePowerPedestal extends TileEntityBase {
   }
 
   def checkAndAddMount(dir: EnumFacing): Boolean = {
-    getLoc.getOffset(dir).getTileEntity(true) match {
+    getLoc.getOffset(dir).getITileEntity(true) match {
       case Some(i: ICrystalMount) =>
         if (i.canAcceptPedestal(getLoc) && canSetMount(getLoc.getOffset(dir))) {
           i.addPedestal(getLoc)
@@ -99,7 +97,6 @@ class TilePowerPedestal extends TileEntityBase {
   /**
     *
     * @param loc Location to accept mount connection at.
-    *
     * @return True if mount can be added to this location.
     */
   def canSetMount(loc: Loc4): Boolean = getLoc.getOffset(EnumFacing.UP) == loc || getLoc.getOffset(EnumFacing.DOWN) == loc

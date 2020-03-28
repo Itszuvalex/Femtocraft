@@ -4,7 +4,9 @@ import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.{Femtocraft, Resources}
-import com.itszuvalex.itszulib.core.traits.tile.BlockFacing
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityRenderCube}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.tileentity.TileEntity
@@ -14,7 +16,7 @@ import org.lwjgl.opengl.GL11
 /**
   * Created by Chris on 8/14/2016.
   */
-abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLocation) extends TileEntityRenderCube[T](Femtocraft.ID.toLowerCase(), Resources.TexBlock("blockmachineblock_side_base.png")) {
+abstract class FemtoMachineRender[T <: TileEntity with ITileEntity](val machineFront: ResourceLocation) extends TileEntityRenderCube[T](Femtocraft.ID.toLowerCase(), Resources.TexBlock("blockmachineblock_side_base.png")) {
   val colorTex      = Resources.TexBlock("blockmachineblock_side_color.png")
   val frontTex      = Resources.TexBlock("blockmachineblock_front_base.png")
   val frontColorTex = Resources.TexBlock("blockmachineblock_front_color.png")
@@ -26,21 +28,21 @@ abstract class FemtoMachineRender[T <: TileEntity](val machineFront: ResourceLoc
 
   override def renderTileEntityInWorld(te: T, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     lastTe = te
-    facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockFacing.FACING)).getOrElse(EnumFacing.NORTH)
+    facing = Option(te).map(_.getIWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
     GL11.glColor4f(1f, 1f, 1f, alpha)
     pass = 0
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     pass = 1
     color = getColor(te)
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null))
     }
     if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null))
+      FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null))
     }
-    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(ItszuLibCapabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(ItszuLibCapabilities.FLUID_STORAGE_CONFIGURABLE, null))
     }
   }
 

@@ -13,9 +13,7 @@ import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
-import com.itszuvalex.itszulib.api.wrappers.IBattery;
-import com.itszuvalex.itszulib.core.SidedFluidStorageConfiguration;
-import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration;
+import com.itszuvalex.itszulib.api.storage.IBattery;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
@@ -59,14 +57,8 @@ public class Capabilities {
     @CapabilityInject(IConnectionProvider.class)
     public static Capability<IConnectionProvider> ITEM_CONNECTION_PROVIDER = null;
 
-    @CapabilityInject(SidedItemStorageConfiguration.class)
-    public static Capability<SidedItemStorageConfiguration> ITEM_STORAGE_CONFIGURABLE = null;
-
     @CapabilityInject(SidedNaniteStorageConfiguration.class)
     public static Capability<SidedNaniteStorageConfiguration> NANITE_STORAGE_CONFIGURABLE = null;
-
-    @CapabilityInject(SidedFluidStorageConfiguration.class)
-    public static Capability<SidedFluidStorageConfiguration> FLUID_STORAGE_CONFIGURABLE = null;
 
     @CapabilityInject(IChunkRiftCapability.class)
     public static Capability<IChunkRiftCapability> CHUNK_RIFT = null;

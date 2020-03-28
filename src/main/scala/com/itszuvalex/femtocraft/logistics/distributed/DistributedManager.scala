@@ -28,8 +28,8 @@ object DistributedManager {
     var orderingFunc = taskOrderingFunction
     if (orderingFunc == null) {
       orderingFunc = { (a, b) =>
-        val aP = a.getPriority
-        val bP = b.getPriority
+        val aP    = a.getPriority
+        val bP    = b.getPriority
         val aFill = a.getWorkers.size / a.getWorkerCap
         val bFill = b.getWorkers.size / b.getWorkerCap
         if (aP > bP) true
@@ -42,14 +42,14 @@ object DistributedManager {
       }
     }
 
-    val availableTasks = availableTasksTracker.getLocationsInRange(provider.getProviderLocation, provider.getTaskConnectionRadius)
-      .flatMap(_.getTileEntity(false))
-      .collect { case tp: ITaskProvider => tp }
-      .filter(tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < (tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius))
-      .flatMap(_.getActiveTasks)
-      .filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
+    val availableTasks   = availableTasksTracker.getLocationsInRange(provider.getProviderLocation, provider.getTaskConnectionRadius)
+                                                .flatMap(_.getITileEntity(false))
+                                                .collect { case tp: ITaskProvider => tp }
+                                                .filter(tp => tp.getProviderLocation.distSqr(provider.getProviderLocation) < (tp.getWorkerConnectionRadius * tp.getWorkerConnectionRadius))
+                                                .flatMap(_.getActiveTasks)
+                                                .filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
     val availableWorkers = provider.getProvidedWorkers.filter(_.getTask == null)
-    val taskProviders = new mutable.HashSet[ITaskProvider]()
+    val taskProviders    = new mutable.HashSet[ITaskProvider]()
 
     availableWorkers.foreach { worker =>
       availableTasks.collectFirst { case task: ITask if worker.canWorkTask(task) && task.getWorkers.size < task.getWorkerCap => task } match {
@@ -89,8 +89,8 @@ object DistributedManager {
     var orderingFunc = taskOrderingFunction
     if (orderingFunc == null) {
       orderingFunc = { (a, b) =>
-        val aP = a.getPriority
-        val bP = b.getPriority
+        val aP    = a.getPriority
+        val bP    = b.getPriority
         val aFill = a.getWorkers.size / a.getWorkerCap
         val bFill = b.getWorkers.size / b.getWorkerCap
         if (aP > bP) true
@@ -104,13 +104,13 @@ object DistributedManager {
     }
 
     val availableWorkers = availableWorkersTracker.getLocationsInRange(provider.getProviderLocation, provider.getWorkerConnectionRadius)
-      .flatMap(_.getTileEntity(false))
-      .collect { case wp: IWorkerProvider => wp }
-      .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
-      .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
-      .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
-    val availableTasks = provider.getActiveTasks.filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
-    val workerProviders = new mutable.HashSet[IWorkerProvider]()
+                                                  .flatMap(_.getITileEntity(false))
+                                                  .collect { case wp: IWorkerProvider => wp }
+                                                  .filter { wp => wp.getProviderLocation.distSqr(provider.getProviderLocation) < wp.getTaskConnectionRadius * wp.getTaskConnectionRadius }
+                                                  .toList.sortWith(_.getProviderLocation.distSqr(provider.getProviderLocation) < _.getProviderLocation.distSqr(provider.getProviderLocation))
+                                                  .flatMap(_.getProvidedWorkers.filter(_.getTask == null))
+    val availableTasks   = provider.getActiveTasks.filter(task => task.getWorkers.size < task.getWorkerCap).toList.sortWith(orderingFunc)
+    val workerProviders  = new mutable.HashSet[IWorkerProvider]()
 
     availableWorkers.foreach { worker =>
       availableTasks.collectFirst { case task: ITask if worker.canWorkTask(task) && task.getWorkers.size < task.getWorkerCap => task } match {
@@ -131,7 +131,7 @@ object DistributedManager {
     * @param task Task that is ending.  This task must not be listed under its task provider's ActiveTasks listing.
     */
   def onTaskEnd(task: ITask): Unit = {
-    val taskProvider = task.getProvider
+    val taskProvider    = task.getProvider
     val workerProviders = new mutable.HashSet[IWorkerProvider]()
     task.getWorkers.foreach { worker =>
       task.removeWorker(worker)

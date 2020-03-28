@@ -21,7 +21,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.maiflai.scalatest" version "0.11"
+    id "com.github.maiflai.scalatest" version "0.19"
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 allprojects{
@@ -73,16 +73,12 @@ if (System.getenv().CI_BUILD_REF_NAME != null && !System.getenv().CI_BUILD_REF_N
 }
 
 compileJava {
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
 compileScala {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
-}
-
-tasks.withType(ScalaCompile) {
-    scalaCompileOptions.useAnt = false
 }
 
 group = "com.itszuvalex.femtocraft" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -105,7 +101,7 @@ minecraft {
 }
 
 dependencies {
-    def name = "${project.mcVersion}-0.1.0-90294528-dev"
+    def name = "${project.mcVersion}-0.1.0-489497859"
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'deobf')
     compile(group: 'com.itszuvalex.itszulib', name: 'ItszuLib', version: name, classifier: 'src')
 

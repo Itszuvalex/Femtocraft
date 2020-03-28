@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.industry.render
 
 import com.itszuvalex.femtocraft.industry.item.ItemShiftTest
-import com.itszuvalex.itszulib.api.IPreviewableRenderer
+import com.itszuvalex.itszulib.api.client.IPreviewableRenderer
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.render.{RenderUtils, Vector3}
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
@@ -16,8 +16,8 @@ import org.lwjgl.opengl.GL11
   */
 @SideOnly(Side.CLIENT)
 class MultiToolPreviewableRenderer extends IPreviewableRenderer {
-  override def render(stack: ItemStack, player: EntityPlayer): Unit = {
-    stack.getItem match {
+  override def render(stack: IItemStack, player: EntityPlayer): Unit = {
+    stack.toMinecraft.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
         shift.getDestination(player.world, player, Vector3(vec.x, vec.y, vec.z), 8d) match {
@@ -48,8 +48,8 @@ class MultiToolPreviewableRenderer extends IPreviewableRenderer {
     }
   }
 
-  override def renderAtLocation(stack: ItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
-    stack.getItem match {
+  override def renderAtLocation(stack: IItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+    stack.toMinecraft.getItem match {
       case shift: ItemShiftTest =>
         val vec = player.getLookVec
         shift.getDestination(player.world, player, Vector3(vec.x, vec.y, vec.z), 8d) match {

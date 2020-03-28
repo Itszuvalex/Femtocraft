@@ -70,12 +70,12 @@ class ProxyClient extends ProxyCommon {
   override def spawnParticle(world: World, name: String, x: Double, y: Double, z: Double, color: Int, velX: Double, velY: Double, velZ: Double): Object = {
     val worldToUse = Minecraft.getMinecraft.world
 
-    val mc = Minecraft.getMinecraft
-    val deltaX = mc.getRenderViewEntity.posX - x
-    val deltaY = mc.getRenderViewEntity.posY - y
-    val deltaZ = mc.getRenderViewEntity.posZ - z
+    val mc             = Minecraft.getMinecraft
+    val deltaX         = mc.getRenderViewEntity.posX - x
+    val deltaY         = mc.getRenderViewEntity.posY - y
+    val deltaZ         = mc.getRenderViewEntity.posZ - z
     val renderDistance = 16D
-    var fx: Particle = null
+    var fx: Particle   = null
     if ((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) > (renderDistance * renderDistance)) {
       return null
     }
@@ -84,16 +84,16 @@ class ProxyClient extends ProxyCommon {
     name match {
       case ProxyCommon.PARTICLE_POWER =>
         fx = new EntityFxPower(worldToUse, x, y, z,
-          (col.red.toInt & 255).toFloat / 255f,
-          (col.green.toInt & 255).toFloat / 255f,
-          (col.blue.toInt & 255).toFloat / 255f
-        )
+                               (col.red.toInt & 255).toFloat / 255f,
+                               (col.green.toInt & 255).toFloat / 255f,
+                               (col.blue.toInt & 255).toFloat / 255f
+                               )
       case ProxyCommon.PARTICLE_NANITE =>
         fx = new EntityFxNanites(worldToUse, x, y, z,
-          (col.red.toInt & 255).toFloat / 255f,
-          (col.green.toInt & 255).toFloat / 255f,
-          (col.blue.toInt & 255).toFloat / 255f,
-          velX, velY, velZ)
+                                 (col.red.toInt & 255).toFloat / 255f,
+                                 (col.green.toInt & 255).toFloat / 255f,
+                                 (col.blue.toInt & 255).toFloat / 255f,
+                                 velX, velY, velZ)
       case _ =>
         return null
     }
@@ -112,16 +112,16 @@ class ProxyClient extends ProxyCommon {
   def registerModels(): Unit = {
     val powerCrystal = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemPowerCrystal,
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, powerCrystal), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_small"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_medium"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_large"), "inventory"))
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, powerCrystal), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_small"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_medium"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${powerCrystal}_large"), "inventory"))
     val configurator = FemtoItems.itemConfigurator.getUnlocalizedName.substring(5).toLowerCase
     ModelBakery.registerItemVariants(FemtoItems.itemConfigurator,
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, configurator), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_item"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_fluid"), "inventory"),
-      new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_nanite"), "inventory"))
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, configurator), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_item"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_fluid"), "inventory"),
+                                     new ModelResourceLocation(new ResourceLocation(Femtocraft.ID.toLowerCase, s"${configurator}_nanite"), "inventory"))
   }
 
   override def init(): Unit = {
@@ -138,7 +138,7 @@ class ProxyClient extends ProxyCommon {
     val powerCrystal = FemtoItems.itemPowerCrystal.getUnlocalizedName.substring(5).toLowerCase
     Minecraft.getMinecraft.getRenderItem.getItemModelMesher.register(FemtoItems.itemPowerCrystal, new ItemMeshDefinition {
       override def getModelLocation(stack: ItemStack): ModelResourceLocation = {
-        val ctype = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
+        val ctype  = stack.getCapability(Capabilities.ITEM_POWER_CRYSTAL, null).getType()
         val suffix = if (ctype != null && !ctype.isEmpty) {
           "_" + ctype
         } else ""
@@ -187,7 +187,7 @@ class ProxyClient extends ProxyCommon {
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
-    RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
+    // RenderIDs.multiblockPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiblockPreviewableRenderer)
     RenderIDs.itemShiftPreviewableID = PreviewableRendererRegistry.bindRenderer(new MultiToolPreviewableRenderer)
 
     //    val furnaceRenderer = new FurnaceRenderer

@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.nanite.block
 
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
-import com.itszuvalex.itszulib.core.TileContainer
+import net.minecraft.block.BlockContainer
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.tileentity.TileEntity
@@ -11,7 +11,7 @@ import net.minecraft.world.{IBlockAccess, World}
 /**
   * Created by Christopher on 8/29/2015.
   */
-class BlockNaniteHiveSmall extends TileContainer(Material.IRON) {
+class BlockNaniteHiveSmall extends BlockContainer(Material.IRON) {
 
   override def isNormalCube(state: IBlockState, world: IBlockAccess, pos: BlockPos): Boolean = false
 

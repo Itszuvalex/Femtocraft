@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.item
 
 import com.itszuvalex.femtocraft.power.item.PowerCrystalItemWrapper._
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, WrapperNBTBattery}
+import com.itszuvalex.itszulib.api.storage.{IBattery, PowerBatteryNBT}
 import com.itszuvalex.itszulib.implicits.ItemStackImplicits._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
@@ -30,7 +30,7 @@ object PowerCrystalItemWrapper {
 class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
   if (stack.getTagCompound == null)
     stack.setTagCompound(new NBTTagCompound)
-  val batWrapper = new WrapperNBTBattery(stack.getTagCompound)
+  val batWrapper = new PowerBatteryNBT(stack.getTagCompound)
 
   override def onTick(): Unit = {
     if (stack == null) return
@@ -52,9 +52,9 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
 
   override def setPassiveGen(passiveGen: Float): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        PASSIVE_GEN_KEY -> passiveGen)
-    )
+                         NBTCompound(
+                           PASSIVE_GEN_KEY -> passiveGen)
+                         )
   }
 
   override def getStoragePartial(): Double = {
@@ -65,10 +65,10 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
 
   override def setStoragePartial(amount: Double): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        STORAGE_PARTIAL_KEY -> amount
-      )
-    )
+                         NBTCompound(
+                           STORAGE_PARTIAL_KEY -> amount
+                           )
+                         )
 
   }
 
@@ -89,10 +89,10 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
 
   override def setTransferRate(rate: Double): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        TRANSFER_KEY -> rate
-      )
-    )
+                         NBTCompound(
+                           TRANSFER_KEY -> rate
+                           )
+                         )
   }
 
   override def getType(): String = {
@@ -103,10 +103,10 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
 
   override def setType(ctype: String): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        TYPE_KEY -> ctype
-      )
-    )
+                         NBTCompound(
+                           TYPE_KEY -> ctype
+                           )
+                         )
   }
 
   override def getColor(): Int = {
@@ -118,10 +118,10 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
 
   override def setColor(color: Int): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        COLOR_KEY -> color
-      )
-    )
+                         NBTCompound(
+                           COLOR_KEY -> color
+                           )
+                         )
   }
 
   override def getName(): String = {
@@ -132,10 +132,10 @@ class PowerCrystalItemWrapper(val stack: ItemStack) extends IPowerCrystal {
 
   override def setName(name: String): Unit = {
     stack.forceTag.merge(NBT_COMPOUND_KEY ->
-      NBTCompound(
-        NAME_KEY -> name
-      )
-    )
+                         NBTCompound(
+                           NAME_KEY -> name
+                           )
+                         )
   }
 
   def updateDamage(): Unit = {

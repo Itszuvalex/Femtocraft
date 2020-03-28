@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.item
 
-import com.itszuvalex.itszulib.api.wrappers.IBattery
+import com.itszuvalex.itszulib.api.storage.IBattery
 
 /**
   * Created by Christopher on 7/29/2015.

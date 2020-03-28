@@ -1,6 +1,5 @@
 package com.itszuvalex.femtocraft.industry.render
 
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.FemtoRenderSwitches
 import com.itszuvalex.femtocraft.industry.IFrameMultiblockRenderer
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
@@ -8,13 +7,13 @@ import com.itszuvalex.femtocraft.industry.tile.{TileFrame, TileGerminationChambe
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer.ObjRender
 import com.itszuvalex.femtocraft.render.{FemtoRenderUtils, OBJDynamicRenderer}
 import com.itszuvalex.femtocraft.{FemtoBlocks, Resources}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityCombinedRenderer}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.MinecraftForgeClient
 import net.minecraftforge.client.model.obj.OBJModel
@@ -42,7 +41,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
     * @param ry    Y Render location
     * @param rz    Z Render location
     */
-  override def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+  override def previewRenderAtWorldLocation(stack: IItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
     renderAtLocation(rx, ry, rz)
   }
 
@@ -68,7 +67,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
   override def boundingBox: (Int, Int, Int) = (2, 3, 2)
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
-    renderAsItem(new ItemStack(FemtoBlocks.blockGerminationChamber), x, y, z)
+    renderAsItem(Converter.IItemStackFromItemStack(new ItemStack(FemtoBlocks.blockGerminationChamber)), x, y, z)
   }
 
   /**
@@ -79,7 +78,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
     * @param ry
     * @param rz
     */
-  override def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit = {
+  override def renderAsItem(stack: IItemStack, rx: Double, ry: Double, rz: Double): Unit = {
     RenderUtils.glMatrixBlock {
       GL11.glTranslated(rx, ry, rz)
       val max = Array(MultiblockGerminationChamber.xSize, MultiblockGerminationChamber.ySize, MultiblockGerminationChamber.zSize).max
@@ -125,7 +124,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
         GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
         chamberModel.renderGroups(Set("Base", "Middle", "Top"))
         GL11.glPopAttrib()
-        FemtoRenderUtils.enableLightMap(lastTe)
+        FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe))
 
         //          val recipe = te.currentRecipe
         //          if (recipe != null) {
@@ -168,7 +167,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
           GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
           renderSprinklers(x, y, z, worldTime, partialTicks)
           GL11.glPopAttrib()
-          FemtoRenderUtils.enableLightMap(lastTe)
+          FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe))
         }
 
         //        RenderUtils.glMatrixBlock {
@@ -186,7 +185,7 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
         FemtoRenderUtils.disableLightMaps()
         GL11.glColor4ub(color.red, color.green, color.blue, 30.toByte)
         chamberModel.renderGroups(Set("Glass"))
-        FemtoRenderUtils.enableLightMap(lastTe)
+        FemtoRenderUtils.enableLightMap(Converter.ITileEntityFromTileEntity(lastTe))
         GL11.glColor3f(1, 1, 1)
         Minecraft.getMinecraft.getTextureManager.bindTexture(MultiblockGerminationChamberRenderer.chamberTexLoc)
         chamberModel.renderGroups(Set("Glass"))
@@ -234,22 +233,23 @@ class MultiblockGerminationChamberRenderer extends TileEntityCombinedRenderer[Ti
   override def renderTileEntityInWorld(te: TileGerminationChamber, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     lastTe = te
     te match {
-      case t: TileGerminationChamber => if (t.hasCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null) && t.getCapability(ItszuLibCapabilities.TILE_MULTIBLOCK, null).isController(t.getLoc))
+      case t: TileGerminationChamber => if (t.hasModule(ItszuLibModules.TILE_MULTIBLOCK, null) && t.getModule(ItszuLibModules.TILE_MULTIBLOCK, null).isController)
         if (MinecraftForgeClient.getRenderPass == 0) {
-          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = true, renderGlass = false, if (te.hasCapability(ItszuLibCapabilities.COLORABLE, null)) te.getCapability(ItszuLibCapabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = true, renderGlass = false, if (te.hasModule(ItszuLibModules.COLORABLE, null)) te.getModule(ItszuLibModules.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
         }
         else if (MinecraftForgeClient.getRenderPass == 1) {
-          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = false, renderGlass = true, if (te.hasCapability(ItszuLibCapabilities.COLORABLE, null)) te.getCapability(ItszuLibCapabilities.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
+          renderAtLocationInternal(x, y, z, te.getWorld.getWorldTime, renderBase = false, renderGlass = true, if (te.hasModule(ItszuLibModules.COLORABLE, null)) te.getModule(ItszuLibModules.COLORABLE, null) else Color(0, 0, 0, 0), partialTicks)
         }
       case _ => return
     }
 
-    if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderItemConfiguration && te.hasModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getModule(ItszuLibModules.ITEM_STORAGE_CONFIGURABLE, null))
     }
 
-    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[TileEntity], x, y, z, te.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderFluidConfiguration && te.hasModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null)) {
+      FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getModule(ItszuLibModules.FLUID_STORAGE_CONFIGURABLE, null))
     }
   }
 }
+

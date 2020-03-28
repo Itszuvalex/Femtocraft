@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabNaniteSideConfig, GuiTabNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerNaniteExtractor
-import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor
+import com.itszuvalex.femtocraft.industry.tile.{NaniteExtractorModule, TileNaniteExtractor}
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteTank
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageDrainNanite
@@ -28,12 +28,12 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   addGuiAndSync(tile.storage, 0, 43, 23)
   addPlayerInventorySlots(inv)
 
-  val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.getProgress / tile.getProgressMax).toFloat) {
+  val progressBar = new GuiProgress(44 + 18, 23 + 7, 85 - (44 + 18), 4, () => (tile.internal.getProgress / tile.internal.getProgressMax).toFloat) {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       super.addTooltip(mouseX, mouseY, tooltip)
-      tooltip += f"${TextFormatting.WHITE}Progress${TextFormatting.RESET}: ${tile.getProgress}%.2f/${tile.getProgressMax}%.2f"
-      tooltip += s"${TextFormatting.WHITE}Ticks${TextFormatting.RESET}: ${TileNaniteExtractor.TICKS_REQ}"
-      tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${TileNaniteExtractor.POWER_PER_TICK}"
+      tooltip += f"${TextFormatting.WHITE}Progress${TextFormatting.RESET}: ${tile.internal.getProgress}%.2f/${tile.internal.getProgressMax}%.2f"
+      tooltip += s"${TextFormatting.WHITE}Ticks${TextFormatting.RESET}: ${NaniteExtractorModule.TICKS_REQ}"
+      tooltip += s"${TextFormatting.WHITE}PPT${TextFormatting.RESET}: ${NaniteExtractorModule.POWER_PER_TICK}"
     }
   }
   val nameLabel   = new GuiLabel(20, 4, fontRenderer.getStringWidth("Nanite Extractor"), fontRenderer.FONT_HEIGHT, () => "Nanite Extractor")
@@ -49,7 +49,7 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
       ret
     }
   }
-  val naniteTank  = new GuiNaniteTank(85, 16, tile.naniteStorageTank)
+  val naniteTank  = new GuiNaniteTank(85, 16, tile.naniteTank)
   val elems       = List(nameLabel, powerMeter, drainButton)
   naniteTank.color = color
   add(naniteTank)

@@ -1,11 +1,11 @@
 package com.itszuvalex.femtocraft.util.data
 
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.mutable.ArrayBuffer
 
-trait TileDataSpec extends TileEntityBase {
+trait TileDataSpec extends TileEntityCore {
   val itemDataSpec        = new DataSpecification(ArrayBuffer())
   val descriptionDataSpec = new DataSpecification(ArrayBuffer())
   val saveDataSpec        = new DataSpecification(ArrayBuffer())

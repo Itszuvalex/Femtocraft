@@ -3,22 +3,24 @@ package com.itszuvalex.femtocraft.logistics.test
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, IWorker, IWorkerProvider}
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.IWorld
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.PlayerUtils
+import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.math.AxisAlignedBB
+import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
+import net.minecraft.util.{EnumFacing, EnumHand}
 
 import scala.collection._
 
 /**
   * Created by Christopher Harris (Itszuvalex) on 8/15/15.
   */
-class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with ILogisticsConnected {
+class TileWorkerProviderTest extends TileEntityCoreTickable with IWorkerProvider with ILogisticsConnected {
   val workers = new mutable.HashSet[IWorker]()
   workers += new TestWorker(this)
   val connections = new mutable.HashSet[Loc4]()
@@ -27,8 +29,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     if (world.isRemote) return
     getProvidedWorkers.foreach(_.onTick())
   }
-
-  override def getMod = Femtocraft
 
   /**
     *
@@ -46,11 +46,11 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
   override def getRenderBoundingBox: AxisAlignedBB = {
     val center = Vector3(getPos.getX + .5f, getPos.getY + .5f, getPos.getZ + .5f)
     new AxisAlignedBB(center.x - 30,
-      center.y - 30,
-      center.z - 30,
-      center.x + 30,
-      center.y + 30,
-      center.z + 30)
+                      center.y - 30,
+                      center.z - 30,
+                      center.x + 30,
+                      center.y + 30,
+                      center.z + 30)
   }
 
   override def invalidate(): Unit = {
@@ -74,10 +74,10 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
 
   def saveConnectionInfo(compound: NBTTagCompound) =
     compound("connections" ->
-      NBTCompound(
-        "tagList" -> NBTList(getConnections.map(NBTCompound))
-      )
-    )
+             NBTCompound(
+               "tagList" -> NBTList(getConnections.map(NBTCompound))
+               )
+             )
 
   override def getConnections: Set[Loc4] = {
     if (world.isRemote) connections
@@ -98,12 +98,13 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
       connections ++= comp.NBTList("tagList").map(Loc4(_))
     }
 
-  override def onSideActivate(par5EntityPlayer: EntityPlayer, side: EnumFacing): Boolean = {
-    val ret = super.onSideActivate(par5EntityPlayer, side)
+
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     if (world.isRemote) return ret
-    PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
+    PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>
-      PlayerUtils.sendMessageToPlayer(par5EntityPlayer, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
+      PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "    Worker:" + (if (worker.getTask == null) " no task" else worker.getTask.getProvider.getProviderLocation))
     }
     ret
   }
@@ -120,7 +121,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     /**
       *
       * @param task Task to be assigned to.
-      *
       * @return True if this worker can work upon the task, false otherwise.
       */
     override def canWorkTask(task: ITask) = true
@@ -150,7 +150,6 @@ class TileWorkerProviderTest extends TileEntityBase with IWorkerProvider with IL
     /**
       *
       * @param attribute Attribute to ask about.
-      *
       * @return Efficiency rating for that attribute.  1d is normal.  Higher is better, lower is worse.
       */
     override def getEfficiency(attribute: String) = 1d

@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.nanite
 
 import com.itszuvalex.femtocraft.api.nanite.NaniteTank
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.nbt.NBTTagCompound
 
 /**
@@ -11,7 +11,7 @@ object TileNaniteStorage {
   val NANITE_TANK_KEY = "NaniteStorageTank"
 }
 
-trait TileNaniteStorage extends TileEntityBase with INaniteStorageTile {
+trait TileNaniteStorage extends TileEntityCore with INaniteStorageTile {
   val storageTank: NaniteTank = defaultStorageTank
 
   def naniteStorageTank: NaniteTank = storageTank

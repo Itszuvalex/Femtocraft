@@ -2,11 +2,10 @@ package com.itszuvalex.femtocraft.api.power
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.{Capabilities, power}
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.femtocraft.api.{ManagerModules, power}
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import com.itszuvalex.itszulib.util.Debug
-import net.minecraftforge.common.capabilities.Capability
 import org.apache.logging.log4j.Level
 
 object PowerNetwork {
@@ -108,7 +107,7 @@ object PowerNetwork {
 
 }
 
-class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.getNextID) {
+class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.instance.getNextID) {
   val statistics = new power.PowerNetwork.Statistics
 
   def countProducers: Int = statistics.countProducers
@@ -135,7 +134,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   def averagePowerTrend: Double = statistics.averagePowerTrend
 
-  override def networkCapability: Capability[IPowerNetworkNode] = Capabilities.TILE_POWER_NODE
+  override def networkModule: IModule[IPowerNetworkNode] = ManagerModules.TILE_POWER_NODE
 
   override def create(): PowerNetwork = new PowerNetwork
 
@@ -144,9 +143,9 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
   override def onTickEnd(): Unit = {
     try {
       var producedPower = 0d
-      var storedPower = 0d
-      var storageRoom = 0d
-      var consumerRoom = 0d
+      var storedPower   = 0d
+      var storageRoom   = 0d
+      var consumerRoom  = 0d
 
       statistics.startNewTick()
 
@@ -158,32 +157,32 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         statistics.addProducer(node)
         (node, min)
       }.toSeq.
-        // Order by nodes with least room.  This prioritizes preventing generators from filling up in power.
-        sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
-      val storedPowerNodes = cacheStorageNodes.map { node =>
+                                              // Order by nodes with least room.  This prioritizes preventing generators from filling up in power.
+                                            sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
+      val storedPowerNodes   = cacheStorageNodes.map { node =>
         val min = Math.min(node.battery.storage, node.transferRate)
         storedPower += min
         statistics.addStorage(node)
         (node, min)
       }.toSeq.
-        // Order by nodes with least room.  This prioritizes preventing storage from filling up in power.
-        sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
-      val storageRoomNodes = cacheStorageNodes.map { node =>
+                                                  // Order by nodes with least room.  This prioritizes preventing storage from filling up in power.
+                                                sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
+      val storageRoomNodes   = cacheStorageNodes.map { node =>
         val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
         storageRoom += min
         (node, min)
       }.toSeq.
-        // Order by nodes with least power.  This prioritizes preventing storage from running out of power.
-        sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
+                                                  // Order by nodes with least power.  This prioritizes preventing storage from running out of power.
+                                                sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
       // Doesn't matter since storage is assumed equal
-      val consumerRoomNodes = consumerNodes.map { node =>
+      val consumerRoomNodes  = consumerNodes.map { node =>
         val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
         consumerRoom += min
         statistics.addConsumer(node)
         (node, min)
       }.toSeq.
-        // Order by nodes with least power.  This prioritizes preventing consumers from running out of power.
-        sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
+                                              // Order by nodes with least power.  This prioritizes preventing consumers from running out of power.
+                                            sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
 
       // Return early to prevent unnecessary computation
 
@@ -196,7 +195,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
       if (consumerRoom <= 0 && storageRoom <= 0) return
 
       //Distribute
-      val producerIt = producerPowerNodes.iterator
+      val producerIt    = producerPowerNodes.iterator
       val storageTakeIt = storedPowerNodes.iterator
 
       def nextPowerSource: (IPowerStorageNode, Double) = {
@@ -209,7 +208,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         else null
       }
 
-      val consumerIt = consumerRoomNodes.iterator
+      val consumerIt     = consumerRoomNodes.iterator
       val storageStoreIt = storageRoomNodes.iterator
 
       def nextPowerSink: (IPowerStorageNode, Double) = {
@@ -224,7 +223,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
       //Freely distribute, since all requests should be fulfilled
       var powerToDistribute = 0d
-      var powerDistributed = 0d
+      var powerDistributed  = 0d
 
       if (producedPower >= consumerRoom) {
         powerToDistribute = Math.min(producedPower, storageRoom + consumerRoom)
@@ -233,10 +232,10 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
         powerToDistribute = Math.min(consumerRoom, producedPower + storedPower)
       }
 
-      var powerSource = nextPowerSource
-      var powerSink = nextPowerSink
+      var powerSource  = nextPowerSource
+      var powerSink    = nextPowerSink
       var powerToDrain = if (powerSource != null) powerSource._2 else 0d
-      var powerToFill = if (powerSink != null) powerSink._2 else 0d
+      var powerToFill  = if (powerSink != null) powerSink._2 else 0d
       while ((powerDistributed < powerToDistribute) && powerSource != null && powerSink != null) {
         var powerShift = Math.min(powerToDrain, powerToFill)
         powerSource._1.battery.storage -= powerShift

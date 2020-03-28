@@ -8,5 +8,5 @@ import com.itszuvalex.itszulib.logistics.{LocationTracker, ManagerNetwork}
 object ManagerTestNetwork {
   val tracker = new LocationTracker
 
-  def NewNetwork() = new TestTrackingNetwork(ManagerNetwork.getNextID)
+  def NewNetwork() = new TestTrackingNetwork(ManagerNetwork.instance.getNextID)
 }

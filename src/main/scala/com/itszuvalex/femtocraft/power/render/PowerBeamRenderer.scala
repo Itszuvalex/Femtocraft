@@ -1,12 +1,11 @@
 package com.itszuvalex.femtocraft.power.render
 
-import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.power.node.PowerNode
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.render.Vector3
 import com.itszuvalex.itszulib.util.Color
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.MathHelper
 import org.lwjgl.opengl.GL11
@@ -17,30 +16,30 @@ import org.lwjgl.opengl.GL11
 
 object PowerBeamRenderer {
 
-  def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with PowerNode, beamWidth: Float, color: Color, child: Loc4): Unit = {
+  def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color, child: Loc4): Unit = {
     beamRenderSetup()
     renderBeamToLocation(x, y, z, node, color, partialTime, child, beamWidth)
     beamRenderTeardown()
   }
 
-  def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with PowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float, reverse: Boolean = false): Unit = {
-    val f2: Float = node.getWorld.getTotalWorldTime.toFloat + partialTime
-    val f3: Float = -f2 * 0.2F - MathHelper.floor(-f2 * 0.1F).toFloat
-    val nloc = node.getLoc
-    val extraOffset = loc.getTileEntity(false) match {
+  def renderBeamToLocation(x: Double, y: Double, z: Double, node: ITileEntity, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float, reverse: Boolean = false): Unit = {
+    val f2  : Float  = node.getIWorld.toMinecraft.getTotalWorldTime.toFloat + partialTime
+    val f3  : Float  = -f2 * 0.2F - MathHelper.floor(-f2 * 0.1F).toFloat
+    val nloc         = new Loc4(node)
+    val extraOffset  = loc.getITileEntity(false) match {
       case Some(t: TileBeamRenderOffset) => t.offset
       case _ => Vector3(0, 0, 0)
     }
-    val diff = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)
-    val startLoc = Vector3(x, y, z)
-    val offset = Vector3(0.5f, 0.5f, 0.5f)
+    val diff         = Vector3(loc.x, loc.y, loc.z) - Vector3(nloc.x, nloc.y, nloc.z)
+    val startLoc     = Vector3(x, y, z)
+    val offset       = Vector3(0.5f, 0.5f, 0.5f)
     val xMin: Double = 0.0D
     val xMax: Double = 1.0D
     val yMin: Double = (-1.0F + f3).toDouble % 1
     val yMax: Double = diff.magnitude * (1 / (2 * beamWidth)) + yMin
     FemtoRenderUtils.drawBeam(startLoc + offset, startLoc + diff + offset + extraOffset, beamWidth,
-      xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
-      color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
+                              xMin.toFloat, xMax.toFloat, yMin.toFloat, yMax.toFloat,
+                              color.red.toInt & 255, color.green.toInt & 255, color.blue.toInt & 255, color.alpha.toInt & 255)
   }
 
   def beamRenderTeardown(): Unit = {
@@ -60,9 +59,9 @@ object PowerBeamRenderer {
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
   }
 
-  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with PowerNode, beamWidth: Float, color: Color): Unit = {
+  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
-    node.getCapability(Capabilities.TILE_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
+    node.getModule(ManagerModules.TILE_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
       renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
     }
     beamRenderTeardown()
@@ -70,12 +69,12 @@ object PowerBeamRenderer {
 }
 
 trait PowerBeamRenderer {
-  def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with PowerNode, beamWidth: Float, color: Color, child: Loc4): Unit =
+  def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color, child: Loc4): Unit =
     PowerBeamRenderer.renderBeamToChild(x, y, z, partialTime, node, beamWidth, color, child)
 
-  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: TileEntity with PowerNode, beamWidth: Float, color: Color): Unit =
+  def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color): Unit =
     PowerBeamRenderer.renderBeamsToAllChildren(x, y, z, partialTime, node, beamWidth, color)
 
-  def renderBeamToLocation(x: Double, y: Double, z: Double, node: TileEntity with PowerNode, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit =
+  def renderBeamToLocation(x: Double, y: Double, z: Double, node: ITileEntity, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit =
     PowerBeamRenderer.renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
 }

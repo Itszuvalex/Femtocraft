@@ -18,8 +18,8 @@ import scala.collection.mutable.ArrayBuffer
   */
 object FemtoItems {
 
-  val itemCallbacks = new ArrayBuffer[() => Unit]()
-  var itemPowerCrystal: Item = _
+  val itemCallbacks                      = new ArrayBuffer[() => Unit]()
+  var itemPowerCrystal            : Item = _
   var itemDumbDust                : Item = _
   var itemCyberleaf               : Item = _
   var itemNanoweaveThread         : Item = _
@@ -39,20 +39,20 @@ object FemtoItems {
   var itemCrystalBattery          : Item = _
   var itemNaniteBeacon            : Item = _
   var itemNanoChannel             : Item = _
-  var itemIronDust   : Item = _
-  var itemGoldDust   : Item = _
-  var itemDiamondDust: Item = _
-  var itemSolarPanel: Item = _
+  var itemIronDust                : Item = _
+  var itemGoldDust                : Item = _
+  var itemDiamondDust             : Item = _
+  var itemSolarPanel              : Item = _
   var itemLogisticsItemChipBasic  : Item = _
   var itemLogisticsFluidChipBasic : Item = _
   var itemLogisticsNaniteChipBasic: Item = _
-  var itemFrame     : Item = _
-  var itemMultiblock: Item = _
-  var itemConfigurator: Item = _
-  var itemMultiTool   : Item = _
-  var itemShiftTest   : Item = _
-  var itemNanoLash    : Item = _
-  var itemNanoPack : Item = _
+  var itemFrame                   : Item = _
+  var itemMultiblock              : Item = _
+  var itemConfigurator            : Item = _
+  var itemMultiTool               : Item = _
+  var itemShiftTest               : Item = _
+  var itemNanoLash                : Item = _
+  var itemNanoPack                : Item = _
 
   @SubscribeEvent
   def registerItems(event: RegistryEvent.Register[Item]): Unit = {

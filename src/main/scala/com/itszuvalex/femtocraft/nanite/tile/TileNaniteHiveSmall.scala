@@ -2,10 +2,9 @@ package com.itszuvalex.femtocraft.nanite.tile
 
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.Configurable
-import com.itszuvalex.itszulib.api.wrappers.{IBattery, PowerBattery}
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.storage.{IBattery, PowerBattery}
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import net.minecraft.nbt.NBTTagCompound
 
 /**
@@ -16,7 +15,7 @@ import net.minecraft.nbt.NBTTagCompound
                 val INVENTORY_SIZE = 30
 }
 
-@Configurable class TileNaniteHiveSmall extends TileEntityBase with PowerLeafNode {
+@Configurable class TileNaniteHiveSmall extends TileEntityCoreTickable with PowerLeafNode {
 
   override def defaultBattery: IBattery = new PowerBattery(5000)
 
@@ -32,12 +31,6 @@ import net.minecraft.nbt.NBTTagCompound
     super.handleDescriptionNBT(compound)
     setRenderUpdate()
   }
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def getGuiID: Int = GuiIDs.TileNaniteHiveGuiID
-
-  override def hasGUI: Boolean = true
 
   override def hasDescription = true
 }

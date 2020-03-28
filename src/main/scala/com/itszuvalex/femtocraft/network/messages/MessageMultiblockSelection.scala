@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.network.messages
 
 import com.itszuvalex.femtocraft.industry.IFrameItem
 import com.itszuvalex.itszulib.ItszuLib
+import com.itszuvalex.itszulib.api.wrappers.Converter
 import com.itszuvalex.itszulib.network.messages.MessageBase
 import io.netty.buffer.ByteBuf
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, MessageContext}
@@ -36,7 +37,7 @@ class MessageMultiblockSelection(var multi: String) extends MessageBase[MessageM
           stack.getItem match {
             case null =>
             case item: IFrameItem =>
-              item.setSelectedMultiblock(stack, message.multi)
+              item.setSelectedMultiblock(Converter.IItemStackFromItemStack(stack), message.multi)
               player.inventory.markDirty()
             case _ =>
           }

@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.power.container
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.container.ContainerInv
 import com.itszuvalex.itszulib.container.sync.{SyncDouble, SyncItemStorageItemStack}
 import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
@@ -16,7 +18,8 @@ class ContainerCrystalStorageArray(parPlayer: EntityPlayer, inv: InventoryPlayer
   addSync(new SyncDouble(GuiID, () => te.battery.storage, (storage) => te.battery.storage = storage))
 
   if (addSyncs) {
-    te.storage.indices.foreach(i => addSync(new SyncItemStorageItemStack(GuiID, te.storage, i)))
+    val storage: IItemStorage = te.getModule(ItszuLibModules.ITEM_STORAGE, null)
+    storage.indices.foreach(i => addSync(new SyncItemStorageItemStack(GuiID, storage, i)))
     addPlayerInventorySlots(inv)
   }
 

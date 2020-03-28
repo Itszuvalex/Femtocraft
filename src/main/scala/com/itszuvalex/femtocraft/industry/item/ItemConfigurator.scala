@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.industry.item
 
 import com.itszuvalex.femtocraft.api.{Capabilities, IOverlayRenderItem, OverlayRenderSwitch}
+import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import net.minecraft.client.util.ITooltipFlag
@@ -56,8 +57,8 @@ class ItemConfigurator extends Item {
     if (tile == null) return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ)
 
     ItemConfigurator.getOverlaySwitch(itemStack) match {
-      case OverlayRenderSwitch.ITEM if tile.hasCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null) =>
-        val cap = tile.getCapability(Capabilities.ITEM_STORAGE_CONFIGURABLE, null)
+      case OverlayRenderSwitch.ITEM if tile.hasCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null) =>
+        val cap = tile.getCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null)
         val relative = FacingUtil.getHorizontalRelativeFacingFromAbsolute(facing, cap.front())
         if (playerIn.isSneaking) {
           cap.cycleRelativeFacingIOBackward(relative)
@@ -94,8 +95,8 @@ class ItemConfigurator extends Item {
             case _ =>
           }
         }
-      case OverlayRenderSwitch.FLUID if tile.hasCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null) =>
-        val cap = tile.getCapability(Capabilities.FLUID_STORAGE_CONFIGURABLE, null)
+      case OverlayRenderSwitch.FLUID if tile.hasCapability(ItszuLibCapabilities.FLUID_STORAGE_CONFIGURABLE, null) =>
+        val cap = tile.getCapability(ItszuLibCapabilities.FLUID_STORAGE_CONFIGURABLE, null)
         val relative = FacingUtil.getHorizontalRelativeFacingFromAbsolute(facing, cap.front())
         if (playerIn.isSneaking) {
           cap.cycleRelativeFacingIOBackward(relative)

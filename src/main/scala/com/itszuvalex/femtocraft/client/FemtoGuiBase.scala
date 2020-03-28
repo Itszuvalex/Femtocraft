@@ -1,28 +1,34 @@
 package com.itszuvalex.femtocraft.client
 
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.wrappers.Converter
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.container.ContainerBase
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
+import com.itszuvalex.itszulib.core.modules.{InternalModules, TempInternal}
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.gui.Gui
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
 import org.lwjgl.opengl.GL11
 
 /**
   * Created by Chris on 1/15/2017.
   */
-abstract class FemtoGuiBase(tile: TileEntity, c: ContainerBase) extends GuiBase(c) {
+abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase(c) {
   val tabBar: GuiTabBar = new GuiTabBar(-GuiTabBar.WIDTH, 0,
-    ySize, GuiID, tile.asInstanceOf[TileEntityBase])
-  tabBar.addTab(Option(tile.getDisplayName).map(_.getFormattedText).getOrElse("Inventory"), new GuiItemStack(0, 0, () => false, "") {
-    val item = Converter.IItemStackFromItemStack(new ItemStack(tile.getBlockType))
+                                        ySize, GuiID, tile.asInstanceOf[TileEntityCore])
+  tabBar.addTab("Inventory", new GuiItemStack(0, 0, () => false, "") {
+    val item = Converter.IItemStackFromItemStack(new ItemStack(tile.toMinecraft.getBlockType))
 
     override def itemStack = item
-  }, tile.asInstanceOf[TileEntityBase].getGuiID)
+  }, if (tile.hasModule(InternalModules.MODULE_GUI, null))
+                  tile.getModule(InternalModules.MODULE_GUI, null).guiId()
+                else if (tile.hasModule(TempInternal.MODULE_MULTIBLOCK_GUI, null))
+    tile.getModule(TempInternal.MODULE_MULTIBLOCK_GUI, null).guiId()
+                else 0)
   add(tabBar)
+
+  override def GuiID: Int = tile.getModule(InternalModules.MODULE_GUI, null).guiId()
 
   override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
@@ -55,14 +61,14 @@ abstract class FemtoGuiBase(tile: TileEntity, c: ContainerBase) extends GuiBase(
   }
 
   private def drawBackgroundLayers(): Unit = {
-    val k = (width - xSize) / 2
-    val l = (height - ySize) / 2
+    val k          = (width - xSize) / 2
+    val l          = (height - ySize) / 2
     val blackColor = Color(255.toByte, 0, 0, 0).toInt
     Gui.drawRect(k, l, k + xSize, l + ySize, blackColor)
 
     var offset = 1
-    if (tile.hasCapability(ItszuLibCapabilities.COLORABLE, null)) {
-      val color = tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt
+    if (tile.hasModule(ItszuLibModules.COLORABLE, null)) {
+      val color = tile.getModule(ItszuLibModules.COLORABLE, null).toInt
       Gui.drawRect(k + offset, l + offset, k + xSize - offset, l + ySize - offset, color)
       offset += 1
     }

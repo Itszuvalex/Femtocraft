@@ -2,10 +2,9 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, PowerNetworkLeafNodeDelegate}
-import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.util.data.DataSpec
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.{ItszuLibCapabilities, ItszuLibModules}
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -21,14 +20,14 @@ object PowerLeafNode {
   val DEFAULT_RADIUS = 8f
 }
 
-trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
+trait PowerLeafNode extends TileEntityCoreTickable with PowerStorageNode {
   val leafDelegate: IPowerLeafNode = defaultLeafDelegate
   var color                        = Color(255.toByte, 0.toByte, 0.toByte, 0.toByte)
 
   def defaultLeafDelegate: IPowerLeafNode = {
     val del: PowerNetworkLeafNodeDelegate = new PowerNetworkLeafNodeDelegate(this, connectionRadius _, battery _, powerStorageNodeType,
-      PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(leafDelegate.asInstanceOf[PowerNetworkLeafNodeDelegate], powerTransferRateDefault),
-      () => delegate.changeForLastTick)
+                                                                             PowerNetworkLeafNodeDelegate.INHERIT_TRANSFER_FROM_PARENT(leafDelegate.asInstanceOf[PowerNetworkLeafNodeDelegate], powerTransferRateDefault),
+                                                                             () => delegate.changeForLastTick)
     del.dataSpec.onLoad = () => setRenderUpdate()
     del
   }
@@ -39,28 +38,6 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
 
   override def onLoad(): Unit = {
     super.onLoad()
-    if (getWorld.isRemote) return
-    PowerManager.instance.addLeaf(leafDelegate)
-  }
-
-  override def validate(): Unit = {
-    super.validate()
-    if (getWorld.isRemote) return
-    PowerManager.instance.addLeaf(leafDelegate)
-  }
-
-  override def invalidate(): Unit = {
-    super.invalidate()
-    if (getWorld.isRemote) return
-    PowerManager.instance.removeLeaf(leafDelegate)
-  }
-
-  override def onBlockBreak(): Unit = {
-    super.onBlockBreak()
-    if (getWorld.isRemote) return
-
-    PowerManager.instance.onLeafBroken(leafDelegate)
-    PowerManager.instance.removeLeaf(leafDelegate)
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
@@ -69,7 +46,7 @@ trait PowerLeafNode extends TileEntityBase with PowerStorageNode {
     else super.getCapability(capability, facing)
   }
 
-  def getColor = Option(leafDelegate.getParent).flatMap(_.getTileEntity()).withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).getOrElse(color)
+  def getColor: Color = Option(leafDelegate.getParent).flatMap(_.getITileEntity()).withFilter(_.hasModule(ItszuLibModules.COLORABLE, null)).map(_.getModule(ItszuLibModules.COLORABLE, null)).getOrElse(color)
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
     if (capability == Capabilities.TILE_POWER_LEAF_NODE) true

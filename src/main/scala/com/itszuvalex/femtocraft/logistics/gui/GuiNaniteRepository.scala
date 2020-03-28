@@ -34,7 +34,7 @@ class GuiNaniteRepository(player: EntityPlayer, inv: InventoryPlayer, private va
   }
   add(fillButton)
 
-  val naniteTank = new GuiNaniteTank(60, 23, tile.naniteStorageTank)
+  val naniteTank = new GuiNaniteTank(60, 23, tile.storage)
   add(naniteTank)
 
   val drainButton = new GuiButton(86, 24, 45, 16, "Drain") {

@@ -3,9 +3,9 @@ package com.itszuvalex.femtocraft.render
 import com.itszuvalex.femtocraft.industry.tile.TileFrame
 import com.itszuvalex.femtocraft.industry.{IFrameMultiblock, IFrameMultiblockRenderer}
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import com.itszuvalex.itszulib.render.RenderUtils
 import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 
 /**
@@ -24,7 +24,7 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     * @param ry    Y Render location
     * @param rz    Z Render location
     */
-  override def previewRenderAtWorldLocation(stack: ItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+  override def previewRenderAtWorldLocation(stack: IItemStack, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
     GL11.glDisable(GL11.GL_CULL_FACE)
     GL11.glEnable(GL11.GL_BLEND)
     if (multi.canPlaceAtLocation(loc)) {
@@ -35,15 +35,15 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     }
     multi.getTakenLocations(loc).toList.sortWith { case (a1, a2) =>
       a1.distSqr((rx + loc.x).toInt,
-        (ry + loc.y).toInt,
-        (rz + loc.z).toInt) <
-        a2.distSqr((rx + loc.x).toInt,
-          (ry + loc.y).toInt,
-          (rz + loc.z).toInt)
+                 (ry + loc.y).toInt,
+                 (rz + loc.z).toInt) <
+      a2.distSqr((rx + loc.x).toInt,
+                 (ry + loc.y).toInt,
+                 (rz + loc.z).toInt)
     }
-      .foreach { rloc =>
-        RenderUtils.renderCube(rx.toFloat + (rloc.x - loc.x), ry.toFloat + (rloc.y - loc.y), rz.toFloat + (rloc.z - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
-      }
+         .foreach { rloc =>
+           RenderUtils.renderCube(rx.toFloat + (rloc.x - loc.x), ry.toFloat + (rloc.y - loc.y), rz.toFloat + (rloc.z - loc.z), 0, 0, 0, 1, 1, 1, RenderUtils.getDefaultTextureForBlock(Blocks.IRON_BLOCK))
+         }
     GL11.glEnable(GL11.GL_CULL_FACE)
     GL11.glDisable(GL11.GL_BLEND)
   }
@@ -83,7 +83,7 @@ class GenericFrameMultiblockRenderer extends IFrameMultiblockRenderer {
     * @param ry
     * @param rz
     */
-  override def renderAsItem(stack: ItemStack, rx: Double, ry: Double, rz: Double): Unit = {
+  override def renderAsItem(stack: IItemStack, rx: Double, ry: Double, rz: Double): Unit = {
   }
 
   /**

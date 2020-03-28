@@ -2,21 +2,21 @@ package com.itszuvalex.femtocraft.api.logistics
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
+import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.common.capabilities.Capability
 
 import scala.collection.JavaConversions._
 
 /**
   * Created by Chris on 2/19/2017.
   */
-class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwork](ManagerNetwork.getNextID) {
+class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwork](ManagerNetwork.instance.getNextID) {
 
   def channels: util.Collection[String] = Set[String]()
 
-  override def networkCapability: Capability[ILogisticsNetworkNode] = Capabilities.TILE_LOGISTICS_NODE
+  override def networkModule: IModule[ILogisticsNetworkNode] = ManagerModules.TILE_LOGISTICS_NODE
 
   override def create(): LogisticsNetwork = new LogisticsNetwork
 
@@ -37,10 +37,10 @@ class LogisticsNetwork extends TileNetwork[ILogisticsNetworkNode, LogisticsNetwo
     }
   }
 
-  private def resourceDistributionLoop[T](resource: IResource[T], connections: Iterable[IConnection[T]]) = {
-    val comparator = ResourceConnectionComparer.FromResource(resource)
+  private def resourceDistributionLoop[T](resource: IResource[T], connections: Iterable[IConnection[T]]): Unit = {
+    val comparator    = ResourceConnectionComparer.FromResource(resource)
     val sortedOutputs = connections.filter(_.direction == ConnectionDirection.OUTPUT).toSeq.sortWith((a, b) => comparator.compare(a, b) < 0)
-    val inputs = connections.withFilter(_.direction == ConnectionDirection.INPUT)
+    val inputs        = connections.withFilter(_.direction == ConnectionDirection.INPUT)
 
     // This will not take into account the change of an empty output slot to an itemstack output slot for cases of ordering of insertion
     // I.E. In the case of inserting into an empty item location (which will be last in the list, anyways), we don't reorder so that slot is further up

@@ -1,190 +1,66 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.nanite.{NaniteStack, NaniteTank}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteTank}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
-import com.itszuvalex.femtocraft.nanite.{SidedNaniteStorageConfiguration, TileNaniteStorage}
-import com.itszuvalex.femtocraft.power.node.PowerLeafNode
-import com.itszuvalex.femtocraft.util.TileEntityUtils
-import com.itszuvalex.femtocraft.util.data.{DataInt, DataSerializable, TileDataSpec}
+import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration}
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, PowerBattery}
-import com.itszuvalex.itszulib.core.traits.tile.{BlockFacing, TileInventory}
-import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityBase}
-import com.itszuvalex.itszulib.util.Task
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
+import com.itszuvalex.itszulib.api.core.{IModule, Module}
+import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
+import com.itszuvalex.itszulib.core.modules._
+import com.itszuvalex.itszulib.core.{SidedItemStorageConfiguration, TileEntityCoreTickable}
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.items.CapabilityItemHandler
 
 object TileNaniteExtractor {
-  val TICKS_REQ      = 20 * 8
-  val POWER_PER_TICK = 10
-  val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
-
-  val TICKS_FOR_AUTOIO = 20
-  val AMT_PER_AUTOIO   = 1
-  val VOL_PER_AUTOIO   = 1
+  val MODULE: IModule[NaniteExtractorModule] = Module.registerModule("NaniteExtractorModule", null)
 
   val INPUT_INV_KEY = "Input"
   val NONE_KEY      = "None"
 
   val NANITE_TANK_KEY = "Tank"
   val NONE_TANK_KEY   = "None"
-
-  val TASK_NBT                = "Task"
-  val ITEM_SIDED_CONFIG_NBT   = "ItemConfig"
-  val NANITE_SIDED_CONFIG_NBT = "NaniteConfig"
-  val TICKS_NBT               = "Ticks"
-
-  class ExtractTask(var stack: NaniteStack) extends Task(POWER_REQ, TICKS_REQ) {
-
-    override def deserializeNBT(t: NBTTagCompound): Unit = {
-      super.deserializeNBT(t)
-      stack = NaniteStack.loadFromNBT(t.getCompoundTag(ExtractTask.NANITES_NBT))
-    }
-
-    override def serializeNBT(): NBTTagCompound = {
-      val ret = super.serializeNBT()
-      if (stack != null)
-        ret.setTag(ExtractTask.NANITES_NBT, stack.serializeNBT())
-      ret
-    }
-
-    override def reset(): Unit = {
-      super.reset()
-      stack = null
-    }
-  }
-
-  object ExtractTask {
-    val NANITES_NBT = "Nanite"
-  }
-
 }
 
-class TileNaniteExtractor extends TileEntityBase with TileInventory with TileDataSpec with PowerLeafNode with TileNaniteStorage {
-  private val task: ExtractTask  = new ExtractTask(null)
-  private val sidedStorageConfig = new SidedItemStorageConfiguration({
+class TileNaniteExtractor extends TileEntityCoreTickable {
+  val storage           : IItemStorage                    = new ItemStorageArray(1) {
+    override def canInsert(i: Int, stack: IItemStack): Boolean = {
+      CybermaterialRegistry.getNaniteFromItem(stack.item, stack.damage).isDefined
+    }
+  }
+  val sidedStorageConfig: SidedItemStorageConfiguration   = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case _ => NONE_KEY
   },
-  Map(NONE_KEY -> IItemStorage.Empty,
-    INPUT_INV_KEY -> storage),
-  () => world.getBlockState(pos).getValue(BlockFacing.FACING))
-  private val sidedNaniteConfig  = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-    Map(NONE_TANK_KEY -> null,
-      NANITE_TANK_KEY -> naniteStorageTank),
-    () => world.getBlockState(pos).getValue(BlockFacing.FACING))
-  var ticks = 0
+   Map(NONE_KEY -> IItemStorage.Empty,
+       INPUT_INV_KEY -> storage),
+   () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
+  val naniteTank        : INaniteTank                     = new NaniteTank(50)
+  val sidedNaniteConfig : SidedNaniteStorageConfiguration = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+                                                                                                Map(NONE_TANK_KEY -> null,
+                                                                                                    NANITE_TANK_KEY -> naniteTank),
+                                                                                                () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
+  val battery           : IBattery                        = new PowerBattery(5000)
+  val leafNode                                            = new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, transRate = () => 80d)
 
-  descriptionDataSpec ++= Array(
-    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
-    new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig)
-  )
-  saveDataSpec ++= Array(
-    new DataSerializable[NBTTagCompound](ITEM_SIDED_CONFIG_NBT, sidedStorageConfig),
-    new DataSerializable[NBTTagCompound](NANITE_SIDED_CONFIG_NBT, sidedNaniteConfig),
-    new DataSerializable[NBTTagCompound](TASK_NBT, task),
-    new DataInt(TICKS_NBT, ticks _, ticks_=)
-  )
+  val internal = new NaniteExtractorModule(storage, battery, naniteTank)
 
-  override def defaultBattery = new PowerBattery(5000)
-
-  override def powerStorageNodeType: PowerStorageNodeType = PowerStorageNodeType.CONSUMER
-
-  override def powerStorageTransferRate: Double = 50d
-
-  override def defaultStorageTank: NaniteTank = new NaniteTank(50)
-
-  override def defaultStorage: IItemStorage = new ItemStorageArray(1) {
-    override def canInsert(i: Int, stack: IItemStack): Boolean = {
-      isItemValidForSlot(i, stack.toMinecraft)
-    }
-  }
-
-  override def isItemValidForSlot(slot: Int, item: ItemStack): Boolean = {
-    CybermaterialRegistry.getNaniteFromItem(item.getItem, item.getItemDamage).isDefined
-  }
-
-  override def getFieldCount: Int = 0
-
-  override def getField(id: Int): Int = 0
-
-  override def setField(id: Int, value: Int): Unit = {}
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasDescription: Boolean = true
-
-  override def hasGUI = true
-
-  override def getGuiID = GuiIDs.TileNaniteExtractorID
-
-  override def serverUpdate(): Unit = {
-    super.serverUpdate()
-
-    ticks = TileEntityUtils.incrementTicks(ticks, TICKS_FOR_AUTOIO)
-    TileEntityUtils.checkDoItemInputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
-    TileEntityUtils.checkDoNaniteInputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-
-    if (task.stack == null) {
-      val item = storage(0)
-      if (!item.isEmpty) {
-        val ins = storage.split(0, 1)
-        task.reset()
-        task.stack = CybermaterialRegistry.getNaniteFromItem(ins.item, ins.damage).map(_.copy()).orNull
-      }
-    }
-    else {
-      battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
-      if (task.completed(0)) {
-        val stack = task.stack
-        if (stack == null || stack.volume <= 0) {
-          task.reset()
-          return
-        }
-
-        task.stack = storageTank.fill(stack, true)
-        if (task.stack == null) {
-          task.reset()
-        }
-      }
-    }
-
-    TileEntityUtils.checkDoNaniteOutputIO(this, sidedNaniteConfig, ticks, VOL_PER_AUTOIO)
-    TileEntityUtils.checkDoItemOutputIO(this, sidedStorageConfig, ticks, AMT_PER_AUTOIO)
-  }
-
-  def getProgress = task.progress
-
-  def setProgress(progress: Double): Unit = {
-    task.progress = progress
-  }
-
-  def getProgressMax = task.adjustedMax(0)
-
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = (capability, facing) match {
-    case (cap, _) if cap == Capabilities.ITEM_STORAGE_CONFIGURABLE => true
-    case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => true
-    case (cap, _) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => true
-    case _ => super.hasCapability(capability, facing)
-  }
-
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = (capability, facing) match {
-    case (cap, _) if cap == Capabilities.ITEM_STORAGE_CONFIGURABLE => sidedStorageConfig.asInstanceOf[T]
-    case (cap, _) if cap == Capabilities.NANITE_STORAGE_CONFIGURABLE => sidedNaniteConfig.asInstanceOf[T]
-    case (cap, null) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => naniteStorageTank.asInstanceOf[T]
-    case (_, null) => super.getCapability(capability, facing)
-    case (cap, _) if cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY => Converter.IItemHandlerModifiableFromIItemStorage(sidedStorageConfig.getStorageForGlobalFacing(facing)).asInstanceOf[T]
-    case (cap, _) if cap == ItszuLibCapabilities.ITEM_STORAGE => sidedStorageConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
-    case (cap, _) if cap == Capabilities.TILE_NANITE_STORAGE_TANK => sidedNaniteConfig.getStorageForGlobalFacing(facing).asInstanceOf[T]
-    case _ => super.getCapability(capability, facing)
-  }
-
+  addTileEntityModule(new ModuleIItemStorage(storage))
+  addTileEntityModule(new ModuleIItemHandlerConverter)
+  addTileEntityModule(new ModuleIItemSidedConfiguration(sidedStorageConfig))
+  addTileEntityModule(new ModuleDropInventory(storage))
+  addTileEntityModule(new ModulePowerStorage(battery))
+  addTileEntityModule(leafNode)
+  addTileEntityModule(new ModuleINaniteTank(naniteTank))
+  addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
+  addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileNaniteExtractorID _))
+  addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
+  addTileEntityModuleTickable(new ModuleNaniteAutoIO(sidedNaniteConfig))
+  addTileEntityModuleTickable(internal)
 }

@@ -36,8 +36,8 @@ object FrameRenderer {
             case (1, 1, _) => "B"
             case _ => ""
           })
-            + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
-        ), bindTextures = false)
+          + (if (a == 0 && b != 1) sidemap1 else sidemap2) (c)
+          ), bindTextures = false)
       }
 
       GL11.glEnable(GL11.GL_BLEND)
@@ -61,25 +61,31 @@ class FrameRenderer extends TileEntityCombinedRenderer[TileFrame] {
         a <- 0 to 1
         b <- 0 to (2 - a)
         c <- 0 to 3
-        if te.getRenderMark(a, b, c)
+        if te.internal.getRenderMark(a, b, c)
       } yield (a, b, c)
-    }.toSet
-    )
-    if (te.renderProgress > 0 && te.isController) {
-      FrameMultiblockRegistry.getMultiblock(te.multiBlock) match {
-        case Some(mb) =>
-          FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
-            case Some(render) =>
-              RenderUtils.glMatrixBlock {
-                GL11.glTranslated(x + .0005, y + .0005, z + .0005)
-                GL11.glScaled(.999, .999, .999)
-                GL11.glColor3f(0, 1, 0)
-                render.renderInProgressAt(0, 0, 0, partialTicks, te)
+    }.toSet)
+
+    if (!te.info.isController) return
+
+    te.state.get match {
+      case None =>
+      case Some(s) =>
+        if (s.renderProgress > 0) {
+          FrameMultiblockRegistry.getMultiblock(s.multiBlock) match {
+            case Some(mb) =>
+              FrameMultiblockRendererRegistry.getRenderer(mb.multiblockRenderID) match {
+                case Some(render) =>
+                  RenderUtils.glMatrixBlock {
+                    GL11.glTranslated(x + .0005, y + .0005, z + .0005)
+                    GL11.glScaled(.999, .999, .999)
+                    GL11.glColor3f(0, 1, 0)
+                    render.renderInProgressAt(0, 0, 0, partialTicks, te)
+                  }
+                case _ =>
               }
             case _ =>
           }
-        case _ =>
-      }
+        }
     }
   }
 }

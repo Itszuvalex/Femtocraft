@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.api.power
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import net.minecraft.nbt.NBTTagCompound
@@ -18,37 +18,37 @@ object PowerNetworkNodeDelegate {
   val LEAF_NODE_TAG = "Leaf"
 }
 
-class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
-  radius: => Float,
-  transfer: => Double,
-  renders: => Boolean
-) extends IPowerNetworkNode with INBTSerializable[NBTTagCompound] {
+class PowerNetworkNodeDelegate(tileEntity: TileEntityCore,
+                               radius: => Float,
+                               transfer: => Double,
+                               renders: => Boolean
+                              ) extends IPowerNetworkNode with INBTSerializable[NBTTagCompound] {
   val leafNodeLocs: mutable.HashSet[Loc4]      = new mutable.HashSet[Loc4]()
   var renderLocs  : scala.collection.Set[Loc4] = Set()
 
   override def addLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs += node.getStorageLoc
     tileEntity.setUpdate()
-    tileEntity.setModified()
+    tileEntity.markDirtyForSave()
   }
 
   override def removeLeafNode(node: IPowerLeafNode): Unit = {
     leafNodeLocs -= node.getStorageLoc
     tileEntity.setUpdate()
-    tileEntity.setModified()
+    tileEntity.markDirtyForSave()
     PowerManager.instance.refreshLeafsOnMain(this)
   }
 
   override def leafTransferRate: Double = transfer
 
-  override def leafNodes(force: Boolean): Set[IPowerLeafNode] = leafNodeLocs.flatMap(_.getTileEntity(force)).withFilter(_.hasCapability(Capabilities.TILE_POWER_LEAF_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_LEAF_NODE, null))
+  override def leafNodes(force: Boolean): Set[IPowerLeafNode] = leafNodeLocs.flatMap(_.getITileEntity(force)).withFilter(_.hasModule(ManagerModules.TILE_POWER_LEAF_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_LEAF_NODE, null))
 
   override def storageNodes(force: Boolean): Set[IPowerStorageNode] = {
     val set = if (tileEntity.hasCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
       Set(tileEntity.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
     else Set()
 
-    set ++ leafNodeLocs.flatMap(_.getTileEntity(force)).withFilter(_.hasCapability(Capabilities.TILE_POWER_STORAGE_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
+    set ++ leafNodeLocs.flatMap(_.getITileEntity(force)).withFilter(_.hasModule(ManagerModules.TILE_POWER_STORAGE_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null))
   }
 
   override def connectionRadius: Float = radius
@@ -76,6 +76,6 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityBase,
   override def serializeNBT(): NBTTagCompound = {
     NBTCompound(
       PowerNetworkNodeDelegate.LEAF_NODE_TAG -> NBTList(leafNodeLocs.map(_.serializeNBT()))
-    )
+      )
   }
 }

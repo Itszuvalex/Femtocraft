@@ -2,14 +2,16 @@ package com.itszuvalex.femtocraft.logistics.block
 
 import java.util
 
+import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
-import com.itszuvalex.itszulib.core.TileContainer
+import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
+import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
+import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.{Entity, EntityLivingBase}
 import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing._
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos, RayTraceResult, Vec3d}
 import net.minecraft.world.{IBlockAccess, World}
@@ -19,10 +21,10 @@ import scala.collection.JavaConversions._
 /**
   * Created by Chris on 2/16/2017.
   */
-class BlockConduit extends TileContainer(Material.IRON) {
+class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileContainer(FemtoBlocks.blockConduit _) {
+  override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileConduit
+}, BlockBehaviors.DEFAULT) {
   var renderBox = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
-
-  override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileConduit
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
@@ -84,8 +86,8 @@ class BlockConduit extends TileContainer(Material.IRON) {
   }
 
   override protected def rayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, boundingBox: AxisAlignedBB): RayTraceResult = {
-    val vec3d: Vec3d = start.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
-    val vec3d1: Vec3d = end.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
+    val vec3d         : Vec3d          = start.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
+    val vec3d1        : Vec3d          = end.subtract(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble)
     val raytraceresult: RayTraceResult = boundingBox.calculateIntercept(vec3d, vec3d1)
     if (raytraceresult == null) null
     else new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX.toDouble, pos.getY.toDouble, pos.getZ.toDouble), raytraceresult.sideHit, pos)

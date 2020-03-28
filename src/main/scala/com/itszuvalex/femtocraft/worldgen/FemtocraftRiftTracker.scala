@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.worldgen.IRift
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageRiftSync
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.core.{ChunkCoord, Loc4}
 import com.itszuvalex.itszulib.logistics.LocationTracker
 import com.itszuvalex.itszulib.util.Debug
 import net.minecraft.entity.player.EntityPlayerMP
@@ -57,7 +57,7 @@ class FemtocraftRiftTracker {
 
   @SubscribeEvent def onChunkWatch(watchEvent: ChunkWatchEvent.Watch): Unit = {
     val chunk = watchEvent.getChunk
-    riftLocs.getLocationsInChunk(watchEvent.getPlayer.dimension, (chunk.x, chunk.z)).map(rifts).foreach(syncRift(_, watchEvent.getPlayer))
+    riftLocs.getLocationsInChunk(watchEvent.getPlayer.dimension, ChunkCoord(chunk.x, chunk.z)).map(rifts).foreach(syncRift(_, watchEvent.getPlayer))
   }
 
   @SubscribeEvent def onChunkUnwatch(watchEvent: ChunkWatchEvent.UnWatch): Unit = {

@@ -9,8 +9,8 @@ import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.gui._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.Converter
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
+import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
@@ -24,7 +24,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
 
   override def getClientGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
-      case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, player.getHeldItemMainhand)
+      case (GuiIDs.TileFrameMultiblockSelectorGuiID, _) => new GuiMultiblockSelection(player, Converter.IItemStackFromItemStack(player.getHeldItemMainhand))
       case (GuiIDs.ItemNanoPackID, _) => new GuiNanoPack(player, player.inventory, Converter.IItemStackFromItemStack(player.getHeldItemMainhand))
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
@@ -41,12 +41,12 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileCrystalHeatExchangerID, te: TileCrystalHeatExchanger) => new GuiCrystalHeatExchanger(player, player.inventory, te)
       case (GuiIDs.TileDemolisherGuiID, te: TileDemolisher) => new GuiDemolisher(player, player.inventory, te)
       case (GuiIDs.TileGerminationChamberID, te: TileGerminationChamber) => new GuiGerminationChamber(player, player.inventory, te)
-      case (GuiIDs.TilePowerNetworkID, te: TileEntityBase) => new GuiPowerNetwork(te)
+      case (GuiIDs.TilePowerNetworkID, te: TileEntityCore) => new GuiPowerNetwork(te)
       case (GuiIDs.TileConduitID, te: TileConduit) => new GuiConduit(player, player.inventory, te)
       case (GuiIDs.TileConduitSideID, te: TileConduit) => new GuiConduitSide(player, player.inventory, te, EnumFacing.getFront(data))
-      case (GuiIDs.TileSidedInventoryConfigID, te: TileEntity) => new GuiSidedInventoryConfig(te)
-      case (GuiIDs.TileSidedNaniteConfigID, te: TileEntity) => new GuiSidedNaniteConfig(te)
-      case (GuiIDs.TileSidedFluidConfigID, te: TileEntity) => new GuiSidedFluidConfig(te)
+      case (GuiIDs.TileSidedInventoryConfigID, te: ITileEntity) => new GuiSidedInventoryConfig(te)
+      case (GuiIDs.TileSidedNaniteConfigID, te: ITileEntity) => new GuiSidedNaniteConfig(te)
+      case (GuiIDs.TileSidedFluidConfigID, te: ITileEntity) => new GuiSidedFluidConfig(te)
       case (_, _) => null
     }
   }

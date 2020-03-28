@@ -2,23 +2,21 @@ package com.itszuvalex.femtocraft.logistics.tile
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ConduitImpl
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.ItszuLibModules
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
-import com.itszuvalex.itszulib.api.wrappers.IItemStack
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.wrappers._
+import com.itszuvalex.itszulib.core.modules.ModuleGui
+import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityModule}
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
-import net.minecraftforge.items.CapabilityItemHandler
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -28,21 +26,23 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Chris on 2/16/2017.
   */
 object TileConduit {
-  lazy val connectionCapabilities: ArrayBuffer[Capability[_]] = mutable.ArrayBuffer[Capability[_]](
-    Capabilities.TILE_CONDUIT,
-    Capabilities.TILE_LOGISTICS_NODE,
-    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-    Capabilities.TILE_NANITE_STORAGE_TANK,
-    CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
-  )
+  lazy val connectionModules: ArrayBuffer[IModule[_]] = mutable.ArrayBuffer[IModule[_]](
+    ManagerModules.TILE_CONDUIT,
+    ManagerModules.TILE_LOGISTICS_NODE,
+    ItszuLibModules.ITEM_STORAGE,
+    ItszuLibModules.ITEM_MINECRAFT_INVENTORY,
+    ManagerModules.TILE_NANITE_STORAGE_TANK,
+    ItszuLibModules.FLUID_STORAGE,
+    ItszuLibModules.FLUID_MINECRAFT_HANDLER
+    )
   val CONDUIT_KEY = "conduit"
 
-  def addConnectionCapability(cap: Capability[_]): Unit = {
-    connectionCapabilities += cap
+  def addConnectionModule(mod: IModule[_]): Unit = {
+    connectionModules += mod
   }
 
   class ConduitStorage(size: Int) extends ItemStorageArray(size) {
-    override def canInsert(i: Int, stack: IItemStack): Boolean = stack.hasCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null)
+    override def canInsert(i: Int, stack: IItemStack): Boolean = stack.hasModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
     override def maxStackSize(i: Int): Int = 1
   }
@@ -56,7 +56,7 @@ object TileConduit {
     override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = {
       if (facing == null) return Set[IConnection[T]]()
 
-      connectionStorage(facing.getIndex).withFilter(f => !f.isEmpty && f.hasCapability(Capabilities.ITEM_CONNECTION_PROVIDER, facing)).map(_.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, facing)).flatMap { f =>
+      connectionStorage(facing.getIndex).withFilter(f => !f.isEmpty && f.hasModule(ManagerModules.ITEM_CONNECTION_PROVIDER, facing)).map(_.getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, facing)).flatMap { f =>
         f.getConnections[T](getLoc, facing)
       }
     }
@@ -80,9 +80,9 @@ object TileConduit {
 
       if (!connections(facing.getIndex)) return
 
-      getLoc.getOffset(facing).getTileEntity(false).foreach { t =>
-        if (!t.hasCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)) return
-        val cap = t.getCapability(Capabilities.TILE_CONDUIT, facing.getOpposite)
+      getLoc.getOffset(facing).getITileEntity(false).foreach { t =>
+        if (!t.hasModule(ManagerModules.TILE_CONDUIT, facing.getOpposite)) return
+        val cap = t.getModule(ManagerModules.TILE_CONDUIT, facing.getOpposite)
         if (!cap.canAddConnection(facing.getOpposite)) return
 
         cap.addConnection(facing.getOpposite)
@@ -97,22 +97,22 @@ object TileConduit {
       if (connections(facing.getIndex)) return
       if (!canAddConnection(facing)) return
 
-      getLoc.getOffset(facing).getTileEntity(false)
-        .withFilter(_.hasCapability(Capabilities.TILE_CONDUIT, facing.getOpposite))
-        .map(_.getCapability(Capabilities.TILE_CONDUIT, facing.getOpposite))
-        .withFilter(!_.canAddConnection(facing.getOpposite))
-        .foreach(a => return)
+      getLoc.getOffset(facing).getITileEntity(false)
+            .withFilter(_.hasModule(ManagerModules.TILE_CONDUIT, facing.getOpposite))
+            .map(_.getModule(ManagerModules.TILE_CONDUIT, facing.getOpposite))
+            .withFilter(!_.canAddConnection(facing.getOpposite))
+            .foreach(a => return)
 
       connections(facing.getIndex) = true
       connectToNetwork(getLoc.getOffset(facing), facing.getOpposite)
-      conduit.setModified()
+      conduit.markDirtyForSave()
       conduit.setUpdate()
     }
 
     def connectToNetwork(loc: Loc4, facing: EnumFacing): Unit = {
-      loc.getTileEntity(false) match {
-        case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
-          val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
+      loc.getITileEntity(false) match {
+        case Some(i: ITileEntity) if i.hasModule(ManagerModules.TILE_LOGISTICS_NODE, facing.getOpposite) =>
+          val cap     = i.getModule(ManagerModules.TILE_LOGISTICS_NODE, facing.getOpposite)
           val network = if (cap.getNetwork != null) cap.getNetwork else getNetwork
           network.addConnection(getLoc, cap.getLoc)
         case _ =>
@@ -124,14 +124,14 @@ object TileConduit {
 
       connections(facing.getIndex) = false
       disconnectFromNetwork(getLoc.getOffset(facing), facing.getOpposite)
-      conduit.setModified()
+      conduit.markDirtyForSave()
       conduit.setUpdate()
     }
 
     def disconnectFromNetwork(loc: Loc4, facing: EnumFacing): Unit = {
-      loc.getTileEntity(false) match {
-        case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
-          val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
+      loc.getITileEntity(false) match {
+        case Some(i: ITileEntity) if i.hasModule(ManagerModules.TILE_LOGISTICS_NODE, facing.getOpposite) =>
+          val cap = i.getModule(ManagerModules.TILE_LOGISTICS_NODE, facing.getOpposite)
           getNetwork.removeConnection(getLoc, cap.getLoc)
         case _ =>
       }
@@ -171,40 +171,51 @@ object TileConduit {
 
 }
 
-class TileConduit extends TileEntityBase {
+class TileConduit extends TileEntityCoreTickable {
   val conduit = new ConduitImpl(this)
   var color   = Color(0, 0, 0, 0)
 
+  addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileConduitID _))
+  addTileEntityModule(new TileEntityModule[IConduit] {
+    override def module: IModule[IConduit] = ManagerModules.TILE_CONDUIT
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[IConduit] = _ => Some(conduit)
+  })
+  addTileEntityModule(new TileEntityModule[ILogisticsNetworkNode] {
+    override def module: IModule[ILogisticsNetworkNode] = ManagerModules.TILE_LOGISTICS_NODE
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[ILogisticsNetworkNode] = _ => Some(conduit)
+  })
+  addTileEntityModule(new TileEntityModule[Color] {
+    override def module: IModule[Color] = ItszuLibModules.COLORABLE
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ => Some(color)
+  })
+
   override def hasDescription: Boolean = true
-
-  override def getMod: AnyRef = Femtocraft
-
-  override def hasGUI: Boolean = true
-
-  override def getGuiID: Int = GuiIDs.TileConduitID
 
   def getStorage(facing: EnumFacing): IItemStorage = conduit.connectionStorage(facing.getIndex)
 
   def onNeighborChange(neighbor: BlockPos): Unit = {
     if (getWorld.isRemote) return
 
-    val loc = getLoc
+    val loc  = getLoc
     val nloc = new Loc4(getWorld, neighbor)
     EnumFacing.VALUES.withFilter(getLoc.getOffset(_) == nloc).foreach(checkFacingForConnection)
   }
 
   private def checkFacingForConnection(f: EnumFacing) = {
-    val loc = getLoc
+    val loc  = getLoc
     val floc = getLoc.getOffset(f)
     if (conduit.isConnected(f)) {
-      floc.getTileEntity(false) match {
-        case Some(a: TileEntity) if TileConduit.connectionCapabilities.exists(a.hasCapability(_, f.getOpposite)) =>
+      floc.getITileEntity(false) match {
+        case Some(a: ITileEntity) if TileConduit.connectionModules.exists(a.hasModule(_, f.getOpposite)) =>
         case _ => conduit.removeConnection(f)
       }
     }
     else {
-      floc.getTileEntity(false) match {
-        case Some(a: TileEntity) if TileConduit.connectionCapabilities.exists(a.hasCapability(_, f.getOpposite)) =>
+      floc.getITileEntity(false) match {
+        case Some(a: ITileEntity) if TileConduit.connectionModules.exists(a.hasModule(_, f.getOpposite)) =>
           conduit.addConnectionInternal(f)
         case _ =>
       }
@@ -221,15 +232,15 @@ class TileConduit extends TileEntityBase {
     EnumFacing.VALUES.foreach(checkFacingForConnection)
   }
 
-  override def onBlockBreak(): Unit = {
-    super.onBlockBreak()
+  override def onBlockBreak(state: IBlockState): Unit = {
+    super.onBlockBreak(state)
 
     if (getWorld.isRemote) return
 
     conduit.connections.indices.withFilter(conduit.connections).map(EnumFacing.VALUES).foreach { f =>
-      val loc = getLoc
+      val loc  = getLoc
       val floc = loc.getOffset(f)
-      floc.getTileEntity(false).withFilter(_.hasCapability(Capabilities.TILE_CONDUIT, f.getOpposite)).map(_.getCapability(Capabilities.TILE_CONDUIT, f.getOpposite)).foreach { c =>
+      floc.getITileEntity(false).withFilter(_.hasModule(ManagerModules.TILE_CONDUIT, f.getOpposite)).map(_.getModule(ManagerModules.TILE_CONDUIT, f.getOpposite)).foreach { c =>
         c.removeConnection(f.getOpposite)
       }
     }
@@ -243,9 +254,9 @@ class TileConduit extends TileEntityBase {
       conduit.seek = false
       conduit.connections.indices.withFilter(conduit.connections).map(EnumFacing.VALUES).foreach { facing =>
         val loc = getLoc.getOffset(facing)
-        loc.getTileEntity(false) match {
-          case Some(i: TileEntity) if i.hasCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite) =>
-            val cap = i.getCapability(Capabilities.TILE_LOGISTICS_NODE, facing.getOpposite)
+        loc.getITileEntity(false) match {
+          case Some(i: ITileEntity) if i.hasModule(ManagerModules.TILE_LOGISTICS_NODE, facing.getOpposite) =>
+            val cap = i.getModule(ManagerModules.TILE_LOGISTICS_NODE, facing.getOpposite)
             if (cap.network != null)
               if (conduit.network == null)
                 cap.network.addNode(conduit)
@@ -265,23 +276,24 @@ class TileConduit extends TileEntityBase {
 
   override def getRenderBoundingBox: AxisAlignedBB = new AxisAlignedBB(getPos, getPos.add(1, 1, 1))
 
+
   override def update(): Unit = {
     super.update()
-    var red: Int = 0
+    var red  : Int = 0
     var green: Int = 0
-    var blue: Int = 0
-    var numBlocks = 0
-    EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getTileEntity(false))
-      .withFilter(_.hasCapability(ItszuLibCapabilities.COLORABLE, null)).map(_.getCapability(ItszuLibCapabilities.COLORABLE, null)).foreach { c =>
+    var blue : Int = 0
+    var numBlocks  = 0
+    EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getITileEntity(false))
+              .withFilter(_.hasModule(ItszuLibModules.COLORABLE, null)).map(_.getModule(ItszuLibModules.COLORABLE, null)).foreach { c =>
       numBlocks += 1
       red += c.red.toInt & 255
       green += c.green.toInt & 255
       blue += c.blue.toInt & 255
     }
     color = if (numBlocks > 0) Color(255.toByte,
-      ((red / numBlocks) & 255).toByte,
-      ((green / numBlocks) & 255).toByte,
-      ((blue / numBlocks) & 255).toByte)
+                                     ((red / numBlocks) & 255).toByte,
+                                     ((green / numBlocks) & 255).toByte,
+                                     ((blue / numBlocks) & 255).toByte)
     else Color(0, 0, 0, 0)
   }
 
@@ -308,23 +320,6 @@ class TileConduit extends TileEntityBase {
     conduit.saveConnectionInfoNBT(con)
     par1nbtTagCompound.setTag(TileConduit.CONDUIT_KEY, con)
     par1nbtTagCompound
-  }
-
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-    if (capability == Capabilities.TILE_CONDUIT)
-      conduit.asInstanceOf[T]
-    else if (capability == Capabilities.TILE_LOGISTICS_NODE)
-      conduit.asInstanceOf[T]
-    else if (capability == ItszuLibCapabilities.COLORABLE)
-      color.asInstanceOf[T]
-    else super.getCapability(capability, facing)
-  }
-
-  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = {
-    capability == Capabilities.TILE_CONDUIT ||
-      capability == Capabilities.TILE_LOGISTICS_NODE ||
-      capability == ItszuLibCapabilities.COLORABLE ||
-      super.hasCapability(capability, facing)
   }
 
   override def invalidate(): Unit = {

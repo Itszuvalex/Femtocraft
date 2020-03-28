@@ -1,12 +1,11 @@
 package com.itszuvalex.femtocraft.power
 
 import com.itszuvalex.femtocraft.Femtocraft
-import com.itszuvalex.femtocraft.api.Capabilities
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, PowerNetwork}
-import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.logistics.LocationTracker
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,16 +34,16 @@ class PowerManager {
   def addNode(node: IPowerNetworkNode): Unit = {
     val loc = node.getLoc
 
-    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, Capabilities.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getLoc, ManagerModules.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(loc) == 0).toSet
     if (nodes.isEmpty) {
       val network = PowerNetwork.createFromNode(node)
       network.register()
     }
     else {
       nodes.withFilter(l => l.getLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)).withFilter(n => n.canConnect(loc) && node.canConnect(n.getLoc)).
-        foreach { nloc =>
-          Option(nloc.getNetwork).foreach(_.addNode(node))
-        }
+           foreach { nloc =>
+             Option(nloc.getNetwork).foreach(_.addNode(node))
+           }
     }
 
     refreshLeafsOnMain(node)
@@ -54,15 +53,15 @@ class PowerManager {
   }
 
   def refreshLeafsOnMain(node: IPowerNetworkNode): Unit = {
-    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, Capabilities.TILE_POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
+    val leafs = getIPowerNetworkNodesInRange(leafTracker, node.getLoc, ManagerModules.TILE_POWER_LEAF_NODE, node.connectionRadius).filterNot(_.getStorageLoc.compareTo(node.getLoc) == 0).toSet
     leafs.view.filter(_.getParent == null).
-      filter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
-      .filter(l => l.canSetParent(node) && node.canAddLeafNode(l)).
-      toSeq.sortBy(_.getStorageLoc.distSqr(node.getLoc))
-      .foreach { l =>
-        node.addLeafNode(l)
-        l.setParent(node)
-      }
+         filter(l => l.getStorageLoc.distSqr(node.getLoc) <= (l.connectionRadius * l.connectionRadius)) // Don't need to check own connection radius
+         .filter(l => l.canSetParent(node) && node.canAddLeafNode(l)).
+         toSeq.sortBy(_.getStorageLoc.distSqr(node.getLoc))
+         .foreach { l =>
+           node.addLeafNode(l)
+           l.setParent(node)
+         }
   }
 
   def addLeaf(node: IPowerLeafNode): Unit = {
@@ -73,22 +72,22 @@ class PowerManager {
   def refreshLeaf(node: IPowerLeafNode): Unit = {
     if (node.getParent != null) return
 
-    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, Capabilities.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
+    val nodes = getIPowerNetworkNodesInRange(nodeTracker, node.getStorageLoc, ManagerModules.TILE_POWER_NODE, node.connectionRadius).filterNot(_.getLoc.compareTo(node.getStorageLoc) == 0).toSet
     nodes.view.filter(l => l.getLoc.distSqr(node.getStorageLoc) <= l.connectionRadius * l.connectionRadius).filter(l => l.canAddLeafNode(node) && node.canSetParent(l)).
-      toSeq.sortBy(_.getLoc.distSqr(node.getStorageLoc)).
-      foreach { n =>
-        n.addLeafNode(node)
-        node.setParent(n)
-        return // Only do this once.
-      }
+         toSeq.sortBy(_.getLoc.distSqr(node.getStorageLoc)).
+         foreach { n =>
+           n.addLeafNode(node)
+           node.setParent(n)
+           return // Only do this once.
+         }
   }
 
-  private def getIPowerNetworkNodesInRange[T](tracker: LocationTracker, loc: Loc4, capability: Capability[T], radius: Float): Iterable[T] = {
+  private def getIPowerNetworkNodesInRange[T](tracker: LocationTracker, loc: Loc4, module: IModule[T], radius: Float): Iterable[T] = {
     tracker.getLocationsInRange(loc, radius).view
-      .withFilter(_.compareTo(loc) != 0)
-      .flatMap(_.getTileEntity(force = false))
-      .withFilter(_.hasCapability(capability, null))
-      .map(_.getCapability(capability, null))
+           .withFilter(_.compareTo(loc) != 0)
+           .flatMap(_.getITileEntity(force = false))
+           .withFilter(_.hasModule(module, null))
+           .map(_.getModule(module, null))
   }
 
   def removeNode(node: IPowerNetworkNode): Unit = {
@@ -107,7 +106,7 @@ class PowerManager {
   }
 
   def onLeafBroken(node: IPowerLeafNode): Unit = {
-    Option(node.getParent).flatMap(_.getTileEntity(true)).withFilter(_.hasCapability(Capabilities.TILE_POWER_NODE, null)).map(_.getCapability(Capabilities.TILE_POWER_NODE, null)).foreach(_.removeLeafNode(node))
+    Option(node.getParent).flatMap(_.getITileEntity(true)).withFilter(_.hasModule(ManagerModules.TILE_POWER_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_NODE, null)).foreach(_.removeLeafNode(node))
   }
 
   @SubscribeEvent def onWorldUnload(worldEvent: WorldEvent.Unload): Unit = {

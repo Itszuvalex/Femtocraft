@@ -1,4 +1,4 @@
-image: ubuntu_gradle_jdk:latest
+image: openjdk:8u242-jdk
 
 stages:
   - build

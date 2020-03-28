@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.industry.{FrameMultiblockRegistry, FrameMultiblockRendererRegistry, IFrameItem}
-import com.itszuvalex.itszulib.api.IPreviewableRenderer
+import com.itszuvalex.itszulib.api.client.IPreviewableRenderer
 import com.itszuvalex.itszulib.api.core.Loc4
+import com.itszuvalex.itszulib.api.wrappers.IItemStack
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
 
@@ -15,10 +15,10 @@ import org.lwjgl.opengl.GL11
 class FramePreviewableRenderer extends IPreviewableRenderer {
   lazy val generic = new GenericFrameMultiblockRenderer
 
-  override def render(stack: ItemStack, player: EntityPlayer): Unit = {}
+  override def render(stack: IItemStack, player: EntityPlayer): Unit = {}
 
-  override def renderAtLocation(stack: ItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
-    stack.getItem match {
+  override def renderAtLocation(stack: IItemStack, player: EntityPlayer, loc: Loc4, rx: Double, ry: Double, rz: Double): Unit = {
+    stack.toMinecraft.getItem match {
       case frame: IFrameItem =>
         frame.getSelectedMultiblock(stack) match {
           case multi: String =>
@@ -44,3 +44,4 @@ class FramePreviewableRenderer extends IPreviewableRenderer {
     GL11.glColor3f(1, 1, 1)
   }
 }
+

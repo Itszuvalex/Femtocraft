@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.power.item
 import java.util
 
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.itszulib.api.wrappers.WrapperNBTBattery
+import com.itszuvalex.itszulib.api.storage.PowerBatteryNBT
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
@@ -48,12 +48,12 @@ object ItemPowerCrystal {
   }
 
   def initialize(stack: ItemStack,
-    name: String,
-    rtype: String,
-    color: Int,
-    storage: Double,
-    passiveGen: Float,
-    transfer: Int): ItemStack = {
+                 name: String,
+                 rtype: String,
+                 color: Int,
+                 storage: Double,
+                 passiveGen: Float,
+                 transfer: Int): ItemStack = {
     if (stack == null) return stack
     if (!stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)) return stack
 
@@ -78,8 +78,8 @@ class ItemPowerCrystal extends Item {
     new ICapabilityProvider {
       override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
         if (capability == Capabilities.ITEM_POWER_CRYSTAL) new PowerCrystalItemWrapper(stack).asInstanceOf[T]
-        else if (capability == Capabilities.POWER_STORAGE) new WrapperNBTBattery(if (stack.hasTagCompound) stack.getTagCompound
-        else {val tag = new NBTTagCompound; stack.setTagCompound(tag); tag}).asInstanceOf[T]
+        else if (capability == Capabilities.POWER_STORAGE) new PowerBatteryNBT(if (stack.hasTagCompound) stack.getTagCompound
+                                                                               else {val tag = new NBTTagCompound; stack.setTagCompound(tag); tag}).asInstanceOf[T]
         else null.asInstanceOf[T]
       }
 

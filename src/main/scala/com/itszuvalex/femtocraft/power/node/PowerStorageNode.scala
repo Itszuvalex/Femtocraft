@@ -2,8 +2,8 @@ package com.itszuvalex.femtocraft.power.node
 
 import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.api.power.{IPowerStorageNode, PowerStorageNodeDelegate, PowerStorageNodeType}
-import com.itszuvalex.itszulib.api.wrappers.IBattery
-import com.itszuvalex.itszulib.core.TileEntityBase
+import com.itszuvalex.itszulib.api.storage.IBattery
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -16,7 +16,7 @@ object PowerStorageNode {
   val BATTERY_TAG = "battery"
 }
 
-trait PowerStorageNode extends TileEntityBase {
+trait PowerStorageNode extends TileEntityCoreTickable {
   val delegate: IPowerStorageNode = defaultStorageDelegate
   var battery : IBattery          = defaultBattery
 

@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.power.block
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.power.tile.TilePowerPedestal
-import com.itszuvalex.itszulib.core.TileContainer
+import net.minecraft.block.BlockContainer
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.EntityLivingBase
@@ -14,7 +14,7 @@ import net.minecraft.world.{IBlockAccess, World}
 /**
   * Created by Christopher on 8/30/2015.
   */
-class BlockPowerPedestal extends TileContainer(Material.IRON) {
+class BlockPowerPedestal extends BlockContainer(Material.IRON) {
   setCreativeTab(Femtocraft.tab)
 
   override def createNewTileEntity(p_149915_1_ : World, p_149915_2_ : Int): TileEntity = new TilePowerPedestal
