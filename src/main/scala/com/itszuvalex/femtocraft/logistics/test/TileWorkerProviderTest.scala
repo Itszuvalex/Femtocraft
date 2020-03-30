@@ -4,7 +4,7 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.logistics.distributed.{DistributedManager, ITask, IWorker, IWorkerProvider}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.IWorld
-import com.itszuvalex.itszulib.core.TileEntityCoreTickable
+import com.itszuvalex.itszulib.core.{KeyedBoundingBox, TileEntityCoreTickable}
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTLiterals._
 import com.itszuvalex.itszulib.render.Vector3
@@ -99,8 +99,8 @@ class TileWorkerProviderTest extends TileEntityCoreTickable with IWorkerProvider
     }
 
 
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float, box: Option[KeyedBoundingBox]): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ, box)
     if (world.isRemote) return ret
     PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "Workers(" + getProvidedWorkers.size + "):")
     getProvidedWorkers.foreach { worker =>

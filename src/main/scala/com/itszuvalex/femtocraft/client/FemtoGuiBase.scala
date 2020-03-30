@@ -4,7 +4,7 @@ import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.container.ContainerBase
 import com.itszuvalex.itszulib.core.TileEntityCore
-import com.itszuvalex.itszulib.core.modules.{InternalModules, TempInternal}
+import com.itszuvalex.itszulib.core.modules.InternalModules
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.client.gui.Gui
@@ -23,8 +23,8 @@ abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase
     override def itemStack = item
   }, if (tile.hasModule(InternalModules.MODULE_GUI, null))
                   tile.getModule(InternalModules.MODULE_GUI, null).guiId()
-                else if (tile.hasModule(TempInternal.MODULE_MULTIBLOCK_GUI, null))
-    tile.getModule(TempInternal.MODULE_MULTIBLOCK_GUI, null).guiId()
+                else if (tile.hasModule(InternalModules.MODULE_MULTIBLOCK_GUI, null))
+    tile.getModule(InternalModules.MODULE_MULTIBLOCK_GUI, null).guiId()
                 else 0)
   add(tabBar)
 

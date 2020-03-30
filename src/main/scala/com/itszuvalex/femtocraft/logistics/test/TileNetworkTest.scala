@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.logistics.test
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.itszulib.api.wrappers.IWorld
-import com.itszuvalex.itszulib.core.TileEntityCoreTickable
+import com.itszuvalex.itszulib.core.{KeyedBoundingBox, TileEntityCoreTickable}
 import com.itszuvalex.itszulib.logistics.TileNetworkNode
 import com.itszuvalex.itszulib.util.PlayerUtils
 import net.minecraft.block.state.IBlockState
@@ -47,8 +47,8 @@ class TileNetworkTest extends TileEntityCoreTickable with TileNetworkNode[TileNe
   }
 
 
-  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+  override def onBlockActivated(world: IWorld, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float, box: Option[KeyedBoundingBox]): Boolean = {
+    val ret = super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ, box)
     if (!world.isRemote)
       PlayerUtils.sendMessageToPlayer(playerIn, Femtocraft.ID, "Network ID:" + getNetwork.id)
     ret

@@ -14,6 +14,7 @@ import com.itszuvalex.itszulib.core.modules.ModuleGui
 import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityModule}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
@@ -196,11 +197,13 @@ class TileConduit extends TileEntityCoreTickable {
 
   def getStorage(facing: EnumFacing): IItemStorage = conduit.connectionStorage(facing.getIndex)
 
-  def onNeighborChange(neighbor: BlockPos): Unit = {
+
+  override def onNeighborChanged(world: IWorld, pos: BlockPos, state: IBlockState, changedBlock: IBlock, changedPos: BlockPos): Unit = {
+    super.onNeighborChanged(world, pos, state, changedBlock, changedPos)
     if (getWorld.isRemote) return
 
     val loc  = getLoc
-    val nloc = new Loc4(getWorld, neighbor)
+    val nloc = new Loc4(getWorld, changedPos)
     EnumFacing.VALUES.withFilter(loc.getOffset(_) == nloc).foreach(checkFacingForConnection)
   }
 
@@ -222,7 +225,9 @@ class TileConduit extends TileEntityCoreTickable {
     }
   }
 
-  def onBlockPlaced(): Unit = {
+
+  override def onBlockPlacedBy(iworld: IWorld, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, istack: IItemStack): Unit = {
+    super.onBlockPlacedBy(iworld, pos, state, placer, istack)
     if (getWorld.isRemote) return
 
     val network = new LogisticsNetwork
