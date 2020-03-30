@@ -201,12 +201,12 @@ class TileConduit extends TileEntityCoreTickable {
 
     val loc  = getLoc
     val nloc = new Loc4(getWorld, neighbor)
-    EnumFacing.VALUES.withFilter(getLoc.getOffset(_) == nloc).foreach(checkFacingForConnection)
+    EnumFacing.VALUES.withFilter(loc.getOffset(_) == nloc).foreach(checkFacingForConnection)
   }
 
-  private def checkFacingForConnection(f: EnumFacing) = {
+  private def checkFacingForConnection(f: EnumFacing): Unit = {
     val loc  = getLoc
-    val floc = getLoc.getOffset(f)
+    val floc = loc.getOffset(f)
     if (conduit.isConnected(f)) {
       floc.getITileEntity(false) match {
         case Some(a: ITileEntity) if TileConduit.connectionModules.exists(a.hasModule(_, f.getOpposite)) =>
@@ -276,9 +276,8 @@ class TileConduit extends TileEntityCoreTickable {
 
   override def getRenderBoundingBox: AxisAlignedBB = new AxisAlignedBB(getPos, getPos.add(1, 1, 1))
 
-
-  override def update(): Unit = {
-    super.update()
+  override def clientUpdate(): Unit = {
+    super.clientUpdate()
     var red  : Int = 0
     var green: Int = 0
     var blue : Int = 0

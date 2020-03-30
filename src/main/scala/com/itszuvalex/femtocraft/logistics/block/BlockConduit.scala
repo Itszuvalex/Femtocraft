@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
 import com.itszuvalex.itszulib.core.{BlockTileContainer, TileBlockContainerCore}
+import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.{Entity, EntityLivingBase}
@@ -30,11 +31,12 @@ class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileCo
 
   override def isNormalCube(state: IBlockState): Boolean = false
 
-  override def onNeighborChange(world: IBlockAccess, pos: BlockPos, neighbor: BlockPos): Unit = {
-    super.onNeighborChange(world, pos, neighbor)
-    world.getTileEntity(pos) match {
+
+  override def observedNeighborChange(observerState: IBlockState, world: World, observerPos: BlockPos, changedBlock: Block, changedBlockPos: BlockPos): Unit = {
+    super.observedNeighborChange(observerState, world, observerPos, changedBlock, changedBlockPos)
+    world.getTileEntity(observerPos) match {
       case null =>
-      case t: TileConduit => t.onNeighborChange(neighbor)
+      case t: TileConduit => t.onNeighborChange(changedBlockPos)
       case _ =>
     }
   }
