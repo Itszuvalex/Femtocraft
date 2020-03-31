@@ -28,13 +28,13 @@ class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileCo
   val negXBB                     = KeyedBoundingBox("NegX", 6, new AxisAlignedBB(0, .25, .25, .25, .75, .75)) // NEG X
 
   var renderBox = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
-  override val boundingBoxes = Some(new NamedDynamicBoundingBoxCollection(() => centerBB, getBoundingBoxes))
+  override val boundingBoxes: Option[NamedDynamicBoundingBoxCollection] = Some(new NamedDynamicBoundingBoxCollection(() => centerBB, getBoundingBoxes))
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
   override def isNormalCube(state: IBlockState): Boolean = false
 
-  def getBoundingBoxes(worldIn: IWorld, pos: BlockPos) = {
+  def getBoundingBoxes(worldIn: IWorld, pos: BlockPos): ArrayBuffer[KeyedBoundingBox] = {
     val list = new ArrayBuffer[KeyedBoundingBox]()
     list += centerBB
 

@@ -2,10 +2,10 @@ package com.itszuvalex.femtocraft.logistics.connections
 
 import com.itszuvalex.femtocraft.api.logistics.{ConnectionDirection, IConnection, IResource, LogisticsResourceRegistry}
 import com.itszuvalex.femtocraft.logistics.connections.ItemConnection.{InternalIItemStack, InternalStorage}
-import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.{IModule, ItemIdentifier, Loc4}
 import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
+import com.itszuvalex.itszulib.util.TileEntityUtils
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -92,8 +92,8 @@ class ItemConnection(val loc: Loc4, val facing: EnumFacing, nbt: NBTTagCompound,
 
   def storage: Option[IItemStorage] = {
     loc.getOffset(facing).getITileEntity(false) match {
-      case Some(i: ITileEntity) if i.hasModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, interfaceDirection) =>
-        Some(Converter.IItemStorageFromIItemHandler(i.getModule(ItszuLibModules.ITEM_MINECRAFT_INVENTORY, interfaceDirection)))
+      case Some(i: ITileEntity) =>
+        TileEntityUtils.getIItemStorageFromTileEntity(i, interfaceDirection)
       case _ => None
     }
   }
