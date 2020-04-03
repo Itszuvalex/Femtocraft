@@ -3,11 +3,9 @@ package com.itszuvalex.femtocraft.logistics.render
 import java.util
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
-import com.itszuvalex.itszulib.api.ItszuLibCapabilities
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import com.itszuvalex.itszulib.util.{Color, StringUtils}
@@ -68,7 +66,7 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
 
   override def renderTileEntityInWorld(te: TileConduit, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    val color = te.getCapability(ItszuLibCapabilities.COLORABLE, null)
+    val color   = te.color.color
     val facings = EnumFacing.VALUES.filter(te.conduit.isConnected)
     val enumSet = if (facings.isEmpty) util.EnumSet.noneOf(classOf[EnumFacing]) else util.EnumSet.copyOf(facings.toSet)
     renderConduitAt(x, y, z, partialTicks, color, enumSet)

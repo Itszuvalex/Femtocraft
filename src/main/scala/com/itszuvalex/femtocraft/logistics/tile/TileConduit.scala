@@ -4,14 +4,14 @@ import java.util
 
 import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.logistics._
-import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ModuleConduit
+import com.itszuvalex.femtocraft.logistics.tile.TileConduit.{ModuleColor, ModuleConduit}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers._
 import com.itszuvalex.itszulib.core.modules.{ModuleGui, ModuleNetworkedWire}
-import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityModule}
+import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityModuleTickable}
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -68,7 +68,6 @@ object TileConduit {
 
     override def getLoc: Loc4 = conduit.getLoc
 
-
     override def writeWorldNBT(tag: NBTTagCompound): Unit = {
       super.writeWorldNBT(tag)
       val storage = new NBTTagCompound
@@ -87,47 +86,64 @@ object TileConduit {
     }
   }
 
+  class ModuleColor(conduit: TileConduit) extends TileEntityModuleTickable[Color] {
+    var color: Color = Color(0, 0, 0, 0)
+
+    override def module: IModule[Color] = ItszuLibModules.COLORABLE
+
+    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ => Some(color)
+
+    override def serverUpdate(tile: ITileEntity): Unit = {
+      update()
+    }
+
+    override def clientUpdate(tile: ITileEntity): Unit = {
+      update()
+    }
+
+    def update(): Unit = {
+      var red  : Int = 0
+      var green: Int = 0
+      var blue : Int = 0
+      var numBlocks  = 0
+      EnumFacing.VALUES.
+                withFilter(conduit.conduit.isConnected).
+                map(conduit.getLoc.getOffset(_)).flatMap(_.getITileEntity(false))
+                .flatMap(_.moduleOption(ItszuLibModules.COLORABLE, null))
+                .foreach { c =>
+                  numBlocks += 1
+                  red += c.red.toInt & 255
+                  green += c.green.toInt & 255
+                  blue += c.blue.toInt & 255
+                }
+      color = if (numBlocks > 0) {
+        Color(255.toByte,
+              ((red / numBlocks) & 255).toByte,
+              ((green / numBlocks) & 255).toByte,
+              ((blue / numBlocks) & 255).toByte)
+
+      }
+      else {
+        Color(0, 0, 0, 0)
+      }
+    }
+  }
+
   object ModuleConduit {
-    val CONNECTION_KEY = "connections"
-    val BLOCKED_KEY    = "blocked"
-    val STORAGE_KEY    = "storage"
+    val STORAGE_KEY = "storage"
   }
 
 }
 
 class TileConduit extends TileEntityCoreTickable {
   val conduit = new ModuleConduit(this)
-  var color: Color = Color(0, 0, 0, 0)
+  var color   = new ModuleColor(this)
 
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileConduitID _))
-  addTileEntityModule(new TileEntityModule[Color] {
-    override def module: IModule[Color] = ItszuLibModules.COLORABLE
-
-    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ => Some(color)
-  })
   addTileEntityModule(conduit)
+  addTileEntityModuleTickable(color)
 
   def getStorage(facing: EnumFacing): IItemStorage = conduit.connectionStorage(facing.getIndex)
 
   override def getRenderBoundingBox: AxisAlignedBB = new AxisAlignedBB(getPos, getPos.add(1, 1, 1))
-
-  override def clientUpdate(): Unit = {
-    super.clientUpdate()
-    var red  : Int = 0
-    var green: Int = 0
-    var blue : Int = 0
-    var numBlocks  = 0
-    EnumFacing.VALUES.map(getLoc.getOffset(_)).flatMap(_.getITileEntity(false))
-              .withFilter(_.hasModule(ItszuLibModules.COLORABLE, null)).map(_.getModule(ItszuLibModules.COLORABLE, null)).foreach { c =>
-      numBlocks += 1
-      red += c.red.toInt & 255
-      green += c.green.toInt & 255
-      blue += c.blue.toInt & 255
-    }
-    color = if (numBlocks > 0) Color(255.toByte,
-                                     ((red / numBlocks) & 255).toByte,
-                                     ((green / numBlocks) & 255).toByte,
-                                     ((blue / numBlocks) & 255).toByte)
-    else Color(0, 0, 0, 0)
-  }
 }
