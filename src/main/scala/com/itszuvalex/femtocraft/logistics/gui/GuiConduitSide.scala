@@ -54,7 +54,7 @@ object GuiConduitSide {
       super.addTooltip(mouseX, mouseY, tooltip)
     }
 
-    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
+    private def connection = Option(configuration).map(_.getConnections(new Loc4(itile), face).iterator().next())
 
     private def configuration: IConnectionProvider = stack().getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
@@ -87,7 +87,7 @@ object GuiConduitSide {
       super.addTooltip(mouseX, mouseY, tooltip)
     }
 
-    private def connection = Option(configuration).map(_.getConnections(new Loc4(tile), face).iterator().next())
+    private def connection = Option(configuration).map(_.getConnections(new Loc4(itile), face).iterator().next())
 
     private def configuration: IConnectionProvider = stack().getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
@@ -126,16 +126,15 @@ object GuiConduitSide {
 
 class GuiConduitSide(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit, facing: EnumFacing) extends FemtoGuiBase(Converter.ITileEntityFromTileEntity(tile), new ContainerConduitSide(player, inv, tile, facing, false)) {
   fontRenderer = Minecraft.getMinecraft.fontRenderer
-  val itile = Converter.ITileEntityFromTileEntity(tile)
 
   if (facing != null) {
     val labelName: String = facing.getName.charAt(0).toUpper.toString
     val faceLabel         = new GuiLabel(30, 14, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, () => {
-      (if (itile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
+      (if (tile.conduit.isConnected(facing)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET
     }) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
         super.addTooltip(mouseX, mouseY, tooltip)
-        if (itile.getModule(ManagerModules.TILE_CONDUIT, facing).isConnected(facing))
+        if (tile.conduit.isConnected(facing))
           tile.getLoc.getOffset(facing).getITileEntity(false) match {
             case None =>
             case Some(null) =>

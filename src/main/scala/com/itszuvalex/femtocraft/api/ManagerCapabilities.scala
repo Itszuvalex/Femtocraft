@@ -32,7 +32,6 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
     CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
     CapabilityManager.INSTANCE.register(classOf[ILogisticsNetworkNode], new LogisticsStorageDummy, classOf[LogisticsImplDummy])
-    CapabilityManager.INSTANCE.register(classOf[IConduit], new ConduitStorageDummy, classOf[ConduitImplDummy])
     CapabilityManager.INSTANCE.register(classOf[IConnectionProvider], new ConnectionProviderStorageDummy, classOf[ConnectionProviderImplDummy])
     CapabilityManager.INSTANCE.register(classOf[SidedNaniteStorageConfiguration], new SidedNaniteStorageConfigurationStorageDummy, classOf[SidedNaniteStorageConfiguration])
     CapabilityManager.INSTANCE.register(classOf[IOverlayRenderItem], new OverlayRenderStorageDummy, classOf[OverlayRenderItemImplDummy])
@@ -73,8 +72,6 @@ object ManagerCapabilities {
   class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
 
   class MultitoolStorageDummy extends DummyStorage[IMultitool]
-
-  class ConduitStorageDummy extends DummyStorage[IConduit]
 
   class LogisticsStorageDummy extends DummyStorage[ILogisticsNetworkNode]
 
@@ -208,16 +205,28 @@ object ManagerCapabilities {
     override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
     override def getLoc: Loc4 = new Loc4
-  }
 
-  class ConduitImplDummy extends IConduit {
-    override def canAddConnection(facing: EnumFacing): Boolean = false
+    override def addPersistedConnection(node: Loc4): Unit = {}
 
-    override def addConnection(facing: EnumFacing): Unit = {}
+    override def removePersistedConnection(node: Loc4): Unit = {}
 
-    override def removeConnection(facing: EnumFacing): Unit = {}
+    override def setNetwork(network: LogisticsNetwork): Unit = {}
 
-    override def isConnected(facing: EnumFacing): Boolean = false
+    override def getNetwork: LogisticsNetwork = null
+
+    override def canConnect(loc: Loc4): Boolean = false
+
+    override def refresh(): Unit = {}
+
+    override def canAdd(iNetwork: LogisticsNetwork): Boolean = false
+
+    override def onAdded(iNetwork: LogisticsNetwork): Unit = {}
+
+    override def onRemoved(iNetwork: LogisticsNetwork): Unit = {}
+
+    override def onConnect(node: Loc4): Unit = {}
+
+    override def onDisconnect(node: Loc4): Unit = {}
   }
 
   class ConnectionProviderImplDummy extends IConnectionProvider {

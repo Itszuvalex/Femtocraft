@@ -1,7 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.block
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.api.Capabilities
 import com.itszuvalex.femtocraft.logistics.tile.TileConduit
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
@@ -28,7 +27,8 @@ class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileCo
   val negXBB                     = KeyedBoundingBox("NegX", 6, new AxisAlignedBB(0, .25, .25, .25, .75, .75)) // NEG X
 
   var renderBox = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
-  override val boundingBoxes: Option[NamedDynamicBoundingBoxCollection] = Some(new NamedDynamicBoundingBoxCollection(() => centerBB, getBoundingBoxes))
+
+  boundingBoxes =  Some(new NamedDynamicBoundingBoxCollection(centerBB _, getBoundingBoxes))
 
   override def isOpaqueCube(state: IBlockState): Boolean = false
 
@@ -41,8 +41,7 @@ class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileCo
     worldIn.getITileEntity(pos) match {
       case null =>
       case t: TileConduit =>
-        val conduit = t.getCapability(Capabilities.TILE_CONDUIT, null)
-        list ++= VALUES.withFilter(conduit.isConnected).map {
+        list ++= VALUES.withFilter(t.conduit.isConnected).map {
           case UP => posYBB
           case DOWN => negYBB
           case NORTH => negZBB
@@ -51,6 +50,7 @@ class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileCo
           case WEST => negXBB
           case _ => centerBB
         }
+      case _ =>
     }
     list
   }

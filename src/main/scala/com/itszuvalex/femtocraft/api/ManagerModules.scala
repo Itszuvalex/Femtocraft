@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.api
 
-import com.itszuvalex.femtocraft.api.logistics.{IConduit, IConnectionProvider, ILogisticsNetworkNode}
+import com.itszuvalex.femtocraft.api.logistics.{IConnectionProvider, ILogisticsNetworkNode}
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable}
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, IPowerStorageNode}
 import com.itszuvalex.femtocraft.api.worldgen.IChunkRiftCapability
@@ -30,8 +30,6 @@ object ManagerModules {
   val TILE_NANITE_UPGRADEABLE: IModule[INaniteUpgradeable] = Module.registerModule("TileNaniteUpgradeable", () => Capabilities.TILE_NANITE_UPGRADEABLE)
 
   val ITEM_MULTITOOL: IModule[IMultitool] = Module.registerModule("ItemMultitool", () => Capabilities.ITEM_MULTITOOL)
-
-  val TILE_CONDUIT: IModule[IConduit] = Module.registerModule("TileConduit", () => Capabilities.TILE_CONDUIT)
 
   val TILE_LOGISTICS_NODE: IModule[ILogisticsNetworkNode] = Module.registerModule("TileLogisticsNode", () => Capabilities.TILE_LOGISTICS_NODE)
 

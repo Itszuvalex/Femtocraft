@@ -21,14 +21,13 @@ import scala.collection.mutable.ListBuffer
   */
 class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit) extends FemtoGuiBase(Converter.ITileEntityFromTileEntity(tile), new ContainerConduit(player, inv, tile, false)) {
   fontRenderer = Minecraft.getMinecraft.fontRenderer
-  val itile = Converter.ITileEntityFromTileEntity(tile)
 
   EnumFacing.VALUES.foreach { f =>
     val labelName: String = f.getName.charAt(0).toUpper.toString + ' '
     val faceButton        = new GuiButton(2 + (f.getIndex / 3) * 90, 10 + (f.getIndex % 3) * 20, fontRenderer.getStringWidth(labelName) + 1, 18, labelName) {
       override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
         super.addTooltip(mouseX, mouseY, tooltip)
-        if (itile.getModule(ManagerModules.TILE_CONDUIT, f).isConnected(f))
+        if (tile.conduit.isConnected(f))
           tile.getLoc.getOffset(f).getITileEntity(false) match {
             case None =>
             case Some(null) =>
@@ -39,13 +38,13 @@ class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: T
 
       override def update(): Unit = {
         text =
-          (if (itile.getModule(ManagerModules.TILE_CONDUIT, f).isConnected(f)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET + ' '
+          (if (tile.conduit.isConnected(f)) ChatFormatting.GREEN else ChatFormatting.RED) + labelName + ChatFormatting.RESET + ' '
       }
 
       override def onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean = {
         val ret = super.onMouseClick(mouseX, mouseY, button)
         if (ret) {
-          FemtoPacketHandler.INSTANCE.sendToServer(new MessageOpenGui(itile, GuiIDs.getTileConduitSideID(f)))
+          FemtoPacketHandler.INSTANCE.sendToServer(new MessageOpenGui(tile, GuiIDs.getTileConduitSideID(f)))
         }
         ret
       }

@@ -45,7 +45,7 @@ object GuiSidedInventoryConfig {
     Color(255.toByte, 255.toByte, 0.toByte, 255.toByte) // Purple
     )
 
-  val connectableModules = Array[IModule[_]](ItszuLibModules.ITEM_MINECRAFT_INVENTORY, ManagerModules.TILE_CONDUIT)
+  val connectableModules = Array[IModule[_]](ItszuLibModules.ITEM_MINECRAFT_INVENTORY, ManagerModules.TILE_LOGISTICS_NODE)
 
   class GuiSideConfigButton(x: Int, y: Int, tile: ITileEntity, val face: EnumFacing) extends GuiButton(x, y, 16, 16) {
     private val faceID        = face.ordinal()

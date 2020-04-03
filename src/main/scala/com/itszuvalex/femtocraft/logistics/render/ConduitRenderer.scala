@@ -68,9 +68,8 @@ class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
 
   override def renderTileEntityInWorld(te: TileConduit, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    val cap = te.getCapability(Capabilities.TILE_CONDUIT, null)
     val color = te.getCapability(ItszuLibCapabilities.COLORABLE, null)
-    val facings = EnumFacing.VALUES.filter(cap.isConnected)
+    val facings = EnumFacing.VALUES.filter(te.conduit.isConnected)
     val enumSet = if (facings.isEmpty) util.EnumSet.noneOf(classOf[EnumFacing]) else util.EnumSet.copyOf(facings.toSet)
     renderConduitAt(x, y, z, partialTicks, color, enumSet)
   }
