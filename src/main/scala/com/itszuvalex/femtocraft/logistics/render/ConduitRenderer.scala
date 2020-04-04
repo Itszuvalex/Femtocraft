@@ -19,9 +19,9 @@ import scala.collection.JavaConversions._
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
   */
 object ConduitRenderer {
-  val conduitModelLocation    = Resources.CustomModelBlock("conduit/conduit.obj")
-  val conduitTexLocation      = Resources.CustomModelBlockTex("conduit/conduit.png")
-  val conduitColorTexLocation = Resources.CustomModelBlockTex("conduit/conduit_color.png")
+  val conduitModelLocation    = Resources.CustomModelBlock("wire/wire_thin.obj")
+  val conduitTexLocation      = Resources.CustomModelBlockTex("wire/wire_thin.png")
+  val conduitColorTexLocation = Resources.CustomModelBlockTex("wire/wire_thin_color.png")
 }
 
 class ConduitRenderer extends TileEntityCombinedRenderer[TileConduit] {
