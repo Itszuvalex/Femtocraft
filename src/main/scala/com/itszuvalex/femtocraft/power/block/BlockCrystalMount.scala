@@ -59,13 +59,13 @@ class BlockCrystalMount extends TileBlockContainerCore(Material.IRON, new BlockC
   }
 
   def renderAbove(worldIn: World, pos: BlockPos): Boolean = {
-    val loc        = new Loc4(worldIn, pos)
+    val loc        = Loc4(worldIn, pos)
     val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.UP).getPos)
     stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.UP).getPos, EnumFacing.DOWN)
   }
 
   def renderBelow(worldIn: World, pos: BlockPos): Boolean = {
-    val loc        = new Loc4(worldIn, pos)
+    val loc        = Loc4(worldIn, pos)
     val stateAbove = worldIn.getBlockState(loc.getOffset(EnumFacing.DOWN).getPos)
     stateAbove.getBlock.isSideSolid(stateAbove, worldIn, loc.getOffset(EnumFacing.DOWN).getPos, EnumFacing.UP)
   }

@@ -75,7 +75,7 @@ class ChunkRiftCapability(val chunk: Chunk) extends IChunkRiftCapability with IC
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     riftBuffer.clear()
     val rifts = nbt.getTagList(ChunkRiftCapability.RIFTS_KEY, 10)
-    riftBuffer ++= (0 until rifts.tagCount()).map(rifts.getCompoundTagAt).map { tag => val rift = new Rift(new Loc4(0, 0, 0, 0)); rift.deserializeNBT(tag); rift }
+    riftBuffer ++= (0 until rifts.tagCount()).map(rifts.getCompoundTagAt).map { tag => val rift = new Rift(Loc4.ORIGIN); rift.deserializeNBT(tag); rift }
   }
 
   override def serializeNBT(): NBTTagCompound = {

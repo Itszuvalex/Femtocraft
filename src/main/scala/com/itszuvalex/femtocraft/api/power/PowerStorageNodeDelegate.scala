@@ -22,7 +22,7 @@ class PowerStorageNodeDelegate(tileEntity: TileEntity,
 
   override def transferRate: Double = transfer()
 
-  override def getStorageLoc: Loc4 = new Loc4(tileEntity)
+  override def getStorageLoc: Loc4 = Loc4(tileEntity)
 
   override def changeForLastTick: Double = battery.storage - lastPowerAmount(1)
 }

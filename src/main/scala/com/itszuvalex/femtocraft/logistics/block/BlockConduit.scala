@@ -9,6 +9,7 @@ import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.EnumFacing.{DOWN, EAST, NORTH, SOUTH, UP, WEST, _}
 import net.minecraft.util.math.{AxisAlignedBB, BlockPos}
+import net.minecraft.world.IBlockAccess
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -18,15 +19,15 @@ import scala.collection.mutable.ArrayBuffer
 class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileContainer(FemtoBlocks.blockConduit _) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = new TileConduit
 }, BlockBehaviors.DEFAULT) {
-  val centerBB: KeyedBoundingBox = KeyedBoundingBox("Center", 0, new AxisAlignedBB(.25, .25, .25, .75, .75, .75))
-  val posYBB                     = KeyedBoundingBox("PosY", 1, new AxisAlignedBB(.25, .75, .25, .75, 1, .75)) // POS Y
-  val negYBB                     = KeyedBoundingBox("NegY", 2, new AxisAlignedBB(.25, 0, .25, .75, .25, .75)) // NEG Y
-  val negZBB                     = KeyedBoundingBox("NegZ", 3, new AxisAlignedBB(.25, .25, 0, .75, .75, .25)) // NEG Z
-  val posZBB                     = KeyedBoundingBox("PosZ", 4, new AxisAlignedBB(.25, .25, .75, .75, .75, 1)) // POS Z
-  val posXBB                     = KeyedBoundingBox("PosX", 5, new AxisAlignedBB(.75, .25, .25, 1, .75, .75)) // POS X
-  val negXBB                     = KeyedBoundingBox("NegX", 6, new AxisAlignedBB(0, .25, .25, .25, .75, .75)) // NEG X
+  val centerBB: KeyedBoundingBox = KeyedBoundingBox("Center", 0, new AxisAlignedBB(.375, .375, .375, .625, .625, .625))
+  val posYBB                     = KeyedBoundingBox("PosY", 1, new AxisAlignedBB(.375, .625, .375, .625, 1, .625)) // POS Y
+  val negYBB                     = KeyedBoundingBox("NegY", 2, new AxisAlignedBB(.375, 0, .375, .625, .375, .625)) // NEG Y
+  val negZBB                     = KeyedBoundingBox("NegZ", 3, new AxisAlignedBB(.375, .375, 0, .625, .625, .375)) // NEG Z
+  val posZBB                     = KeyedBoundingBox("PosZ", 4, new AxisAlignedBB(.375, .375, .625, .625, .625, 1)) // POS Z
+  val posXBB                     = KeyedBoundingBox("PosX", 5, new AxisAlignedBB(.625, .375, .375, 1, .625, .625)) // POS X
+  val negXBB                     = KeyedBoundingBox("NegX", 6, new AxisAlignedBB(0, .375, .375, .375, .625, .625)) // NEG X
 
-  var renderBox = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
+  var renderBox = new AxisAlignedBB(.375, .375, .375, .625, .625, .625)
 
   boundingBoxes =  Some(new NamedDynamicBoundingBoxCollection(centerBB _, getBoundingBoxes))
 
@@ -54,4 +55,6 @@ class BlockConduit extends TileBlockContainerCore(Material.IRON, new BlockTileCo
     }
     list
   }
+
+  override def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos): AxisAlignedBB = new AxisAlignedBB(.25, .25, .25, .75, .75, .75)
 }

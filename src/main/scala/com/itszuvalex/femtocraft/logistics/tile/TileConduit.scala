@@ -93,15 +93,7 @@ object TileConduit {
 
     override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ => Some(color)
 
-    override def serverUpdate(tile: ITileEntity): Unit = {
-      update()
-    }
-
     override def clientUpdate(tile: ITileEntity): Unit = {
-      update()
-    }
-
-    def update(): Unit = {
       var red  : Int = 0
       var green: Int = 0
       var blue : Int = 0

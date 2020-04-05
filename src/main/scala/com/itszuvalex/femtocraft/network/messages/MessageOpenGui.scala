@@ -5,7 +5,6 @@ import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import io.netty.buffer.ByteBuf
-import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
 
 /**
@@ -16,7 +15,7 @@ class MessageOpenGui(var x: Int, var y: Int, var z: Int, var dim: Int, var guiID
 
   def this(loc: Loc4, guiID: Int) = this(loc.x, loc.y, loc.z, loc.dim, guiID)
 
-  def this(tile: ITileEntity, guiID: Int) = this(new Loc4(tile), guiID)
+  def this(tile: ITileEntity, guiID: Int) = this(Loc4(tile), guiID)
 
   override def toBytes(buf: ByteBuf): Unit = {
     buf.writeInt(x)
@@ -36,7 +35,7 @@ class MessageOpenGui(var x: Int, var y: Int, var z: Int, var dim: Int, var guiID
 
   override def onMessage(message: MessageOpenGui, ctx: MessageContext): IMessage = {
     ItszuLib.proxy.addScheduledTask(() => {
-      ctx.getServerHandler.player.openGui(Femtocraft, message.guiID, DimensionManager.getWorld(message.dim), message.x, message.y, message.z)
+      ctx.getServerHandler.player.openGui(Femtocraft, message.guiID, ItszuLib.proxy.getWorld(message.dim), message.x, message.y, message.z)
     })
     null
   }

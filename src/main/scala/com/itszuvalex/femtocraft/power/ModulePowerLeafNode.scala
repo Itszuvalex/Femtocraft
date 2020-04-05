@@ -56,11 +56,10 @@ class ModulePowerLeafNode(tile: ITileEntity,
   }
 
   override def onParentBroken(node: IPowerNetworkNode): Unit = {
+    if (tile.getIWorld.isRemote) return
     parentLoc = None
     tile.setUpdate()
     tile.markDirtyForSave()
-
-    if (tile.getIWorld.isRemote) return
     PowerManager.instance.refreshLeaf(this)
   }
 
@@ -70,7 +69,7 @@ class ModulePowerLeafNode(tile: ITileEntity,
 
   override def transferRate: Double = transRate()
 
-  override def getStorageLoc: Loc4 = new Loc4(tile)
+  override def getStorageLoc: Loc4 = Loc4(tile)
 
   override def changeForLastTick: Double = 0 //TODO Fix
 

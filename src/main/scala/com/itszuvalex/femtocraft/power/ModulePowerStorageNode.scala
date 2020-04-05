@@ -19,7 +19,7 @@ class ModulePowerStorageNode(val tile: ITileEntity, val bat: IBattery, val store
 
   override def transferRate: Double = tranRate()
 
-  override def getStorageLoc: Loc4 = new Loc4(tile)
+  override def getStorageLoc: Loc4 = Loc4(tile)
 
   override def changeForLastTick: Double = 0 // TODO
 

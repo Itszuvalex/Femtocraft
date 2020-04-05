@@ -80,9 +80,9 @@ class BlockCrystalsWorldgen extends BlockContainer(Material.GLASS) {
           val storage     = (random.nextDouble() * (DROP_STORAGE_MAX_MAX - DROP_STORAGE_MAX_MIN)).toLong + DROP_STORAGE_MAX_MIN
           val transfer    = random.nextInt(DROP_TRANSFER_MAX - DROP_TRANSFER_MIN + 1) + DROP_TRANSFER_MIN
           val crystal     = new ItemStack(FemtoItems.itemPowerCrystal, 1)
-          InventoryUtils.dropItem(Converter.IItemStackFromItemStack(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer)), new Loc4(world, pos), random)
+          InventoryUtils.dropItem(Converter.IItemStackFromItemStack(ItemPowerCrystal.initialize(crystal, "Power Crystal", crystalType, color, storage, passiveGen, transfer)), Loc4(world, pos), random)
         }
-        InventoryUtils.dropItem(FemtoItems.itemCracklingDust.newIStack(random.nextInt(DROP_DUST_MAX - DROP_DUST_MIN + 1) + DROP_DUST_MIN), new Loc4(world, pos), random)
+        InventoryUtils.dropItem(FemtoItems.itemCracklingDust.newIStack(random.nextInt(DROP_DUST_MAX - DROP_DUST_MIN + 1) + DROP_DUST_MIN), Loc4(world, pos), random)
       case _ =>
     }
     super.breakBlock(world, pos, state)

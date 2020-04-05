@@ -118,7 +118,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
       var adjustedY = y
       while (adjustedY > 1 && world.isAirBlock(new BlockPos(x, adjustedY, z))) adjustedY -= 1
       adjustedY += random.nextInt(4)
-      val rift = new Rift(new Loc4(x, adjustedY, z, world.provider.getDimension))
+      val rift = new Rift(Loc4(x, adjustedY, z, world.provider.getDimension))
       rift.addTraits(RiftTraitRegistry.generateTraits(random))
       chunkRiftCapability.addRift(rift)
       FemtocraftRiftTracker.instance.registerRift(rift)

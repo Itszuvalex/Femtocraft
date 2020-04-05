@@ -71,7 +71,7 @@ object GuiSidedNaniteConfig {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       tooltip += face.getName
       if (!isDisabled && customizeable) {
-        val loc       = new Loc4(tile)
+        val loc       = Loc4(tile)
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
@@ -109,7 +109,7 @@ object GuiSidedNaniteConfig {
           addVertexUV(screenX, screenY, 0, 0, 0)
         }
 
-        val loc       = new Loc4(tile)
+        val loc       = Loc4(tile)
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)
@@ -156,7 +156,7 @@ object GuiSidedNaniteConfig {
     override def addTooltip(mouseX: Int, mouseY: Int, tooltip: ListBuffer[String]): Unit = {
       tooltip += face.getName
       if (!isDisabled && customizeable) {
-        val loc       = new Loc4(tile)
+        val loc       = Loc4(tile)
         val offset    = FacingUtil.getAbsoluteFacingFromHorizontalRelative(face, configuration.front())
         val offsetLoc = loc.getOffset(offset)
         val te        = offsetLoc.getITileEntity(false)

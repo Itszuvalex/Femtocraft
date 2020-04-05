@@ -27,7 +27,7 @@ class RiftRenderer {
   @SubscribeEvent
   def render(event: RenderWorldLastEvent): Unit = {
     val player = Minecraft.getMinecraft.player
-    val playerLoc = new Loc4(player.getPosition, player.getEntityWorld.provider.getDimension)
+    val playerLoc = Loc4(player.getPosition, player.getEntityWorld.provider.getDimension)
     val px = player.prevPosX + (player.posX - player.prevPosX) * event.getPartialTicks
     val py = player.prevPosY + (player.posY - player.prevPosY) * event.getPartialTicks
     val pz = player.prevPosZ + (player.posZ - player.prevPosZ) * event.getPartialTicks

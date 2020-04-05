@@ -22,7 +22,7 @@ class MessageSidedNaniteIOChange(var tile: ITileEntity, var side: EnumFacing, va
     buf.writeBoolean(forward)
   }
 
-  def loc: Loc4 = new Loc4(tile)
+  def loc: Loc4 = Loc4(tile)
 
   override def fromBytes(buf: ByteBuf): Unit = {
     val x    = buf.readInt()

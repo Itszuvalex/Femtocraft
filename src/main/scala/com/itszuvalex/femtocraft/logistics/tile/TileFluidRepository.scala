@@ -26,7 +26,7 @@ object TileFluidRepository {
     override def module: IModule[FluidRepositoryModule] = TileFluidRepository.MODULE
 
     override def serverUpdate(tile: ITileEntity): Unit = {
-      new Loc4(tile).getOffset(EnumFacing.DOWN).getBlock(false) match {
+      Loc4(tile).getOffset(EnumFacing.DOWN).getBlock(false) match {
         case None =>
         case Some(b) if b == Blocks.WATER => storage.fill(Converter.IFluidStackFromFluidStack(new FluidStack(FluidRegistry.WATER, 25)), true)
         case Some(b) if b.isInstanceOf[IFluidBlock] && b.asInstanceOf[IFluidBlock].getFluid == FluidRegistry.WATER => storage.fill(Converter.IFluidStackFromFluidStack(new FluidStack(FluidRegistry.WATER, 25)), true)

@@ -109,7 +109,7 @@ object TileFrame {
           val random = new Random
           if (StorageUtils.removeItemsFromStorage(storage, items, false)) {
             storage.foreach { item =>
-              if (!tile.getIWorld.isRemote) InventoryUtils.dropItem(item, new Loc4(tile), random)
+              if (!tile.getIWorld.isRemote) InventoryUtils.dropItem(item, Loc4(tile), random)
             }
             isBuilding = true
             tile.setUpdate()
@@ -188,7 +188,7 @@ object TileFrame {
                 case Some(multi) =>
                   TileFrame.shouldDrop = false
                   TileFrame.shouldFullyRemove = false
-                  multi.formAtLocation(new Loc4(tile))
+                  multi.formAtLocation(Loc4(tile))
                   TileFrame.shouldFullyRemove = true
                   TileFrame.shouldDrop = true
                 case _ =>
@@ -219,7 +219,7 @@ object TileFrame {
               val random = new Random
               FrameMultiblockRegistry.getMultiblock(s.multiBlock) match {
                 case Some(multi) =>
-                  multi.getTakenLocations(new Loc4(tile)).foreach { loc =>
+                  multi.getTakenLocations(Loc4(tile)).foreach { loc =>
                     tile.getIWorld.setBlockToAir(loc.getPos)
                     if (TileFrame.shouldDrop) {
                       val itemStack = Converter.IItemStackFromItemStack(new ItemStack(FemtoItems.itemFrame))
@@ -228,10 +228,10 @@ object TileFrame {
                     }
                   }
                   if (s.isBuilding && TileFrame.shouldDrop)
-                    multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(i, new Loc4(core), random))
+                    multi.getRequiredResources.foreach(i => InventoryUtils.dropItem(i, Loc4(core), random))
                 case _ =>
               }
-              state.get.foreach(_.storage.foreach(i => InventoryUtils.dropItem(i, new Loc4(core), random)))
+              state.get.foreach(_.storage.foreach(i => InventoryUtils.dropItem(i, Loc4(core), random)))
           }
         }
         else info.controller.flatMap(_.getITileEntity(true)) match {

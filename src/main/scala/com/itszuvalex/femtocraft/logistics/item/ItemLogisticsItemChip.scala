@@ -29,13 +29,13 @@ class ItemLogisticsItemChip extends Item {
 
   override def getMaxDamage(stack: ItemStack): Int = {
     var sum = 0d
-    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsMaximum)
+    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](Loc4.ORIGIN, null).foreach(a => sum += a.flopsMaximum)
     sum.toInt
   }
 
   override def getDamage(stack: ItemStack): Int = {
     var sum = 0d
-    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](new Loc4, null).foreach(a => sum += a.flopsRemaining)
+    stack.getCapability(Capabilities.ITEM_CONNECTION_PROVIDER, null).getConnections[Any](Loc4.ORIGIN, null).foreach(a => sum += a.flopsRemaining)
     getMaxDamage(stack) - sum.toInt
   }
 
@@ -66,7 +66,7 @@ class ItemLogisticsItemChip extends Item {
           }
 
           override def addTooltip(tooltip: util.List[String]): Unit = {
-            val con       = new ItemConnection(new Loc4, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
+            val con       = new ItemConnection(Loc4.ORIGIN, null, Option(stack.getTagCompound).getOrElse(new NBTTagCompound), 5000d, 1, 16)
             val itemstack = con.ibuffer
 
             tooltip += f"${ChatHelper.yellow("Item: ")}${if (itemstack.isEmpty) ChatHelper.italic("Empty") else itemstack.toMinecraft.toString}"

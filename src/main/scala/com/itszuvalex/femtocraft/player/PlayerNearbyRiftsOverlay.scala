@@ -89,5 +89,5 @@ class PlayerNearbyRiftsOverlay {
     rifts.toBuffer
   }
 
-  def getPlayerLoc = new Loc4(mc.player.getPosition, mc.world.provider.getDimension)
+  def getPlayerLoc = Loc4(mc.player.getPosition, mc.world.provider.getDimension)
 }

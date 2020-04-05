@@ -64,7 +64,7 @@ class ModulePowerNode(val tile: ITileEntity, var conRad: () => Float, var tranRa
 
   override def leafTransferRate: Double = tranRate()
 
-  override def getLoc: Loc4 = new Loc4(tile)
+  override def getLoc: Loc4 = Loc4(tile)
 
 
   override def invalidate(tile: ITileEntity): Unit = {
@@ -77,12 +77,14 @@ class ModulePowerNode(val tile: ITileEntity, var conRad: () => Float, var tranRa
   }
 
   override def onBlockBreak(core: ITileEntity, state: IBlockState): Unit = {
+    if(tile.getIWorld.isRemote) return
     PowerManager.instance.removeNode(this)
     PowerManager.instance.onNodeBroken(this)
   }
 
 
   override def onLoad(tile: ITileEntity): Unit = {
+    if(tile.getIWorld.isRemote) return
     if (network == null && !tile.isInvalid) {
       PowerManager.instance.addNode(this)
     }

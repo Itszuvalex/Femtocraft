@@ -213,7 +213,7 @@ object TileGerminationChamber {
         }
         FrameMultiblockRegistry.getMultiblock(MultiblockGerminationChamber.name)
                                .foreach {
-                                 _.onMultiblockBroken(new Loc4(core))
+                                 _.onMultiblockBroken(Loc4(core))
                                }
       }
       else {

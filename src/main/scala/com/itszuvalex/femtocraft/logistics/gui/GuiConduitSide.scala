@@ -54,7 +54,7 @@ object GuiConduitSide {
       super.addTooltip(mouseX, mouseY, tooltip)
     }
 
-    private def connection = Option(configuration).map(_.getConnections(new Loc4(itile), face).iterator().next())
+    private def connection = Option(configuration).map(_.getConnections(Loc4(itile), face).iterator().next())
 
     private def configuration: IConnectionProvider = stack().getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 
@@ -87,7 +87,7 @@ object GuiConduitSide {
       super.addTooltip(mouseX, mouseY, tooltip)
     }
 
-    private def connection = Option(configuration).map(_.getConnections(new Loc4(itile), face).iterator().next())
+    private def connection = Option(configuration).map(_.getConnections(Loc4(itile), face).iterator().next())
 
     private def configuration: IConnectionProvider = stack().getModule(ManagerModules.ITEM_CONNECTION_PROVIDER, null)
 

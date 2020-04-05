@@ -204,7 +204,7 @@ object ManagerCapabilities {
   class LogisticsImplDummy extends ILogisticsNetworkNode {
     override def getConnections[T](facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
-    override def getLoc: Loc4 = new Loc4
+    override def getLoc: Loc4 = Loc4.ORIGIN
 
     override def addPersistedConnection(node: Loc4): Unit = {}
 

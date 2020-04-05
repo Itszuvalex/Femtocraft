@@ -58,7 +58,7 @@ class PowerNetworkLeafNodeDelegate(
 
   override def transferRate: Double = transfer()
 
-  override def getStorageLoc: Loc4 = new Loc4(tileEntity.asInstanceOf[ITileEntity])
+  override def getStorageLoc: Loc4 = Loc4(tileEntity.asInstanceOf[ITileEntity])
 
   override def changeForLastTick: Double = change()
 }

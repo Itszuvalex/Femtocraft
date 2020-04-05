@@ -17,7 +17,7 @@ class MessageRequestSyncs(var x: Int, var y: Int, var z: Int, var dim: Int) exte
 
   def this(loc: Loc4, guiID: Int) = this(loc.x, loc.y, loc.z, loc.dim)
 
-  def this(tile: ITileEntity, guiID: Int) = this(new Loc4(tile), guiID)
+  def this(tile: ITileEntity, guiID: Int) = this(Loc4(tile), guiID)
 
   override def toBytes(buf: ByteBuf): Unit = {
     buf.writeInt(x)

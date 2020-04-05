@@ -25,7 +25,7 @@ object PowerBeamRenderer {
   def renderBeamToLocation(x: Double, y: Double, z: Double, node: ITileEntity, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float, reverse: Boolean = false): Unit = {
     val f2  : Float  = node.getIWorld.toMinecraft.getTotalWorldTime.toFloat + partialTime
     val f3  : Float  = -f2 * 0.2F - MathHelper.floor(-f2 * 0.1F).toFloat
-    val nloc         = new Loc4(node)
+    val nloc         = Loc4(node)
     val extraOffset  = loc.getITileEntity(false) match {
       case Some(t: TileBeamRenderOffset) => t.offset
       case _ => Vector3(0, 0, 0)
