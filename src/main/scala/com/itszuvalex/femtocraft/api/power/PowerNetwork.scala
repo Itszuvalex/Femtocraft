@@ -2,7 +2,8 @@ package com.itszuvalex.femtocraft.api.power
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.{ManagerModules, power}
+import com.itszuvalex.femtocraft.api
+import com.itszuvalex.femtocraft.api.{DistributableBattery, DistributionAlgorithm, ManagerModules, power}
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import com.itszuvalex.itszulib.util.Debug
@@ -142,120 +143,22 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   override def onTickEnd(): Unit = {
     try {
-      var producedPower = 0d
-      var storedPower   = 0d
-      var storageRoom   = 0d
-      var consumerRoom  = 0d
-
       statistics.startNewTick()
 
+      val cacheProducerNodes = producerNodes
       val cacheStorageNodes = storageNodes
+      val cacheConsumerNodes = consumerNodes
 
-      val producerPowerNodes = producerNodes.map { node =>
-        val min = Math.min(node.battery.storage, node.transferRate)
-        producedPower += min
-        statistics.addProducer(node)
-        (node, min)
-      }.toSeq.
-                                              // Order by nodes with least room.  This prioritizes preventing generators from filling up in power.
-                                            sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
-      val storedPowerNodes   = cacheStorageNodes.map { node =>
-        val min = Math.min(node.battery.storage, node.transferRate)
-        storedPower += min
-        statistics.addStorage(node)
-        (node, min)
-      }.toSeq.
-                                                  // Order by nodes with least room.  This prioritizes preventing storage from filling up in power.
-                                                sortWith((pairA, pairB) => (pairA._1.battery.maxStorage - pairA._1.battery.storage) < (pairB._1.battery.maxStorage - pairB._1.battery.storage))
-      val storageRoomNodes   = cacheStorageNodes.map { node =>
-        val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
-        storageRoom += min
-        (node, min)
-      }.toSeq.
-                                                  // Order by nodes with least power.  This prioritizes preventing storage from running out of power.
-                                                sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
-      // Doesn't matter since storage is assumed equal
-      val consumerRoomNodes  = consumerNodes.map { node =>
-        val min = Math.min(node.battery.maxStorage - node.battery.storage, node.transferRate)
-        consumerRoom += min
-        statistics.addConsumer(node)
-        (node, min)
-      }.toSeq.
-                                              // Order by nodes with least power.  This prioritizes preventing consumers from running out of power.
-                                            sortWith((pairA, pairB) => pairA._1.battery.storage < pairB._1.battery.storage)
-
-      // Return early to prevent unnecessary computation
+      cacheProducerNodes.foreach(statistics.addProducer)
+      cacheStorageNodes.foreach(statistics.addStorage)
+      cacheConsumerNodes.foreach(statistics.addConsumer)
 
       statistics.updatePowerTrend()
 
-      // No power left to distribute
-      if (producedPower <= 0 && storedPower <= 0) return
-
-      // Nowhere to distribute power to
-      if (consumerRoom <= 0 && storageRoom <= 0) return
-
-      //Distribute
-      val producerIt    = producerPowerNodes.iterator
-      val storageTakeIt = storedPowerNodes.iterator
-
-      def nextPowerSource: (IPowerStorageNode, Double) = {
-        if (producerIt.hasNext) {
-          producerIt.next()
-        }
-        else if (storageTakeIt.hasNext) {
-          storageTakeIt.next()
-        }
-        else null
-      }
-
-      val consumerIt     = consumerRoomNodes.iterator
-      val storageStoreIt = storageRoomNodes.iterator
-
-      def nextPowerSink: (IPowerStorageNode, Double) = {
-        if (consumerIt.hasNext) {
-          consumerIt.next()
-        }
-        else if (storageStoreIt.hasNext) {
-          storageStoreIt.next()
-        }
-        else null
-      }
-
-      //Freely distribute, since all requests should be fulfilled
-      var powerToDistribute = 0d
-      var powerDistributed  = 0d
-
-      if (producedPower >= consumerRoom) {
-        powerToDistribute = Math.min(producedPower, storageRoom + consumerRoom)
-      }
-      else {
-        powerToDistribute = Math.min(consumerRoom, producedPower + storedPower)
-      }
-
-      var powerSource  = nextPowerSource
-      var powerSink    = nextPowerSink
-      var powerToDrain = if (powerSource != null) powerSource._2 else 0d
-      var powerToFill  = if (powerSink != null) powerSink._2 else 0d
-      while ((powerDistributed < powerToDistribute) && powerSource != null && powerSink != null) {
-        var powerShift = Math.min(powerToDrain, powerToFill)
-        powerSource._1.battery.storage -= powerShift
-        powerToDrain -= powerShift
-        powerSink._1.battery.storage += powerShift
-        powerToFill -= powerShift
-        powerDistributed += powerShift
-
-        if (powerToDrain <= 0d) {
-          powerSource = nextPowerSource
-          if (powerSource != null)
-            powerToDrain = powerSource._2
-        }
-
-        if (powerToFill <= 0d) {
-          powerSink = nextPowerSink
-          if (powerSink != null)
-            powerToFill = powerSink._2
-        }
-      }
+      new DistributionAlgorithm(cacheProducerNodes.map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq,
+                                cacheStorageNodes.map(n => api.DistributableBattery(n.battery, n.transferRate _)).toSeq,
+                                cacheConsumerNodes.map(n => api.DistributableBattery(n.battery, n.transferRate _)).toSeq)
+        .distribute()
     }
     catch {
       case e: Throwable => Debug.log(Level.ERROR, e.toString)
