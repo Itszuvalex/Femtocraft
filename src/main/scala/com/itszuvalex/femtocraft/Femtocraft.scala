@@ -9,7 +9,7 @@ import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapability
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
-import com.itszuvalex.femtocraft.worldgen.{FemtocraftOreGenerator}
+import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import com.itszuvalex.itszulib.initialization.{InitializationStage, ModInit}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.{Item, ItemStack}
@@ -20,8 +20,8 @@ import net.minecraftforge.fml.common.{Mod, SidedProxy}
 import org.apache.logging.log4j.LogManager
 
 /**
-  * Created by Christopher on 4/5/2015.
-  */
+ * Created by Christopher on 4/5/2015.
+ */
 @Mod(modid = Femtocraft.ID, name = Femtocraft.NAME, version = Femtocraft.VERSION, modLanguage = Femtocraft.MOD_LANGUAGE, dependencies = Femtocraft.DEPENDENCIES)
 object Femtocraft extends ModInit {
   final val ID           = "femtocraft"
@@ -36,7 +36,7 @@ object Femtocraft extends ModInit {
 
 
   val tab                      = new CreativeTabs(Femtocraft.ID) {
-    override def getTabIconItem: ItemStack = new ItemStack(Item.getItemFromBlock(FemtoBlocks.blockNaniteHiveSmall))
+    override def getTabIconItem: ItemStack = new ItemStack(Item.getItemFromBlock(FemtoBlocks.blockItemRepository))
   }
   @SidedProxy(clientSide = "com.itszuvalex.femtocraft.proxy.ProxyClient",
               serverSide = "com.itszuvalex.femtocraft.proxy.ProxyServer")

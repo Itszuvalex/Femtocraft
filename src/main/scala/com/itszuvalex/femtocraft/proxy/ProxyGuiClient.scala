@@ -5,14 +5,11 @@ import com.itszuvalex.femtocraft.industry.gui._
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.gui._
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
-import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteHive
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.gui._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -28,7 +25,6 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.ItemNanoPackID, _) => new GuiNanoPack(player, player.inventory, Converter.IItemStackFromItemStack(player.getHeldItemMainhand))
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new GuiFrame(player, player.inventory, te)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new GuiFrameConstructing(player, player.inventory, te)
-      case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new GuiNaniteHive(player, player.inventory, te)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new GuiItemRepository(player, player.inventory, te)
       case (GuiIDs.TileNaniteRepositoryGuiID, te: TileNaniteRepository) => new GuiNaniteRepository(player, player.inventory, te)
       case (GuiIDs.TileFluidRepositoryGuiID, te: TileFluidRepository) => new GuiFluidRepository(player, player.inventory, te)

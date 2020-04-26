@@ -4,7 +4,6 @@ import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block._
 import com.itszuvalex.femtocraft.logistics.block.{BlockConduit, BlockFluidRepository, BlockItemRepository, BlockNaniteRepository}
 import com.itszuvalex.femtocraft.logistics.test.{BlockNetworkTest, BlockTaskProviderTest, BlockWorkerProviderTest}
-import com.itszuvalex.femtocraft.nanite.block.BlockNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.block._
 import com.itszuvalex.femtocraft.worldgen.block.BlockCrystalsWorldgen
 import net.minecraft.block.Block
@@ -45,7 +44,6 @@ object FemtoBlocks {
   var blockFrame                 : Block = _
   var blockCyberBase             : Block = _
   var blockCyberMachineInProgress: Block = _
-  var blockNaniteHiveSmall       : Block = _
   var blockCrystalMount          : Block = _
   var blockPowerPedestal         : Block = _
   var blockCrystalChargingArray  : Block = _
@@ -87,7 +85,6 @@ object FemtoBlocks {
     blockNanoFurnace = registerBlock(registry, new BlockNanoFurnace, "blockNanoFurnace")
     blockNaniteInfuser = registerBlock(registry, new BlockNaniteInfuser, "blockNaniteInfuser")
     blockFrame = registerBlock(registry, new BlockFrame(), "blockFrame")
-    blockNaniteHiveSmall = registerBlock(registry, new BlockNaniteHiveSmall(), "blockNaniteHive_small")
     blockNaniteRepository = registerBlock(registry, new BlockNaniteRepository(), "blockNaniteRepository")
     blockItemRepository = registerBlock(registry, new BlockItemRepository(), "blockItemRepository")
     blockFluidRepository = registerBlock(registry, new BlockFluidRepository(), "blockFluidRepository")
@@ -134,7 +131,6 @@ object FemtoBlocks {
     blockDiamondreplacement.registerModel()
     blockCrystalMount.registerModel()
     blockPowerPedestal.registerModel()
-    blockNaniteHiveSmall.registerModel()
     blockCrystals.registerModel()
     blockNaniteRepository.registerModel()
     blockItemRepository.registerModel()

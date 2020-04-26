@@ -5,8 +5,6 @@ import com.itszuvalex.femtocraft.industry.container._
 import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.container._
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
-import com.itszuvalex.femtocraft.nanite.container.ContainerNaniteHive
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.power.container._
 import com.itszuvalex.femtocraft.power.tile.{TileCrystalChargingArray, TileCrystalHeatExchanger, TileCrystalMount, TileCrystalStorageArray}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, ITileEntity}
@@ -27,7 +25,6 @@ class ProxyGuiCommon extends ItszuGuiHandler {
       case (GuiIDs.ItemNanoPackID, _) => new ContainerNanoPack(player, player.inventory, Converter.IItemStackFromItemStack(player.getHeldItemMainhand), true)
       case (GuiIDs.TileFrameMultiblockGuiID, te: TileFrame) => new ContainerFrame(player, player.inventory, te, true)
       case (GuiIDs.TileFrameConstructingGuiID, te: TileFrame) => new ContainerFrameConstructing(player, player.inventory, te)
-      case (GuiIDs.TileNaniteHiveGuiID, te: TileNaniteHiveSmall) => new ContainerNaniteHive(player, player.inventory, te, true)
       case (GuiIDs.TileItemRepositoryGuiID, te: TileItemRepository) => new ContainerItemRepository(player, player.inventory, te, true)
       case (GuiIDs.TileNaniteRepositoryGuiID, te: TileNaniteRepository) => new ContainerNaniteRepository(player, player.inventory, te, true)
       case (GuiIDs.TileFluidRepositoryGuiID, te: TileFluidRepository) => new ContainerFluidRepository(player, player.inventory, te, true)

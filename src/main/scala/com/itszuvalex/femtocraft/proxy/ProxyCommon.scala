@@ -25,7 +25,6 @@ import com.itszuvalex.femtocraft.industry.tile._
 import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProviderTest, TileWorkerProviderTest}
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
-import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.tile._
@@ -89,8 +88,6 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileGerminationChamber], "TileGerminationChamber")
 
     GameRegistry.registerTileEntity(classOf[TileNetworkTest], "TileNetworkTest")
-
-    GameRegistry.registerTileEntity(classOf[TileNaniteHiveSmall], "TileNaniteHive")
   }
 
   def registerTickHandlers() {
