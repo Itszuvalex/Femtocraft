@@ -29,8 +29,8 @@ import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.power.tile._
+import com.itszuvalex.femtocraft.worldgen.WorldgenEventHandler
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
-import com.itszuvalex.femtocraft.worldgen.{FemtocraftRiftTracker, WorldgenEventHandler}
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.util.ResourceLocation
@@ -44,7 +44,6 @@ object ProxyCommon {
 }
 
 class ProxyCommon {
-  val riftTracker  = new FemtocraftRiftTracker
   val powerManager = new PowerManager
 
   def preInit(): Unit = {

@@ -3,7 +3,6 @@ package com.itszuvalex.femtocraft.api
 import com.itszuvalex.femtocraft.api.logistics.{IConnectionProvider, ILogisticsNetworkNode}
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable}
 import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, IPowerStorageNode}
-import com.itszuvalex.femtocraft.api.worldgen.IChunkRiftCapability
 import com.itszuvalex.femtocraft.industry.item.IMultitool
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
@@ -36,8 +35,6 @@ object ManagerModules {
   val ITEM_CONNECTION_PROVIDER: IModule[IConnectionProvider] = Module.registerModule("ItemConnectionProvider", () => Capabilities.ITEM_CONNECTION_PROVIDER)
 
   val NANITE_STORAGE_CONFIGURABLE: IModule[SidedNaniteStorageConfiguration] = Module.registerModule("NaniteStorageConfigurable", () => Capabilities.NANITE_STORAGE_CONFIGURABLE)
-
-  val CHUNK_RIFT: IModule[IChunkRiftCapability] = Module.registerModule("ChunkRift", () => Capabilities.CHUNK_RIFT)
 
   val ITEM_OVERLAY_RENDER: IModule[IOverlayRenderItem] = Module.registerModule("ItemOverlayRender", () => Capabilities.ITEM_OVERLAY_RENDER)
 

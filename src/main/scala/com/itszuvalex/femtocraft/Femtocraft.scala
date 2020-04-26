@@ -3,14 +3,13 @@ package com.itszuvalex.femtocraft
 import com.itszuvalex.femtocraft.api.ManagerCapabilities
 import com.itszuvalex.femtocraft.api.logistics.LogisticsResourceRegistry
 import com.itszuvalex.femtocraft.api.nanite.NaniteRegistry
-import com.itszuvalex.femtocraft.api.worldgen.{ChunkRiftCapability, RiftTraitRegistry}
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapability
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
-import com.itszuvalex.femtocraft.worldgen.{FemtocraftOreGenerator, FemtocraftRiftTracker}
+import com.itszuvalex.femtocraft.worldgen.{FemtocraftOreGenerator}
 import com.itszuvalex.itszulib.initialization.{InitializationStage, ModInit}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.{Item, ItemStack}
@@ -60,7 +59,6 @@ object Femtocraft extends ModInit {
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)
     NetworkRegistry.INSTANCE.registerGuiHandler(this, guiProxy)
     PlayerNaniteCapability.register()
-    ChunkRiftCapability.register()
     ManagerCapabilities.register()
     proxy.preInit()
   })
@@ -72,9 +70,7 @@ object Femtocraft extends ModInit {
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
     PowerManager.instance.init()
-    FemtocraftRiftTracker.instance.init()
     LogisticsResourceRegistry.init()
-    RiftTraitRegistry.init()
     proxy.init()
   })
 

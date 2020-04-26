@@ -32,12 +32,12 @@ import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.nanite.render.NaniteHiveSmallRenderer
 import com.itszuvalex.femtocraft.nanite.tile.TileNaniteHiveSmall
 import com.itszuvalex.femtocraft.particles.{EntityFxNanites, EntityFxPower}
-import com.itszuvalex.femtocraft.player.{PlayerNaniteCapabilitiesOverlay, PlayerNearbyRiftsOverlay}
+import com.itszuvalex.femtocraft.player.PlayerNaniteCapabilitiesOverlay
 import com.itszuvalex.femtocraft.power.render._
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.render._
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
-import com.itszuvalex.femtocraft.worldgen.render.{CrystalRenderer, RiftRenderer}
+import com.itszuvalex.femtocraft.worldgen.render.CrystalRenderer
 import com.itszuvalex.femtocraft.{FemtoItems, Femtocraft, Resources}
 import com.itszuvalex.itszulib.render.PreviewableRendererRegistry
 import com.itszuvalex.itszulib.util.Color
@@ -237,8 +237,6 @@ class ProxyClient extends ProxyCommon {
     super.registerEventHandlers()
     //    MinecraftForge.EVENT_BUS.register(TERenderSortingFix)
     MinecraftForge.EVENT_BUS.register(new PlayerNaniteCapabilitiesOverlay)
-    MinecraftForge.EVENT_BUS.register(new PlayerNearbyRiftsOverlay)
-    MinecraftForge.EVENT_BUS.register(new RiftRenderer)
     MinecraftForge.EVENT_BUS.register(OverlayRenderer)
   }
 

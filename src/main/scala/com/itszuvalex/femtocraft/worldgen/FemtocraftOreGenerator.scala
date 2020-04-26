@@ -3,12 +3,10 @@ package com.itszuvalex.femtocraft.worldgen
 import java.util.Random
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.worldgen.RiftTraitRegistry
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator._
 import com.itszuvalex.itszulib.api.core
-import com.itszuvalex.itszulib.api.core.{Configurable, Loc4}
+import com.itszuvalex.itszulib.api.core.Configurable
 import net.minecraft.init.Blocks
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -17,8 +15,8 @@ import net.minecraft.world.gen.IChunkGenerator
 import net.minecraftforge.fml.common.IWorldGenerator
 
 /**
-  * Created by Christopher on 8/27/2015.
-  */
+ * Created by Christopher on 8/27/2015.
+ */
 @Configurable object FemtocraftOreGenerator {
   @Configurable val GENERATION_WEIGHT = 1
 
@@ -51,11 +49,11 @@ import net.minecraftforge.fml.common.IWorldGenerator
   override def generate(random: Random, chunkX: Int, chunkZ: Int, world: World, chunkGenerator: IChunkGenerator, chunkProvider: IChunkProvider): Unit = {
     if (random.nextFloat > CHANCE_PER_CHUNK) return
 
-    val x = chunkX * 16 + random.nextInt(16)
-    var y = random.nextInt(255)
-    val z = chunkZ * 16 + random.nextInt(16)
-    var distMin = 0
-    var distMax = 0
+    val x        = chunkX * 16 + random.nextInt(16)
+    var y        = random.nextInt(255)
+    val z        = chunkZ * 16 + random.nextInt(16)
+    var distMin  = 0
+    var distMax  = 0
     var crystMin = 0
     var crystMax = 0
 
@@ -77,7 +75,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
         crystMax = LARGE_CRYSTAL_MAX
     }
 
-    val dist = random.nextInt(distMax - distMin + 1) + distMin
+    val dist  = random.nextInt(distMax - distMin + 1) + distMin
     val cryst = random.nextInt(crystMax - crystMin + 1) + crystMin
 
     //Replace in cylinder
@@ -94,7 +92,7 @@ import net.minecraftforge.fml.common.IWorldGenerator
       .foreach { case (lx, ly, lz) =>
         val state = world.getBlockState(new BlockPos(lx, ly, lz))
         val block = state.getBlock
-        val meta = block.getMetaFromState(state)
+        val meta  = block.getMetaFromState(state)
         CybermaterialRegistry.getReplacement(block, meta) match {
           case Some((rblock, rmeta)) =>
             world.setBlockState(new BlockPos(lx, ly, lz), rblock.getStateFromMeta(rmeta), 3)
@@ -110,18 +108,6 @@ import net.minecraftforge.fml.common.IWorldGenerator
       while (cy > 1 && world.isAirBlock(new BlockPos(cx, cy - 1, cz))) cy -= 1
       while (world.getBlockState(new BlockPos(cx, cy, cz)).getBlock == Blocks.BEDROCK) cy += 1
       world.setBlockState(new BlockPos(cx, cy, cz), FemtoBlocks.blockCrystals.getDefaultState)
-    }
-
-    // add rift
-    val chunkRiftCapability = world.getChunkFromBlockCoords(new BlockPos(x, y, z)).getCapability(Capabilities.CHUNK_RIFT, null)
-    if (chunkRiftCapability != null) {
-      var adjustedY = y
-      while (adjustedY > 1 && world.isAirBlock(new BlockPos(x, adjustedY, z))) adjustedY -= 1
-      adjustedY += random.nextInt(4)
-      val rift = new Rift(Loc4(x, adjustedY, z, world.provider.getDimension))
-      rift.addTraits(RiftTraitRegistry.generateTraits(random))
-      chunkRiftCapability.addRift(rift)
-      FemtocraftRiftTracker.instance.registerRift(rift)
     }
   }
 }
