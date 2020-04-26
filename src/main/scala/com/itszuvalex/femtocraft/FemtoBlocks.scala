@@ -45,7 +45,6 @@ object FemtoBlocks {
   var blockCyberBase             : Block = _
   var blockCyberMachineInProgress: Block = _
   var blockCrystalMount          : Block = _
-  var blockPowerPedestal         : Block = _
   var blockCrystalChargingArray  : Block = _
   var blockCrystalStorageArray   : Block = _
   var blockCrystalHeatExchanger  : Block = _
@@ -89,7 +88,6 @@ object FemtoBlocks {
     blockItemRepository = registerBlock(registry, new BlockItemRepository(), "blockItemRepository")
     blockFluidRepository = registerBlock(registry, new BlockFluidRepository(), "blockFluidRepository")
     blockCrystalMount = registerBlock(registry, new BlockCrystalMount(), "blockCrystalMount")
-    blockPowerPedestal = registerBlock(registry, new BlockPowerPedestal(), "blockPowerPedestal")
     blockCrystalChargingArray = registerBlock(registry, new BlockCrystalChargingArray(), "blockCrystalChargingArray")
     blockCrystalStorageArray = registerBlock(registry, new BlockCrystalStorageArray(), "blockCrystalStorageArray")
     blockCrystalHeatExchanger = registerBlock(registry, new BlockCrystalHeatExchanger(), "blockCrystalHeatExchanger")
@@ -130,7 +128,6 @@ object FemtoBlocks {
     blockLapisreplacement.registerModel()
     blockDiamondreplacement.registerModel()
     blockCrystalMount.registerModel()
-    blockPowerPedestal.registerModel()
     blockCrystals.registerModel()
     blockNaniteRepository.registerModel()
     blockItemRepository.registerModel()
