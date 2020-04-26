@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount.CrystalMountModule
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromICrystal, ModulePowerNode, ModulePowerStorage, ModulePowerStorageNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromICrystal, ModuleWirelessPowerNode, ModulePowerStorage, ModuleWirelessPowerStorageNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{DynamicIBattery, IBattery, IItemStorage, ItemStorageArray}
@@ -57,7 +57,7 @@ class TileCrystalMount extends TileEntityCoreTickable {
     }
   }
   val battery: IBattery     = new DynamicIBattery(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(IBattery.Empty))
-  val powerNetworkNode      = new ModulePowerNode(this, () => TileCrystalMount.PEDESTAL_RANGE, () => powerStorageTransferRate, () => true)
+  val powerNetworkNode      = new ModuleWirelessPowerNode(this, () => TileCrystalMount.PEDESTAL_RANGE, () => powerStorageTransferRate, () => true)
   val internal              = new CrystalMountModule(this, storage)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
@@ -65,7 +65,7 @@ class TileCrystalMount extends TileEntityCoreTickable {
   addTileEntityModule(new ModulePowerStorage(battery) {
     override def hasWorldNBT: Boolean = false // We don't need to save the battery since it's part of the itemstack and saved with ItemStorage
   })
-  addTileEntityModule(new ModulePowerStorageNode(this, battery, PowerStorageNodeType.STORAGE, () => powerStorageTransferRate))
+  addTileEntityModule(new ModuleWirelessPowerStorageNode(this, battery, PowerStorageNodeType.STORAGE, () => powerStorageTransferRate))
   addTileEntityModule(powerNetworkNode)
   addTileEntityModule(new ModuleColorableFromICrystal(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null)))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileCrystalMountGuiID _))

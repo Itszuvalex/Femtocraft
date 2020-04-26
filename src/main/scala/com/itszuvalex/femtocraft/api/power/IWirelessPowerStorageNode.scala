@@ -6,7 +6,7 @@ import com.itszuvalex.itszulib.api.storage.IBattery
 /**
   * Created by Chris on 1/4/2017.
   */
-trait IPowerStorageNode {
+trait IWirelessPowerStorageNode {
 
   def battery: IBattery
 

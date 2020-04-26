@@ -4,9 +4,9 @@ import com.itszuvalex.femtocraft.api.logistics.IConnectionProvider;
 import com.itszuvalex.femtocraft.api.logistics.ILogisticsNetworkNode;
 import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
 import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
-import com.itszuvalex.femtocraft.api.power.IPowerLeafNode;
-import com.itszuvalex.femtocraft.api.power.IPowerNetworkNode;
-import com.itszuvalex.femtocraft.api.power.IPowerStorageNode;
+import com.itszuvalex.femtocraft.api.power.IWirelessPowerLeafNode;
+import com.itszuvalex.femtocraft.api.power.IWirelessPowerNetworkNode;
+import com.itszuvalex.femtocraft.api.power.IWirelessPowerStorageNode;
 import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
@@ -22,14 +22,14 @@ public class Capabilities {
     @CapabilityInject(IBattery.class)
     public static Capability<IBattery> POWER_STORAGE = null;
 
-    @CapabilityInject(IPowerStorageNode.class)
-    public static Capability<IPowerStorageNode> TILE_POWER_STORAGE_NODE = null;
+    @CapabilityInject(IWirelessPowerStorageNode.class)
+    public static Capability<IWirelessPowerStorageNode> TILE_WIRELESS_POWER_STORAGE_NODE = null;
 
-    @CapabilityInject(IPowerLeafNode.class)
-    public static Capability<IPowerLeafNode> TILE_POWER_LEAF_NODE = null;
+    @CapabilityInject(IWirelessPowerLeafNode.class)
+    public static Capability<IWirelessPowerLeafNode> TILE_WIRELESS_POWER_LEAF_NODE = null;
 
-    @CapabilityInject(IPowerNetworkNode.class)
-    public static Capability<IPowerNetworkNode> TILE_POWER_NODE = null;
+    @CapabilityInject(IWirelessPowerNetworkNode.class)
+    public static Capability<IWirelessPowerNetworkNode> TILE_WIRELESS_POWER_NODE = null;
 
     @CapabilityInject(IPlayerNaniteCapability.class)
     public static Capability<IPlayerNaniteCapability> PLAYER_NANITE_CAPABILITY = null;

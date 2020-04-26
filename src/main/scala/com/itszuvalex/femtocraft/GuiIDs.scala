@@ -25,9 +25,9 @@ object GuiIDs {
   val TileNaniteInfuserID              = nextID
   val TileCrystalChargingArrayID       = nextID
   val TileCrystalStorageArrayID        = nextID
-  val TileCrystalHeatExchangerID       = nextID
-  val TilePowerNetworkID               = nextID
-  val TileConduitID                    = nextID
+  val TileCrystalHeatExchangerID = nextID
+  val TileWirelessPowerNetworkID = nextID
+  val TileConduitID              = nextID
 
   val TileConduitSideID = nextID
   val TileSidedInventoryConfigID = nextID

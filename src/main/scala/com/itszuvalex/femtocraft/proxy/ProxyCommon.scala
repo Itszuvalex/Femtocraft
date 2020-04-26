@@ -26,7 +26,7 @@ import com.itszuvalex.femtocraft.logistics.test.{TileNetworkTest, TileTaskProvid
 import com.itszuvalex.femtocraft.logistics.tile.{TileConduit, TileFluidRepository, TileItemRepository, TileNaniteRepository}
 import com.itszuvalex.femtocraft.nanite.entity.EntityNanoLash
 import com.itszuvalex.femtocraft.player.PlayerEventHandler
-import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.femtocraft.power.WirelessPowerManager
 import com.itszuvalex.femtocraft.power.tile._
 import com.itszuvalex.femtocraft.worldgen.WorldgenEventHandler
 import com.itszuvalex.femtocraft.worldgen.block.TileCrystalsWorldgen
@@ -43,7 +43,7 @@ object ProxyCommon {
 }
 
 class ProxyCommon {
-  val powerManager = new PowerManager
+  val powerManager = new WirelessPowerManager
 
   def preInit(): Unit = {
     EntityRegistry.registerModEntity(new ResourceLocation(Femtocraft.ID.toLowerCase(), "entityNanoLash"), classOf[EntityNanoLash], "entityNanoLash", 0, Femtocraft, 30, 1, false)

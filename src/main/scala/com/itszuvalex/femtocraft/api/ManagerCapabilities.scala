@@ -24,9 +24,9 @@ import scala.collection.Set
 object ManagerCapabilities {
   def register(): Unit = {
     CapabilityManager.INSTANCE.register(classOf[IBattery], new PowerStorageStorage, classOf[PowerBattery])
-    CapabilityManager.INSTANCE.register(classOf[IPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[PowerNodeNodeImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[IPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[PowerStorageNodeImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[IPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[PowerLeafNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWirelessPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[WirelessPowerNodeNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWirelessPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[WirelessPowerStorageNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWirelessPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[WirelessWirelessPowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
@@ -63,11 +63,11 @@ object ManagerCapabilities {
 
   class NaniteUpgradeableStorage extends DummyStorage[INaniteUpgradeable]
 
-  class PowerNetworkNodeStorageDummy extends DummyStorage[IPowerNetworkNode]
+  class PowerNetworkNodeStorageDummy extends DummyStorage[IWirelessPowerNetworkNode]
 
-  class PowerStorageNodeStorageDummy extends DummyStorage[IPowerStorageNode]
+  class PowerStorageNodeStorageDummy extends DummyStorage[IWirelessPowerStorageNode]
 
-  class PowerLeafNodeStorageDummy extends DummyStorage[IPowerLeafNode]
+  class PowerLeafNodeStorageDummy extends DummyStorage[IWirelessPowerLeafNode]
 
   class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
 
@@ -79,15 +79,15 @@ object ManagerCapabilities {
 
   class OverlayRenderStorageDummy extends DummyStorage[IOverlayRenderItem]
 
-  class PowerNodeNodeImplementationDummy extends IPowerNetworkNode {
+  class WirelessPowerNodeNodeImplementationDummy extends IWirelessPowerNetworkNode {
 
-    override def leafNodes(force: Boolean): Set[IPowerLeafNode] = Set()
+    override def leafNodes(force: Boolean): Set[IWirelessPowerLeafNode] = Set()
 
-    override def addLeafNode(node: IPowerLeafNode): Unit = {}
+    override def addLeafNode(node: IWirelessPowerLeafNode): Unit = {}
 
-    override def removeLeafNode(node: IPowerLeafNode): Unit = {}
+    override def removeLeafNode(node: IWirelessPowerLeafNode): Unit = {}
 
-    override def storageNodes(force: Boolean): Set[IPowerStorageNode] = Set()
+    override def storageNodes(force: Boolean): Set[IWirelessPowerStorageNode] = Set()
 
     override def leafTransferRate: Double = 0
 
@@ -102,7 +102,7 @@ object ManagerCapabilities {
     override def setRenderLocations(set: scala.collection.Set[Loc4]): Unit = {}
   }
 
-  class PowerStorageNodeImplementationDummy extends IPowerStorageNode {
+  class WirelessPowerStorageNodeImplementationDummy extends IWirelessPowerStorageNode {
     override def battery: IBattery = null
 
     override def storageType: PowerStorageNodeType = PowerStorageNodeType.NONE
@@ -114,14 +114,14 @@ object ManagerCapabilities {
     override def changeForLastTick: Double = 0d
   }
 
-  class PowerLeafNodeImplementationDummy extends PowerStorageNodeImplementationDummy with IPowerLeafNode {
+  class WirelessWirelessPowerLeafNodeImplementationDummy extends WirelessPowerStorageNodeImplementationDummy with IWirelessPowerLeafNode {
     override def connectionRadius: Float = 0
 
     override def getParent: Loc4 = Loc4(0, 0, 0, 0)
 
-    override def setParent(node: IPowerNetworkNode): Unit = {}
+    override def setParent(node: IWirelessPowerNetworkNode): Unit = {}
 
-    override def onParentBroken(node: IPowerNetworkNode): Unit = {}
+    override def onParentBroken(node: IWirelessPowerNetworkNode): Unit = {}
   }
 
   class PowerCrystalImplementationDummy extends IPowerCrystal {

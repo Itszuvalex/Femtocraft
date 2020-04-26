@@ -114,9 +114,9 @@ object TileGerminationChamber {
                       }
     @Wrapper(storage) val inputStorage          : IItemStorage            = new ItemStorageSlice(storage, Array(0))
     @Wrapper(storage) val outputStorage         : IItemStorage            = new ItemStorageSlice(storage, Array(1, 2, 3))
-                      val task                  : GerminationTask         = new GerminationTask
-                      val powerStorageNodeModule: ModulePowerStorageNode  = new ModulePowerStorageNode(tile, battery, PowerStorageNodeType.CONSUMER, () => 40d)
-                      val powerLeafNodeModule   : ModulePowerLeafNode     = new ModulePowerLeafNode(tile, battery, PowerStorageNodeType.CONSUMER, transRate = () => 40d)
+                      val task                  : GerminationTask                     = new GerminationTask
+                      val powerStorageNodeModule: ModuleWirelessPowerStorageNode = new ModuleWirelessPowerStorageNode(tile, battery, PowerStorageNodeType.CONSUMER, () => 40d)
+                      val powerLeafNodeModule   : ModuleWirelessPowerLeafNode    = new ModuleWirelessPowerLeafNode(tile, battery, PowerStorageNodeType.CONSUMER, transRate = () => 40d)
 
     def serializeDescriptionNBT(): NBTTagCompound = {
       val nbt         = new NBTTagCompound
@@ -295,7 +295,7 @@ class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderO
     override def breakMultiBlock(loc: Loc4): Boolean = {
       val ret = super.breakMultiBlock(loc)
       if (isController)
-        PowerManager.instance.removeLeaf(state.get.get.powerLeafNodeModule)
+        WirelessPowerManager.instance.removeLeaf(state.get.get.powerLeafNodeModule)
       setUpdate()
       ret
     }
@@ -303,7 +303,7 @@ class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderO
     override def formMultiBlock(loc: Loc4, cloc: Loc4): Boolean = {
       val ret = super.formMultiBlock(loc, cloc)
       if (isController)
-        PowerManager.instance.addLeaf(state.get.get.powerLeafNodeModule)
+        WirelessPowerManager.instance.addLeaf(state.get.get.powerLeafNodeModule)
       setUpdate()
       ret
     }
@@ -343,8 +343,8 @@ class TileGerminationChamber extends TileEntityCoreTickable with TileBeamRenderO
   addTileEntityModule(new ModuleMultiblockGui(info, Femtocraft, () => GuiIDs.TileGerminationChamberID))
   addTileEntityModule(new ModuleMultiblockColor(() => state.get.map(_.powerLeafNodeModule).
                                                            flatMap(_.parentLoc).flatMap(_.getITileEntity()).flatMap(_.moduleOption(ItszuLibModules.COLORABLE, null))))
-  addTileEntityModule(new ModuleMultiblockPowerLeafNode(info, () => state.get.get.powerLeafNodeModule))
-  addTileEntityModule(new ModuleMultiblockPowerStorageNode(info, () => state.get.get.powerStorageNodeModule))
+  addTileEntityModule(new ModuleMultiblockWirelessPowerLeafNode(info, () => state.get.get.powerLeafNodeModule))
+  addTileEntityModule(new ModuleMultiblockWirelessPowerStorageNode(info, () => state.get.get.powerStorageNodeModule))
   addTileEntityModuleTickable(internal)
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(new ModuleIFluidAutoIO(sidedFluidConfig))

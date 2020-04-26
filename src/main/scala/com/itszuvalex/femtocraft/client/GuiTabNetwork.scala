@@ -18,4 +18,4 @@ object GuiTabNetwork {
 class GuiTabNetwork(text: String,
                     tile: ITileEntity,
                     activeGuiID: () => Int)
-  extends GuiTab(text, new GuiPanelTexture(2, 2, 18, 18, GuiTabNetwork.NetworkTexLoc), tile, GuiIDs.TilePowerNetworkID, activeGuiID)
+  extends GuiTab(text, new GuiPanelTexture(2, 2, 18, 18, GuiTabNetwork.NetworkTexLoc), tile, GuiIDs.TileWirelessPowerNetworkID, activeGuiID)

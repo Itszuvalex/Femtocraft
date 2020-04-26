@@ -20,7 +20,7 @@ class GuiCrystalChargingArray(player: EntityPlayer, inv: InventoryPlayer, privat
   )
   addPlayerInventorySlots(inv)
 
-  val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null).battery, tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
+  val powerMeter   = new GuiPowerMeter(6, 22, tile.getCapability(Capabilities.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery, tile.getCapability(ItszuLibCapabilities.COLORABLE, null).toInt)
   val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT, labelText)
   add(powerReading, powerMeter)
 

@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL11
   * Created by Christopher Harris (Itszuvalex) on 8/5/15.
   */
 
-object PowerBeamRenderer {
+object WirelessPowerBeamRenderer {
 
   def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color, child: Loc4): Unit = {
     beamRenderSetup()
@@ -61,20 +61,20 @@ object PowerBeamRenderer {
 
   def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color): Unit = {
     beamRenderSetup()
-    node.getModule(ManagerModules.TILE_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
+    node.getModule(ManagerModules.TILE_WIRELESS_POWER_NODE, EnumFacing.UP).renderLocations.foreach { loc =>
       renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
     }
     beamRenderTeardown()
   }
 }
 
-trait PowerBeamRenderer {
+trait WirelessPowerBeamRenderer {
   def renderBeamToChild(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color, child: Loc4): Unit =
-    PowerBeamRenderer.renderBeamToChild(x, y, z, partialTime, node, beamWidth, color, child)
+    WirelessPowerBeamRenderer.renderBeamToChild(x, y, z, partialTime, node, beamWidth, color, child)
 
   def renderBeamsToAllChildren(x: Double, y: Double, z: Double, partialTime: Float, node: ITileEntity, beamWidth: Float, color: Color): Unit =
-    PowerBeamRenderer.renderBeamsToAllChildren(x, y, z, partialTime, node, beamWidth, color)
+    WirelessPowerBeamRenderer.renderBeamsToAllChildren(x, y, z, partialTime, node, beamWidth, color)
 
   def renderBeamToLocation(x: Double, y: Double, z: Double, node: ITileEntity, color: Color, partialTime: Float, loc: Loc4, beamWidth: Float): Unit =
-    PowerBeamRenderer.renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
+    WirelessPowerBeamRenderer.renderBeamToLocation(x, y, z, node, color, partialTime, loc, beamWidth)
 }

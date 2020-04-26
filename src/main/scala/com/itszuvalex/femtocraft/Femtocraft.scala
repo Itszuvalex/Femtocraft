@@ -7,7 +7,7 @@ import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.player.PlayerNaniteCapability
-import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.femtocraft.power.WirelessPowerManager
 import com.itszuvalex.femtocraft.proxy.{ProxyCommon, ProxyGuiCommon}
 import com.itszuvalex.femtocraft.worldgen.FemtocraftOreGenerator
 import com.itszuvalex.itszulib.initialization.{InitializationStage, ModInit}
@@ -69,7 +69,7 @@ object Femtocraft extends ModInit {
     FemtoFluids.init()
     FemtoRecipes.init()
     FrameMultiblockRegistry.init()
-    PowerManager.instance.init()
+    WirelessPowerManager.instance.init()
     LogisticsResourceRegistry.init()
     proxy.init()
   })

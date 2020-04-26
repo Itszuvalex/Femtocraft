@@ -10,7 +10,7 @@ import net.minecraft.util.{EnumFacing, ResourceLocation}
 /**
   * Created by Christopher on 8/29/2015.
   */
-object DiffusionNodeBeamRenderer extends PowerBeamRenderer {
+object DiffusionNodeBeamRenderer extends WirelessPowerBeamRenderer {
   val BEAM_WIDTH    = .1f
   val RENDER_RADIUS = 64
   private val beamColorLocation = new ResourceLocation(Femtocraft.ID + ":" + "textures/diffusion_particles_colored.png")

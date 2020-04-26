@@ -93,13 +93,13 @@ class CrystalMountRenderer extends TileEntityCombinedRenderer[TileCrystalMount] 
       renderCrystalMountAt(te, x, y, z, partialTicks, te.getWorld.getTotalWorldTime.toFloat, renderAbove, renderBelow, te.storage.head != null && !te.storage.head.isEmpty, te.getModule(ItszuLibModules.COLORABLE, EnumFacing.UP))
     }
 
-    te.getModule(ManagerModules.TILE_POWER_NODE, null).renderLocations.flatMap(loc => loc.getITileEntity()).withFilter(_.hasModule(ManagerModules.TILE_POWER_NODE, null)).
+    te.getModule(ManagerModules.TILE_WIRELESS_POWER_NODE, null).renderLocations.flatMap(loc => loc.getITileEntity()).withFilter(_.hasModule(ManagerModules.TILE_WIRELESS_POWER_NODE, null)).
       foreach { t =>
-        val cap = t.getModule(ManagerModules.TILE_POWER_NODE, null)
-        if (MinecraftForgeClient.getRenderPass == 1) PowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
+        val cap = t.getModule(ManagerModules.TILE_WIRELESS_POWER_NODE, null)
+        if (MinecraftForgeClient.getRenderPass == 1) WirelessPowerNodeBeamRenderer.renderPowerBeamToChild(te, x, y, z, partialTicks, cap.getLoc)
       }
 
-    te.getModule(ManagerModules.TILE_POWER_NODE, null).leafNodes(false).
+    te.getModule(ManagerModules.TILE_WIRELESS_POWER_NODE, null).leafNodes(false).
       foreach { t =>
         if (MinecraftForgeClient.getRenderPass == 1) DiffusionNodeBeamRenderer.renderBeamToChild(te, x, y, z, partialTicks, t.getStorageLoc)
       }

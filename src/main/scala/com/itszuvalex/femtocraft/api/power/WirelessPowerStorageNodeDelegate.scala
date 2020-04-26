@@ -4,11 +4,11 @@ import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.IBattery
 import net.minecraft.tileentity.TileEntity
 
-class PowerStorageNodeDelegate(tileEntity: TileEntity,
-                               getBattery: () => IBattery,
-                               storageT: PowerStorageNodeType,
-                               transfer: () => Double)
-  extends IPowerStorageNode {
+class WirelessPowerStorageNodeDelegate(tileEntity: TileEntity,
+                                       getBattery: () => IBattery,
+                                       storageT: PowerStorageNodeType,
+                                       transfer: () => Double)
+  extends IWirelessPowerStorageNode {
   val lastPowerAmount: Array[Double] = Array(0d, 0d)
 
   def updateServerTick(): Unit = {

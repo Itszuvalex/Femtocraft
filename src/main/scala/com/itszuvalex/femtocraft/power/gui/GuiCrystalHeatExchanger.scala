@@ -26,7 +26,7 @@ class GuiCrystalHeatExchanger(player: EntityPlayer, inv: InventoryPlayer, privat
   progressGui.colorProgress = tile.getModule(ItszuLibModules.COLORABLE, null).toInt
   add(progressGui)
 
-  val powerMeter   = new GuiPowerMeter(6, 22, tile.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null).battery, tile.getModule(ItszuLibModules.COLORABLE, null).toInt)
+  val powerMeter   = new GuiPowerMeter(6, 22, tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery, tile.getModule(ItszuLibModules.COLORABLE, null).toInt)
   val powerReading = new GuiLabel(6, 14, 80, Minecraft.getMinecraft.fontRenderer.FONT_HEIGHT, labelText)
   add(powerReading, powerMeter)
 

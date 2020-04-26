@@ -9,17 +9,17 @@ import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import com.itszuvalex.itszulib.util.Debug
 import org.apache.logging.log4j.Level
 
-object PowerNetwork {
+object WirelessPowerNetwork {
   val TICKS_TO_AVERAGE_POWER_OVER: Int = 20 * 10
 
-  def createFromNode(tile: IPowerNetworkNode): PowerNetwork = {
-    val network = new PowerNetwork
+  def createFromNode(tile: IWirelessPowerNetworkNode): WirelessPowerNetwork = {
+    val network = new WirelessPowerNetwork
     network.addNode(tile)
     network
   }
 
   class Statistics {
-    val powerAverageCache     = new Array[Double](PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
+    val powerAverageCache     = new Array[Double](WirelessPowerNetwork.TICKS_TO_AVERAGE_POWER_OVER)
     var lastTickProducerGen   = 0d
     var lastTickConsumerReq   = 0d
     var lastTickStored        = 0d
@@ -71,14 +71,14 @@ object PowerNetwork {
 
     def averagePowerTrend: Double = if (powerAverageCount == 0) 0d else powerAverageCache.map(_ / powerAverageCount).sum
 
-    def addConsumer(node: IPowerStorageNode): Unit = {
+    def addConsumer(node: IWirelessPowerStorageNode): Unit = {
       lastTickConsumerReq += node.changeForLastTick
       consumerNodeCount += 1
       lastTickTotalStored += node.battery.storage
       lastTickTotalStorage += node.battery.maxStorage
     }
 
-    def addStorage(node: IPowerStorageNode): Unit = {
+    def addStorage(node: IWirelessPowerStorageNode): Unit = {
       lastTickStored += node.battery.storage
       lastTickStorageMax += node.battery.maxStorage
       lastTickStorageChange += node.changeForLastTick
@@ -87,7 +87,7 @@ object PowerNetwork {
       storageNodeCount += 1
     }
 
-    def addProducer(node: IPowerStorageNode): Unit = {
+    def addProducer(node: IWirelessPowerStorageNode): Unit = {
       lastTickProducerGen += node.changeForLastTick
       producerNodeCount += 1
       lastTickTotalStored += node.battery.storage
@@ -101,15 +101,15 @@ object PowerNetwork {
 
     private def trackPowerTrend(a: Double): Unit = {
       powerAverageCache(powerAverageInd) = a
-      powerAverageCount = Math.min(PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER, powerAverageCount + 1)
-      powerAverageInd = (powerAverageInd + 1) % PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER
+      powerAverageCount = Math.min(WirelessPowerNetwork.TICKS_TO_AVERAGE_POWER_OVER, powerAverageCount + 1)
+      powerAverageInd = (powerAverageInd + 1) % WirelessPowerNetwork.TICKS_TO_AVERAGE_POWER_OVER
     }
   }
 
 }
 
-class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](ManagerNetwork.instance.getNextID) {
-  val statistics = new power.PowerNetwork.Statistics
+class WirelessPowerNetwork() extends TileNetwork[IWirelessPowerNetworkNode, WirelessPowerNetwork](ManagerNetwork.instance.getNextID) {
+  val statistics = new power.WirelessPowerNetwork.Statistics
 
   def countProducers: Int = statistics.countProducers
 
@@ -135,9 +135,9 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   def averagePowerTrend: Double = statistics.averagePowerTrend
 
-  override def networkModule: IModule[IPowerNetworkNode] = ManagerModules.TILE_POWER_NODE
+  override def networkModule: IModule[IWirelessPowerNetworkNode] = ManagerModules.TILE_WIRELESS_POWER_NODE
 
-  override def create(): PowerNetwork = new PowerNetwork
+  override def create(): WirelessPowerNetwork = new WirelessPowerNetwork
 
   override def onTickStart(): Unit = {}
 
@@ -171,11 +171,11 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
 
   def consumerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
 
-  override def onTakeover(iNetwork: PowerNetwork): Unit = {}
+  override def onTakeover(iNetwork: WirelessPowerNetwork): Unit = {}
 
-  override def onSplit(iNetwork: PowerNetwork): Unit = {}
+  override def onSplit(iNetwork: WirelessPowerNetwork): Unit = {}
 
-  override def removeNodes(nodes: util.Collection[IPowerNetworkNode]): Unit = {
+  override def removeNodes(nodes: util.Collection[IWirelessPowerNetworkNode]): Unit = {
     super.removeNodes(nodes)
 
     val mst = MinimalSpanningTree.calculate(this)
@@ -192,7 +192,7 @@ class PowerNetwork() extends TileNetwork[IPowerNetworkNode, PowerNetwork](Manage
     }
   }
 
-  override def addNode(node: IPowerNetworkNode): Unit = {
+  override def addNode(node: IWirelessPowerNetworkNode): Unit = {
     super.addNode(node)
 
     val mst = MinimalSpanningTree.calculate(this)

@@ -14,8 +14,8 @@ import net.minecraft.item.ItemStack
   * Created by Alex on 18.08.2016.
   */
 class ContainerNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, tile: TileNaniteExtractor, shouldSync: Boolean) extends ContainerInv[TileNaniteExtractor](player, tile, 0, 0, GuiIDs.TileNaniteExtractorID, shouldSync) {
-  addSync(new SyncDouble(GuiID, () => tile.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null).battery.storage = a))
-  addSync(new SyncDouble(GuiID, () => tile.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null).battery.maxStorage = a))
+  addSync(new SyncDouble(GuiID, () => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.storage = a))
+  addSync(new SyncDouble(GuiID, () => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.maxStorage = a))
   addSync(new SyncDouble(GuiID, () => tile.internal.getProgress, (a: Double) => tile.internal.setProgress(a)))
   addSync(new SyncINaniteTank(GuiID, () => tile.naniteTank.copy(), (a: INaniteTank) => tile.naniteTank.deserializeNBT(a.serializeNBT())))
 

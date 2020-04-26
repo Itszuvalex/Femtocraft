@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.api.power
 
 import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.femtocraft.power.WirelessPowerManager
 import com.itszuvalex.femtocraft.util.data.{DataAssignable, DataSpec}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.IBattery
@@ -9,24 +9,24 @@ import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.TileEntityCore
 import net.minecraft.nbt.NBTTagCompound
 
-object PowerNetworkLeafNodeDelegate {
+object WirelessPowerNetworkLeafNodeDelegate {
   val PARENT_TAG = "parent"
 
-  def INHERIT_TRANSFER_FROM_PARENT(delegate: PowerNetworkLeafNodeDelegate, default: Double): () => Double = () =>
-    delegate.parentLoc.flatMap(_.getITileEntity()).withFilter(_.hasModule(ManagerModules.TILE_POWER_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_NODE, null)).map(_.leafTransferRate).getOrElse(default)
+  def INHERIT_TRANSFER_FROM_PARENT(delegate: WirelessPowerNetworkLeafNodeDelegate, default: Double): () => Double = () =>
+    delegate.parentLoc.flatMap(_.getITileEntity()).withFilter(_.hasModule(ManagerModules.TILE_WIRELESS_POWER_NODE, null)).map(_.getModule(ManagerModules.TILE_WIRELESS_POWER_NODE, null)).map(_.leafTransferRate).getOrElse(default)
 }
 
-class PowerNetworkLeafNodeDelegate(
+class WirelessPowerNetworkLeafNodeDelegate(
                                     tileEntity: TileEntityCore,
                                     radius: () => Float,
                                     getBattery: () => IBattery,
                                     stype: PowerStorageNodeType,
                                     transfer: () => Double,
                                     change: () => Double
-                                  ) extends IPowerLeafNode with DataSpec {
+                                  ) extends IWirelessPowerLeafNode with DataSpec {
   var parentLoc: Option[Loc4] = None
 
-  dataSpec += new DataAssignable[Option[Loc4]](PowerNetworkLeafNodeDelegate.PARENT_TAG,
+  dataSpec += new DataAssignable[Option[Loc4]](WirelessPowerNetworkLeafNodeDelegate.PARENT_TAG,
                                                parentLoc _,
     { case None => null; case Some(a) => a.serializeNBT() },
                                                parentLoc_=,
@@ -37,19 +37,19 @@ class PowerNetworkLeafNodeDelegate(
 
   override def getParent: Loc4 = parentLoc.orNull
 
-  override def setParent(node: IPowerNetworkNode): Unit = {
+  override def setParent(node: IWirelessPowerNetworkNode): Unit = {
     parentLoc = Option(node.getLoc)
     tileEntity.setUpdate()
     tileEntity.markDirtyForSave()
   }
 
-  override def onParentBroken(node: IPowerNetworkNode): Unit = {
+  override def onParentBroken(node: IWirelessPowerNetworkNode): Unit = {
     parentLoc = None
     tileEntity.setUpdate()
     tileEntity.markDirtyForSave()
 
     if (tileEntity.getWorld.isRemote) return
-    PowerManager.instance.refreshLeaf(this)
+    WirelessPowerManager.instance.refreshLeaf(this)
   }
 
   override def battery: IBattery = getBattery()

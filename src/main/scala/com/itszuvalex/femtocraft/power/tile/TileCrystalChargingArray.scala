@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.tile.TileCrystalChargingArray.CrystalChargingArrayModule
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModulePowerStorage, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
@@ -43,7 +43,7 @@ class TileCrystalChargingArray extends TileEntityCoreTickable {
     }
   }
   val battery: IBattery     = new PowerBattery(TileCrystalChargingArray.POWER_STORAGE)
-  val leafNode              = new ModulePowerLeafNode(this, battery, PowerStorageNodeType.PRODUCER, transRate = () => 50d)
+  val leafNode              = new ModuleWirelessPowerLeafNode(this, battery, PowerStorageNodeType.PRODUCER, transRate = () => 50d)
 
   val internal = new CrystalChargingArrayModule(storage, battery)
 
@@ -52,7 +52,7 @@ class TileCrystalChargingArray extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleIItemHandlerConverter)
   addTileEntityModule(new ModulePowerStorage(battery))
   addTileEntityModule(leafNode)
-  addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileCrystalChargingArrayID _))
   addTileEntityModuleTickable(internal)

@@ -1,9 +1,9 @@
 package com.itszuvalex.femtocraft.power.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
-import com.itszuvalex.femtocraft.api.power.PowerNetwork
+import com.itszuvalex.femtocraft.api.power.WirelessPowerNetwork
 import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiIcons}
-import com.itszuvalex.femtocraft.power.container.ContainerPowerNetwork
+import com.itszuvalex.femtocraft.power.container.ContainerWirelessPowerNetwork
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.gui.{GuiLabel, GuiSpacingPanel}
 import com.itszuvalex.itszulib.util.ChatHelper
@@ -13,8 +13,8 @@ import net.minecraft.client.Minecraft
   * Created by Christopher Harris (Itszuvalex) on 1/27/17.
   */
 
-class GuiPowerNetwork(tile: ITileEntity) extends FemtoGuiBase(tile, new ContainerPowerNetwork(tile, false)) {
-  val network            = inventorySlots.asInstanceOf[ContainerPowerNetwork]
+class GuiWirelessPowerNetwork(tile: ITileEntity) extends FemtoGuiBase(tile, new ContainerWirelessPowerNetwork(tile, false)) {
+  val network            = inventorySlots.asInstanceOf[ContainerWirelessPowerNetwork]
   val numbersPanel       = new GuiSpacingPanel(5, 5, panelWidth, HEIGHT)
   val nodeCountString    = "Node Count"
   val nodeCountLabel     = new GuiLabel((panelWidth - fontRendererActual.getStringWidth(nodeCountString)) / 2, 0, panelWidth, fontRendererActual.FONT_HEIGHT, () => nodeCountString)
@@ -41,7 +41,7 @@ class GuiPowerNetwork(tile: ITileEntity) extends FemtoGuiBase(tile, new Containe
   changePanel.add(nodeAmountLabel, producerAmountIcon, producerAmountLabel, storageAmountIcon, storageDeltaLabel, consumersAmountIcon, consumerAmountLabel)
   val lastTickString       = f"Last Tick: ${network.lastNetworkDelta}%,.1f"
   val networkLastTickLabel = new GuiLabel(0, HEIGHT / 2, (panelWidth - 8) / 2, HEIGHT / 2, () => lastTickString)
-  val networkAverageLabel  = new GuiLabel(2 * HORIZ, HEIGHT / 2, (panelWidth - 8) / 2, HEIGHT / 2, () => f"${PowerNetwork.TICKS_TO_AVERAGE_POWER_OVER} Ticks: ${network.networkAvg}%,.1f")
+  val networkAverageLabel  = new GuiLabel(2 * HORIZ, HEIGHT / 2, (panelWidth - 8) / 2, HEIGHT / 2, () => f"${WirelessPowerNetwork.TICKS_TO_AVERAGE_POWER_OVER} Ticks: ${network.networkAvg}%,.1f")
   val storagePanel         = new GuiSpacingPanel(5, 3 * HEIGHT + 35, panelWidth, (5 * HEIGHT) / 2)
   val storageString        = "Storage"
   val storageLabel         = new GuiLabel((panelWidth - fontRendererActual.getStringWidth(storageString)) / 2, 0, panelWidth, fontRendererActual.FONT_HEIGHT, () => storageString)
@@ -62,7 +62,7 @@ class GuiPowerNetwork(tile: ITileEntity) extends FemtoGuiBase(tile, new Containe
 
   def HEIGHT: Int = panelHeight / 5 - 10
 
-  override def GuiID: Int = GuiIDs.TilePowerNetworkID
+  override def GuiID: Int = GuiIDs.TileWirelessPowerNetworkID
 
   def fontRendererActual = Minecraft.getMinecraft.fontRenderer
 

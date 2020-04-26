@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.api
 
 import com.itszuvalex.femtocraft.api.logistics.{IConnectionProvider, ILogisticsNetworkNode}
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteUpgradeable}
-import com.itszuvalex.femtocraft.api.power.{IPowerLeafNode, IPowerNetworkNode, IPowerStorageNode}
+import com.itszuvalex.femtocraft.api.power.{IWirelessPowerLeafNode, IWirelessPowerNetworkNode, IWirelessPowerStorageNode}
 import com.itszuvalex.femtocraft.industry.item.IMultitool
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
@@ -14,11 +14,11 @@ object ManagerModules {
 
   val POWER_STORAGE: IModule[IBattery] = Module.registerModule("PowerStorage", () => Capabilities.POWER_STORAGE)
 
-  val TILE_POWER_STORAGE_NODE: IModule[IPowerStorageNode] = Module.registerModule("TilePowerStorageNode", () => Capabilities.TILE_POWER_STORAGE_NODE)
+  val TILE_WIRELESS_POWER_STORAGE_NODE: IModule[IWirelessPowerStorageNode] = Module.registerModule("TileWirelessPowerStorageNode", () => Capabilities.TILE_WIRELESS_POWER_STORAGE_NODE)
 
-  val TILE_POWER_LEAF_NODE: IModule[IPowerLeafNode] = Module.registerModule("TilePowerLeafNode", () => Capabilities.TILE_POWER_LEAF_NODE)
+  val TILE_WIRELESS_POWER_LEAF_NODE: IModule[IWirelessPowerLeafNode] = Module.registerModule("TileWirelessPowerLeafNode", () => Capabilities.TILE_WIRELESS_POWER_LEAF_NODE)
 
-  val TILE_POWER_NODE: IModule[IPowerNetworkNode] = Module.registerModule("TilePowerNode", () => Capabilities.TILE_POWER_NODE)
+  val TILE_WIRELESS_POWER_NODE: IModule[IWirelessPowerNetworkNode] = Module.registerModule("TileWirelessPowerNode", () => Capabilities.TILE_WIRELESS_POWER_NODE)
 
   val PLAYER_NANITE_CAPABILITY: IModule[IPlayerNaniteCapability] = Module.registerModule("PlayerNaniteCapability", () => Capabilities.PLAYER_NANITE_CAPABILITY)
 

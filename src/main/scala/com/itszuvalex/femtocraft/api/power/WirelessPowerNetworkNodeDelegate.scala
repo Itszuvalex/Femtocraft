@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.api.power
 
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
-import com.itszuvalex.femtocraft.power.PowerManager
+import com.itszuvalex.femtocraft.power.WirelessPowerManager
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.implicits.NBTHelpers.NBTAdditions._
@@ -14,41 +14,41 @@ import scala.collection.{Set, mutable}
 /**
   * Created by Chris on 1/1/2017.
   */
-object PowerNetworkNodeDelegate {
+object WirelessPowerNetworkNodeDelegate {
   val LEAF_NODE_TAG = "Leaf"
 }
 
-class PowerNetworkNodeDelegate(tileEntity: TileEntityCore,
-                               radius: => Float,
-                               transfer: => Double,
-                               renders: => Boolean
-                              ) extends IPowerNetworkNode with INBTSerializable[NBTTagCompound] {
+class WirelessPowerNetworkNodeDelegate(tileEntity: TileEntityCore,
+                                       radius: => Float,
+                                       transfer: => Double,
+                                       renders: => Boolean
+                              ) extends IWirelessPowerNetworkNode with INBTSerializable[NBTTagCompound] {
   val leafNodeLocs: mutable.HashSet[Loc4]      = new mutable.HashSet[Loc4]()
   var renderLocs  : scala.collection.Set[Loc4] = Set()
 
-  override def addLeafNode(node: IPowerLeafNode): Unit = {
+  override def addLeafNode(node: IWirelessPowerLeafNode): Unit = {
     leafNodeLocs += node.getStorageLoc
     tileEntity.setUpdate()
     tileEntity.markDirtyForSave()
   }
 
-  override def removeLeafNode(node: IPowerLeafNode): Unit = {
+  override def removeLeafNode(node: IWirelessPowerLeafNode): Unit = {
     leafNodeLocs -= node.getStorageLoc
     tileEntity.setUpdate()
     tileEntity.markDirtyForSave()
-    PowerManager.instance.refreshLeafsOnMain(this)
+    WirelessPowerManager.instance.refreshLeafsOnMain(this)
   }
 
   override def leafTransferRate: Double = transfer
 
-  override def leafNodes(force: Boolean): Set[IPowerLeafNode] = leafNodeLocs.flatMap(_.getITileEntity(force)).withFilter(_.hasModule(ManagerModules.TILE_POWER_LEAF_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_LEAF_NODE, null))
+  override def leafNodes(force: Boolean): Set[IWirelessPowerLeafNode] = leafNodeLocs.flatMap(_.getITileEntity(force)).withFilter(_.hasModule(ManagerModules.TILE_WIRELESS_POWER_LEAF_NODE, null)).map(_.getModule(ManagerModules.TILE_WIRELESS_POWER_LEAF_NODE, null))
 
-  override def storageNodes(force: Boolean): Set[IPowerStorageNode] = {
-    val set = if (tileEntity.hasCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
-      Set(tileEntity.getCapability(Capabilities.TILE_POWER_STORAGE_NODE, null))
+  override def storageNodes(force: Boolean): Set[IWirelessPowerStorageNode] = {
+    val set = if (tileEntity.hasCapability(Capabilities.TILE_WIRELESS_POWER_STORAGE_NODE, null))
+      Set(tileEntity.getCapability(Capabilities.TILE_WIRELESS_POWER_STORAGE_NODE, null))
     else Set()
 
-    set ++ leafNodeLocs.flatMap(_.getITileEntity(force)).withFilter(_.hasModule(ManagerModules.TILE_POWER_STORAGE_NODE, null)).map(_.getModule(ManagerModules.TILE_POWER_STORAGE_NODE, null))
+    set ++ leafNodeLocs.flatMap(_.getITileEntity(force)).withFilter(_.hasModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null)).map(_.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null))
   }
 
   override def connectionRadius: Float = radius
@@ -66,7 +66,7 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityCore,
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
     leafNodeLocs.clear()
-    val locs = nbt.NBTList(PowerNetworkNodeDelegate.LEAF_NODE_TAG)
+    val locs = nbt.NBTList(WirelessPowerNetworkNodeDelegate.LEAF_NODE_TAG)
     if (locs != null) {
       leafNodeLocs ++= locs.map(Loc4(_))
     }
@@ -75,7 +75,7 @@ class PowerNetworkNodeDelegate(tileEntity: TileEntityCore,
 
   override def serializeNBT(): NBTTagCompound = {
     NBTCompound(
-      PowerNetworkNodeDelegate.LEAF_NODE_TAG -> NBTList(leafNodeLocs.map(_.serializeNBT()))
+      WirelessPowerNetworkNodeDelegate.LEAF_NODE_TAG -> NBTList(leafNodeLocs.map(_.serializeNBT()))
       )
   }
 }

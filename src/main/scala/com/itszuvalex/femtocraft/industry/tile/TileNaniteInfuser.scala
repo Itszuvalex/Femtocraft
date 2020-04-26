@@ -5,7 +5,7 @@ import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration, NaniteInfusionRecipeRegistry}
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerLeafNode, ModulePowerStorage, ModulePowerStorageNodeFromPowerLeafNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModulePowerStorage, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
@@ -63,7 +63,7 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
                                                                             NANITE_TANK_KEY -> naniteTank),
                                                                         () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   val battery      : IBattery     = new PowerBattery(4000)
-  val leafNode                    = new ModulePowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, 8, () => 50d)
+  val leafNode                    = new ModuleWirelessPowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, 8, () => 50d)
 
   val internal = new NaniteInfuserModule(inputStorage, outputStorage, battery, naniteTank)
 
@@ -75,7 +75,7 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   addTileEntityModule(leafNode)
   addTileEntityModule(new ModuleINaniteTank(naniteTank))
   addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
-  addTileEntityModule(new ModulePowerStorageNodeFromPowerLeafNode(leafNode))
+  addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileNaniteInfuserID _))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))

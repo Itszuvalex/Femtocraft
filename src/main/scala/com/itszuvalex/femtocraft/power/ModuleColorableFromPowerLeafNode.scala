@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power
 
-import com.itszuvalex.femtocraft.api.power.IPowerLeafNode
+import com.itszuvalex.femtocraft.api.power.IWirelessPowerLeafNode
 import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
@@ -8,7 +8,7 @@ import com.itszuvalex.itszulib.core.TileEntityModule
 import com.itszuvalex.itszulib.util.Color
 import net.minecraft.util.EnumFacing
 
-class ModuleColorableFromPowerLeafNode(val leaf: IPowerLeafNode) extends TileEntityModule[Color] {
+class ModuleColorableFromPowerLeafNode(val leaf: IWirelessPowerLeafNode) extends TileEntityModule[Color] {
   override def module: IModule[Color] = ItszuLibModules.COLORABLE
 
   override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ =>

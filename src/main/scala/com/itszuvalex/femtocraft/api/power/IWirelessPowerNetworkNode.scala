@@ -6,7 +6,7 @@ import com.itszuvalex.itszulib.logistics.TileNetworkNode
 /**
   * Created by Chris on 1/1/2017.
   */
-trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork] {
+trait IWirelessPowerNetworkNode extends TileNetworkNode[IWirelessPowerNetworkNode, WirelessPowerNetwork] {
   override def canConnect(loc: Loc4): Boolean = {
     if (!(getLoc.distSqr(loc) <= connectionRadius * connectionRadius))
       return false
@@ -16,15 +16,15 @@ trait IPowerNetworkNode extends TileNetworkNode[IPowerNetworkNode, PowerNetwork]
 
   def connectionRadius: Float
 
-  def leafNodes(force: Boolean): scala.collection.Set[IPowerLeafNode]
+  def leafNodes(force: Boolean): scala.collection.Set[IWirelessPowerLeafNode]
 
-  def canAddLeafNode(node: IPowerLeafNode): Boolean = node.getStorageLoc.distSqr(getLoc) <= connectionRadius * connectionRadius
+  def canAddLeafNode(node: IWirelessPowerLeafNode): Boolean = node.getStorageLoc.distSqr(getLoc) <= connectionRadius * connectionRadius
 
-  def addLeafNode(node: IPowerLeafNode): Unit
+  def addLeafNode(node: IWirelessPowerLeafNode): Unit
 
-  def removeLeafNode(node: IPowerLeafNode): Unit
+  def removeLeafNode(node: IWirelessPowerLeafNode): Unit
 
-  def storageNodes(force: Boolean): scala.collection.Set[IPowerStorageNode]
+  def storageNodes(force: Boolean): scala.collection.Set[IWirelessPowerStorageNode]
 
   def rendersConnections: Boolean
 

@@ -1,10 +1,10 @@
 package com.itszuvalex.femtocraft.industry
 
-import com.itszuvalex.femtocraft.api.power.{IPowerStorageNode, PowerStorageNodeType}
+import com.itszuvalex.femtocraft.api.power.{IWirelessPowerStorageNode, PowerStorageNodeType}
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.storage.IBattery
 
-class DynamicIPowerStorageNode(getter: () => IPowerStorageNode) extends IPowerStorageNode {
+class DynamicIWirelessPowerStorageNode(getter: () => IWirelessPowerStorageNode) extends IWirelessPowerStorageNode {
   override def battery: IBattery = getter().battery
 
   override def storageType: PowerStorageNodeType = getter().storageType
