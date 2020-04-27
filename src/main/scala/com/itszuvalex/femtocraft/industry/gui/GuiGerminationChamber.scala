@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabWirelessPowerNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerGerminationChamber
 import com.itszuvalex.femtocraft.industry.tile.TileGerminationChamber
 import com.itszuvalex.femtocraft.logistics.gui.GuiFluidTank
@@ -19,7 +19,7 @@ import scala.collection.mutable.ListBuffer
   * Created by Alex on 18.08.2016.
   */
 class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileGerminationChamber) extends FemtoGuiBase(tile, new ContainerGerminationChamber(player, inv, tile, false)) {
-  GuiTabNetwork.addToGuiTabBar(tabBar, tile)
+  GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
 
   fontRenderer = Minecraft.getMinecraft.fontRenderer
 

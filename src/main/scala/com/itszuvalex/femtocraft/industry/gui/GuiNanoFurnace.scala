@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabNetwork}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabWirelessPowerNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerNanoFurnace
 import com.itszuvalex.femtocraft.industry.tile.{NanoFurnaceModule, TileNanoFurnace}
 import com.itszuvalex.itszulib.api.ItszuLibModules
@@ -19,7 +19,7 @@ import scala.collection.mutable.ListBuffer
   * Created by Alex on 18.08.2016.
   */
 class GuiNanoFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileNanoFurnace) extends FemtoGuiBase(tile, new ContainerNanoFurnace(player, inv, tile, false)) {
-  GuiTabNetwork.addToGuiTabBar(tabBar, tile)
+  GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
 
   fontRenderer = Minecraft.getMinecraft.fontRenderer

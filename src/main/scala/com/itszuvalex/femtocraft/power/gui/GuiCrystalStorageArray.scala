@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.power.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabWirelessPowerNetwork}
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalStorageArray
 import com.itszuvalex.femtocraft.power.tile.TileCrystalStorageArray
@@ -12,7 +12,7 @@ import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
 class GuiCrystalStorageArray(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCrystalStorageArray)
   extends FemtoGuiBase(tile, new ContainerCrystalStorageArray(player, inv, tile, false)) {
-  GuiTabNetwork.addToGuiTabBar(tabBar, tile)
+  GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
 
   val storage: IItemStorage = tile.getModule(ItszuLibModules.ITEM_STORAGE, null)
   storage.indices.foreach(i =>

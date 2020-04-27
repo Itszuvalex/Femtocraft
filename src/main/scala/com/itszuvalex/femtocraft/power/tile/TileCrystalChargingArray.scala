@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.power.tile.TileCrystalChargingArray.CrystalChargingArrayModule
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModulePowerStorage, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerStorage, ModuleWiredPowerLeafNode, ModuleWirelessPowerLeafNode, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage, ItemStorageArray, PowerBattery}
@@ -55,6 +55,7 @@ class TileCrystalChargingArray extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileCrystalChargingArrayID _))
+  addTileEntityModule(new ModuleWiredPowerLeafNode(this, battery _, PowerStorageNodeType.PRODUCER, () => 50d))
   addTileEntityModuleTickable(internal)
 
   def powerPerTick: Double = storage.flatMap(_.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null)).foldLeft(0d)((s, c) => s + c.getPassiveGen() * TileCrystalChargingArray.PASSIVE_GEN_MULTIPLIER)

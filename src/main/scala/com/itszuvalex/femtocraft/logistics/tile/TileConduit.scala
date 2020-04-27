@@ -4,15 +4,15 @@ import java.util
 
 import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.api.logistics._
-import com.itszuvalex.femtocraft.logistics.tile.TileConduit.{ModuleColor, ModuleConduit}
+import com.itszuvalex.femtocraft.logistics.tile.TileConduit.ModuleConduit
+import com.itszuvalex.femtocraft.power.ModuleColorNeighborAverage
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.storage.{IItemStorage, ItemStorageArray}
 import com.itszuvalex.itszulib.api.wrappers._
+import com.itszuvalex.itszulib.core.TileEntityCoreTickable
 import com.itszuvalex.itszulib.core.modules.{ModuleGui, ModuleNetworkedWire}
-import com.itszuvalex.itszulib.core.{TileEntityCoreTickable, TileEntityModuleTickable}
-import com.itszuvalex.itszulib.util.Color
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
@@ -22,8 +22,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Created by Chris on 2/16/2017.
-  */
+ * Created by Chris on 2/16/2017.
+ */
 object TileConduit {
   lazy val connectionModules: ArrayBuffer[IModule[_]] = mutable.ArrayBuffer[IModule[_]](
     ManagerModules.TILE_LOGISTICS_NODE,
@@ -86,41 +86,6 @@ object TileConduit {
     }
   }
 
-  class ModuleColor(conduit: TileConduit) extends TileEntityModuleTickable[Color] {
-    var color: Color = Color(0, 0, 0, 0)
-
-    override def module: IModule[Color] = ItszuLibModules.COLORABLE
-
-    override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[Color] = _ => Some(color)
-
-    override def clientUpdate(tile: ITileEntity): Unit = {
-      var red  : Int = 0
-      var green: Int = 0
-      var blue : Int = 0
-      var numBlocks  = 0
-      EnumFacing.VALUES.
-                withFilter(conduit.conduit.isConnected).
-                map(conduit.getLoc.getOffset(_)).flatMap(_.getITileEntity(false))
-                .flatMap(_.moduleOption(ItszuLibModules.COLORABLE, null))
-                .foreach { c =>
-                  numBlocks += 1
-                  red += c.red.toInt & 255
-                  green += c.green.toInt & 255
-                  blue += c.blue.toInt & 255
-                }
-      color = if (numBlocks > 0) {
-        Color(255.toByte,
-              ((red / numBlocks) & 255).toByte,
-              ((green / numBlocks) & 255).toByte,
-              ((blue / numBlocks) & 255).toByte)
-
-      }
-      else {
-        Color(0, 0, 0, 0)
-      }
-    }
-  }
-
   object ModuleConduit {
     val STORAGE_KEY = "storage"
   }
@@ -129,7 +94,7 @@ object TileConduit {
 
 class TileConduit extends TileEntityCoreTickable {
   val conduit = new ModuleConduit(this)
-  var color   = new ModuleColor(this)
+  var color   = new ModuleColorNeighborAverage(conduit.isConnected)
 
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileConduitID _))
   addTileEntityModule(conduit)

@@ -6,6 +6,7 @@ import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.power.tile.TilePowerConduitCrystal
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
+import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.render.RenderUtils._
 import com.itszuvalex.itszulib.render.TileEntityCombinedRenderer
 import com.itszuvalex.itszulib.util.{Color, StringUtils}
@@ -66,7 +67,7 @@ class PowerConduitRenderer extends TileEntityCombinedRenderer[TilePowerConduitCr
 
   override def renderTileEntityInWorld(te: TilePowerConduitCrystal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    val color   = Color(0, 0, 0, 0)
+    val color   = te.getModule(ItszuLibModules.COLORABLE, null)
     val facings = EnumFacing.VALUES.filter(te.conduit.isConnected)
     val enumSet = if (facings.isEmpty) util.EnumSet.noneOf(classOf[EnumFacing]) else util.EnumSet.copyOf(facings.toSet)
     renderConduitAt(x, y, z, partialTicks, color, enumSet)

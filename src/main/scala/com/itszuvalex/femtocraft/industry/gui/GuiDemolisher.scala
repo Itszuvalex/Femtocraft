@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabNetwork}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabInventorySideConfig, GuiTabWirelessPowerNetwork}
 import com.itszuvalex.femtocraft.industry.container.ContainerDemolisher
 import com.itszuvalex.femtocraft.industry.tile.{DemolisherModule, TileDemolisher}
 import com.itszuvalex.itszulib.api.ItszuLibModules
@@ -16,7 +16,7 @@ import net.minecraft.util.text.TextFormatting
 import scala.collection.mutable.ListBuffer
 
 class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileDemolisher) extends FemtoGuiBase(tile, new ContainerDemolisher(player, inv, tile, false)) {
-  GuiTabNetwork.addToGuiTabBar(tabBar, tile)
+  GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
 
   fontRenderer = Minecraft.getMinecraft.fontRenderer

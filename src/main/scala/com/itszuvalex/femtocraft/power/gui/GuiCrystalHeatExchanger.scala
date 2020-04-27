@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.power.gui
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabNetwork}
+import com.itszuvalex.femtocraft.client.{FemtoGuiBase, GuiTabWirelessPowerNetwork}
 import com.itszuvalex.femtocraft.industry.gui.GuiPowerMeter
 import com.itszuvalex.femtocraft.power.container.ContainerCrystalHeatExchanger
 import com.itszuvalex.femtocraft.power.tile.TileCrystalHeatExchanger
@@ -14,7 +14,7 @@ import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
 
 class GuiCrystalHeatExchanger(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCrystalHeatExchanger)
   extends FemtoGuiBase(tile, new ContainerCrystalHeatExchanger(player, inv, tile, false)) {
-  GuiTabNetwork.addToGuiTabBar(tabBar, tile)
+  GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
 
   val storage: IItemStorage = tile.getModule(ItszuLibModules.ITEM_STORAGE, null)
   storage.indices.foreach(i =>

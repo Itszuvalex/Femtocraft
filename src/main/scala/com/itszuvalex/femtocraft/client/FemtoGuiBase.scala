@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL11
 abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase(c) {
   val tabBar: GuiTabBar = new GuiTabBar(-GuiTabBar.WIDTH, 0,
                                         ySize, GuiID, tile.asInstanceOf[TileEntityCore])
-  tabBar.addTab("Inventory", new GuiItemStack(0, 0, () => false, "") {
+  tabBar.addTab(Option(tile.toMinecraft.getBlockType).map(_.getLocalizedName).getOrElse(""), new GuiItemStack(0, 0, () => false, "") {
     val item = Converter.IItemStackFromItemStack(new ItemStack(tile.toMinecraft.getBlockType))
 
     override def itemStack = item

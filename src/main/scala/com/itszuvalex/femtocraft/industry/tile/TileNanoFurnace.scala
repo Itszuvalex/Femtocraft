@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNanoFurnace._
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModulePowerStorage, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModulePowerStorage, ModuleWiredPowerLeafNode, ModuleWirelessPowerLeafNode, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{ItemStorageArray, _}
@@ -70,6 +70,7 @@ class TileNanoFurnace extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileFurnaceGuiID _))
+  addTileEntityModule(new ModuleWiredPowerLeafNode(this, battery _, PowerStorageNodeType.CONSUMER, () => 50d))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(internal)
 }

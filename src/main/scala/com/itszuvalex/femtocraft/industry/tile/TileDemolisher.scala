@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileDemolisher._
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWiredPowerLeafNode, ModuleWirelessPowerLeafNode, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage._
@@ -54,6 +54,7 @@ class TileDemolisher extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileDemolisherGuiID _))
+  addTileEntityModule(new ModuleWiredPowerLeafNode(this, battery _, PowerStorageNodeType.CONSUMER, () => 50d))
   addTileEntityModuleTickable(new ModuleIItemAutoIO(sidedStorageConfig))
   addTileEntityModuleTickable(internal)
 }
