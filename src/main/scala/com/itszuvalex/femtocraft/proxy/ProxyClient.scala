@@ -180,6 +180,7 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(FemtoItems.itemFrame, 0, classOf[TileFrame])
     ForgeHooksClient.registerTESRItemStack(FemtoItems.itemMultiblock, 0, classOf[TileFrame])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockConduit), 0, classOf[TileConduit])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockPowerConduitCrystal), 0, classOf[TilePowerConduitCrystal])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
@@ -215,6 +216,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalHeatExchanger], new CrystalHeatExchangeRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileFrame], new FrameRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileConduit], new ConduitRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerConduitCrystal], new PowerConduitRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 

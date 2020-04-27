@@ -4,9 +4,7 @@ import com.itszuvalex.femtocraft.api.logistics.IConnectionProvider;
 import com.itszuvalex.femtocraft.api.logistics.ILogisticsNetworkNode;
 import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
 import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
-import com.itszuvalex.femtocraft.api.power.IWirelessPowerLeafNode;
-import com.itszuvalex.femtocraft.api.power.IWirelessPowerNetworkNode;
-import com.itszuvalex.femtocraft.api.power.IWirelessPowerStorageNode;
+import com.itszuvalex.femtocraft.api.power.*;
 import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
@@ -21,6 +19,12 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 public class Capabilities {
     @CapabilityInject(IBattery.class)
     public static Capability<IBattery> POWER_STORAGE = null;
+
+    @CapabilityInject(IWiredPowerNode.class)
+    public static Capability<IWiredPowerNode> TILE_WIRED_POWER_NODE = null;
+
+    @CapabilityInject(IWiredPowerLeafNode.class)
+    public static Capability<IWiredPowerLeafNode> TILE_WIRED_POWER_LEAF_NODE = null;
 
     @CapabilityInject(IWirelessPowerStorageNode.class)
     public static Capability<IWirelessPowerStorageNode> TILE_WIRELESS_POWER_STORAGE_NODE = null;

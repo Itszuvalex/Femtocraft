@@ -86,6 +86,8 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileConduit], "TileConduit")
     GameRegistry.registerTileEntity(classOf[TileGerminationChamber], "TileGerminationChamber")
 
+    GameRegistry.registerTileEntity(classOf[TilePowerConduitCrystal], "TilePowerConduitCrystal")
+
     GameRegistry.registerTileEntity(classOf[TileNetworkTest], "TileNetworkTest")
   }
 

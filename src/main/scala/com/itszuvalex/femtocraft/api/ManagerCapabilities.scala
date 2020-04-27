@@ -19,11 +19,13 @@ import scala.collection.JavaConversions._
 import scala.collection.Set
 
 /**
-  * Created by Chris on 1/1/2017.
-  */
+ * Created by Chris on 1/1/2017.
+ */
 object ManagerCapabilities {
   def register(): Unit = {
     CapabilityManager.INSTANCE.register(classOf[IBattery], new PowerStorageStorage, classOf[PowerBattery])
+    CapabilityManager.INSTANCE.register(classOf[IWiredPowerNode], new WiredPowerNodeStorage, classOf[WiredPowerNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWiredPowerLeafNode], new WiredPowerLeafNodeStorage, classOf[WiredPowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[WirelessPowerNodeNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[WirelessPowerStorageNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[WirelessWirelessPowerLeafNodeImplementationDummy])
@@ -36,6 +38,10 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[SidedNaniteStorageConfiguration], new SidedNaniteStorageConfigurationStorageDummy, classOf[SidedNaniteStorageConfiguration])
     CapabilityManager.INSTANCE.register(classOf[IOverlayRenderItem], new OverlayRenderStorageDummy, classOf[OverlayRenderItemImplDummy])
   }
+
+  class WiredPowerNodeStorage extends DummyStorage[IWiredPowerNode]
+
+  class WiredPowerLeafNodeStorage extends DummyStorage[IWiredPowerLeafNode]
 
   class PowerStorageStorage extends Capability.IStorage[IBattery] {
     override def writeNBT(capability: Capability[IBattery], instance: IBattery, side: EnumFacing): NBTBase = instance.serializeNBT()
@@ -78,6 +84,58 @@ object ManagerCapabilities {
   class ConnectionProviderStorageDummy extends DummyStorage[IConnectionProvider]
 
   class OverlayRenderStorageDummy extends DummyStorage[IOverlayRenderItem]
+
+  class WiredPowerNodeImplementationDummy extends IWiredPowerNode {
+    override def tier: IWiredPowerTier = null
+
+    override def isConnectedWiredPower(facing: EnumFacing): Boolean = false
+
+    override def canConnectWiredPower(facing: EnumFacing): Boolean = false
+
+    override def connectWiredPower(facing: EnumFacing): Boolean = false
+
+    override def disconnectWiredPower(facing: EnumFacing): Boolean = false
+
+    override def getLoc: Loc4 = Loc4.ORIGIN
+
+    override def addPersistedConnection(node: Loc4): Unit = {}
+
+    override def removePersistedConnection(node: Loc4): Unit = {}
+
+    override def setNetwork(network: WiredPowerNetwork): Unit = {}
+
+    override def getNetwork: WiredPowerNetwork = null
+
+    override def canConnect(loc: Loc4): Boolean = false
+
+    override def refresh(): Unit = {}
+
+    override def canAdd(iNetwork: WiredPowerNetwork): Boolean = false
+
+    override def onAdded(iNetwork: WiredPowerNetwork): Unit = {}
+
+    override def onRemoved(iNetwork: WiredPowerNetwork): Unit = {}
+
+    override def onConnect(node: Loc4): Unit = {}
+
+    override def onDisconnect(node: Loc4): Unit = {}
+  }
+
+  class WiredPowerLeafNodeImplementationDummy extends IWiredPowerLeafNode {
+    override def battery: IBattery = IBattery.Empty
+
+    override def powerType: PowerStorageNodeType = PowerStorageNodeType.NONE
+
+    override def isConnectedWiredPower(facing: EnumFacing): Boolean = false
+
+    override def canConnectWiredPower(facing: EnumFacing): Boolean = false
+
+    override def connectWiredPower(facing: EnumFacing): Boolean = false
+
+    override def disconnectWiredPower(facing: EnumFacing): Boolean = false
+
+    override def transferRate: Double = 0d
+  }
 
   class WirelessPowerNodeNodeImplementationDummy extends IWirelessPowerNetworkNode {
 
@@ -126,8 +184,8 @@ object ManagerCapabilities {
 
   class PowerCrystalImplementationDummy extends IPowerCrystal {
     /**
-      * Used to trigger passive trickle charging.
-      */
+     * Used to trigger passive trickle charging.
+     */
     override def onTick(): Unit = {}
 
     override def getName(): String = ""
@@ -135,41 +193,41 @@ object ManagerCapabilities {
     override def setName(name: String): Unit = {}
 
     /**
-      *
-      * @return Color of the crystal.
-      */
+     *
+     * @return Color of the crystal.
+     */
     override def getColor(): Int = 0
 
     override def setColor(color: Int): Unit = {}
 
     /**
-      *
-      * @return Amount of power to generate per tick.
-      */
+     *
+     * @return Amount of power to generate per tick.
+     */
     override def getPassiveGen(): Double = 0d
 
     override def setPassiveGen(passiveGen: Float): Unit = {}
 
     /**
-      *
-      * @return Amount of power in crystal that is less than current storage.  Used for passive trickle charging.
-      */
+     *
+     * @return Amount of power in crystal that is less than current storage.  Used for passive trickle charging.
+     */
     override def getStoragePartial(): Double = 0d
 
     override def setStoragePartial(amount: Double): Unit = {}
 
     /**
-      *
-      * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
-      */
+     *
+     * @return Maximum amount of power that can flow from this crystal.  This is meant to be per-tick, divided among children.
+     */
     override def getTransferRate(): Double = 0d
 
     override def setTransferRate(rate: Double): Unit = {}
 
     /**
-      *
-      * @return Size of the crystal.
-      */
+     *
+     * @return Size of the crystal.
+     */
     override def getType(): String = ""
 
     override def setType(ctype: String): Unit = {}
@@ -231,12 +289,12 @@ object ManagerCapabilities {
 
   class ConnectionProviderImplDummy extends IConnectionProvider {
     /**
-      * Given loc and facing to allow the provider to build the connection...connections...as needed
-      *
-      * @param loc    Loc holding this connection provider
-      * @param facing Facing
-      * @return Set of Connections provided by this provider
-      */
+     * Given loc and facing to allow the provider to build the connection...connections...as needed
+     *
+     * @param loc    Loc holding this connection provider
+     * @param facing Facing
+     * @return Set of Connections provided by this provider
+     */
     override def getConnections[T](loc: Loc4, facing: EnumFacing): util.Collection[IConnection[T]] = Set[IConnection[T]]()
 
     override def addTooltip(tooltip: util.List[String]): Unit = {}

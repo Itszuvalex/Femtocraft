@@ -21,6 +21,7 @@ import scala.collection.mutable.ArrayBuffer
   */
 object FemtoBlocks {
 
+
   val blockCallbacks = new ArrayBuffer[() => Unit]()
   private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
   private val oresToRegister       = new ArrayBuffer[(Block, String)]
@@ -50,6 +51,7 @@ object FemtoBlocks {
   var blockCrystalHeatExchanger  : Block = _
   var blockGerminationChamber    : Block = _
   var blockNaniteExtractor       : Block = _
+  var blockPowerConduitCrystal : Block = _
 
   //Tests
   var blockDemolisher        : Block = _
@@ -97,6 +99,8 @@ object FemtoBlocks {
     blockGerminationChamber = registerBlock(registry, new BlockGerminationChamber(), "blockGerminationChamber")
     blockGlowStick = registerBlock(registry, new BlockGlowStick(), "blockGlowStick")
 
+    blockPowerConduitCrystal = registerBlock(registry, new BlockPowerConduitCrystal, "blockPowerConduitCrystal")
+
     //tests
 
     testBlock = registerBlock(registry, new BlockTest, "testBlock")
@@ -140,6 +144,7 @@ object FemtoBlocks {
     blockCrystalStorageArray.registerModel()
     blockCrystalHeatExchanger.registerModel()
     blockConduit.registerModel()
+    blockPowerConduitCrystal.registerModel()
     blockGerminationChamber.registerModel()
   }
 
