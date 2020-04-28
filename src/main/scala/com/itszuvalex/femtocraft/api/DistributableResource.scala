@@ -1,15 +1,19 @@
 package com.itszuvalex.femtocraft.api
 
-trait DistributableResource {
-  def max: Double
+abstract class DistributableResource[T:Numeric] {
+  val n: Numeric[T] = implicitly[Numeric[T]]
 
-  def room: Double = max - amt
+  def max: T
 
-  def amt: Double
+  def room: T ={
+    n.minus(max, amt)
+  }
 
-  def transferMax: Double
+  def amt: T
 
-  def add(amt: Double): Double
+  def transferMax: T
 
-  def remove(amt: Double): Double
+  def add(amt: T): T
+
+  def remove(amt: T): T
 }
