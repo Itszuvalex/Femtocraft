@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.power.tile
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.power.tile.TileCrystalMount.CrystalMountModule
-import com.itszuvalex.femtocraft.power.{ModuleColorableFromICrystal, ModuleWirelessPowerNode, ModulePowerStorage, ModuleWirelessPowerStorageNode}
+import com.itszuvalex.femtocraft.power.{ModuleColorableFromICrystal, ModulePowerStorage, ModuleWirelessPowerNode, ModuleWirelessPowerStorageNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.storage.{DynamicIBattery, IBattery, IItemStorage, ItemStorageArray}
@@ -15,8 +15,8 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.AxisAlignedBB
 
 /**
-  * Created by Christopher Harris (Itszuvalex) on 8/27/15.
-  */
+ * Created by Christopher Harris (Itszuvalex) on 8/27/15.
+ */
 object TileCrystalMount {
   val MODULE: IModule[CrystalMountModule] = Module.registerModule("CrystalMountModule", null)
   val CRYSTAL_KEY                         = "Crystal"
@@ -56,7 +56,7 @@ class TileCrystalMount extends TileEntityCoreTickable {
       stack == null || stack.isEmpty || stack.hasCapability(Capabilities.ITEM_POWER_CRYSTAL, null)
     }
   }
-  val battery: IBattery     = new DynamicIBattery(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.battery).getOrElse(IBattery.Empty))
+  val battery: IBattery     = new DynamicIBattery(() => storage.head.moduleOption(ManagerModules.POWER_STORAGE, null).getOrElse(IBattery.Empty))
   val powerNetworkNode      = new ModuleWirelessPowerNode(this, () => TileCrystalMount.PEDESTAL_RANGE, () => powerStorageTransferRate, () => true)
   val internal              = new CrystalMountModule(this, storage)
 
@@ -67,8 +67,8 @@ class TileCrystalMount extends TileEntityCoreTickable {
   })
   addTileEntityModule(new ModuleWirelessPowerStorageNode(this, battery, PowerStorageNodeType.STORAGE, () => powerStorageTransferRate))
   addTileEntityModule(powerNetworkNode)
-  addTileEntityModule(new ModuleColorableFromICrystal(() => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null)))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileCrystalMountGuiID _))
+  addTileEntityModuleTickable(new ModuleColorableFromICrystal(this, () => storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null)))
   addTileEntityModuleTickable(internal)
 
   def powerStorageTransferRate: Double = storage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).map(_.getTransferRate())

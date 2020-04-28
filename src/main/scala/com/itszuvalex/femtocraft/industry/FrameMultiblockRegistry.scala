@@ -16,6 +16,25 @@ object FrameMultiblockRegistry {
 
   def init(): Unit = {
     registerMultiblock(new MultiblockGerminationChamber)
+    /*
+    registerMultiblock(new MultiblockReformer)
+    registerMultiblock(new MultiblockFabricator)
+    registerMultiblock(new MultiblockCircuitPrinter)
+    registerMultiblock(new MultiblockFocusingChamber)
+    registerMultiblock(new MultiblockMainframe)
+    registerMultiblock(new MultiblockNaniteBehaviorModeller)
+    registerMultiblock(new MultiblockNaniteHive)
+    registerMultiblock(new MultiblockNaniteHoldingTank)
+    registerMultiblock(new MultiblockItemVault)
+    registerMultiblock(new MultiblockFluidReservoir)
+    registerMultiblock(new MultiblockCrystalChargingArray)
+    registerMultiblock(new MultiblockCrystalGrowthChamber)
+    registerMultiblock(new MultiblockThermoelectricGenerator)
+    registerMultiblock(new MultiblockCrystalStorageMatrix)
+    registerMultiblock(new MultiblockCrystalProjectionMatrix)
+    registerMultiblock(new MultiblockForge)
+    registerMultiblock(new MultiblockExtractor)
+     */
   }
 
   def registerMultiblock(multi: IFrameMultiblock) = frameMap.put(multi.getName, multi)
