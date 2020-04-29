@@ -47,7 +47,7 @@ class TileCrystalFurnace extends TileEntityCoreTickable {
        OUTPUT_INV_KEY -> outputStorage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
 
-  val internal = new CrystalFurnaceModule(inputStorage, outputStorage, battery)
+  val internal = new CrystalFurnaceModule(inputStorage, outputStorage, batteryStorage, battery)
 
   addTileEntityModule(new ModuleIItemStorage(storage))
   addTileEntityModule(new ModuleIItemHandlerConverter)

@@ -25,7 +25,7 @@ class GuiCrystalFurnace(player: EntityPlayer, inv: InventoryPlayer, private val 
 
   addGuiAndSync(tile.storage, 0, 44, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
-  addGuiAndSync(tile.storage, 2, 6, 23)
+  addGuiAndSync(tile.storage, 2, 6, 56)
 
   addPlayerInventorySlots(inv)
 

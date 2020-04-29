@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.industry.tile.CrystalFurnaceModule._
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
@@ -51,7 +52,7 @@ object CrystalFurnaceModule {
 
 }
 
-class CrystalFurnaceModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[CrystalFurnaceModule] {
+class CrystalFurnaceModule(val input: IItemStorage, val output: IItemStorage, val batteryStorage: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[CrystalFurnaceModule] {
   private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
 
   override def module: IModule[CrystalFurnaceModule] = TileCrystalFurnace.MODULE
@@ -67,6 +68,8 @@ class CrystalFurnaceModule(val input: IItemStorage, val output: IItemStorage, va
   }
 
   override def serverUpdate(tile: ITileEntity): Unit = {
+    batteryStorage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())
+
     if (task.stack == null || task.stack.isEmpty) {
       val item = input.head
       if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty) {
