@@ -35,6 +35,9 @@ object GuiIDs {
   val TileSidedFluidConfigID     = nextID
   val TileGerminationChamberID   = nextID
 
+  //
+  val TileCrystalFurnaceID = nextID
+
   val ItemNanoPackID = nextID
 
   private var n = 0

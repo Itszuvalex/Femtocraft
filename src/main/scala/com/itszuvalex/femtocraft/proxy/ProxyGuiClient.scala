@@ -43,6 +43,7 @@ class ProxyGuiClient extends ProxyGuiCommon {
       case (GuiIDs.TileSidedInventoryConfigID, te: ITileEntity) => new GuiSidedInventoryConfig(te)
       case (GuiIDs.TileSidedNaniteConfigID, te: ITileEntity) => new GuiSidedNaniteConfig(te)
       case (GuiIDs.TileSidedFluidConfigID, te: ITileEntity) => new GuiSidedFluidConfig(te)
+      case (GuiIDs.TileCrystalFurnaceID, te: TileCrystalFurnace) => new GuiCrystalFurnace(player, player.inventory, te)
       case (_, _) => null
     }
   }

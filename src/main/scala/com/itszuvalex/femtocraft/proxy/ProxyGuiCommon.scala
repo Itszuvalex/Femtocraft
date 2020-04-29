@@ -16,8 +16,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 /**
-  * Created by Christopher Harris (Itszuvalex) on 11/21/14.
-  */
+ * Created by Christopher Harris (Itszuvalex) on 11/21/14.
+ */
 class ProxyGuiCommon extends ItszuGuiHandler {
   override def getServerGuiElement(ID: Int, data: Int, player: EntityPlayer, world: World, x: Int, y: Int, z: Int): AnyRef = {
     (ID, world.getTileEntity(new BlockPos(x, y, z))) match {
@@ -43,6 +43,7 @@ class ProxyGuiCommon extends ItszuGuiHandler {
       case (GuiIDs.TileSidedInventoryConfigID, te: ITileEntity) => new ContainerSidedInventoryConfig(te)
       case (GuiIDs.TileSidedNaniteConfigID, te: ITileEntity) => new ContainerSidedNaniteConfig(te)
       case (GuiIDs.TileSidedFluidConfigID, te: ITileEntity) => new ContainerSidedFluidConfig(te)
+      case (GuiIDs.TileCrystalFurnaceID, te: TileCrystalFurnace) => new ContainerCrystalFurnace(player, player.inventory, te, true)
       case (_, _) => null
     }
   }

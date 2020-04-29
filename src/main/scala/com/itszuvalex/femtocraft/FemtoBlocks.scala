@@ -25,6 +25,44 @@ object FemtoBlocks {
   val blockCallbacks = new ArrayBuffer[() => Unit]()
   private val itemBlocksToRegister = new ArrayBuffer[(Block, String)]
   private val oresToRegister       = new ArrayBuffer[(Block, String)]
+
+
+  // V3 blocks
+  var blockCrystalFurnace: Block = _
+  var blockCrystalCrusher: Block = _
+  var blockReformer: Block = _
+  var blockFabricator: Block = _
+  var blockCircuitPrinter: Block = _
+  var blockFocusingPedestal: Block = _
+  var blockDarkPedestal: Block = _
+  var blockFocusingChamber: Block = _
+  var blockForge: Block = _
+  var blockExtractor: Block = _
+  //var blockCrystalChargingArray: Block = _
+  var blockCrystalGrowthChamber: Block = _
+  var blockDarkPanel: Block = _
+  var blockCrystalStorageBuffer: Block = _
+  var blockCrystalStorageMatrix: Block = _
+  var blockThermoelectricGenerator: Block = _
+  var blockCrystalReceiverMatrix: Block = _
+  var blockCrystalProjectionMatrix: Block = _
+  var blockItemVault: Block = _
+  var blockFluidReservoir: Block = _
+  var blockNaniteBehaviorModeller: Block = _
+  var blockNaniteHive: Block = _
+  var blockNaniteHoldingTank: Block = _
+  var blockArchiveInterface: Block = _
+  var blockMainframe: Block = _
+  var blockInformationConduit: Block = _
+  var blockHeatAirDucting: Block = _
+  var blockHeatAirRadiator: Block = _
+  var blockHeatAirFan: Block = _
+  var blockNaniteRepository      : Block = _
+  var blockItemRepository        : Block = _
+  var blockFluidRepository       : Block = _
+  var blockPowerConduitCrystal : Block = _
+  // End V3
+
   //Cyber
   var blockSubstrate             : Block = _
   var blockRefinedSubstrate      : Block = _
@@ -37,9 +75,6 @@ object FemtoBlocks {
   var blockLapisreplacement      : Block = _
   var blockDiamondreplacement    : Block = _
   var blockCrystals              : Block = _
-  var blockNaniteRepository      : Block = _
-  var blockItemRepository        : Block = _
-  var blockFluidRepository       : Block = _
   var blockNanoFurnace           : Block = _
   var blockNaniteInfuser         : Block = _
   var blockFrame                 : Block = _
@@ -51,7 +86,6 @@ object FemtoBlocks {
   var blockCrystalHeatExchanger  : Block = _
   var blockGerminationChamber    : Block = _
   var blockNaniteExtractor       : Block = _
-  var blockPowerConduitCrystal : Block = _
 
   //Tests
   var blockDemolisher        : Block = _
@@ -108,6 +142,9 @@ object FemtoBlocks {
     testTaskProvider = registerBlock(registry, new BlockTaskProviderTest, "testTaskProvider")
     testWorkerProvider = registerBlock(registry, new BlockWorkerProviderTest, "testWorkerProvider")
 
+    //
+    blockCrystalFurnace = registerBlock(registry, new BlockCrystalFurnace(), "blockCrystalFurnace")
+
     blockCallbacks.foreach(_ ())
     blockCallbacks.clear()
   }
@@ -146,6 +183,9 @@ object FemtoBlocks {
     blockConduit.registerModel()
     blockPowerConduitCrystal.registerModel()
     blockGerminationChamber.registerModel()
+
+    //
+    blockCrystalFurnace.registerModel()
   }
 
   def postInit(): Unit = {
