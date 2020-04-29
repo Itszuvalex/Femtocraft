@@ -1,13 +1,12 @@
 package com.itszuvalex.femtocraft.api
 
-abstract class DistributableResource[T:Numeric] {
-  val n: Numeric[T] = implicitly[Numeric[T]]
+abstract class DistributableResource[T: Numeric] {
+
+  import scala.math.Numeric.Implicits._
 
   def max: T
 
-  def room: T ={
-    n.minus(max, amt)
-  }
+  def room: T = max - amt
 
   def amt: T
 
