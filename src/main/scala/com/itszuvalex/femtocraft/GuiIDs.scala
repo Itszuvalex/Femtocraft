@@ -37,6 +37,7 @@ object GuiIDs {
 
   //
   val TileCrystalFurnaceID = nextID
+  val TileCrystalCrusherID = nextID
 
   val ItemNanoPackID = nextID
 

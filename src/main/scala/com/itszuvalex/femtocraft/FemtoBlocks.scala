@@ -34,7 +34,6 @@ object FemtoBlocks {
   var blockFabricator: Block = _
   var blockCircuitPrinter: Block = _
   var blockFocusingPedestal: Block = _
-  var blockDarkPedestal: Block = _
   var blockFocusingChamber: Block = _
   var blockForge: Block = _
   var blockExtractor: Block = _
@@ -144,6 +143,7 @@ object FemtoBlocks {
 
     //
     blockCrystalFurnace = registerBlock(registry, new BlockCrystalFurnace(), "blockCrystalFurnace")
+    blockCrystalCrusher = registerBlock(registry, new BlockCrystalCrusher(), "blockCrystalCrusher")
 
     blockCallbacks.foreach(_ ())
     blockCallbacks.clear()
@@ -186,6 +186,7 @@ object FemtoBlocks {
 
     //
     blockCrystalFurnace.registerModel()
+    blockCrystalCrusher.registerModel()
   }
 
   def postInit(): Unit = {

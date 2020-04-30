@@ -44,6 +44,7 @@ class ProxyGuiCommon extends ItszuGuiHandler {
       case (GuiIDs.TileSidedNaniteConfigID, te: ITileEntity) => new ContainerSidedNaniteConfig(te)
       case (GuiIDs.TileSidedFluidConfigID, te: ITileEntity) => new ContainerSidedFluidConfig(te)
       case (GuiIDs.TileCrystalFurnaceID, te: TileCrystalFurnace) => new ContainerCrystalFurnace(player, player.inventory, te, true)
+      case (GuiIDs.TileCrystalCrusherID, te: TileCrystalCrusher) => new ContainerCrystalCrusher(player, player.inventory, te, true)
       case (_, _) => null
     }
   }
