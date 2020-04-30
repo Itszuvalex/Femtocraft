@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
+import com.itszuvalex.femtocraft.api.ManagerModules
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.CrystalCrusherModule.CrushTask
 import com.itszuvalex.itszulib.api.core.IModule
@@ -55,6 +56,8 @@ class CrystalCrusherModule(val input: IItemStorage, val output: IItemStorage, va
   override def module: IModule[CrystalCrusherModule] = TileCrystalCrusher.MODULE
 
   override def serverUpdate(tile: ITileEntity): Unit = {
+    batteryStorage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())
+
     if (task.stack == null || task.stack.isEmpty) {
       val item = input.head
       if (!item.isEmpty && DustRecipeRegistry.getDust(item).isDefined) {
