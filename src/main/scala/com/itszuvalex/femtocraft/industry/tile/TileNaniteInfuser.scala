@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteTank}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, NaniteTankOLD}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration, NaniteInfusionRecipeRegistry}
@@ -48,7 +48,7 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   }
   val inputStorage : IItemStorage = new ItemStorageSlice(storage, Array(0))
   val outputStorage: IItemStorage = new ItemStorageSlice(storage, Array(1))
-  val sidedStorageConfig          = new SidedItemStorageConfiguration({
+  val sidedStorageConfig            = new SidedItemStorageConfiguration({
     case EnumFacing.UP | EnumFacing.SOUTH => INPUT_INV_KEY
     case EnumFacing.DOWN | EnumFacing.EAST | EnumFacing.WEST | EnumFacing.NORTH => OUTPUT_INV_KEY
     case _ => NONE_INV_KEY
@@ -57,9 +57,9 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
        INPUT_INV_KEY -> inputStorage,
        OUTPUT_INV_KEY -> outputStorage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  val naniteTank   : INaniteTank  = new NaniteTank(50)
-  val sidedNaniteConfig           = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-                                                                        Map(NONE_TANK_KEY -> INaniteTank.Empty,
+  val naniteTank   : INaniteTankOLD = new NaniteTankOLD(50)
+  val sidedNaniteConfig             = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+                                                                        Map(NONE_TANK_KEY -> INaniteTankOLD.Empty,
                                                                             NANITE_TANK_KEY -> naniteTank),
                                                                         () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   val battery      : IBattery     = new PowerBattery(4000)

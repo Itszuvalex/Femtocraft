@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.container
 
-import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteTank}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, NaniteTankOLD}
 import com.itszuvalex.itszulib.container.sync.SyncBase
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 
@@ -8,7 +8,7 @@ import net.minecraft.nbt.{NBTBase, NBTTagCompound}
   * Created by Chris on 1/31/2017.
   */
 object SyncINaniteTank {
-  def tankEquals(a: INaniteTank, b: INaniteTank): Boolean = {
+  def tankEquals(a: INaniteTankOLD, b: INaniteTankOLD): Boolean = {
     if (a == null && b == null) return true
     if ((a == null) != (b == null)) return false
     if (a.volume != b.volume) return false
@@ -23,14 +23,14 @@ object SyncINaniteTank {
 }
 
 class SyncINaniteTank
-(gui: Int, valFunc: () => INaniteTank, setValFunc: (INaniteTank) => Unit)
-  extends SyncBase[INaniteTank](gui, valFunc, setValFunc, SyncINaniteTank.tankEquals) {
+(gui: Int, valFunc: () => INaniteTankOLD, setValFunc: (INaniteTankOLD) => Unit)
+  extends SyncBase[INaniteTankOLD](gui, valFunc, setValFunc, SyncINaniteTank.tankEquals) {
   override def writeNBT(): NBTBase = {
     value.serializeNBT()
   }
 
   override def handleNBT(nbt: NBTBase): Unit = {
-    val tank = new NaniteTank(0)
+    val tank = new NaniteTankOLD(0)
     tank.deserializeNBT(nbt.asInstanceOf[NBTTagCompound])
     value = tank
   }

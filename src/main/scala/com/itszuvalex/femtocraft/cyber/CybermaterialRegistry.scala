@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.cyber
 
 import com.itszuvalex.femtocraft.FemtoBlocks
-import com.itszuvalex.femtocraft.api.nanite.{INanite, NaniteRegistry, NaniteStack}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteOLD, NaniteRegistryOLD, NaniteStackOLD}
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
@@ -14,18 +14,18 @@ import scala.collection._
   * Created by Christopher on 7/29/2015.
   */
 object CybermaterialRegistry {
-  private val blockMassTypeMap = mutable.HashMap[INanite, mutable.HashMap[(Block, Int), NaniteStack]]()
-  private val itemMassTypeMap  = mutable.HashMap[INanite, mutable.HashMap[(Item, Int), NaniteStack]]()
-  private val blockMap         = mutable.HashMap[(Block, Int), NaniteStack]()
-  private val itemMap          = mutable.HashMap[(Item, Int), NaniteStack]()
+  private val blockMassTypeMap = mutable.HashMap[INaniteOLD, mutable.HashMap[(Block, Int), NaniteStackOLD]]()
+  private val itemMassTypeMap  = mutable.HashMap[INaniteOLD, mutable.HashMap[(Item, Int), NaniteStackOLD]]()
+  private val blockMap         = mutable.HashMap[(Block, Int), NaniteStackOLD]()
+  private val itemMap          = mutable.HashMap[(Item, Int), NaniteStackOLD]()
 
   private val blockTypeToReplacement = mutable.HashMap[(Block, Int), (Block, Int)]()
 
   def getReplacement(block: Block, damage: Int) = blockTypeToReplacement.get((block, damage))
 
-  def getBlocksOfNanite(nanite: INanite) = blockMassTypeMap.get(nanite)
+  def getBlocksOfNanite(nanite: INaniteOLD) = blockMassTypeMap.get(nanite)
 
-  def getItemsOfNanite(nanite: INanite) = itemMassTypeMap.get(nanite)
+  def getItemsOfNanite(nanite: INaniteOLD) = itemMassTypeMap.get(nanite)
 
   def getNaniteFromBlock(block: Block, damage: Int) = blockMap.get((block, damage))
 
@@ -37,29 +37,29 @@ object CybermaterialRegistry {
   }
 
   private def registerNanites(): Unit = {
-    registerBlockWithItem(FemtoBlocks.blockCyberwood, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockCyberleaf, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockSubstrate, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockNanoweave, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockRiftiron, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockPhasemetal, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockDiamondreplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockRedstonereplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
-    registerBlockWithItem(FemtoBlocks.blockLapisreplacement, 0, new NaniteStack(NaniteRegistry.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockCyberwood, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockCyberleaf, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockSubstrate, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockNanoweave, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockRiftiron, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockPhasemetal, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockDiamondreplacement, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockRedstonereplacement, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
+    registerBlockWithItem(FemtoBlocks.blockLapisreplacement, 0, new NaniteStackOLD(NaniteRegistryOLD.NANITE_DUMB, 1))
   }
 
-  def registerBlockWithItem(block: Block, damage: Int, nanites: NaniteStack) = {
+  def registerBlockWithItem(block: Block, damage: Int, nanites: NaniteStackOLD) = {
     registerBlock(block, damage, nanites)
     registerItem(Item.getItemFromBlock(block), damage, nanites)
   }
 
-  def registerBlock(block: Block, damage: Int, nanites: NaniteStack) = {
-    blockMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Block, Int), NaniteStack]()).put((block, damage), nanites)
+  def registerBlock(block: Block, damage: Int, nanites: NaniteStackOLD) = {
+    blockMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Block, Int), NaniteStackOLD]()).put((block, damage), nanites)
     blockMap.put((block, damage), nanites)
   }
 
-  def registerItem(item: Item, damage: Int, nanites: NaniteStack) = {
-    itemMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Item, Int), NaniteStack]()).put((item, damage), nanites)
+  def registerItem(item: Item, damage: Int, nanites: NaniteStackOLD) = {
+    itemMassTypeMap.getOrElseUpdate(nanites.nanite, mutable.HashMap[(Item, Int), NaniteStackOLD]()).put((item, damage), nanites)
     itemMap.put((item, damage), nanites)
   }
 

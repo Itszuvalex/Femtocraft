@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.logistics.tile
 
-import com.itszuvalex.femtocraft.api.nanite.{INanite, INaniteTank, NaniteTank}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteOLD, INaniteTankOLD, NaniteTankOLD}
 import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration}
 import com.itszuvalex.femtocraft.logistics.tile.TileNaniteRepository._
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
@@ -16,13 +16,13 @@ object TileNaniteRepository {
 }
 
 class TileNaniteRepository extends TileEntityCoreTickable {
-  val storage: INaniteTank = new NaniteTank(REPOSITORY_VOLUME) {
-    override def canFill(nanite: INanite, vol: Int): Boolean = {
+  val storage: INaniteTankOLD = new NaniteTankOLD(REPOSITORY_VOLUME) {
+    override def canFill(nanite: INaniteOLD, vol: Int): Boolean = {
       nanitesInTank.isEmpty || containsNanite(nanite)
     }
   }
-  val sidedNaniteConfig    = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
-                                                                 Map(NONE_TANK_KEY -> INaniteTank.Empty,
+  val sidedNaniteConfig       = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+                                                                 Map(NONE_TANK_KEY -> INaniteTankOLD.Empty,
                                                                      NANITE_TANK_KEY -> storage),
                                                                  () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
 

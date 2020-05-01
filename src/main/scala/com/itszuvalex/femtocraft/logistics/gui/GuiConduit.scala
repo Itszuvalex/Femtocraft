@@ -20,8 +20,6 @@ import scala.collection.mutable.ListBuffer
   * Created by Alex on 18.08.2016.
   */
 class GuiConduit(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit) extends FemtoGuiBase(Converter.ITileEntityFromTileEntity(tile), new ContainerConduit(player, inv, tile, false)) {
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
-
   EnumFacing.VALUES.foreach { f =>
     val labelName: String = f.getName.charAt(0).toUpper.toString + ' '
     val faceButton        = new GuiButton(2 + (f.getIndex / 3) * 90, 10 + (f.getIndex % 3) * 20, fontRenderer.getStringWidth(labelName) + 1, 18, labelName) {

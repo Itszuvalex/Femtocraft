@@ -125,8 +125,6 @@ object GuiConduitSide {
 }
 
 class GuiConduitSide(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileConduit, facing: EnumFacing) extends FemtoGuiBase(Converter.ITileEntityFromTileEntity(tile), new ContainerConduitSide(player, inv, tile, facing, false)) {
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
-
   if (facing != null) {
     val labelName: String = facing.getName.charAt(0).toUpper.toString
     val faceLabel         = new GuiLabel(30, 14, fontRenderer.getStringWidth(labelName), fontRenderer.FONT_HEIGHT, () => {

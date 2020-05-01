@@ -7,6 +7,7 @@ import com.itszuvalex.itszulib.core.TileEntityCore
 import com.itszuvalex.itszulib.core.modules.InternalModules
 import com.itszuvalex.itszulib.gui.{GuiBase, GuiItemStack}
 import com.itszuvalex.itszulib.util.Color
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
@@ -27,6 +28,8 @@ abstract class FemtoGuiBase(tile: ITileEntity, c: ContainerBase) extends GuiBase
     tile.getModule(InternalModules.MODULE_MULTIBLOCK_GUI, null).guiId()
                 else 0)
   add(tabBar)
+
+  fontRenderer = Minecraft.getMinecraft.fontRenderer
 
   override def GuiID: Int = tile.getModule(InternalModules.MODULE_GUI, null).guiId()
 

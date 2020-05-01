@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteStack}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, NaniteStackOLD}
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.NaniteExtractorModule.ExtractTask
 import com.itszuvalex.itszulib.api.core.IModule
@@ -16,11 +16,11 @@ object NaniteExtractorModule {
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
   val TASK_NBT       = "Task"
 
-  class ExtractTask(var stack: NaniteStack) extends Task(POWER_REQ, TICKS_REQ) {
+  class ExtractTask(var stack: NaniteStackOLD) extends Task(POWER_REQ, TICKS_REQ) {
 
     override def deserializeNBT(t: NBTTagCompound): Unit = {
       super.deserializeNBT(t)
-      stack = NaniteStack.loadFromNBT(t.getCompoundTag(ExtractTask.NANITES_NBT))
+      stack = NaniteStackOLD.loadFromNBT(t.getCompoundTag(ExtractTask.NANITES_NBT))
     }
 
     override def serializeNBT(): NBTTagCompound = {
@@ -42,7 +42,7 @@ object NaniteExtractorModule {
 
 }
 
-class NaniteExtractorModule(val input: IItemStorage, val battery: IBattery, val tank: INaniteTank) extends TileEntityInternalModuleTickable[NaniteExtractorModule] {
+class NaniteExtractorModule(val input: IItemStorage, val battery: IBattery, val tank: INaniteTankOLD) extends TileEntityInternalModuleTickable[NaniteExtractorModule] {
   private val task: ExtractTask = new ExtractTask(null)
 
   override def module: IModule[NaniteExtractorModule] = TileNaniteExtractor.MODULE

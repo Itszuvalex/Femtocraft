@@ -29,7 +29,7 @@ object TileConduit {
     ManagerModules.TILE_LOGISTICS_NODE,
     ItszuLibModules.ITEM_STORAGE,
     ItszuLibModules.ITEM_MINECRAFT_INVENTORY,
-    ManagerModules.TILE_NANITE_STORAGE_TANK,
+    ManagerModules.TILE_NANITE_STORAGE_TANK_OLD,
     ItszuLibModules.FLUID_STORAGE,
     ItszuLibModules.FLUID_MINECRAFT_HANDLER
     )

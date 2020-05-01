@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.api;
 
 import com.itszuvalex.femtocraft.api.logistics.IConnectionProvider;
 import com.itszuvalex.femtocraft.api.logistics.ILogisticsNetworkNode;
-import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
+import com.itszuvalex.femtocraft.api.nanite.INaniteTankOLD;
 import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
 import com.itszuvalex.femtocraft.api.power.*;
 import com.itszuvalex.femtocraft.industry.item.IMultitool;
@@ -41,8 +41,8 @@ public class Capabilities {
     @CapabilityInject(IPowerCrystal.class)
     public static Capability<IPowerCrystal> ITEM_POWER_CRYSTAL = null;
 
-    @CapabilityInject(INaniteTank.class)
-    public static Capability<INaniteTank> TILE_NANITE_STORAGE_TANK = null;
+    @CapabilityInject(INaniteTankOLD.class)
+    public static Capability<INaniteTankOLD> TILE_NANITE_STORAGE_TANK_OLD = null;
 
     @CapabilityInject(INaniteUpgradeable.class)
     public static Capability<INaniteUpgradeable> TILE_NANITE_UPGRADEABLE = null;

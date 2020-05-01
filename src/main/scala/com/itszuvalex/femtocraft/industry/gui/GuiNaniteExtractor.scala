@@ -24,7 +24,6 @@ class GuiNaniteExtractor(player: EntityPlayer, inv: InventoryPlayer, private val
   GuiTabNaniteSideConfig.addToGuiTabBar(tabBar, tile)
 
   var color: Color = tile.getCapability(ItszuLibCapabilities.COLORABLE, EnumFacing.UP)
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
   addGuiAndSync(tile.storage, 0, 43, 23)
   addPlayerInventorySlots(inv)
 

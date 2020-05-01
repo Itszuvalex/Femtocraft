@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry.container
 
 import com.itszuvalex.femtocraft.GuiIDs
 import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.api.nanite.INaniteTank
+import com.itszuvalex.femtocraft.api.nanite.INaniteTankOLD
 import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser
 import com.itszuvalex.itszulib.api.wrappers.Converter
@@ -15,7 +15,7 @@ class ContainerNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, tile: T
   addSync(new SyncDouble(GuiID, () => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.storage, (a: Double) => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.storage = a))
   addSync(new SyncDouble(GuiID, () => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.maxStorage, (a: Double) => tile.getModule(ManagerModules.TILE_WIRELESS_POWER_STORAGE_NODE, null).battery.maxStorage = a))
   addSync(new SyncDouble(GuiID, () => tile.internal.getProgress, (a: Double) => tile.internal.setProgress(a)))
-  addSync(new SyncINaniteTank(GuiID, () => tile.naniteTank.copy(), (a: INaniteTank) => tile.naniteTank.deserializeNBT(a.serializeNBT())))
+  addSync(new SyncINaniteTank(GuiID, () => tile.naniteTank.copy(), (a: INaniteTankOLD) => tile.naniteTank.deserializeNBT(a.serializeNBT())))
 
   if (shouldSync) {
     addSync(new SyncItemStorageItemStack(GuiID, tile.storage, 0))

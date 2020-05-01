@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.nanite.gui
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.api.nanite.INaniteTank
+import com.itszuvalex.femtocraft.api.nanite.INaniteTankOLD
 import com.itszuvalex.femtocraft.nanite.gui.GuiNaniteTank._
 import com.itszuvalex.itszulib.gui.GuiPanel
 import com.itszuvalex.itszulib.render.RenderUtils._
@@ -27,7 +27,7 @@ object GuiNaniteTank {
 class GuiNaniteTank(
   override var anchorX: Int,
   override var anchorY: Int,
-  var tank: INaniteTank)
+  var tank: INaniteTankOLD)
   extends GuiPanel {
 
   override var _panelWidth : Int = texWidth

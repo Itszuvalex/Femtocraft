@@ -38,6 +38,7 @@ class FocusingChamberState extends INBTSerializable[NBTTagCompound] {
 
 object ModuleFocusingChamber {
   val TRANSFER_PER_TICK = 5d
+  val SMALL_MULTIPLIER  = 6
 }
 
 class ModuleFocusingChamber(info: MultiBlockInfo, state: MultiblockStateHolder[FocusingChamberState, TileFocusingChamber]) extends TileEntityMultiblockTickableModule[ModuleFocusingChamber](info) {
@@ -50,7 +51,7 @@ class ModuleFocusingChamber(info: MultiBlockInfo, state: MultiblockStateHolder[F
       crystals.foreach { c =>
         val cbat = c.battery
         val amt  = cbat.storage
-        c.onTick()
+        cbat.fill(c.getPassiveGen() * ModuleFocusingChamber.SMALL_MULTIPLIER)
         if (cbat.storage != amt)
           tile.markDirtyForSave()
       }

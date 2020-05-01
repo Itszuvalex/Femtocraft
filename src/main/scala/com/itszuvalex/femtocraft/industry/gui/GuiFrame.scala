@@ -15,7 +15,6 @@ import net.minecraft.entity.player.{EntityPlayer, InventoryPlayer}
   */
 
 class GuiFrame(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileFrame) extends FemtoGuiBase(tile, new ContainerFrame(player, inv, tile, false)) {
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
 
   (0 until 9).foreach { i =>
     addGuiAndSync(tile.multiblockStorageModule.storage, i, 7 + 18 * i, 61)

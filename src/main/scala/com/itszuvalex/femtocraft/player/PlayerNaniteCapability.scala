@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.player
 
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.api.Capabilities
-import com.itszuvalex.femtocraft.api.nanite.NaniteTank
+import com.itszuvalex.femtocraft.api.nanite.NaniteTankOLD
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
 import com.itszuvalex.femtocraft.network.messages.MessageNaniteCapabilities
 import net.minecraft.entity.Entity
@@ -52,7 +52,7 @@ object PlayerNaniteCapability {
 }
 
 class PlayerNaniteCapability(player: EntityPlayer) extends IPlayerNaniteCapability with ICapabilitySerializable[NBTTagCompound] {
-  private val _tank = new NaniteTank(PlayerNaniteCapability.tankVolume)
+  private val _tank = new NaniteTankOLD(PlayerNaniteCapability.tankVolume)
 
   def this() = this(null)
 

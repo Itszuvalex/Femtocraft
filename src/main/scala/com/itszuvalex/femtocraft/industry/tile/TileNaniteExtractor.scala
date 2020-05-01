@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, NaniteTank}
+import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, NaniteTankOLD}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
@@ -39,7 +39,7 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
    Map(NONE_KEY -> IItemStorage.Empty,
        INPUT_INV_KEY -> storage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  val naniteTank        : INaniteTank                     = new NaniteTank(50)
+  val naniteTank        : INaniteTankOLD                  = new NaniteTankOLD(50)
   val sidedNaniteConfig : SidedNaniteStorageConfiguration = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
                                                                                                 Map(NONE_TANK_KEY -> null,
                                                                                                     NANITE_TANK_KEY -> naniteTank),

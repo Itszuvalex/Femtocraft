@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.api.ManagerCapabilities
 import com.itszuvalex.femtocraft.api.logistics.LogisticsResourceRegistry
-import com.itszuvalex.femtocraft.api.nanite.NaniteRegistry
+import com.itszuvalex.femtocraft.api.nanite.NaniteRegistryOLD
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRegistry
 import com.itszuvalex.femtocraft.network.FemtoPacketHandler
@@ -53,7 +53,7 @@ object Femtocraft extends ModInit {
 
     FemtoFluids.preInit()
     FemtoRecipes.preInit()
-    NaniteRegistry.preInit()
+    NaniteRegistryOLD.preInit()
 
     FemtoPacketHandler.preInit()
     GameRegistry.registerWorldGenerator(new FemtocraftOreGenerator, FemtocraftOreGenerator.GENERATION_WEIGHT)

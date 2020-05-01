@@ -19,8 +19,6 @@ class GuiDemolisher(player: EntityPlayer, inv: InventoryPlayer, private val tile
   GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
 
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
-
   addGuiAndSync(tile.storage, 0, 44, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
 

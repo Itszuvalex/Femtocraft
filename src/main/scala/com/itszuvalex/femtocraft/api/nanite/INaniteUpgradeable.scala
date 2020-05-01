@@ -5,6 +5,6 @@ package com.itszuvalex.femtocraft.api.nanite
   */
 trait INaniteUpgradeable {
 
-  def tank: INaniteTank
+  def tank: INaniteTankOLD
 
 }

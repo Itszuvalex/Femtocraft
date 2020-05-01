@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.industry.tile
 
-import com.itszuvalex.femtocraft.api.nanite.INaniteTank
+import com.itszuvalex.femtocraft.api.nanite.INaniteTankOLD
 import com.itszuvalex.femtocraft.industry.NaniteInfusionRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.NaniteInfuserModule.InfuseTask
 import com.itszuvalex.femtocraft.industry.tile.NaniteInfuserModule.InfuseTask._
@@ -48,7 +48,7 @@ object NaniteInfuserModule {
 
 }
 
-class NaniteInfuserModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery, val ntank: INaniteTank) extends TileEntityInternalModuleTickable[NaniteInfuserModule] {
+class NaniteInfuserModule(val input: IItemStorage, val output: IItemStorage, val battery: IBattery, val ntank: INaniteTankOLD) extends TileEntityInternalModuleTickable[NaniteInfuserModule] {
   private val task: InfuseTask = new InfuseTask(IItemStack.Empty)
 
   override def hasWorldNBT: Boolean = true

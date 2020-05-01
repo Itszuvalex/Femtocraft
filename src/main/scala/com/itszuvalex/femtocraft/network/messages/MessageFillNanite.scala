@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.network.messages
 
-import com.itszuvalex.femtocraft.api.nanite.NaniteStack
+import com.itszuvalex.femtocraft.api.nanite.NaniteStackOLD
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
 import com.itszuvalex.itszulib.ItszuLib
@@ -16,7 +16,7 @@ object MessageFillNanite {
   val STACK_KEY = "Stack"
 }
 
-class MessageFillNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageUpdateNBT[MessageFillNanite, IMessage]({
+class MessageFillNanite(var loc: Loc4, var nanite: NaniteStackOLD) extends MessageUpdateNBT[MessageFillNanite, IMessage]({
   val compound = new NBTTagCompound
   compound.setTag(MessageFillNanite.LOC_KEY, loc.serializeNBT())
   if (nanite != null)
@@ -30,12 +30,12 @@ class MessageFillNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageU
     ItszuLib.proxy.addScheduledTask(() => {
       // Parse nbt
       message.loc = Loc4(message.nbt.getCompoundTag(MessageFillNanite.LOC_KEY))
-      message.nanite = if (message.nbt.hasKey(MessageFillNanite.STACK_KEY)) NaniteStack.loadFromNBT(message.nbt.getCompoundTag(MessageFillNanite.STACK_KEY)) else null
+      message.nanite = if (message.nbt.hasKey(MessageFillNanite.STACK_KEY)) NaniteStackOLD.loadFromNBT(message.nbt.getCompoundTag(MessageFillNanite.STACK_KEY)) else null
 
       // Do things
       message.loc.getITileEntity() match {
-        case Some(tile: ITileEntity) if tile.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK, null) =>
-          val storageTank = tile.getModule(ManagerModules.TILE_NANITE_STORAGE_TANK, null)
+        case Some(tile: ITileEntity) if tile.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK_OLD, null) =>
+          val storageTank = tile.getModule(ManagerModules.TILE_NANITE_STORAGE_TANK_OLD, null)
           if (storageTank != null) {
             if (ctx.getServerHandler.player.hasCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)) {
               val capability = ctx.getServerHandler.player.getCapability[IPlayerNaniteCapability](Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)

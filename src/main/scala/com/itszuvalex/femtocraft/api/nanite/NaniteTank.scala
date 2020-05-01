@@ -4,119 +4,34 @@ import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.mutable.ArrayBuffer
 
-/**
-  * Created by Chris on 8/18/2016.
-  */
-class NaniteTank(private var vol: Int) extends INaniteTank {
-  private val nanites = ArrayBuffer[NaniteStack]()
+class NaniteTank(private val cap: Int) extends INaniteTank {
+  private val nanite = ArrayBuffer[INaniteStack]()
 
-  override def nMols: Int = nanites.map(_.nMol).sum
+  override def capacity: Int = cap
 
-  override def canDrain(nanite: INanite, vol: Int): Boolean = nanites.exists(_.nanite == nanite)
+  override def fill(stack: INaniteStack, doFill: Boolean): INaniteStack = ???
 
-  override def canFill(nanite: INanite, vol: Int): Boolean = true
+  override def drain(stack: INaniteStack, doDrain: Boolean): INaniteStack = ???
 
-  override def containsNanite(nanite: INanite): Boolean = findStack(nanite).isDefined
+  override def canFill(stack: INaniteStack): Boolean = ???
 
-  override def volForNanite(nanite: INanite): Int = findStack(nanite).map(ind => nanites(ind).vol).getOrElse(0)
+  override def canDrain(stack: INaniteStack): Boolean = ???
 
-  override def nanitesInTank: Iterable[INanite] = nanites.map(_.nanite)
+  override def containedNanites: Iterable[INaniteStack] = ???
 
-  def copy(): NaniteTank = {
-    val ret = new NaniteTank(vol)
-    ret.deserializeNBT(serializeNBT())
-    ret
-  }
-
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    nanites.clear()
-    vol = nbt.getInteger("vol")
-    val size = nbt.getInteger("size")
-    nanites.sizeHint(size)
-    (0 until size).forall { i =>
-      if (nbt.hasKey(i.toString)) {
-        nanites += NaniteStack.loadFromNBT(nbt.getCompoundTag(i.toString))
-        true
-      }
-      else false
-    }
-  }
-
-  override def serializeNBT(): NBTTagCompound = {
-    val nbt = new NBTTagCompound()
-    nbt.setInteger("vol", vol)
-    nbt.setInteger("size", nanites.size)
-    nanites.zipWithIndex.view.filterNot { case (a, b) => a == null }.foreach { case (a, b) =>
-      nbt.setTag(b.toString, a.serializeNBT())
-    }
-    nbt
-  }
 
   /**
-    *
-    * @param nanite  Nanite to drain
-    * @param vol     Volume to drain
-    * @param doDrain True to actually modify the tank
-    * @return Stack containing the results of the drain
-    */
-  override def drain(nanite: INanite, vol: Int, doDrain: Boolean): NaniteStack = {
-    if (nanite == null) return null
+   *
+   * @return True if this tank has specialized handling for nanites that are not equal.
+   *         This could be a a tank that can store nanites of different strains but same archetype, or
+   *         for example the Nanite Holding Tank that can upgrade nanites of the same archetype and strain, from a lower to higher version
+   *         without destructive behavior.
+   *
+   *         These tanks should be prioritized when automation distributes resources.
+   */
+  override def supportsIntermingling: Boolean = false
 
-    findStack(nanite).map { index =>
-      val stack  = nanites(index)
-      val lowest = Math.min(vol, stack.volume)
-      if (doDrain) {
-        stack.vol -= lowest
-        if (stack.volume <= 0)
-          nanites.remove(index)
-      }
-      NaniteStack(nanite, lowest)
-    }.orNull
-  }
+  override def serializeNBT(): NBTTagCompound = ???
 
-  /**
-    *
-    * @param stack  Stack to fill.  This is not modified.
-    * @param doFill True to actually modify the tank
-    * @return Copy of NaniteStack containing the remainder, or null
-    */
-  override def fill(stack: NaniteStack, doFill: Boolean): NaniteStack = {
-    if (stack.nanite == null) return stack
-
-    val room = volume - volumeFilled
-    if (room <= 0) return stack
-    if (stack.volume <= 0) return null
-
-    val storageStack =
-      findStack(stack.nanite).map(nanites(_)).
-                             getOrElse {
-                               val add = NaniteStack(stack.nanite, 0)
-                               if (doFill) {
-                                 nanites += add
-                               }
-                               add
-                             }
-
-    val lowest = Math.min(stack.volume, room)
-    if (doFill) {
-      storageStack.vol += lowest
-    }
-
-    if (stack.volume - lowest <= 0)
-      null
-    else
-      NaniteStack(stack.nanite, stack.volume - lowest)
-  }
-
-  override def volume: Int = vol
-
-  override def volumeFilled: Int = nanites.map(_.volume).sum
-
-  private def findStack(nanite: INanite): Option[Int] = {
-    nanites.zipWithIndex.foreach { case (stack: NaniteStack, i: Int) =>
-      if (stack.nanite == nanite)
-        return Some(i)
-    }
-    None
-  }
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = ???
 }

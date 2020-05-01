@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.api.logistics
 
-import com.itszuvalex.femtocraft.api.nanite.NaniteStack
+import com.itszuvalex.femtocraft.api.nanite.NaniteStackOLD
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fluids.FluidStack
 
@@ -20,9 +20,9 @@ object Connections {
     else null
   }
 
-  implicit def asNanite(connection: IConnection[_]): IConnection[NaniteStack] = {
+  implicit def asNanite(connection: IConnection[_]): IConnection[NaniteStackOLD] = {
     if (connection.resource == LogisticsResourceRegistry.RESOURCE_NANITES)
-      connection.asInstanceOf[IConnection[NaniteStack]]
+      connection.asInstanceOf[IConnection[NaniteStackOLD]]
     else null
   }
 }

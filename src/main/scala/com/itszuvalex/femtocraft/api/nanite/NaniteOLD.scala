@@ -3,23 +3,17 @@ package com.itszuvalex.femtocraft.api.nanite
 /**
   * Created by Christopher Harris (Itszuvalex) on 7/3/15.
   */
-object INanite {
-
-}
-
-trait INanite {
-
+class NaniteOLD(private val str: String, private val dens: Int) extends INaniteOLD {
   /**
     * Strain is the identifier for nanites
     *
     * @return
     */
-  def strain: String
+  override def strain: String = str
 
   /**
     *
     * @return Number of nMols of Nanites per cm3
     */
-  def density: Int
-
+  override def density: Int = dens
 }

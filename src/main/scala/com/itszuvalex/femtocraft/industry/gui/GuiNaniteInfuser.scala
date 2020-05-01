@@ -24,7 +24,6 @@ class GuiNaniteInfuser(player: EntityPlayer, inv: InventoryPlayer, private val t
   GuiTabNaniteSideConfig.addToGuiTabBar(tabBar, tile)
 
   var color: Color = tile.getModule(ItszuLibModules.COLORABLE, EnumFacing.UP)
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
   addGuiAndSync(tile.storage, 0, 43, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
   addPlayerInventorySlots(inv)

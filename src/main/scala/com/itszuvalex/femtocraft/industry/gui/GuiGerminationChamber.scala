@@ -21,8 +21,6 @@ import scala.collection.mutable.ListBuffer
 class GuiGerminationChamber(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileGerminationChamber) extends FemtoGuiBase(tile, new ContainerGerminationChamber(player, inv, tile, false)) {
   GuiTabWirelessPowerNetwork.addToGuiTabBar(tabBar, tile)
 
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
-
   addGuiAndSync(tile.multiblockStorageModule.storage, 0, 48, 23)
   addGuiAndSync(tile.multiblockStorageModule.storage, 1, 90, 23)
   addGuiAndSync(tile.multiblockStorageModule.storage, 2, 90 + 18, 23)

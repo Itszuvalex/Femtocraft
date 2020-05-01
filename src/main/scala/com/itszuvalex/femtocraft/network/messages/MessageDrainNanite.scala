@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.network.messages
 
-import com.itszuvalex.femtocraft.api.nanite.NaniteStack
+import com.itszuvalex.femtocraft.api.nanite.NaniteStackOLD
 import com.itszuvalex.femtocraft.api.{Capabilities, ManagerModules}
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability
 import com.itszuvalex.itszulib.ItszuLib
@@ -19,7 +19,7 @@ object MessageDrainNanite {
   val STACK_KEY = "Stack"
 }
 
-class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends MessageUpdateNBT[MessageDrainNanite, IMessage]({
+class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStackOLD) extends MessageUpdateNBT[MessageDrainNanite, IMessage]({
   val compound = new NBTTagCompound
   compound.setTag(MessageDrainNanite.LOC_KEY, loc.serializeNBT())
   if (nanite != null)
@@ -33,12 +33,12 @@ class MessageDrainNanite(var loc: Loc4, var nanite: NaniteStack) extends Message
     ItszuLib.proxy.addScheduledTask(() => {
       // Parse nbt
       message.loc = Loc4(message.nbt.getCompoundTag(MessageDrainNanite.LOC_KEY))
-      message.nanite = if (message.nbt.hasKey(MessageDrainNanite.STACK_KEY)) NaniteStack.loadFromNBT(message.nbt.getCompoundTag(MessageDrainNanite.STACK_KEY)) else null
+      message.nanite = if (message.nbt.hasKey(MessageDrainNanite.STACK_KEY)) NaniteStackOLD.loadFromNBT(message.nbt.getCompoundTag(MessageDrainNanite.STACK_KEY)) else null
 
       // Do things
       message.loc.getITileEntity() match {
-        case Some(tile: ITileEntity) if tile.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK, null) =>
-          val storageTank = tile.getModule(ManagerModules.TILE_NANITE_STORAGE_TANK, null)
+        case Some(tile: ITileEntity) if tile.hasModule(ManagerModules.TILE_NANITE_STORAGE_TANK_OLD, null) =>
+          val storageTank = tile.getModule(ManagerModules.TILE_NANITE_STORAGE_TANK_OLD, null)
           if (storageTank != null) {
             val nanites = storageTank.nanitesInTank
             if (nanites.nonEmpty && ctx.getServerHandler.player.hasCapability(Capabilities.PLAYER_NANITE_CAPABILITY, EnumFacing.UP)) {

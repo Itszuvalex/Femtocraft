@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.api.logistics
 
 import java.util
 
-import com.itszuvalex.femtocraft.api.nanite.NaniteStack
+import com.itszuvalex.femtocraft.api.nanite.NaniteStackOLD
 import com.itszuvalex.itszulib.util.Comparators
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fluids.FluidStack
@@ -35,7 +35,7 @@ object LogisticsResourceRegistry {
       else Comparators.ItemStack.IDDamageNBTComparator.compare(a, b) < 0
     }
   }
-  val RESOURCE_NANITES = new IResource[NaniteStack] {
+  val RESOURCE_NANITES = new IResource[NaniteStackOLD] {
     override def resourceKey = "nanites"
 
     /**
@@ -46,7 +46,7 @@ object LogisticsResourceRegistry {
       *
       * @return True if A is less than B.
       */
-    override def sort(a: NaniteStack, b: NaniteStack): Boolean = {
+    override def sort(a: NaniteStackOLD, b: NaniteStackOLD): Boolean = {
       val aEmpty = a == null || a.nanite == null
       val bEmpty = b == null || b.nanite == null
       if (aEmpty && !bEmpty) false

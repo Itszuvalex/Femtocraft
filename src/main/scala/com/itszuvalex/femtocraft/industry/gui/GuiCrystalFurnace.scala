@@ -21,8 +21,6 @@ import scala.collection.mutable.ListBuffer
 class GuiCrystalFurnace(player: EntityPlayer, inv: InventoryPlayer, private val tile: TileCrystalFurnace) extends FemtoGuiBase(tile, new ContainerCrystalFurnace(player, inv, tile, false)) {
   GuiTabInventorySideConfig.addToGuiTabBar(tabBar, tile)
 
-  fontRenderer = Minecraft.getMinecraft.fontRenderer
-
   addGuiAndSync(tile.storage, 0, 44, 23)
   addGuiAndSync(tile.storage, 1, 85, 23)
   addGuiAndSync(tile.storage, 2, 6, 56)
