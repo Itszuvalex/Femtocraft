@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex._
 import com.itszuvalex.femtocraft.industry.ModuleNaniteAutoIO._
-import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfigurationOLD
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
@@ -19,7 +19,7 @@ object ModuleNaniteAutoIO {
   val AMT_PER_OP_NBT   = "AmtPerOp"
 }
 
-class ModuleNaniteAutoIO(val config: SidedNaniteStorageConfiguration, var ticksPerOperation: Int = TICKS_DEFAULT, var amtPerOperation: Int = AMT_DEFAULT) extends TileEntityInternalModuleTickable[ModuleNaniteAutoIO] {
+class ModuleNaniteAutoIO(val config: SidedNaniteStorageConfigurationOLD, var ticksPerOperation: Int = TICKS_DEFAULT, var amtPerOperation: Int = AMT_DEFAULT) extends TileEntityInternalModuleTickable[ModuleNaniteAutoIO] {
   var ticks = 0
 
   override def module: IModule[ModuleNaniteAutoIO] = MODULE

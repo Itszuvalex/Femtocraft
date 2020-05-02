@@ -8,6 +8,7 @@ import com.itszuvalex.femtocraft.api.nanite.INaniteUpgradeable;
 import com.itszuvalex.femtocraft.api.power.*;
 import com.itszuvalex.femtocraft.industry.item.IMultitool;
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration;
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfigurationOLD;
 import com.itszuvalex.femtocraft.player.IPlayerNaniteCapability;
 import com.itszuvalex.femtocraft.power.item.IPowerCrystal;
 import com.itszuvalex.itszulib.api.storage.IBattery;
@@ -59,6 +60,9 @@ public class Capabilities {
 
     @CapabilityInject(IConnectionProvider.class)
     public static Capability<IConnectionProvider> ITEM_CONNECTION_PROVIDER = null;
+
+    @CapabilityInject(SidedNaniteStorageConfigurationOLD.class)
+    public static Capability<SidedNaniteStorageConfigurationOLD> NANITE_STORAGE_CONFIGURABLE_OLD = null;
 
     @CapabilityInject(SidedNaniteStorageConfiguration.class)
     public static Capability<SidedNaniteStorageConfiguration> NANITE_STORAGE_CONFIGURABLE = null;

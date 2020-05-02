@@ -76,8 +76,8 @@ class ItemConfigurator extends Item {
             case _ =>
           }
         }
-      case OverlayRenderSwitch.NANITE if tile.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null) =>
-        val cap = tile.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)
+      case OverlayRenderSwitch.NANITE if tile.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE_OLD, null) =>
+        val cap = tile.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE_OLD, null)
         val relative = FacingUtil.getHorizontalRelativeFacingFromAbsolute(facing, cap.front())
         if (playerIn.isSneaking) {
           cap.cycleRelativeFacingIOBackward(relative)

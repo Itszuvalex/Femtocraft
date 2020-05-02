@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.util
 
 import com.itszuvalex.femtocraft.api.nanite.INaniteTankOLD
-import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfigurationOLD
 import com.itszuvalex.itszulib.api.core.Loc4
 import com.itszuvalex.itszulib.api.utility.FacingUtil
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
@@ -9,7 +9,7 @@ import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import net.minecraft.util.EnumFacing
 
 object TileEntityUtils {
-  def checkDoNaniteInputIO(te: ITileEntity, config: SidedNaniteStorageConfiguration, ticks: Int, inputSize: Int): Unit = {
+  def checkDoNaniteInputIO(te: ITileEntity, config: SidedNaniteStorageConfigurationOLD, ticks: Int, inputSize: Int): Unit = {
     if (ticks != 0) return
 
     var isize = inputSize
@@ -30,7 +30,7 @@ object TileEntityUtils {
     }
   }
 
-  def getNaniteTanksForIO(te: ITileEntity, sidedStorageConfig: SidedNaniteStorageConfiguration, io: EnumAutomaticIO): Iterable[(INaniteTankOLD, INaniteTankOLD)] = {
+  def getNaniteTanksForIO(te: ITileEntity, sidedStorageConfig: SidedNaniteStorageConfigurationOLD, io: EnumAutomaticIO): Iterable[(INaniteTankOLD, INaniteTankOLD)] = {
     val facings = sidedStorageConfig.automaticIO.zipWithIndex.filter(_._1 == io).map(a => FacingUtil.getAbsoluteFacingFromHorizontalRelative(EnumFacing.VALUES(a._2), sidedStorageConfig.front())).map(a => (Loc4(te).getOffset(a), a))
     val tiles   = facings.map(pair => (pair._1.getITileEntity(force = false).orNull, pair._2)).filterNot(_._1 == null)
     tiles.map { pair =>
@@ -40,7 +40,7 @@ object TileEntityUtils {
     }.filterNot(_._1 == null).filterNot(_._2 == null)
   }
 
-  def checkDoNaniteOutputIO(te: ITileEntity, config: SidedNaniteStorageConfiguration, ticks: Int, outputSize: Int): Unit = {
+  def checkDoNaniteOutputIO(te: ITileEntity, config: SidedNaniteStorageConfigurationOLD, ticks: Int, outputSize: Int): Unit = {
     if (ticks != 0) return
 
     var osize = outputSize

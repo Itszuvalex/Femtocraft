@@ -4,8 +4,8 @@ import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, NaniteTankOLD}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.cyber.CybermaterialRegistry
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteExtractor._
-import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration}
-import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.femtocraft.industry.{ModuleINaniteTankOLD, ModuleNaniteAutoIO, ModuleNaniteSidedConfigurationOLD}
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfigurationOLD
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModulePowerStorage, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
@@ -39,12 +39,12 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
    Map(NONE_KEY -> IItemStorage.Empty,
        INPUT_INV_KEY -> storage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  val naniteTank        : INaniteTankOLD                  = new NaniteTankOLD(50)
-  val sidedNaniteConfig : SidedNaniteStorageConfiguration = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+  val naniteTank        : INaniteTankOLD                     = new NaniteTankOLD(50)
+  val sidedNaniteConfig : SidedNaniteStorageConfigurationOLD = new SidedNaniteStorageConfigurationOLD(_ => NANITE_TANK_KEY,
                                                                                                 Map(NONE_TANK_KEY -> null,
                                                                                                     NANITE_TANK_KEY -> naniteTank),
                                                                                                 () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
-  val battery           : IBattery                        = new PowerBattery(5000)
+  val battery           : IBattery                           = new PowerBattery(5000)
   val leafNode                                            = new ModuleWirelessPowerLeafNode(this, battery, PowerStorageNodeType.CONSUMER, transRate = () => 80d)
 
   val internal = new NaniteExtractorModule(storage, battery, naniteTank)
@@ -55,8 +55,8 @@ class TileNaniteExtractor extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleDropInventory(storage))
   addTileEntityModule(new ModulePowerStorage(battery))
   addTileEntityModule(leafNode)
-  addTileEntityModule(new ModuleINaniteTank(naniteTank))
-  addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
+  addTileEntityModule(new ModuleINaniteTankOLD(naniteTank))
+  addTileEntityModule(new ModuleNaniteSidedConfigurationOLD(sidedNaniteConfig))
   addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileNaniteExtractorID _))

@@ -38,8 +38,8 @@ abstract class FemtoMachineRender[T <: TileEntity with ITileEntity](val machineF
     if (FemtoRenderSwitches.renderItemConfiguration && te.hasCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null)) {
       FemtoRenderUtils.renderItemConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(ItszuLibCapabilities.ITEM_STORAGE_CONFIGURABLE, null))
     }
-    if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE_OLD, null)) {
+      FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE_OLD, null))
     }
     if (FemtoRenderSwitches.renderFluidConfiguration && te.hasCapability(ItszuLibCapabilities.FLUID_STORAGE_CONFIGURABLE, null)) {
       FemtoRenderUtils.renderFluidConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(ItszuLibCapabilities.FLUID_STORAGE_CONFIGURABLE, null))

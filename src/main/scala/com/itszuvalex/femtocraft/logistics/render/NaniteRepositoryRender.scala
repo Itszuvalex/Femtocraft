@@ -35,8 +35,8 @@ class NaniteRepositoryRender extends TileEntityRenderCube[TileNaniteRepository](
   override def renderTileEntityInWorld(te: TileNaniteRepository, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     facing = Option(te).map(_.getWorld.getBlockState(te.getPos).getValue(BlockBehaviorHorizontalFacing.FACING)).getOrElse(EnumFacing.NORTH)
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
-    if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null)) {
-      FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE, null))
+    if (FemtoRenderSwitches.renderNaniteConfiguration && te.hasCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE_OLD, null)) {
+      FemtoRenderUtils.renderNaniteConfigOverlay(te.asInstanceOf[ITileEntity], x, y, z, te.getCapability(Capabilities.NANITE_STORAGE_CONFIGURABLE_OLD, null))
     }
   }
 }

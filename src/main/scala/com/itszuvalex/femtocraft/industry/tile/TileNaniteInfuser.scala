@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.industry.tile
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, NaniteTankOLD}
 import com.itszuvalex.femtocraft.api.power.PowerStorageNodeType
 import com.itszuvalex.femtocraft.industry.tile.TileNaniteInfuser._
-import com.itszuvalex.femtocraft.industry.{ModuleINaniteTank, ModuleNaniteAutoIO, ModuleNaniteSidedConfiguration, NaniteInfusionRecipeRegistry}
-import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.femtocraft.industry.{ModuleINaniteTankOLD, ModuleNaniteAutoIO, ModuleNaniteSidedConfigurationOLD, NaniteInfusionRecipeRegistry}
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfigurationOLD
 import com.itszuvalex.femtocraft.power.{ModuleColorableFromPowerLeafNode, ModuleWirelessPowerLeafNode, ModulePowerStorage, ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode}
 import com.itszuvalex.femtocraft.{Femtocraft, GuiIDs}
 import com.itszuvalex.itszulib.api.core.{IModule, Module}
@@ -58,7 +58,7 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
        OUTPUT_INV_KEY -> outputStorage),
    () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
   val naniteTank   : INaniteTankOLD = new NaniteTankOLD(50)
-  val sidedNaniteConfig             = new SidedNaniteStorageConfiguration(_ => NANITE_TANK_KEY,
+  val sidedNaniteConfig             = new SidedNaniteStorageConfigurationOLD(_ => NANITE_TANK_KEY,
                                                                         Map(NONE_TANK_KEY -> INaniteTankOLD.Empty,
                                                                             NANITE_TANK_KEY -> naniteTank),
                                                                         () => world.getBlockState(pos).getValue(BlockBehaviorHorizontalFacing.FACING))
@@ -73,8 +73,8 @@ class TileNaniteInfuser extends TileEntityCoreTickable {
   addTileEntityModule(new ModuleDropInventory(storage))
   addTileEntityModule(new ModulePowerStorage(battery))
   addTileEntityModule(leafNode)
-  addTileEntityModule(new ModuleINaniteTank(naniteTank))
-  addTileEntityModule(new ModuleNaniteSidedConfiguration(sidedNaniteConfig))
+  addTileEntityModule(new ModuleINaniteTankOLD(naniteTank))
+  addTileEntityModule(new ModuleNaniteSidedConfigurationOLD(sidedNaniteConfig))
   addTileEntityModule(new ModuleWirelessPowerStorageNodeFromWirelessPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleColorableFromPowerLeafNode(leafNode))
   addTileEntityModule(new ModuleGui(Femtocraft, GuiIDs.TileNaniteInfuserID _))

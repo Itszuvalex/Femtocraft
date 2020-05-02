@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.render
 
 import com.itszuvalex.femtocraft.Resources
 import com.itszuvalex.femtocraft.industry.gui.{GuiSidedFluidConfig, GuiSidedInventoryConfig, GuiSidedNaniteConfig}
-import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
+import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfigurationOLD
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.{EnumAutomaticIO, SidedFluidStorageConfiguration, SidedItemStorageConfiguration}
 import com.itszuvalex.itszulib.render.RenderUtils._
@@ -124,7 +124,7 @@ object FemtoRenderUtils {
     OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j, k)
   }
 
-  def renderNaniteConfigOverlay(te: ITileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedNaniteStorageConfiguration): Unit = {
+  def renderNaniteConfigOverlay(te: ITileEntity, x: Double, y: Double, z: Double, sidedConfig: SidedNaniteStorageConfigurationOLD): Unit = {
     renderConfigOverlay(te, x, y, z,
                         (facing) =>
                           GuiSidedNaniteConfig.colors(sidedConfig.storages.keys.toArray.indexOf(sidedConfig.getStorageNameForAbsoluteFacing(facing)) % GuiSidedNaniteConfig.colors.length),
