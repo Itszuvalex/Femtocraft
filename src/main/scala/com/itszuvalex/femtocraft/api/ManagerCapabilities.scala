@@ -3,7 +3,7 @@ package com.itszuvalex.femtocraft.api
 import java.util
 
 import com.itszuvalex.femtocraft.api.logistics._
-import com.itszuvalex.femtocraft.api.nanite.{INaniteTankOLD, INaniteUpgradeable, NaniteTankOLD}
+import com.itszuvalex.femtocraft.api.nanite._
 import com.itszuvalex.femtocraft.api.power._
 import com.itszuvalex.femtocraft.industry.item._
 import com.itszuvalex.femtocraft.nanite.SidedNaniteStorageConfiguration
@@ -30,7 +30,8 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[WirelessPowerStorageNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[WirelessWirelessPowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[INaniteTankOLD], new NaniteTankStorage, classOf[NaniteTankOLD])
+    CapabilityManager.INSTANCE.register(classOf[INaniteTankOLD], new NaniteTankStorageOLD, classOf[NaniteTankOLD])
+    CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
     CapabilityManager.INSTANCE.register(classOf[INaniteUpgradeable], new NaniteUpgradeableStorage, classOf[NaniteUpgradeableDummy])
     CapabilityManager.INSTANCE.register(classOf[IMultitool], new MultitoolStorageDummy, classOf[MultitoolImplDummy])
     CapabilityManager.INSTANCE.register(classOf[ILogisticsNetworkNode], new LogisticsStorageDummy, classOf[LogisticsImplDummy])
@@ -65,7 +66,9 @@ object ManagerCapabilities {
     }
   }
 
-  class NaniteTankStorage extends DummyStorage[INaniteTankOLD]
+  class NaniteTankStorageOLD extends DummyStorage[INaniteTankOLD]
+
+  class NaniteTankStorage extends DummyStorage[INaniteTank]
 
   class NaniteUpgradeableStorage extends DummyStorage[INaniteUpgradeable]
 

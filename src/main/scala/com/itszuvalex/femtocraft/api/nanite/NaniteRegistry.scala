@@ -24,4 +24,11 @@ object NaniteRegistry {
 
   def getStrain(archetype: String, strain: String): Option[NaniteStrain] = archetypes.find(_.name == archetype).flatMap(_.allowedStrains.find(_.name == strain))
 
+  def init(): Unit = {
+    addArchetype(NaniteArchetype.Empty)
+    addStrain(NaniteStrain.Empty)
+
+
+  }
+
 }

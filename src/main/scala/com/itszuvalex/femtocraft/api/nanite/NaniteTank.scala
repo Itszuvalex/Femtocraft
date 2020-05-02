@@ -4,20 +4,59 @@ import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.mutable.ArrayBuffer
 
+object NaniteTank {
+  val SIZE_NBT = "Size"
+  val NANITES_NBT = "Nanites"
+}
+
 class NaniteTank(private val cap: Int) extends INaniteTank {
-  private val nanite = ArrayBuffer[INaniteStack]()
+  private val nanites = ArrayBuffer[INaniteStack]()
 
   override def capacity: Int = cap
 
-  override def fill(stack: INaniteStack, doFill: Boolean): INaniteStack = ???
+  override def amount: Int = nanites.map(_.amount).sum
 
-  override def drain(stack: INaniteStack, doDrain: Boolean): INaniteStack = ???
+  override def fill(stack: INaniteStack, doFill: Boolean): INaniteStack = {
+    val copy      = stack.copy()
+    val amtToFill = math.min(stack.amount, room)
+    copy.amount -= amtToFill
+    if (doFill) {
+      findMatchingNanite(stack) match {
+        case None => // TODO: Destructive add
+          val toFill = stack.copy()
+          toFill.amount = amtToFill
+          nanites += toFill
+        case Some(s) => s.amount += amtToFill
+      }
+    }
+    copy
+  }
 
-  override def canFill(stack: INaniteStack): Boolean = ???
+  override def drain(stack: INaniteStack, doDrain: Boolean): INaniteStack = {
+    var copy = INaniteStack.Empty
+    findMatchingNanite(stack) match {
+      case None =>
+      case Some(s) =>
+        val amtToDrain = math.min(s.amount, stack.amount)
+        copy = s.copy()
+        copy.amount = amtToDrain
+        if (doDrain) {
+          s.amount -= amtToDrain
+          if (s.amount <= 0) {
+            nanites -= s
+          }
+        }
+    }
+    copy
+  }
 
-  override def canDrain(stack: INaniteStack): Boolean = ???
+  override def canFill(stack: INaniteStack): Boolean = true
 
-  override def containedNanites: Iterable[INaniteStack] = ???
+  override def canDrain(stack: INaniteStack): Boolean = findMatchingNanite(stack).nonEmpty
+
+  override def containedNanites: Iterable[INaniteStack] = nanites
+
+  def findMatchingNanite(stack: INaniteStack): Option[INaniteStack] = nanites.find(INaniteStack.areNaniteStacksEqual(_, stack))
 
 
   /**
@@ -31,7 +70,16 @@ class NaniteTank(private val cap: Int) extends INaniteTank {
    */
   override def supportsIntermingling: Boolean = false
 
-  override def serializeNBT(): NBTTagCompound = ???
+  override def serializeNBT(): NBTTagCompound = {
+    val nbt = new NBTTagCompound
+    nbt.setInteger(NaniteTank.SIZE_NBT, nanites.length)
+    nanites.zipWithIndex.foreach(x => nbt.setTag(x._2.toString, x._1.serializeNBT()))
+    nbt
+  }
 
-  override def deserializeNBT(nbt: NBTTagCompound): Unit = ???
+  override def deserializeNBT(nbt: NBTTagCompound): Unit = {
+    nanites.clear()
+    val size = nbt.getInteger(NaniteTank.SIZE_NBT)
+    (0 until size).foreach(i => nanites += INaniteStack.deserializeNaniteStack(nbt.getCompoundTag(i.toString)))
+  }
 }

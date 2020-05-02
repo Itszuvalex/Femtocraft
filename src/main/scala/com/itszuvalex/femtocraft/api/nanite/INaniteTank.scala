@@ -7,6 +7,10 @@ trait INaniteTank extends INBTSerializable[NBTTagCompound] {
 
   def capacity: Int
 
+  def amount: Int
+
+  def room: Int = capacity - amount
+
   def fill(stack: INaniteStack, doFill: Boolean): INaniteStack
 
   def drain(stack: INaniteStack, doDrain: Boolean): INaniteStack
