@@ -26,22 +26,34 @@ object INaniteStack {
   }
 
   def areNaniteStacksEqual(stack1: INaniteStack, stack2: INaniteStack): Boolean = {
-    String.CASE_INSENSITIVE_ORDER.compare(stack1.archetype.name, stack2.archetype.name) match {
-      case 0 =>
-        String.CASE_INSENSITIVE_ORDER.compare(stack1.strain.name, stack2.strain.name) match {
+    (stack1, stack2) match {
+      case (null, null) => true
+      case (null, _) => false
+      case (_, null) => false
+      case (_, _) =>
+        String.CASE_INSENSITIVE_ORDER.compare(stack1.archetype.name, stack2.archetype.name) match {
           case 0 =>
-            stack1.version.compareTo(stack2.version) == 0
+            String.CASE_INSENSITIVE_ORDER.compare(stack1.strain.name, stack2.strain.name) match {
+              case 0 =>
+                stack1.version.compareTo(stack2.version) == 0
+              case _ => false
+            }
           case _ => false
         }
-      case _ => false
     }
   }
 
   def areNaniteStacksSameStrain(stack1: INaniteStack, stack2: INaniteStack): Boolean = {
-    String.CASE_INSENSITIVE_ORDER.compare(stack1.archetype.name, stack2.archetype.name) match {
-      case 0 =>
-        String.CASE_INSENSITIVE_ORDER.compare(stack1.strain.name, stack2.strain.name) == 0
-      case _ => false
+    (stack1, stack2) match {
+      case (null, null) => true
+      case (null, _) => false
+      case (_, null) => false
+      case (_, _) =>
+        String.CASE_INSENSITIVE_ORDER.compare(stack1.archetype.name, stack2.archetype.name) match {
+          case 0 =>
+            String.CASE_INSENSITIVE_ORDER.compare(stack1.strain.name, stack2.strain.name) == 0
+          case _ => false
+        }
     }
   }
 
