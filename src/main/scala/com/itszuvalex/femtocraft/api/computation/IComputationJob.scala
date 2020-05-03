@@ -1,4 +1,4 @@
-package com.itszuvalex.femtocraft.api.logistics
+package com.itszuvalex.femtocraft.api.computation
 
 trait IComputationJob {
 

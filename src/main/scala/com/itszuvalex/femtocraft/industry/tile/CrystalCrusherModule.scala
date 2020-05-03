@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.ManagerModules
+import com.itszuvalex.femtocraft.common.BatteryPoweredTask
 import com.itszuvalex.femtocraft.industry.DustRecipeRegistry
 import com.itszuvalex.femtocraft.industry.tile.CrystalCrusherModule.CrushTask
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.{IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
-import com.itszuvalex.itszulib.util.Task
 import net.minecraft.nbt.NBTTagCompound
 
 object CrystalCrusherModule {
@@ -17,8 +17,49 @@ object CrystalCrusherModule {
 
   val TASK_NBT = "Task"
 
-  class CrushTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
+  class CrushTask(var stack: IItemStack, input: IItemStorage, output: IItemStorage, bat: IBattery) extends BatteryPoweredTask(POWER_REQ, TICKS_REQ, bat, () => 0d, () => 0d) {
+
     import com.itszuvalex.femtocraft.industry.tile.CrystalCrusherModule.CrushTask._
+
+    override def inProgress: Boolean = !(stack == null || stack.isEmpty)
+
+    override def canStart: Boolean = {
+      val item = input.head
+      !item.isEmpty && DustRecipeRegistry.getDust(item).isDefined
+    }
+
+    override def start(): Unit = {
+      val ins = input.split(0, 1)
+      reset()
+      stack = ins
+    }
+
+    override def onCompleted(): Unit = {
+      val item = stack
+      if (item == null || item.isEmpty) {
+        reset()
+        return
+      }
+
+      var insertItem = stack
+      if (!crushed) {
+        val resultItem = DustRecipeRegistry.getDust(item).getOrElse(IItemStack.Empty)
+        if (resultItem == null || resultItem.isEmpty) {
+          reset()
+          return
+        }
+        else {
+          insertItem = resultItem.copy()
+        }
+
+        crushed = true
+      }
+
+      // Will clear the stack once we successfully insert the result item or set stack to the finished result
+      stack = output.insert(0, insertItem)
+      if (stack == null || stack.isEmpty)
+        reset()
+    }
 
     var crushed = false
 
@@ -48,53 +89,17 @@ object CrystalCrusherModule {
     val CRUSHING_STACK_NBT   = "Crush"
     val CRUSHING_SMELTED_NBT = "Crushed"
   }
+
 }
 
 class CrystalCrusherModule(val input: IItemStorage, val output: IItemStorage, val batteryStorage: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[CrystalCrusherModule] {
-  private val task: CrushTask = new CrushTask(IItemStack.Empty)
+  private val task: CrushTask = new CrushTask(IItemStack.Empty, input, output, battery)
 
   override def module: IModule[CrystalCrusherModule] = TileCrystalCrusher.MODULE
 
   override def serverUpdate(tile: ITileEntity): Unit = {
     batteryStorage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())
-
-    if (task.stack == null || task.stack.isEmpty) {
-      val item = input.head
-      if (!item.isEmpty && DustRecipeRegistry.getDust(item).isDefined) {
-        val ins = input.split(0, 1)
-        task.reset()
-        task.stack = ins
-      }
-    }
-    else {
-      battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
-      if (task.completed(0)) {
-        val item = task.stack
-        if (item == null || item.isEmpty) {
-          task.reset()
-          return
-        }
-
-        var insertItem = task.stack
-        if (!task.crushed) {
-          val resultItem = DustRecipeRegistry.getDust(item).getOrElse(IItemStack.Empty)
-          if (resultItem == null || resultItem.isEmpty) {
-            task.reset()
-            return
-          }
-          else {
-            insertItem = resultItem.copy()
-          }
-
-          task.crushed = true
-        }
-
-        // Will clear the stack once we successfully insert the result item or set stack to the finished result
-        task.stack = output.insert(0, insertItem)
-        if (task.stack == null || task.stack.isEmpty)
-          task.reset()
-      }
-    }
+    task.tick()
   }
 
   def getProgress: Double = task.progress
