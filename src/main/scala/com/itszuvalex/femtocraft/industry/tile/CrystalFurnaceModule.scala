@@ -1,12 +1,12 @@
 package com.itszuvalex.femtocraft.industry.tile
 
 import com.itszuvalex.femtocraft.api.ManagerModules
+import com.itszuvalex.femtocraft.common.BatteryPoweredTask
 import com.itszuvalex.femtocraft.industry.tile.CrystalFurnaceModule._
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.api.storage.{IBattery, IItemStorage}
 import com.itszuvalex.itszulib.api.wrappers.{Converter, IItemStack, ITileEntity}
 import com.itszuvalex.itszulib.core.TileEntityInternalModuleTickable
-import com.itszuvalex.itszulib.util.Task
 import net.minecraft.item.crafting.FurnaceRecipes
 import net.minecraft.nbt.NBTTagCompound
 
@@ -17,11 +17,51 @@ object CrystalFurnaceModule {
   val POWER_PER_TICK = 10
   val POWER_REQ      = TICKS_REQ * POWER_PER_TICK
 
-  class SmeltTask(var stack: IItemStack) extends Task(POWER_REQ, TICKS_REQ) {
+  class SmeltTask(var stack: IItemStack, input: IItemStorage, output: IItemStorage, battery: IBattery) extends BatteryPoweredTask(POWER_REQ, TICKS_REQ, battery, () => 0d, () => 0d) {
 
     import com.itszuvalex.femtocraft.industry.tile.CrystalFurnaceModule.SmeltTask._
 
     var smelted = false
+
+    override def inProgress: Boolean = !(stack == null || stack.isEmpty)
+
+    override def canStart: Boolean = {
+      val item = input.head
+      !item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty
+    }
+
+    override def start(): Unit = {
+      val ins = input.split(0, 1)
+      reset()
+      stack = ins
+    }
+
+    override def onCompleted(): Unit = {
+      val item = stack
+      if (item == null || item.isEmpty) {
+        reset()
+        return
+      }
+
+      var insertItem = stack
+      if (!smelted) {
+        val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
+        if (resultItem == null || resultItem.isEmpty) {
+          reset()
+          return
+        }
+        else {
+          insertItem = Converter.IItemStackFromItemStack(resultItem.copy())
+        }
+
+        smelted = true
+      }
+
+      // Will clear the stack once we successfully insert the result item or set stack to the finished result
+      stack = output.insert(0, insertItem)
+      if (stack == null || stack.isEmpty)
+        reset()
+    }
 
     override def deserializeNBT(t: NBTTagCompound): Unit = {
       super.deserializeNBT(t)
@@ -53,7 +93,7 @@ object CrystalFurnaceModule {
 }
 
 class CrystalFurnaceModule(val input: IItemStorage, val output: IItemStorage, val batteryStorage: IItemStorage, val battery: IBattery) extends TileEntityInternalModuleTickable[CrystalFurnaceModule] {
-  private val task: SmeltTask = new SmeltTask(IItemStack.Empty)
+  private val task: SmeltTask = new SmeltTask(IItemStack.Empty, input, output, battery)
 
   override def module: IModule[CrystalFurnaceModule] = TileCrystalFurnace.MODULE
 
@@ -69,44 +109,7 @@ class CrystalFurnaceModule(val input: IItemStorage, val output: IItemStorage, va
 
   override def serverUpdate(tile: ITileEntity): Unit = {
     batteryStorage.head.moduleOption(ManagerModules.ITEM_POWER_CRYSTAL, null).foreach(_.onTick())
-
-    if (task.stack == null || task.stack.isEmpty) {
-      val item = input.head
-      if (!item.isEmpty && !FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft).isEmpty) {
-        val ins = input.split(0, 1)
-        task.reset()
-        task.stack = ins
-      }
-    }
-    else {
-      battery.storage -= task.contribute(Math.min(task.powerPerTick(0, 0), battery.storage), 0, 0)
-      if (task.completed(0)) {
-        val item = task.stack
-        if (item == null || item.isEmpty) {
-          task.reset()
-          return
-        }
-
-        var insertItem = task.stack
-        if (!task.smelted) {
-          val resultItem = FurnaceRecipes.instance().getSmeltingResult(item.toMinecraft)
-          if (resultItem == null || resultItem.isEmpty) {
-            task.reset()
-            return
-          }
-          else {
-            insertItem = Converter.IItemStackFromItemStack(resultItem.copy())
-          }
-
-          task.smelted = true
-        }
-
-        // Will clear the stack once we successfully insert the result item or set stack to the finished result
-        task.stack = output.insert(0, insertItem)
-        if (task.stack == null || task.stack.isEmpty)
-          task.reset()
-      }
-    }
+    task.tick()
   }
 
   def getProgress: Double = task.progress
