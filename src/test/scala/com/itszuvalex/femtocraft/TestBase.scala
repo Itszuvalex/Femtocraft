@@ -1,3 +1,5 @@
+package com.itszuvalex.femtocraft
+
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, OneInstancePerTest, WordSpec}
 

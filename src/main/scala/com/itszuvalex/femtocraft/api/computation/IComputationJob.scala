@@ -6,6 +6,8 @@ trait IComputationJob {
 
   def FLOPsRequired: Double
 
+  def FLOPsRemaining: Double = FLOPsRequired - FLOPs
+
   def FLOPSContributablePerTick: Double
 
   /**
