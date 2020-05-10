@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.power.tile
 
-import com.itszuvalex.femtocraft.api.ManagerModules
-import com.itszuvalex.femtocraft.api.power.{IWiredPowerNode, IWiredPowerTier, WiredPowerNetwork}
+import com.itszuvalex.femtocraft.api.{IConduitTier, ManagerModules}
+import com.itszuvalex.femtocraft.api.power.{IWiredPowerNode, WiredPowerNetwork}
 import com.itszuvalex.femtocraft.power.ModuleColorNeighborAverage
 import com.itszuvalex.femtocraft.power.tile.TilePowerConduitCrystal.ModulePowerConduitCrystal
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
@@ -13,12 +13,12 @@ import net.minecraft.util.math.AxisAlignedBB
 
 object TilePowerConduitCrystal {
 
-  class ModulePowerConduitCrystal(tile: ITileEntity) extends ModuleNetworkedWire[IWiredPowerNode, WiredPowerNetwork](tile, () => new WiredPowerNetwork(IWiredPowerTier.CRYSTAL)) with IWiredPowerNode {
+  class ModulePowerConduitCrystal(tile: ITileEntity) extends ModuleNetworkedWire[IWiredPowerNode, WiredPowerNetwork](tile, () => new WiredPowerNetwork(IConduitTier.CRYSTAL)) with IWiredPowerNode {
     override def module: IModule[IWiredPowerNode] = ManagerModules.TILE_WIRED_POWER_NODE
 
     override def faceToModuleMapper(tile: ITileEntity): EnumFacing => Option[IWiredPowerNode] = _ => Some(this)
 
-    override def tier: IWiredPowerTier = IWiredPowerTier.CRYSTAL
+    override def tier: IConduitTier = IConduitTier.CRYSTAL
 
     override def getLoc: Loc4 = Loc4(tile)
 

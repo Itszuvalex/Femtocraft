@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.api;
 
+import com.itszuvalex.femtocraft.api.computation.IWiredComputationLeafNode;
+import com.itszuvalex.femtocraft.api.computation.IWiredComputationNode;
 import com.itszuvalex.femtocraft.api.logistics.IConnectionProvider;
 import com.itszuvalex.femtocraft.api.logistics.ILogisticsNetworkNode;
 import com.itszuvalex.femtocraft.api.nanite.INaniteTank;
@@ -36,6 +38,12 @@ public class Capabilities {
 
     @CapabilityInject(IWirelessPowerNetworkNode.class)
     public static Capability<IWirelessPowerNetworkNode> TILE_WIRELESS_POWER_NODE = null;
+
+    @CapabilityInject(IWiredComputationNode.class)
+    public static Capability<IWiredComputationNode> TILE_WIRED_COMPUTATION_NODE = null;
+
+    @CapabilityInject(IWiredComputationLeafNode.class)
+    public static Capability<IWiredComputationLeafNode> TILE_WIRED_COMPUTATION_LEAF_NODE = null;
 
     @CapabilityInject(IPlayerNaniteCapability.class)
     public static Capability<IPlayerNaniteCapability> PLAYER_NANITE_CAPABILITY = null;

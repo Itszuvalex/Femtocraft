@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.power.block
 
-import com.itszuvalex.femtocraft.api.power.IWiredPowerTier
+import com.itszuvalex.femtocraft.api.IConduitTier
 import com.itszuvalex.femtocraft.power.tile.TilePowerConduitCrystal
 import com.itszuvalex.itszulib.api.wrappers.{ITileEntity, IWorld}
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviors
@@ -17,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by Chris on 2/16/2017.
  */
-abstract class BlockPowerConduit(tier: IWiredPowerTier, blockFunc: () => Block, tileFunc: () => ITileEntity) extends TileBlockContainerCore(Material.IRON, new BlockTileContainer(blockFunc) {
+abstract class BlockPowerConduit(tier: IConduitTier, blockFunc: () => Block, tileFunc: () => ITileEntity) extends TileBlockContainerCore(Material.IRON, new BlockTileContainer(blockFunc) {
   override def createTileEntity(world: IWorld, meta: Int): ITileEntity = tileFunc()
 }, BlockBehaviors.DEFAULT) {
   val centerBB: KeyedBoundingBox = KeyedBoundingBox("Center", 0, new AxisAlignedBB(.375, .375, .375, .625, .625, .625))

@@ -1,13 +1,13 @@
 package com.itszuvalex.femtocraft.api.power
 
-import com.itszuvalex.femtocraft.api.{DistributableBattery, DistributionAlgorithm, ManagerModules}
+import com.itszuvalex.femtocraft.api.{DistributableBattery, DistributionAlgorithm, IConduitTier, ManagerModules}
 import com.itszuvalex.itszulib.api.core.IModule
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import net.minecraft.util.EnumFacing
 
 import scala.collection.mutable
 
-class WiredPowerNetwork(tier: IWiredPowerTier) extends TileNetwork[IWiredPowerNode, WiredPowerNetwork](ManagerNetwork.instance.getNextID) {
+class WiredPowerNetwork(tier: IConduitTier) extends TileNetwork[IWiredPowerNode, WiredPowerNetwork](ManagerNetwork.instance.getNextID) {
   override def networkModule: IModule[IWiredPowerNode] = ManagerModules.TILE_WIRED_POWER_NODE
 
   override def create(): WiredPowerNetwork = new WiredPowerNetwork(tier)

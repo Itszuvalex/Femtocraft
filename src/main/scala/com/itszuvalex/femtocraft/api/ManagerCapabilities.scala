@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.api
 
 import java.util
 
+import com.itszuvalex.femtocraft.api.computation._
 import com.itszuvalex.femtocraft.api.logistics._
 import com.itszuvalex.femtocraft.api.nanite._
 import com.itszuvalex.femtocraft.api.power._
@@ -28,7 +29,9 @@ object ManagerCapabilities {
     CapabilityManager.INSTANCE.register(classOf[IWiredPowerLeafNode], new WiredPowerLeafNodeStorage, classOf[WiredPowerLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerNetworkNode], new PowerNetworkNodeStorageDummy, classOf[WirelessPowerNodeNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IWirelessPowerStorageNode], new PowerStorageNodeStorageDummy, classOf[WirelessPowerStorageNodeImplementationDummy])
-    CapabilityManager.INSTANCE.register(classOf[IWirelessPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[WirelessWirelessPowerLeafNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWirelessPowerLeafNode], new PowerLeafNodeStorageDummy, classOf[WirelessPowerLeafNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWiredComputationNode], new ComputationNodeStorageDummy, classOf[WiredComputationNodeImplementationDummy])
+    CapabilityManager.INSTANCE.register(classOf[IWiredComputationLeafNode], new ComputationLeafNodeStorageDummy, classOf[WiredComputationLeafNodeImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[IPowerCrystal], new PowerCrystalStorageDummy, classOf[PowerCrystalImplementationDummy])
     CapabilityManager.INSTANCE.register(classOf[INaniteTankOLD], new NaniteTankStorageOLD, classOf[NaniteTankOLD])
     CapabilityManager.INSTANCE.register(classOf[INaniteTank], new NaniteTankStorage, classOf[NaniteTank])
@@ -89,6 +92,10 @@ object ManagerCapabilities {
 
   class PowerLeafNodeStorageDummy extends DummyStorage[IWirelessPowerLeafNode]
 
+  class ComputationNodeStorageDummy extends DummyStorage[IWiredComputationNode]
+
+  class ComputationLeafNodeStorageDummy extends DummyStorage[IWiredComputationLeafNode]
+
   class PowerCrystalStorageDummy extends DummyStorage[IPowerCrystal]
 
   class MultitoolStorageDummy extends DummyStorage[IMultitool]
@@ -100,7 +107,7 @@ object ManagerCapabilities {
   class OverlayRenderStorageDummy extends DummyStorage[IOverlayRenderItem]
 
   class WiredPowerNodeImplementationDummy extends IWiredPowerNode {
-    override def tier: IWiredPowerTier = null
+    override def tier: IConduitTier = null
 
     override def isConnectedWiredPower(facing: EnumFacing): Boolean = false
 
@@ -186,7 +193,7 @@ object ManagerCapabilities {
     override def changeForLastTick: Double = 0d
   }
 
-  class WirelessWirelessPowerLeafNodeImplementationDummy extends WirelessPowerStorageNodeImplementationDummy with IWirelessPowerLeafNode {
+  class WirelessPowerLeafNodeImplementationDummy extends WirelessPowerStorageNodeImplementationDummy with IWirelessPowerLeafNode {
     override def connectionRadius: Float = 0
 
     override def getParent: Loc4 = Loc4(0, 0, 0, 0)
@@ -194,6 +201,56 @@ object ManagerCapabilities {
     override def setParent(node: IWirelessPowerNetworkNode): Unit = {}
 
     override def onParentBroken(node: IWirelessPowerNetworkNode): Unit = {}
+  }
+
+  class WiredComputationNodeImplementationDummy extends IWiredComputationNode {
+    override def tier: IConduitTier = ???
+
+    override def isConnectedWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def canConnectWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def connectWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def disconnectWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def addPersistedConnection(node: Loc4): Unit = ???
+
+    override def removePersistedConnection(node: Loc4): Unit = ???
+
+    override def setNetwork(network: WiredComputationNetwork): Unit = ???
+
+    override def getNetwork: WiredComputationNetwork = ???
+
+    override def getLoc: Loc4 = ???
+
+    override def canConnect(loc: Loc4): Boolean = ???
+
+    override def refresh(): Unit = ???
+
+    override def canAdd(iNetwork: WiredComputationNetwork): Boolean = ???
+
+    override def onAdded(iNetwork: WiredComputationNetwork): Unit = ???
+
+    override def onRemoved(iNetwork: WiredComputationNetwork): Unit = ???
+
+    override def onConnect(node: Loc4): Unit = ???
+
+    override def onDisconnect(node: Loc4): Unit = ???
+  }
+
+  class WiredComputationLeafNodeImplementationDummy extends IWiredComputationLeafNode {
+    override def jobs: Seq[IComputationJob] = ???
+
+    override def computers: Seq[IComputer] = ???
+
+    override def isConnectedWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def canConnectWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def connectWiredComputation(facing: EnumFacing): Boolean = ???
+
+    override def disconnectWiredComputation(facing: EnumFacing): Boolean = ???
   }
 
   class PowerCrystalImplementationDummy extends IPowerCrystal {

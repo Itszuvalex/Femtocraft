@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.api
 
+import com.itszuvalex.femtocraft.api.computation.{IWiredComputationLeafNode, IWiredComputationNode}
 import com.itszuvalex.femtocraft.api.logistics.{IConnectionProvider, ILogisticsNetworkNode}
 import com.itszuvalex.femtocraft.api.nanite.{INaniteTank, INaniteTankOLD, INaniteUpgradeable}
 import com.itszuvalex.femtocraft.api.power._
@@ -23,6 +24,10 @@ object ManagerModules {
   val TILE_WIRELESS_POWER_LEAF_NODE: IModule[IWirelessPowerLeafNode] = Module.registerModule("TileWirelessPowerLeafNode", () => Capabilities.TILE_WIRELESS_POWER_LEAF_NODE)
 
   val TILE_WIRELESS_POWER_NODE: IModule[IWirelessPowerNetworkNode] = Module.registerModule("TileWirelessPowerNode", () => Capabilities.TILE_WIRELESS_POWER_NODE)
+
+  val TILE_WIRED_COMPUTATION_NODE: IModule[IWiredComputationNode] = Module.registerModule("TileWiredComputationNode", () => Capabilities.TILE_WIRED_COMPUTATION_NODE)
+
+  val TILE_WIRED_COMPUTATION_LEAF_NODE: IModule[IWiredComputationLeafNode] = Module.registerModule("TileWiredComputationLeafNode", () => Capabilities.TILE_WIRED_COMPUTATION_LEAF_NODE)
 
   val PLAYER_NANITE_CAPABILITY: IModule[IPlayerNaniteCapability] = Module.registerModule("PlayerNaniteCapability", () => Capabilities.PLAYER_NANITE_CAPABILITY)
 
