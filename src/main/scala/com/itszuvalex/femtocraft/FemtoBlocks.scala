@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft
 
+import com.itszuvalex.femtocraft.computation.block.BlockComputationConduitCrystal
 import com.itszuvalex.femtocraft.cyber.block._
 import com.itszuvalex.femtocraft.industry.block._
 import com.itszuvalex.femtocraft.logistics.block.{BlockConduit, BlockFluidRepository, BlockItemRepository, BlockNaniteRepository}
@@ -51,9 +52,9 @@ object FemtoBlocks {
   var blockNaniteHive: Block = _
   var blockNaniteHoldingTank: Block = _
   var blockArchiveInterface: Block = _
-  var blockMainframe: Block = _
-  var blockInformationConduit: Block = _
-  var blockHeatAirDucting: Block = _
+  var blockMainframe                : Block = _
+  var blockComputationConduitCrystal: Block = _
+  var blockHeatAirDucting           : Block = _
   var blockHeatAirRadiator: Block = _
   var blockHeatAirFan: Block = _
   var blockNaniteRepository      : Block = _
@@ -144,6 +145,7 @@ object FemtoBlocks {
     //
     blockCrystalFurnace = registerBlock(registry, new BlockCrystalFurnace(), "blockCrystalFurnace")
     blockCrystalCrusher = registerBlock(registry, new BlockCrystalCrusher(), "blockCrystalCrusher")
+    blockComputationConduitCrystal = registerBlock(registry, new BlockComputationConduitCrystal, "blockComputationConduitCrystal")
 
     blockCallbacks.foreach(_ ())
     blockCallbacks.clear()
@@ -187,6 +189,7 @@ object FemtoBlocks {
     //
     blockCrystalFurnace.registerModel()
     blockCrystalCrusher.registerModel()
+    blockComputationConduitCrystal.registerModel()
   }
 
   def postInit(): Unit = {

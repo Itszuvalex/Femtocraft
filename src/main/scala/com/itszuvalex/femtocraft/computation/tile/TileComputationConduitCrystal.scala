@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.computation.tile
 
 import com.itszuvalex.femtocraft.api.computation.{IWiredComputationNode, WiredComputationNetwork}
 import com.itszuvalex.femtocraft.api.{IConduitTier, ManagerModules}
-import com.itszuvalex.femtocraft.computation.tile.TileConduitComputation.ModuleComputationConduitCrystal
+import com.itszuvalex.femtocraft.computation.tile.TileComputationConduitCrystal.ModuleComputationConduitCrystal
 import com.itszuvalex.femtocraft.power.ModuleColorNeighborAverage
 import com.itszuvalex.itszulib.api.core.{IModule, Loc4}
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
@@ -11,7 +11,7 @@ import com.itszuvalex.itszulib.core.modules.ModuleNetworkedWire
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.AxisAlignedBB
 
-object TileConduitComputation {
+object TileComputationConduitCrystal {
 
   class ModuleComputationConduitCrystal(tile: ITileEntity) extends ModuleNetworkedWire[IWiredComputationNode, WiredComputationNetwork](tile, () => new WiredComputationNetwork(IConduitTier.CRYSTAL)) with IWiredComputationNode {
     override def module: IModule[IWiredComputationNode] = ManagerModules.TILE_WIRED_COMPUTATION_NODE
@@ -44,7 +44,7 @@ object TileConduitComputation {
 
 }
 
-class TileConduitComputation extends TileEntityCoreTickable {
+class TileComputationConduitCrystal extends TileEntityCoreTickable {
   val conduit = new ModuleComputationConduitCrystal(this)
 
   addTileEntityModule(conduit)

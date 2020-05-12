@@ -1,9 +1,9 @@
-package com.itszuvalex.femtocraft.power.render
+package com.itszuvalex.femtocraft.computation.render
 
 import java.util
 
 import com.itszuvalex.femtocraft.Resources
-import com.itszuvalex.femtocraft.power.tile.TilePowerConduitCrystal
+import com.itszuvalex.femtocraft.computation.tile.TileComputationConduitCrystal
 import com.itszuvalex.femtocraft.render.FemtoRenderUtils
 import com.itszuvalex.femtocraft.render.OBJDynamicRenderer._
 import com.itszuvalex.itszulib.api.ItszuLibModules
@@ -16,17 +16,15 @@ import org.lwjgl.opengl.GL11
 
 import scala.collection.JavaConversions._
 
-/**
- * Created by Christopher Harris (Itszuvalex) on 8/5/15.
- */
-object PowerConduitRenderer {
+
+object ComputationConduitRenderer {
   val conduitModelLocation    = Resources.CustomModelBlock("wire/wire_thin.obj")
-  val conduitTexLocation      = Resources.CustomModelBlockTex("wire/wire_thin_power.png")
-  val conduitColorTexLocation = Resources.CustomModelBlockTex("wire/wire_thin_power_color.png")
+  val conduitTexLocation      = Resources.CustomModelBlockTex("wire/wire_thin_computation.png")
+  val conduitColorTexLocation = Resources.CustomModelBlockTex("wire/wire_thin_computation_color.png")
 }
 
-class PowerConduitRenderer extends TileEntityCombinedRenderer[TilePowerConduitCrystal] {
-  val conduitModel  = LoadObj(PowerConduitRenderer.conduitModelLocation)
+class ComputationConduitRenderer extends TileEntityCombinedRenderer[TileComputationConduitCrystal] {
+  val conduitModel  = LoadObj(ComputationConduitRenderer.conduitModelLocation)
   val slowingFactor = 1.3f
 
   override def renderTileEntityAsItem(x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
@@ -38,7 +36,7 @@ class PowerConduitRenderer extends TileEntityCombinedRenderer[TilePowerConduitCr
     GL11.glPushMatrix()
 
     translationBlock(x + .5, y + .5, z + .5) {
-      this.bindTexture(PowerConduitRenderer.conduitTexLocation)
+      this.bindTexture(ComputationConduitRenderer.conduitTexLocation)
 
       conduitModel.renderGroups(Set("Core_Cube"))
 
@@ -51,7 +49,7 @@ class PowerConduitRenderer extends TileEntityCombinedRenderer[TilePowerConduitCr
       val time = Option(Minecraft.getMinecraft.world).map(_.getTotalWorldTime.toFloat).getOrElse(0f)
 
       GL11.glColor4ub(color.red, color.green, color.blue, 255.toByte)
-      this.bindTexture(PowerConduitRenderer.conduitColorTexLocation)
+      this.bindTexture(ComputationConduitRenderer.conduitColorTexLocation)
 
       FemtoRenderUtils.disableLightMaps()
       conduitModel.renderGroups(Set("Core_Cube"))
@@ -65,7 +63,7 @@ class PowerConduitRenderer extends TileEntityCombinedRenderer[TilePowerConduitCr
     GL11.glEnable(GL11.GL_CULL_FACE)
   }
 
-  override def renderTileEntityInWorld(te: TilePowerConduitCrystal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
+  override def renderTileEntityInWorld(te: TileComputationConduitCrystal, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float): Unit = {
     super.renderTileEntityInWorld(te, x, y, z, partialTicks, destroyStage, alpha)
     val color   = te.getModule(ItszuLibModules.COLORABLE, null)
     val facings = EnumFacing.VALUES.filter(te.conduit.isConnected)

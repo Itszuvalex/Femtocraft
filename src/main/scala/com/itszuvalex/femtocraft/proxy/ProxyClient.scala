@@ -21,6 +21,7 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.api.{Capabilities, OverlayRenderSwitch}
+import com.itszuvalex.femtocraft.computation.tile.TileComputationConduitCrystal
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.item.ItemConfigurator
 import com.itszuvalex.femtocraft.industry.render._
@@ -184,6 +185,7 @@ class ProxyClient extends ProxyCommon {
 
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalFurnace), 0, classOf[TileCrystalFurnace])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalCrusher), 0, classOf[TileCrystalCrusher])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockComputationConduitCrystal), 0, classOf[TileComputationConduitCrystal])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
@@ -222,6 +224,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TilePowerConduitCrystal], new PowerConduitRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalFurnace], new CrystalFurnaceRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalCrusher], new CrystalCrusherRender)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileComputationConduitCrystal], new ComputationConduitRenderer)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 
