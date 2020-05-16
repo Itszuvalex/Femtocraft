@@ -21,6 +21,7 @@
 package com.itszuvalex.femtocraft.proxy
 
 import com.itszuvalex.femtocraft.api.{Capabilities, OverlayRenderSwitch}
+import com.itszuvalex.femtocraft.computation.render.ComputationConduitRenderer
 import com.itszuvalex.femtocraft.computation.tile.TileComputationConduitCrystal
 import com.itszuvalex.femtocraft.industry.FrameMultiblockRendererRegistry
 import com.itszuvalex.femtocraft.industry.item.ItemConfigurator
