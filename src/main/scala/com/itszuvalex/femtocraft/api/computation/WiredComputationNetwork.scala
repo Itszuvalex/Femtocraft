@@ -31,7 +31,9 @@ class WiredComputationNetwork(tier: IConduitTier) extends TileNetwork[IWiredComp
   override def onTickEnd(): Unit = {
     try {
       val nodes = getLeafNodes
-      new ComputationDistributionAlgorithm(nodes.view.flatMap(_.computers).toSeq, nodes.view.flatMap(_.jobs).toSeq)
+      val computers = new mutable.HashSet[IComputer]() ++ nodes.view.flatMap(_.computers)
+      val jobs = new mutable.HashSet[IComputationJob]() ++ nodes.view.flatMap(_.jobs)
+      new ComputationDistributionAlgorithm(computers.toSeq, jobs.toSeq)
         .distribute()
     } catch {
       case _: Throwable =>
