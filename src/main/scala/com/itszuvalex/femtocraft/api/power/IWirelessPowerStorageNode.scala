@@ -12,9 +12,9 @@ trait IWirelessPowerStorageNode {
 
   def storageType: PowerStorageNodeType
 
-  def transferRate: Double
+  def transferRate: DEPower
 
   def getStorageLoc: Loc4
 
-  def changeForLastTick: Double
+  def changeForLastTick: DEPower
 }

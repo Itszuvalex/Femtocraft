@@ -8,6 +8,6 @@ trait IWiredPowerLeafNode extends IWiredPowerConnectable {
 
   def powerType: PowerStorageNodeType
 
-  def transferRate: Double
+  def transferRate: DEPower
 
 }

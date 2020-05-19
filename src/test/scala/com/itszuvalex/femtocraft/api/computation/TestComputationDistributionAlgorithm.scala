@@ -17,7 +17,7 @@ class TestComputationDistributionAlgorithm extends TestBase {
 
         comp1.usedFlops shouldBe 500d
         comp2.usedFlops shouldBe 0d
-        job.FLOPsRemaining shouldBe 250d
+        job.FLOPSRemaining shouldBe 250d
       }
 
       "power multiple jobs with one computer" in {
@@ -33,9 +33,9 @@ class TestComputationDistributionAlgorithm extends TestBase {
 
         new ComputationDistributionAlgorithm(Seq(comp), jobs).distribute()
 
-        comp.usedFlops shouldBe comp.FLOPsPerTick
+        comp.usedFlops shouldBe comp.FLOPSPerTick
 
-        jobs.map(_.FLOPs).sum shouldBe comp.FLOPsPerTick
+        jobs.map(_.FLOPs).sum shouldBe comp.FLOPSPerTick
       }
 
       "use multiple computers to power one job" in {
@@ -69,7 +69,7 @@ class TestComputationDistributionAlgorithm extends TestBase {
 
     override def FLOPs: Double = flops
 
-    override def FLOPsRequired: Double = flopsRequired
+    override def FLOPSRequired: Double = flopsRequired
 
     override def FLOPSContributablePerTick: Double = flopsContributable
 
@@ -78,8 +78,8 @@ class TestComputationDistributionAlgorithm extends TestBase {
      * @param f Amount of FLOPs to contribute.
      * @return Amount of flops remaining out of flops.
      */
-    override def contributeFlops(f: Double): Double = {
-      val room = math.min(FLOPsRemaining, FLOPSContributablePerTick)
+    override def contributeFLOPS(f: Double): Double = {
+      val room = math.min(FLOPSRemaining, FLOPSContributablePerTick)
       val min  = math.min(f, room)
       flops += min
       f - min

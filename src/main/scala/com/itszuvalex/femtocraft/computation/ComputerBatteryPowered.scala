@@ -1,10 +1,11 @@
 package com.itszuvalex.femtocraft.computation
 
-import com.itszuvalex.femtocraft.api.computation.IComputer
+import com.itszuvalex.femtocraft.api.computation.{FLOPS, IComputer}
+import com.itszuvalex.femtocraft.api.power.DEPower
 import com.itszuvalex.itszulib.api.storage.IBattery
 
-class ComputerBatteryPowered(battery: IBattery, flopsFunc: () => Double, costPerFlopFunc: () => Double) extends IComputer {
-  override def FLOPsPerTick: Double = math.min(flopsFunc(), costPerFlopFunc() * battery.storage)
+class ComputerBatteryPowered(battery: IBattery, flopsFunc: () => FLOPS, costPerFlopFunc: () => DEPower) extends IComputer {
+  override def FLOPSPerTick: FLOPS = math.min(flopsFunc(), costPerFlopFunc() * battery.storage)
 
   /**
    *
@@ -19,8 +20,7 @@ class ComputerBatteryPowered(battery: IBattery, flopsFunc: () => Double, costPer
     else Double.MaxValue
   }
 
-  override def useFLOPS(flops: Double): Unit = {
+  override def useFLOPS(flops: FLOPS): Unit = {
     battery.drain(flops * costPerFlopFunc())
-
   }
 }

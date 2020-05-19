@@ -13,7 +13,7 @@ class TestComputationLimitedBatteryTask extends TestBase {
       val job  = new IComputationJob {
         override def FLOPs: Double = 5000
 
-        override def FLOPsRequired: Double = 10000
+        override def FLOPSRequired: Double = 10000
 
         override def FLOPSContributablePerTick: Double = 0
 
@@ -22,7 +22,7 @@ class TestComputationLimitedBatteryTask extends TestBase {
          * @param flops Amount of FLOPs to contribute.
          * @return Amount of flops remaining out of flops.
          */
-        override def contributeFlops(flops: Double): Double = 0d
+        override def contributeFLOPS(flops: Double): Double = 0d
       }
       val task = new TestComputationLimitedBatteryTask(battery, job)
 

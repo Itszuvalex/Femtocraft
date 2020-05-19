@@ -1,11 +1,11 @@
 package com.itszuvalex.femtocraft.computation
 
-import com.itszuvalex.femtocraft.api.computation.IComputer
+import com.itszuvalex.femtocraft.api.computation.{FLOPS, IComputer}
 
-class ComputerConstant(flopsFunc: () => Double) extends IComputer {
-  override def FLOPsPerTick: Double = flopsFunc()
+class ComputerConstant(flopsFunc: () => FLOPS) extends IComputer {
+  override def FLOPSPerTick: FLOPS = flopsFunc()
 
-  override def useFLOPS(flops: Double): Unit = {}
+  override def useFLOPS(flops: FLOPS): Unit = {}
 
   /**
    *

@@ -1,10 +1,31 @@
 package com.itszuvalex.femtocraft.api.computation
 
+/**
+ * Measurement of the heat energy in an object.
+ * Dependent on factors such as mass, a material's heat capacity, and the measure of energy in said object.
+ */
 trait Temperature {
+  /**
+   * Kelvin has a minimum of absolute 0.
+   *
+   * @return Kelvin measurement of this temperature.
+   */
   def kelvin: Double
 
+  /**
+   * Fahrenheit is useful as it represents a more human-sensitive scale.
+   * 0^o^F is very cold, whereas 100^o^F is very hot.
+   *
+   * @return Fahrenheit measurement of this temperature.
+   */
   def fahrenheit: Double
 
+  /**
+   * Celsius is an offset from Kelvin, slid to correspond to the states of water.
+   * 0^o^C is solid water, whereas 100^o^C is boiling water.
+   *
+   * @return Celsius measurement of this temperature.
+   */
   def celsius: Double
 
   def toKelvin: TemperatureKelvin = TemperatureKelvin(kelvin)

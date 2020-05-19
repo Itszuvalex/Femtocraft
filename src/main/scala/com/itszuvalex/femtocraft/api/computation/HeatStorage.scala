@@ -9,9 +9,9 @@ object HeatStorage {
   val ENERGY_NBT   = "en"
 }
 
-class HeatStorage(energyMaterial: IEnergyMaterial, var materialMass: Double, materialTemperature: Temperature) extends IHeatStorage with INBTSerializable[NBTTagCompound] {
+class HeatStorage(energyMaterial: IEnergyMaterial, var materialMass: Kg, materialTemperature: Temperature) extends IHeatStorage with INBTSerializable[NBTTagCompound] {
 
-  def this(energyMaterial: IEnergyMaterial, materialMass: Double, materialEnergy: Double) = this(
+  def this(energyMaterial: IEnergyMaterial, materialMass: Kg, materialEnergy: Joules) = this(
     energyMaterial, materialMass,
     Temperature.kelvin((materialEnergy / materialMass) / energyMaterial.heatCapacity)
     )
@@ -24,7 +24,7 @@ class HeatStorage(energyMaterial: IEnergyMaterial, var materialMass: Double, mat
    *
    * J = HeatCapacity * 1^o^C * Kg
    */
-  var energyInJoules: Double = energyMaterial.heatCapacity * temp.kelvin * materialMass
+  var energyInJoules: Joules = energyMaterial.heatCapacity * temp.kelvin * materialMass
 
   /**
    * HeatCapacity = J / Kg / 1^o^C
@@ -39,11 +39,11 @@ class HeatStorage(energyMaterial: IEnergyMaterial, var materialMass: Double, mat
    *
    * @return Returned in Kg
    */
-  override def mass: Double = materialMass
+  override def mass: Kg = materialMass
 
   override def material: IEnergyMaterial = energyMaterial
 
-  override def energy: Double = energyInJoules
+  override def energy: Joules = energyInJoules
 
   override def temperature: Temperature = temp
 

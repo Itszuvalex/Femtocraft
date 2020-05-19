@@ -165,11 +165,11 @@ class WirelessPowerNetwork() extends TileNetwork[IWirelessPowerNetworkNode, Wire
     }
   }
 
-  def producerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
+  private def producerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.PRODUCER)
 
-  def storageNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
+  private def storageNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.STORAGE)
 
-  def consumerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
+  private def consumerNodes = nodeMap.values.flatMap(_.storageNodes(false)).withFilter(_.storageType == PowerStorageNodeType.CONSUMER)
 
   override def onTakeover(iNetwork: WirelessPowerNetwork): Unit = {}
 

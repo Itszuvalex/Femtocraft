@@ -1,11 +1,11 @@
 package com.itszuvalex.femtocraft.computation
 
-import com.itszuvalex.femtocraft.api.computation.IComputer
+import com.itszuvalex.femtocraft.api.computation.{FLOPS, IComputer}
 
 class DynamicIComputer(dynFunc: () => IComputer) extends IComputer {
-  override def FLOPsPerTick: Double = dynFunc().FLOPsPerTick
+  override def FLOPSPerTick: FLOPS = dynFunc().FLOPSPerTick
 
-  override def useFLOPS(flops: Double): Unit = dynFunc().useFLOPS(flops)
+  override def useFLOPS(flops: FLOPS): Unit = dynFunc().useFLOPS(flops)
 
   /**
    *

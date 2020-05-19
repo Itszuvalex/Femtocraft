@@ -2,9 +2,9 @@ package com.itszuvalex.femtocraft.api.computation
 
 object IComputer {
   val Empty: IComputer = new IComputer {
-    override def FLOPsPerTick: Double = 0
+    override def FLOPSPerTick: FLOPS = 0
 
-    override def useFLOPS(flops: Double): Unit = {}
+    override def useFLOPS(flops: FLOPS): Unit = {}
 
     /**
      *
@@ -17,9 +17,9 @@ object IComputer {
 
 trait IComputer {
 
-  def FLOPsPerTick: Double
+  def FLOPSPerTick: FLOPS
 
-  def useFLOPS(flops: Double): Unit
+  def useFLOPS(flops: FLOPS): Unit
 
   /**
    *

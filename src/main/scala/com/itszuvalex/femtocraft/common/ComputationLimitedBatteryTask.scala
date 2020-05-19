@@ -12,7 +12,7 @@ abstract class ComputationLimitedBatteryTask(baseGoal: Double, minTicks: Int, ba
    */
   override def contribute(power: Double, speed: Double, efficiency: Double): Double = {
     val take      = Math.min(progressRemaining(efficiency), powerPerTick(speed, efficiency))
-    val compPerc  = if (comp.FLOPsRequired > 0) comp.FLOPs / comp.FLOPsRequired else 1d
+    val compPerc  = if (comp.FLOPSRequired > 0) comp.FLOPs / comp.FLOPSRequired else 1d
     val progPerc  = progress / adjustedMax(efficiency)
     val roomToCap   = (compPerc - progPerc) * adjustedMax(efficiency)
     val ret       = Math.min(power, math.min(take, roomToCap))

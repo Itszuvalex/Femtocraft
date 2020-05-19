@@ -1,7 +1,7 @@
 package com.itszuvalex.femtocraft.api.computation
 
 object IHeatStorage {
-  val defaultTemperature: Double = 300d
+  val defaultTemperature: Temperature = Temperature.kelvin(300d)
 }
 
 trait IHeatStorage {
@@ -15,27 +15,27 @@ trait IHeatStorage {
    *
    * @return Returned in Kg
    */
-  def mass: Double
+  def mass: Kg
 
   /**
    *
    * @return Amount of energy contained in this storage as calculated by the heatCapacity of the material, the mass of material, and the current temperature.
    */
-  def energy: Double
+  def energy: Joules
 
   /**
    *
    * @param energyToAdd Amount of energy to add
    * @return Amount of energy remaining out of energyToAdd
    */
-  def addEnergy(energyToAdd: Double): Double
+  def addEnergy(energyToAdd: Joules): Joules
 
   /**
    *
    * @param energyToRemove Amount of energy to remove
    * @return Amount of energy successfully removed.
    */
-  def removeEnergy(energyToRemove: Double): Double
+  def removeEnergy(energyToRemove: Joules): Joules
 
   /**
    *
