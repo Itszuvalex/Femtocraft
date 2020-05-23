@@ -2,9 +2,8 @@ package com.itszuvalex.femtocraft.api.computation
 
 object IComputer {
   val Empty: IComputer = new IComputer {
-    override def FLOPSPerTick: FLOPS = 0
 
-    override def useFLOPS(flops: FLOPS): Unit = {}
+    override def generateFLOPS(): FLOPS = 0
 
     /**
      *
@@ -17,15 +16,12 @@ object IComputer {
 
 trait IComputer {
 
-  def FLOPSPerTick: FLOPS
-
-  def useFLOPS(flops: FLOPS): Unit
+  def generateFLOPS(): FLOPS
 
   /**
    *
-   * @return FLOPS / Energy cost per flop.  Higher efficiency computers are used before lower efficiency computers.
+   * @return FLOPS / Power cost per flop.  Higher efficiency computers are used before lower efficiency computers.
    *         This should be dynamic - so throttled computers should return lower if they use generate fewer flops for the same power.
    */
   def efficiency: Double
-
 }

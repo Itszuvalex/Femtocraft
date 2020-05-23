@@ -3,9 +3,8 @@ package com.itszuvalex.femtocraft.computation
 import com.itszuvalex.femtocraft.api.computation.{FLOPS, IComputer}
 
 class ComputerConstant(flopsFunc: () => FLOPS) extends IComputer {
-  override def FLOPSPerTick: FLOPS = flopsFunc()
 
-  override def useFLOPS(flops: FLOPS): Unit = {}
+  override def generateFLOPS(): FLOPS = flopsFunc()
 
   /**
    *

@@ -8,15 +8,32 @@ class TestComputationDistributionAlgorithm extends TestBase {
   "A ComputationDistributionAlgorithm" should {
     "when distributing" should {
       "prioritize higher efficiency computers" in {
-        val comp1      = new TestComputer(1000d, Double.MaxValue)
-        val comp2      = new TestComputer(1000d, 0d)
+        val comp1      = new TestComputer(500d, Double.MaxValue)
+        val comp2      = new TestComputer(1000d, 5d)
+        val comp3      = new TestComputer(1000d, 1d)
+
+        val job = new TestJob(750d, 750d)
+
+        new ComputationDistributionAlgorithm(Seq(comp1, comp2, comp3), Seq(job)).distribute()
+
+        comp1.usedFlops shouldBe 500d
+        comp2.usedFlops shouldBe 1000d
+        comp3.usedFlops shouldBe 0d
+        job.FLOPSRemaining shouldBe 0d
+      }
+
+      "respect job max contributable" in {
+        val comp1      = new TestComputer(500d, Double.MaxValue)
+        val comp2      = new TestComputer(1000d, 5d)
+        val comp3      = new TestComputer(1000d, 1d)
 
         val job = new TestJob(750d, 500d)
 
-        new ComputationDistributionAlgorithm(Seq(comp1, comp2), Seq(job)).distribute()
+        new ComputationDistributionAlgorithm(Seq(comp1, comp2, comp3), Seq(job)).distribute()
 
         comp1.usedFlops shouldBe 500d
         comp2.usedFlops shouldBe 0d
+        comp3.usedFlops shouldBe 0d
         job.FLOPSRemaining shouldBe 250d
       }
 
@@ -33,10 +50,11 @@ class TestComputationDistributionAlgorithm extends TestBase {
 
         new ComputationDistributionAlgorithm(Seq(comp), jobs).distribute()
 
-        comp.usedFlops shouldBe comp.FLOPSPerTick
+        comp.usedFlops shouldBe 5000d
 
-        jobs.map(_.FLOPs).sum shouldBe comp.FLOPSPerTick
+        jobs.map(_.FLOPs).sum shouldBe 5000d
       }
+
 
       "use multiple computers to power one job" in {
         val comp1 = new TestComputer(1000d, 0d)
@@ -59,8 +77,12 @@ class TestComputationDistributionAlgorithm extends TestBase {
   class TestComputer(val flops: Double, e: Double) extends ComputerConstant(() => flops) {
     var usedFlops = 0d
 
-    override def useFLOPS(flops: Double): Unit = usedFlops += flops
 
+    override def generateFLOPS(): FLOPS = {
+      val s = super.generateFLOPS()
+      usedFlops += s
+      s
+    }
     override def efficiency: Double = e
   }
 

@@ -3,9 +3,8 @@ package com.itszuvalex.femtocraft.computation
 import com.itszuvalex.femtocraft.api.computation.{FLOPS, IComputer}
 
 class DynamicIComputer(dynFunc: () => IComputer) extends IComputer {
-  override def FLOPSPerTick: FLOPS = dynFunc().FLOPSPerTick
 
-  override def useFLOPS(flops: FLOPS): Unit = dynFunc().useFLOPS(flops)
+  override def generateFLOPS(): FLOPS = dynFunc().generateFLOPS()
 
   /**
    *

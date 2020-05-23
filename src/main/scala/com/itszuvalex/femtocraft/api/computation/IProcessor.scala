@@ -2,9 +2,11 @@ package com.itszuvalex.femtocraft.api.computation
 
 import com.itszuvalex.femtocraft.api.power.DEPower
 
+case class ProcessorTick(flops: FLOPS, power: DEPower, energy: Joules)
+
 /**
  * Trait for processor [[com.itszuvalex.itszulib.api.core.Module Module]]/[[net.minecraftforge.common.capabilities.Capability Capability]]
- * This is intended for [[net.minecraft.item.ItemStack]] module return in [[net.minecraft.item.ItemStack#getCapability]].
+ * This is intended for [[net.minecraft.item.ItemStack ItemStack]] module return in [[net.minecraft.item.ItemStack#getCapability ItemStack#GetCapability]].
  *
  * Processors should
  *
@@ -14,20 +16,27 @@ import com.itszuvalex.femtocraft.api.power.DEPower
  */
 trait IProcessor {
 
-  def maxPower(temperature: Temperature): DEPower
+  /**
+   *
+   * @param temperature Temperature of the processor
+   * @param power       Power available for ticking
+   * @return The results of ticking this processor at this temperature.
+   */
+  def tick(temperature: Temperature, power: DEPower, simulate: Boolean): ProcessorTick
+
+  /**
+   * Utility function so that you don't have to try and parse archaic [[com.itszuvalex.femtocraft.api.computation.ProcessorTick ProcessorTick]] results of a throttled processor.
+   *
+   * @param temperature Temperature of the processor
+   * @param power       Power available for ticking
+   * @return True if this processor can be ticked.
+   */
+  def canTick(temperature: Temperature, power: DEPower): Boolean
 
   /**
    *
-   * @param temperature Current temperature of the processor
-   * @return Number of FLOPs that would be generated per tick given temperature
+   * @param temperature Temperature of the processor
+   * @return Efficiency rating of this processor at this temperature.
    */
-  def FLOPS(temperature: Temperature): FLOPS
-
-  /**
-   *
-   * @param temperature Current temperature of the processor
-   * @return Energy in J that would be generated per tick given temperature
-   */
-  def EnergyPerTick(temperature: Temperature): Joules
-
+  def efficiency(temperature: Temperature): Double
 }
