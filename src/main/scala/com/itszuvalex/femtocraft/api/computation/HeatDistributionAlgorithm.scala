@@ -33,7 +33,7 @@ class HeatDistributionAlgorithm(val generators: Seq[IHeatStorage], val distribut
       removed
     }.sum
 
-    var tempDifferentialInKelvin = 0
+    var tempDifferentialInKelvin = 0d
     if (sortedSinks.size == 1) {
       sortedSinks.head.heatStorage.addEnergy(energyFromGens)
     }

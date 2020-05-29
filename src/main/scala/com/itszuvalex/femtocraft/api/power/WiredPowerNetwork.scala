@@ -1,7 +1,8 @@
 package com.itszuvalex.femtocraft.api.power
 
-import com.itszuvalex.femtocraft.api.{DistributableBattery, DistributionAlgorithm, IConduitTier, ManagerModules}
+import com.itszuvalex.femtocraft.api._
 import com.itszuvalex.itszulib.api.core.IModule
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import net.minecraft.util.EnumFacing
 
@@ -29,8 +30,14 @@ class WiredPowerNetwork(tier: IConduitTier) extends TileNetwork[IWiredPowerNode,
   }
 
   override def onTickEnd(): Unit = {
+    val nodes = new mutable.ArrayBuffer[IWiredPowerLeafNode]()
+
+    NetworkNodeVisitor(nodeMap.iterator).withNeighborFilter((node, _, facing) => node.isConnectedWiredPower(facing)).withVisitor({
+      case (tile: ITileEntity, facing: EnumFacing) if tile.hasModule(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite) =>
+        Option(tile.getModule(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite)).map(nodes += _)
+    }).visit()
+
     try {
-      val nodes = getLeafNodes
       new DistributionAlgorithm(nodes.withFilter(_.powerType == PowerStorageNodeType.PRODUCER).map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq,
                                 nodes.withFilter(_.powerType == PowerStorageNodeType.STORAGE).map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq,
                                 nodes.withFilter(_.powerType == PowerStorageNodeType.CONSUMER).map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq)
@@ -38,15 +45,5 @@ class WiredPowerNetwork(tier: IConduitTier) extends TileNetwork[IWiredPowerNode,
     } catch {
       case _: Throwable =>
     }
-  }
-
-  def getLeafNodes: mutable.Set[IWiredPowerLeafNode] = {
-    val hashSet = new mutable.HashSet[IWiredPowerLeafNode]()
-    nodeMap.foreach { node =>
-      EnumFacing.VALUES.filter(node._2.isConnectedWiredPower).foreach { facing =>
-        node._1.getOffset(facing).getITileEntity().flatMap(_.moduleOption(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite)).foreach(hashSet += _)
-      }
-    }
-    hashSet
   }
 }
