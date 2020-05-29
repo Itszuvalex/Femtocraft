@@ -22,7 +22,7 @@ class HeatDistributionAlgorithm(val generators: Seq[IHeatStorage], val distribut
     val sinksMaxTemp = Temperature.kelvin(sinkTemps.max)
 
     // Only take heat from generators above the sink average temp.
-    val filteredGens = generators.filter(_.temperature.kelvin >= sinksAvgTemp.kelvin)
+    val filteredGens = sortedGen.filter(_.temperature.kelvin >= sinksAvgTemp.kelvin)
 
     var energyRemainingToRemove = energyCap
     val energyFromGens          = filteredGens.map { g =>

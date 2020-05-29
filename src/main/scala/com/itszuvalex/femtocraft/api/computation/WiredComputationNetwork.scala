@@ -1,11 +1,12 @@
 package com.itszuvalex.femtocraft.api.computation
 
-import com.itszuvalex.femtocraft.api.{IConduitTier, ManagerModules}
+import com.itszuvalex.femtocraft.api.{IConduitTier, ManagerModules, NetworkNodeVisitor}
 import com.itszuvalex.itszulib.api.core.IModule
+import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.logistics.{ManagerNetwork, TileNetwork}
 import net.minecraft.util.EnumFacing
 
-import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class WiredComputationNetwork(tier: IConduitTier) extends TileNetwork[IWiredComputationNode, WiredComputationNetwork](ManagerNetwork.instance.getNextID) {
   override def networkModule: IModule[IWiredComputationNode] = ManagerModules.TILE_WIRED_COMPUTATION_NODE
@@ -30,23 +31,19 @@ class WiredComputationNetwork(tier: IConduitTier) extends TileNetwork[IWiredComp
 
   override def onTickEnd(): Unit = {
     try {
-      val nodes = getLeafNodes
-      val computers = new mutable.HashSet[IComputer]() ++ nodes.view.flatMap(_.computers)
-      val jobs = new mutable.HashSet[IComputationJob]() ++ nodes.view.flatMap(_.jobs)
-      new ComputationDistributionAlgorithm(computers.toSeq, jobs.toSeq)
+      val nodes = new ArrayBuffer[IWiredComputationLeafNode]()
+
+      NetworkNodeVisitor(nodeMap.iterator).withNeighborFilter((node, _, facing) => node.isConnectedWiredComputation(facing)).withVisitor({
+        case (tile: ITileEntity, facing: EnumFacing) if tile.hasModule(ManagerModules.TILE_WIRED_COMPUTATION_LEAF_NODE, facing.getOpposite) =>
+          Option(tile.getModule(ManagerModules.TILE_WIRED_COMPUTATION_LEAF_NODE, facing.getOpposite)).map(nodes += _)
+      }).visit()
+
+      val computers = nodes.view.flatMap(_.computers)
+      val jobs      = nodes.view.flatMap(_.jobs)
+      new ComputationDistributionAlgorithm(computers, jobs)
         .distribute()
     } catch {
       case _: Throwable =>
     }
-  }
-
-  def getLeafNodes: mutable.Set[IWiredComputationLeafNode] = {
-    val hashSet = new mutable.HashSet[IWiredComputationLeafNode]()
-    nodeMap.foreach { node =>
-      EnumFacing.VALUES.filter(node._2.isConnectedWiredComputation).foreach { facing =>
-        node._1.getOffset(facing).getITileEntity().flatMap(_.moduleOption(ManagerModules.TILE_WIRED_COMPUTATION_LEAF_NODE, facing.getOpposite)).foreach(hashSet += _)
-      }
-    }
-    hashSet
   }
 }

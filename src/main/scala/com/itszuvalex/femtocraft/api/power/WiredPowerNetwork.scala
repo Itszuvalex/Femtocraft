@@ -32,15 +32,15 @@ class WiredPowerNetwork(tier: IConduitTier) extends TileNetwork[IWiredPowerNode,
   override def onTickEnd(): Unit = {
     val nodes = new mutable.ArrayBuffer[IWiredPowerLeafNode]()
 
-    NetworkNodeVisitor(nodeMap.iterator).withNeighborFilter((node, _, facing) => node.isConnectedWiredPower(facing)).withVisitor({
-      case (tile: ITileEntity, facing: EnumFacing) if tile.hasModule(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite) =>
-        Option(tile.getModule(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite)).map(nodes += _)
-    }).visit()
-
     try {
-      new DistributionAlgorithm(nodes.withFilter(_.powerType == PowerStorageNodeType.PRODUCER).map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq,
-                                nodes.withFilter(_.powerType == PowerStorageNodeType.STORAGE).map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq,
-                                nodes.withFilter(_.powerType == PowerStorageNodeType.CONSUMER).map(n => DistributableBattery(n.battery, n.transferRate _)).toSeq)
+      NetworkNodeVisitor(nodeMap.iterator).withNeighborFilter((node, _, facing) => node.isConnectedWiredPower(facing)).withVisitor({
+        case (tile: ITileEntity, facing: EnumFacing) if tile.hasModule(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite) =>
+          Option(tile.getModule(ManagerModules.TILE_WIRED_POWER_LEAF_NODE, facing.getOpposite)).map(nodes += _)
+      }).visit()
+
+      new DistributionAlgorithm(nodes.withFilter(_.powerType == PowerStorageNodeType.PRODUCER).map(n => DistributableBattery(n.battery, n.transferRate _)),
+                                nodes.withFilter(_.powerType == PowerStorageNodeType.STORAGE).map(n => DistributableBattery(n.battery, n.transferRate _)),
+                                nodes.withFilter(_.powerType == PowerStorageNodeType.CONSUMER).map(n => DistributableBattery(n.battery, n.transferRate _)))
         .distribute()
     } catch {
       case _: Throwable =>
