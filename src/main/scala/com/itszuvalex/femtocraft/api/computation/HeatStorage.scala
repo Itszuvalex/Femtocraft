@@ -9,7 +9,7 @@ object HeatStorage {
   val ENERGY_NBT   = "en"
 }
 
-class HeatStorage(energyMaterial: IEnergyMaterial, var materialMass: Kg, materialTemperature: Temperature) extends IHeatStorage with INBTSerializable[NBTTagCompound] {
+class HeatStorage(energyMaterial: IEnergyMaterial, val materialMass: Kg, materialTemperature: Temperature) extends IHeatStorage with INBTSerializable[NBTTagCompound] {
 
   def this(energyMaterial: IEnergyMaterial, materialMass: Kg, materialEnergy: Joules) = this(
     energyMaterial, materialMass,
@@ -72,15 +72,11 @@ class HeatStorage(energyMaterial: IEnergyMaterial, var materialMass: Kg, materia
 
   override def serializeNBT(): NBTTagCompound = {
     val nbt = new NBTTagCompound
-    nbt.setString(HeatStorage.MATERIAL_NBT, material.name)
-    nbt.setDouble(HeatStorage.MASS_NBT, mass)
     nbt.setDouble(HeatStorage.ENERGY_NBT, energy)
     nbt
   }
 
   override def deserializeNBT(nbt: NBTTagCompound): Unit = {
-    mat = EnergyMaterialRegistry.getMaterial(nbt.getString(HeatStorage.MATERIAL_NBT))
-    materialMass = nbt.getDouble(HeatStorage.MASS_NBT)
     energyInJoules = nbt.getDouble(HeatStorage.ENERGY_NBT)
     calculateTemperature()
   }
