@@ -18,8 +18,8 @@ import net.minecraftforge.registries.IForgeRegistry
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
-  */
+ * Created by Christopher Harris (Itszuvalex) on 5/3/15.
+ */
 object FemtoBlocks {
 
 
@@ -29,38 +29,39 @@ object FemtoBlocks {
 
 
   // V3 blocks
-  var blockCrystalFurnace: Block = _
-  var blockCrystalCrusher: Block = _
-  var blockReformer: Block = _
-  var blockFabricator: Block = _
-  var blockCircuitPrinter: Block = _
-  var blockFocusingPedestal: Block = _
-  var blockFocusingChamber: Block = _
-  var blockForge: Block = _
-  var blockExtractor: Block = _
+  var blockCrystalFurnace           : Block = _
+  var blockCrystalCrusher           : Block = _
+  var blockReformer                 : Block = _
+  var blockFabricator               : Block = _
+  var blockCircuitPrinter           : Block = _
+  var blockFocusingPedestal         : Block = _
+  var blockFocusingChamber          : Block = _
+  var blockForge                    : Block = _
+  var blockExtractor                : Block = _
   //var blockCrystalChargingArray: Block = _
-  var blockCrystalGrowthChamber: Block = _
-  var blockDarkPanel: Block = _
-  var blockCrystalStorageBuffer: Block = _
-  var blockCrystalStorageMatrix: Block = _
-  var blockThermoelectricGenerator: Block = _
-  var blockCrystalReceiverMatrix: Block = _
-  var blockCrystalProjectionMatrix: Block = _
-  var blockItemVault: Block = _
-  var blockFluidReservoir: Block = _
-  var blockNaniteBehaviorModeller: Block = _
-  var blockNaniteHive: Block = _
-  var blockNaniteHoldingTank: Block = _
-  var blockArchiveInterface: Block = _
+  var blockCrystalGrowthChamber     : Block = _
+  var blockDarkPanel                : Block = _
+  var blockCrystalStorageBuffer     : Block = _
+  var blockCrystalStorageMatrix     : Block = _
+  var blockThermoelectricGenerator  : Block = _
+  var blockCrystalReceiverMatrix    : Block = _
+  var blockCrystalProjectionMatrix  : Block = _
+  var blockItemVault                : Block = _
+  var blockFluidReservoir           : Block = _
+  var blockNaniteBehaviorModeller   : Block = _
+  var blockNaniteHive               : Block = _
+  var blockNaniteHoldingTank        : Block = _
+  var blockArchiveInterface         : Block = _
   var blockMainframe                : Block = _
   var blockComputationConduitCrystal: Block = _
   var blockHeatAirDucting           : Block = _
-  var blockHeatAirRadiator: Block = _
-  var blockHeatAirFan: Block = _
-  var blockNaniteRepository      : Block = _
-  var blockItemRepository        : Block = _
-  var blockFluidRepository       : Block = _
-  var blockPowerConduitCrystal : Block = _
+  var blockHeatAirRadiator          : Block = _
+  var blockHeatAirFan               : Block = _
+  var blockNaniteRepository         : Block = _
+  var blockItemRepository           : Block = _
+  var blockFluidRepository          : Block = _
+  var blockPowerConduitCrystal      : Block = _
+  var blockCrystalFocusingChamber   : Block = _
   // End V3
 
   //Cyber
@@ -135,6 +136,8 @@ object FemtoBlocks {
 
     blockPowerConduitCrystal = registerBlock(registry, new BlockPowerConduitCrystal, "blockPowerConduitCrystal")
 
+    blockCrystalFocusingChamber = registerBlock(registry, new BlockCrystalFocusingChamber, "blockCrystalFocusingChamber")
+
     //tests
 
     testBlock = registerBlock(registry, new BlockTest, "testBlock")
@@ -184,6 +187,7 @@ object FemtoBlocks {
     blockCrystalHeatExchanger.registerModel()
     blockConduit.registerModel()
     blockPowerConduitCrystal.registerModel()
+    blockCrystalFocusingChamber.registerModel()
     blockGerminationChamber.registerModel()
 
     //

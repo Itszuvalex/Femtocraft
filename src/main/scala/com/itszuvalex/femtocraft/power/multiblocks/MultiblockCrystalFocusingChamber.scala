@@ -1,8 +1,10 @@
 package com.itszuvalex.femtocraft.power.multiblocks
 
+import com.itszuvalex.femtocraft.FemtoBlocks
 import com.itszuvalex.femtocraft.industry.RectangularSimpleFrameMultiblock
 import com.itszuvalex.femtocraft.power.multiblocks.MultiblockCrystalFocusingChamber.{xSize, ySize, zSize}
-import com.itszuvalex.itszulib.api.wrappers.{IBlock, IItemStack}
+import com.itszuvalex.femtocraft.render.RenderIDs
+import com.itszuvalex.itszulib.api.wrappers.{Converter, IBlock, IItemStack}
 
 object MultiblockCrystalFocusingChamber {
   val xSize = 2
@@ -17,11 +19,11 @@ class MultiblockCrystalFocusingChamber extends RectangularSimpleFrameMultiblock 
 
   override def getAllowedFrameTypes: Array[String] = Array("Basic")
 
-  override def blockType: IBlock = ???
+  override def blockType: IBlock = Converter.IBlockFromBlock(FemtoBlocks.blockCrystalFocusingChamber)
 
-  override def getRequiredResources: IndexedSeq[IItemStack] = Array()
+  override def getRequiredResources: IndexedSeq[IItemStack] = Array[IItemStack]()
 
   override def size: (Int, Int, Int) = (xSize, ySize, zSize)
 
-  override def multiblockRenderID: Int = ???
+  override def multiblockRenderID: Int = RenderIDs.multiblockCrystalFocusingChamberID
 }

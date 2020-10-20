@@ -1,12 +1,13 @@
 package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.industry.multiblocks.MultiblockGerminationChamber
+import com.itszuvalex.femtocraft.power.multiblocks.MultiblockCrystalFocusingChamber
 
 import scala.collection._
 
 /**
-  * Created by Christopher on 8/26/2015.
-  */
+ * Created by Christopher on 8/26/2015.
+ */
 object FrameMultiblockRegistry {
   private val frameMap = mutable.HashMap[String, IFrameMultiblock]()
 
@@ -16,6 +17,7 @@ object FrameMultiblockRegistry {
 
   def init(): Unit = {
     registerMultiblock(new MultiblockGerminationChamber)
+    registerMultiblock(new MultiblockCrystalFocusingChamber)
     /*
     registerMultiblock(new MultiblockReformer)
     registerMultiblock(new MultiblockFabricator)

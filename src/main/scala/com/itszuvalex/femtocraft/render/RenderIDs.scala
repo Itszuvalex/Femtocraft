@@ -1,8 +1,8 @@
 package com.itszuvalex.femtocraft.render
 
 /**
-  * Created by Christopher on 8/26/2015.
-  */
+ * Created by Christopher on 8/26/2015.
+ */
 object RenderIDs {
 
 
@@ -13,10 +13,11 @@ object RenderIDs {
   var itemShiftPreviewableID  = 0
 
   //Multiblock IDs
-  var multiblockArcFurnaceID   = 0
-  var multiblockCentrifugeID   = 0
-  var multiblockCrystallizerID = 0
-  var multiblockFurnaceID      = 0
+  var multiblockArcFurnaceID             = 0
+  var multiblockCentrifugeID             = 0
+  var multiblockCrystallizerID           = 0
+  var multiblockFurnaceID                = 0
+  var multiblockCrystalFocusingChamberID = 0
 
   //Cyber Machine IDs
   var germinationChamberID    = 0

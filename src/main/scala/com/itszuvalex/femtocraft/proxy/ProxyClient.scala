@@ -184,6 +184,8 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockConduit), 0, classOf[TileConduit])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockPowerConduitCrystal), 0, classOf[TilePowerConduitCrystal])
 
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalFocusingChamber), 0, classOf[TileCrystalFocusingChamber])
+
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalFurnace), 0, classOf[TileCrystalFurnace])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalCrusher), 0, classOf[TileCrystalCrusher])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockComputationConduitCrystal), 0, classOf[TileComputationConduitCrystal])
@@ -200,6 +202,7 @@ class ProxyClient extends ProxyCommon {
     val germinationChamberRenderer = new MultiblockGerminationChamberRenderer
     RenderIDs.germinationChamberID = FrameMultiblockRendererRegistry.bindRenderer(germinationChamberRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGerminationChamber], germinationChamberRenderer)
+//    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalFocusingChamber], germinationChamberRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], new CrystalMountRenderer)
 
