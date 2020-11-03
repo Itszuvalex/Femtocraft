@@ -2,7 +2,7 @@ package com.itszuvalex.femtocraft.api.computation
 
 import com.itszuvalex.femtocraft.api.power.DEPower
 
-case class ProcessorTick(flops: FLOPS, power: DEPower, energy: Joules)
+case class ProcessorTick(flops: FLOPS, power: DEPower)
 
 /**
  * Trait for processor [[com.itszuvalex.itszulib.api.core.Module Module]]/[[net.minecraftforge.common.capabilities.Capability Capability]]
@@ -18,25 +18,22 @@ trait IProcessor {
 
   /**
    *
-   * @param temperature Temperature of the processor
    * @param power       Power available for ticking
    * @return The results of ticking this processor at this temperature.
    */
-  def tick(temperature: Temperature, power: DEPower, simulate: Boolean): ProcessorTick
+  def tick(power: DEPower, simulate: Boolean): ProcessorTick
 
   /**
    * Utility function so that you don't have to try and parse archaic [[com.itszuvalex.femtocraft.api.computation.ProcessorTick ProcessorTick]] results of a throttled processor.
    *
-   * @param temperature Temperature of the processor
    * @param power       Power available for ticking
    * @return True if this processor can be ticked.
    */
-  def canTick(temperature: Temperature, power: DEPower): Boolean
+  def canTick(power: DEPower): Boolean
 
   /**
    *
-   * @param temperature Temperature of the processor
    * @return Efficiency rating of this processor at this temperature.
    */
-  def efficiency(temperature: Temperature): Double
+  def efficiency(): Double
 }

@@ -2,20 +2,18 @@ package com.itszuvalex.femtocraft.api.computation
 
 import com.itszuvalex.itszulib.api.storage.IBattery
 
-class MultiProcessorComputer(val battery: IBattery, val heat: IHeatStorage, val processors: Seq[IProcessor]) extends IComputer {
+class MultiProcessorComputer(val battery: IBattery, val processors: Seq[IProcessor]) extends IComputer {
 
 
   override def generateFLOPS(): FLOPS = {
     // Do not cache power as they can run out of power mid-tick.
-    val temp  = heat.temperature // Cache temperature just because it's easier and I don't want processors to throttle mid-tick
     var flops = 0d
 
     // Always use most efficient processor first.
-    processors.sortWith(_.efficiency(temp) < _.efficiency(temp)).foreach { p =>
-      if (p.canTick(temp, battery.storage)) {
-        val result = p.tick(temp, battery.storage, simulate = false)
+    processors.sortWith(_.efficiency() < _.efficiency()).foreach { p =>
+      if (p.canTick(battery.storage)) {
+        val result = p.tick(battery.storage, simulate = false)
         battery.drain(result.power)
-        heat.addEnergy(result.energy)
         flops += result.flops
       }
     }
@@ -29,15 +27,14 @@ class MultiProcessorComputer(val battery: IBattery, val heat: IHeatStorage, val 
    */
   override def efficiency: Double = {
     // Do not cache power as they can run out of power mid-tick.
-    val temp    = heat.temperature // Cache temperature just because it's easier and I don't want processors to throttle mid-tick
     var storage = battery.storage
 
     // Always use most efficient processor first.
-    val flopefficiencymap = processors.sortWith(_.efficiency(temp) < _.efficiency(temp)).flatMap { p =>
-      if (p.canTick(temp, storage)) {
-        val result = p.tick(temp, storage, simulate = true)
+    val flopefficiencymap = processors.sortWith(_.efficiency() < _.efficiency()).flatMap { p =>
+      if (p.canTick(storage)) {
+        val result = p.tick(storage, simulate = true)
         storage -= result.power
-        Some((result.flops, p.efficiency(temp)))
+        Some((result.flops, p.efficiency()))
       }
       else None
     }
