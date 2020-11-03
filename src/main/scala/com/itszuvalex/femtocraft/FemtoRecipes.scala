@@ -36,5 +36,6 @@ object FemtoRecipes {
     SynthesizerRegistry.postInit()
     NaniteInfusionRecipeRegistry.postInit()
     GerminationChamberRecipeRegistry.postInit()
+    LiquifierRecipeRegistry.postInit()
   }
 }

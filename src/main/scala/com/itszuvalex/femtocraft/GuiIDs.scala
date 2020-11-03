@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft
 import net.minecraft.util.EnumFacing
 
 /**
-  * Created by Christopher on 9/1/2015.
-  */
+ * Created by Christopher on 9/1/2015.
+ */
 object GuiIDs {
 
 
@@ -25,19 +25,20 @@ object GuiIDs {
   val TileNaniteInfuserID              = nextID
   val TileCrystalChargingArrayID       = nextID
   val TileCrystalStorageArrayID        = nextID
-  val TileCrystalHeatExchangerID = nextID
-  val TileWirelessPowerNetworkID = nextID
-  val TileConduitID              = nextID
+  val TileCrystalHeatExchangerID       = nextID
+  val TileWirelessPowerNetworkID       = nextID
+  val TileConduitID                    = nextID
 
-  val TileConduitSideID = nextID
+  val TileConduitSideID          = nextID
   val TileSidedInventoryConfigID = nextID
   val TileSidedNaniteConfigID    = nextID
   val TileSidedFluidConfigID     = nextID
   val TileGerminationChamberID   = nextID
 
   //
-  val TileCrystalFurnaceID = nextID
-  val TileCrystalCrusherID = nextID
+  val TileCrystalFurnaceID   = nextID
+  val TileCrystalCrusherID   = nextID
+  val TileCrystalLiquifierID = nextID
 
   val ItemNanoPackID = nextID
 

@@ -94,6 +94,7 @@ class ProxyCommon {
     GameRegistry.registerTileEntity(classOf[TileCrystalFurnace], "TileCrystalFurnace")
     GameRegistry.registerTileEntity(classOf[TileCrystalCrusher], "TileCrystalCrusher")
     GameRegistry.registerTileEntity(classOf[TileComputationConduitCrystal], "TileComputationConduitCrystal")
+    GameRegistry.registerTileEntity(classOf[TileCrystalLiquifier], "TileCrystalLiquifier")
   }
 
   def registerTickHandlers() {

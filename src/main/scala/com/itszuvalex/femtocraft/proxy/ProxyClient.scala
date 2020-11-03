@@ -189,6 +189,7 @@ class ProxyClient extends ProxyCommon {
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalFurnace), 0, classOf[TileCrystalFurnace])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalCrusher), 0, classOf[TileCrystalCrusher])
     ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockComputationConduitCrystal), 0, classOf[TileComputationConduitCrystal])
+    ForgeHooksClient.registerTESRItemStack(Item.getItemFromBlock(Femtocraft.blocks.blockCrystalLiquifier), 0, classOf[TileCrystalLiquifier])
 
     //
     RenderIDs.framePreviewableID = PreviewableRendererRegistry.bindRenderer(new FramePreviewableRenderer)
@@ -202,7 +203,7 @@ class ProxyClient extends ProxyCommon {
     val germinationChamberRenderer = new MultiblockGerminationChamberRenderer
     RenderIDs.germinationChamberID = FrameMultiblockRendererRegistry.bindRenderer(germinationChamberRenderer)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileGerminationChamber], germinationChamberRenderer)
-//    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalFocusingChamber], germinationChamberRenderer)
+    //    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalFocusingChamber], germinationChamberRenderer)
 
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalMount], new CrystalMountRenderer)
 
@@ -229,6 +230,7 @@ class ProxyClient extends ProxyCommon {
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalFurnace], new CrystalFurnaceRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalCrusher], new CrystalCrusherRender)
     ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileComputationConduitCrystal], new ComputationConduitRenderer)
+    ClientRegistry.bindTileEntitySpecialRenderer(classOf[TileCrystalLiquifier], new CrystalLiquifierRender)
 
     //    MinecraftForgeClient.registerItemRenderer(FemtoItems.itemFrame, new FrameItemRenderer)
 

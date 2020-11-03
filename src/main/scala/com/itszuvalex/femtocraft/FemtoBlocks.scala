@@ -62,6 +62,7 @@ object FemtoBlocks {
   var blockFluidRepository          : Block = _
   var blockPowerConduitCrystal      : Block = _
   var blockCrystalFocusingChamber   : Block = _
+  var blockCrystalLiquifier         : Block = _
   // End V3
 
   //Cyber
@@ -149,6 +150,7 @@ object FemtoBlocks {
     blockCrystalFurnace = registerBlock(registry, new BlockCrystalFurnace(), "blockCrystalFurnace")
     blockCrystalCrusher = registerBlock(registry, new BlockCrystalCrusher(), "blockCrystalCrusher")
     blockComputationConduitCrystal = registerBlock(registry, new BlockComputationConduitCrystal, "blockComputationConduitCrystal")
+    blockCrystalLiquifier = registerBlock(registry, new BlockCrystalLiquifier, "blockCrystalLiquifier")
 
     blockCallbacks.foreach(_ ())
     blockCallbacks.clear()
@@ -194,6 +196,7 @@ object FemtoBlocks {
     blockCrystalFurnace.registerModel()
     blockCrystalCrusher.registerModel()
     blockComputationConduitCrystal.registerModel()
+    blockCrystalLiquifier.registerModel()
   }
 
   def postInit(): Unit = {

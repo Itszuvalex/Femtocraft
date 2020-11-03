@@ -14,6 +14,7 @@ object FemtoFluids {
   var gelDumb : Fluid = null
   var gelPower: Fluid = null
 
+  var slurryGritty : Fluid = /*TODO*/ FluidRegistry.WATER
 
   def preInit(): Unit = {
 
