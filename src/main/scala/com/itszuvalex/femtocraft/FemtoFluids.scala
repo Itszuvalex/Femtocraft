@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft
 import net.minecraftforge.fluids.{Fluid, FluidRegistry}
 
 /**
-  * Created by Christopher Harris (Itszuvalex) on 5/3/15.
-  */
+ * Created by Christopher Harris (Itszuvalex) on 5/3/15.
+ */
 object FemtoFluids {
 
   val cybermass = /*TODO: Implement fluid*/ FluidRegistry.WATER
@@ -14,14 +14,15 @@ object FemtoFluids {
   var gelDumb : Fluid = null
   var gelPower: Fluid = null
 
-  var slurryGritty : Fluid = /*TODO*/ FluidRegistry.WATER
+  val slurryGrittyName    = "slurryGritty"
+  var slurryGritty: Fluid = _
 
   def preInit(): Unit = {
-
+    slurryGritty = new Fluid(slurryGrittyName, Resources.Femtocraft("blocks/blockgrittyslurry_still"), Resources.Femtocraft("blocks/blockgrittyslurry_flow"))
   }
 
   def init(): Unit = {
-
+    FluidRegistry.registerFluid(slurryGritty)
   }
 
   def postInit(): Unit = {

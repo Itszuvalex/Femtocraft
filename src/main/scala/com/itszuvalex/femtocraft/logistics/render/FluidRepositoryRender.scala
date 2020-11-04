@@ -8,6 +8,7 @@ import com.itszuvalex.itszulib.api.ItszuLibModules
 import com.itszuvalex.itszulib.api.wrappers.ITileEntity
 import com.itszuvalex.itszulib.core.behaviors.BlockBehaviorHorizontalFacing
 import com.itszuvalex.itszulib.render.{RenderUtils, TileEntityRenderCube}
+import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumFacing
 import org.lwjgl.opengl.GL11
 
@@ -56,9 +57,9 @@ class FluidRepositoryRender extends TileEntityRenderCube[TileFluidRepository](Fe
     val fluidStack = Option(te).filter(_.hasModule(ItszuLibModules.FLUID_STORAGE, null)).map(_.getModule(ItszuLibModules.FLUID_STORAGE, null).head).orNull
     if (fluidStack != null && !fluidStack.isEmpty) {
       RenderUtils.bindBlockTextures()
-      val block = fluidStack.fluid.getBlock
       RenderUtils.glMatrixBlock {
-        val sprite = RenderUtils.getDefaultTextureForBlock(block)
+        val resource = fluidStack.fluid.getStill(fluidStack.toMinecraft)
+        val sprite   = Minecraft.getMinecraft.getTextureMapBlocks.getAtlasSprite(resource.toString)
         GL11.glColor4f(1f, 1f, 1f, 1f)
         EnumFacing.VALUES.foreach { face =>
           RenderUtils.drawArbitraryFace(x.toFloat, y.toFloat, z.toFloat,

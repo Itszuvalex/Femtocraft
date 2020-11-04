@@ -260,5 +260,7 @@ class ProxyClient extends ProxyCommon {
   @SubscribeEvent
   def handleTextureStitchPreEvent(event: TextureStitchEvent.Pre): Unit = {
     ProxyClient.TEXTURE_RIFT_BILLBOARD = event.getMap.registerSprite(Resources.Femtocraft("rift_billboard"))
+    event.getMap.registerSprite(Resources.Femtocraft("blocks/blockgrittyslurry_still"))
+    event.getMap.registerSprite(Resources.Femtocraft("blocks/blockgrittyslurry_flow"))
   }
 }

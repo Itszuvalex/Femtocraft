@@ -34,7 +34,7 @@ class GuiCrystalLiquifier(player: EntityPlayer, inv: InventoryPlayer, private va
   var color: Color = tile.getModule(ItszuLibModules.COLORABLE, EnumFacing.UP)
   val nameLabel    = new GuiLabel(20, 12, fontRenderer.getStringWidth("Crystal Liquifier"), fontRenderer.FONT_HEIGHT, () => "Crystal Liquifier")
   val powerMeter   = new GuiPowerMeter(6, 4, tile.battery, color.toInt)
-  val tank         = new GuiFluidTank(28, fontRenderer.FONT_HEIGHT + 2, this, tile.outputStorage, 0, true)
+  val tank         = new GuiFluidTankFixed(120, fontRenderer.FONT_HEIGHT + 2, this, tile.outputStorage, 0, true)
   progressBar.colorProgress = color.toInt
   add(progressBar)
   val elems = List(nameLabel, powerMeter, tank)
