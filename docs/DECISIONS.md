@@ -28,11 +28,11 @@ As in ItszuLib: legacy Scala stays in `src/main/scala` as uncompiled reference a
 
 ---
 
-## B1. BLOCKING — ItszuLib API shape
+## B1. ItszuLib API shape — DECIDED: TechnoLich's fragments/modules framework (option 2)
 
-See `../ItszuLib/docs/DECISIONS.md` B1. Femtocraft is rewritten against whatever ItszuLib becomes, so this blocks Femtocraft too. Recommendation there: **hybrid** (keep ItszuLib's base-class/`@Saveable` shape, reuse technolich's 26.1 implementations for `Loc4`, networks, `IItemStorage`, transfer-API adapters).
+See `../ItszuLib/docs/DECISIONS.md` B1. Femtocraft is rewritten against whatever ItszuLib becomes, so this blocks Femtocraft too. Recommendation there was the hybrid option. **Decision (maintainer, 2026-09-30): option 2.** ItszuLib becomes the Kotlin copy of TechnoLich's framework, and Femtocraft block entities are rebuilt as `BlockEntityCore` + fragments: each 1.7.10 tile trait (`TileInventory`, `TileFluidTank`, `MultiBlockComponent`, power node, ...) becomes a fragment, `@Saveable` fields become fragment serialization in the LEVEL/DESCRIPTION/ITEM scopes, and capabilities are exposed through modules.
 
-## B2. BLOCKING — Scope of the Femtocraft port
+## B2. Scope of the Femtocraft port — DECIDED: logic first, simple visuals (option 2)
 
 **Context.** Femtocraft is a 17k-line pre-alpha mod: placeholder fluids, nine debug/test blocks, half-finished machines (single array, several cyber machines whose tiles are 28-line stubs), and recent commits describing broken rendering. About 3.7k lines are client rendering/GUI code written for immediate-mode OpenGL (`Tessellator`, GL11, `AdvancedModelLoader` OBJ models, custom `EntityFX`). 26.1's render pipeline is completely different (baked JSON/OBJ models, `BlockEntityRenderer` with extracted render state, `RenderPipeline`s), and none of it can be verified by `runGameTestServer`, which is headless.
 
@@ -51,3 +51,5 @@ See `../ItszuLib/docs/DECISIONS.md` B1. Femtocraft is rewritten against whatever
 **Also needs a call:** whether to drop features that are pure 1.7.10 workarounds: `TERenderSortingFix` (drop; the modern renderer sorts), `GuiIDs` (drop; replaced by `MenuType`s), ore dictionary (replace with tags).
 
 **Recommendation:** option 2, with the three workaround drops above.
+
+**Decision (maintainer, 2026-09-30): option 2**, with the workaround drops. Port all server-side gameplay logic, menus/screens, recipes and worldgen as datapack JSON, with simple JSON/OBJ models. Dynamic renderers (beams, growth stages, preview ghosts, particles) are follow-up work listed in [PORTING.md](PORTING.md#follow-up-rendering-work). Test blocks become dev-only content plus game tests. The ore dictionary becomes tags.
