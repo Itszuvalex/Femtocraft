@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "femtocraft:crystal_mount",
+    "femtocraft:cyberweave",
+    "femtocraft:power_generator",
+    "femtocraft:power_pedestal",
+    "femtocraft:power_sink"
+  ]
+}

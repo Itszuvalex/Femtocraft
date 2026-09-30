@@ -1,0 +1,17 @@
+{
+  "block.femtocraft.crystal_mount": "Crystal Mount",
+  "block.femtocraft.cyberleaf": "Cyberleaf",
+  "block.femtocraft.cyberweave": "Cyberweave",
+  "block.femtocraft.cyberwood": "Cyberwood",
+  "block.femtocraft.glow_stick": "Glow Stick",
+  "block.femtocraft.power_generator": "Power Generator",
+  "block.femtocraft.power_pedestal": "Power Pedestal",
+  "block.femtocraft.power_sink": "Power Sink",
+  "item.femtocraft.crackling_dust": "Crackling Dust",
+  "item.femtocraft.power_crystal": "Power Crystal",
+  "itemGroup.femtocraft": "Femtocraft",
+  "tooltip.femtocraft.crystal.passive": "Passive Gen: %s",
+  "tooltip.femtocraft.crystal.transfer": "Transfer Rate: %s",
+  "tooltip.femtocraft.crystal.type": "Crystal Type: %s",
+  "tooltip.femtocraft.power": "Power: %s/%s"
+}
