@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "CFC",
+    "III"
+  ],
+  "key": {
+    "C": "#femtocraft:cyberweave",
+    "F": "minecraft:furnace",
+    "I": "#c:ingots/iron"
+  },
+  "result": {
+    "id": "femtocraft:furnace_assembly",
+    "count": 1
+  }
+}

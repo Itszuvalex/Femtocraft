@@ -48,12 +48,41 @@ BLOCKS = {
     "power_sink": ("Power Sink", ("machine",), "self", True, "pickaxe"),
     "power_generator": ("Power Generator", ("machine",), "self", True, "pickaxe"),
     "glow_stick": ("Glow Stick", ("post", "glow_stick"), "self", True, None),
+    "crystal_cluster": ("Crystal Cluster", ("cross", "power_crystal_large"), "none", True, "pickaxe"),
+    "item_repository": ("Item Repository", ("column", "item_repository_side", "item_repository_top"), "self", True, "pickaxe"),
+    "nanite_hive_small": ("Small Nanite Hive", ("machine",), "self", True, "pickaxe"),
+    # Placed by items; drops handled by the block entities
+    "frame": ("Frame", ("frame",), "none", False, "pickaxe"),
+    "arc_furnace": ("Arc Furnace", ("machine",), "none", False, "pickaxe"),
+    "centrifuge": ("Centrifuge", ("machine",), "none", False, "pickaxe"),
+    "crystallization_chamber": ("Crystallization Chamber", ("machine",), "none", False, "pickaxe"),
+    "material_processor": ("Material Processor", ("machine",), "none", False, "pickaxe"),
+    "cyber_base": ("Cyber Base", ("cube_all", "machine_side_empty"), "none", False, "pickaxe"),
+    "cyber_machine_in_progress": ("Machine In Progress", ("frame",), "none", False, None),
+    "growth_chamber": ("Growth Chamber", ("machine",), "none", False, "pickaxe"),
+    "grasping_vines": ("Grasping Vines", ("cube_all", "cyberleaf"), "none", False, "pickaxe"),
+    "bio_beacon": ("Bio Beacon", ("machine",), "none", False, "pickaxe"),
+    "condensation_array": ("Condensation Array", ("machine",), "none", False, "pickaxe"),
+    "cybermat_disintegrator": ("Cybermat Disintegrator", ("machine",), "none", False, "pickaxe"),
+    "lashing_vines": ("Lashing Vines", ("cube_all", "cyberleaf"), "none", False, "pickaxe"),
+    "metabolic_converter": ("Metabolic Converter", ("machine",), "none", False, "pickaxe"),
+    "photosynthesis_tower": ("Photosynthesis Tower", ("machine",), "none", False, "pickaxe"),
+    "spore_distributor": ("Spore Distributor", ("machine",), "none", False, "pickaxe"),
 }
+
+# Block entity drops for these are handled in code; the loot tables above only cover the block item.
+DEV_BLOCKS = ["transfer", "diffusion", "diffusion_target", "direct", "generation"]
 
 ITEMS = {
     # name: (display name, texture or None for block items)
     "power_crystal": ("Power Crystal", "power_crystal_large"),
     "crackling_dust": ("Crackling Dust", "crackling_dust"),
+    "dumb_dust": ("Dumb Dust", "dumb_dust"),
+    "furnace_assembly": ("Furnace Assembly", "furnace_assembly"),
+    "grinder_assembly": ("Grinder Assembly", "grinder_assembly"),
+    "frame": ("Frame", None),
+    "base_seed": ("Cyber Base Seed", "base_seed"),
+    "multiblock": ("Multiblock", "multiblock"),
 }
 
 LANG_EXTRA = {
@@ -62,6 +91,69 @@ LANG_EXTRA = {
     "tooltip.femtocraft.crystal.passive": "Passive Gen: %s",
     "tooltip.femtocraft.crystal.transfer": "Transfer Rate: %s",
     "tooltip.femtocraft.power": "Power: %s/%s",
+    "tooltip.femtocraft.frame.type": "Frame: %s",
+    "tooltip.femtocraft.frame.selected": "Selected: %s",
+    "tooltip.femtocraft.base_seed.size.1": "Size: Small (1x1)",
+    "tooltip.femtocraft.base_seed.size.2": "Size: Medium (2x2)",
+    "tooltip.femtocraft.base_seed.size.3": "Size: Large (3x3)",
+    "item.femtocraft.multiblock.invalid": "Invalid Multiblock",
+    "gui.femtocraft.multiblock_selection": "Select Multiblock",
+    "gui.femtocraft.machine_selection": "Select Machine",
+    "gui.femtocraft.cyber_base": "%sx%s Cyber Base",
+    "gui.femtocraft.build_machine": "Build Machine",
+    "gui.femtocraft.clear_selection": "Clear Selection",
+    "gui.femtocraft.constructing": "Constructing...",
+    "gui.femtocraft.cybermass": "Cybermass: %s",
+    "gui.femtocraft.progress": "Progress: %s%%",
+    "gui.femtocraft.water": "Water: %s/%s mB",
+}
+
+TAGS = {
+    # (registry, namespace, path): values
+    ("block", NS, "cyberweave"): [f"{NS}:cyberweave"],
+    ("item", NS, "cyberweave"): [f"{NS}:cyberweave"],
+    ("block", NS, "converts_to_cyberwood"): ["#minecraft:logs"],
+    ("block", NS, "converts_to_cyberleaf"): ["#minecraft:leaves"],
+    ("block", NS, "converts_to_cyberweave"): ["minecraft:stone", "minecraft:grass_block", "minecraft:dirt"],
+    ("item", NS, "crystals"): [f"{NS}:power_crystal"],
+    ("item", NS, "assemblies/furnace"): [f"{NS}:furnace_assembly"],
+    ("item", NS, "assemblies/grinder"): [f"{NS}:grinder_assembly"],
+    ("item", NS, "nanite_strains"): [],
+    ("block", "minecraft", "logs"): [f"{NS}:cyberwood"],
+    ("item", "minecraft", "logs"): [f"{NS}:cyberwood"],
+    ("block", "minecraft", "leaves"): [f"{NS}:cyberleaf"],
+    ("item", "minecraft", "leaves"): [f"{NS}:cyberleaf"],
+    # Plants that grow on dirt grow on cyberweave (1.7.10 canSustainPlant for Plains/Beach plants)
+    ("block", "minecraft", "dirt"): [f"{NS}:cyberweave"],
+}
+
+
+def shaped(pattern, key, result, count=1):
+    return {"type": "minecraft:crafting_shaped", "category": "misc", "pattern": pattern, "key": key,
+            "result": {"id": result, "count": count}}
+
+
+RECIPES = {
+    "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:cyberweave", "I": "minecraft:iron_ingot"}, f"{NS}:frame", 4),
+    "furnace_assembly": shaped([" C ", "CFC", "III"], {"C": f"#{NS}:cyberweave", "F": "minecraft:furnace", "I": "#c:ingots/iron"},
+                               f"{NS}:furnace_assembly"),
+    "grinder_assembly": shaped([" C ", "CPC", "III"], {"C": f"#{NS}:cyberweave", "P": "minecraft:piston", "I": "#c:ingots/iron"},
+                               f"{NS}:grinder_assembly"),
+    "growth_chamber/wheat": {
+        "type": f"{NS}:growth_chamber", "ingredient": "minecraft:wheat_seeds", "count": 1,
+        "results": [{"id": "minecraft:wheat_seeds", "count": 2}, {"id": "minecraft:wheat", "count": 1}],
+        "ticks": 500,
+        "growth_stages": [f"{NS}:textures/growth/wheat_{i}.png" for i in range(8)],
+    },
+}
+
+WORLDGEN = {
+    "worldgen/configured_feature/crystal_cluster.json": {"type": f"{NS}:crystal_cluster", "config": {}},
+    # 1.7.10 CHANCE_PER_CHUNK = .015 -> about 1 in 67 chunks
+    "worldgen/placed_feature/crystal_cluster.json": {"feature": f"{NS}:crystal_cluster", "placement": [
+        {"type": "minecraft:rarity_filter", "chance": 67}, {"type": "minecraft:in_square"}, {"type": "minecraft:biome"}]},
+    "neoforge/biome_modifier/crystal_clusters.json": {"type": "neoforge:add_features", "biomes": "#minecraft:is_overworld",
+                                                      "features": f"{NS}:crystal_cluster", "step": "local_modifications"},
 }
 
 
@@ -122,10 +214,25 @@ def main():
         if tool:
             tools.setdefault(tool, []).append(f"{NS}:{name}")
     for name, (display, texture) in ITEMS.items():
-        write(os.path.join(ASSETS, "models", "item", f"{name}.json"),
-              {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}:item/{texture}"}})
-        write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:item/{name}"}})
+        if texture is not None:
+            write(os.path.join(ASSETS, "models", "item", f"{name}.json"),
+                  {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}:item/{texture}"}})
+            model = f"{NS}:item/{name}"
+        else:
+            model = f"{NS}:block/{name}"
+        write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": model}})
         lang[f"item.{NS}.{name}"] = display
+    for dev in DEV_BLOCKS:
+        name = f"dev_{dev}_node"
+        write(os.path.join(ASSETS, "models", "block", f"{name}.json"), block_model(name, ("cube_all", "machine_side_color")))
+        write(os.path.join(ASSETS, "blockstates", f"{name}.json"), blockstate(name, ("cube_all",)))
+        lang[f"block.{NS}.{name}"] = f"Dev {dev.replace('_', ' ').title()} Node"
+    for (reg, ns, path), values in TAGS.items():
+        write(os.path.join(ROOT, "data", ns, "tags", reg, f"{path}.json"), {"replace": False, "values": values})
+    for name, recipe in RECIPES.items():
+        write(os.path.join(DATA, "recipe", f"{name}.json"), recipe)
+    for path, obj in WORLDGEN.items():
+        write(os.path.join(DATA, path), obj)
     mc_tags = os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable")
     for tool, blocks in tools.items():
         write(os.path.join(mc_tags, f"{tool}.json"), {"replace": False, "values": sorted(blocks)})

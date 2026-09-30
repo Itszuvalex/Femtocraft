@@ -1,0 +1,26 @@
+{
+  "type": "femtocraft:growth_chamber",
+  "ingredient": "minecraft:wheat_seeds",
+  "count": 1,
+  "results": [
+    {
+      "id": "minecraft:wheat_seeds",
+      "count": 2
+    },
+    {
+      "id": "minecraft:wheat",
+      "count": 1
+    }
+  ],
+  "ticks": 500,
+  "growth_stages": [
+    "femtocraft:textures/growth/wheat_0.png",
+    "femtocraft:textures/growth/wheat_1.png",
+    "femtocraft:textures/growth/wheat_2.png",
+    "femtocraft:textures/growth/wheat_3.png",
+    "femtocraft:textures/growth/wheat_4.png",
+    "femtocraft:textures/growth/wheat_5.png",
+    "femtocraft:textures/growth/wheat_6.png",
+    "femtocraft:textures/growth/wheat_7.png"
+  ]
+}

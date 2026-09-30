@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "femtocraft:block/item_repository_side",
+    "end": "femtocraft:block/item_repository_top"
+  }
+}

@@ -119,6 +119,8 @@ class OwnPowerStorage(var max: Double, private val onChanged: () -> Unit = {}) :
 open class FragPowerNode(
     val rules: PowerNodeRules,
     var storage: PowerStorage = OwnPowerStorage(0.0),
+    private val parentRadius: Float = PowerNodeTypes.DEFAULT_MAX_RADIUS,
+    private val childRadius: Float = PowerNodeTypes.DEFAULT_MAX_RADIUS,
 ) : BlockEntityFragment<IPowerNode>(), IPowerNode {
     protected val childrenLocs = LinkedHashSet<Loc4>()
     protected var parentLocation: Loc4? = null
@@ -168,7 +170,7 @@ open class FragPowerNode(
         return true
     }
 
-    override fun parentConnectionRadius(): Float = PowerNodeTypes.DEFAULT_MAX_RADIUS
+    override fun parentConnectionRadius(): Float = parentRadius
 
     override fun getChildren(): Set<IPowerNode>? {
         if (rules.leaf) return null
@@ -195,7 +197,7 @@ open class FragPowerNode(
         return true
     }
 
-    override fun childrenConnectionRadius(): Float = PowerNodeTypes.DEFAULT_MAX_RADIUS
+    override fun childrenConnectionRadius(): Float = childRadius
 
     override fun getPowerCurrent(): Double = storage.current()
 

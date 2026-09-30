@@ -53,6 +53,9 @@ object DevGameTests {
             helper.succeed()
         }
         PowerGameTests.register()
+        CyberGameTests.register()
+        IndustryGameTests.register()
+        LogisticsGameTests.register()
     }
 
     fun register(modBus: IEventBus) {

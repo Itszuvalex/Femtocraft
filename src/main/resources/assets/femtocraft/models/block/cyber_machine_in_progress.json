@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "femtocraft:block/frame"
+  },
+  "render_type": "minecraft:cutout"
+}

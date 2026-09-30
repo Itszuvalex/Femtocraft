@@ -55,7 +55,7 @@ class CrystalMountBlockEntity(pos: BlockPos, state: BlockState) :
         override fun maxStackSize(index: Int): Int = 1
     }
     val itemHandler = WrapperResourceHandlerIItemStorage.of(inventory)
-    val node = FragPowerNode(PowerNodeRules.MOUNT, CrystalStorage())
+    val node = FragPowerNode(PowerNodeRules.MOUNT, CrystalStorage(), childRadius = PEDESTAL_RANGE)
     private val pedestalLocs = LinkedHashSet<Loc4>()
     private var hadCrystal = false
 

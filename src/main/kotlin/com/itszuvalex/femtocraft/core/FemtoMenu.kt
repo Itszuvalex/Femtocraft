@@ -64,8 +64,16 @@ abstract class FemtoMenu(type: MenuType<*>, containerId: Int, protected val play
      * Syncs a long (e.g. power) as two ints, like the 1.7.10 containers did.
      */
     protected fun trackLong(get: () -> Long, set: (Long) -> Unit) {
-        trackInt({ (get() ushr 32).toInt() }, { hi -> set((hi.toLong() shl 32) or (get() and 0xFFFFFFFFL)) })
-        trackInt({ get().toInt() }, { lo -> set((get() and -0x100000000L) or (lo.toLong() and 0xFFFFFFFFL)) })
+        // Client side: assemble the halves in a local copy, since the halves arrive separately.
+        var received = 0L
+        trackInt({ (get() ushr 32).toInt() }, { hi ->
+            received = (hi.toLong() shl 32) or (received and 0xFFFFFFFFL)
+            set(received)
+        })
+        trackInt({ get().toInt() }, { lo ->
+            received = (received and -0x100000000L) or (lo.toLong() and 0xFFFFFFFFL)
+            set(received)
+        })
     }
 
     override fun stillValid(player: Player): Boolean {

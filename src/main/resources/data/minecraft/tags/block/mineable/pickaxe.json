@@ -1,10 +1,28 @@
 {
   "replace": false,
   "values": [
+    "femtocraft:arc_furnace",
+    "femtocraft:bio_beacon",
+    "femtocraft:centrifuge",
+    "femtocraft:condensation_array",
+    "femtocraft:crystal_cluster",
     "femtocraft:crystal_mount",
+    "femtocraft:crystallization_chamber",
+    "femtocraft:cyber_base",
+    "femtocraft:cybermat_disintegrator",
     "femtocraft:cyberweave",
+    "femtocraft:frame",
+    "femtocraft:grasping_vines",
+    "femtocraft:growth_chamber",
+    "femtocraft:item_repository",
+    "femtocraft:lashing_vines",
+    "femtocraft:material_processor",
+    "femtocraft:metabolic_converter",
+    "femtocraft:nanite_hive_small",
+    "femtocraft:photosynthesis_tower",
     "femtocraft:power_generator",
     "femtocraft:power_pedestal",
-    "femtocraft:power_sink"
+    "femtocraft:power_sink",
+    "femtocraft:spore_distributor"
   ]
 }

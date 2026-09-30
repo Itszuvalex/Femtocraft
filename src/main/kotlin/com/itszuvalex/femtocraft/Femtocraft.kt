@@ -32,6 +32,8 @@ object Femtocraft {
         FemtoBlockEntities.register(MOD_BUS)
         FemtoMenus.register(MOD_BUS)
         FemtoTabs.register(MOD_BUS)
+        FemtoRecipes.register(MOD_BUS)
+        com.itszuvalex.femtocraft.worldgen.FemtoWorldgen.register(MOD_BUS)
 
         if (!FMLEnvironment.isProduction()) {
             DevContent.register(MOD_BUS)

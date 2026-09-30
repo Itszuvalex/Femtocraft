@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "CPC",
+    "III"
+  ],
+  "key": {
+    "C": "#femtocraft:cyberweave",
+    "P": "minecraft:piston",
+    "I": "#c:ingots/iron"
+  },
+  "result": {
+    "id": "femtocraft:grinder_assembly",
+    "count": 1
+  }
+}

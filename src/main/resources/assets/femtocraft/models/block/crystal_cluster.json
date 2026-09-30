@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "femtocraft:item/power_crystal_large"
+  },
+  "render_type": "minecraft:cutout"
+}
