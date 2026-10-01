@@ -6,24 +6,23 @@ import com.itszuvalex.femtocraft.core.FragData
 import com.itszuvalex.femtocraft.industry.IndustryContent
 import com.itszuvalex.femtocraft.power.PowerContent
 import com.itszuvalex.femtocraft.power.PowerCrystals
-import com.itszuvalex.itszulib.api.adapters.ILevel
 import com.itszuvalex.itszulib.api.utility.NBTSerializationScope
-import com.itszuvalex.itszulib.core.frag.InternalBlockEntityFragment
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
-import net.minecraft.world.Containers
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
-import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.storage.loot.LootParams
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 
 /**
  * A crystal cluster from rift worldgen. Breaking it drops 2-7 random power crystals of its color and 3-5 crackling
  * dust. Port of v3's `BlockCrystalsWorldgen`/`TileCrystalsWorldgen` (the per-crystal color offsets only fed the
- * renderer, which is follow-up work).
+ * renderer, which is follow-up work). v3 dropped them on any removal; here they drop like any block's drops
+ * ([CrystalClusterBlock.getDrops]), so not when broken in creative or replaced by a command (REVIEW F18).
  */
 class CrystalClusterBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(WorldgenContent.CRYSTAL_CLUSTER_BE.get(), pos, state) {
     /**
@@ -34,15 +33,6 @@ class CrystalClusterBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEn
 
     init {
         fragList.addInternalFragment(FragData("Color", setOf(NBTSerializationScope.LEVEL, NBTSerializationScope.DESCRIPTION), { _, o -> o.putInt(COLOR_KEY, color) }, { _, i -> color = i.getIntOr(COLOR_KEY, color) }))
-        fragList.addInternalFragment(object : InternalBlockEntityFragment() {
-            override fun name(): String = "Drops"
-            override fun onRemove(level: ILevel, pos: BlockPos, blockStatePrev: BlockState) = drops(level.toMinecraft(), pos)
-        })
-    }
-
-    private fun drops(level: Level, pos: BlockPos) {
-        val random = level.random
-        for (stack in rollDrops(random, color)) Containers.dropItemStack(level, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), stack)
     }
 
     companion object {
@@ -90,6 +80,16 @@ class CrystalClusterBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEn
 
 class CrystalClusterBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<CrystalClusterBlockEntity>(properties, { WorldgenContent.CRYSTAL_CLUSTER_BE.get() }) {
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
+
+    /**
+     * Rolls the cluster's drops wherever vanilla drops a block's loot: survival breaking, explosions and
+     * `destroyBlock`, but not creative breaking or a plain replacement.
+     */
+    override fun getDrops(state: BlockState, params: LootParams.Builder): List<ItemStack> {
+        val color = (params.getOptionalParameter(LootContextParams.BLOCK_ENTITY) as? CrystalClusterBlockEntity)?.color
+            ?: CrystalClusterBlockEntity.randomColor(params.level.random)
+        return CrystalClusterBlockEntity.rollDrops(params.level.random, color)
+    }
 
     companion object {
         private val SHAPE: VoxelShape = box(2.0, 0.0, 2.0, 14.0, 12.0, 14.0)

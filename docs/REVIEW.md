@@ -28,18 +28,18 @@ on the old behaviour.
 | F15 | `DistributedManager` task order | Compared fill as `workers.size / workerCap` on integers, so every task that was not full tied at 0 and workers piled onto the first task of a priority | Fill is a fraction | `DistributedManagerTest.Seek_PrefersPriorityThenEmptierTask` |
 | F16 | `DistributedManager` assignment | Set the worker's task even when `addWorker` refused it, and freed workers by removing them from the set being iterated | Assigns only on acceptance (a refused worker tries the next task); iterates a copy | `DistributedManagerTest.Seek_TaskRefusesWorker_WorkerTriesTheNext`, `RemoveTaskProvider_FreesAllWorkers` |
 | F17 | Conduit chips (port) | The flop countdown lived on the chip, so every active chip rewrote its component, called `setChanged` (notifying all six neighbours) and resent itself to an open menu every tick | The conduit keeps each slot's countdown in memory; it is read from the chip when placed or loaded and written back when the slot is read from outside (taken, dropped, saved, shown). An operation flags the chunk for saving without neighbour updates | game test `conduit_chip_progress_moves_with_the_chip` |
+| F18 | `BlockCrystalsWorldgen` drops | Rolled crystals and dust on any removal, so creative breaking and `/setblock`/`/fill` gave free crystals | Drops come from the block's `getDrops` (survival breaking, explosions, `destroyBlock` with drops), keeping the cluster's color | game test `crystal_cluster_drops_nothing_when_replaced_or_creative_broken` |
 
 ## Open
 
 Not fixed; each needs a maintainer call or is a documented limitation. Numbers are kept when an item closes (O2,
-menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine recipes, as D12; O4, fluid and nanite chips, is implemented: see `Chips.kt`; O5, chips rewritten every tick, is fixed: see F17).
+menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine recipes, as D12; O4, fluid and nanite chips, is implemented: see `Chips.kt`; O5, chips rewritten every tick, is fixed: see F17; O9, crystal cluster drops, see F18).
 
 | # | Area | Finding | Current handling |
 |---|---|---|---|
 | O6 | Rift edges | A rift converts what exists when it generates; trees and structures that neighbouring chunks place later stay unconverted, so rift edges can show half-converted trees | Left as is (maintainer, 2026-10-01): the rift is a placeholder; how rifts and cybermaterials generate is to be revisited |
 | O7 | Rift size | Large rifts are capped to radius 24 (v3: up to 40) by the feature write region | Left as is (maintainer, 2026-10-01), with O6: a multi-chunk structure would allow v3's sizes if rifts keep this shape |
 | O8 | Machine side configuration | No side-configuration screen; faces are set with the configurator only | Left as is (maintainer, 2026-10-01). Planned with the rendering work (O10): the machine screen renders the block and its neighbours in 3D, rotated by dragging, so faces are configured on the model and the player sees what each face connects to. Faces change through `MenuActionPayload` actions |
-| O9 | Crystal clusters | Drop crystals on any removal, including creative breaking and commands (as in v3) | Kept |
 | O10 | Rendering | Simple models and placeholder textures; no TESRs, OBJ models, beams, particles or overlays | DECISIONS B2, PORTING "Follow-up rendering work" |
 | O11 | Systems not ported | Computation, tech tree, logistics test blocks, `*OLD` nanites, stubs, multitool | DECISIONS D4 (decided): the job/task system and indexed inventories are ported; stubs are planned machines (PORTING); the rest waits |
 

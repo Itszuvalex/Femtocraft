@@ -46,6 +46,7 @@ object CyberGameTests {
         DevGameTests.test("rift_sizes_include_medium_and_fit_the_feature_region", body = ::riftSizes)
         DevGameTests.test("rift_crystals_rest_on_the_ground", body = ::riftCrystals)
         DevGameTests.test("crystal_cluster_drops_crystals_and_dust", body = ::crystalCluster)
+        DevGameTests.test("crystal_cluster_drops_nothing_when_replaced_or_creative_broken", body = ::crystalClusterNoFreeDrops)
         DevGameTests.test("rift_feature_and_recipes_load", body = ::dataLoads)
     }
 
@@ -179,9 +180,28 @@ object CyberGameTests {
         helper.assertTrue(crystals.size in 2..7, "2-7 crystals, got ${crystals.size}")
         helper.assertTrue(crystals.all { PowerCrystals.data(it)?.color == be.color }, "crystals take the cluster's color")
         helper.assertTrue(drops.single { it.`is`(IndustryContent.CRACKLING_DUST.get()) }.count in 3..5, "3-5 crackling dust")
-        helper.destroyBlock(CENTER)
+        // Breaking with drops, as survival breaking and explosions do.
+        helper.level.destroyBlock(helper.absolutePos(CENTER), true)
         helper.assertItemEntityPresent(PowerContent.POWER_CRYSTAL.get(), CENTER, 2.0)
         helper.assertItemEntityPresent(IndustryContent.CRACKLING_DUST.get(), CENTER, 2.0)
+        helper.succeed()
+    }
+
+    /**
+     * v3 dropped crystals on any removal; replacing the block (a command) or breaking it in creative drops nothing.
+     */
+    private fun crystalClusterNoFreeDrops(helper: GameTestHelper) {
+        helper.place<CrystalClusterBlockEntity>(CENTER, WorldgenContent.CRYSTAL_CLUSTER.get())
+        helper.setBlock(CENTER, Blocks.AIR)
+        helper.place<CrystalClusterBlockEntity>(CENTER.west(), WorldgenContent.CRYSTAL_CLUSTER.get())
+        helper.destroyBlock(CENTER.west()) // removed without drops
+        helper.place<CrystalClusterBlockEntity>(CENTER.east(), WorldgenContent.CRYSTAL_CLUSTER.get())
+        val player = helper.makeMockServerPlayerInLevel()
+        player.setGameMode(GameType.CREATIVE)
+        player.gameMode.destroyBlock(helper.absolutePos(CENTER.east()))
+        helper.assertBlockNotPresent(WorldgenContent.CRYSTAL_CLUSTER.get(), CENTER.east())
+        helper.assertItemEntityNotPresent(PowerContent.POWER_CRYSTAL.get(), CENTER, 4.0)
+        helper.assertItemEntityNotPresent(IndustryContent.CRACKLING_DUST.get(), CENTER, 4.0)
         helper.succeed()
     }
 
