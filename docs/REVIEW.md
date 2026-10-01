@@ -36,8 +36,8 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 
 | # | Area | Finding | Current handling |
 |---|---|---|---|
-| O6 | Rift edges | A rift converts what exists when it generates; trees and structures that neighbouring chunks place later stay unconverted, so rift edges can show half-converted trees | Placed in the last feature step (D13) to keep this small |
-| O7 | Rift size | Large rifts are capped to radius 24 (v3: up to 40) by the feature write region | DECISIONS D13. A multi-chunk structure, or conversion spread over chunk generation, would allow v3's sizes |
+| O6 | Rift edges | A rift converts what exists when it generates; trees and structures that neighbouring chunks place later stay unconverted, so rift edges can show half-converted trees | Left as is (maintainer, 2026-10-01): the rift is a placeholder; how rifts and cybermaterials generate is to be revisited |
+| O7 | Rift size | Large rifts are capped to radius 24 (v3: up to 40) by the feature write region | Left as is (maintainer, 2026-10-01), with O6: a multi-chunk structure would allow v3's sizes if rifts keep this shape |
 | O8 | Machine side configuration | No side-configuration screen; faces are set with the configurator only | PORTING "Not ported"; a screen could send `MenuActionPayload` actions |
 | O9 | Crystal clusters | Drop crystals on any removal, including creative breaking and commands (as in v3) | Kept |
 | O10 | Rendering | Simple models and placeholder textures; no TESRs, OBJ models, beams, particles or overlays | DECISIONS B2, PORTING "Follow-up rendering work" |

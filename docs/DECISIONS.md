@@ -151,5 +151,5 @@ Small changes, each noted in the code:
   tags, so deepslate ores convert like their stone variants.
 - Dumb dust is not used up in creative mode (vanilla `consume`).
 
-**Decision:** keep all four. Full-size rifts (a multi-chunk structure instead of a feature) stay a possible later
-change (REVIEW O7).
+**Decision:** keep all four. The rift is a placeholder: how rifts and Femtocraft materials generate may be
+revisited, so its edges (REVIEW O6) and size cap (O7) are left as they are until then.
