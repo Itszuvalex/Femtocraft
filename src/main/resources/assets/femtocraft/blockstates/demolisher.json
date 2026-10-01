@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "femtocraft:block/demolisher"
+    },
+    "facing=east": {
+      "model": "femtocraft:block/demolisher",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "femtocraft:block/demolisher",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "femtocraft:block/demolisher",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "femtocraft:block/crystal_liquifier"
+    },
+    "facing=east": {
+      "model": "femtocraft:block/crystal_liquifier",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "femtocraft:block/crystal_liquifier",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "femtocraft:block/crystal_liquifier",
+      "y": 270
+    }
+  }
+}

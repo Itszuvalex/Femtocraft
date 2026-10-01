@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "#c:dusts/riftiron",
+    "#c:dusts/phasemetal",
+    "#c:dusts/redstonereplacement",
+    "#c:dusts/lapisreplacement",
+    "#c:dusts/diamondreplacement"
+  ]
+}

@@ -2,9 +2,17 @@
   "replace": false,
   "values": [
     "femtocraft:crystal_charging_array",
+    "femtocraft:crystal_crusher",
+    "femtocraft:crystal_focusing_chamber",
+    "femtocraft:crystal_furnace",
     "femtocraft:crystal_heat_exchanger",
+    "femtocraft:crystal_liquifier",
     "femtocraft:crystal_mount",
     "femtocraft:crystal_storage_array",
+    "femtocraft:demolisher",
+    "femtocraft:frame",
+    "femtocraft:germination_chamber",
+    "femtocraft:nano_furnace",
     "femtocraft:power_conduit_crystal"
   ]
 }

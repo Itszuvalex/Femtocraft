@@ -74,16 +74,53 @@ BLOCKS = {
     "crystal_heat_exchanger": ("Crystal Heat Exchanger", ("machine", "crystalheatexchanger_front"), "self", "pickaxe"),
     "power_conduit_crystal": ("Crystal Power Conduit", ("box", "power_conduit_crystal", [6, 6, 6, 10, 10, 10]), "self", "pickaxe"),
     "glow_stick": ("Glow Stick", ("box", "blockglowstick", [7, 0, 7, 9, 12, 9]), "self", None),
+    # --- industry ---
+    "nano_furnace": ("Nano Furnace", ("machine", "nanofurnace_front"), "self", "pickaxe"),
+    "demolisher": ("Demolisher", ("machine", "demolisher_front"), "self", "pickaxe"),
+    "crystal_furnace": ("Crystal Furnace", ("machine", "crystal_furnace_front"), "self", "pickaxe"),
+    "crystal_crusher": ("Crystal Crusher", ("machine", "crystal_crusher_front"), "self", "pickaxe"),
+    "crystal_liquifier": ("Crystal Liquifier", ("machine", "liquifier_front"), "self", "pickaxe"),
+    # Placed by the frame item and by frame building; they drop through their teardown, not loot tables.
+    "frame": ("Frame", ("box", "standin_frame", [0, 0, 0, 16, 16, 16]), "none", "pickaxe", False),
+    "germination_chamber": ("Germination Chamber", ("cube_all", "germination_chamber"), "none", "pickaxe", False),
+    "crystal_focusing_chamber": ("Crystal Focusing Chamber", ("cube_all", "crystal_focusing_chamber"), "none", "pickaxe", False),
 }
 
 ITEMS = {
-    # name: (display name, texture); block items are generated from BLOCKS
+    # name: (display name, texture); block items are generated from BLOCKS. A texture "block:<name>" uses that block
+    # model; None means a special model below.
     "power_crystal": ("Power Crystal", None),
+    "crackling_dust": ("Crackling Dust", "dust_crystal"),
+    "riftiron_dust": ("Riftiron Dust", "dust_riftiron"),
+    "phasemetal_dust": ("Phasemetal Dust", "dust_phasemetal"),
+    "iron_dust": ("Iron Dust", "dust_iron"),
+    "gold_dust": ("Gold Dust", "dust_gold"),
+    "diamond_dust": ("Diamond Dust", "dust_diamond"),
+    "redstonereplacement_dust": ("Redstone Replacement Dust", "dust_redstonereplacement"),
+    "lapisreplacement_dust": ("Lapis Replacement Dust", "dust_lapisreplacement"),
+    "diamondreplacement_dust": ("Diamond Replacement Dust", "dust_diamondreplacement"),
+    "riftiron_ingot_devoid": ("Devoid Riftiron Ingot", "ingot_riftiron_devoid"),
+    "riftiron_ingot_activated": ("Activated Riftiron Ingot", "ingot_riftiron_activated"),
+    "phasemetal_ingot_devoid": ("Devoid Phasemetal Ingot", "ingot_phasemetal_devoid"),
+    "phasemetal_ingot_activated": ("Activated Phasemetal Ingot", "ingot_phasemetal_activated"),
+    "basic_circuit": ("Basic Circuit", "itembasiccircuit"),
+    "energy_regulator": ("Energy Regulator", "itemenergyregulator"),
+    "crystal_battery": ("Crystal Battery", "itemcrystalbattery"),
+    "nanite_beacon": ("Nanite Beacon", "itemnanitebeacon"),
+    "nano_channel": ("Nano Channel", "itemnanochannel"),
+    "solar_panel": ("Solar Panel", "itemsolarpanel"),
+    "frame": ("Frame", "block:frame"),
+    "configurator": ("Configurator", None),
+    "shift_test": ("Shift Device", "itemshifttest"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
 PLACEHOLDERS = {
     "block/power_conduit_crystal": ((60, 200, 230, 255), (30, 110, 130, 255)),
+    "block/crystal_furnace_front": ((0, 0, 0, 0), (230, 120, 40, 255)),
+    "block/crystal_crusher_front": ((0, 0, 0, 0), (140, 140, 160, 255)),
+    "block/germination_chamber": ((70, 140, 60, 255), (40, 80, 35, 255)),
+    "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
 }
 
 LANG = {
@@ -104,11 +141,37 @@ LANG = {
     "femtocraft.subtitle.shiftsound": "Nanites shift",
     "femtocraft.subtitle.crystalbreak": "Crystal shatters",
     "femtocraft.subtitle.riftloop": "Rift hums",
+    "fluid.femtocraft.gritty_slurry": "Gritty Slurry",
+    "multiblock.femtocraft.germination_chamber": "Germination Chamber",
+    "multiblock.femtocraft.crystal_focusing_chamber": "Crystal Focusing Chamber",
+    "tooltip.femtocraft.none": "none",
+    "tooltip.femtocraft.frame.type": "Frame: %s",
+    "tooltip.femtocraft.frame.selected": "Selected: %s",
+    "tooltip.femtocraft.configurator.mode": "Interaction: %s",
+    "tooltip.femtocraft.configurator.item": "Items",
+    "tooltip.femtocraft.configurator.fluid": "Fluids",
+    "tooltip.femtocraft.configurator.nanite": "Nanites",
+    "gui.femtocraft.multiblock_selection": "Select Multiblock",
+    "gui.femtocraft.constructing": "Constructing...",
 }
 
 TAGS = {
     # (registry, namespace, path): values
     ("item", NS, "power_crystals"): [f"{NS}:power_crystal"],
+    # Ore dictionary names (v3 registerOre) become common tags; the demolisher grinds c:ores/<x> into c:dusts/<x>.
+    ("item", "c", "dusts/riftiron"): [f"{NS}:riftiron_dust"],
+    ("item", "c", "dusts/phasemetal"): [f"{NS}:phasemetal_dust"],
+    ("item", "c", "dusts/iron"): [f"{NS}:iron_dust"],
+    ("item", "c", "dusts/gold"): [f"{NS}:gold_dust"],
+    ("item", "c", "dusts/diamond"): [f"{NS}:diamond_dust"],
+    ("item", "c", "dusts/redstonereplacement"): [f"{NS}:redstonereplacement_dust"],
+    ("item", "c", "dusts/lapisreplacement"): [f"{NS}:lapisreplacement_dust"],
+    ("item", "c", "dusts/diamondreplacement"): [f"{NS}:diamondreplacement_dust"],
+    ("item", "c", "dusts"): [f"#c:dusts/{x}" for x in ["riftiron", "phasemetal", "redstonereplacement", "lapisreplacement", "diamondreplacement"]],
+    ("item", "c", "ingots/riftiron_devoid"): [f"{NS}:riftiron_ingot_devoid"],
+    ("item", "c", "ingots/riftiron_activated"): [f"{NS}:riftiron_ingot_activated"],
+    ("item", "c", "ingots/phasemetal_devoid"): [f"{NS}:phasemetal_ingot_devoid"],
+    ("item", "c", "ingots/phasemetal_activated"): [f"{NS}:phasemetal_ingot_activated"],
 }
 
 
@@ -128,7 +191,13 @@ def smelting(ingredient, result, xp=0.1):
 
 
 # v3's assets/femtocraft/recipes/*.json and FemtoRecipes smelting, translated to 26.1 ids and recipe formats.
-RECIPES = {}
+RECIPES = {
+    # FemtoRecipes.addSmeltingRecipes (dusts; the ore blocks are added with the cyber area)
+    "smelting/riftiron_ingot_from_dust": smelting(f"{NS}:riftiron_dust", f"{NS}:riftiron_ingot_devoid"),
+    "smelting/phasemetal_ingot_from_dust": smelting(f"{NS}:phasemetal_dust", f"{NS}:phasemetal_ingot_devoid"),
+    "smelting/iron_ingot_from_dust": smelting(f"{NS}:iron_dust", "minecraft:iron_ingot"),
+    "smelting/gold_ingot_from_dust": smelting(f"{NS}:gold_dust", "minecraft:gold_ingot"),
+}
 
 
 def element(box, texture="#all"):
@@ -193,13 +262,25 @@ def power_crystal_item():
                       "fallback": model("small")}}
 
 
+def configurator_item():
+    """Texture by mode, from the femtocraft:configurator_mode component."""
+    def model(mode):
+        return {"type": "minecraft:model", "model": f"{NS}:item/configurator_{mode}"}
+    return {"model": {"type": "minecraft:select", "property": "minecraft:component", "component": f"{NS}:configurator_mode",
+                      "cases": [{"when": m.upper(), "model": model(m)} for m in ["item", "fluid", "nanite"]],
+                      "fallback": model("item")}}
+
+
 def main():
     lang = dict(LANG)
     tools = {}
-    for name, (display, kind, drops, tool) in BLOCKS.items():
+    for name, entry in BLOCKS.items():
+        display, kind, drops, tool = entry[:4]
+        has_item = entry[4] if len(entry) > 4 else True
         write(os.path.join(ASSETS, "models", "block", f"{name}.json"), block_model(name, kind))
         write(os.path.join(ASSETS, "blockstates", f"{name}.json"), blockstate(name, kind))
-        write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{name}"}})
+        if has_item:
+            write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{name}"}})
         lang[f"block.{NS}.{name}"] = display
         write(os.path.join(DATA, "loot_table", "blocks", f"{name}.json"), loot(name, drops))
         if tool:
@@ -211,6 +292,15 @@ def main():
             for size in ["small", "medium", "large"]:
                 write(os.path.join(ASSETS, "models", "item", f"power_crystal_{size}.json"),
                       {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}:item/itemcrystal_{size}"}})
+            continue
+        if name == "configurator":
+            write(os.path.join(ASSETS, "items", f"{name}.json"), configurator_item())
+            for mode in ["item", "fluid", "nanite"]:
+                write(os.path.join(ASSETS, "models", "item", f"configurator_{mode}.json"),
+                      {"parent": "minecraft:item/handheld", "textures": {"layer0": f"{NS}:item/itemconfigurator_{mode}"}})
+            continue
+        if texture.startswith("block:"):
+            write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{texture[6:]}"}})
             continue
         write(os.path.join(ASSETS, "models", "item", f"{name}.json"),
               {"parent": "minecraft:item/generated", "textures": {"layer0": f"{NS}:item/{texture}"}})

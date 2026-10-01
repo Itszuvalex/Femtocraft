@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "femtocraft:item/itemconfigurator_nanite"
+  }
+}

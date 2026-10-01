@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.client.FemtoClient
 import com.itszuvalex.femtocraft.dev.DevContent
+import com.itszuvalex.femtocraft.industry.IndustryContent
 import com.itszuvalex.femtocraft.power.PowerContent
 import com.itszuvalex.femtocraft.power.WirelessPowerManager
 import com.mojang.logging.LogUtils
@@ -26,7 +27,9 @@ object Femtocraft {
 
     init {
         // Content objects register into FemtoRegistries (and register their modules) when initialized.
+        FemtoSounds.init()
         PowerContent.init()
+        IndustryContent.init(MOD_BUS)
         FemtoRegistries.register(MOD_BUS)
 
         NeoForge.EVENT_BUS.addListener { _: ServerStoppedEvent -> WirelessPowerManager.clear() }
