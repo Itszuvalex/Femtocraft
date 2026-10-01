@@ -136,7 +136,7 @@ printer, forge, extractor) whose recipes take nanites, and likely FLOPs, as inpu
 that. When the first of those machines is built, design datapack recipe types around what it needs and move every
 machine recipe, including the four tables above, onto them in the same change.
 
-## D13. Behaviour changes while porting — OPEN
+## D13. Behaviour changes while porting — DECIDED (maintainer, 2026-10-01)
 
 Small changes, each noted in the code:
 
@@ -150,3 +150,6 @@ Small changes, each noted in the code:
 - Rift conversion also turns deepslate into substrate (26.1 worlds are deepslate below y 0) and uses the `c:ores/*`
   tags, so deepslate ores convert like their stone variants.
 - Dumb dust is not used up in creative mode (vanilla `consume`).
+
+**Decision:** keep all four. Full-size rifts (a multi-chunk structure instead of a feature) stay a possible later
+change (REVIEW O7).
