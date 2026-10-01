@@ -38,7 +38,7 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 |---|---|---|---|
 | O6 | Rift edges | A rift converts what exists when it generates; trees and structures that neighbouring chunks place later stay unconverted, so rift edges can show half-converted trees | Left as is (maintainer, 2026-10-01): the rift is a placeholder; how rifts and cybermaterials generate is to be revisited |
 | O7 | Rift size | Large rifts are capped to radius 24 (v3: up to 40) by the feature write region | Left as is (maintainer, 2026-10-01), with O6: a multi-chunk structure would allow v3's sizes if rifts keep this shape |
-| O8 | Machine side configuration | No side-configuration screen; faces are set with the configurator only | PORTING "Not ported"; a screen could send `MenuActionPayload` actions |
+| O8 | Machine side configuration | No side-configuration screen; faces are set with the configurator only | Left as is (maintainer, 2026-10-01). Planned with the rendering work (O10): the machine screen renders the block and its neighbours in 3D, rotated by dragging, so faces are configured on the model and the player sees what each face connects to. Faces change through `MenuActionPayload` actions |
 | O9 | Crystal clusters | Drop crystals on any removal, including creative breaking and commands (as in v3) | Kept |
 | O10 | Rendering | Simple models and placeholder textures; no TESRs, OBJ models, beams, particles or overlays | DECISIONS B2, PORTING "Follow-up rendering work" |
 | O11 | Systems not ported | Computation, tech tree, logistics test blocks, `*OLD` nanites, stubs, multitool | DECISIONS D4 (decided): the job/task system and indexed inventories are ported; stubs are planned machines (PORTING); the rest waits |

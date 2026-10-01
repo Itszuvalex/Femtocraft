@@ -78,8 +78,8 @@ DECISIONS D4 and D5 give the reasoning.
 - **Multiblock item** (`ItemMultiblock`): placing it did nothing (`onItemUse` returned success without acting) and nothing
   created one except an unused helper.
 - **Machine side-configuration tabs** (`GuiSidedInventoryConfig`/`Fluid`/`Nanite`, `ContainerSided*Config` and their
-  messages): GUI only; faces are configured with the configurator, which v3 also had. A screen could send
-  `MenuActionPayload` actions (ItszuLib D7) later.
+  messages): GUI only; faces are configured with the configurator, which v3 also had. Their replacement is planned
+  with the rendering work (REVIEW O8): a 3D view of the machine and its neighbours in the machine screen.
 - **Fluid placeholders** `cybermass`, `biomass`, `ambrosia` (aliases of water, unused).
 - **Rendering** (B2): TESRs, OBJ models, beams, previewable ghosts, particles, the nanite HUD overlay, GUI tabs and
   icons. Listed under [Follow-up rendering work](#follow-up-rendering-work).
@@ -114,6 +114,10 @@ Bugs found in v3 while porting are listed, with the test that pins each fix, in 
 
 All of this was client rendering in v3 and needs the 26.1 pipeline (`BlockEntityRenderer` with render state,
 `RenderLevelStageEvent`, particle providers). Blocks currently use simple cube models.
+
+Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
+dragging, so the player configures each face on the model and sees what it connects to (REVIEW O8). Ender IO's IO
+configuration view works this way.
 
 - OBJ models in `art/` and the v3 `models/block/*` folders (crystal mount, power pedestal, power sink, arc furnace,
   cyber base, germination chamber, conduits): NeoForge's OBJ loader can take them once the `.mtl` texture paths are
