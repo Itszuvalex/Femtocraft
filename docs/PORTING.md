@@ -40,7 +40,7 @@ Scala. Commits are listed under [Progress](#progress).
 |---|---|---|
 | Power | `power/`: wireless network (`WirelessPowerNetwork`, `WirelessPowerManager`), wired network (`WiredPowerNetwork` on ItszuLib's `FragNetworkedWire`), node/leaf/storage fragments, power crystal item (data component), crystal mount, charging/storage arrays, heat exchanger, crystal conduit, glow stick | Done (`dev/PowerGameTests`) |
 | Industry | `industry/`: materials, the five single-block machines on ItszuLib sided storage and auto IO, gritty slurry, frames and frame multiblocks (germination chamber, crystal focusing chamber), recipes, configurator, shift device | Done (`dev/IndustryGameTests`) |
-| Nanite | `nanite/`: one nanite API (stack, tank, registry, sided configuration and auto IO), nanite extractor/infuser and repository on it, player nanite tank as a data attachment, nano lash | Pending |
+| Nanite | `nanite/`: one nanite API (stack, tank, registry, sided configuration and auto IO), nanite extractor and infuser on it (the repository lands with logistics), player nanite tank as a synced data attachment with fill/drain menu actions, nano lash, configurator nanite mode | Done (`dev/NaniteGameTests`) |
 | Logistics | `logistics/`: item/fluid repositories, logistics conduit with item chips, nano pack | Pending |
 | Cyber and worldgen | `cyber/`, `worldgen/`: cybermaterial blocks and drops, dumb dust conversion, crystal cluster, rift feature + biome modifier | Pending |
 
@@ -79,7 +79,8 @@ DECISIONS D4 and D5 give the reasoning.
 - [x] Docs rewritten for v3 (this file, DECISIONS.md).
 - [x] Power: wireless and wired networks, crystals, crystal machines, conduit, glow stick; 14 game tests, 9 JUnit tests.
 - [x] Industry: materials, machines, frames and frame multiblocks, configurator, shift device; 17 game tests.
-- [ ] Nanite, logistics, cyber/worldgen (table above).
+- [x] Nanite: API, extractor, infuser, player tank, nano lash; 8 game tests.
+- [ ] Logistics, cyber/worldgen (table above).
 
 ## 1.12.2 bugs fixed
 

@@ -80,6 +80,9 @@ BLOCKS = {
     "crystal_furnace": ("Crystal Furnace", ("machine", "crystal_furnace_front"), "self", "pickaxe"),
     "crystal_crusher": ("Crystal Crusher", ("machine", "crystal_crusher_front"), "self", "pickaxe"),
     "crystal_liquifier": ("Crystal Liquifier", ("machine", "liquifier_front"), "self", "pickaxe"),
+    # --- nanite ---
+    "nanite_extractor": ("Nanite Extractor", ("machine", "naniteextractor_front"), "self", "pickaxe"),
+    "nanite_infuser": ("Nanite Infuser", ("machine", "naniteinfuser_front"), "self", "pickaxe"),
     # Placed by the frame item and by frame building; they drop through their teardown, not loot tables.
     "frame": ("Frame", ("box", "standin_frame", [0, 0, 0, 16, 16, 16]), "none", "pickaxe", False),
     "germination_chamber": ("Germination Chamber", ("cube_all", "germination_chamber"), "none", "pickaxe", False),
@@ -112,6 +115,7 @@ ITEMS = {
     "frame": ("Frame", "block:frame"),
     "configurator": ("Configurator", None),
     "shift_test": ("Shift Device", "itemshifttest"),
+    "nano_lash": ("Nano Lash", "itemnanolash"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
@@ -153,6 +157,11 @@ LANG = {
     "tooltip.femtocraft.configurator.nanite": "Nanites",
     "gui.femtocraft.multiblock_selection": "Select Multiblock",
     "gui.femtocraft.constructing": "Constructing...",
+    "gui.femtocraft.nanite.fill": "Fill",
+    "gui.femtocraft.nanite.drain": "Drain",
+    "gui.femtocraft.nanite.tank": "Nanites: %s/%s",
+    "gui.femtocraft.nanite.player": "Yours: %s",
+    "entity.femtocraft.nano_lash": "Nano Lash",
 }
 
 TAGS = {

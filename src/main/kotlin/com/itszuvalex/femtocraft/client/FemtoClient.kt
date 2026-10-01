@@ -3,7 +3,10 @@ package com.itszuvalex.femtocraft.client
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.FemtoFluids
 import com.itszuvalex.femtocraft.industry.IndustryContent
+import com.itszuvalex.femtocraft.nanite.NaniteContent
 import com.itszuvalex.femtocraft.power.PowerContent
+import net.minecraft.client.renderer.entity.ThrownItemRenderer
+import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.minecraft.client.renderer.block.FluidModel
 import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.resources.Identifier
@@ -18,6 +21,7 @@ object FemtoClient {
     fun register(modBus: IEventBus) {
         modBus.addListener(::registerScreens)
         modBus.addListener(::registerFluidModels)
+        modBus.addListener { event: EntityRenderersEvent.RegisterRenderers -> event.registerEntityRenderer(NaniteContent.NANO_LASH_ENTITY.get(), ::ThrownItemRenderer) }
     }
 
     private fun registerFluidModels(event: RegisterFluidModelsEvent) {
@@ -37,5 +41,6 @@ object FemtoClient {
         event.register(IndustryContent.FRAME_SELECTION_MENU.get(), ::FrameSelectionScreen)
         event.register(IndustryContent.GERMINATION_CHAMBER_MENU.get(), ::GerminationChamberScreen)
         event.register(IndustryContent.FOCUSING_CHAMBER_MENU.get(), ::FocusingChamberScreen)
+        event.register(NaniteContent.NANITE_MACHINE_MENU.get(), ::NaniteMachineScreen)
     }
 }

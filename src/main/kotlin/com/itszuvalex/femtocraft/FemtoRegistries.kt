@@ -47,6 +47,13 @@ object FemtoRegistries {
     val SOUNDS: DeferredRegister<SoundEvent> = DeferredRegister.create(Registries.SOUND_EVENT, Femtocraft.ID)
 
     @JvmField
+    val ENTITY_TYPES: DeferredRegister.Entities = DeferredRegister.createEntities(Femtocraft.ID)
+
+    @JvmField
+    val ATTACHMENT_TYPES: DeferredRegister<net.neoforged.neoforge.attachment.AttachmentType<*>> =
+        DeferredRegister.create(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Femtocraft.ID)
+
+    @JvmField
     val TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Femtocraft.ID)
 
     private val coreBlockEntities = ArrayList<DeferredHolder<BlockEntityType<*>, out BlockEntityType<out BlockEntityCore>>>()
@@ -96,6 +103,8 @@ object FemtoRegistries {
         DATA_COMPONENTS.register(modBus)
         SOUNDS.register(modBus)
         TABS.register(modBus)
+        ENTITY_TYPES.register(modBus)
+        ATTACHMENT_TYPES.register(modBus)
         modBus.addListener { event: RegisterCapabilitiesEvent ->
             coreBlockEntities.forEach { ModuleCapabilities.registerBlockEntity(event, it.get()) }
         }

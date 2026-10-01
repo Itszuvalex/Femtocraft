@@ -91,6 +91,13 @@ abstract class ProcessingMachineBlockEntity(type: BlockEntityType<*>, pos: Block
     protected abstract fun hasRecipe(stack: ItemStack): Boolean
 
     /**
+     * Pays whatever the recipe for [stack] costs up front (the nanite infuser's nanites).
+     *
+     * @return False to not start.
+     */
+    protected open fun payStartCost(stack: ItemStack): Boolean = true
+
+    /**
      * Works out the result of [stack] and holds it until [pushResult] gets it all out.
      *
      * @return False if there is none (the recipe went away); the input is then dropped from the task.
@@ -127,7 +134,7 @@ abstract class ProcessingMachineBlockEntity(type: BlockEntityType<*>, pos: Block
     override fun serverTick() {
         if (processing.isEmpty) {
             val item = input.get(0).toMinecraft()
-            if (!item.isEmpty && hasRecipe(item)) {
+            if (!item.isEmpty && hasRecipe(item) && payStartCost(item)) {
                 processing = input.split(0, 1).toMinecraft()
                 task.reset()
                 done = false
@@ -202,7 +209,10 @@ abstract class ItemProcessingMachineBlockEntity(type: BlockEntityType<*>, pos: B
         pending = input.read(PENDING_KEY, ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY)
     }
 
-    protected fun addItemMachineFragments(title: String) {
+    protected fun addItemMachineFragments(
+        title: String,
+        menu: (Int, net.minecraft.world.entity.player.Inventory) -> net.minecraft.world.inventory.AbstractContainerMenu = { id, inv -> MachineMenu(id, inv, this) },
+    ) {
         val config = FragSidedConfiguration(
             "ItemConfig",
             SidedItemStorageConfiguration(::machineItemFaces, mapOf(NONE to IItemStorage.Empty, INPUT to input, OUTPUT to output)) { HorizontalFacing.front(blockState) },
@@ -212,7 +222,7 @@ abstract class ItemProcessingMachineBlockEntity(type: BlockEntityType<*>, pos: B
         fragList.addItemStorage(FragItemStorage(inventory))
         fragList.addInternalFragment(FragDropInventory(inventory))
         fragList.addTickableFragment(FragItemAutoIO())
-        fragList.addFragment(FragMenu(Component.translatable(title), { id, inv, _ -> MachineMenu(id, inv, this) }))
+        fragList.addFragment(FragMenu(Component.translatable(title), { id, inv, _ -> menu(id, inv) }))
     }
 }
 
