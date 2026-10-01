@@ -29,12 +29,10 @@ on the old behaviour.
 ## Open
 
 Not fixed; each needs a maintainer call or is a documented limitation. Numbers are kept when an item closes (O2,
-menu slots, was decided as DECISIONS D6).
+menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine recipes, as D12).
 
 | # | Area | Finding | Current handling |
 |---|---|---|---|
-| O1 | Power interop | Femtocraft power is internal: no Forge Energy in or out | DECISIONS D10 (one fragment per block if wanted) |
-| O3 | Machine recipes | Kotlin tables, so datapacks cannot change dust, liquifier, germination or infusion recipes | DECISIONS D12 |
 | O4 | Fluid and nanite chips | v3 never implemented fluid or nanite connections; the chips are craftable and do nothing | Kept as items (they have recipes and textures); only item chips work |
 | O5 | Item chip countdown | The flop countdown lives in the chip's component (as in v3's NBT), so every active chip writes its stack and marks its conduit dirty each tick, and an open conduit menu resends the chip | Correct but chatty; moving the countdown into the conduit fragment would fix it, at the cost of chips losing progress when moved |
 | O6 | Rift edges | A rift converts what exists when it generates; trees and structures that neighbouring chunks place later stay unconverted, so rift edges can show half-converted trees | Placed in the last feature step (D13) to keep this small |

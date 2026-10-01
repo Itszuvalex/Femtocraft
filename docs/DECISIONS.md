@@ -116,12 +116,17 @@ position and were applied without checking that the sender had its GUI open. The
 `MenuActionPayload` (ItszuLib D7), routed only to the sender's open, valid menu. Particle and teleport-effect messages
 are client rendering (B2).
 
-## D12. Recipes — OPEN
+## D12. Recipes — DECIDED (maintainer, 2026-10-01)
 
 Crafting and smelting recipes are datapack JSON (vanilla types). Machine recipes (dust/demolisher, liquifier,
 germination chamber, nanite infusion) stay as Kotlin tables, as in v3, instead of new datapack recipe types; the ore
 dictionary lookups become item tags (`c:ores/<x>` -> first item of `c:dusts/<x>`). Datapack recipe types are the
 natural next step if pack makers should be able to change them.
+
+**Decision:** keep the tables for now. The 2020 v3 design notes plan Tier 1 machines (reformer, fabricator, circuit
+printer, forge, extractor) whose recipes take nanites, and likely FLOPs, as inputs; no vanilla recipe type covers
+that. When the first of those machines is built, design datapack recipe types around what it needs and move every
+machine recipe, including the four tables above, onto them in the same change.
 
 ## D13. Behaviour changes while porting — OPEN
 
