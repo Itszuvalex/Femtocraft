@@ -97,12 +97,17 @@ from tables in `tools/gen_assets.py` (run `python3 tools/gen_assets.py`, commit 
 generation, to keep the port small. Textures moved to the 26.1 layout (`textures/block`, `textures/item`,
 `textures/gui`); blocks without a v3 texture use a generated placeholder.
 
-## D10. Femtocraft power stays its own system — OPEN
+## D10. Femtocraft power stays its own system — DECIDED (maintainer, 2026-10-01)
 
 v3's power (`IBattery` storages, wireless and wired networks) is internal: it never exposed Forge Energy. The default
 keeps it that way: the power modules are ItszuLib modules with no NeoForge capability. Exposing machines through
 NeoForge's `Capabilities.Energy.BLOCK` (ItszuLib's `WrapperEnergyHandlerIBattery` already exists) is a one-line
 fragment per block if the maintainer wants interop.
+
+**Decision:** internal. The 2020 v3 design notes make power its own progression (crystals carried by hand and
+recharged in the dark, then wired, then wireless), which FE input would skip. Femtocraft exposes no NeoForge energy
+in either direction. Converting between Femtocraft power and other energy systems is left to a separate add-on mod,
+to be scoped later depending on which systems it should convert between.
 
 ## D11. Network messages — DECIDED (non-blocking)
 
