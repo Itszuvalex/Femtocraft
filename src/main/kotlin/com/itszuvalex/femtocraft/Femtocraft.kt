@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.logistics.distributed.DistributedManager
 import com.itszuvalex.femtocraft.nanite.NaniteManager
 import com.itszuvalex.femtocraft.power.PowerManager
 import com.mojang.logging.LogUtils
+import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.common.Mod
 import net.neoforged.fml.loading.FMLEnvironment
 import net.neoforged.neoforge.common.NeoForge
@@ -37,6 +38,10 @@ object Femtocraft {
 
         if (!FMLEnvironment.isProduction()) {
             DevContent.register(MOD_BUS)
+        }
+
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
+            com.itszuvalex.femtocraft.client.FemtoClient.init(MOD_BUS)
         }
 
         // Managers hold server-side locations; drop them with the server.

@@ -32,6 +32,7 @@ def tex(name):
 #   ("cube_all", tex)                  one texture
 #   ("machine",)                       machine front/side textures
 #   ("column", side, end)              log-like, axis property
+#   ("column_static", side, end)       same textures, no axis property
 #   ("leaves", tex)
 #   ("cross", item_tex)                crossed planes (crystals)
 #   ("post", tex)                      4px post (glow stick)
@@ -48,8 +49,8 @@ BLOCKS = {
     "power_sink": ("Power Sink", ("machine",), "self", True, "pickaxe"),
     "power_generator": ("Power Generator", ("machine",), "self", True, "pickaxe"),
     "glow_stick": ("Glow Stick", ("post", "glow_stick"), "self", True, None),
-    "crystal_cluster": ("Crystal Cluster", ("cross", "power_crystal_large"), "none", True, "pickaxe"),
-    "item_repository": ("Item Repository", ("column", "item_repository_side", "item_repository_top"), "self", True, "pickaxe"),
+    "crystal_cluster": ("Crystal Cluster", ("cross", "crystal_cluster"), "none", True, "pickaxe"),
+    "item_repository": ("Item Repository", ("column_static", "item_repository_side", "item_repository_top"), "self", True, "pickaxe"),
     "nanite_hive_small": ("Small Nanite Hive", ("machine",), "self", True, "pickaxe"),
     # Placed by items; drops handled by the block entities
     "frame": ("Frame", ("frame",), "none", False, "pickaxe"),
@@ -164,12 +165,12 @@ def block_model(name, kind):
     if k == "machine":
         return {"parent": "minecraft:block/orientable",
                 "textures": {"front": tex("machine_front"), "side": tex("machine_side"), "top": tex("machine_side")}}
-    if k == "column":
+    if k in ("column", "column_static"):
         return {"parent": "minecraft:block/cube_column", "textures": {"side": tex(kind[1]), "end": tex(kind[2])}}
     if k == "leaves":
         return {"parent": "minecraft:block/leaves", "textures": {"all": tex(kind[1])}}
     if k == "cross":
-        return {"parent": "minecraft:block/cross", "textures": {"cross": f"{NS}:item/{kind[1]}"}, "render_type": "minecraft:cutout"}
+        return {"parent": "minecraft:block/cross", "textures": {"cross": tex(kind[1])}, "render_type": "minecraft:cutout"}
     if k == "post":
         t = tex(kind[1])
         return {"textures": {"particle": t, "post": t},

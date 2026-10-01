@@ -1,16 +1,7 @@
 {
   "variants": {
-    "axis=x": {
-      "model": "femtocraft:block/item_repository",
-      "x": 90,
-      "y": 90
-    },
-    "axis=y": {
+    "": {
       "model": "femtocraft:block/item_repository"
-    },
-    "axis=z": {
-      "model": "femtocraft:block/item_repository",
-      "x": 90
     }
   }
 }

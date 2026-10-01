@@ -63,7 +63,8 @@ class CrystalClusterFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConfi
         val center = BlockPos(origin.x, y, origin.z)
 
         val size = pickSize(random.nextInt(Size.entries.sumOf { it.weight }))
-        val dist = random.nextInt(size.distMax - size.distMin) + size.distMin
+        // Features may only write within one chunk of their origin chunk; larger 1.7.10 spheres are capped.
+        val dist = minOf(random.nextInt(size.distMax - size.distMin) + size.distMin, MAX_RADIUS)
         val cryst = random.nextInt(size.crystMax - size.crystMin) + size.crystMin
 
         // Replace in sphere
@@ -93,6 +94,11 @@ class CrystalClusterFeature : Feature<NoneFeatureConfiguration>(NoneFeatureConfi
         const val Y_MIN = 20
         const val Y_MAX = 100
         const val CRYSTAL_SPAWN_DIST_MAX = 5
+
+        /**
+         * Largest sphere radius that stays inside the 3x3 chunks a feature may write to.
+         */
+        const val MAX_RADIUS = 16
 
         /**
          * Weighted pick of a cluster size. [roll] is uniform in [0, total weight).
