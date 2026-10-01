@@ -44,11 +44,19 @@ headers; the repo has no LICENSE file, which the maintainer may want to add).
 **Maintainer defaults — DECIDED:** v3's unfinished systems are not ported: computation, the tech tree, the logistics
 test blocks, and the duplicate `*OLD` nanite classes.
 
-**Further cuts — OPEN (conservative default: not ported):** code that nothing registered or that cannot run:
+**Further cuts — DECIDED (maintainer, 2026-10-01):** code that nothing registered or that cannot run:
 7-line stub tiles never registered as blocks, recipe registries with no machine (circuit printer, fabricator, forge,
 reformer, synthesizer), the multitool (all `???`), the job/task system and indexed inventories (only the test blocks
-used them), and the water-aliased fluid placeholders. The full list is in [PORTING.md](PORTING.md#not-ported). Each
-can be added later on the ported framework; none blocks anything that was ported.
+used them), and the water-aliased fluid placeholders.
+
+- **Ported:** the job/task system and the indexed inventories (`logistics/distributed/`, `logistics/Jobs.kt`,
+  `logistics/storage/`). The distributed task/worker manager is the one working piece; the job, queue, runner and
+  item logistics network interfaces had no implementation in v3 and are ported as interfaces. The v3 test blocks
+  stay out; unit and game tests cover the manager and the index.
+- **Waiting:** everything else. The stub tiles and machine-less recipe registries match the machine list in the 2020
+  v3 design notes, so PORTING lists them as [planned machines](PORTING.md#planned-machines), to be written fresh when
+  designed. The multitool, multiblock item, water-aliased fluids and cyberbloom stay under
+  [not ported](PORTING.md#not-ported) until something needs them.
 
 ## D5. One nanite API — DECIDED (maintainer, 2026-10-01)
 

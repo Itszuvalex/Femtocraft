@@ -25,6 +25,8 @@ on the old behaviour.
 | F12 | `FemtocraftOreGenerator` sizes | The medium branch tested `rand < MEDIUM_WEIGHT` after `rand < SMALL_WEIGHT` failed, which is never true (30 < 50), so medium rifts never spawned | Cumulative weights | game test `rift_sizes_include_medium_and_fit_the_feature_region` |
 | F13 | `FemtocraftOreGenerator` crystals | A crystal whose random height was inside the ground replaced the block there, burying it | It climbs to the air above first, then rests on the ground | game test `rift_crystals_rest_on_the_ground` |
 | F14 | Nano pack (port) | A hotbar-key swap over a pack slot moved the held pack into its own storage, deleting the pack and its contents. Menu slots ignored `canInsert` (ItszuLib R17) and the pack accepted nano packs | Nano packs refuse nano packs, and ItszuLib's slots now honour that | game test `nano_pack_cannot_be_swapped_into_itself` |
+| F15 | `DistributedManager` task order | Compared fill as `workers.size / workerCap` on integers, so every task that was not full tied at 0 and workers piled onto the first task of a priority | Fill is a fraction | `DistributedManagerTest.Seek_PrefersPriorityThenEmptierTask` |
+| F16 | `DistributedManager` assignment | Set the worker's task even when `addWorker` refused it, and freed workers by removing them from the set being iterated | Assigns only on acceptance (a refused worker tries the next task); iterates a copy | `DistributedManagerTest.Seek_TaskRefusesWorker_WorkerTriesTheNext`, `RemoveTaskProvider_FreesAllWorkers` |
 
 ## Open
 
@@ -40,7 +42,7 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 | O8 | Machine side configuration | No side-configuration screen; faces are set with the configurator only | PORTING "Not ported"; a screen could send `MenuActionPayload` actions |
 | O9 | Crystal clusters | Drop crystals on any removal, including creative breaking and commands (as in v3) | Kept |
 | O10 | Rendering | Simple models and placeholder textures; no TESRs, OBJ models, beams, particles or overlays | DECISIONS B2, PORTING "Follow-up rendering work" |
-| O11 | Systems not ported | Computation, tech tree, logistics test blocks and job system, `*OLD` nanites, stubs, multitool | DECISIONS D4 (further cuts OPEN) |
+| O11 | Systems not ported | Computation, tech tree, logistics test blocks, `*OLD` nanites, stubs, multitool | DECISIONS D4 (decided): the job/task system and indexed inventories are ported; stubs are planned machines (PORTING); the rest waits |
 
 ## Framework changes
 

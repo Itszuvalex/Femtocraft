@@ -103,13 +103,15 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          configurator, shift device, gritty slurry fluid
 ├── nanite/                Nanite API (stack, tank, registry, sided configuration, auto IO), extractor/infuser,
 │                          player nanites (synced data attachment), nano lash
-├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item chips, nano pack
+├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item chips, nano pack;
+│                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
+│                          indexed item storages (storage/)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
 ├── client/                FemtoScreen (plain functional screens) and each area's screens; fluid model and entity
 │                          renderer registration. Client only.
 └── dev/                   Game tests (one object per area), registered only outside production
-src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree)
+src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree, distributed task manager)
 src/main/resources/        assets (v3 textures under 26.1 paths, generated models/lang) and data (generated), plus
                            data/femtocraft/structure/test_area.nbt (empty 9x5x9 game test structure)
 tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,
@@ -140,7 +142,10 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 - **Nanites**: one API (DECISIONS D5): `NaniteStack(archetype, strain, version, amount)` in `NaniteTank`s, exposed by
   `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`); item chips in a conduit face keep their
-  state in the `femtocraft:item_connection` component and move one item per 5000 flops.
+  state in the `femtocraft:item_connection` component and move one item per 5000 flops. `DistributedManager` matches
+  idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
+  or broken); `IndexedItemStorage` indexes an `IItemStorage` by item id and answers tag lookups (keep it current with
+  `slotChanged` or `invalidateCache` from the storage's `onChanged`). Neither has a block using it yet (DECISIONS D4).
 - **Cyber/worldgen**: `Cybermaterials.replacement(state)` drives both dumb dust and the rift feature, which converts a
   cylinder of terrain (radius capped to the feature region, DECISIONS D13) and drops crystal clusters on it.
 - **Menus**: ItszuLib `MenuCore`s with vanilla slots (DECISIONS D6); non-slot values use `MenuSync`s; buttons send

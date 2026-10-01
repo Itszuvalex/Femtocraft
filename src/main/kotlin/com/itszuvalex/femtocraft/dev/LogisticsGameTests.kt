@@ -10,15 +10,20 @@ import com.itszuvalex.femtocraft.logistics.ItemRepositoryBlockEntity
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.logistics.NanoPackMenu
 import com.itszuvalex.femtocraft.logistics.NaniteRepositoryBlockEntity
+import com.itszuvalex.femtocraft.logistics.storage.IndexedItemStorage
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteStack
 import com.itszuvalex.femtocraft.nanite.NaniteStrainVersion
 import com.itszuvalex.itszulib.api.adapters.IItemStack
+import com.itszuvalex.itszulib.api.storage.ItemStorageArray
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.gametest.framework.GameTestHelper
+import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
+import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
@@ -44,6 +49,7 @@ object LogisticsGameTests {
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
         DevGameTests.test("nano_pack_saves_contents_and_locks_its_slot", body = ::nanoPack)
         DevGameTests.test("nano_pack_cannot_be_swapped_into_itself", body = ::nanoPackSwap)
+        DevGameTests.test("indexed_storage_finds_slots_by_item_and_tag", body = ::indexedStorage)
     }
 
     private fun itemRepository(helper: GameTestHelper) {
@@ -66,6 +72,38 @@ object LogisticsGameTests {
             helper.assertTrue(fluid.fluid == Fluids.WATER, "filled with water")
             helper.assertTrue(fluid.amount >= 10 * FluidRepositoryBlockEntity.WATER_PER_TICK, "keeps filling, at ${fluid.amount}")
         }
+    }
+
+    private fun indexedStorage(helper: GameTestHelper) {
+        lateinit var index: IndexedItemStorage
+        val storage = ItemStorageArray(4) { index.invalidateCache() }
+        index = IndexedItemStorage(storage)
+        val diamond = BuiltInRegistries.ITEM.getKey(Items.DIAMOND)
+        storage.setSlot(0, IItemStack.of(ItemStack(Items.OAK_LOG, 3)))
+        storage.setSlot(2, IItemStack.of(ItemStack(Items.DIAMOND)))
+        storage.setSlot(3, IItemStack.of(ItemStack(Items.BIRCH_LOG)))
+        helper.assertValueEqual(index.getSlotsByItem(diamond), setOf(2), "diamond slot")
+        helper.assertValueEqual(index.getSlotsByTag(ItemTags.LOGS), setOf(0, 3), "log slots")
+        helper.assertTrue(ItemTags.LOGS in index.getContainedTags(), "contained tags")
+        helper.assertTrue(index.isCacheValid(), "rebuilt on lookup")
+
+        // A named diamond still counts as a diamond: callers check components themselves.
+        storage.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND).also { it.set(DataComponents.CUSTOM_NAME, Component.literal("x")) }))
+        helper.assertTrue(!index.isCacheValid(), "onChanged invalidates")
+        helper.assertValueEqual(index.getSlotsByItemStack(IItemStack.of(ItemStack(Items.DIAMOND))), setOf(1, 2), "diamonds by item id")
+
+        // Incremental updates without invalidation.
+        val quiet = ItemStorageArray(2)
+        val quietIndex = IndexedItemStorage(quiet)
+        helper.assertTrue(quietIndex.getContainedItems().isEmpty(), "empty")
+        quiet.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND)))
+        quietIndex.slotChanged(1)
+        helper.assertValueEqual(quietIndex.getSlotsByItem(diamond), setOf(1), "added")
+        quiet.setSlot(1, IItemStack.of(ItemStack(Items.OAK_LOG)))
+        quietIndex.slotChanged(1)
+        helper.assertTrue(!quietIndex.containsItemStack(IItemStack.of(ItemStack(Items.DIAMOND))), "replaced")
+        helper.assertTrue(quietIndex.containsTag(ItemTags.LOGS), "now a log")
+        helper.succeed()
     }
 
     private fun naniteRepository(helper: GameTestHelper) {

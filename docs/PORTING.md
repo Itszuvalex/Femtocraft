@@ -41,8 +41,23 @@ Scala. Commits are listed under [Progress](#progress).
 | Power | `power/`: wireless network (`WirelessPowerNetwork`, `WirelessPowerManager`), wired network (`WiredPowerNetwork` on ItszuLib's `FragNetworkedWire`), node/leaf/storage fragments, power crystal item (data component), crystal mount, charging/storage arrays, heat exchanger, crystal conduit, glow stick | Done (`dev/PowerGameTests`) |
 | Industry | `industry/`: materials, the five single-block machines on ItszuLib sided storage and auto IO, gritty slurry, frames and frame multiblocks (germination chamber, crystal focusing chamber), recipes, configurator, shift device | Done (`dev/IndustryGameTests`) |
 | Nanite | `nanite/`: one nanite API (stack, tank, registry, sided configuration and auto IO), nanite extractor and infuser on it (the repository lands with logistics), player nanite tank as a synced data attachment with fill/drain menu actions, nano lash, configurator nanite mode | Done (`dev/NaniteGameTests`) |
-| Logistics | `logistics/`: item/fluid repositories, logistics conduit with item chips, nano pack | Pending |
+| Logistics | `logistics/`: item/fluid repositories, logistics conduit with item chips, nano pack; the distributed task/worker manager (`logistics/distributed/`), job interfaces, provider tracker and item logistics network interface (`Jobs.kt`), indexed item storages (`logistics/storage/`) | Done (`dev/LogisticsGameTests`, `DistributedManagerTest`) |
 | Cyber and worldgen | `cyber/`: cybermaterial blocks and their drops (loot tables), the replacement table (`Cybermaterials`, tags instead of the ore dictionary), dumb dust, nanite values; `worldgen/`: crystal cluster, rift feature (configured/placed feature + biome modifier); v3's crafting and ore smelting recipes | Done (`dev/CyberGameTests`) |
+
+## Planned machines
+
+v3 had these only as 7-line stub tiles (never registered as blocks) or empty recipe registries. They match the machine
+list in the maintainer's 2020 v3 design notes, so they are the roadmap rather than dead code (D4). Each will be written
+fresh on ItszuLib fragments when it is designed; machine recipes move to datapack recipe types with the first of them
+(D12).
+
+- Power: crystal growth chamber, projection/receiver/storage matrices, storage buffer, dark panel, dense power conduit,
+  thermoelectric generator, power-side focusing chamber tile.
+- Industry: extractor, fabricator, forge, reformer (+ `ModuleReformer`, whose module is `???`), circuit printer and
+  synthesizer (recipe registries only).
+- Logistics: item vault, fluid reservoir.
+- Nanites: nanite hive, holding tank, behavior modeller.
+- Computation: archive interface, mainframe, information conduit.
 
 ## Not ported
 
@@ -51,17 +66,14 @@ DECISIONS D4 and D5 give the reasoning.
 - **Computation** (`api/computation/*`, `computation/*`, `common/ComputationLimitedBatteryTask`, the computation
   modules): unfinished; its tiles are stubs and its dummy capability implementations are all `???`.
 - **Tech tree** (`tech/*`): a skeleton with no content or consumer.
-- **Logistics test blocks** (`logistics/test/*`, `BlockTest`): debug content. The job/task system they exercise
-  (`IJob`, `IJobQueue`, `IJobRunner`, `ProviderManager`, `IItemLogisticsNetwork`, `distributed/*`) and the indexed
-  inventories (`logistics/storage/item/*`) have no other user, so they go too.
+- **Logistics test blocks** (`logistics/test/*`, `BlockTest`): debug content. The job/task system and indexed
+  inventories they exercised are ported (D4); unit and game tests replace the test blocks.
+- **Tile forms of the indexed inventory** (`IndexedInventory`, `TileIndexedInventory*`, `TileMultiblockIndexedInventory*`):
+  already commented out in v3. `IndexedItemStorage` indexes any ItszuLib `IItemStorage` instead.
 - **Duplicate `*OLD` nanite classes** (`INaniteOLD`, `NaniteOLD`, `NaniteStackOLD`, `INaniteTankOLD`, `NaniteTankOLD`,
   `NaniteRegistryOLD`, `SidedNaniteStorageConfigurationOLD`, the `*OLD` modules): v3 has two nanite APIs. The newer
   one is ported and the machines that used the old one are moved onto it (D5).
-- **Stub tiles** never registered as blocks (7-line classes): crystal growth chamber, projection/receiver/storage
-  matrices, storage buffer, dark panel, dense power conduit, thermoelectric generator, power-side focusing chamber
-  tile, extractor, fabricator, forge, reformer (+ `ModuleReformer`, whose module is `???`), item vault, fluid
-  reservoir, nanite hive/holding tank/behavior modeller, archive interface, mainframe, information conduit.
-- **Recipe registries without a machine**: circuit printer, fabricator, forge, reformer, synthesizer.
+- **Stub tiles and recipe registries without a machine**: planned, not dropped; see [Planned machines](#planned-machines).
 - **Multitool** (`ItemMultiTool`, `Multitool`, upgrades): every method is `???`.
 - **Multiblock item** (`ItemMultiblock`): placing it did nothing (`onItemUse` returned success without acting) and nothing
   created one except an unused helper.

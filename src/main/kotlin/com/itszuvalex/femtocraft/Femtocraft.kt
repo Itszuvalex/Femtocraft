@@ -5,6 +5,8 @@ import com.itszuvalex.femtocraft.cyber.CyberContent
 import com.itszuvalex.femtocraft.dev.DevContent
 import com.itszuvalex.femtocraft.industry.IndustryContent
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
+import com.itszuvalex.femtocraft.logistics.ProviderManager
+import com.itszuvalex.femtocraft.logistics.distributed.DistributedManager
 import com.itszuvalex.femtocraft.nanite.NaniteContent
 import com.itszuvalex.femtocraft.power.PowerContent
 import com.itszuvalex.femtocraft.power.WirelessPowerManager
@@ -40,7 +42,11 @@ object Femtocraft {
         WorldgenContent.init()
         FemtoRegistries.register(MOD_BUS)
 
-        NeoForge.EVENT_BUS.addListener { _: ServerStoppedEvent -> WirelessPowerManager.clear() }
+        NeoForge.EVENT_BUS.addListener { _: ServerStoppedEvent ->
+            WirelessPowerManager.clear()
+            DistributedManager.clear()
+            ProviderManager.clear()
+        }
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) FemtoClient.register(MOD_BUS)
         if (!FMLEnvironment.isProduction()) DevContent.register(MOD_BUS)
