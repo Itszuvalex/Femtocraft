@@ -41,6 +41,7 @@ object DevGameTests {
             helper.assertTrue(ModList.get().isLoaded(ItszuLib.ID), "ItszuLib dependency is not loaded")
             helper.succeed()
         }
+        PowerGameTests.register()
     }
 
     fun register(modBus: IEventBus) {

@@ -1,109 +1,40 @@
 package com.itszuvalex.femtocraft.core
 
-import com.itszuvalex.itszulib.api.storage.IItemStorage
-import com.itszuvalex.itszulib.api.wrappers.WrapperContainerIItemStorage
-import net.minecraft.core.BlockPos
-import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.world.Container
+import com.itszuvalex.itszulib.api.adapters.IBattery
+import com.itszuvalex.itszulib.menu.BlockMenus
+import com.itszuvalex.itszulib.menu.MenuCore
+import com.itszuvalex.itszulib.menu.MenuSyncs
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.inventory.DataSlot
 import net.minecraft.world.inventory.MenuType
-import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 
 /**
- * Menu over a block entity's [IItemStorage]s. Port of ItszuLib 1.7.10's `ContainerInv`: machine slots first, then the
- * player inventory; shift-click moves between the two groups.
+ * Base for Femtocraft's block menus: an ItszuLib [MenuCore] (vanilla slots, shift-click, typed syncs; DECISIONS D6)
+ * over a block entity, valid while the player is in reach of it. Port of v3's `ContainerInv` subclasses.
  *
- * Client-side instances are built from the block entity at the position sent in the open-menu buffer (see [readBlockEntity]).
+ * @param blockEntity Null only if the client could not find the block entity the server named.
  */
-abstract class FemtoMenu(type: MenuType<*>, containerId: Int, protected val playerInventory: Inventory, val blockEntity: BlockEntity?) :
-    AbstractContainerMenu(type, containerId) {
+abstract class FemtoMenu<T : BlockEntity>(type: MenuType<*>, containerId: Int, inventory: Inventory, @JvmField val blockEntity: T?) :
+    MenuCore(type, containerId, inventory.player) {
 
-    private var machineSlots = 0
+    override fun stillValid(player: Player): Boolean = BlockMenus.stillValid(blockEntity, player)
 
     /**
-     * Adds a slot backed by one index of [storage]. Must be called before [addPlayerInventory].
-     *
-     * @param mayPlace Which items the slot accepts; defaults to `storage.canInsert`.
+     * Syncs a battery's charge and capacity into [view] (the client copy, read by the screen).
      */
-    protected fun addStorageSlot(
-        storage: IItemStorage,
-        index: Int,
-        x: Int,
-        y: Int,
-        mayPlace: (ItemStack) -> Boolean = { storage.canInsert(index, com.itszuvalex.itszulib.api.adapters.IItemStack.of(it)) },
-    ): Slot {
-        machineSlots++
-        return addSlot(object : Slot(WrapperContainerIItemStorage(storage), index, x, y) {
-            override fun mayPlace(stack: ItemStack): Boolean = mayPlace(stack)
-        })
+    protected fun syncBattery(battery: () -> IBattery, view: BatteryView) {
+        addSync(MenuSyncs.double({ battery().storage() }, { view.storage = it }))
+        addSync(MenuSyncs.double({ battery().maxStorage() }, { view.max = it }))
     }
 
     /**
-     * Output-only slot.
+     * Client-side copy of a synced battery.
      */
-    protected fun addOutputSlot(storage: IItemStorage, index: Int, x: Int, y: Int): Slot = addStorageSlot(storage, index, x, y) { false }
+    class BatteryView {
+        var storage = 0.0
+        var max = 0.0
 
-    protected fun addPlayerInventory(x: Int = 8, y: Int = 84) = addStandardInventorySlots(playerInventory, x, y)
-
-    /**
-     * Syncs an int to the client (e.g. progress).
-     */
-    protected fun trackInt(get: () -> Int, set: (Int) -> Unit) {
-        addDataSlot(object : DataSlot() {
-            override fun get(): Int = get()
-            override fun set(value: Int) = set(value)
-        })
-    }
-
-    /**
-     * Syncs a long (e.g. power) as two ints, like the 1.7.10 containers did.
-     */
-    protected fun trackLong(get: () -> Long, set: (Long) -> Unit) {
-        // Client side: assemble the halves in a local copy, since the halves arrive separately.
-        var received = 0L
-        trackInt({ (get() ushr 32).toInt() }, { hi ->
-            received = (hi.toLong() shl 32) or (received and 0xFFFFFFFFL)
-            set(received)
-        })
-        trackInt({ get().toInt() }, { lo ->
-            received = (received and -0x100000000L) or (lo.toLong() and 0xFFFFFFFFL)
-            set(received)
-        })
-    }
-
-    override fun stillValid(player: Player): Boolean {
-        val be = blockEntity ?: return false
-        return !be.isRemoved && Container.stillValidBlockEntity(be, player)
-    }
-
-    override fun quickMoveStack(player: Player, index: Int): ItemStack {
-        val slot = slots.getOrNull(index) ?: return ItemStack.EMPTY
-        if (!slot.hasItem()) return ItemStack.EMPTY
-        val stack = slot.item
-        val original = stack.copy()
-        if (index < machineSlots) {
-            if (!moveItemStackTo(stack, machineSlots, slots.size, true)) return ItemStack.EMPTY
-        } else if (!moveItemStackTo(stack, 0, machineSlots, false)) {
-            return ItemStack.EMPTY
-        }
-        if (stack.isEmpty) slot.setByPlayer(ItemStack.EMPTY) else slot.setChanged()
-        if (stack.count == original.count) return ItemStack.EMPTY
-        slot.onTake(player, stack)
-        return original
-    }
-
-    companion object {
-        /**
-         * Client side: the block entity at the position written by `Player.openMenu(provider, pos)`.
-         */
-        inline fun <reified T : BlockEntity> readBlockEntity(inventory: Inventory, buf: RegistryFriendlyByteBuf): T? {
-            val pos: BlockPos = buf.readBlockPos()
-            return inventory.player.level().getBlockEntity(pos) as? T
-        }
+        val fraction: Double get() = if (max <= 0) 0.0 else (storage / max).coerceIn(0.0, 1.0)
     }
 }

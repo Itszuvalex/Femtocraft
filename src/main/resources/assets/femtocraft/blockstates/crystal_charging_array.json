@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "femtocraft:block/crystal_charging_array"
+    },
+    "facing=east": {
+      "model": "femtocraft:block/crystal_charging_array",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "femtocraft:block/crystal_charging_array",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "femtocraft:block/crystal_charging_array",
+      "y": 270
+    }
+  }
+}

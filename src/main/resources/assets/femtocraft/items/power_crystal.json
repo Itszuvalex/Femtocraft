@@ -1,0 +1,62 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "cases": [
+      {
+        "when": "small",
+        "model": {
+          "type": "minecraft:model",
+          "model": "femtocraft:item/power_crystal_small",
+          "tints": [
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": 65535
+            }
+          ]
+        }
+      },
+      {
+        "when": "medium",
+        "model": {
+          "type": "minecraft:model",
+          "model": "femtocraft:item/power_crystal_medium",
+          "tints": [
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": 65535
+            }
+          ]
+        }
+      },
+      {
+        "when": "large",
+        "model": {
+          "type": "minecraft:model",
+          "model": "femtocraft:item/power_crystal_large",
+          "tints": [
+            {
+              "type": "minecraft:custom_model_data",
+              "index": 0,
+              "default": 65535
+            }
+          ]
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "femtocraft:item/power_crystal_small",
+      "tints": [
+        {
+          "type": "minecraft:custom_model_data",
+          "index": 0,
+          "default": 65535
+        }
+      ]
+    }
+  }
+}

@@ -16,8 +16,8 @@ import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 
 /**
- * Femtocraft's block entity base: a fragment-composed [TickableBlockEntityCore] with the lifecycle hooks the 1.7.10
- * `TileEntityBase` offered (split server/client updates, activation, placement), mapped onto 26.1.
+ * Femtocraft's block entity base: a fragment-composed [TickableBlockEntityCore] with the hooks v3's
+ * `TileEntityCoreTickable` offered (split server/client updates, activation, placement), mapped onto 26.1.
  */
 abstract class FemtoBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) :
     TickableBlockEntityCore(type, pos, state) {
@@ -35,17 +35,17 @@ abstract class FemtoBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: 
     }
 
     /**
-     * Called every tick on the server.
+     * Called every tick on the server, after the fragments' ticks.
      */
     open fun serverTick() {}
 
     /**
-     * Called every tick on the client.
+     * Called every tick on the client, after the fragments' ticks.
      */
     open fun clientTick() {}
 
     /**
-     * Right-click with an empty hand (or an item the block does not handle).
+     * Right-click with an empty hand, when the block has no menu.
      */
     open fun onUse(player: Player): InteractionResult = InteractionResult.PASS
 
@@ -53,27 +53,6 @@ abstract class FemtoBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: 
      * Placed by an entity, after the block entity exists.
      */
     open fun onPlaced(placer: LivingEntity?, stack: ItemStack) {}
-
-    override fun onLoad() {
-        super.onLoad()
-        if (isServer) onServerLoad()
-    }
-
-    /**
-     * Server side, when this block entity is added to a loaded level (placement or chunk load). Register with
-     * server-side managers here.
-     */
-    open fun onServerLoad() {}
-
-    override fun setRemoved() {
-        if (isServer) onServerUnload()
-        super.setRemoved()
-    }
-
-    /**
-     * Server side, when this block entity leaves the level (broken or chunk unloaded). Unregister here.
-     */
-    open fun onServerUnload() {}
 
     /**
      * Saves, and on the server re-sends client (DESCRIPTION) data.

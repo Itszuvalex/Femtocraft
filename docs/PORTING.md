@@ -38,7 +38,7 @@ Scala. Commits are listed under [Progress](#progress).
 
 | Area | 26.1 shape | Status |
 |---|---|---|
-| Power | `power/`: wireless network (`WirelessPowerNetwork`, `WirelessPowerManager`), wired network (`WiredPowerNetwork` on ItszuLib's `FragNetworkedWire`), node/leaf/storage fragments, power crystal item (data component), crystal mount, charging/storage arrays, heat exchanger, crystal conduit, glow stick | Pending |
+| Power | `power/`: wireless network (`WirelessPowerNetwork`, `WirelessPowerManager`), wired network (`WiredPowerNetwork` on ItszuLib's `FragNetworkedWire`), node/leaf/storage fragments, power crystal item (data component), crystal mount, charging/storage arrays, heat exchanger, crystal conduit, glow stick | Done (`dev/PowerGameTests`) |
 | Industry | `industry/`: frames and frame multiblocks, the single-block machines on ItszuLib sided storage and auto IO, germination chamber, focusing chamber, recipes, configurator, shift item | Pending |
 | Nanite | `nanite/`: one nanite API (stack, tank, registry, sided configuration and auto IO), nanite extractor/infuser and repository on it, player nanite tank as a data attachment, nano lash | Pending |
 | Logistics | `logistics/`: item/fluid repositories, logistics conduit with item chips, nano pack | Pending |
@@ -72,7 +72,8 @@ DECISIONS D4 and D5 give the reasoning.
 
 - [x] Branch from `develop-1.12.2-v3` with the 26.1 build and test harness (03a8d00).
 - [x] Docs rewritten for v3 (this file, DECISIONS.md).
-- [ ] Power, industry, nanite, logistics, cyber/worldgen (table above).
+- [x] Power: wireless and wired networks, crystals, crystal machines, conduit, glow stick; 14 game tests, 9 JUnit tests.
+- [ ] Industry, nanite, logistics, cyber/worldgen (table above).
 
 ## 1.12.2 bugs fixed
 
@@ -80,6 +81,12 @@ Bugs found in v3 while porting. Each fix is pinned by a test named in the last c
 
 | Area | v3 behaviour | Fix | Test |
 |---|---|---|---|
+| Crystal charging/storage array, heat exchanger | Drained the crystal's full transfer rate into the battery and clamped the battery, destroying whatever did not fit | Only what fits is drained (`drainCrystalInto`) | game test `charging_array_full_battery_keeps_crystal_power` |
+| `WirelessPowerManager.addNode` | A node in range of two networks was added to each in turn; adding it to the second removed it from the first, so the networks never merged | Joins one network, then connects to the others (merging them) | game test `mount_bridging_two_networks_merges_them` |
+| `DistributionAlgorithm` | Removed power from the source before adding it to the sink and ignored how much the sink accepted | Removes only what the sink accepted | `DistributionAlgorithmTest.Distribute_SinkAcceptsLess_SourceKeepsTheRest` |
+| `MinimalSpanningTree` | A Prim-style walk that revisited nodes and threw (`.get` on an empty search) on graphs it could not finish | Kruskal with union-find; disconnected parts get their own trees | `MinimalSpanningTreeTest.Calculate_Disconnected_GivesForest` |
+| `WirelessPowerNetwork` statistics | Read `changeForLastTick`, which every node left at `0 // TODO`, so the network screen always showed zeros | Counts the power the distribution moved | game test `wireless_network_distributes_power` |
+| `TileCrystalHeatExchanger` | Burning a lava bucket lost the bucket | The container stays in the fuel slot | game test `heat_exchanger_keeps_lava_bucket` |
 
 ## Follow-up rendering work
 

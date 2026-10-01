@@ -1,9 +1,15 @@
 package com.itszuvalex.femtocraft
 
+import com.itszuvalex.femtocraft.client.FemtoClient
 import com.itszuvalex.femtocraft.dev.DevContent
+import com.itszuvalex.femtocraft.power.PowerContent
+import com.itszuvalex.femtocraft.power.WirelessPowerManager
 import com.mojang.logging.LogUtils
+import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.common.Mod
 import net.neoforged.fml.loading.FMLEnvironment
+import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.event.server.ServerStoppedEvent
 import org.slf4j.Logger
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 
@@ -19,8 +25,13 @@ object Femtocraft {
     val LOGGER: Logger = LogUtils.getLogger()
 
     init {
-        if (!FMLEnvironment.isProduction()) {
-            DevContent.register(MOD_BUS)
-        }
+        // Content objects register into FemtoRegistries (and register their modules) when initialized.
+        PowerContent.init()
+        FemtoRegistries.register(MOD_BUS)
+
+        NeoForge.EVENT_BUS.addListener { _: ServerStoppedEvent -> WirelessPowerManager.clear() }
+
+        if (FMLEnvironment.getDist() == Dist.CLIENT) FemtoClient.register(MOD_BUS)
+        if (!FMLEnvironment.isProduction()) DevContent.register(MOD_BUS)
     }
 }

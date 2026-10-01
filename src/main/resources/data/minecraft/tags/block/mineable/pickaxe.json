@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "femtocraft:crystal_charging_array",
+    "femtocraft:crystal_heat_exchanger",
+    "femtocraft:crystal_mount",
+    "femtocraft:crystal_storage_array",
+    "femtocraft:power_conduit_crystal"
+  ]
+}
