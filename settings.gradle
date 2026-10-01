@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'femtocraft'
+
+// ItszuLib is consumed from a sibling checkout as a Gradle composite build: the
+// com.itszuvalex.itszulib:itszulib dependency in build.gradle is substituted with
+// that project, so ItszuLib changes are picked up without publishing anything.
+// Override the location with -Pitszulib_dir=/path/to/ItszuLib (or in ~/.gradle/gradle.properties).
+def itszulibDir = file(providers.gradleProperty('itszulib_dir').getOrElse('../ItszuLib'))
+if (!new File(itszulibDir, 'settings.gradle').isFile()) {
+    throw new GradleException("ItszuLib checkout not found at ${itszulibDir}. Clone https://github.com/Itszuvalex/ItszuLib " +
+            "(branch neoforge-26.1) next to Femtocraft, or set itszulib_dir in ~/.gradle/gradle.properties.")
+}
+includeBuild(itszulibDir)
