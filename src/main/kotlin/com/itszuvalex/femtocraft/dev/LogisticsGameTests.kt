@@ -54,6 +54,7 @@ object LogisticsGameTests {
         DevGameTests.test("conduit_fluid_chips_move_fluid_between_tanks", body = ::conduitMovesFluid)
         DevGameTests.test("conduit_nanite_chips_move_nanites_between_tanks", body = ::conduitMovesNanites)
         DevGameTests.test("conduit_drops_chips", body = ::conduitDrops)
+        DevGameTests.test("conduit_chip_progress_moves_with_the_chip", body = ::chipProgress)
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
         DevGameTests.test("nano_pack_saves_contents_and_locks_its_slot", body = ::nanoPack)
         DevGameTests.test("nano_pack_cannot_be_swapped_into_itself", body = ::nanoPackSwap)
@@ -126,9 +127,9 @@ object LogisticsGameTests {
     /**
      * A chip that runs its first operation on the next tick.
      */
-    private fun chip(face: Direction, channel: String = "default", kind: ChipKind<*> = ItemChipKind): ItemStack {
+    private fun chip(face: Direction, channel: String = "default", kind: ChipKind<*> = ItemChipKind, flops: Double = 1.0): ItemStack {
         val stack = ItemStack(chipItem(kind))
-        primed(kind, stack, face, channel)
+        primed(kind, stack, face, channel, flops)
         return stack
     }
 
@@ -138,9 +139,42 @@ object LogisticsGameTests {
         else -> LogisticsContent.ITEM_CHIP.get()
     }
 
-    private fun <B : Any> primed(kind: ChipKind<B>, stack: ItemStack, face: Direction, channel: String) {
+    private fun <B : Any> primed(kind: ChipKind<B>, stack: ItemStack, face: Direction, channel: String, flops: Double) {
         val d = kind.defaults(face)
-        stack.set(kind.component, d.with(settings = d.settings.copy(flops = 1.0, channel = channel)))
+        stack.set(kind.component, d.with(settings = d.settings.copy(flops = flops, channel = channel)))
+    }
+
+    private fun flopsOf(stack: ItemStack): Double = stack.get(ItemChipKind.component)!!.settings.flops
+
+    /**
+     * The countdown ticks in the conduit without rewriting the chip (REVIEW O5), is written to the chip when it is taken
+     * out, and is picked up by the next conduit.
+     */
+    private fun chipProgress(helper: GameTestHelper) {
+        val first = helper.place<ConduitBlockEntity>(CENTER, LogisticsContent.CONDUIT.get())
+        val second = helper.place<ConduitBlockEntity>(CENTER.offset(0, 0, 3), LogisticsContent.CONDUIT.get())
+        val stored = chip(Direction.WEST, flops = 3000.0)
+        val slots = first.conduit.chips[Direction.WEST.get3DDataValue()]
+        slots.setSlot(0, IItemStack.of(stored))
+        // Saving writes the countdown into the chip (the test server saves the new chunk early); a chunk is saved at
+        // most every 10 s, so between ticks 10 and 20 only the conduit's counter may move.
+        var chipAt10 = 0.0
+        var counterAt10 = 0.0
+        helper.runAfterDelay(10) {
+            chipAt10 = flopsOf(stored)
+            counterAt10 = slots.counter(0).flops
+        }
+        helper.runAfterDelay(20) {
+            helper.assertValueEqual(flopsOf(stored), chipAt10, "ticking leaves the chip alone")
+            val counted = slots.counter(0).flops
+            helper.assertTrue(counted < counterAt10 && counted > 0.0, "the conduit counted down, at $counted")
+            val taken = slots.split(0, 1).toMinecraft()
+            helper.assertValueEqual(flopsOf(taken), counted, "taking the chip writes its progress")
+            val target = second.conduit.chips[Direction.EAST.get3DDataValue()]
+            target.setSlot(2, IItemStack.of(taken))
+            helper.assertValueEqual(target.counter(2).flops, counted, "the next conduit starts from it")
+            helper.succeed()
+        }
     }
 
     /**

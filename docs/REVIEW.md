@@ -27,15 +27,15 @@ on the old behaviour.
 | F14 | Nano pack (port) | A hotbar-key swap over a pack slot moved the held pack into its own storage, deleting the pack and its contents. Menu slots ignored `canInsert` (ItszuLib R17) and the pack accepted nano packs | Nano packs refuse nano packs, and ItszuLib's slots now honour that | game test `nano_pack_cannot_be_swapped_into_itself` |
 | F15 | `DistributedManager` task order | Compared fill as `workers.size / workerCap` on integers, so every task that was not full tied at 0 and workers piled onto the first task of a priority | Fill is a fraction | `DistributedManagerTest.Seek_PrefersPriorityThenEmptierTask` |
 | F16 | `DistributedManager` assignment | Set the worker's task even when `addWorker` refused it, and freed workers by removing them from the set being iterated | Assigns only on acceptance (a refused worker tries the next task); iterates a copy | `DistributedManagerTest.Seek_TaskRefusesWorker_WorkerTriesTheNext`, `RemoveTaskProvider_FreesAllWorkers` |
+| F17 | Conduit chips (port) | The flop countdown lived on the chip, so every active chip rewrote its component, called `setChanged` (notifying all six neighbours) and resent itself to an open menu every tick | The conduit keeps each slot's countdown in memory; it is read from the chip when placed or loaded and written back when the slot is read from outside (taken, dropped, saved, shown). An operation flags the chunk for saving without neighbour updates | game test `conduit_chip_progress_moves_with_the_chip` |
 
 ## Open
 
 Not fixed; each needs a maintainer call or is a documented limitation. Numbers are kept when an item closes (O2,
-menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine recipes, as D12; O4, fluid and nanite chips, is implemented: see `Chips.kt`).
+menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine recipes, as D12; O4, fluid and nanite chips, is implemented: see `Chips.kt`; O5, chips rewritten every tick, is fixed: see F17).
 
 | # | Area | Finding | Current handling |
 |---|---|---|---|
-| O5 | Item chip countdown | The flop countdown lives in the chip's component (as in v3's NBT), so every active chip writes its stack and marks its conduit dirty each tick, and an open conduit menu resends the chip | Correct but chatty; moving the countdown into the conduit fragment would fix it, at the cost of chips losing progress when moved |
 | O6 | Rift edges | A rift converts what exists when it generates; trees and structures that neighbouring chunks place later stay unconverted, so rift edges can show half-converted trees | Placed in the last feature step (D13) to keep this small |
 | O7 | Rift size | Large rifts are capped to radius 24 (v3: up to 40) by the feature write region | DECISIONS D13. A multi-chunk structure, or conversion spread over chunk generation, would allow v3's sizes |
 | O8 | Machine side configuration | No side-configuration screen; faces are set with the configurator only | PORTING "Not ported"; a screen could send `MenuActionPayload` actions |

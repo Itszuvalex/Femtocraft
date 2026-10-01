@@ -22,6 +22,7 @@ import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockBehaviour
@@ -79,10 +80,51 @@ class LogisticsConduit : FragNetworkedWire<LogisticsConduit, LogisticsNetwork>({
     private var lvl: Level? = null
 
     @JvmField
-    val chips: Array<ItemStorageArray> = Array(6) {
-        object : ItemStorageArray(CHIPS_PER_FACE, { markDirty() }) {
-            override fun canInsert(index: Int, stack: IItemStack): Boolean = stack.isEmpty() || Chips.isChip(stack.toMinecraft())
-            override fun maxStackSize(index: Int): Int = 1
+    val chips: Array<ChipSlots> = Array(6) { ChipSlots(Direction.from3DDataValue(it)) }
+
+    /**
+     * The chips of one face. Each chip's flop countdown lives here while the chip is in the conduit, so ticking does not
+     * rewrite the chip (REVIEW O5): it is read from the chip when the chip is placed or loaded, and written back
+     * whenever the slot is read from outside ([get]: taking it out, dropping it, saving, an open menu).
+     */
+    inner class ChipSlots(private val face: Direction) : ItemStorageArray(CHIPS_PER_FACE, { markDirty() }) {
+        /** Each slot's countdown; null until read from its chip. */
+        private val flops = arrayOfNulls<Double>(CHIPS_PER_FACE)
+
+        override fun canInsert(index: Int, stack: IItemStack): Boolean = stack.isEmpty() || Chips.isChip(stack.toMinecraft())
+
+        override fun maxStackSize(index: Int): Int = 1
+
+        /** The chip in [index], without writing its countdown back. */
+        fun chip(index: Int): ItemStack = super.get(index).toMinecraft()
+
+        override fun get(index: Int): IItemStack {
+            flops[index]?.let { Chips.writeFlops(chip(index), face, it) }
+            return super.get(index)
+        }
+
+        override fun setSlot(index: Int, stack: IItemStack) {
+            flops[index] = null
+            super.setSlot(index, stack)
+        }
+
+        override fun setSlotQuietly(index: Int, stack: IItemStack) {
+            flops[index] = null
+            super.setSlotQuietly(index, stack)
+        }
+
+        fun counter(index: Int): FlopCounter = object : FlopCounter {
+            override var flops: Double
+                get() = this@ChipSlots.flops[index] ?: (Chips.settingsOf(chip(index), face)?.flops ?: 0.0).also { this@ChipSlots.flops[index] = it }
+                set(value) {
+                    this@ChipSlots.flops[index] = value
+                }
+
+            /** Flags the chunk for saving without `setChanged`'s neighbour updates; saving writes the countdown back. */
+            override fun onOperation() {
+                val pos = host?.blockEntity()?.getBlockPos() ?: return
+                lvl?.blockEntityChanged(pos)
+            }
         }
     }
 
@@ -93,7 +135,7 @@ class LogisticsConduit : FragNetworkedWire<LogisticsConduit, LogisticsNetwork>({
         val pos = host?.blockEntity()?.getBlockPos() ?: return listOf()
         return Direction.entries.flatMap { face ->
             val storage = chips[face.get3DDataValue()]
-            (0 until storage.size()).mapNotNull { Chips.connection(storage.get(it).toMinecraft(), level, pos, face) { markDirty() } }
+            (0 until storage.size()).mapNotNull { Chips.connection(storage.chip(it), level, pos, face, storage.counter(it)) { markDirty() } }
         }
     }
 

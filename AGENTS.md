@@ -144,7 +144,9 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
   in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
   operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how
-  much (1 item, 250 mB, 5 nanites), and the network routes each kind separately by channel. Add a kind by
+  much (1 item, 250 mB, 5 nanites), and the network routes each kind separately by channel. A chip's countdown lives in the
+  conduit's `ChipSlots` while it is inserted and is written back to the chip whenever the slot is read from outside
+  (`get`); the conduit itself uses `chip(index)`, which does not write. Add a kind by
   subclassing `ChipKind` and listing it in `Chips.KINDS`. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
   or broken); `IndexedItemStorage` indexes an `IItemStorage` by item id and answers tag lookups (keep it current with

@@ -275,6 +275,17 @@ object NaniteChipKind : ChipKind<NaniteStack>("nanite", NaniteStack.CODEC, Nanit
 }
 
 /**
+ * Where a [Connection] keeps its flop countdown. A conduit keeps it in memory and writes it back to the chip only when
+ * the chip is read from outside (taken out, dropped, saved, shown), so ticking does not rewrite the chip.
+ */
+interface FlopCounter {
+    var flops: Double
+
+    /** Called after an operation reset the countdown. */
+    fun onOperation() {}
+}
+
+/**
  * One chip in a conduit face: every time its flop counter runs down it pulls (INPUT) [ChipKind.perOp] from the block on
  * that face into its buffer, or pushes (OUTPUT) that much from the buffer into the block. Flops recharge passively at
  * a 200th of [ChipKind.flopsRequired] per tick. Port of v3's `ItemConnection` (5000 flops, 1 item per operation,
@@ -286,6 +297,7 @@ class Connection<B : Any>(
     private val level: Level,
     private val conduit: BlockPos,
     private val face: Direction,
+    private val counter: FlopCounter,
     private val onChanged: Runnable,
 ) {
     val data: ChipData<B> get() = kind.data(chip, face)
@@ -294,8 +306,6 @@ class Connection<B : Any>(
         chip.set(kind.component, change(data))
         onChanged.run()
     }
-
-    private fun updateSettings(change: (ConnectionSettings) -> ConnectionSettings) = update { it.with(settings = change(it.settings)) }
 
     val settings: ConnectionSettings get() = data.settings
 
@@ -319,15 +329,16 @@ class Connection<B : Any>(
      * @return Unused flops.
      */
     fun contributeFlops(flops: Double): Double {
-        val used = min(settings.flops, flops)
-        updateSettings { it.copy(flops = it.flops - used) }
-        if (settings.flops <= 0) {
+        val used = min(counter.flops, flops)
+        counter.flops -= used
+        if (counter.flops <= 0) {
             when (direction) {
                 ConnectionDirection.INPUT -> input()
                 ConnectionDirection.OUTPUT -> output()
                 ConnectionDirection.DISABLED -> {}
             }
-            updateSettings { it.copy(flops = kind.flopsRequired) }
+            counter.flops = kind.flopsRequired
+            counter.onOperation()
         }
         return flops - used
     }
@@ -387,8 +398,21 @@ object Chips {
     /**
      * A connection for [chip] in conduit face [face].
      */
-    fun connection(chip: ItemStack, level: Level, conduit: BlockPos, face: Direction, onChanged: Runnable): Connection<*>? =
-        kindOf(chip)?.let { Connection(it, chip, level, conduit, face, onChanged) }
+    fun connection(chip: ItemStack, level: Level, conduit: BlockPos, face: Direction, counter: FlopCounter, onChanged: Runnable): Connection<*>? =
+        kindOf(chip)?.let { Connection(it, chip, level, conduit, face, counter, onChanged) }
+
+    /**
+     * Writes [flops] into chip [chip] (in conduit face [face]) if it differs from what the chip holds.
+     */
+    fun writeFlops(chip: ItemStack, face: Direction, flops: Double) {
+        val kind = kindOf(chip) ?: return
+        writeFlops(kind, chip, face, flops)
+    }
+
+    private fun <B : Any> writeFlops(kind: ChipKind<B>, chip: ItemStack, face: Direction, flops: Double) {
+        val d = kind.data(chip, face)
+        if (d.settings.flops != flops) chip.set(kind.component, d.with(settings = d.settings.copy(flops = flops)))
+    }
 
     /**
      * A copy of [chip] (in conduit face [face]) with its connection direction ([mode]) or interface face cycled one
