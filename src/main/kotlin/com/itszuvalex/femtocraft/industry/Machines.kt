@@ -195,7 +195,7 @@ abstract class ItemProcessingMachineBlockEntity(type: BlockEntityType<*>, pos: B
     }
 
     override fun pushResult(): Boolean {
-        pending = inventory.insert(1, IItemStack.of(pending)).toMinecraft()
+        pending = inventory.insertUnchecked(1, IItemStack.of(pending)).toMinecraft()
         return pending.isEmpty
     }
 

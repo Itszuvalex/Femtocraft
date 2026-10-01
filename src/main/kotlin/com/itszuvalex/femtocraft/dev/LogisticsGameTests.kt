@@ -156,18 +156,15 @@ object LogisticsGameTests {
         val stored = chip(Direction.WEST, flops = 3000.0)
         val slots = first.conduit.chips[Direction.WEST.get3DDataValue()]
         slots.setSlot(0, IItemStack.of(stored))
-        // Saving writes the countdown into the chip (the test server saves the new chunk early); a chunk is saved at
-        // most every 10 s, so between ticks 10 and 20 only the conduit's counter may move.
-        var chipAt10 = 0.0
-        var counterAt10 = 0.0
-        helper.runAfterDelay(10) {
-            chipAt10 = flopsOf(stored)
-            counterAt10 = slots.counter(0).flops
-        }
+        // Saving writes the countdown into the chip, and the test server saves a new chunk early at an unpredictable
+        // tick. A chunk is saved at most every 10 s, so over 20 ticks the chip may change once while the counter moves
+        // every tick.
+        val chipValues = mutableSetOf(flopsOf(stored))
+        helper.onEachTick { chipValues += flopsOf(stored) }
         helper.runAfterDelay(20) {
-            helper.assertValueEqual(flopsOf(stored), chipAt10, "ticking leaves the chip alone")
+            helper.assertTrue(chipValues.size <= 2, "ticking leaves the chip alone, saw $chipValues")
             val counted = slots.counter(0).flops
-            helper.assertTrue(counted < counterAt10 && counted > 0.0, "the conduit counted down, at $counted")
+            helper.assertTrue(counted < 3000.0 - 15 * 25.0 && counted > 0.0, "the conduit counted down, at $counted")
             val taken = slots.split(0, 1).toMinecraft()
             helper.assertValueEqual(flopsOf(taken), counted, "taking the chip writes its progress")
             val target = second.conduit.chips[Direction.EAST.get3DDataValue()]

@@ -46,4 +46,4 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 ## Framework changes
 
 Changes made to ItszuLib for Femtocraft are listed in `../ItszuLib/docs/REVIEW.md` ("Framework changes to mirror into
-TechnoLich" and the fixed list): `StorageUtils` (R16), `StorageSlot.mayPlace` (R17) and the `MenuCore` write-back (R18) came out of this port.
+TechnoLich" and the fixed list): `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port.

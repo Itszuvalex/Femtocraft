@@ -127,7 +127,7 @@ class GerminationState(onChanged: Runnable) : ValueIOSerializable {
             var stack = it.next()
             for (slot in 0 until output.size()) {
                 if (stack.isEmpty) break
-                stack = output.insert(slot, IItemStack.of(stack)).toMinecraft()
+                stack = output.insertUnchecked(slot, IItemStack.of(stack)).toMinecraft()
             }
             if (stack.isEmpty) it.remove() else it.set(stack)
         }
