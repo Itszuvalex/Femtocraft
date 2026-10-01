@@ -1,7 +1,0 @@
-{
-  "parent": "block/cube_column",
-  "textures": {
-    "end": "femtocraft:blocks/log_cyber_top",
-    "side": "femtocraft:blocks/log_cyber"
-  }
-}
