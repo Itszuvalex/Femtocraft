@@ -61,11 +61,12 @@ would contradict D4, and porting both would carry the duplication over.
 1), becomes archetype `Dumb` / strain `Dumb`, version 0.0, and old volumes become amounts 1:1. The old API's density
 (`nMol`) has no counterpart and is dropped (nothing read it except a GUI label).
 
-## D6. Menus use vanilla slots — OPEN (awaiting maintainer sign-off)
+## D6. Menus use vanilla slots — DECIDED (maintainer, 2026-10-01)
 
 As ItszuLib D6: menus are ItszuLib `MenuCore`s with vanilla `Slot`s over `WrapperContainerIItemStorage`; values that
 are not slots (power, progress, tanks) use `MenuSync`s. v3's `SyncItemStorageItemStack` slots and their click message
-are not ported. Pending the maintainer's sign-off on ItszuLib D6.
+are not ported. Confirmed with ItszuLib D6, which also lists what synced slots offered and how vanilla slots now cover
+storages that return copies.
 
 ## D7. ItszuLib dependency: Gradle composite build — DECIDED (non-blocking)
 

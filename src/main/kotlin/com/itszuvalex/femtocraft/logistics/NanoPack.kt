@@ -35,9 +35,9 @@ class NanoPackItem(properties: Properties) : Item(properties) {
 
 /**
  * The nano pack's slots (two rows of nine) and the player's inventory. Port of v3's `ContainerNanoPack`. The pack is
- * read into a live storage when the menu opens and written back to the held stack after every change, since vanilla
- * slots change their stacks in place (ItszuLib REVIEW O1). The held pack's own slot cannot be used, and nano packs do
- * not go into nano packs: a hotbar-key swap could otherwise move the held pack into itself and delete it.
+ * read into a storage when the menu opens and written back to the held stack after every change. The held pack's own
+ * slot cannot be used, and nano packs do not go into nano packs: a hotbar-key swap could otherwise move the held pack
+ * into itself and delete it.
  */
 class NanoPackMenu(containerId: Int, private val inventory: Inventory, private val hand: InteractionHand) :
     MenuCore(LogisticsContent.NANO_PACK_MENU.get(), containerId, inventory.player) {
