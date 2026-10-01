@@ -25,7 +25,6 @@ on the old behaviour.
 | F12 | `FemtocraftOreGenerator` sizes | The medium branch tested `rand < MEDIUM_WEIGHT` after `rand < SMALL_WEIGHT` failed, which is never true (30 < 50), so medium rifts never spawned | Cumulative weights | game test `rift_sizes_include_medium_and_fit_the_feature_region` |
 | F13 | `FemtocraftOreGenerator` crystals | A crystal whose random height was inside the ground replaced the block there, burying it | It climbs to the air above first, then rests on the ground | game test `rift_crystals_rest_on_the_ground` |
 | F14 | Nano pack (port) | A hotbar-key swap over a pack slot moved the held pack into its own storage, deleting the pack and its contents. Menu slots ignored `canInsert` (ItszuLib R17) and the pack accepted nano packs | Nano packs refuse nano packs, and ItszuLib's slots now honour that | game test `nano_pack_cannot_be_swapped_into_itself` |
-| F15 | Conduit screen (port) | Overriding `slotClicked` with a non-null `Slot` would have thrown on clicks outside the panel, which vanilla reports with a null slot | Selection uses `mouseClicked` and the hovered slot | Reviewed in code (client only) |
 
 ## Open
 
