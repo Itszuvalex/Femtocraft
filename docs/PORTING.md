@@ -41,10 +41,54 @@ Every ItszuLib import in `develop-gui` resolves against ItszuLib `develop`.
 
 Client-only code (renderers, GUIs, particles) is roughly 3.7k of the 17k lines. It cannot be exercised by `runGameTestServer`, which is a dedicated server; it can only be compiled and checked in `runClient`.
 
-Legacy Scala sources are kept under `src/main/scala` as reference (not compiled) and deleted as each area is ported. Assets under `src/main/resources/assets/femtocraft` stay; 1.7.10 texture paths (`textures/blocks`, `textures/items`) will be renamed to 26.1's `textures/block`, `textures/item` as models are added.
+The inventory above describes the 1.7.10 code. Runtime textures now live under 26.1 paths (`textures/block`, `item`, `gui`, `effect`, `growth`); unused old item art and the OBJ models are in `art/`.
 
 ## Progress
 
 - [x] Branch `neoforge-26.1` from `develop-gui`.
-- [x] Build: ModDevGradle 2.0.148, Gradle 9.2.1, Java 25, Kotlin 2.4.0 + Kotlin for Forge 6.3.0, ItszuLib via composite build. `./gradlew build` and `./gradlew runGameTestServer` pass with a skeleton mod (1 JUnit test; game tests: Femtocraft's `itszulib_loaded`, ItszuLib's `mod_loaded`, plus vanilla's built-in one).
-- [ ] **Blocked on DECISIONS B1** (ItszuLib API shape) **and B2** (scope).
+- [x] Build: ModDevGradle 2.0.148, Gradle 9.2.1, Java 25, Kotlin 2.4.0 + Kotlin for Forge 6.3.0, ItszuLib via composite build.
+- [x] B1/B2 decided (DECISIONS.md): Femtocraft is rebuilt on ItszuLib's fragment framework; gameplay logic first, simple models.
+- [x] Assets moved to the 26.1 layout (afe4fc8); power network (1af2642); cyber, industry, logistics, nanites, worldgen (6416c51); menu screens and client-run fixes (adabeea).
+- [x] Legacy Scala removed (it stays on `develop-gui`).
+- [ ] Follow-up rendering work (below).
+
+## Where each subsystem went
+
+| 1.7.10 | 26.1.2 (`src/main/kotlin/com/itszuvalex/femtocraft/...`) |
+|---|---|
+| `TileEntityBase` + traits | `core/FemtoBlockEntity` (a `TickableBlockEntityCore`) composed of fragments: `FragPowerNode`, `FragMultiBlock`, `FragNaniteNode`/`FragNaniteHive`, `FragData` (ad-hoc state), `FragExpose` (module), ItszuLib's `FragDropInventory` |
+| `TileContainer` | `core/FemtoEntityBlock` (ticker on both sides, use/placement forwarded to the block entity) |
+| `IInventory`/`IndexedInventory` | ItszuLib `IItemStorage` (`ItemStorageArray`); `logistics/IndexedItemStorage` indexes by item and item tag; exposed as NeoForge `Capabilities.Item.BLOCK` |
+| `FluidTank`, `TileFluidTank` | `core/FluidTanks` (NeoForge `FluidStacksResourceHandler`), exposed as `Capabilities.Fluid.BLOCK` where 1.7.10 allowed filling/draining |
+| `@Saveable`/NBT compounds | Fragment scoped serialization (LEVEL / DESCRIPTION / ITEM), same key names |
+| Item NBT | Data components (`FemtoComponents`): `power_crystal`, `base_size`, `frame_selection`, `multiblock`, `assembly` |
+| Ore dictionary | Tags (`FemtoTags`, `data/*/tags`), `c:ores/*` -> `c:dusts/*` for grinding |
+| `GameRegistry.addRecipe`, `GrowthChamberRegistry` | Datapack recipes; `femtocraft:growth_chamber` recipe type |
+| `IWorldGenerator` | `worldgen/CrystalClusterFeature` + configured/placed feature + NeoForge biome modifier |
+| `Container`/`GuiContainer`, GUI ids, `MessageOpenGui`/`MessageBuildMachine`/`MessageMultiblockSelection` | `MenuType`s + `client/FemtoClient` screens; button clicks use vanilla `clickMenuButton` instead of custom packets |
+| `PowerManager`, `NaniteManager`, `DistributedManager` | Same objects, keyed by `Loc4`, cleared on server stop; nodes found through `FemtoModules` |
+| Test blocks (`power/test`, `logistics/test`, `BlockTest`) | `dev/DevContent` (dev-only power nodes) and game tests (`dev/*GameTests`) |
+
+## Not ported (with reasons)
+
+- **Renderers** (follow-up, see below), `RenderIDs`, `TERenderSortingFix` (modern renderer sorts), `ProxyClient`.
+- **Nanite strains/attributes/traits** (`nanite/Attribute`, `nanite/trait`, `NaniteStrain`): registries that nothing populated and no item implemented. The material processor's nanite slot accepts items tagged `femtocraft:nanite_strains` (empty).
+- **Arc furnace/centrifuge/crystallizer/cubic crafting recipe registries**: had no recipes and no machine used them. The machines form and break correctly but do nothing, as in 1.7.10.
+- **Logistics job/queue interfaces** (`IJob`, `IJobQueue`, `IJobRunner`, `ILogisticsNetwork`, `ProviderManager`): unimplemented interfaces.
+- **Single array** (`BlockSingleArray`, `TileSingleArray`): never registered; its tile was all `???`.
+- **`BlockCyberbloom`**: empty class. **Network test blocks** (`TileNetworkTest`): exercised ItszuLib's networks, which ItszuLib now tests itself.
+- **Cybermaterial mass types** (`CybermaterialRegistry.registerBlock/registerItem`): never called.
+- **Arc furnace GUI**: one slot at (0,0) bound to nothing.
+- **Frame render marks** (`renderInt`): rendering only.
+
+## Follow-up rendering work
+
+All of this was client rendering in 1.7.10 and needs the 26.1 pipeline (`BlockEntityRenderer` with render state, `RenderLevelStageEvent`, particle providers). Blocks currently use simple cube/cross models.
+
+- OBJ models (in `art/obj_models`): crystal mount, power pedestal, power sink, nanite hive, frame, furnace (material processor), arc furnace, cyber bases (1x1/2x2/3x3), growth chamber, crystal cluster. NeoForge's OBJ loader (`"loader": "neoforge:obj"`) can take them once the `.mtl` texture paths are updated.
+- Power beams between power nodes (`PowerBeamRenderer`, `DiffusionNodeBeamRenderer`), crystal mount crystal (`CrystalMountRenderer`), glow stick colors.
+- Growth chamber growth stages (`GrowthChamberRenderer`, recipe `growth_stages` textures) and water spray (`FXWaterSpray`).
+- Grasping vine tendrils (`GraspingVinesRenderer`, `GraspingVineBeamRenderer`), logistics worker beams.
+- Preview ghosts for frames, multiblock items and base seeds (`PreviewableRenderHandler` and the `*PreviewableRenderer`s).
+- Power and nanite particles (`EntityFxPower`, `EntityFxNanites`) for crystals, clusters, frames being built and dumb dust.
+- Item color tint for power crystals and per-type crystal item models (small/medium/large).

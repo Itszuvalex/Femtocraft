@@ -9,7 +9,7 @@ Femtocraft is a tech mod (cybernetic machines, crystal power networks, frame mul
 - **Minecraft 26.1.2 / NeoForge 26.1.2.112 / Java 25**, ModDevGradle (`net.neoforged.moddev` 2.0.148), Gradle 9.2.1.
 - Written in **Kotlin 2.4.0**, loaded through **Kotlin for Forge 6.3.0** (`thedarkcolour:kotlinforforge-neoforge`, `modLoader="kotlinforforge"`). KFF is a required runtime mod: it provides the language loader and the Kotlin stdlib, reflect, coroutines and serialization. Do not add a second copy of the stdlib (`kotlin.stdlib.default.dependency=false`).
 - Mod id `femtocraft`, package `com.itszuvalex.femtocraft`, GPL-2.0-or-later (from source headers; the repo has no LICENSE file).
-- Being ported from Forge 1.7.10 / Scala 2.11 on branch `neoforge-26.1` (from `develop-gui`). `master`/`develop`/`develop-gui` still hold the 1.7.10 code. Port status: [docs/PORTING.md](docs/PORTING.md). Decisions and open questions: [docs/DECISIONS.md](docs/DECISIONS.md).
+- Ported from Forge 1.7.10 / Scala 2.11 on branch `neoforge-26.1` (from `develop-gui`). `master`/`develop`/`develop-gui` still hold the 1.7.10 code. Server-side gameplay, menus and data are ported; dynamic rendering is follow-up work. Port status and the follow-up list: [docs/PORTING.md](docs/PORTING.md). Decisions: [docs/DECISIONS.md](docs/DECISIONS.md). Review: [docs/REVIEW.md](docs/REVIEW.md).
 
 ## Build and run
 
@@ -61,13 +61,37 @@ Library sources: `../ItszuLib` (its `AGENTS.md` and `docs/`). Reference implemen
 
 ```
 src/main/kotlin/com/itszuvalex/femtocraft/
-├── Femtocraft.kt      @Mod object (KFF); registers dev content outside production
-└── dev/               Dev-only content and game tests (never registered in production)
-src/test/kotlin/...    JUnit 5 tests
-src/main/scala/...     LEGACY 1.7.10 Scala sources, not compiled; reference only, deleted as areas are ported
-src/main/resources/assets/femtocraft/  Textures, OBJ models, sounds (1.7.10 layout, migrated as models are added)
-art/                   Source art (not packaged)
+├── Femtocraft.kt          @Mod object: registries, dev content (non-production), client init, manager reset on stop
+├── FemtoRegistries.kt     FemtoBlocks, FemtoItems, FemtoBlockEntities (+ capability registration), FemtoMenus, FemtoTabs
+├── FemtoModules.kt        Femtocraft modules (power node, task/worker provider, nanite hive/node)
+├── FemtoComponents.kt     Item data components; FemtoTags; FemtoRecipes (growth_chamber recipe type)
+├── core/                  FemtoBlockEntity/FemtoEntityBlock, FragData, FragExpose, FragMultiBlock, FluidTanks,
+│                          FemtoMenu, Loc4 helpers (inLevel/blockEntity/module, Loc4 save helpers)
+├── power/                 FragPowerNode + PowerNodeRules, PowerManager, power crystal item, crystal mount,
+│                          pedestal, sink, generator, glow stick
+├── logistics/             IndexedItemStorage, item repository, distributed task/worker manager
+├── nanite/                Hive/node fragments, NaniteManager, small nanite hive
+├── industry/              Frame multiblocks, frames, multiblock item, material processor, assemblies, dust recipes
+├── cyber/                 Cybermaterials, dumb dust, cyber base + seed, cyber machines, growth chamber (+ recipe), vines
+├── worldgen/              Crystal cluster feature, block and block entity
+├── client/                Menu screens (client only)
+└── dev/                   Dev-only power-node blocks and all game tests
+src/test/kotlin/...        JUnit 5 tests
+src/main/resources/        assets (textures under 26.1 paths, generated models/lang) and data (generated)
+tools/gen_assets.py        Generates models, blockstates, loot tables, tags, lang, recipes, worldgen JSON
+art/                       Source art, unused 1.7.10 item art, OBJ models (not packaged)
 ```
+
+## Core concepts
+
+Femtocraft block entities are ItszuLib `BlockEntityCore`s (read `../ItszuLib/AGENTS.md` first). `FemtoBlockEntity` adds `serverTick`/`clientTick`, `onUse`, `onPlaced`, and `onServerLoad`/`onServerUnload` (register with the server-side managers there; note `onLoad` runs on the tick *after* a block is placed). State lives in fragments:
+
+- `FragPowerNode` (module `POWER_NODE`): parent/child links found by radius through `PowerManager`; `PowerNodeRules` encode the 1.7.10 whitelists; storage is pluggable (`OwnPowerStorage`, crystal-backed, slot-or-parent).
+- `FragMultiBlock`: formed flag + controller position (keys `isFormed`, `c_x/y/z`). Multiblocks remove themselves inside `MultiblockGuard.run` so part break handlers don't recurse.
+- `FragData` for ad-hoc state with explicit keys; `FragExpose` to expose the block entity itself as a module.
+- Server-side managers (`PowerManager`, `DistributedManager`, `NaniteManager`) index `Loc4`s (always `Loc4Level`, so lookups work) and are cleared on server stop.
+
+Content data (models, loot, tags, recipes, worldgen, lang) is generated: edit the tables in `tools/gen_assets.py`, run `python tools/gen_assets.py`, commit the outputs. Hand-written JSON under those paths is overwritten.
 
 ## Kotlin conventions
 
@@ -78,10 +102,11 @@ art/                   Source art (not packaged)
 
 ## Dev content and game tests
 
-`dev/DevGameTests.kt` registers test functions (`Registries.TEST_FUNCTION`) and test instances (`RegisterGameTestsEvent`) on vanilla's 1x1x1 `minecraft:empty` structure. Add a test with `test("name") { helper -> ...; helper.succeed() }`. `GameTestHelper#assertValueEqual(expected, actual, name)` takes the expected value first.
+`dev/DevContent.kt` registers dev-only power node blocks (`femtocraft:dev_<type>_node`, right-click prints links). `dev/DevGameTests.kt` registers every game test on `femtocraft:test_area` (empty 9x5x9, padding 2); tests are grouped in `PowerGameTests`, `CyberGameTests`, `IndustryGameTests`, `LogisticsGameTests`. Add one with `DevGameTests.test("name", maxTicks) { helper -> ... }`; use `succeedWhen` for anything that needs a tick (block entity `onLoad`, ticking machines). Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(expected, actual, name)` takes the expected value first.
 
 ## Testing conventions
 
-- Unit tests: `src/test/kotlin`, JUnit 5, names like `method_ExpectedBehavior`. ModDevGradle puts Minecraft classes on the test classpath, but anything needing registries or a level belongs in a game test.
+- Unit tests: `src/test/kotlin`, JUnit 5, names like `Method_ExpectedBehavior`. ModDevGradle puts Minecraft classes on the test classpath, but anything needing registries or a level belongs in a game test.
 - Add a game test for anything that crosses into vanilla/NeoForge (registries, block entities, capabilities, serialization with real items, networking).
-- Verify with `./gradlew build` **and** `./gradlew runGameTestServer`.
+- Verify with `./gradlew build` **and** `./gradlew runGameTestServer`. The "required tests" count includes ItszuLib's dev tests and one vanilla test.
+- Client screens and models can only be checked in `./gradlew runClient` (opens a game window); resource loading errors show up in its log.
