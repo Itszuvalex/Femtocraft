@@ -44,6 +44,7 @@ object DevGameTests {
         PowerGameTests.register()
         IndustryGameTests.register()
         NaniteGameTests.register()
+        LogisticsGameTests.register()
     }
 
     fun register(modBus: IEventBus) {

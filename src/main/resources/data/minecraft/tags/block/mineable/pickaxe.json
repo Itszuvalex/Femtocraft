@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "femtocraft:conduit",
     "femtocraft:crystal_charging_array",
     "femtocraft:crystal_crusher",
     "femtocraft:crystal_focusing_chamber",
@@ -10,10 +11,13 @@
     "femtocraft:crystal_mount",
     "femtocraft:crystal_storage_array",
     "femtocraft:demolisher",
+    "femtocraft:fluid_repository",
     "femtocraft:frame",
     "femtocraft:germination_chamber",
+    "femtocraft:item_repository",
     "femtocraft:nanite_extractor",
     "femtocraft:nanite_infuser",
+    "femtocraft:nanite_repository",
     "femtocraft:nano_furnace",
     "femtocraft:power_conduit_crystal"
   ]

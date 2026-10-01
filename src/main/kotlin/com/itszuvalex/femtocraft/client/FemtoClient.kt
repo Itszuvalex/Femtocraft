@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.client
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.FemtoFluids
 import com.itszuvalex.femtocraft.industry.IndustryContent
+import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.nanite.NaniteContent
 import com.itszuvalex.femtocraft.power.PowerContent
 import net.minecraft.client.renderer.entity.ThrownItemRenderer
@@ -42,5 +43,10 @@ object FemtoClient {
         event.register(IndustryContent.GERMINATION_CHAMBER_MENU.get(), ::GerminationChamberScreen)
         event.register(IndustryContent.FOCUSING_CHAMBER_MENU.get(), ::FocusingChamberScreen)
         event.register(NaniteContent.NANITE_MACHINE_MENU.get(), ::NaniteMachineScreen)
+        event.register(LogisticsContent.ITEM_REPOSITORY_MENU.get(), ::ItemRepositoryScreen)
+        event.register(LogisticsContent.FLUID_REPOSITORY_MENU.get(), ::FluidRepositoryScreen)
+        event.register(LogisticsContent.NANITE_REPOSITORY_MENU.get(), ::NaniteRepositoryScreen)
+        event.register(LogisticsContent.CONDUIT_MENU.get(), ::ConduitScreen)
+        event.register(LogisticsContent.NANO_PACK_MENU.get(), ::NanoPackScreen)
     }
 }

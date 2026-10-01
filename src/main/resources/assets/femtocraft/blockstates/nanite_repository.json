@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "femtocraft:block/nanite_repository"
+    },
+    "facing=east": {
+      "model": "femtocraft:block/nanite_repository",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "femtocraft:block/nanite_repository",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "femtocraft:block/nanite_repository",
+      "y": 270
+    }
+  }
+}

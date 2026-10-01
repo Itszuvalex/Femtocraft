@@ -80,7 +80,8 @@ DECISIONS D4 and D5 give the reasoning.
 - [x] Power: wireless and wired networks, crystals, crystal machines, conduit, glow stick; 14 game tests, 9 JUnit tests.
 - [x] Industry: materials, machines, frames and frame multiblocks, configurator, shift device; 17 game tests.
 - [x] Nanite: API, extractor, infuser, player tank, nano lash; 8 game tests.
-- [ ] Logistics, cyber/worldgen (table above).
+- [x] Logistics: repositories, conduit network and item chips, nano pack; 8 game tests.
+- [ ] Cyber/worldgen (table above).
 
 ## 1.12.2 bugs fixed
 

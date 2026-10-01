@@ -60,6 +60,7 @@ MACHINE_FRONT = "blockmachineblock_front_base"
 # Block model kinds:
 #   ("cube_all", tex)                 one texture
 #   ("machine", front_overlay)        v3 machine: base cube plus the machine's front overlay, horizontal facing
+#   ("orientable", front, side, top)  front/side/top textures, horizontal facing
 #   ("column", side, end)             log-like with an axis property
 #   ("leaves", tex)
 #   ("cross", tex)                    crossed planes
@@ -83,6 +84,11 @@ BLOCKS = {
     # --- nanite ---
     "nanite_extractor": ("Nanite Extractor", ("machine", "naniteextractor_front"), "self", "pickaxe"),
     "nanite_infuser": ("Nanite Infuser", ("machine", "naniteinfuser_front"), "self", "pickaxe"),
+    # --- logistics ---
+    "item_repository": ("Item Repository", ("orientable", "blockitemrepository_front", "blockitemrepository_side", "blockitemrepository_top"), "self", "pickaxe"),
+    "fluid_repository": ("Fluid Repository", ("orientable", "blockfluidrepository_front", "blockfluidrepository_side", "blockfluidrepository_top"), "self", "pickaxe"),
+    "nanite_repository": ("Nanite Repository", ("orientable", "blocknaniterepository_front", "blocknaniterepository_side", "blocknaniterepository_top"), "self", "pickaxe"),
+    "conduit": ("Logistics Conduit", ("box", "logistics_conduit", [6, 6, 6, 10, 10, 10]), "self", "pickaxe"),
     # Placed by the frame item and by frame building; they drop through their teardown, not loot tables.
     "frame": ("Frame", ("box", "standin_frame", [0, 0, 0, 16, 16, 16]), "none", "pickaxe", False),
     "germination_chamber": ("Germination Chamber", ("cube_all", "germination_chamber"), "none", "pickaxe", False),
@@ -116,6 +122,10 @@ ITEMS = {
     "configurator": ("Configurator", None),
     "shift_test": ("Shift Device", "itemshifttest"),
     "nano_lash": ("Nano Lash", "itemnanolash"),
+    "logistics_item_chip_basic": ("Basic Item Logistics Chip", "itemlogisticsitemchipbasic"),
+    "logistics_fluid_chip_basic": ("Basic Fluid Logistics Chip", "itemlogisticsfluidchipbasic"),
+    "logistics_nanite_chip_basic": ("Basic Nanite Logistics Chip", "itemlogisticsnanitechipbasic"),
+    "nano_pack": ("Nano Pack", "itemnanopack"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
@@ -125,6 +135,7 @@ PLACEHOLDERS = {
     "block/crystal_crusher_front": ((0, 0, 0, 0), (140, 140, 160, 255)),
     "block/germination_chamber": ((70, 140, 60, 255), (40, 80, 35, 255)),
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
+    "block/logistics_conduit": ((200, 170, 60, 255), (110, 90, 30, 255)),
 }
 
 LANG = {
@@ -149,6 +160,13 @@ LANG = {
     "multiblock.femtocraft.germination_chamber": "Germination Chamber",
     "multiblock.femtocraft.crystal_focusing_chamber": "Crystal Focusing Chamber",
     "tooltip.femtocraft.none": "none",
+    "gui.femtocraft.conduit.mode": "Mode",
+    "gui.femtocraft.conduit.interface": "Side",
+    "tooltip.femtocraft.chip.item": "Buffer: %s",
+    "tooltip.femtocraft.chip.flops": "Flops: %s/%s",
+    "tooltip.femtocraft.chip.channel": "Channel: %s",
+    "tooltip.femtocraft.chip.mode": "Mode: %s",
+    "tooltip.femtocraft.chip.interface": "Interface: %s",
     "tooltip.femtocraft.frame.type": "Frame: %s",
     "tooltip.femtocraft.frame.selected": "Selected: %s",
     "tooltip.femtocraft.configurator.mode": "Interaction: %s",
@@ -228,6 +246,8 @@ def block_model(name, kind):
                 "textures": {"particle": tex(MACHINE_SIDE), "side": tex(MACHINE_SIDE), "front_base": tex(MACHINE_FRONT),
                              "front": tex(kind[1])},
                 "elements": [base, overlay]}
+    if k == "orientable":
+        return {"parent": "minecraft:block/orientable", "textures": {"front": tex(kind[1]), "side": tex(kind[2]), "top": tex(kind[3])}}
     if k == "column":
         return {"parent": "minecraft:block/cube_column", "textures": {"side": tex(kind[1]), "end": tex(kind[2])}}
     if k == "leaves":
@@ -242,7 +262,7 @@ def block_model(name, kind):
 
 def blockstate(name, kind):
     m = f"{NS}:block/{name}"
-    if kind[0] == "machine":
+    if kind[0] in ("machine", "orientable"):
         return {"variants": {f"facing={f}": ({"model": m, "y": y} if y else {"model": m})
                              for f, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]}}
     if kind[0] == "column":

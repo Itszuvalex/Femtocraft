@@ -13,8 +13,8 @@ import java.util.Locale
  * Plain functional screen: grey panel, slot outlines, title and inventory label, with helpers for power meters,
  * progress bars and text. v3's textured GUIs and widget toolkit are follow-up work (DECISIONS B2).
  */
-abstract class FemtoScreen<M : AbstractContainerMenu>(menu: M, inventory: Inventory, title: Component) :
-    AbstractContainerScreen<M>(menu, inventory, title) {
+abstract class FemtoScreen<M : AbstractContainerMenu>(menu: M, inventory: Inventory, title: Component, width: Int = 176, height: Int = 166) :
+    AbstractContainerScreen<M>(menu, inventory, title, width, height) {
 
     override fun extractBackground(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         super.extractBackground(graphics, mouseX, mouseY, a)
