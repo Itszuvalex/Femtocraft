@@ -50,7 +50,7 @@ reformer, synthesizer), the multitool (all `???`), the job/task system and index
 used them), and the water-aliased fluid placeholders. The full list is in [PORTING.md](PORTING.md#not-ported). Each
 can be added later on the ported framework; none blocks anything that was ported.
 
-## D5. One nanite API — OPEN
+## D5. One nanite API — DECIDED (maintainer, 2026-10-01)
 
 v3 has two nanite APIs. The newer one (`INaniteStack`/`NaniteStack` with archetype, strain and version;
 `INaniteTank`/`NaniteTank`; `NaniteRegistry`) has no working machine, while the working machines (nanite extractor,
@@ -60,6 +60,13 @@ would contradict D4, and porting both would carry the duplication over.
 **Default:** port only the newer API and move the old-API machines onto it. v3's single old strain, "Dumb" (density
 1), becomes archetype `Dumb` / strain `Dumb`, version 0.0, and old volumes become amounts 1:1. The old API's density
 (`nMol`) has no counterpart and is dropped (nothing read it except a GUI label).
+
+**Decision:** the default. The 2020 v3 design notes ("Nanites") describe the newer API's shape (archetype, strain,
+version) and say molage "should maybe go away", so density stays dropped. Those notes version strains
+Major.Minor.Build, where build counts the upgrade points a nanite hive earns from FLOPs. Build is not added: a
+version that changes with every point would split a tank into many unstackable versions, and tanks should not have to
+track that. Versions stay `major.minor`; if build points come back with the hive, they belong to the hive, not to
+the nanites.
 
 ## D6. Menus use vanilla slots — DECIDED (maintainer, 2026-10-01)
 
