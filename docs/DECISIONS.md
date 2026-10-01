@@ -1,68 +1,119 @@
 # Port decisions
 
-Each entry: context, options, trade-offs, recommendation, and status. **BLOCKING** entries shape large amounts of work and wait for the maintainer. Decisions shared with the library are recorded in full in `../ItszuLib/docs/DECISIONS.md`.
+Each entry: context, the choice, and its status. **DECIDED** entries are settled (by the maintainer, or non-blocking
+and safe to change later). **OPEN** entries are conservative defaults chosen so the port could continue; they wait
+for the maintainer. Decisions shared with the library are recorded in full in `../ItszuLib/docs/DECISIONS.md`.
+
+The numbering restarted when the port moved to v3; the 1.7.10-era entries that no longer apply were dropped.
+
+---
+
+## B1. Framework: ItszuLib's fragments/modules — DECIDED
+
+See ItszuLib B1 (maintainer, 2026-09-30). Femtocraft block entities are ItszuLib `BlockEntityCore`s composed of
+fragments. v3 was already written this way (its "modules" are 1.12.2 ItszuLib `TileEntityModule`s), so each v3
+module becomes a fragment, each `IModule`/capability pair becomes an ItszuLib `IModule`, and NBT becomes fragment
+serialization in the LEVEL/DESCRIPTION/ITEM scopes.
+
+## B2. Scope: gameplay logic first, simple models — DECIDED
+
+Maintainer, 2026-09-30, for the earlier port; it carries over to v3. Port server-side gameplay, menus and functional
+screens, recipes and worldgen, with simple block/item models (placeholder textures where none exist). Dynamic
+rendering (TESRs, OBJ models, beams, previewables, particles, overlays) is follow-up work
+([PORTING.md](PORTING.md#follow-up-rendering-work)).
 
 ---
 
 ## D1. Language: Kotlin with Kotlin for Forge — DECIDED
 
-Same as ItszuLib D1: Kotlin 2.4.0 on Kotlin for Forge 6.3.0 (`thedarkcolour:kotlinforforge-neoforge`, supports MC `[1.21.9,26.3)`). Verified by a smoke-test mod that built and passed (and, when made to fail, failed) `runGameTestServer` on NeoForge 26.1.2.112 / Java 25. This repo's skeleton builds and passes the same way (commit `fdaa66d`).
+Same as ItszuLib D1: Kotlin 2.4.0 on Kotlin for Forge 6.3.0.
 
-## D2. Source branch: `develop-gui` — DECIDED
+## D2. Source branch: GitLab `develop-1.12.2-v3` — DECIDED
 
-`develop-gui` has all of `develop` plus 68 newer commits (Jan–Mar 2016). `develop`'s only unique commit is the merge of `develop-gui` itself. See [PORTING.md](PORTING.md#source-branch).
+Maintainer, 2026-09-30. The newest Femtocraft work is on GitLab `develop-1.12.2-v3`, built against ItszuLib
+`develop-1.12.2-types` (ItszuLib D2). The branch restarted from it at 03a8d00; the 1.7.10-based port is kept as
+`neoforge-26.1-from-2016`.
 
 ## D3. Mod id, package, version, license — DECIDED (non-blocking)
 
-- Mod id `femtocraft` (the 1.7.10 id was `Femtocraft`; NeoForge requires lowercase). Package stays `com.itszuvalex.femtocraft`. Version `0.2.0`.
-- License `GPL-2.0-or-later`: the repo has no LICENSE file, but its source headers carry the GPL v2-or-later notice (same as ItszuLib). **Maintainer may want to add a LICENSE file** or pick another license.
-- Dropped dead Artifactory publishing and the CircleCI/GitLab CI configs.
+Mod id `femtocraft`, package `com.itszuvalex.femtocraft`, version `0.2.0`, license `GPL-2.0-or-later` (from the source
+headers; the repo has no LICENSE file, which the maintainer may want to add).
 
-## D4. ItszuLib dependency: Gradle composite build — DECIDED (non-blocking)
+## D4. Systems not ported
 
-`settings.gradle` includes the sibling ItszuLib checkout (`../ItszuLib`, override with `-Pitszulib_dir=/path` on the command line or in `~/.gradle/gradle.properties`) and `build.gradle` depends on `com.itszuvalex.itszulib:itszulib:${itszulib_version}`, which Gradle substitutes with the included project. The build fails early with a clear message if the checkout is missing. `neoforge.mods.toml` declares `itszulib` as a required dependency ordered `AFTER`. Alternatives (mavenLocal, a published repo) need a publish step on every library change.
+**Maintainer defaults — DECIDED:** v3's unfinished systems are not ported: computation, the tech tree, the logistics
+test blocks, and the duplicate `*OLD` nanite classes.
 
-## D5. Legacy sources — DECIDED (non-blocking)
+**Further cuts — OPEN (conservative default: not ported):** code that nothing registered or that cannot run:
+7-line stub tiles never registered as blocks, recipe registries with no machine (circuit printer, fabricator, forge,
+reformer, synthesizer), the multitool (all `???`), the job/task system and indexed inventories (only the test blocks
+used them), and the water-aliased fluid placeholders. The full list is in [PORTING.md](PORTING.md#not-ported). Each
+can be added later on the ported framework; none blocks anything that was ported.
 
-As in ItszuLib: legacy Scala stays in `src/main/scala` as uncompiled reference and is deleted area by area as Kotlin replacements land.
+## D5. One nanite API — OPEN
 
----
+v3 has two nanite APIs. The newer one (`INaniteStack`/`NaniteStack` with archetype, strain and version;
+`INaniteTank`/`NaniteTank`; `NaniteRegistry`) has no working machine, while the working machines (nanite extractor,
+infuser, repository, player tank, configurator) use the `*OLD` one (a strain name and a volume). Porting the old API
+would contradict D4, and porting both would carry the duplication over.
 
-## B1. ItszuLib API shape — DECIDED: TechnoLich's fragments/modules framework (option 2)
+**Default:** port only the newer API and move the old-API machines onto it. v3's single old strain, "Dumb" (density
+1), becomes archetype `Dumb` / strain `Dumb`, version 0.0, and old volumes become amounts 1:1. The old API's density
+(`nMol`) has no counterpart and is dropped (nothing read it except a GUI label).
 
-See `../ItszuLib/docs/DECISIONS.md` B1. Femtocraft is rewritten against whatever ItszuLib becomes, so this blocks Femtocraft too. Recommendation there was the hybrid option. **Decision (maintainer, 2026-09-30): option 2.** ItszuLib becomes the Kotlin copy of TechnoLich's framework, and Femtocraft block entities are rebuilt as `BlockEntityCore` + fragments: each 1.7.10 tile trait (`TileInventory`, `TileFluidTank`, `MultiBlockComponent`, power node, ...) becomes a fragment, `@Saveable` fields become fragment serialization in the LEVEL/DESCRIPTION/ITEM scopes, and capabilities are exposed through modules.
+## D6. Menus use vanilla slots — OPEN (awaiting maintainer sign-off)
 
-## B2. Scope of the Femtocraft port — DECIDED: logic first, simple visuals (option 2)
+As ItszuLib D6: menus are ItszuLib `MenuCore`s with vanilla `Slot`s over `WrapperContainerIItemStorage`; values that
+are not slots (power, progress, tanks) use `MenuSync`s. v3's `SyncItemStorageItemStack` slots and their click message
+are not ported. Pending the maintainer's sign-off on ItszuLib D6.
 
-**Context.** Femtocraft is a 17k-line pre-alpha mod: placeholder fluids, nine debug/test blocks, half-finished machines (single array, several cyber machines whose tiles are 28-line stubs), and recent commits describing broken rendering. About 3.7k lines are client rendering/GUI code written for immediate-mode OpenGL (`Tessellator`, GL11, `AdvancedModelLoader` OBJ models, custom `EntityFX`). 26.1's render pipeline is completely different (baked JSON/OBJ models, `BlockEntityRenderer` with extracted render state, `RenderPipeline`s), and none of it can be verified by `runGameTestServer`, which is headless.
+## D7. ItszuLib dependency: Gradle composite build — DECIDED (non-blocking)
 
-**Options.**
+`settings.gradle` includes the sibling checkout (`../ItszuLib`, override with `-Pitszulib_dir=/path` or in
+`~/.gradle/gradle.properties`) and `build.gradle` depends on `com.itszuvalex.itszulib:itszulib:${itszulib_version}`,
+which Gradle substitutes with the included project. The build stops with a clear message if the checkout is missing.
+`neoforge.mods.toml` declares `itszulib` as a required dependency ordered `AFTER`. See ItszuLib D4.
 
-1. **Everything, 1:1.** Port every block, item, machine, GUI, renderer, particle and test block.
-   - Pro: nothing lost.
-   - Con: the largest effort by far, much of it spent re-implementing visuals for features that never worked in 1.7.10 either. Rendering can only be compile-checked and eyeballed in `runClient`; I cannot see a client, so visual correctness would be unverified.
-2. **Logic first, simple visuals (recommended).** Port all server-side gameplay: registrations, block entities, power/nanite/logistics networks, multiblocks (frames, cyber base), recipes as datapack recipe types, item power via data components, worldgen as datapack features, menus and functional screens, networking payloads. Visuals use static JSON models with the existing textures, plus the NeoForge OBJ loader for the existing `.obj` models where it works as-is. Dynamic renderers (power/vine/logistics beams, growth-chamber stages, previewable ghost placement, custom particles, TESR sort fix) are listed as follow-up work, not ported now. Debug/test blocks become dev-only content, and their behaviour moves into game tests.
-   - Pro: everything that can be verified gets ported and tested; the result is playable-shaped; follow-up rendering work can go piece by piece in `runClient`.
-   - Con: the mod looks plainer than intended until renderers are done.
-3. **Only what worked.** Port just the finished features (power network + crystals, frames + furnace/grinder assemblies + material processor, item repository) and drop stubs.
-   - Pro: smallest and cleanest.
-   - Con: loses WIP systems (most cyber machines, nanites) the author may still want.
+## D8. Registry ids and block items — DECIDED (non-blocking)
 
-**Also needs a call:** whether to drop features that are pure 1.7.10 workarounds: `TERenderSortingFix` (drop; the modern renderer sorts), `GuiIDs` (drop; replaced by `MenuType`s), ore dictionary (replace with tags).
+Ids are snake_case v3 names without the `block`/`item` prefix (`blockCrystalMount` -> `crystal_mount`,
+`itemPowerCrystal` -> `power_crystal`; `crystalCluster` -> `crystal_cluster`). v3 gave every registered block an item,
+including frame and multiblock parts placed by other means; those parts have no block item here (they are placed by
+the frame item and by multiblock forming). 1.12.2 worlds cannot be migrated anyway.
 
-**Recommendation:** option 2, with the three workaround drops above.
+## D9. Assets are generated by `tools/gen_assets.py` — DECIDED (non-blocking)
 
-**Decision (maintainer, 2026-09-30): option 2**, with the workaround drops. Port all server-side gameplay logic, menus/screens, recipes and worldgen as datapack JSON, with simple JSON/OBJ models. Dynamic renderers (beams, growth stages, preview ghosts, particles) are follow-up work listed in [PORTING.md](PORTING.md#follow-up-rendering-work). Test blocks become dev-only content plus game tests. The ore dictionary becomes tags.
+Blockstates, block/item models, item model definitions, loot tables, tags, lang and crafting recipes are generated
+from tables in `tools/gen_assets.py` (run `python3 tools/gen_assets.py`, commit the outputs) instead of NeoForge data
+generation, to keep the port small. Textures moved to the 26.1 layout (`textures/block`, `textures/item`,
+`textures/gui`); blocks without a v3 texture use a generated placeholder.
 
----
+## D10. Femtocraft power stays its own system — OPEN
 
-## Non-blocking decisions made during the port
+v3's power (`IBattery` storages, wireless and wired networks) is internal: it never exposed Forge Energy. The default
+keeps it that way: the power modules are ItszuLib modules with no NeoForge capability. Exposing machines through
+NeoForge's `Capabilities.Energy.BLOCK` (ItszuLib's `WrapperEnergyHandlerIBattery` already exists) is a one-line
+fragment per block if the maintainer wants interop.
 
-- **D6. Registry ids** are snake_case versions of the 1.7.10 names (`blockCrystalMount` -> `crystal_mount`, `itemBaseSeed` -> `base_seed`). Old worlds cannot be migrated anyway (1.7.10 -> 26.1).
-- **D7. Block items** only for blocks a player places directly (cyber materials, power blocks, crystal cluster, item repository, nanite hive). Multiblock parts, frames, cyber bases/machines are placed by their items (frame, multiblock, base seed), so they have none; 1.7.10 registered unusable items for them.
-- **D8. Femtocraft-internal capabilities are ItszuLib modules** (`FemtoModules`: power node, task/worker provider, nanite hive/node) with no NeoForge capability. Items and fluids use NeoForge's standard capabilities. No NeoForge energy capability is exposed: Femtocraft power is its own system, as in 1.7.10.
-- **D9. Custom packets replaced by menu button clicks** (`AbstractContainerMenu.clickMenuButton`) for "build machine" and "select multiblock". No payloads are registered.
-- **D10. Data is generated by `tools/gen_assets.py`** (models, blockstates, item model definitions, loot tables, tags, lang, recipes, worldgen) instead of NeoForge data generation, to keep the port small. Its outputs are committed.
-- **D11. Game tests use `femtocraft:test_area`**, an empty 9x5x9 structure with 2 blocks of padding, so multi-block setups fit.
-- **D12. Placeholders kept as in 1.7.10**: cybermass is water; seven cyber machines and the centrifuge/crystallizer/arc furnace are inert parts; cyber machines are built without checking or consuming resources/cybermass (all as in 1.7.10).
-- **D13. Small behaviour changes**, each noted in the code: the growth chamber's water tank and the cyber base tanks/inventory and material processor inventory are exposed through NeoForge capabilities (1.7.10's tank fill paths were unreachable); breaking any block of any cyber machine breaks that machine and everything above it (1.7.10 did this only for the growth chamber and grasping vines); the arc furnace controller joins the power tree; crystal cluster spheres are capped at radius 16 (feature write limits).
+## D11. Network messages — DECIDED (non-blocking)
+
+v3's per-control messages (side config and IO changes, nanite fill/drain, multiblock selection) named a block by
+position and were applied without checking that the sender had its GUI open. They become actions on ItszuLib's
+`MenuActionPayload` (ItszuLib D7), routed only to the sender's open, valid menu. Particle and teleport-effect messages
+are client rendering (B2).
+
+## D12. Recipes — OPEN
+
+Crafting and smelting recipes are datapack JSON (vanilla types). Machine recipes (dust/demolisher, liquifier,
+germination chamber, nanite infusion) stay as Kotlin tables, as in v3, instead of new datapack recipe types; the ore
+dictionary lookups become item tags (`c:ores/<x>` -> first item of `c:dusts/<x>`). Datapack recipe types are the
+natural next step if pack makers should be able to change them.
+
+## D13. Behaviour changes while porting — OPEN
+
+Small changes, each noted in the code:
+
+- The crystal focusing chamber's logic (`ModuleFocusingChamber`) was written but never attached to its tile, so the
+  frame built an inert block. The port attaches it.
+- Rift worldgen: v3 converted a cylinder of radius 10-40 down to bedrock in one go, which a 26.1 feature cannot do
+  (features may only write within the 3x3 chunks around their origin). The radius is capped to fit.
