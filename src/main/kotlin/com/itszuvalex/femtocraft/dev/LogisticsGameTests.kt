@@ -5,7 +5,11 @@ import com.itszuvalex.femtocraft.logistics.ConduitBlockEntity
 import com.itszuvalex.femtocraft.logistics.ConduitMenu
 import com.itszuvalex.femtocraft.logistics.ConnectionDirection
 import com.itszuvalex.femtocraft.logistics.FluidRepositoryBlockEntity
-import com.itszuvalex.femtocraft.logistics.ItemChips
+import com.itszuvalex.femtocraft.logistics.ChipKind
+import com.itszuvalex.femtocraft.logistics.Connection
+import com.itszuvalex.femtocraft.logistics.FluidChipKind
+import com.itszuvalex.femtocraft.logistics.ItemChipKind
+import com.itszuvalex.femtocraft.logistics.NaniteChipKind
 import com.itszuvalex.femtocraft.logistics.ItemRepositoryBlockEntity
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.logistics.NanoPackMenu
@@ -14,6 +18,7 @@ import com.itszuvalex.femtocraft.logistics.storage.IndexedItemStorage
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteStack
 import com.itszuvalex.femtocraft.nanite.NaniteStrainVersion
+import com.itszuvalex.itszulib.api.adapters.IFluidStack
 import com.itszuvalex.itszulib.api.adapters.IItemStack
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
 import net.minecraft.core.BlockPos
@@ -30,6 +35,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.ChestBlockEntity
 import net.minecraft.world.level.material.Fluids
 import net.neoforged.neoforge.capabilities.Capabilities
+import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil
 import net.neoforged.neoforge.transfer.item.ItemResource
 
@@ -45,6 +51,8 @@ object LogisticsGameTests {
         DevGameTests.test("nanite_repository_holds_one_strain", body = ::naniteRepository)
         DevGameTests.test("conduit_chips_move_items_between_inventories", body = ::conduitMovesItems)
         DevGameTests.test("conduit_channels_keep_items_apart", body = ::conduitChannels)
+        DevGameTests.test("conduit_fluid_chips_move_fluid_between_tanks", body = ::conduitMovesFluid)
+        DevGameTests.test("conduit_nanite_chips_move_nanites_between_tanks", body = ::conduitMovesNanites)
         DevGameTests.test("conduit_drops_chips", body = ::conduitDrops)
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
         DevGameTests.test("nano_pack_saves_contents_and_locks_its_slot", body = ::nanoPack)
@@ -118,10 +126,21 @@ object LogisticsGameTests {
     /**
      * A chip that runs its first operation on the next tick.
      */
-    private fun chip(face: Direction, channel: String = "default"): ItemStack {
-        val stack = ItemStack(LogisticsContent.ITEM_CHIP.get())
-        stack.set(ItemChips.CONNECTION.get(), ItemChips.defaults(face).copy(flops = 1.0, channel = channel))
+    private fun chip(face: Direction, channel: String = "default", kind: ChipKind<*> = ItemChipKind): ItemStack {
+        val stack = ItemStack(chipItem(kind))
+        primed(kind, stack, face, channel)
         return stack
+    }
+
+    private fun chipItem(kind: ChipKind<*>) = when (kind) {
+        FluidChipKind -> LogisticsContent.FLUID_CHIP.get()
+        NaniteChipKind -> LogisticsContent.NANITE_CHIP.get()
+        else -> LogisticsContent.ITEM_CHIP.get()
+    }
+
+    private fun <B : Any> primed(kind: ChipKind<B>, stack: ItemStack, face: Direction, channel: String) {
+        val d = kind.defaults(face)
+        stack.set(kind.component, d.with(settings = d.settings.copy(flops = 1.0, channel = channel)))
     }
 
     /**
@@ -150,6 +169,48 @@ object LogisticsGameTests {
         }
     }
 
+    /**
+     * [source] - conduit - conduit - [target] along x, with an input chip of [kind] facing the source and an output chip
+     * facing the target. @return The two conduits.
+     */
+    private fun chipLine(helper: GameTestHelper, kind: ChipKind<*>): Pair<ConduitBlockEntity, ConduitBlockEntity> {
+        val first = helper.place<ConduitBlockEntity>(BlockPos(3, 1, 4), LogisticsContent.CONDUIT.get())
+        val second = helper.place<ConduitBlockEntity>(BlockPos(4, 1, 4), LogisticsContent.CONDUIT.get())
+        first.conduit.chips[Direction.WEST.get3DDataValue()].setSlot(0, IItemStack.of(chip(Direction.WEST, kind = kind)))
+        second.conduit.chips[Direction.EAST.get3DDataValue()].setSlot(0, IItemStack.of(chip(Direction.EAST, kind = kind)))
+        return first to second
+    }
+
+    private fun <B : Any> buffered(kind: ChipKind<B>, conduits: Pair<ConduitBlockEntity, ConduitBlockEntity>): Int =
+        (conduits.first.conduit.connections() + conduits.second.conduit.connections())
+            .filter { it.kind === kind }
+            .sumOf { @Suppress("UNCHECKED_CAST") kind.amount((it as Connection<B>).buffer) }
+
+    private fun conduitMovesFluid(helper: GameTestHelper) {
+        val source = helper.place<FluidRepositoryBlockEntity>(BlockPos(2, 1, 4), LogisticsContent.FLUID_REPOSITORY.get())
+        val target = helper.place<FluidRepositoryBlockEntity>(BlockPos(5, 1, 4), LogisticsContent.FLUID_REPOSITORY.get())
+        source.tank.fill(IFluidStack.of(FluidStack(Fluids.WATER, 600)), true)
+        val conduits = chipLine(helper, FluidChipKind)
+        helper.assertTrue(conduits.first.conduit.inventoryFaces[Direction.WEST], "tank face connected")
+        helper.succeedWhen {
+            val arrived = target.tank.get(0).toMinecraft()
+            helper.assertTrue(arrived.fluid == Fluids.WATER && arrived.amount >= FluidChipKind.perOp, "water arrived, at ${arrived.amount}")
+            helper.assertValueEqual(source.tank.get(0).amount() + arrived.amount + buffered(FluidChipKind, conduits), 600, "nothing lost or duplicated")
+        }
+    }
+
+    private fun conduitMovesNanites(helper: GameTestHelper) {
+        val source = helper.place<NaniteRepositoryBlockEntity>(BlockPos(2, 1, 4), LogisticsContent.NANITE_REPOSITORY.get())
+        val target = helper.place<NaniteRepositoryBlockEntity>(BlockPos(5, 1, 4), LogisticsContent.NANITE_REPOSITORY.get())
+        source.naniteTank.fill(NaniteRegistry.dumb(30), true)
+        val conduits = chipLine(helper, NaniteChipKind)
+        helper.succeedWhen {
+            val arrived = target.naniteTank.contents().singleOrNull()
+            helper.assertTrue(arrived != null && arrived.isSameNanite(NaniteRegistry.dumb(1)) && arrived.amount >= NaniteChipKind.perOp, "nanites arrived, at $arrived")
+            helper.assertValueEqual(source.naniteTank.amount + target.naniteTank.amount + buffered(NaniteChipKind, conduits), 30, "nothing lost or duplicated")
+        }
+    }
+
     private fun conduitChannels(helper: GameTestHelper) {
         val (source, target) = line(helper, "other")
         helper.runAfterDelay(20) {
@@ -174,7 +235,7 @@ object LogisticsGameTests {
         chips.setSlot(1, IItemStack.of(chip(Direction.UP)))
         val player = helper.makeMockServerPlayerInLevel()
         val menu = ConduitMenu(1, player.inventory, be)
-        fun data() = chips.get(1).toMinecraft().get(ItemChips.CONNECTION.get())!!
+        fun data() = chips.get(1).toMinecraft().get(ItemChipKind.component)!!.settings
         helper.assertTrue(data().direction == ConnectionDirection.OUTPUT, "up chip starts as output")
         helper.assertTrue(menu.handleAction(player, ConduitMenu.ACTION_MODE, ConduitMenu.data(Direction.UP.get3DDataValue(), 1)), "handled")
         helper.assertTrue(data().direction == ConnectionDirection.DISABLED, "output -> disabled")

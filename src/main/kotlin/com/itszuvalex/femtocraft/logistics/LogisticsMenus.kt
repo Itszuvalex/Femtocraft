@@ -86,8 +86,8 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
         val index = slot % LogisticsConduit.CHIPS_PER_FACE
         val storage = be.conduit.chips[face]
         val chip = storage.get(index).toMinecraft()
-        if (!ItemChips.isChip(chip)) return false
-        storage.setSlot(index, IItemStack.of(ItemChips.cycled(chip, Direction.from3DDataValue(face), action == ACTION_MODE, data and BACKWARD == 0)))
+        if (!Chips.isChip(chip)) return false
+        storage.setSlot(index, IItemStack.of(Chips.cycled(chip, Direction.from3DDataValue(face), action == ACTION_MODE, data and BACKWARD == 0)))
         return true
     }
 

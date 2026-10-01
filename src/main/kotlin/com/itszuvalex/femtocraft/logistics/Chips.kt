@@ -1,0 +1,433 @@
+package com.itszuvalex.femtocraft.logistics
+
+import com.itszuvalex.femtocraft.FemtoRegistries
+import com.itszuvalex.femtocraft.nanite.INaniteTank
+import com.itszuvalex.femtocraft.nanite.NaniteModules
+import com.itszuvalex.femtocraft.nanite.NaniteStack
+import com.itszuvalex.itszulib.api.adapters.IBlockEntity
+import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.ChatFormatting
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.TooltipDisplay
+import net.minecraft.world.level.Level
+import net.neoforged.neoforge.capabilities.Capabilities
+import net.neoforged.neoforge.fluids.FluidStack
+import net.neoforged.neoforge.registries.DeferredHolder
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil
+import net.neoforged.neoforge.transfer.fluid.FluidResource
+import net.neoforged.neoforge.transfer.item.ItemResource
+import java.util.Locale
+import java.util.Objects
+import java.util.function.Consumer
+import kotlin.math.min
+
+/**
+ * Direction of a logistics connection. Port of v3's `ConnectionDirection`.
+ */
+enum class ConnectionDirection { INPUT, OUTPUT, DISABLED }
+
+/**
+ * The settings every chip shares, whatever it moves. Port of v3's `ItemConnection` NBT keys (`flops`, `channel`,
+ * `paused`, `condir`, `intdir`).
+ */
+data class ConnectionSettings(
+    val flops: Double,
+    val channel: String,
+    val paused: Boolean,
+    val direction: ConnectionDirection,
+    val interfaceDirection: Direction,
+) {
+    /**
+     * These settings with the connection direction ([mode]) or interface face cycled one step. Port of v3's
+     * `MessageConduitInputOutputChange` and `MessageConduitFacingChange`.
+     */
+    fun cycled(mode: Boolean, forward: Boolean): ConnectionSettings {
+        val step = if (forward) 1 else -1
+        return if (mode) {
+            val values = ConnectionDirection.entries
+            copy(direction = values[Math.floorMod(direction.ordinal + step, values.size)])
+        } else {
+            copy(interfaceDirection = Direction.from3DDataValue(Math.floorMod(interfaceDirection.get3DDataValue() + step, 6)))
+        }
+    }
+
+    companion object {
+        @JvmField
+        val MAP_CODEC: MapCodec<ConnectionSettings> = RecordCodecBuilder.mapCodec { i ->
+            i.group(
+                Codec.DOUBLE.fieldOf("flops").forGetter(ConnectionSettings::flops),
+                Codec.STRING.optionalFieldOf("channel", "default").forGetter(ConnectionSettings::channel),
+                Codec.BOOL.optionalFieldOf("paused", false).forGetter(ConnectionSettings::paused),
+                Codec.STRING.xmap({ n -> ConnectionDirection.entries.firstOrNull { it.name == n } ?: ConnectionDirection.DISABLED }, ConnectionDirection::name)
+                    .optionalFieldOf("condir", ConnectionDirection.DISABLED).forGetter(ConnectionSettings::direction),
+                Direction.CODEC.optionalFieldOf("intdir", Direction.NORTH).forGetter(ConnectionSettings::interfaceDirection),
+            ).apply(i, ::ConnectionSettings)
+        }
+
+        /**
+         * A new chip's settings when first used in [face]: v3 made even-indexed faces (down, north, west) inputs and
+         * the others outputs, facing back into the inventory.
+         */
+        fun defaults(face: Direction?, flops: Double): ConnectionSettings = ConnectionSettings(
+            flops, "default", false,
+            when {
+                face == null -> ConnectionDirection.DISABLED
+                face.get3DDataValue() % 2 == 0 -> ConnectionDirection.INPUT
+                else -> ConnectionDirection.OUTPUT
+            },
+            face?.opposite ?: Direction.NORTH,
+        )
+    }
+}
+
+/**
+ * A chip's state, kept on the chip as a data component: its [settings] and the [buffer] of whatever it moves.
+ * Equality goes through [kind], since item and fluid stacks do not compare by value.
+ */
+class ChipData<B : Any>(val settings: ConnectionSettings, val buffer: B, val kind: ChipKind<B>) {
+    fun with(settings: ConnectionSettings = this.settings, buffer: B = this.buffer) = ChipData(settings, buffer, kind)
+
+    @Suppress("UNCHECKED_CAST")
+    override fun equals(other: Any?): Boolean =
+        other is ChipData<*> && other.kind === kind && settings == other.settings && kind.matches(buffer, other.buffer as B)
+
+    override fun hashCode(): Int = Objects.hash(settings, kind.hash(buffer))
+
+    override fun toString(): String = "ChipData(${kind.name}, $settings, ${kind.amount(buffer)})"
+}
+
+/**
+ * What a kind of chip moves and how: its buffer type [B], how much it moves per operation ([perOp]) and holds
+ * ([bufferLimit]), and how it reaches the block on its face. The connection logic itself is shared ([Connection]).
+ */
+abstract class ChipKind<B : Any>(
+    val name: String,
+    private val bufferCodec: Codec<B>,
+    val empty: B,
+    val perOp: Int,
+    val bufferLimit: Int,
+) {
+    val flopsRequired: Double = 5000.0
+
+    val codec: Codec<ChipData<B>> by lazy {
+        RecordCodecBuilder.create { i ->
+            i.group(
+                ConnectionSettings.MAP_CODEC.forGetter(ChipData<B>::settings),
+                bufferCodec.optionalFieldOf("buffer", empty).forGetter(ChipData<B>::buffer),
+            ).apply(i) { s, b -> ChipData(s, b, this) }
+        }
+    }
+
+    private val holder: DeferredHolder<DataComponentType<*>, DataComponentType<ChipData<B>>> =
+        FemtoRegistries.DATA_COMPONENTS.registerComponentType("${name}_connection") { b ->
+            b.persistent(codec).networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(codec))
+        }
+
+    val component: DataComponentType<ChipData<B>> get() = holder.get()
+
+    fun defaults(face: Direction?): ChipData<B> = ChipData(ConnectionSettings.defaults(face, flopsRequired), empty, this)
+
+    fun data(chip: ItemStack, face: Direction?): ChipData<B> = chip.get(component) ?: defaults(face)
+
+    /** Same contents and amount. */
+    abstract fun matches(a: B, b: B): Boolean
+
+    abstract fun hash(b: B): Int
+
+    /** Same contents, ignoring the amount: can [a] and [b] share a buffer. */
+    abstract fun sameType(a: B, b: B): Boolean
+
+    abstract fun amount(b: B): Int
+
+    abstract fun withAmount(b: B, amount: Int): B
+
+    fun isEmpty(b: B): Boolean = amount(b) <= 0
+
+    /** How much the buffer may hold of [b]. */
+    open fun limit(b: B): Int = bufferLimit
+
+    abstract fun describe(b: B): Component
+
+    /** Orders output buffers in the network. */
+    abstract fun sortKey(b: B): String
+
+    /** Whether the block at [pos], accessed from [side], would take some of [offer]. */
+    abstract fun canAccept(level: Level, pos: BlockPos, side: Direction, offer: B): Boolean
+
+    /** Pulls up to [max] matching [buffer] (anything, if empty) from the block at [pos]. @return The new buffer. */
+    abstract fun pull(level: Level, pos: BlockPos, side: Direction, buffer: B, max: Int): B
+
+    /** Pushes up to [max] of [buffer] into the block at [pos]. @return How much went in. */
+    abstract fun push(level: Level, pos: BlockPos, side: Direction, buffer: B, max: Int): Int
+}
+
+/**
+ * Item chips: 1 item per operation, a 16-item buffer (v3's `ItemConnection`), through `Capabilities.Item.BLOCK`.
+ */
+object ItemChipKind : ChipKind<ItemStack>("item", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY, 1, 16) {
+    override fun matches(a: ItemStack, b: ItemStack) = ItemStack.matches(a, b)
+    override fun hash(b: ItemStack) = Objects.hash(ItemStack.hashItemAndComponents(b), b.count)
+    override fun sameType(a: ItemStack, b: ItemStack) = ItemStack.isSameItemSameComponents(a, b)
+    override fun amount(b: ItemStack) = b.count
+    override fun withAmount(b: ItemStack, amount: Int): ItemStack = if (amount <= 0) ItemStack.EMPTY else b.copyWithCount(amount)
+    override fun limit(b: ItemStack) = if (b.isEmpty) bufferLimit else min(bufferLimit, b.maxStackSize)
+    override fun describe(b: ItemStack): Component = b.hoverName
+    override fun sortKey(b: ItemStack) = BuiltInRegistries.ITEM.getKey(b.item).toString()
+
+    private fun handler(level: Level, pos: BlockPos, side: Direction) = level.getCapability(Capabilities.Item.BLOCK, pos, side)
+
+    override fun canAccept(level: Level, pos: BlockPos, side: Direction, offer: ItemStack): Boolean {
+        val handler = handler(level, pos, side) ?: return false
+        val resource = ItemResource.of(offer)
+        return (0 until handler.size()).any { handler.isValid(it, resource) }
+    }
+
+    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: ItemStack, max: Int): ItemStack {
+        val handler = handler(level, pos, side) ?: return buffer
+        val got = ResourceHandlerUtil.extractFirst(handler, { r -> buffer.isEmpty || r.matches(buffer) }, max, null)
+        return if (got == null || got.amount() <= 0) buffer else got.resource().toStack(buffer.count + got.amount())
+    }
+
+    override fun push(level: Level, pos: BlockPos, side: Direction, buffer: ItemStack, max: Int): Int {
+        val handler = handler(level, pos, side) ?: return 0
+        return ResourceHandlerUtil.insertStacking(handler, ItemResource.of(buffer), min(max, buffer.count), null)
+    }
+}
+
+/**
+ * Fluid chips: 250 mB per operation and a 1000 mB buffer, through `Capabilities.Fluid.BLOCK`. v3 had the item but no
+ * connection; the amounts are new.
+ */
+object FluidChipKind : ChipKind<FluidStack>("fluid", FluidStack.OPTIONAL_CODEC, FluidStack.EMPTY, 250, 1000) {
+    override fun matches(a: FluidStack, b: FluidStack) = FluidStack.matches(a, b)
+    override fun hash(b: FluidStack) = Objects.hash(FluidStack.hashFluidAndComponents(b), b.amount)
+    override fun sameType(a: FluidStack, b: FluidStack) = FluidStack.isSameFluidSameComponents(a, b)
+    override fun amount(b: FluidStack) = b.amount
+    override fun withAmount(b: FluidStack, amount: Int): FluidStack = if (amount <= 0) FluidStack.EMPTY else b.copyWithAmount(amount)
+    override fun describe(b: FluidStack): Component = Component.literal("${b.amount} mB ").append(b.hoverName)
+    override fun sortKey(b: FluidStack) = BuiltInRegistries.FLUID.getKey(b.fluid).toString()
+
+    private fun handler(level: Level, pos: BlockPos, side: Direction) = level.getCapability(Capabilities.Fluid.BLOCK, pos, side)
+
+    override fun canAccept(level: Level, pos: BlockPos, side: Direction, offer: FluidStack): Boolean {
+        val handler = handler(level, pos, side) ?: return false
+        val resource = FluidResource.of(offer)
+        return (0 until handler.size()).any { handler.isValid(it, resource) }
+    }
+
+    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: FluidStack, max: Int): FluidStack {
+        val handler = handler(level, pos, side) ?: return buffer
+        val got = ResourceHandlerUtil.extractFirst(handler, { r -> buffer.isEmpty || r.matches(buffer) }, max, null)
+        return if (got == null || got.amount() <= 0) buffer else got.resource().toStack(buffer.amount + got.amount())
+    }
+
+    override fun push(level: Level, pos: BlockPos, side: Direction, buffer: FluidStack, max: Int): Int {
+        val handler = handler(level, pos, side) ?: return 0
+        return ResourceHandlerUtil.insertStacking(handler, FluidResource.of(buffer), min(max, buffer.amount), null)
+    }
+}
+
+/**
+ * Nanite chips: 5 nanites per operation and a 25-nanite buffer of one strain and version, through the nanite tank
+ * module ([NaniteModules.NANITE_TANK]). v3 had the item but no connection; the amounts are new.
+ */
+object NaniteChipKind : ChipKind<NaniteStack>("nanite", NaniteStack.CODEC, NaniteStack.EMPTY, 5, 25) {
+    override fun matches(a: NaniteStack, b: NaniteStack) = (a.isEmpty && b.isEmpty) || a == b
+    override fun hash(b: NaniteStack) = if (b.isEmpty) 0 else b.hashCode()
+    override fun sameType(a: NaniteStack, b: NaniteStack) = a.isSameNanite(b)
+    override fun amount(b: NaniteStack) = b.amount
+    override fun withAmount(b: NaniteStack, amount: Int) = b.withAmount(amount)
+    override fun describe(b: NaniteStack): Component = Component.literal("${b.amount} ${b.archetype}/${b.strain} v${b.version.major}.${b.version.minor}")
+    override fun sortKey(b: NaniteStack) = "${b.archetype}/${b.strain}/${b.version.major}.${b.version.minor}"
+
+    private fun tank(level: Level, pos: BlockPos, side: Direction): INaniteTank? {
+        if (!level.isLoaded(pos)) return null
+        return level.getBlockEntity(pos)?.let(IBlockEntity::of)?.getModule(NaniteModules.NANITE_TANK, side)
+    }
+
+    override fun canAccept(level: Level, pos: BlockPos, side: Direction, offer: NaniteStack): Boolean {
+        val tank = tank(level, pos, side) ?: return false
+        return tank.fill(offer.withAmount(1), false).isEmpty
+    }
+
+    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: NaniteStack, max: Int): NaniteStack {
+        val tank = tank(level, pos, side) ?: return buffer
+        val source = if (buffer.isEmpty) tank.contents().firstOrNull() ?: return buffer else buffer
+        val got = tank.drain(source.withAmount(max), true)
+        return if (got.isEmpty) buffer else got.withAmount(buffer.amount + got.amount)
+    }
+
+    override fun push(level: Level, pos: BlockPos, side: Direction, buffer: NaniteStack, max: Int): Int {
+        val tank = tank(level, pos, side) ?: return 0
+        val offer = buffer.withAmount(min(max, buffer.amount))
+        return offer.amount - tank.fill(offer, true).amount
+    }
+}
+
+/**
+ * One chip in a conduit face: every time its flop counter runs down it pulls (INPUT) [ChipKind.perOp] from the block on
+ * that face into its buffer, or pushes (OUTPUT) that much from the buffer into the block. Flops recharge passively at
+ * a 200th of [ChipKind.flopsRequired] per tick. Port of v3's `ItemConnection` (5000 flops, 1 item per operation,
+ * 16-item buffer), generalised to the fluid and nanite chips v3 never implemented.
+ */
+class Connection<B : Any>(
+    val kind: ChipKind<B>,
+    private val chip: ItemStack,
+    private val level: Level,
+    private val conduit: BlockPos,
+    private val face: Direction,
+    private val onChanged: Runnable,
+) {
+    val data: ChipData<B> get() = kind.data(chip, face)
+
+    private fun update(change: (ChipData<B>) -> ChipData<B>) {
+        chip.set(kind.component, change(data))
+        onChanged.run()
+    }
+
+    private fun updateSettings(change: (ConnectionSettings) -> ConnectionSettings) = update { it.with(settings = change(it.settings)) }
+
+    val settings: ConnectionSettings get() = data.settings
+
+    val buffer: B get() = data.buffer
+
+    val direction: ConnectionDirection get() = if (settings.paused) ConnectionDirection.DISABLED else settings.direction
+
+    val channel: String get() = settings.channel
+
+    val active: Boolean get() = !settings.paused && if (direction == ConnectionDirection.INPUT) canAcceptMoreInput() else !kind.isEmpty(buffer)
+
+    val passiveFlopGen: Double get() = kind.flopsRequired / (20 * 10)
+
+    private val target: BlockPos get() = conduit.relative(face)
+
+    private fun canAcceptMoreInput(): Boolean = kind.amount(buffer) < kind.limit(buffer)
+
+    /**
+     * Spends [flops] on the countdown; runs an operation when it reaches 0.
+     *
+     * @return Unused flops.
+     */
+    fun contributeFlops(flops: Double): Double {
+        val used = min(settings.flops, flops)
+        updateSettings { it.copy(flops = it.flops - used) }
+        if (settings.flops <= 0) {
+            when (direction) {
+                ConnectionDirection.INPUT -> input()
+                ConnectionDirection.OUTPUT -> output()
+                ConnectionDirection.DISABLED -> {}
+            }
+            updateSettings { it.copy(flops = kind.flopsRequired) }
+        }
+        return flops - used
+    }
+
+    /**
+     * Whether the block on this face would take [offer].
+     */
+    fun canInsert(offer: B): Boolean = !settings.paused && !kind.isEmpty(offer) && kind.canAccept(level, target, settings.interfaceDirection, offer)
+
+    /**
+     * Adds [offer] to the buffer.
+     *
+     * @return What did not fit.
+     */
+    fun insert(offer: B): B {
+        if (kind.isEmpty(offer)) return offer
+        val current = buffer
+        if (!kind.isEmpty(current) && !kind.sameType(current, offer)) return offer
+        val room = kind.limit(offer) - kind.amount(current)
+        if (room <= 0) return offer
+        val moved = min(room, kind.amount(offer))
+        update { it.with(buffer = kind.withAmount(offer, kind.amount(current) + moved)) }
+        return kind.withAmount(offer, kind.amount(offer) - moved)
+    }
+
+    fun setBuffer(buffer: B) = update { it.with(buffer = buffer) }
+
+    private fun input() {
+        if (!canAcceptMoreInput()) return
+        val current = buffer
+        val want = min(kind.perOp, kind.limit(current) - kind.amount(current))
+        val next = kind.pull(level, target, settings.interfaceDirection, current, want)
+        if (!kind.matches(next, current)) setBuffer(next)
+    }
+
+    private fun output() {
+        val current = buffer
+        if (kind.isEmpty(current)) return
+        val pushed = kind.push(level, target, settings.interfaceDirection, current, kind.perOp)
+        if (pushed > 0) setBuffer(kind.withAmount(current, kind.amount(current) - pushed))
+    }
+}
+
+/**
+ * The chip kinds and helpers for chip stacks.
+ */
+object Chips {
+    @JvmField val KINDS: List<ChipKind<*>> = listOf(ItemChipKind, FluidChipKind, NaniteChipKind)
+
+    fun isChip(stack: ItemStack): Boolean = stack.item is ChipItem
+
+    fun kindOf(stack: ItemStack): ChipKind<*>? = (stack.item as? ChipItem)?.kind
+
+    /** The settings of chip [stack] (its defaults if it has never been used), or null for a non-chip. */
+    fun settingsOf(stack: ItemStack, face: Direction? = null): ConnectionSettings? = kindOf(stack)?.data(stack, face)?.settings
+
+    /**
+     * A connection for [chip] in conduit face [face].
+     */
+    fun connection(chip: ItemStack, level: Level, conduit: BlockPos, face: Direction, onChanged: Runnable): Connection<*>? =
+        kindOf(chip)?.let { Connection(it, chip, level, conduit, face, onChanged) }
+
+    /**
+     * A copy of [chip] (in conduit face [face]) with its connection direction ([mode]) or interface face cycled one
+     * step.
+     */
+    fun cycled(chip: ItemStack, face: Direction, mode: Boolean, forward: Boolean): ItemStack {
+        val kind = kindOf(chip) ?: return chip
+        return chip.copy().also { cycle(kind, it, face, mode, forward) }
+    }
+
+    private fun <B : Any> cycle(kind: ChipKind<B>, chip: ItemStack, face: Direction, mode: Boolean, forward: Boolean) {
+        val d = kind.data(chip, face)
+        chip.set(kind.component, d.with(settings = d.settings.cycled(mode, forward)))
+    }
+}
+
+/**
+ * A logistics chip of one [kind]. Port of v3's `ItemLogisticsItemChip`: the damage bar shows the flop countdown and the
+ * tooltip the connection state.
+ */
+class ChipItem(val kind: ChipKind<*>, properties: Properties) : Item(properties) {
+    override fun isBarVisible(stack: ItemStack): Boolean = stack.has(kind.component)
+
+    override fun getBarWidth(stack: ItemStack): Int {
+        val d = stack.get(kind.component) ?: return 0
+        return (13.0 * (1 - d.settings.flops / kind.flopsRequired)).toInt().coerceIn(0, 13)
+    }
+
+    override fun appendHoverText(stack: ItemStack, context: TooltipContext, display: TooltipDisplay, builder: Consumer<Component>, flag: TooltipFlag) =
+        tooltip(kind, stack, builder)
+
+    private fun <B : Any> tooltip(kind: ChipKind<B>, stack: ItemStack, builder: Consumer<Component>) {
+        val d = kind.data(stack, null)
+        val s = d.settings
+        fun line(key: String, vararg args: Any) = builder.accept(Component.translatable("tooltip.femtocraft.chip.$key", *args).withStyle(ChatFormatting.GRAY))
+        line("item", if (kind.isEmpty(d.buffer)) Component.translatable("tooltip.femtocraft.none") else kind.describe(d.buffer))
+        line("flops", "%,.1f".format(Locale.ROOT, s.flops), "%,.1f".format(Locale.ROOT, kind.flopsRequired))
+        line("channel", s.channel)
+        line("mode", s.direction.name)
+        line("interface", s.interfaceDirection.serializedName)
+    }
+}

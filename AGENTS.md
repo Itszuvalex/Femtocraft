@@ -103,7 +103,7 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          configurator, shift device, gritty slurry fluid
 ├── nanite/                Nanite API (stack, tank, registry, sided configuration, auto IO), extractor/infuser,
 │                          player nanites (synced data attachment), nano lash
-├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item chips, nano pack;
+├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
 │                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
 │                          indexed item storages (storage/)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
@@ -141,8 +141,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   in `FragMultiblockState`. `FragMultiblockTeardown` drops the controller's contents when any part breaks.
 - **Nanites**: one API (DECISIONS D5): `NaniteStack(archetype, strain, version, amount)` in `NaniteTank`s, exposed by
   `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
-- **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`); item chips in a conduit face keep their
-  state in the `femtocraft:item_connection` component and move one item per 5000 flops. `DistributedManager` matches
+- **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
+  in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
+  operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how
+  much (1 item, 250 mB, 5 nanites), and the network routes each kind separately by channel. Add a kind by
+  subclassing `ChipKind` and listing it in `Chips.KINDS`. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
   or broken); `IndexedItemStorage` indexes an `IItemStorage` by item id and answers tag lookups (keep it current with
   `slotChanged` or `invalidateCache` from the storage's `onChanged`). Neither has a block using it yet (DECISIONS D4).

@@ -15,7 +15,7 @@ import net.minecraft.client.gui.components.Button
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
-import com.itszuvalex.femtocraft.logistics.ItemChips
+import com.itszuvalex.femtocraft.logistics.Chips
 import net.minecraft.world.entity.player.Inventory
 import net.neoforged.neoforge.client.network.ClientPacketDistributor
 
@@ -75,7 +75,7 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
         }
         val slot = menu.slots.getOrNull(selected) ?: return
         graphics.fill(leftPos + slot.x - 1, topPos + slot.y + 16, leftPos + slot.x + 17, topPos + slot.y + 17, SELECTED)
-        val data = slot.item.get(ItemChips.CONNECTION.get()) ?: return
+        val data = Chips.settingsOf(slot.item) ?: return
         text(graphics, Component.literal("${data.direction.name.lowercase()} / ${data.interfaceDirection.serializedName}"), 94, 83)
     }
 
