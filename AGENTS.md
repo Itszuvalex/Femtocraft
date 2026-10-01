@@ -4,37 +4,58 @@ Guidance for coding agents (Claude Code, Codex, etc.) and humans working in this
 
 ## What this is
 
-Femtocraft is a tech mod (cybernetic machines, crystal power networks, frame multiblocks, nanites, logistics) by Itszuvalex, built on the ItszuLib library mod (`../ItszuLib`). The source it is ported from is a pre-alpha 2015–16 rewrite; see [docs/PORTING.md](docs/PORTING.md) for what exists.
+Femtocraft is a tech mod by Itszuvalex: crystal power networks, processing machines, frame multiblocks, nanites,
+logistics and cybermaterial "rifts" in the world. It is built on the ItszuLib library mod (`../ItszuLib`).
 
 - **Minecraft 26.1.2 / NeoForge 26.1.2.112 / Java 25**, ModDevGradle (`net.neoforged.moddev` 2.0.148), Gradle 9.2.1.
-- Written in **Kotlin 2.4.0**, loaded through **Kotlin for Forge 6.3.0** (`thedarkcolour:kotlinforforge-neoforge`, `modLoader="kotlinforforge"`). KFF is a required runtime mod: it provides the language loader and the Kotlin stdlib, reflect, coroutines and serialization. Do not add a second copy of the stdlib (`kotlin.stdlib.default.dependency=false`).
-- Mod id `femtocraft`, package `com.itszuvalex.femtocraft`, GPL-2.0-or-later (from source headers; the repo has no LICENSE file).
-- Ported from Forge 1.7.10 / Scala 2.11 on branch `neoforge-26.1` (from `develop-gui`). `master`/`develop`/`develop-gui` still hold the 1.7.10 code. Server-side gameplay, menus and data are ported; dynamic rendering is follow-up work. Port status and the follow-up list: [docs/PORTING.md](docs/PORTING.md). Decisions: [docs/DECISIONS.md](docs/DECISIONS.md). Review: [docs/REVIEW.md](docs/REVIEW.md).
+- Written in **Kotlin 2.4.0**, loaded through **Kotlin for Forge 6.3.0** (`thedarkcolour:kotlinforforge-neoforge`,
+  `modLoader="kotlinforforge"`). KFF is a required runtime mod: it provides the language loader and the Kotlin stdlib,
+  reflect, coroutines and serialization. Do not add a second copy of the stdlib (`kotlin.stdlib.default.dependency=false`).
+- Mod id `femtocraft`, package `com.itszuvalex.femtocraft`, GPL-2.0-or-later (from source headers; the repo has no
+  LICENSE file).
+- Ported on branch `neoforge-26.1` from GitLab `develop-1.12.2-v3` (Minecraft 1.12.2, Scala). Every v3 area is ported
+  (power, industry, nanite, logistics, cyber, worldgen); what was deliberately left out, the bugs fixed on the way and
+  the follow-up rendering work are in [docs/PORTING.md](docs/PORTING.md). Decisions: [docs/DECISIONS.md](docs/DECISIONS.md).
+  Review findings: [docs/REVIEW.md](docs/REVIEW.md). The 1.7.10-based attempt is kept as `neoforge-26.1-from-2016`.
 
 ## Build and run
 
 ```bash
-./gradlew build                 # compile + unit tests + jar (build/libs/femtocraft-<version>.jar)
+./gradlew build                 # compile ItszuLib + Femtocraft, unit tests, jar (build/libs/femtocraft-<version>.jar)
 ./gradlew test                  # JUnit unit tests only
 ./gradlew runGameTestServer     # in-game tests; exits non-zero if a required test fails
-./gradlew runClient             # dev client (dev content is registered)
+./gradlew runClient             # dev client
 ./gradlew runServer             # dev dedicated server (run/eula.txt must say eula=true)
+python3 tools/gen_assets.py     # regenerate models, blockstates, loot tables, tags, lang, recipes, worldgen JSON
 ```
 
-`runGameTestServer` also runs one built-in vanilla test (`minecraft:default` environment), so its "All N required tests passed" count is Femtocraft's tests + ItszuLib's dev tests (they load too, see below) + one. `runServer` does not forward stdin, so use game tests for in-world checks.
+`runGameTestServer` runs Femtocraft's tests, ItszuLib's dev tests (its dev content loads in Femtocraft's dev runs) and
+one built-in vanilla test, so "All N required tests passed" counts all three. `runServer` does not forward stdin; stop
+it with SIGINT (the shutdown hook saves the world) and use game tests for in-world checks.
 
-The build targets a JDK 25 toolchain, and NeoForge's tooling also uses JDK 21. Gradle auto-detects installed JDKs and downloads missing ones through the foojay resolver (`settings.gradle`). `gradlew` itself needs Java 17+ on `PATH` or `JAVA_HOME` to start.
+The build targets a JDK 25 toolchain, and NeoForge's tooling also uses JDK 21. Gradle auto-detects installed JDKs and
+downloads missing ones through the foojay resolver (`settings.gradle`). `gradlew` itself needs Java 17+ on `PATH` or
+`JAVA_HOME` to start.
 
 ## Dependencies
 
-- **ItszuLib** (required, mod id `itszulib`): consumed as a **Gradle composite build** of a sibling checkout. `settings.gradle` runs `includeBuild('../ItszuLib')`, and `build.gradle` depends on `com.itszuvalex.itszulib:itszulib:${itszulib_version}`, which Gradle substitutes with that project (building its jar as needed). Clone ItszuLib's `neoforge-26.1` branch next to this repo, or point elsewhere with `itszulib_dir=/path/to/ItszuLib` in `~/.gradle/gradle.properties` (or `-Pitszulib_dir=...`). The build stops with a clear error if the checkout is missing. Changes to ItszuLib are picked up by the next Femtocraft build without publishing. ItszuLib's dev-only content and game tests also load in Femtocraft's dev runs.
+- **ItszuLib** (required, mod id `itszulib`), as a **Gradle composite build** of a sibling checkout (DECISIONS D7).
+  `settings.gradle` runs `includeBuild` on `../ItszuLib` and `build.gradle` depends on
+  `com.itszuvalex.itszulib:itszulib:${itszulib_version}`, which Gradle substitutes with that project. Clone ItszuLib's
+  `neoforge-26.1` branch next to this repo, or point elsewhere with `itszulib_dir=/path/to/ItszuLib` in
+  `~/.gradle/gradle.properties` (or `-Pitszulib_dir=...`). The build stops with a clear error if the checkout is
+  missing. ItszuLib changes are picked up by the next Femtocraft build without publishing. `neoforge.mods.toml` declares
+  `itszulib` as a required dependency ordered `AFTER`.
 - **Kotlin for Forge** (required, `thedarkcolour:kotlinforforge-neoforge:${kff_version}`), see above.
 
-Mod metadata is generated from `src/main/templates/META-INF/neoforge.mods.toml` using the `mod_*`, `kff_version` and `itszulib_version` properties in `gradle.properties`.
+Mod metadata is generated from `src/main/templates/META-INF/neoforge.mods.toml` using the `mod_*`, `kff_version` and
+`itszulib_version` properties in `gradle.properties`.
 
 ## Machine notes
 
-Machine-specific JDK settings go in the user-level `~/.gradle/gradle.properties` (or `$GRADLE_USER_HOME/gradle.properties`), never in the project's `gradle.properties`. NixOS can't run the generic-Linux JDKs Gradle downloads, so point it at Nix JDKs there:
+Machine-specific JDK settings go in the user-level `~/.gradle/gradle.properties` (or `$GRADLE_USER_HOME/gradle.properties`),
+never in the project's `gradle.properties`. NixOS can't run the generic-Linux JDKs Gradle downloads, so point it at Nix
+JDKs there:
 
 ```properties
 org.gradle.java.home=/home/cchharris/.gradle/jdks/jdk25
@@ -48,65 +69,111 @@ On the maintainer's Windows machine `GRADLE_USER_HOME` is under scoop (`~/scoop/
 
 NeoForge's API changes a lot between versions and many online examples are stale. Prefer these sources, in order:
 
-1. **Decompiled, NeoForge-patched Minecraft sources**: `build/moddev/artifacts/minecraft-patched-<version>-sources.jar` (created by any Gradle build). NeoForge classes: `neoforge-<version>-universal.jar` under `$GRADLE_USER_HOME/caches/modules-2/files-2.1/net.neoforged/neoforge/`; use `javap` to check signatures.
-2. **NeoForge docs**: https://docs.neoforged.net/docs/ (unversioned pages are 26.1): capabilities, transactions, Value I/O, block entities, menus, networking, game tests.
+1. **Decompiled, NeoForge-patched Minecraft sources**: `build/moddev/artifacts/minecraft-patched-<version>-sources.jar`
+   (created by any Gradle build). NeoForge classes: `neoforge-<version>-universal.jar` under
+   `$GRADLE_USER_HOME/caches/modules-2/files-2.1/net.neoforged/neoforge/`; use `javap` to check signatures.
+2. **NeoForge docs**: https://docs.neoforged.net/docs/ (unversioned pages are 26.1): capabilities, transactions, Value
+   I/O, block entities, menus, networking, game tests, worldgen and biome modifiers.
 3. **Porting primers**: https://docs.neoforged.net/primer/docs/ (per-version change lists).
 4. **ModDevGradle docs**: https://docs.neoforged.net/toolchain/docs/plugins/mdg/.
 5. **Kotlin for Forge**: https://github.com/thedarkcolour/KotlinForForge (branch `6.x` for 1.21.9–26.2).
-6. **Forge 1.7.10 era** (historical, for the legacy code's intent only).
+6. **v3 sources** (GitLab `develop-1.12.2-v3`, or this branch's history before each area's port commit) for the
+   original intent.
 
-Library sources: `../ItszuLib` (its `AGENTS.md` and `docs/`). Reference implementation for 26.1 patterns (same author, Java): `../technolich` on branch `neoforge-26.1` (Value I/O serialization, transfer-API adapters, networks, game tests).
+Library: `../ItszuLib` (its `AGENTS.md` and `docs/`).
 
 ## Source layout
 
 ```
 src/main/kotlin/com/itszuvalex/femtocraft/
-├── Femtocraft.kt          @Mod object: registries, dev content (non-production), client init, manager reset on stop
-├── FemtoRegistries.kt     FemtoBlocks, FemtoItems, FemtoBlockEntities (+ capability registration), FemtoMenus, FemtoTabs
-├── FemtoModules.kt        Femtocraft modules (power node, task/worker provider, nanite hive/node)
-├── FemtoComponents.kt     Item data components; FemtoTags; FemtoRecipes (growth_chamber recipe type)
-├── core/                  FemtoBlockEntity/FemtoEntityBlock, FragData, FragExpose, FragMultiBlock, FluidTanks,
-│                          FemtoMenu, Loc4 helpers (inLevel/blockEntity/module, Loc4 save helpers)
-├── power/                 FragPowerNode + PowerNodeRules, PowerManager, power crystal item, crystal mount,
-│                          pedestal, sink, generator, glow stick
-├── logistics/             IndexedItemStorage, item repository, distributed task/worker manager
-├── nanite/                Hive/node fragments, NaniteManager, small nanite hive
-├── industry/              Frame multiblocks, frames, multiblock item, material processor, assemblies, dust recipes
-├── cyber/                 Cybermaterials, dumb dust, cyber base + seed, cyber machines, growth chamber (+ recipe), vines
-├── worldgen/              Crystal cluster feature, block and block entity
-├── client/                Menu screens (client only)
-└── dev/                   Dev-only power-node blocks and all game tests
-src/test/kotlin/...        JUnit 5 tests
-src/main/resources/        assets (textures under 26.1 paths, generated models/lang) and data (generated)
-tools/gen_assets.py        Generates models, blockstates, loot tables, tags, lang, recipes, worldgen JSON
-art/                       Source art, unused 1.7.10 item art, OBJ models (not packaged)
+├── Femtocraft.kt          @Mod object: initializes each area's content object, registers FemtoRegistries, clears
+│                          the wireless power manager on server stop, client and dev (non-production) init
+├── FemtoRegistries.kt     DeferredRegisters (blocks, items, block entities, menus, data components, sounds, entities,
+│                          attachments, features, creative tab); blockEntity() (also registers the type's ItszuLib
+│                          modules/capabilities) and blockMenu() helpers
+├── FemtoSounds.kt         v3's three sounds
+├── core/                  FemtoBlockEntity (serverTick/clientTick/onUse/onPlaced), FemtoEntityBlock and
+│                          FemtoHorizontalEntityBlock, FemtoMenu (BatteryView sync), FragData, FragExpose,
+│                          FragDerivedColor, Loc4 helpers
+├── power/                 Power API (modules, node interfaces), wireless network + manager (distribution, spanning
+│                          tree), wired network on ItszuLib FragNetworkedWire, power fragments, power crystal item
+│                          (data component), crystal mount, charging/storage arrays, heat exchanger, conduit, glow stick
+├── industry/              Recipes (code tables), single-block machines (ProcessingMachineBlockEntity on ItszuLib sided
+│                          storage/auto IO), frames and frame multiblocks (germination chamber, focusing chamber),
+│                          configurator, shift device, gritty slurry fluid
+├── nanite/                Nanite API (stack, tank, registry, sided configuration, auto IO), extractor/infuser,
+│                          player nanites (synced data attachment), nano lash
+├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item chips, nano pack
+├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
+├── worldgen/              Crystal cluster block/block entity, rift feature
+├── client/                FemtoScreen (plain functional screens) and each area's screens; fluid model and entity
+│                          renderer registration. Client only.
+└── dev/                   Game tests (one object per area), registered only outside production
+src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree)
+src/main/resources/        assets (v3 textures under 26.1 paths, generated models/lang) and data (generated), plus
+                           data/femtocraft/structure/test_area.nbt (empty 9x5x9 game test structure)
+tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,
+                           worldgen JSON and placeholder textures from tables; validates texture references
+art/                       Source art and OBJ models (not packaged)
 ```
 
-## Core concepts
+Each area has a `*Content` object (registrations, `init()` called from `Femtocraft`) and, where it has menus, a
+`*Menus.kt` and `client/*Screens.kt`.
 
-Femtocraft block entities are ItszuLib `BlockEntityCore`s (read `../ItszuLib/AGENTS.md` first). `FemtoBlockEntity` adds `serverTick`/`clientTick`, `onUse`, `onPlaced`, and `onServerLoad`/`onServerUnload` (register with the server-side managers there; note `onLoad` runs on the tick *after* a block is placed). State lives in fragments:
+## Architecture
 
-- `FragPowerNode` (module `POWER_NODE`): parent/child links found by radius through `PowerManager`; `PowerNodeRules` encode the 1.7.10 whitelists; storage is pluggable (`OwnPowerStorage`, crystal-backed, slot-or-parent).
-- `FragMultiBlock`: formed flag + controller position (keys `isFormed`, `c_x/y/z`). Multiblocks remove themselves inside `MultiblockGuard.run` so part break handlers don't recurse.
-- `FragData` for ad-hoc state with explicit keys; `FragExpose` to expose the block entity itself as a module.
-- Server-side managers (`PowerManager`, `DistributedManager`, `NaniteManager`) index `Loc4`s (always `Loc4Level`, so lookups work) and are cleared on server stop.
+Femtocraft block entities are ItszuLib `BlockEntityCore`s composed of fragments; read `../ItszuLib/AGENTS.md` first.
+v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto ItszuLib `IModule`s.
 
-Content data (models, loot, tags, recipes, worldgen, lang) is generated: edit the tables in `tools/gen_assets.py`, run `python tools/gen_assets.py`, commit the outputs. Hand-written JSON under those paths is overwritten.
+- **Power** (internal, no Forge Energy; DECISIONS D10). Wireless: `FragWirelessPowerNode` (crystal mounts) join
+  `WirelessPowerNetwork`s by range through `WirelessPowerManager`; leaf fragments (arrays, heat exchanger, machines)
+  attach to the nearest node. Each tick a network distributes power over its minimal spanning tree
+  (`DistributionAlgorithm`). Wired: `WiredPowerConduit` is an ItszuLib `FragNetworkedWire`; `FragWiredPowerLeafNode`
+  machines connect to adjacent conduits. Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
+  `femtocraft:power_crystal` component.
+- **Machines**: `ProcessingMachineBlockEntity` holds an `ItemStorageArray` behind ItszuLib sided configuration, item
+  auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).
+  Recipes are Kotlin tables (DECISIONS D12); ore dictionary lookups are `c:ores/*`/`c:dusts/*` tags.
+- **Frames**: the frame item places frame blocks; when the frame's inventory holds a multiblock's materials it
+  builds the multiblock (`FrameMultiblocks`), using ItszuLib `MultiblockStatic`/`FragMultiBlockInfo` and shared state
+  in `FragMultiblockState`. `FragMultiblockTeardown` drops the controller's contents when any part breaks.
+- **Nanites**: one API (DECISIONS D5): `NaniteStack(archetype, strain, version, amount)` in `NaniteTank`s, exposed by
+  `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
+- **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`); item chips in a conduit face keep their
+  state in the `femtocraft:item_connection` component and move one item per 5000 flops.
+- **Cyber/worldgen**: `Cybermaterials.replacement(state)` drives both dumb dust and the rift feature, which converts a
+  cylinder of terrain (radius capped to the feature region, DECISIONS D13) and drops crystal clusters on it.
+- **Menus**: ItszuLib `MenuCore`s with vanilla slots (DECISIONS D6); non-slot values use `MenuSync`s; buttons send
+  ItszuLib `MenuActionPayload` actions that only reach the sender's open menu (D11).
+- **Content data** (models, loot, tags, recipes, worldgen, lang) is generated: edit the tables in `tools/gen_assets.py`,
+  run it, commit the outputs. Hand-written JSON under those paths is overwritten.
 
 ## Kotlin conventions
 
-- `@Mod` classes are Kotlin `object`s; use `thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS` for the mod event bus and `NeoForge.EVENT_BUS` for game events.
-- Registries: `DeferredRegister` in `object`s, registered from the mod object's `init`.
+- `@Mod` classes are Kotlin `object`s; use `thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS` for the mod event bus
+  and `NeoForge.EVENT_BUS` for game events.
+- Registries: `DeferredRegister`s in `FemtoRegistries`; each area's content object registers into them and is
+  initialized from `Femtocraft`'s `init` before `FemtoRegistries.register`.
 - Use `@JvmField`/`@JvmStatic` on things Java code or reflection needs to see as plain fields/statics.
-- Nullability: Kotlin types carry it; prefer non-null returns and `?` only where NeoForge expects a nullable (capability providers).
+- Nullability: Kotlin types carry it; prefer non-null returns and `?` only where NeoForge expects a nullable. When
+  overriding a Java method whose parameter vanilla passes as null at runtime, keep the Kotlin parameter nullable.
 
-## Dev content and game tests
+## Game tests
 
-`dev/DevContent.kt` registers dev-only power node blocks (`femtocraft:dev_<type>_node`, right-click prints links). `dev/DevGameTests.kt` registers every game test on `femtocraft:test_area` (empty 9x5x9, padding 2); tests are grouped in `PowerGameTests`, `CyberGameTests`, `IndustryGameTests`, `LogisticsGameTests`. Add one with `DevGameTests.test("name", maxTicks) { helper -> ... }`; use `succeedWhen` for anything that needs a tick (block entity `onLoad`, ticking machines). Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(expected, actual, name)` takes the expected value first.
+`dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
+`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`. Add one with
+`DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
+ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
+the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode
+and `snapTo` the test area when that matters.
 
 ## Testing conventions
 
-- Unit tests: `src/test/kotlin`, JUnit 5, names like `Method_ExpectedBehavior`. ModDevGradle puts Minecraft classes on the test classpath, but anything needing registries or a level belongs in a game test.
-- Add a game test for anything that crosses into vanilla/NeoForge (registries, block entities, capabilities, serialization with real items, networking).
-- Verify with `./gradlew build` **and** `./gradlew runGameTestServer`. The "required tests" count includes ItszuLib's dev tests and one vanilla test.
-- Client screens and models can only be checked in `./gradlew runClient` (opens a game window); resource loading errors show up in its log.
+- Unit tests: `src/test/kotlin`, JUnit 5, names like `Method_ExpectedBehavior`. ModDevGradle puts Minecraft classes on
+  the test classpath, but anything needing registries or a level belongs in a game test.
+- Add a game test for anything that crosses into vanilla/NeoForge (registries, block entities, capabilities,
+  serialization with real items, networking, data files). A bug fix gets a test that fails on the old behaviour.
+- Verify with `./gradlew build` **and** `./gradlew runGameTestServer`.
+- Client screens and models can only be checked in `./gradlew runClient`; resource loading errors show up in its log.
+  Worldgen can be checked with `runServer` on a fresh `run/world` (raise the rarity in
+  `data/femtocraft/worldgen/placed_feature/rift.json` temporarily, then regenerate it with `gen_assets.py`).

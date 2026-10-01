@@ -43,6 +43,7 @@ object LogisticsGameTests {
         DevGameTests.test("conduit_drops_chips", body = ::conduitDrops)
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
         DevGameTests.test("nano_pack_saves_contents_and_locks_its_slot", body = ::nanoPack)
+        DevGameTests.test("nano_pack_cannot_be_swapped_into_itself", body = ::nanoPackSwap)
     }
 
     private fun itemRepository(helper: GameTestHelper) {
@@ -159,6 +160,25 @@ object LogisticsGameTests {
         helper.assertValueEqual(reopened.storage.get(3).stackSize(), 5, "read back")
         val held = reopened.slots.first { it.container === player.inventory && it.containerSlot == player.inventory.selectedSlot }
         helper.assertTrue(!held.mayPickup(player), "the pack's own slot is locked")
+        helper.succeed()
+    }
+
+    /**
+     * Pressing the hotbar key of the slot holding the pack over a pack slot (SWAP) used to move the pack into its own
+     * storage, which is saved to the pack: the pack and everything in it were deleted.
+     */
+    private fun nanoPackSwap(helper: GameTestHelper) {
+        val player = helper.makeMockServerPlayerInLevel()
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL)
+        val pack = ItemStack(LogisticsContent.NANO_PACK.get())
+        player.setItemInHand(InteractionHand.MAIN_HAND, pack)
+        val menu = NanoPackMenu(1, player.inventory, InteractionHand.MAIN_HAND)
+        menu.storage.setSlot(0, IItemStack.of(ItemStack(Items.DIAMOND, 5)))
+        menu.clicked(1, player.inventory.selectedSlot, net.minecraft.world.inventory.ContainerInput.SWAP, player)
+        helper.assertTrue(player.mainHandItem.`is`(LogisticsContent.NANO_PACK.get()), "the pack stays in the hand")
+        helper.assertTrue(menu.storage.get(1).isEmpty(), "the pack is not inside itself")
+        helper.assertTrue(!menu.slots[1].mayPlace(ItemStack(LogisticsContent.NANO_PACK.get())), "no nano packs in nano packs")
+        helper.assertValueEqual(menu.storage.get(0).stackSize(), 5, "contents kept")
         helper.succeed()
     }
 }

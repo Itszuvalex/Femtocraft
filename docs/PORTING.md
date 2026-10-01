@@ -96,23 +96,7 @@ DECISIONS D4 and D5 give the reasoning.
 
 ## 1.12.2 bugs fixed
 
-Bugs found in v3 while porting. Each fix is pinned by a test named in the last column.
-
-| Area | v3 behaviour | Fix | Test |
-|---|---|---|---|
-| Crystal charging/storage array, heat exchanger | Drained the crystal's full transfer rate into the battery and clamped the battery, destroying whatever did not fit | Only what fits is drained (`drainCrystalInto`) | game test `charging_array_full_battery_keeps_crystal_power` |
-| `WirelessPowerManager.addNode` | A node in range of two networks was added to each in turn; adding it to the second removed it from the first, so the networks never merged | Joins one network, then connects to the others (merging them) | game test `mount_bridging_two_networks_merges_them` |
-| `DistributionAlgorithm` | Removed power from the source before adding it to the sink and ignored how much the sink accepted | Removes only what the sink accepted | `DistributionAlgorithmTest.Distribute_SinkAcceptsLess_SourceKeepsTheRest` |
-| `MinimalSpanningTree` | A Prim-style walk that revisited nodes and threw (`.get` on an empty search) on graphs it could not finish | Kruskal with union-find; disconnected parts get their own trees | `MinimalSpanningTreeTest.Calculate_Disconnected_GivesForest` |
-| `WirelessPowerNetwork` statistics | Read `changeForLastTick`, which every node left at `0 // TODO`, so the network screen always showed zeros | Counts the power the distribution moved | game test `wireless_network_distributes_power` |
-| `StorageUtils` (ItszuLib 1.12.2, used by frames) | Never compared items, so any ten items started a germination chamber build | Items are compared (ItszuLib R16) | game test `frame_ignores_wrong_items` |
-| `TileGerminationChamber` results | Rolled results stayed in the task; with a full output the next seed reset the task and the harvest was lost | Results wait in a pending list until they fit; no new seed starts meanwhile | game test `germination_chamber_output_full_keeps_harvest` |
-| `GerminationChamberRecipe` ranges | `nextInt(max - min) + min` never reached the top of a range (cactus 2-3 always gave 2) | Inclusive ranges | game test `germination_results_reach_range_top` |
-| Germination chamber teardown | Breaking the chamber removed its blocks and lost its inventory | The controller's contents drop | game test `germination_chamber_teardown_drops_contents` |
-| `ModuleFocusingChamber` | Written but never attached to the tile; the frame built an inert block | Attached, with a menu (D13) | game test `focusing_chamber_charges_large_crystal` |
-| `TileCrystalHeatExchanger` | Burning a lava bucket lost the bucket | The container stays in the fuel slot | game test `heat_exchanger_keeps_lava_bucket` |
-| `FemtocraftOreGenerator` sizes | The medium branch tested `rand < MEDIUM_WEIGHT` after `rand < SMALL_WEIGHT` failed, which is never true (30 < 50), so medium rifts never spawned | Cumulative weights | game test `rift_sizes_include_medium_and_fit_the_feature_region` |
-| `FemtocraftOreGenerator` crystals | A crystal whose random height was inside the ground replaced the block there, burying it | It climbs to the air above first, then rests on the ground | game test `rift_crystals_rest_on_the_ground` |
+Bugs found in v3 while porting are listed, with the test that pins each fix, in [REVIEW.md](REVIEW.md#fixed).
 
 ## Follow-up rendering work
 
