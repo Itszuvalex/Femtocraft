@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LIL",
+    "ICI",
+    "LIL"
+  ],
+  "key": {
+    "L": "femtocraft:cyberleaf",
+    "I": "minecraft:iron_ingot",
+    "C": "femtocraft:crackling_dust"
+  },
+  "result": {
+    "id": "femtocraft:energy_regulator",
+    "count": 1
+  }
+}

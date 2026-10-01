@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BMB",
+    "CFC",
+    "BMB"
+  ],
+  "key": {
+    "B": "femtocraft:crystal_battery",
+    "C": "femtocraft:basic_circuit",
+    "M": "femtocraft:nanoweave_sheet",
+    "F": "femtocraft:frame"
+  },
+  "result": {
+    "id": "femtocraft:crystal_storage_array",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "RBR"
+  ],
+  "key": {
+    "R": "femtocraft:redstonereplacement_dust",
+    "C": "femtocraft:nanite_beacon",
+    "B": "femtocraft:basic_circuit"
+  },
+  "result": {
+    "id": "femtocraft:logistics_item_chip_basic",
+    "count": 8
+  }
+}

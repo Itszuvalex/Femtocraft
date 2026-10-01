@@ -1,12 +1,14 @@
 package com.itszuvalex.femtocraft
 
 import com.itszuvalex.femtocraft.client.FemtoClient
+import com.itszuvalex.femtocraft.cyber.CyberContent
 import com.itszuvalex.femtocraft.dev.DevContent
 import com.itszuvalex.femtocraft.industry.IndustryContent
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.nanite.NaniteContent
 import com.itszuvalex.femtocraft.power.PowerContent
 import com.itszuvalex.femtocraft.power.WirelessPowerManager
+import com.itszuvalex.femtocraft.worldgen.WorldgenContent
 import com.mojang.logging.LogUtils
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.common.Mod
@@ -34,6 +36,8 @@ object Femtocraft {
         IndustryContent.init(MOD_BUS)
         NaniteContent.init()
         LogisticsContent.init()
+        CyberContent.init()
+        WorldgenContent.init()
         FemtoRegistries.register(MOD_BUS)
 
         NeoForge.EVENT_BUS.addListener { _: ServerStoppedEvent -> WirelessPowerManager.clear() }

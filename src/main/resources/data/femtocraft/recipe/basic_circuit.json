@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NRN",
+    "SIS"
+  ],
+  "key": {
+    "N": "femtocraft:nanoweave_thread",
+    "R": "minecraft:redstone",
+    "S": "femtocraft:substrate",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "femtocraft:basic_circuit",
+    "count": 1
+  }
+}

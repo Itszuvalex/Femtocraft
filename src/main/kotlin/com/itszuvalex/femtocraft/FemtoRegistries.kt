@@ -56,6 +56,9 @@ object FemtoRegistries {
     @JvmField
     val TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Femtocraft.ID)
 
+    @JvmField
+    val FEATURES: DeferredRegister<net.minecraft.world.level.levelgen.feature.Feature<*>> = DeferredRegister.create(Registries.FEATURE, Femtocraft.ID)
+
     private val coreBlockEntities = ArrayList<DeferredHolder<BlockEntityType<*>, out BlockEntityType<out BlockEntityCore>>>()
 
     /**
@@ -105,6 +108,7 @@ object FemtoRegistries {
         TABS.register(modBus)
         ENTITY_TYPES.register(modBus)
         ATTACHMENT_TYPES.register(modBus)
+        FEATURES.register(modBus)
         modBus.addListener { event: RegisterCapabilitiesEvent ->
             coreBlockEntities.forEach { ModuleCapabilities.registerBlockEntity(event, it.get()) }
         }

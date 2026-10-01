@@ -57,6 +57,17 @@ def tex(name):
 MACHINE_SIDE = "blockmachineblock_side_base"
 MACHINE_FRONT = "blockmachineblock_front_base"
 
+def drop_count(name, item, lo, hi):
+    """Drops lo..hi of item, plus 0..fortune more (v3 quantityDroppedWithBonus)."""
+    return {"type": "minecraft:block", "random_sequence": f"{NS}:blocks/{name}", "pools": [{
+        "rolls": 1.0, "bonus_rolls": 0.0,
+        "entries": [{"type": "minecraft:item", "name": item, "functions": [
+            {"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": lo, "max": hi}, "add": False},
+            {"function": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:uniform_bonus_count",
+             "parameters": {"bonusMultiplier": 1}},
+            {"function": "minecraft:explosion_decay"}]}]}]}
+
+
 # Block model kinds:
 #   ("cube_all", tex)                 one texture
 #   ("machine", front_overlay)        v3 machine: base cube plus the machine's front overlay, horizontal facing
@@ -89,6 +100,19 @@ BLOCKS = {
     "fluid_repository": ("Fluid Repository", ("orientable", "blockfluidrepository_front", "blockfluidrepository_side", "blockfluidrepository_top"), "self", "pickaxe"),
     "nanite_repository": ("Nanite Repository", ("orientable", "blocknaniterepository_front", "blocknaniterepository_side", "blocknaniterepository_top"), "self", "pickaxe"),
     "conduit": ("Logistics Conduit", ("box", "logistics_conduit", [6, 6, 6, 10, 10, 10]), "self", "pickaxe"),
+    # --- cyber ---
+    "substrate": ("Substrate", ("cube_all", "substrate"), "self", "pickaxe"),
+    "refined_substrate": ("Refined Substrate", ("cube_all", "refinedsubstrate"), "self", "pickaxe"),
+    "cyberwood": ("Cyberwood", ("column", "log_cyber", "log_cyber_top"), "self", "axe"),
+    "cyberleaves": ("Cyberleaves", ("leaves", "cyberleaf"), drop_count("cyberleaves", f"{NS}:cyberleaf", 3, 5), "hoe"),
+    "nanoweave": ("Nanoweave", ("cube_all", "blocknanoweave"), drop_count("nanoweave", f"{NS}:nanoweave_thread", 3, 5), "pickaxe"),
+    "riftiron": ("Riftiron", ("cube_all", "blockriftiron"), "self", "pickaxe"),
+    "phasemetal": ("Phasemetal", ("cube_all", "blockphasemetal"), "self", "pickaxe"),
+    "redstonereplacement": ("Redstone Replacement", ("cube_all", "blockredstonereplacement"), drop_count("redstonereplacement", f"{NS}:redstonereplacement_dust", 3, 5), "pickaxe"),
+    "lapisreplacement": ("Lapis Replacement", ("cube_all", "blocklapisreplacement"), drop_count("lapisreplacement", f"{NS}:lapisreplacement_dust", 3, 5), "pickaxe"),
+    "diamondreplacement": ("Diamond Replacement", ("cube_all", "blockdiamondreplacement"), "self", "pickaxe"),
+    # --- worldgen --- (the crystal cluster's block entity drops crystals and dust)
+    "crystal_cluster": ("Crystal Cluster", ("cross", "crystal_cluster"), "none", None),
     # Placed by the frame item and by frame building; they drop through their teardown, not loot tables.
     "frame": ("Frame", ("box", "standin_frame", [0, 0, 0, 16, 16, 16]), "none", "pickaxe", False),
     "germination_chamber": ("Germination Chamber", ("cube_all", "germination_chamber"), "none", "pickaxe", False),
@@ -126,6 +150,10 @@ ITEMS = {
     "logistics_fluid_chip_basic": ("Basic Fluid Logistics Chip", "itemlogisticsfluidchipbasic"),
     "logistics_nanite_chip_basic": ("Basic Nanite Logistics Chip", "itemlogisticsnanitechipbasic"),
     "nano_pack": ("Nano Pack", "itemnanopack"),
+    "dumb_dust": ("Dumb Dust", "dust_dumb"),
+    "cyberleaf": ("Cyberleaf", "itemcyberleaf"),
+    "nanoweave_thread": ("Nanoweave Thread", "nanoweave_thread"),
+    "nanoweave_sheet": ("Nanoweave Sheet", "nanoweave_sheet"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
@@ -136,6 +164,7 @@ PLACEHOLDERS = {
     "block/germination_chamber": ((70, 140, 60, 255), (40, 80, 35, 255)),
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
     "block/logistics_conduit": ((200, 170, 60, 255), (110, 90, 30, 255)),
+    "block/crystal_cluster": ((0, 0, 0, 0), (150, 230, 255, 255)),
 }
 
 LANG = {
@@ -199,6 +228,25 @@ TAGS = {
     ("item", "c", "ingots/riftiron_activated"): [f"{NS}:riftiron_ingot_activated"],
     ("item", "c", "ingots/phasemetal_devoid"): [f"{NS}:phasemetal_ingot_devoid"],
     ("item", "c", "ingots/phasemetal_activated"): [f"{NS}:phasemetal_ingot_activated"],
+    ("item", "c", "ores/riftiron"): [f"{NS}:riftiron"],
+    ("item", "c", "ores/phasemetal"): [f"{NS}:phasemetal"],
+    ("item", "c", "ores/nanoweave"): [f"{NS}:nanoweave"],
+    ("item", "c", "ores/redstonereplacement"): [f"{NS}:redstonereplacement"],
+    ("item", "c", "ores/lapisreplacement"): [f"{NS}:lapisreplacement"],
+    ("item", "c", "ores/diamondreplacement"): [f"{NS}:diamondreplacement"],
+    ("block", "c", "ores/riftiron"): [f"{NS}:riftiron"],
+    ("block", "c", "ores/phasemetal"): [f"{NS}:phasemetal"],
+    ("block", "c", "ores/nanoweave"): [f"{NS}:nanoweave"],
+    ("block", "c", "ores/redstonereplacement"): [f"{NS}:redstonereplacement"],
+    ("block", "c", "ores/lapisreplacement"): [f"{NS}:lapisreplacement"],
+    ("block", "c", "ores/diamondreplacement"): [f"{NS}:diamondreplacement"],
+    # v3 registered cyberwood as logWood and cyberleaf as treeLeaves; substrate sustained plains and beach plants.
+    ("block", "minecraft", "logs"): [f"{NS}:cyberwood"],
+    ("item", "minecraft", "logs"): [f"{NS}:cyberwood"],
+    ("block", "minecraft", "leaves"): [f"{NS}:cyberleaves"],
+    ("item", "minecraft", "leaves"): [f"{NS}:cyberleaves"],
+    ("block", "minecraft", "supports_vegetation"): [f"{NS}:substrate"],
+    ("block", "minecraft", "supports_sugar_cane"): [f"{NS}:substrate"],
 }
 
 
@@ -224,6 +272,41 @@ RECIPES = {
     "smelting/phasemetal_ingot_from_dust": smelting(f"{NS}:phasemetal_dust", f"{NS}:phasemetal_ingot_devoid"),
     "smelting/iron_ingot_from_dust": smelting(f"{NS}:iron_dust", "minecraft:iron_ingot"),
     "smelting/gold_ingot_from_dust": smelting(f"{NS}:gold_dust", "minecraft:gold_ingot"),
+    "smelting/riftiron_ingot_from_ore": smelting(f"{NS}:riftiron", f"{NS}:riftiron_ingot_devoid"),
+    "smelting/phasemetal_ingot_from_ore": smelting(f"{NS}:phasemetal", f"{NS}:phasemetal_ingot_devoid"),
+    # v3 crafting recipes
+    "conduit": shaped(["SSS", "CCC", "SSS"], {"C": f"{NS}:nano_channel", "S": f"{NS}:nanoweave_sheet"}, f"{NS}:conduit", 6),
+    "crystal_charging_array": shaped(["RMR", "CFC", "RMR"], {"R": f"{NS}:energy_regulator", "C": f"{NS}:basic_circuit", "M": f"{NS}:nanoweave_sheet", "F": f"{NS}:frame"}, f"{NS}:crystal_charging_array"),
+    "crystal_heat_exchanger": shaped(["ERE", "CMC", "BFB"], {"R": f"{NS}:energy_regulator", "B": f"{NS}:crystal_battery", "C": f"{NS}:basic_circuit", "M": f"{NS}:frame", "E": f"{NS}:riftiron_ingot_devoid", "F": "minecraft:furnace"}, f"{NS}:crystal_heat_exchanger"),
+    "crystal_mount": shaped([" S ", "RFR", "CSC"], {"S": f"{NS}:nanoweave_sheet", "R": f"{NS}:riftiron_ingot_devoid", "F": f"{NS}:frame", "C": f"{NS}:basic_circuit"}, f"{NS}:crystal_mount"),
+    "crystal_storage_array": shaped(["BMB", "CFC", "BMB"], {"B": f"{NS}:crystal_battery", "C": f"{NS}:basic_circuit", "M": f"{NS}:nanoweave_sheet", "F": f"{NS}:frame"}, f"{NS}:crystal_storage_array"),
+    "demolisher": shaped(["SSS", "CMC", "RPR"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "P": "minecraft:piston", "R": f"{NS}:riftiron_ingot_devoid", "M": f"{NS}:frame"}, f"{NS}:demolisher"),
+    "nano_furnace": shaped(["SSS", "CMC", "RFR"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "F": "minecraft:furnace", "R": f"{NS}:riftiron_ingot_devoid", "M": f"{NS}:frame"}, f"{NS}:nano_furnace"),
+    "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
+    "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
+    "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:frame"),
+    "logistics_fluid_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:lapisreplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_fluid_chip_basic", 8),
+    "logistics_item_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_item_chip_basic", 8),
+    "logistics_nanite_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:phasemetal_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_nanite_chip_basic", 8),
+    # The "reset" recipes: a recipe result has no components, so crafting a chip alone clears its connection.
+    "logistics_fluid_chip_basic_reset": shapeless([f"{NS}:logistics_fluid_chip_basic"], f"{NS}:logistics_fluid_chip_basic"),
+    "logistics_item_chip_basic_reset": shapeless([f"{NS}:logistics_item_chip_basic"], f"{NS}:logistics_item_chip_basic"),
+    "logistics_nanite_chip_basic_reset": shapeless([f"{NS}:logistics_nanite_chip_basic"], f"{NS}:logistics_nanite_chip_basic"),
+    "nanite_beacon": shaped(["SCS", "RCR", "EDE"], {"S": "minecraft:redstone", "C": f"{NS}:basic_circuit", "R": f"{NS}:riftiron_ingot_devoid", "E": f"{NS}:energy_regulator", "D": f"{NS}:diamond_dust"}, f"{NS}:nanite_beacon", 4),
+    "nano_channel": shapeless([f"{NS}:cyberwood"], f"{NS}:nano_channel", 2),
+    "nanoweave_sheet": shaped(["TT", "TT"], {"T": f"{NS}:nanoweave_thread"}, f"{NS}:nanoweave_sheet"),
+}
+
+
+# Worldgen data (paths under data/): the rift feature, 1 in 333 overworld chunks (v3 CHANCE_PER_CHUNK .003), placed last so
+# ores and trees exist to be converted.
+WORLDGEN = {
+    f"{NS}/worldgen/configured_feature/rift.json": {"type": f"{NS}:rift", "config": {}},
+    f"{NS}/worldgen/placed_feature/rift.json": {"feature": f"{NS}:rift", "placement": [
+        {"type": "minecraft:rarity_filter", "chance": 333}, {"type": "minecraft:biome"}]},
+    f"{NS}/neoforge/biome_modifier/rift.json": {"type": "neoforge:add_features", "biomes": "#minecraft:is_overworld",
+                                                "features": f"{NS}:rift", "step": "top_layer_modification"},
 }
 
 
@@ -251,7 +334,7 @@ def block_model(name, kind):
     if k == "column":
         return {"parent": "minecraft:block/cube_column", "textures": {"side": tex(kind[1]), "end": tex(kind[2])}}
     if k == "leaves":
-        return {"parent": "minecraft:block/leaves", "textures": {"all": tex(kind[1])}}
+        return {"parent": "minecraft:block/leaves", "textures": {"all": tex(kind[1])}, "render_type": "minecraft:cutout_mipped"}
     if k == "cross":
         return {"parent": "minecraft:block/cross", "textures": {"cross": tex(kind[1])}, "render_type": "minecraft:cutout"}
     if k == "box":
@@ -340,6 +423,8 @@ def main():
         write(os.path.join(ROOT, "data", ns, "tags", reg, f"{path}.json"), {"replace": False, "values": values})
     for name, recipe in RECIPES.items():
         write(os.path.join(DATA, "recipe", f"{name}.json"), recipe)
+    for path, obj in WORLDGEN.items():
+        write(os.path.join(ROOT, "data", path), obj)
     mc_tags = os.path.join(ROOT, "data", "minecraft", "tags", "block", "mineable")
     for tool, blocks in tools.items():
         write(os.path.join(mc_tags, f"{tool}.json"), {"replace": False, "values": sorted(blocks)})

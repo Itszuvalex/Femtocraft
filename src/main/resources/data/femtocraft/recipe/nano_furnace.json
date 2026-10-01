@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "CMC",
+    "RFR"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "C": "femtocraft:basic_circuit",
+    "F": "minecraft:furnace",
+    "R": "femtocraft:riftiron_ingot_devoid",
+    "M": "femtocraft:frame"
+  },
+  "result": {
+    "id": "femtocraft:nano_furnace",
+    "count": 1
+  }
+}

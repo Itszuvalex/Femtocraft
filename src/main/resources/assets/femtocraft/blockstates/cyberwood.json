@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "femtocraft:block/cyberwood",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "femtocraft:block/cyberwood"
+    },
+    "axis=z": {
+      "model": "femtocraft:block/cyberwood",
+      "x": 90
+    }
+  }
+}

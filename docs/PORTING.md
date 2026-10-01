@@ -42,7 +42,7 @@ Scala. Commits are listed under [Progress](#progress).
 | Industry | `industry/`: materials, the five single-block machines on ItszuLib sided storage and auto IO, gritty slurry, frames and frame multiblocks (germination chamber, crystal focusing chamber), recipes, configurator, shift device | Done (`dev/IndustryGameTests`) |
 | Nanite | `nanite/`: one nanite API (stack, tank, registry, sided configuration and auto IO), nanite extractor and infuser on it (the repository lands with logistics), player nanite tank as a synced data attachment with fill/drain menu actions, nano lash, configurator nanite mode | Done (`dev/NaniteGameTests`) |
 | Logistics | `logistics/`: item/fluid repositories, logistics conduit with item chips, nano pack | Pending |
-| Cyber and worldgen | `cyber/`, `worldgen/`: cybermaterial blocks and drops, dumb dust conversion, crystal cluster, rift feature + biome modifier | Pending |
+| Cyber and worldgen | `cyber/`: cybermaterial blocks and their drops (loot tables), the replacement table (`Cybermaterials`, tags instead of the ore dictionary), dumb dust, nanite values; `worldgen/`: crystal cluster, rift feature (configured/placed feature + biome modifier); v3's crafting and ore smelting recipes | Done (`dev/CyberGameTests`) |
 
 ## Not ported
 
@@ -72,6 +72,14 @@ DECISIONS D4 and D5 give the reasoning.
 - **Rendering** (B2): TESRs, OBJ models, beams, previewable ghosts, particles, the nanite HUD overlay, GUI tabs and
   icons. Listed under [Follow-up rendering work](#follow-up-rendering-work).
 - **Cyberbloom** (`BlockCyberbloom`): empty class.
+- **Replaced by the framework or 26.1**: `Femtocraft.scala`, `FemtoBlocks`/`FemtoItems` (registries), proxies and the GUI
+  handler (`GuiIDs`, menus), `FemtoPacketHandler` and the remaining messages (`MessageOpenGui`, `MessageRequestSyncs`:
+  menus open and sync through vanilla/ItszuLib; side config messages: see the side-configuration tabs above),
+  `ManagerModules`/`ManagerCapabilities`/`Capabilities.java` (ItszuLib modules), `Loc4*NeighborIterator`.
+- **Unused utilities**: item filters (`util/ItemFilter*`, `OreNameFilterRule`), the `util/data` data specs, `KeyObject`,
+  `Wrapper` (nothing outside `util/` used them).
+- **v3 Scala tests** (`src/test/scala`): they tested computation (not ported) on Scala fakes; the Kotlin port has its
+  own JUnit and game tests.
 
 ## Progress
 
@@ -81,7 +89,10 @@ DECISIONS D4 and D5 give the reasoning.
 - [x] Industry: materials, machines, frames and frame multiblocks, configurator, shift device; 17 game tests.
 - [x] Nanite: API, extractor, infuser, player tank, nano lash; 8 game tests.
 - [x] Logistics: repositories, conduit network and item chips, nano pack; 8 game tests.
-- [ ] Cyber/worldgen (table above).
+- [x] Cyber and worldgen: cybermaterials, dumb dust, crystal cluster, rift feature, v3 recipes; 9 game tests. The
+  rift was also checked in a generated world (dev server with the rarity raised: no far-chunk writes, converted
+  chunks and crystal clusters saved).
+- [x] All v3 Scala/Java removed; what was not ported is listed above.
 
 ## 1.12.2 bugs fixed
 
@@ -100,6 +111,8 @@ Bugs found in v3 while porting. Each fix is pinned by a test named in the last c
 | Germination chamber teardown | Breaking the chamber removed its blocks and lost its inventory | The controller's contents drop | game test `germination_chamber_teardown_drops_contents` |
 | `ModuleFocusingChamber` | Written but never attached to the tile; the frame built an inert block | Attached, with a menu (D13) | game test `focusing_chamber_charges_large_crystal` |
 | `TileCrystalHeatExchanger` | Burning a lava bucket lost the bucket | The container stays in the fuel slot | game test `heat_exchanger_keeps_lava_bucket` |
+| `FemtocraftOreGenerator` sizes | The medium branch tested `rand < MEDIUM_WEIGHT` after `rand < SMALL_WEIGHT` failed, which is never true (30 < 50), so medium rifts never spawned | Cumulative weights | game test `rift_sizes_include_medium_and_fit_the_feature_region` |
+| `FemtocraftOreGenerator` crystals | A crystal whose random height was inside the ground replaced the block there, burying it | It climbs to the air above first, then rests on the ground | game test `rift_crystals_rest_on_the_ground` |
 
 ## Follow-up rendering work
 
@@ -112,4 +125,6 @@ All of this was client rendering in v3 and needs the 26.1 pipeline (`BlockEntity
 - Wireless power beams between nodes (`WirelessPowerBeamRenderer`; the spanning-tree render locations are computed and
   synced), crystal mount crystal, glow stick and conduit colors.
 - Frame and multiblock renderers, germination chamber growth, frame/multiblock/shift previewables.
-- Power and nanite particles, the nanite teleport effect, the player nanite overlay.
+- Power and nanite particles, the nanite teleport effect, the player nanite overlay, dumb dust particles.
+- Crystal cluster renderer (`CrystalRenderer`, with per-crystal color offsets), cybermaterial colors (cyberleaves use
+  the vanilla leaves model untinted).

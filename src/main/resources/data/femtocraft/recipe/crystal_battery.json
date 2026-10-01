@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " R ",
+    "ICI",
+    "DCD"
+  ],
+  "key": {
+    "R": "femtocraft:cyberleaf",
+    "I": "minecraft:iron_ingot",
+    "C": "femtocraft:crackling_dust",
+    "D": "femtocraft:riftiron_ingot_devoid"
+  },
+  "result": {
+    "id": "femtocraft:crystal_battery",
+    "count": 1
+  }
+}

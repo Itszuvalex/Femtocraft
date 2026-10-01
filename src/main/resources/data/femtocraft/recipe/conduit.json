@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "CCC",
+    "SSS"
+  ],
+  "key": {
+    "C": "femtocraft:nano_channel",
+    "S": "femtocraft:nanoweave_sheet"
+  },
+  "result": {
+    "id": "femtocraft:conduit",
+    "count": 6
+  }
+}

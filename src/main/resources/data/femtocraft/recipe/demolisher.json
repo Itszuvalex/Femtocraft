@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "CMC",
+    "RPR"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "C": "femtocraft:basic_circuit",
+    "P": "minecraft:piston",
+    "R": "femtocraft:riftiron_ingot_devoid",
+    "M": "femtocraft:frame"
+  },
+  "result": {
+    "id": "femtocraft:demolisher",
+    "count": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "femtocraft:block/log_cyber",
+    "end": "femtocraft:block/log_cyber_top"
+  }
+}

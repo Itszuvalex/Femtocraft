@@ -77,7 +77,8 @@ which Gradle substitutes with the included project. The build stops with a clear
 ## D8. Registry ids and block items — DECIDED (non-blocking)
 
 Ids are snake_case v3 names without the `block`/`item` prefix (`blockCrystalMount` -> `crystal_mount`,
-`itemPowerCrystal` -> `power_crystal`; `crystalCluster` -> `crystal_cluster`). v3 gave every registered block an item,
+`itemPowerCrystal` -> `power_crystal`; `crystalCluster` -> `crystal_cluster`). Where a block and an item shared a
+name, the block takes the vanilla-style plural: `blockCyberleaf` -> `cyberleaves`, `itemCyberleaf` -> `cyberleaf`. v3 gave every registered block an item,
 including frame and multiblock parts placed by other means; those parts have no block item here (they are placed by
 the frame item and by multiblock forming). 1.12.2 worlds cannot be migrated anyway.
 
@@ -116,4 +117,10 @@ Small changes, each noted in the code:
 - The crystal focusing chamber's logic (`ModuleFocusingChamber`) was written but never attached to its tile, so the
   frame built an inert block. The port attaches it.
 - Rift worldgen: v3 converted a cylinder of radius 10-40 down to bedrock in one go, which a 26.1 feature cannot do
-  (features may only write within the 3x3 chunks around their origin). The radius is capped to fit.
+  (features may only write within the 3x3 chunks around their origin). The rift centers itself in its chunk and the
+  radius is capped at 24 (blocks up to 23 out), so small rifts are unchanged, medium ones are capped above 24 and
+  large ones are all 24. Rifts are placed in the last feature step (`top_layer_modification`) so the ores and trees
+  they convert exist; terrain from neighbouring chunks generated later is not converted.
+- Rift conversion also turns deepslate into substrate (26.1 worlds are deepslate below y 0) and uses the `c:ores/*`
+  tags, so deepslate ores convert like their stone variants.
+- Dumb dust is not used up in creative mode (vanilla `consume`).

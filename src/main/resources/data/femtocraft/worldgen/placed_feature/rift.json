@@ -1,0 +1,12 @@
+{
+  "feature": "femtocraft:rift",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 333
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}
