@@ -22,7 +22,7 @@ object LogisticsContent {
     @JvmField val NANITE_REPOSITORY = block("nanite_repository", ::NaniteRepositoryBlock)
     @JvmField val CONDUIT = block("conduit", ::ConduitBlock) { machine(it).noOcclusion() }
 
-    private fun chip(name: String, kind: ChipKind<*>) = R.ITEMS.registerItem(name, { ChipItem(kind, it) }, UnaryOperator { it.stacksTo(1) })
+    private fun chip(name: String, kind: ChipKind<*>) = R.ITEMS.registerItem(name, { ChipItem(kind, it) })
 
     @JvmField val ITEM_CHIP = chip("logistics_item_chip_basic", ItemChipKind)
     @JvmField val FLUID_CHIP = chip("logistics_fluid_chip_basic", FluidChipKind)

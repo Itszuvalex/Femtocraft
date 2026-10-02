@@ -12,6 +12,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.codec.ByteBufCodecs
@@ -303,7 +304,7 @@ class Connection<B : Any>(
     val data: ChipData<B> get() = kind.data(chip, face)
 
     private fun update(change: (ChipData<B>) -> ChipData<B>) {
-        chip.set(kind.component, change(data))
+        Chips.write(kind, chip, change(data))
         onChanged.run()
     }
 
@@ -396,6 +397,15 @@ object Chips {
     fun settingsOf(stack: ItemStack, face: Direction? = null): ConnectionSettings? = kindOf(stack)?.data(stack, face)?.settings
 
     /**
+     * Stores [data] on [chip]. A blank chip stacks to 64; one that holds data (settings, a buffer) stacks to 1, so two
+     * used chips never merge and lose one buffer.
+     */
+    fun <B : Any> write(kind: ChipKind<B>, chip: ItemStack, data: ChipData<B>) {
+        chip.set(kind.component, data)
+        chip.set(DataComponents.MAX_STACK_SIZE, 1)
+    }
+
+    /**
      * A connection for [chip] in conduit face [face].
      */
     fun connection(chip: ItemStack, level: Level, conduit: BlockPos, face: Direction, counter: FlopCounter, onChanged: Runnable): Connection<*>? =
@@ -411,7 +421,7 @@ object Chips {
 
     private fun <B : Any> writeFlops(kind: ChipKind<B>, chip: ItemStack, face: Direction, flops: Double) {
         val d = kind.data(chip, face)
-        if (d.settings.flops != flops) chip.set(kind.component, d.with(settings = d.settings.copy(flops = flops)))
+        if (d.settings.flops != flops) write(kind, chip, d.with(settings = d.settings.copy(flops = flops)))
     }
 
     /**
@@ -425,7 +435,7 @@ object Chips {
 
     private fun <B : Any> cycle(kind: ChipKind<B>, chip: ItemStack, face: Direction, mode: Boolean, forward: Boolean) {
         val d = kind.data(chip, face)
-        chip.set(kind.component, d.with(settings = d.settings.cycled(mode, forward)))
+        write(kind, chip, d.with(settings = d.settings.cycled(mode, forward)))
     }
 }
 
