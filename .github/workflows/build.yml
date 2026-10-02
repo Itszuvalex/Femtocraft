@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # Public repo on a self-hosted runner: never run pull requests from forks.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: self-hosted
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: Femtocraft
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Femtocraft
+
+      # ItszuLib is a composite build from the sibling checkout (settings.gradle).
+      - uses: actions/checkout@v4
+        with:
+          repository: Itszuvalex/ItszuLib
+          ref: main
+          path: ItszuLib
+
+      # The build compiles with a JDK 25 toolchain; NeoForge's tooling also needs JDK 21.
+      - id: jdk21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - id: jdk25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Build and unit tests
+        run: ./gradlew build --stacktrace "-Porg.gradle.java.installations.paths=${{ steps.jdk21.outputs.path }},${{ steps.jdk25.outputs.path }}"
+
+      - name: Game tests
+        run: ./gradlew runGameTestServer --stacktrace "-Porg.gradle.java.installations.paths=${{ steps.jdk21.outputs.path }},${{ steps.jdk25.outputs.path }}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: femtocraft
+          path: |
+            Femtocraft/build/libs/*.jar
+            Femtocraft/build/reports/tests/
+          if-no-files-found: ignore
