@@ -165,6 +165,17 @@ PLACEHOLDERS = {
 
 LANG = {
     "itemGroup.femtocraft": "Femtocraft",
+    "jei.femtocraft.crushing": "Crushing",
+    "jei.femtocraft.liquifying": "Liquifying",
+    "jei.femtocraft.germination": "Germination",
+    "jei.femtocraft.nanite_infusion": "Nanite Infusion",
+    "jei.femtocraft.nanite_extraction": "Nanite Extraction",
+    "jei.femtocraft.count_range": "Yields %s-%s",
+    "jei.femtocraft.seconds": "%ss",
+    "jei.femtocraft.power": "%s DE",
+    "jei.femtocraft.nanite_amount": "%s nanites",
+    "jei.femtocraft.nanites_consumed": "Uses %s %s nanites v%s",
+    "jei.femtocraft.nanites_produced": "Yields %s %s nanites v%s",
     "item.femtocraft.power_crystal.named": "%s %s",
     "item.femtocraft.power_crystal.type.small": "Small",
     "item.femtocraft.power_crystal.type.medium": "Medium",

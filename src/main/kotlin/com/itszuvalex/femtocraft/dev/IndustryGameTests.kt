@@ -52,6 +52,7 @@ object IndustryGameTests {
         DevGameTests.test("nano_furnace_smelts", 400, ::nanoFurnaceSmelts)
         DevGameTests.test("demolisher_grinds_cobblestone", 400, ::demolisherGrinds)
         DevGameTests.test("dust_recipes_use_ore_and_dust_tags", body = ::dustRecipeTags)
+        DevGameTests.test("dust_recipes_list_for_recipe_viewers", body = ::dustRecipeList)
         DevGameTests.test("crystal_furnace_runs_on_its_crystal", 400, ::crystalFurnace)
         DevGameTests.test("crystal_liquifier_makes_gritty_slurry", 400, ::liquifier)
         DevGameTests.test("wired_conduit_charges_crystal_machine", body = ::wiredPower)
@@ -95,6 +96,14 @@ object IndustryGameTests {
         val redstone = DustRecipes.result(ItemStack(Items.REDSTONE_ORE))
         helper.assertTrue(redstone.`is`(Items.REDSTONE) && redstone.count == 6, "redstone ore gives six redstone (v3 override), got $redstone")
         helper.assertValueEqual(DustRecipes.result(crystal(type = PowerCrystals.TYPE_LARGE)).count, 3, "large crystal -> 3 crackling dust")
+        helper.succeed()
+    }
+
+    private fun dustRecipeList(helper: GameTestHelper) {
+        val all = DustRecipes.all()
+        helper.assertTrue(all.any { (input, output) -> input.`is`(Items.COBBLESTONE) && output.`is`(Items.GRAVEL) }, "cobblestone -> gravel is listed")
+        helper.assertTrue(all.any { (input, output) -> input.`is`(Items.IRON_ORE) && output.`is`(IndustryContent.IRON_DUST.get()) }, "tag-based iron ore -> iron dust is listed")
+        helper.assertTrue(all.none { (input, _) -> input.`is`(Items.DIRT) }, "dirt has no dust and is not listed")
         helper.succeed()
     }
 

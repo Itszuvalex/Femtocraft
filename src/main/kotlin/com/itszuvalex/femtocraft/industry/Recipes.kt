@@ -94,6 +94,16 @@ object DustRecipes {
 
     fun hasResult(stack: ItemStack): Boolean = !result(stack).isEmpty
 
+    /**
+     * Every registered item that grinds into something, with its result, for recipe viewers. Power crystals are left
+     * out: their dust depends on data a plain stack does not carry.
+     */
+    fun all(): List<Pair<ItemStack, ItemStack>> = BuiltInRegistries.ITEM.stream()
+        .map { ItemStack(it) }
+        .map { it to result(it) }
+        .filter { !it.second.isEmpty }
+        .toList()
+
     private const val ORES = "ores/"
 }
 
@@ -110,6 +120,8 @@ object LiquifierRecipes {
     }
 
     fun find(stack: ItemStack): Recipe? = if (stack.isEmpty) null else recipes.firstOrNull { stack.`is`(it.input) }
+
+    fun all(): List<Recipe> = recipes
 }
 
 /**

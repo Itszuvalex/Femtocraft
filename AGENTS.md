@@ -50,6 +50,9 @@ downloads missing ones through the foojay resolver (`settings.gradle`). `gradlew
   missing. ItszuLib changes are picked up by the next Femtocraft build without publishing. `neoforge.mods.toml` declares
   `itszulib` as a required dependency ordered `AFTER`.
 - **Kotlin for Forge** (required, `thedarkcolour:kotlinforforge-neoforge:${kff_version}`), see above.
+- **JEI** (optional, `mezz.jei`, version `jei_version`; DECISIONS D14). The plugin compiles against the API jars only;
+  dev runs (`runClient`, `runServer`, `runGameTestServer`) include the full mod through `localRuntime`. Pass
+  `-Pjei=false` to run without it.
 
 Mod metadata is generated from `src/main/templates/META-INF/neoforge.mods.toml` using the `mod_*`, `kff_version` and
 `itszulib_version` properties in `gradle.properties`.
@@ -114,6 +117,7 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          indexed item storages (storage/)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
+├── compat/jei/            JEI plugin: a category per machine recipe table, furnaces as smelting catalysts (D14)
 ├── client/                FemtoScreen (plain functional screens on ItszuLib's ComponentScreen: power gauges, the 3D
 │                          side configuration panel behind the "IO" tab) and each area's screens; fluid model and
 │                          entity renderer registration. Client only.

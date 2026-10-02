@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.dev
 
 import com.itszuvalex.femtocraft.dev.DevGameTests.place
+import com.itszuvalex.femtocraft.cyber.CyberContent
 import com.itszuvalex.femtocraft.industry.ConfiguratorItem
 import com.itszuvalex.femtocraft.industry.ConfiguratorMode
 import com.itszuvalex.femtocraft.industry.IndustryContent
@@ -35,6 +36,7 @@ object NaniteGameTests {
     fun register() {
         DevGameTests.test("nanite_tank_fill_drain_save", body = ::tank)
         DevGameTests.test("nanite_extractor_extracts_cybermaterial", 400, ::extractor)
+        DevGameTests.test("cybermaterial_nanites_list_for_recipe_viewers", body = ::cybermaterialList)
         DevGameTests.test("nanite_infuser_activates_riftiron", 600, ::infuser)
         DevGameTests.test("nanite_infuser_waits_for_nanites", 200, ::infuserNeedsNanites)
         DevGameTests.test("nanite_auto_io_moves_between_machines", body = ::autoIO)
@@ -65,6 +67,12 @@ object NaniteGameTests {
             helper.assertValueEqual(be.naniteTank.amount, 2, "nanites extracted")
             CybermaterialNanites.unregister(Items.SLIME_BALL)
         }
+    }
+
+    private fun cybermaterialList(helper: GameTestHelper) {
+        val all = CybermaterialNanites.all()
+        helper.assertTrue(all[CyberContent.SUBSTRATE.get().asItem()] == NaniteRegistry.dumb(1), "substrate is listed with one dumb nanite, got ${all[CyberContent.SUBSTRATE.get().asItem()]}")
+        helper.succeed()
     }
 
     private fun infuser(helper: GameTestHelper) {

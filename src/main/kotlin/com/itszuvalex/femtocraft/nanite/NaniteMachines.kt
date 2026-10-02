@@ -51,6 +51,8 @@ object NaniteInfusionRecipes {
     )
 
     fun find(stack: ItemStack): Recipe? = if (stack.isEmpty) null else recipes.firstOrNull { stack.`is`(it.input()) }
+
+    fun all(): List<Recipe> = recipes
 }
 
 /**

@@ -153,3 +153,15 @@ Small changes, each noted in the code:
 
 **Decision:** keep all four. The rift is a placeholder: how rifts and Femtocraft materials generate may be
 revisited, so its edges (REVIEW O6) and size cap (O7) are left as they are until then.
+
+## D14. JEI integration — DECIDED (maintainer, 2026-10-01)
+
+JEI is an optional dependency. The plugin (`compat/jei/FemtoJeiPlugin.kt`) compiles against JEI's common and NeoForge
+API jars (`compileOnly`) and is found by JEI's `@JeiPlugin` scan, so nothing loads it when JEI is absent. It shows
+one category per machine recipe table (crushing, liquifying, germination, nanite infusion, nanite extraction) and
+adds the nano and crystal furnaces to vanilla smelting. Nanites are not a JEI ingredient type yet, so recipes name
+them in text; a custom ingredient type is the next step once there are strains other than Dumb.
+
+Dev runs get the full JEI mod through `localRuntime`, which is not published as a dependency; `-Pjei=false` leaves it
+out. JEI and its config library come from `maven.blamejared.com`. When the machine recipes move to datapack recipe
+types (D12), the categories move with them.

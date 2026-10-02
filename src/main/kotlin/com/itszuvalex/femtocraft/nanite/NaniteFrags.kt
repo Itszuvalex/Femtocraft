@@ -124,10 +124,22 @@ object CybermaterialNanites {
 
     fun nanitesFor(stack: ItemStack): NaniteStack? {
         if (stack.isEmpty) return null
+        resolvePending()
+        return items[stack.item]
+    }
+
+    /**
+     * Every registered cybermaterial with its nanites, for recipe viewers.
+     */
+    fun all(): Map<Item, NaniteStack> {
+        resolvePending()
+        return items.toMap()
+    }
+
+    private fun resolvePending() {
         if (pending.isNotEmpty()) {
             pending.forEach { (i, n) -> items[i()] = n }
             pending.clear()
         }
-        return items[stack.item]
     }
 }
