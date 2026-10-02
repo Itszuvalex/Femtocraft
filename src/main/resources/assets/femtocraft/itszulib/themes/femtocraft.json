@@ -1,0 +1,8 @@
+{
+  "parent": "itszulib:dark",
+  "colors": {
+    "slot_output": "#2E7F95",
+    "text": "#D6E2E4",
+    "text_muted": "#7E8E92"
+  }
+}

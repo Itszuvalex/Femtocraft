@@ -23,7 +23,7 @@ class ItemRepositoryScreen(menu: ItemRepositoryMenu, inventory: Inventory, title
 
 class FluidRepositoryScreen(menu: FluidRepositoryMenu, inventory: Inventory, title: Component) : FemtoScreen<FluidRepositoryMenu>(menu, inventory, title) {
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        graphics.fill(leftPos + 79, topPos + 17, leftPos + 97, topPos + 71, SLOT)
+        inset(graphics, 79, 17, 18, 54)
         ScreenHelpers.fluidTank(graphics, leftPos + 80, topPos + 18, 16, 52, menu.tank.toMinecraft(), FluidRepositoryBlockEntity.TANK_SIZE)
         ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, leftPos + 80, topPos + 18, 16, 52, ScreenHelpers.fluidTooltip(menu.tank.toMinecraft(), FluidRepositoryBlockEntity.TANK_SIZE))
     }

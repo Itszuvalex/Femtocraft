@@ -130,7 +130,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
 ├── compat/jei/            JEI plugin: a category per machine recipe table, furnaces as smelting catalysts (D14)
-├── client/                FemtoScreen (plain functional screens on ItszuLib's ComponentScreen: power gauges, the 3D
+├── client/                FemtoScreen (functional screens on ItszuLib's ComponentScreen in Femtocraft's theme,
+│                          `femtocraft:femtocraft` from assets/femtocraft/itszulib/themes: power gauges, the 3D
 │                          side configuration panel behind the "IO" tab) and each area's screens; fluid model and
 │                          entity renderer registration. Client only.
 └── dev/                   Game tests (one object per area), registered only outside production

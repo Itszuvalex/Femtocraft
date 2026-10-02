@@ -5,9 +5,55 @@
     "particle": "femtocraft:block/blockmachineblock_side_base",
     "side": "femtocraft:block/blockmachineblock_side_base",
     "front_base": "femtocraft:block/blockmachineblock_front_base",
+    "side_color": "femtocraft:block/blockmachineblock_side_color",
+    "front_color": "femtocraft:block/blockmachineblock_front_color",
     "front": "femtocraft:block/crystalstoragearray_front"
   },
   "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front_color",
+          "cullface": "north",
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#side_color",
+          "cullface": "south",
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#side_color",
+          "cullface": "east",
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#side_color",
+          "cullface": "west",
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#side_color",
+          "cullface": "up",
+          "tintindex": 0
+        },
+        "down": {
+          "texture": "#side_color",
+          "cullface": "down",
+          "tintindex": 0
+        }
+      }
+    },
     {
       "from": [
         0,

@@ -254,3 +254,23 @@ shared queue that Archives take items from), they chose the shared focus, and th
 
 Open: whether the Codex item is needed at all (the host could reach the Archive's mind directly, e.g. a key), Archive
 tiers (more points held, longer host reach, faster spending), and per-Archive specialisation.
+
+## D18. Dark screens in Femtocraft's own theme — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked for a dark mode like Femtocraft's old GUIs, built as a theme system (ItszuLib DECISIONS D16), with
+the old per-pixel grain as a toggle, and for slots that show where items go on generated screens.
+
+- Femtocraft's screens default to `femtocraft:femtocraft` (`assets/femtocraft/itszulib/themes/femtocraft.json`):
+  ItszuLib's dark theme (the old art's colours) with a teal output ring and cool light text. Players can force any
+  theme, or turn grain off, in ItszuLib's client config.
+- `FemtoScreen` draws ItszuLib's themed panel and slots; its text, progress bars and tank wells (`inset`) take the
+  theme's colours instead of fixed greys.
+- Crystal slots (crystal mount, crystal machines, crystal liquifier) show a faded power crystal while empty; outputs
+  are ringed.
+- The dev showcase has two more views for checking screens: the Codex (11) and a nano furnace (12).
+- **Machine colour layer** (maintainer: the coloured parts of the nano furnace and other machines were see-through).
+  v3's machine base textures have holes that v3 filled with a separately drawn colour layer; the port drew only the
+  base, so the holes showed through. The machine models (`tools/gen_assets.py` "machine") now put v3's colour textures
+  (`blockmachineblock_*_color`) under the base as a tinted layer: the machine's own colour if it has one
+  (`FemtoTints.MACHINE_DEFAULT` otherwise, black), and black for the items.
+

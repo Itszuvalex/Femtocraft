@@ -53,7 +53,7 @@ class CrystalMountMenu(containerId: Int, inventory: Inventory, be: CrystalMountB
     val network = PowerNetworkView()
 
     init {
-        addStorageSlots(be?.storage ?: IItemStorage.Empty, 80, 35, count = if (be == null) 0 else 1)
+        addStorageSlots(be?.storage ?: IItemStorage.Empty, 80, 35, count = if (be == null) 0 else 1, hint = net.minecraft.world.item.ItemStack(PowerContent.POWER_CRYSTAL.get()))
         addPlayerInventorySlots(inventory)
         PowerNetworkView.addTo(this, network, be)
     }
