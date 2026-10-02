@@ -28,6 +28,9 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
@@ -185,9 +188,28 @@ class ArchiveBlockEntity(pos: BlockPos, state: BlockState) :
             }
         })
     }
+
+    /**
+     * Whether [player] may use this Archive: it is formed, and it researches for nobody yet or for [player]'s team.
+     */
+    fun canAccess(player: Player): Boolean {
+        val state = state() ?: return false
+        val team = state.team ?: return true
+        return ItszuLib.TEAMS.state.teamOf(player.uuid)?.id == team
+    }
 }
 
-class ArchiveBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<ArchiveBlockEntity>(p, { ArchiveContent.ARCHIVE_BE.get() })
+/**
+ * Using an Archive opens its menu, and is first contact ([NaniteHost.contact]) for a player who has access
+ * ([ArchiveBlockEntity.canAccess]) and is not a host yet: a second way in besides touching a crystal cluster, for
+ * players joining a team that already built one.
+ */
+class ArchiveBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<ArchiveBlockEntity>(p, { ArchiveContent.ARCHIVE_BE.get() }) {
+    override fun useWithoutItem(state: BlockState, level: Level, pos: BlockPos, player: Player, hitResult: BlockHitResult): InteractionResult {
+        if (!level.isClientSide && (level.getBlockEntity(pos) as? ArchiveBlockEntity)?.canAccess(player) == true) NaniteHost.contact(player)
+        return super.useWithoutItem(state, level, pos, player, hitResult)
+    }
+}
 
 /**
  * The Archive's menu: no slots; syncs the chosen technology (by its synced registry id), points and status, and takes

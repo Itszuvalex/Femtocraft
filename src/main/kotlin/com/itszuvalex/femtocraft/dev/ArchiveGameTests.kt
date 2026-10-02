@@ -37,6 +37,8 @@ object ArchiveGameTests {
     fun register() {
         DevGameTests.test("archive_tech_tree_loads", body = ::treeLoads)
         DevGameTests.test("crystal_cluster_touch_makes_a_nanite_host", body = ::contact)
+        DevGameTests.test("archive_use_makes_a_nanite_host", body = ::archiveContact)
+        DevGameTests.test("archive_use_needs_access_for_first_contact", body = ::archiveContactNeedsAccess)
         DevGameTests.test("nanite_host_regenerates_archive_nanites", body = ::regenerates)
         DevGameTests.test("archive_researches_with_host_nanites", body = ::researches)
         DevGameTests.test("archive_menu_chooses_only_available_technologies", body = ::menuChoose)
@@ -78,6 +80,32 @@ object ArchiveGameTests {
         NaniteHost.draw(player, 3)
         touch()
         helper.assertValueEqual(NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP - 3, "a host gets nothing more")
+        helper.succeed()
+    }
+
+    private fun useArchive(helper: GameTestHelper, player: Player) {
+        val pos = helper.absolutePos(AT)
+        helper.level.getBlockState(pos).useWithoutItem(helper.level, player, BlockHitResult(pos.center, Direction.UP, pos, false))
+    }
+
+    private fun archiveContact(helper: GameTestHelper) {
+        formArchive(helper)
+        val (player, _) = player(helper)
+        useArchive(helper, player)
+        helper.assertTrue(NaniteHost.isHost(player), "using the Archive made a host")
+        helper.assertValueEqual(NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP, "stocked with Archive nanites")
+        NaniteHost.draw(player, 3)
+        useArchive(helper, player)
+        helper.assertValueEqual(NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP - 3, "a host gets nothing more")
+        helper.succeed()
+    }
+
+    private fun archiveContactNeedsAccess(helper: GameTestHelper) {
+        val be = formArchive(helper)
+        be.state()!!.choose(METALLURGY, UUID.randomUUID())
+        val (player, _) = player(helper)
+        useArchive(helper, player)
+        helper.assertFalse(NaniteHost.isHost(player), "another team's Archive gives no first contact")
         helper.succeed()
     }
 

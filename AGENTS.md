@@ -176,7 +176,8 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
 - **Archive and research** (DECISIONS D15): Femtocraft's tech tree is ItszuLib technologies in tree
   `femtocraft:archive` (`data/femtocraft/itszulib/technology`, generated from `tools/technologies.json`), researched per
-  team (ItszuLib DECISIONS D13). Touching a crystal cluster bare-handed makes the player a nanite host
+  team (ItszuLib DECISIONS D13). Touching a crystal cluster bare-handed, or using an Archive they have access to
+  (`ArchiveBlockEntity.canAccess`), makes the player a nanite host
   (`NaniteHost.contact`: a synced, death-surviving attachment plus 10 Archive nanites); a fed host regrows Archive
   nanites to 10, costing hunger. The Archive (`ArchiveContent.MULTIBLOCK`, a frame multiblock) researches the technology
   chosen in its screen for the chooser's team: once a second it draws an Archive nanite from that team's nearest host

@@ -178,7 +178,9 @@ progress, and to start with the player as a nanite host carrying the absolute ti
   into tree `femtocraft:archive`, costed by level (macro 20 points up to temporal and dimensional 5000) with
   placeholder icons. They refer to alpha machines that do not exist and gate nothing; they are to be replaced or
   re-pointed as v3's machines are designed. The layout is ItszuLib's automatic one; `position` fields can override it.
-- **The nanite host.** Touching a crystal cluster with a bare hand is first contact ("WE ARE THE ARCHIVE", Draft 1):
+- **The nanite host.** Touching a crystal cluster with a bare hand is first contact ("WE ARE THE ARCHIVE", Draft 1);
+  so is using an Archive the player has access to (it researches for nobody yet or for their team), so players joining
+  a team that already built one need not find a cluster:
   the player becomes a host for good (an attachment that survives death) and gets 10 Archive nanites, a new tier 0
   archetype and strain (`NaniteRegistry.ARCHIVE`). A fed host (food 7 or more) regrows one every 10 seconds up to 10,
   for 1.5 food points each. Machines draw from a host standing nearby: the 2016 "Back to Magic" idea of the player as
