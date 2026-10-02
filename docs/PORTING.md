@@ -122,7 +122,7 @@ renderers (`client/FemtoRenderers.kt`, pass 2):
 
 | Block | v3 model | Block model | Block entity renderer |
 |---|---|---|---|
-| Crystal mount | `crystal mount/crystal_mount.obj` | Bottom plate, plus the top plate under a solid block (`top`/`bottom` block state, as v3 chose) | Grips turning one degree a tick, holding the crystal in its color (fullbright) |
+| Crystal mount | `crystal mount/crystal_mount.obj` | Bottom plate, plus the top plate under a solid block (`top`/`bottom` block state, as v3 chose) | Grips turning one degree a tick, holding the crystal in its color (fullbright); the wireless beams (pass 3, below) |
 | Crystal power conduit, logistics conduit | `wire/wire_thin.obj` | Core, and an arm per connected face (`north`...`down` block state, set from the block entity's connections); v3's colour layer | - |
 | Frame | `frame/frame.obj` | Particle only | The edges of the structure's bounding box (v3's render marks); every edge outside a structure |
 | Germination chamber | `growth chamber/growth chamber.obj` | The whole chamber on the home block (`home` block state; the other blocks draw nothing): base, top, colour layer and the tinted glass | The three sprinklers swinging on their hinges |
@@ -145,14 +145,20 @@ How it is built:
   the camera through fixed views, logging `SHOWCASE view <i>`, with the HUD hidden. It was used to check both passes
   headless (Xvfb, Mesa llvmpipe).
 
+**Pass 3 (done): wireless beams.** The crystal mount's renderer draws v3's beams (`WirelessPowerBeamRenderer`,
+`FemtoRenderUtils.drawBeam`) to the targets its node syncs: power beams to child nodes (`power_beam_outer` in
+(180, 255, 255) plus `power_beam_colored` in the crystal's colour) and diffusion beams to its leaves
+(`diffusion_particles_colored`, alpha 64). Each is a quad from block centre to block centre turned to face the camera,
+its texture scrolling along it, fullbright and translucent (vanilla's beacon beam render type), drawn from both sides.
+
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
 only; the empty mount's end portal crystal (a shader in v3) and the frame's machine-in-progress preview are not drawn.
 
 **Next passes:**
 
-- Wireless power beams between nodes (`WirelessPowerBeamRenderer`: the node syncs its spanning-tree render locations)
-  and diffusion beams to leaves, glow stick color.
+- Glow stick color; logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test
+  blocks).
 - Germination chamber growth, frame/multiblock/shift previewables, the frame's machine-in-progress preview, the empty
   mount's end portal crystal.
 - Power and nanite particles, the nanite teleport effect, the player nanite overlay, dumb dust particles.

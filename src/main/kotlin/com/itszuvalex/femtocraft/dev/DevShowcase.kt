@@ -49,6 +49,7 @@ object DevShowcase {
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
         Vec3(2.5, 2.2, -2.5) to Vec3(2.5, 0.5, 2.5),
         Vec3(2.0, 1.6, 0.2) to Vec3(2.5, 0.7, 2.5),
+        Vec3(1.0, 3.5, -3.5) to Vec3(1.5, 0.5, 1.5),
         Vec3(7.5, 2.5, -2.0) to Vec3(7.5, 0.5, 2.5),
         Vec3(15.5, 4.5, -6.0) to Vec3(16.0, 1.5, 1.0),
         Vec3(18.0, 4.0, -3.0) to Vec3(18.0, 2.2, 1.0),
@@ -126,6 +127,9 @@ object DevShowcase {
         // Crystals in two of them (the renderer turns them with the grips, in the crystal's color).
         mountCrystal(level, BASE.offset(0, 0, 2), 0x00FFFF)
         mountCrystal(level, BASE.offset(2, 0, 2), 0xFF40C0)
+        // The two mounts with crystals form a wireless network (a power beam between them); a charging array nearby
+        // is its leaf (a diffusion beam).
+        set(1, 0, 0, PowerContent.CRYSTAL_CHARGING_ARRAY.get())
         // Power conduits: a corner, so arms show along x and z.
         for (x in 6..8) set(x, 0, 2, PowerContent.POWER_CONDUIT.get())
         set(8, 0, 3, PowerContent.POWER_CONDUIT.get())

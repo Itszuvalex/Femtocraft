@@ -72,6 +72,13 @@ object FemtoRenderers {
         var bottom = true
         var rotation = 0f
         var crystalColor: Int? = null
+        var time = 0f
+
+        /**
+         * Power beam targets (child nodes) and diffusion beam targets (leaves), relative to the mount.
+         */
+        val beams = ArrayList<Vec3>()
+        val leaves = ArrayList<Vec3>()
     }
 
     /**
@@ -91,7 +98,13 @@ object FemtoRenderers {
             state.top = blockState.hasProperty(CrystalMountBlock.TOP) && blockState.getValue(CrystalMountBlock.TOP)
             state.bottom = !blockState.hasProperty(CrystalMountBlock.BOTTOM) || blockState.getValue(CrystalMountBlock.BOTTOM)
             state.rotation = time(be, partialTicks)
+            state.time = state.rotation
             state.crystalColor = be.crystal()?.color?.let { it or OPAQUE }
+            val origin = Vec3.atLowerCornerOf(be.blockPos)
+            state.beams.clear()
+            be.node.renderLocations.forEach { state.beams += Vec3.atLowerCornerOf(it.pos).subtract(origin) }
+            state.leaves.clear()
+            be.node.leafLocs().forEach { state.leaves += Vec3.atLowerCornerOf(it.pos).subtract(origin) }
         }
 
         override fun submit(state: CrystalMountState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
@@ -101,6 +114,73 @@ object FemtoRenderers {
             if (state.top) draw(poseStack, collector, ObjParts.MOUNT_TOP_GRIP, -1, state.lightCoords)
             state.crystalColor?.let { draw(poseStack, collector, ObjParts.MOUNT_CRYSTAL, it, state.lightCoords) }
             poseStack.popPose()
+            val color = state.crystalColor ?: BEAM_OUTER_COLOR
+            for (target in state.beams) {
+                Beams.submit(poseStack, collector, camera, state.blockPos, target, state.time, POWER_BEAM_OUTER, BEAM_OUTER_COLOR)
+                Beams.submit(poseStack, collector, camera, state.blockPos, target, state.time, POWER_BEAM_COLORED, color)
+            }
+            for (target in state.leaves) {
+                Beams.submit(poseStack, collector, camera, state.blockPos, target, state.time, DIFFUSION_BEAM, (color and 0xFFFFFF) or (64 shl 24))
+            }
+        }
+
+        override fun shouldRenderOffScreen(): Boolean = true
+
+        override fun getRenderBoundingBox(be: CrystalMountBlockEntity): AABB = AABB(be.blockPos).inflate(CrystalMountBlockEntity.RANGE.toDouble() + 1)
+
+        companion object {
+            private val POWER_BEAM_OUTER = net.minecraft.resources.Identifier.fromNamespaceAndPath(com.itszuvalex.femtocraft.Femtocraft.ID, "textures/power_beam_outer.png")
+            private val POWER_BEAM_COLORED = net.minecraft.resources.Identifier.fromNamespaceAndPath(com.itszuvalex.femtocraft.Femtocraft.ID, "textures/power_beam_colored.png")
+            private val DIFFUSION_BEAM = net.minecraft.resources.Identifier.fromNamespaceAndPath(com.itszuvalex.femtocraft.Femtocraft.ID, "textures/diffusion_particles_colored.png")
+
+            /**
+             * v3's outer layer color, (180, 255, 255).
+             */
+            private const val BEAM_OUTER_COLOR = 0xFFB4FFFF.toInt()
+        }
+    }
+
+    /**
+     * v3's wireless beams (`WirelessPowerBeamRenderer`, `FemtoRenderUtils.drawBeam`): a textured quad from block centre
+     * to block centre, turned to face the camera, its texture scrolling along it; fullbright and translucent.
+     */
+    object Beams {
+        const val WIDTH = .1f
+
+        /**
+         * Draws a beam from the centre of the block at [origin] to the centre of the block at [origin] + [target].
+         */
+        fun submit(
+            poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState, origin: BlockPos, target: Vec3,
+            time: Float, texture: net.minecraft.resources.Identifier, color: Int,
+        ) {
+            val start = Vec3(.5, .5, .5)
+            val end = target.add(.5, .5, .5)
+            val dir = end.subtract(start)
+            val length = dir.length()
+            if (length < 1e-3) return
+            val centre = Vec3.atLowerCornerOf(origin).add(start).add(dir.scale(.5))
+            val side = camera.pos.subtract(centre).cross(dir).normalize().scale(WIDTH.toDouble())
+            if (side.lengthSqr() < 1e-8) return
+            val scroll = -time * .2f - Mth.floor(-time * .1f).toFloat()
+            val vMin = (-1f + scroll) % 1f
+            val vMax = (length * (1 / (2 * WIDTH))).toFloat() + vMin
+            val corners = listOf(start.subtract(side), end.subtract(side), end.add(side), start.add(side))
+            val uvs = listOf(0f to vMin, 0f to vMax, 1f to vMax, 1f to vMin)
+            collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.beaconBeam(texture, true)) { pose, buffer ->
+                // Both windings, so the beam shows from either side.
+                for (order in listOf(listOf(0, 1, 2, 3), listOf(3, 2, 1, 0))) {
+                    for (i in order) {
+                        val c = corners[i]
+                        buffer.addVertex(pose, c.x.toFloat(), c.y.toFloat(), c.z.toFloat())
+                            .setColor(color)
+                            .setUv(uvs[i].first, uvs[i].second)
+                            .setOverlay(OverlayTexture.NO_OVERLAY)
+                            .setLight(0xF000F0)
+                            .setNormal(pose, 0f, 1f, 0f)
+                    }
+                }
+            }
         }
     }
 
