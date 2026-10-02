@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "femtocraft:block/blockfluidrepository_front",
+    "side": "femtocraft:block/blockfluidrepository_side",
+    "top": "femtocraft:block/blockfluidrepository_top"
+  }
+}

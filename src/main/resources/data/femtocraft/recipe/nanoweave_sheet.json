@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TT",
+    "TT"
+  ],
+  "key": {
+    "T": "femtocraft:nanoweave_thread"
+  },
+  "result": {
+    "id": "femtocraft:nanoweave_sheet",
+    "count": 1
+  }
+}

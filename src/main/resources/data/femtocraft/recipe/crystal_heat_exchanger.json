@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ERE",
+    "CMC",
+    "BFB"
+  ],
+  "key": {
+    "R": "femtocraft:energy_regulator",
+    "B": "femtocraft:crystal_battery",
+    "C": "femtocraft:basic_circuit",
+    "M": "femtocraft:frame",
+    "E": "femtocraft:riftiron_ingot_devoid",
+    "F": "minecraft:furnace"
+  },
+  "result": {
+    "id": "femtocraft:crystal_heat_exchanger",
+    "count": 1
+  }
+}

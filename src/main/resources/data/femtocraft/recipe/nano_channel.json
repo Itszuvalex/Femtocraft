@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "femtocraft:cyberwood"
+  ],
+  "result": {
+    "id": "femtocraft:nano_channel",
+    "count": 2
+  }
+}

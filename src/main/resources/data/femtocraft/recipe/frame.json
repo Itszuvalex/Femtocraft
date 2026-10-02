@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CIC",
+    "I I",
+    "CIC"
+  ],
+  "key": {
+    "C": "femtocraft:substrate",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "femtocraft:frame",
+    "count": 1
+  }
+}

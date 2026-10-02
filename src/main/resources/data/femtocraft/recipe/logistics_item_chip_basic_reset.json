@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "femtocraft:logistics_item_chip_basic"
+  ],
+  "result": {
+    "id": "femtocraft:logistics_item_chip_basic",
+    "count": 1
+  }
+}

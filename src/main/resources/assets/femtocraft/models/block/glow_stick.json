@@ -1,0 +1,153 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "femtocraft:block/blockglowstick_colored",
+    "side": "femtocraft:block/blockglowstick",
+    "colored": "femtocraft:block/blockglowstick_colored"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        0,
+        6
+      ],
+      "to": [
+        10,
+        16,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#side",
+          "uv": [
+            0,
+            12,
+            4,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#side",
+          "uv": [
+            0,
+            12,
+            4,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        0,
+        6
+      ],
+      "to": [
+        10,
+        16,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#colored",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "tintindex": 0
+        },
+        "south": {
+          "texture": "#colored",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "tintindex": 0
+        },
+        "east": {
+          "texture": "#colored",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "tintindex": 0
+        },
+        "west": {
+          "texture": "#colored",
+          "uv": [
+            6,
+            0,
+            10,
+            16
+          ],
+          "tintindex": 0
+        },
+        "up": {
+          "texture": "#colored",
+          "uv": [
+            0,
+            12,
+            4,
+            16
+          ],
+          "tintindex": 0
+        },
+        "down": {
+          "texture": "#colored",
+          "uv": [
+            0,
+            12,
+            4,
+            16
+          ],
+          "tintindex": 0
+        }
+      }
+    }
+  ]
+}

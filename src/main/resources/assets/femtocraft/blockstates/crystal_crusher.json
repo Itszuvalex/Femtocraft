@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "femtocraft:block/crystal_crusher"
+    },
+    "facing=east": {
+      "model": "femtocraft:block/crystal_crusher",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "femtocraft:block/crystal_crusher",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "femtocraft:block/crystal_crusher",
+      "y": 270
+    }
+  }
+}

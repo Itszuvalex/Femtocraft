@@ -1,0 +1,32 @@
+{
+  "replace": false,
+  "values": [
+    "femtocraft:conduit",
+    "femtocraft:crystal_charging_array",
+    "femtocraft:crystal_crusher",
+    "femtocraft:crystal_focusing_chamber",
+    "femtocraft:crystal_furnace",
+    "femtocraft:crystal_heat_exchanger",
+    "femtocraft:crystal_liquifier",
+    "femtocraft:crystal_mount",
+    "femtocraft:crystal_storage_array",
+    "femtocraft:demolisher",
+    "femtocraft:diamondreplacement",
+    "femtocraft:fluid_repository",
+    "femtocraft:frame",
+    "femtocraft:germination_chamber",
+    "femtocraft:item_repository",
+    "femtocraft:lapisreplacement",
+    "femtocraft:nanite_extractor",
+    "femtocraft:nanite_infuser",
+    "femtocraft:nanite_repository",
+    "femtocraft:nano_furnace",
+    "femtocraft:nanoweave",
+    "femtocraft:phasemetal",
+    "femtocraft:power_conduit_crystal",
+    "femtocraft:redstonereplacement",
+    "femtocraft:refined_substrate",
+    "femtocraft:riftiron",
+    "femtocraft:substrate"
+  ]
+}

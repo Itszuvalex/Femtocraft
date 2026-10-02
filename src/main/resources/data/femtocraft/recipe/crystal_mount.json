@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "RFR",
+    "CSC"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "R": "femtocraft:riftiron_ingot_devoid",
+    "F": "femtocraft:frame",
+    "C": "femtocraft:basic_circuit"
+  },
+  "result": {
+    "id": "femtocraft:crystal_mount",
+    "count": 1
+  }
+}

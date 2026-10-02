@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "femtocraft:block/crystal_focusing_chamber"
+  }
+}

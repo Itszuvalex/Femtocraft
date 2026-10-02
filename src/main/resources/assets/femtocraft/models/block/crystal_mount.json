@@ -1,0 +1,17 @@
+{
+  "parent": "minecraft:block/block",
+  "loader": "neoforge:obj",
+  "model": "femtocraft:models/block/obj/crystal_mount.obj",
+  "flip_v": true,
+  "textures": {
+    "particle": "femtocraft:block/obj/crystal_mount",
+    "texture": "femtocraft:block/obj/crystal_mount"
+  },
+  "visibility": {
+    "BottomMount": true,
+    "TopMount": false,
+    "Crystal": false,
+    "BottomGripBase": false,
+    "TopGripBase": false
+  }
+}
