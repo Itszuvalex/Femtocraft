@@ -54,6 +54,7 @@ object DevShowcase {
         Vec3(15.5, 4.5, -6.0) to Vec3(16.0, 1.5, 1.0),
         Vec3(18.0, 4.0, -3.0) to Vec3(18.0, 2.2, 1.0),
         Vec3(8.0, 2.5, 2.0) to Vec3(9.0, 0.8, 6.0),
+        Vec3(12.0, 3.0, 1.0) to Vec3(13.0, -0.5, 3.5),
         Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
     )
 
@@ -95,8 +96,11 @@ object DevShowcase {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
             return
         }
-        // The last view also fills the player's nanites, so the HUD shows the nanite gauge sliding in.
+        // The last view also fills the player's nanites, so the HUD shows the nanite gauge sliding in, and hands the
+        // player frames for a germination chamber, so the frame preview outlines it where the camera looks.
         if (view == VIEWS.size - 1) {
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                FrameItem.withSelection(net.minecraft.world.item.ItemStack(com.itszuvalex.femtocraft.industry.IndustryContent.FRAME_ITEM.get(), 64), FrameMultiblocks.GERMINATION_CHAMBER.id))
             val tank = com.itszuvalex.femtocraft.nanite.PlayerNanites.tank(p)
             tank.fill(com.itszuvalex.femtocraft.nanite.NaniteRegistry.dumb(60), true)
             com.itszuvalex.femtocraft.nanite.PlayerNanites.save(p, tank)

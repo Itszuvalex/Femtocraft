@@ -165,6 +165,11 @@ layer at the right edge of the screen, halfway down, showing the player's nanite
 slides in when the amount changes, stays two seconds after the last change and slides out. The showcase fills the
 player's tank in its last view and shows the HUD from then on, to check it.
 
+**Pass 6 (done): previews.** `client/Previews.kt` (on NeoForge's `SubmitCustomGeometryEvent`) outlines where held
+items act, as v3's `IPreviewable` items did: a frame item outlines the multiblock it would place where the player is
+looking (the footprint and each block), green where it fits and the player has the frames, red otherwise (v3 drew the
+machine's model tinted the same way); a shift device outlines the player-sized spot it would teleport to.
+
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
 only; the empty mount's end portal crystal (a shader in v3) and the frame's machine-in-progress preview are not drawn.
@@ -172,8 +177,8 @@ only; the empty mount's end portal crystal (a shader in v3) and the frame's mach
 **Next passes:**
 
 - Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
-- Germination chamber growth, frame/multiblock/shift previewables, the frame's machine-in-progress preview, the empty
-  mount's end portal crystal.
+- The frame's machine-in-progress preview and the empty mount's end portal crystal (both shader or model ghost work);
+  germination chamber growth (already commented out in v3).
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
 - Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
