@@ -82,6 +82,15 @@ class CrystalClusterBlock(properties: BlockBehaviour.Properties) : FemtoEntityBl
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
 
     /**
+     * A power particle somewhere in the block, in the cluster's color (v3 `BlockCrystalsWorldgen.randomDisplayTick`).
+     */
+    override fun animateTick(state: BlockState, level: net.minecraft.world.level.Level, pos: BlockPos, random: RandomSource) {
+        val color = (level.getBlockEntity(pos) as? CrystalClusterBlockEntity)?.color ?: return
+        level.addParticle(com.itszuvalex.femtocraft.core.FemtoParticles.power(color),
+            pos.x + random.nextDouble(), pos.y + random.nextDouble(), pos.z + random.nextDouble(), 0.0, 0.0, 0.0)
+    }
+
+    /**
      * Rolls the cluster's drops wherever vanilla drops a block's loot: survival breaking, explosions and
      * `destroyBlock`, but not creative breaking or a plain replacement.
      */

@@ -70,8 +70,8 @@ object Cybermaterials {
 }
 
 /**
- * Converts the block it is used on into its cybermaterial, using one dust. Port of v3's `ItemDumbDust` (its nanite
- * particles are follow-up rendering work).
+ * Converts the block it is used on into its cybermaterial, using one dust, with a few nanites between the player and
+ * the block. Port of v3's `ItemDumbDust`.
  */
 class DumbDustItem(properties: Properties) : Item(properties) {
     override fun useOn(context: UseOnContext): InteractionResult {
@@ -81,6 +81,13 @@ class DumbDustItem(properties: Properties) : Item(properties) {
         if (level is ServerLevel) {
             level.setBlockAndUpdate(pos, replacement)
             context.itemInHand.consume(1, context.player)
+            context.player?.let { player ->
+                val mid = player.position().add(net.minecraft.world.phys.Vec3.atLowerCornerOf(pos)).scale(.5)
+                repeat(4) {
+                    val at = mid.add(level.random.nextDouble() - .5, level.random.nextDouble() - .5, level.random.nextDouble() - .5)
+                    com.itszuvalex.femtocraft.core.FemtoParticles.sendNanite(level, at, com.itszuvalex.femtocraft.core.FemtoParticles.randomColor(level.random, 128))
+                }
+            }
         }
         return InteractionResult.SUCCESS
     }

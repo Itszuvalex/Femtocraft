@@ -112,14 +112,16 @@ class ConfiguratorItem(properties: Properties) : Item(properties) {
 
 /**
  * Short-range nanite teleport. Port of v3's `ItemShiftTest`: moves the player up to [RANGE] blocks along the look
- * direction to the furthest spot their body fits, with a [COOLDOWN_TICKS] cooldown. The particle trail (v3's
- * `MessageNaniteTeleport`) is client rendering, follow-up work.
+ * direction to the furthest spot their body fits, with a [COOLDOWN_TICKS] cooldown, in a stream of nanites (v3's
+ * `MessageNaniteTeleport`, [com.itszuvalex.femtocraft.core.FemtoParticles.teleportEffect]).
  */
 class ShiftItem(properties: Properties) : Item(properties) {
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResult {
         if (!level.isClientSide) {
             destination(level, player)?.let { pos ->
+                val start = player.position()
                 player.teleportTo(pos.x + 0.5, pos.y.toDouble(), pos.z + 0.5)
+                (level as? net.minecraft.server.level.ServerLevel)?.let { com.itszuvalex.femtocraft.core.FemtoParticles.teleportEffect(it, start, player.position()) }
                 level.playSound(null, pos, FemtoSounds.SHIFT.get(), SoundSource.PLAYERS, 1f, 1f)
                 player.cooldowns.addCooldown(player.getItemInHand(hand), COOLDOWN_TICKS)
             }

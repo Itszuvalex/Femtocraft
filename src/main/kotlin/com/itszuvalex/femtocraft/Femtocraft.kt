@@ -34,6 +34,7 @@ object Femtocraft {
     init {
         // Content objects register into FemtoRegistries (and register their modules) when initialized.
         FemtoSounds.init()
+        com.itszuvalex.femtocraft.core.FemtoParticles.init()
         PowerContent.init()
         IndustryContent.init(MOD_BUS)
         // Multiblock shapes must be registered before any world loads.

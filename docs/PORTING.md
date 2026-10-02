@@ -151,18 +151,25 @@ How it is built:
 (`diffusion_particles_colored`, alpha 64). Each is a quad from block centre to block centre turned to face the camera,
 its texture scrolling along it, fullbright and translucent (vanilla's beacon beam render type), drawn from both sides.
 
+**Pass 4 (done): particles and the glow stick.** v3's two particles are `femtocraft:power` and `femtocraft:nanite`
+(`core/FemtoParticles.kt`, colored by a `ColorParticleOption`; `client/FemtoParticleProviders.kt` ports
+`EntityFxPower` and `EntityFxNanites`, fullbright, with eight frames each sliced from v3's
+`textures/particles/particles.png` into `textures/particle/`). Power particles rise from crystal mounts with a crystal
+and from crystal clusters (`animateTick`, in their colour); nanite particles are sent by the server while a frame
+builds, when dumb dust converts a block, and around a shift device teleport (v3's `MessageNaniteTeleport`: bursts at
+both ends and a stream flowing between them). The glow stick has v3's model at last (its `GlowStickRenderer` was never
+registered): a 4x4 stick with the colored texture over it in the stick's random pale colour.
+
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
 only; the empty mount's end portal crystal (a shader in v3) and the frame's machine-in-progress preview are not drawn.
 
 **Next passes:**
 
-- Glow stick color; logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test
-  blocks).
+- Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
 - Germination chamber growth, frame/multiblock/shift previewables, the frame's machine-in-progress preview, the empty
   mount's end portal crystal.
-- Power and nanite particles, the nanite teleport effect, the player nanite overlay, dumb dust particles.
-- Cybermaterial colors (cyberleaves use the vanilla leaves model untinted).
+- The player nanite overlay.
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
 - Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by

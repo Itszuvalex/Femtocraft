@@ -85,7 +85,7 @@ BLOCKS = {
     "crystal_storage_array": ("Crystal Storage Array", ("machine", "crystalstoragearray_front"), "self", "pickaxe"),
     "crystal_heat_exchanger": ("Crystal Heat Exchanger", ("machine", "crystalheatexchanger_front"), "self", "pickaxe"),
     "power_conduit_crystal": ("Crystal Power Conduit", ("conduit_obj", "wire_thin_power", "wire_thin_power_color"), "self", "pickaxe"),
-    "glow_stick": ("Glow Stick", ("box", "blockglowstick", [7, 0, 7, 9, 12, 9]), "self", None),
+    "glow_stick": ("Glow Stick", ("glow_stick",), "self", None),
     # --- industry ---
     "nano_furnace": ("Nano Furnace", ("machine", "nanofurnace_front"), "self", "pickaxe"),
     "demolisher": ("Demolisher", ("machine", "demolisher_front"), "self", "pickaxe"),
@@ -388,6 +388,16 @@ def block_model(name, kind):
     k = kind[0]
     if k == "obj":
         return obj_model(kind[1], kind[2])
+    if k == "glow_stick":
+        # v3's GlowStickRenderer (never registered): a 4x4 stick, sides from texture columns 6-10 and ends from the
+        # 4x4 corner at the bottom left, with the colored texture over the same faces in the stick's color.
+        def stick(texture, tint):
+            sides = {d: {"texture": texture, "uv": [6, 0, 10, 16], **tint} for d in ["north", "south", "east", "west"]}
+            ends = {d: {"texture": texture, "uv": [0, 12, 4, 16], **tint} for d in ["up", "down"]}
+            return {"from": [6, 0, 6], "to": [10, 16, 10], "faces": {**sides, **ends}}
+        return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+                "textures": {"particle": tex("blockglowstick_colored"), "side": tex("blockglowstick"), "colored": tex("blockglowstick_colored")},
+                "elements": [stick("#side", {}), stick("#colored", {"tintindex": 0})]}
     if k == "animated_obj":
         # Drawn entirely by the block entity renderer; the block model only gives the particle texture.
         return {"textures": {"particle": obj_tex(kind[1])}}
@@ -455,6 +465,7 @@ def loot(name, drops):
 
 # Tint index 0 of block items whose OBJ model has a tinted material: the block's default tint (client/FemtoTints.kt).
 ITEM_TINTS = {
+    "glow_stick": 0xFFFFE0C0,
     "crystal_cluster": 0xFF73E6FF,
     "power_conduit_crystal": 0xFF33CCFF,
     "conduit": 0xFFFFB040,
@@ -503,6 +514,9 @@ def main():
         write(os.path.join(DATA, "loot_table", "blocks", f"{name}.json"), loot(name, drops))
         if tool:
             tools.setdefault(tool, []).append(f"{NS}:{name}")
+    # Particle sprites: 8 frames each, sliced from v3's textures/particles/particles.png (row 0 power, row 1 nanite).
+    for particle in ("power", "nanite"):
+        write(os.path.join(ASSETS, "particles", f"{particle}.json"), {"textures": [f"{NS}:{particle}_{i}" for i in range(8)]})
     for name, model in part_models().items():
         write(os.path.join(ASSETS, "models", "block", "part", f"{name}.json"), model)
     for name, (display, texture) in ITEMS.items():

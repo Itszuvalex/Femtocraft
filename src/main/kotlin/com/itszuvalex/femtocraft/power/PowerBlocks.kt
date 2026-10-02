@@ -121,6 +121,15 @@ class CrystalMountBlock(properties: BlockBehaviour.Properties) :
 
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
 
+    /**
+     * A power particle near the crystal, in its color (v3 `BlockCrystalMount.randomDisplayTick`).
+     */
+    override fun animateTick(state: BlockState, level: Level, pos: BlockPos, random: RandomSource) {
+        val color = (level.getBlockEntity(pos) as? CrystalMountBlockEntity)?.crystal()?.color ?: return
+        level.addParticle(com.itszuvalex.femtocraft.core.FemtoParticles.power(color),
+            pos.x + .5 + random.nextDouble() * .2 - .1, pos.y + .5 + random.nextDouble() * .2 - .1, pos.z + .5 + random.nextDouble() * .2 - .1, 0.0, 0.0, 0.0)
+    }
+
     companion object {
         @JvmField
         val TOP: BooleanProperty = BooleanProperty.create("top")
@@ -411,7 +420,7 @@ class GlowStickBlock(properties: BlockBehaviour.Properties) :
     override fun <E : BlockEntity> getTicker(level: Level, state: BlockState, type: BlockEntityType<E>): BlockEntityTicker<E>? = null
 
     companion object {
-        private val SHAPE: VoxelShape = Block.box(7.0, 0.0, 7.0, 9.0, 12.0, 9.0)
+        private val SHAPE: VoxelShape = Block.box(6.0, 0.0, 6.0, 10.0, 16.0, 10.0)
     }
 }
 

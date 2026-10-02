@@ -238,6 +238,14 @@ class FrameBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Indu
         }
         s.progress++
         (level.getBlockEntity(anchor) as? FrameBlockEntity)?.markDirty()
+        // Nanites at work: now and then one in a random frame block (v3 `BlockFrame.randomDisplayTick`).
+        if (level is net.minecraft.server.level.ServerLevel) {
+            for (pos in multi.takenLocations(anchor)) {
+                if (level.random.nextInt(6) != 0) continue
+                val at = net.minecraft.world.phys.Vec3(pos.x + level.random.nextDouble(), pos.y + level.random.nextDouble(), pos.z + level.random.nextDouble())
+                com.itszuvalex.femtocraft.core.FemtoParticles.sendNanite(level, at, com.itszuvalex.femtocraft.core.FemtoParticles.randomColor(level.random, 128))
+            }
+        }
         if (s.progress >= FrameState.BUILD_TIME) multi.formAt(level, anchor)
     }
 }

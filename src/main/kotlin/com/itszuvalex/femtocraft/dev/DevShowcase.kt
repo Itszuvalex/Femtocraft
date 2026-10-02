@@ -53,6 +53,7 @@ object DevShowcase {
         Vec3(7.5, 2.5, -2.0) to Vec3(7.5, 0.5, 2.5),
         Vec3(15.5, 4.5, -6.0) to Vec3(16.0, 1.5, 1.0),
         Vec3(18.0, 4.0, -3.0) to Vec3(18.0, 2.2, 1.0),
+        Vec3(8.0, 2.5, 2.0) to Vec3(9.0, 0.8, 6.0),
         Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
     )
 
@@ -87,6 +88,7 @@ object DevShowcase {
             Femtocraft.LOGGER.info("SHOWCASE built")
         }
         if (ticks < BUILD_AT) return
+        building()?.progress = 0
         val view = (ticks - BUILD_AT) / VIEW_TICKS
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
@@ -106,6 +108,9 @@ object DevShowcase {
         val pitch = (-Math.toDegrees(atan2(d.y, sqrt(d.x * d.x + d.z * d.z)))).toFloat()
         p.teleportTo(p.level() as ServerLevel, from.x, from.y - p.eyeHeight, from.z, setOf(), yaw, pitch, true)
     }
+
+    private fun building(): com.itszuvalex.femtocraft.industry.FrameState? =
+        (player?.level()?.getBlockEntity(BASE.offset(10, 0, 5)) as? com.itszuvalex.femtocraft.industry.FrameBlockEntity)?.frameState()
 
     private fun mountCrystal(level: ServerLevel, pos: BlockPos, color: Int) {
         val stack = net.minecraft.world.item.ItemStack(PowerContent.POWER_CRYSTAL.get())
@@ -142,5 +147,10 @@ object DevShowcase {
         FrameMultiblocks.GERMINATION_CHAMBER.formAt(level, BASE.offset(17, 0, 0))
         // Crystal clusters, each with its own random color.
         for (x in listOf(0, 2, 4)) set(x, 0, 5, WorldgenContent.CRYSTAL_CLUSTER.get())
+        // Glow sticks, each with its own random pale color.
+        for (x in listOf(6, 7, 8)) set(x, 0, 6, PowerContent.GLOW_STICK.get())
+        // A frame structure that keeps building (nanite particles; [tick] holds its progress at 0).
+        FrameItem.place(level, BASE.offset(10, 0, 5), FrameMultiblocks.GERMINATION_CHAMBER)
+        building()?.building = true
     }
 }

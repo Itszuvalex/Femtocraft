@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/glow_stick"
+    "model": "femtocraft:block/glow_stick",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -8000
+      }
+    ]
   }
 }
