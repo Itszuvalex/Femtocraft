@@ -25,7 +25,7 @@ class MachineScreen(menu: MachineMenu, inventory: Inventory, title: Component) :
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         progress(graphics, 79, 40, 24, 6, menu.progress)
         if (menu.blockEntity is CrystalLiquifierBlockEntity) {
-            graphics.fill(leftPos + 151, topPos + 17, leftPos + 169, topPos + 71, SLOT)
+            inset(graphics, 151, 17, 18, 54)
             ScreenHelpers.fluidTank(graphics, leftPos + 152, topPos + 18, 16, 52, menu.tank.toMinecraft(), CrystalLiquifierBlockEntity.TANK_SIZE)
             ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, leftPos + 152, topPos + 18, 16, 52, ScreenHelpers.fluidTooltip(menu.tank.toMinecraft(), CrystalLiquifierBlockEntity.TANK_SIZE))
         }
@@ -40,7 +40,7 @@ class GerminationChamberScreen(menu: GerminationChamberMenu, inventory: Inventor
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         progress(graphics, 66, 40, 24, 6, menu.progress)
         val water = FluidStack(Fluids.WATER, menu.water)
-        graphics.fill(leftPos + 151, topPos + 17, leftPos + 169, topPos + 71, SLOT)
+        inset(graphics, 151, 17, 18, 54)
         ScreenHelpers.fluidTank(graphics, leftPos + 152, topPos + 18, 16, 52, water, GerminationState.TANK_SIZE)
         ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, leftPos + 152, topPos + 18, 16, 52, ScreenHelpers.fluidTooltip(water, GerminationState.TANK_SIZE))
     }

@@ -25,11 +25,11 @@ class MachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMachineB
             is ItemProcessingMachineBlockEntity -> {
                 addStorageSlots(storage, 56, 35, count = 1)
                 addStorageSlots(storage, 116, 35, first = 1, count = 1, output = true)
-                if (be is CrystalItemMachineBlockEntity) addStorageSlots(storage, 56, 57, first = CrystalItemMachineBlockEntity.CRYSTAL_SLOT, count = 1)
+                if (be is CrystalItemMachineBlockEntity) addStorageSlots(storage, 56, 57, first = CrystalItemMachineBlockEntity.CRYSTAL_SLOT, count = 1, hint = net.minecraft.world.item.ItemStack(com.itszuvalex.femtocraft.power.PowerContent.POWER_CRYSTAL.get()))
             }
             is CrystalLiquifierBlockEntity -> {
                 addStorageSlots(storage, 56, 35, count = 1)
-                addStorageSlots(storage, 56, 57, first = CrystalLiquifierBlockEntity.CRYSTAL_SLOT, count = 1)
+                addStorageSlots(storage, 56, 57, first = CrystalLiquifierBlockEntity.CRYSTAL_SLOT, count = 1, hint = net.minecraft.world.item.ItemStack(com.itszuvalex.femtocraft.power.PowerContent.POWER_CRYSTAL.get()))
             }
             else -> {}
         }

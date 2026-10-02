@@ -63,11 +63,14 @@ object DevShowcase {
         Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
         Vec3(16.5, 2.5, 3.0) to Vec3(16.5, 0.5, 6.5),
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
+        Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
     )
 
     private const val FRAMES_VIEW = 9
     private const val SIDE_CONFIG_VIEW = 10
     private const val CODEX_VIEW = 11
+    private const val MACHINE_VIEW = 12
+    private val FURNACE = BlockPos(9, 2, -7)
     private const val MENU_DELAY = 40
     private val LIQUIFIER = BlockPos(16, 0, 6)
 
@@ -115,6 +118,16 @@ object DevShowcase {
         if (view == CODEX_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
             p.closeContainer()
             codex(p, level)
+        }
+        // The machine view opens a nano furnace's screen: an input slot, an output slot and a power gauge.
+        // (Placed first, so the client has its block entity when the menu opens.)
+        if (view == MACHINE_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == 1) {
+            level.setBlockAndUpdate(BASE.offset(FURNACE), com.itszuvalex.femtocraft.industry.IndustryContent.NANO_FURNACE.get().defaultBlockState())
+        }
+        if (view == MACHINE_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            (level.getBlockEntity(BASE.offset(FURNACE)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
         }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
