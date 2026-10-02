@@ -291,6 +291,13 @@ class FrameItem(properties: Properties) : Item(properties) {
         builder.accept(Component.translatable("tooltip.femtocraft.frame.type", FrameMultiblocks.BASIC).withStyle(ChatFormatting.GRAY))
         val multi = FrameMultiblocks.get(selection(stack))
         builder.accept(Component.translatable("tooltip.femtocraft.frame.selected", multi?.displayName ?: Component.translatable("tooltip.femtocraft.none")).withStyle(ChatFormatting.GRAY))
+        if (multi != null) {
+            builder.accept(Component.translatable("tooltip.femtocraft.frame.needs").withStyle(ChatFormatting.GRAY))
+            builder.accept(Component.translatable("tooltip.femtocraft.frame.needs.frames", multi.numFrames).withStyle(ChatFormatting.DARK_GRAY))
+            for (need in multi.required()) {
+                builder.accept(Component.translatable("tooltip.femtocraft.frame.needs.item", need.count, need.hoverName).withStyle(ChatFormatting.DARK_GRAY))
+            }
+        }
     }
 
     companion object {
@@ -344,10 +351,31 @@ class FrameMenu(containerId: Int, inventory: Inventory, be: FrameBlockEntity?) :
     var progress = 0
     var building = false
 
+    private var synced: FrameMultiblock? = null
+
+    /** The multiblock being built (on the client, the synced copy), or null. */
+    val multiblock: FrameMultiblock? get() = synced ?: blockEntity?.multiblock()
+
     init {
         addStorageSlots(be?.storage ?: IItemStorage.Empty, 62, 17, columns = 3, count = if (be == null) 0 else 9)
         addPlayerInventorySlots(inventory)
         addSync(com.itszuvalex.itszulib.menu.MenuSyncs.int({ be?.frameState()?.progress ?: 0 }, { progress = it }))
         addSync(com.itszuvalex.itszulib.menu.MenuSyncs.boolean({ be?.frameState()?.building ?: false }, { building = it }))
+        addSync(com.itszuvalex.itszulib.menu.MenuSyncs.string({ be?.multiblock()?.id ?: "" }, { synced = FrameMultiblocks.get(it) }))
+    }
+
+    /**
+     * What the multiblock still needs: each required stack with how many of it the frame holds (up to the amount).
+     */
+    fun requirements(): List<Pair<ItemStack, Int>> {
+        val multi = multiblock ?: return listOf()
+        val held = (0 until FRAME_SLOTS).map { slots[it].item }
+        return multi.required().map { need ->
+            need to minOf(need.count, held.filter { ItemStack.isSameItemSameComponents(it, need) }.sumOf { it.count })
+        }
+    }
+
+    companion object {
+        const val FRAME_SLOTS = 9
     }
 }

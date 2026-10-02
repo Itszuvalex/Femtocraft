@@ -216,4 +216,8 @@ Follow-ups to D15, asked for by the maintainer:
 - **Distribution moved to ItszuLib.** The power distribution algorithm (with its F3 fix) is now ItszuLib's
   resource-agnostic `DistributionAlgorithm`, and the wired power network is an ItszuLib `DistributingTileNetwork`
   (ItszuLib DECISIONS D15), so computation can reuse it. The minimal spanning tree stays here.
+- **Frame requirements shown** (maintainer, after trying it): a frame structure's screen lists what its multiblock
+  needs, each item with how many the frame holds (green once enough), and the frame item's tooltip and the multiblock
+  selection buttons list the frames and items too. JEI's list no longer covers the side configuration panel (ItszuLib
+  DECISIONS D12).
 

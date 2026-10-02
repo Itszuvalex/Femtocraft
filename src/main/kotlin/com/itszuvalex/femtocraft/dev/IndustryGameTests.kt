@@ -61,6 +61,7 @@ object IndustryGameTests {
         DevGameTests.test("side_config_panel_action_cycles_face", body = ::sideConfigAction)
         DevGameTests.test("frame_builds_germination_chamber", 400, ::frameBuilds)
         DevGameTests.test("frame_ignores_wrong_items", 200, ::frameWrongItems)
+        DevGameTests.test("frame_menu_lists_what_the_multiblock_needs", body = ::frameRequirements)
         DevGameTests.test("frame_teardown_drops_frames", body = ::frameTeardown)
         DevGameTests.test("germination_chamber_grows_seeds", 200, ::germinationGrows)
         DevGameTests.test("germination_chamber_output_full_keeps_harvest", 200, ::germinationOutputFull)
@@ -328,6 +329,16 @@ object IndustryGameTests {
         player.snapTo(start.x + 0.5, start.y.toDouble(), start.z + 0.5, -90f, 0f)
         val dest = ShiftItem.destination(helper.level, player)
         helper.assertTrue(dest != null && dest.x - start.x >= 7, "teleports about 8 blocks east, got $dest from $start")
+        helper.succeed()
+    }
+
+    private fun frameRequirements(helper: GameTestHelper) {
+        val frame = placeFrame(helper, com.itszuvalex.femtocraft.archive.ArchiveContent.MULTIBLOCK)
+        frame.storage.setSlot(0, IItemStack.of(ItemStack(IndustryContent.CRACKLING_DUST.get(), 3)))
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        val needs = com.itszuvalex.femtocraft.industry.FrameMenu(1, player.inventory, frame).requirements()
+        helper.assertValueEqual(needs.map { it.first.item to it.first.count }, listOf(IndustryContent.CRACKLING_DUST.get() to 8, Items.GLASS to 9), "needed")
+        helper.assertValueEqual(needs.map { it.second }, listOf(3, 0), "held")
         helper.succeed()
     }
 }
