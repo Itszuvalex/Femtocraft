@@ -45,5 +45,5 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 
 ## Framework changes
 
-Changes made to ItszuLib for Femtocraft are listed in `../ItszuLib/docs/REVIEW.md` ("Framework changes to mirror into
-TechnoLich" and the fixed list): `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port. The frame multiblocks moved onto ItszuLib's controller-less multiblocks with home-held state (ItszuLib DECISIONS D11), which also closed ItszuLib O3: a chamber straddling a chunk boundary keeps its state reachable from every block.
+Changes made to ItszuLib for Femtocraft are listed in `../ItszuLib/docs/REVIEW.md` (the fixed list) and its
+DECISIONS: `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port. The frame multiblocks moved onto ItszuLib's controller-less multiblocks with home-held state (ItszuLib DECISIONS D11), which also closed ItszuLib O3: a chamber straddling a chunk boundary keeps its state reachable from every block.
