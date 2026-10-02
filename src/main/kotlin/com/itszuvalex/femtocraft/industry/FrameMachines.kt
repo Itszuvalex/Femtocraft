@@ -3,8 +3,8 @@ package com.itszuvalex.femtocraft.industry
 import com.itszuvalex.femtocraft.core.FemtoBlockEntity
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.femtocraft.core.FragDerivedColor
-import com.itszuvalex.femtocraft.power.DistributableBattery
-import com.itszuvalex.femtocraft.power.DistributionAlgorithm
+import com.itszuvalex.itszulib.core.DistributableBattery
+import com.itszuvalex.itszulib.core.DistributionAlgorithm
 import com.itszuvalex.femtocraft.power.FragPowerStorage
 import com.itszuvalex.femtocraft.power.FragWirelessPowerLeafNode
 import com.itszuvalex.femtocraft.power.PowerCrystals

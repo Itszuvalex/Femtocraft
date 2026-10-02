@@ -1,0 +1,11 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:nano_circuits",
+    "femtocraft:advanced_chemistry",
+    "femtocraft:artificial_materials",
+    "femtocraft:thorium_fissibility"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

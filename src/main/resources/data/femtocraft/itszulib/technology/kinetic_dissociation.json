@@ -1,0 +1,10 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:workload_scheduling",
+    "femtocraft:artificial_materials",
+    "femtocraft:resource_optimization"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

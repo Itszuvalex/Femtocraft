@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:macroscopic_structures"
+  ],
+  "cost": 20,
+  "icon": "minecraft:book"
+}

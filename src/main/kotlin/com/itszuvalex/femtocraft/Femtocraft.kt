@@ -39,6 +39,7 @@ object Femtocraft {
         IndustryContent.init(MOD_BUS)
         // Multiblock shapes must be registered before any world loads.
         com.itszuvalex.femtocraft.industry.FrameMultiblocks.init()
+        com.itszuvalex.femtocraft.archive.ArchiveContent.init()
         NaniteContent.init()
         LogisticsContent.init()
         CyberContent.init()

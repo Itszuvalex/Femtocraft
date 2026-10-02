@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:spontaneous_generation"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

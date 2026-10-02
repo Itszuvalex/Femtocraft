@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:dimensional_transformation",
+    "femtocraft:element_manufacturing"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

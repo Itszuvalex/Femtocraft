@@ -137,10 +137,13 @@ interface IWiredPowerLeafNode : IWiredPowerConnectable {
  * Conduit tiers; conduits only connect to their own tier. Port of v3's `IConduitTier` (only the crystal tier had
  * conduits).
  */
-enum class ConduitTier {
-    CRYSTAL,
-    DENSE,
-    NANO,
+enum class ConduitTier(
+    /** Colour of the power particles the conduit gives off: the 1.7.10 alpha's Micro, Nano and Femto power colours. */
+    val particleColor: Int,
+) {
+    CRYSTAL(0x1A1AFF),
+    DENSE(0x1AFF1A),
+    NANO(0xFF801A),
 }
 
 /**

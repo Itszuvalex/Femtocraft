@@ -112,6 +112,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          configurator, shift device, gritty slurry fluid
 ├── nanite/                Nanite API (stack, tank, registry, sided configuration, auto IO), extractor/infuser,
 │                          player nanites (synced data attachment), nano lash
+├── archive/               The Archive (3x3x3 frame multiblock researching Femtocraft's tech tree), NaniteHost (the
+│                          player as host of tier 0 Archive nanites: first contact, regeneration, drawing)
 ├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
 │                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
 │                          indexed item storages (storage/)
@@ -126,7 +128,8 @@ src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree,
 src/main/resources/        assets (v3 textures under 26.1 paths, generated models/lang) and data (generated), plus
                            data/femtocraft/structure/test_area.nbt (empty 9x5x9 game test structure)
 tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,
-                           worldgen JSON and placeholder textures from tables; validates texture references
+                           worldgen JSON, technologies and placeholder textures from tables; validates texture references
+tools/technologies.json    The tech tree's placeholder technologies (from the 1.7.10 alpha), read by gen_assets.py
 tools/gen_obj.py           Converts art/obj_models into models/block/obj/*.obj (blocks, origin at the block's lowest
                            corner; shared femtocraft.mtl) and textures/block/obj/*.png
 art/                       Source art and OBJ models (not packaged; art/obj_models feeds gen_obj.py)
@@ -142,9 +145,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 
 - **Power** (internal, no Forge Energy; DECISIONS D10). Wireless: `FragWirelessPowerNode` (crystal mounts) join
   `WirelessPowerNetwork`s by range through `WirelessPowerManager`; leaf fragments (arrays, heat exchanger, machines)
-  attach to the nearest node. Each tick a network distributes power over its minimal spanning tree
-  (`DistributionAlgorithm`). Wired: `WiredPowerConduit` is an ItszuLib `FragNetworkedWire`; `FragWiredPowerLeafNode`
-  machines connect to adjacent conduits. Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
+  attach to the nearest node. Each tick a network distributes power over its minimal spanning tree (ItszuLib's
+  `DistributionAlgorithm`, ItszuLib DECISIONS D15). Wired: `WiredPowerNetwork` is an ItszuLib
+  `DistributingTileNetwork` and `WiredPowerConduit` an ItszuLib `FragNetworkedWire` and `IDistributionNode`, whose
+  participants are the `FragWiredPowerLeafNode` machines on its faces (keyed by block or multiblock, so each counts
+  once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours). Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
   `femtocraft:power_crystal` component.
 - **Machines**: `ProcessingMachineBlockEntity` holds an `ItemStorageArray` behind ItszuLib sided configuration, item
   auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).
@@ -159,6 +164,17 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   block is the chamber's wireless power consumer.
 - **Nanites**: one API (DECISIONS D5): `NaniteStack(archetype, strain, version, amount)` in `NaniteTank`s, exposed by
   `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
+- **Archive and research** (DECISIONS D15): Femtocraft's tech tree is ItszuLib technologies in tree
+  `femtocraft:archive` (`data/femtocraft/itszulib/technology`, generated from `tools/technologies.json`), researched per
+  team (ItszuLib DECISIONS D13). Touching a crystal cluster bare-handed makes the player a nanite host
+  (`NaniteHost.contact`: a synced, death-surviving attachment plus 10 Archive nanites); a fed host regrows Archive
+  nanites to 10, costing hunger. The Archive (`ArchiveContent.MULTIBLOCK`, a frame multiblock) researches the technology
+  chosen in its screen for the chooser's team: once a second it draws an Archive nanite from that team's nearest host
+  within 8 blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Machines fed by a host take nanites
+  with `NaniteHost.drawTo(player, amount, level, target)`, which shows them flowing to the target
+  (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`) opens the tree read-only anywhere. Hosts see
+  their status at the top left (`client/HostOverlay`; other systems add lines with `HostOverlay.addLine`). Gate content
+  with `TechTree.isResearched(player, id)`.
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
   in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
   operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how
@@ -194,7 +210,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 ## Game tests
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
-`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`. Add one with
+`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`. Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode

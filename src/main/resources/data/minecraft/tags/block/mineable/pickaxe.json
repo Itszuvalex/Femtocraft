@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "femtocraft:archive",
     "femtocraft:conduit",
     "femtocraft:crystal_charging_array",
     "femtocraft:crystal_crusher",

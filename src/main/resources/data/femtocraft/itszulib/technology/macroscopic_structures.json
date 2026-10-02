@@ -1,0 +1,7 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [],
+  "cost": 20,
+  "icon": "minecraft:book",
+  "unlocked_by_default": true
+}

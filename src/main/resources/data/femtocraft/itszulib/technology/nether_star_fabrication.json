@@ -1,0 +1,10 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:stellar_mimicry",
+    "femtocraft:corruption_stabilization",
+    "femtocraft:particle_manipulation"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

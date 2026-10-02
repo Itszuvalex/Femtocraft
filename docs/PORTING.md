@@ -105,6 +105,10 @@ DECISIONS D4 and D5 give the reasoning.
   rift was also checked in a generated world (dev server with the rarity raised: no far-chunk writes, converted
   chunks and crystal clusters saved).
 - [x] All v3 Scala/Java removed; what was not ported is listed above.
+- [x] After the port (new, not from v3): research on ItszuLib's tech trees, the Archive multiblock, the player as a
+  host of tier 0 Archive nanites, and the alpha's technologies as a placeholder tree (DECISIONS D15); 5 game tests.
+- [x] The Archive Codex, host status on the HUD, nanite flow from host to Archive, conduit power particles; power
+  distribution moved onto ItszuLib's `DistributingTileNetwork` (DECISIONS D16); 2 game tests.
 
 ## 1.12.2 bugs fixed
 
@@ -184,6 +188,10 @@ headless; hovering, dragging and clicking were not, since the headless client ha
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
 only; the frame's machine-in-progress preview is not drawn.
+
+**After the port: research visuals** (DECISIONS D16). Power conduits give off power particles in their tier's colour,
+as the 1.7.10 alpha's cables did; Archive nanites stream from a host to the Archive while it draws them; hosts have a
+status line at the top left of the HUD. Not yet checked in a client.
 
 **Next passes:**
 

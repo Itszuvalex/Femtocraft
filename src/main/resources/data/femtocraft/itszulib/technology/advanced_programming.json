@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:nano_circuits"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

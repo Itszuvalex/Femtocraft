@@ -165,3 +165,55 @@ them in text; a custom ingredient type is the next step once there are strains o
 Dev runs get the full JEI mod through `localRuntime`, which is not published as a dependency; `-Pjei=false` leaves it
 out. JEI and its config library come from `maven.blamejared.com`. When the machine recipes move to datapack recipe
 types (D12), the categories move with them.
+
+## D15. Research, the Archive and the player as nanite host — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked for the 1.7.10 tech tree in ItszuLib (ItszuLib DECISIONS D13), an Archive multiblock with research
+progress, and to start with the player as a nanite host carrying the absolute tier 0 nanites, the Archive's own.
+
+- **Research is per team**, through ItszuLib's team data: a solo player's team is theirs alone, and players who join
+  share research. The Archive researches for the team of whoever chose its technology.
+- **The tech tree is placeholder content.** The alpha's 58 technologies (`tools/technologies.json`; the alpha listed 61
+  names, three never defined, and two prerequisite links to the undefined "Quantum Robotics" are dropped) are generated
+  into tree `femtocraft:archive`, costed by level (macro 20 points up to temporal and dimensional 5000) with
+  placeholder icons. They refer to alpha machines that do not exist and gate nothing; they are to be replaced or
+  re-pointed as v3's machines are designed. The layout is ItszuLib's automatic one; `position` fields can override it.
+- **The nanite host.** Touching a crystal cluster with a bare hand is first contact ("WE ARE THE ARCHIVE", Draft 1):
+  the player becomes a host for good (an attachment that survives death) and gets 10 Archive nanites, a new tier 0
+  archetype and strain (`NaniteRegistry.ARCHIVE`). A fed host (food 7 or more) regrows one every 10 seconds up to 10,
+  for 1.5 food points each. Machines draw from a host standing nearby: the 2016 "Back to Magic" idea of the player as
+  the nanite source.
+- **The Archive** is a 3x3x3 frame multiblock (27 frames, 8 crackling dust, 9 glass: placeholder costs). Choosing an
+  available technology in its screen starts research; every second it draws one Archive nanite from the researching
+  team's nearest host within 8 blocks (10 points) and spends up to 5 points on the technology. Leftover points carry
+  over; the choice clears when the technology is researched, and the team's online members are told.
+- **Also decided in the same discussion:**
+  - Wired power stays a plain conduit network (the existing `WiredPowerNetwork`); the alpha's fill-percentage
+    diffusion is not used for it.
+  - The alpha's Nano elements do not map onto anything in the new Femtocraft.
+  - The nanite strain design (colours, palette, catalysts) stays open until it has been tried in play.
+- **Open:** whether Micro/Nano/Femto become tier names, given that nanites are the "nano" scale (for example Micro for
+  what is built by hand and with crystals, Nano for what nanites do, Femto for reality-bending endgame; or nanite tiers
+  only); scanning as a research source (for example scanning chunks with Archive nanites); what research unlocks.
+
+## D16. Host status, the Archive Codex, visible nanite flow — DECIDED (maintainer, 2026-10-02)
+
+Follow-ups to D15, asked for by the maintainer:
+
+- **Host status.** A host sees their Archive nanites against what their body keeps stocked, as a bar at the top left,
+  with "Regrowing" or "Too hungry to regrow" while below it (`client/HostOverlay`). Bonuses and other host details will
+  add lines to it (`HostOverlay.addLine`).
+- **The Archive Codex** (book + crackling dust) opens the tech tree anywhere, read-only. Research is still chosen at
+  an Archive.
+- **Visible nanite flow.** A machine fed by a host draws through `NaniteHost.drawTo`, which sends a stream of Archive
+  nanite particles from the host to the machine; each particle's velocity is set so its drag brings it to rest on the
+  target. The Archive uses it; future host-fed machines should too.
+- **The 1.7.10 alpha's power particle.** The alpha's (Femtocraft-alpha-1) particle sheet holds only the power
+  particle, and its eight frames are the ones v3 inherited and the port already used. What was missing was where the
+  alpha emitted it: its cables gave off power particles in their tier's colour (Micro blue, Nano green, Femto orange).
+  Power conduits now do (`ConduitTier.particleColor`), and the particle's brightness varies 0.6-1x again, as in the
+  alpha (v3 had narrowed it).
+- **Distribution moved to ItszuLib.** The power distribution algorithm (with its F3 fix) is now ItszuLib's
+  resource-agnostic `DistributionAlgorithm`, and the wired power network is an ItszuLib `DistributingTileNetwork`
+  (ItszuLib DECISIONS D15), so computation can reuse it. The minimal spanning tree stays here.
+

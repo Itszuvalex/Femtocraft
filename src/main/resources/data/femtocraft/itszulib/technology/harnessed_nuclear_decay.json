@@ -1,0 +1,12 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:thorium_fissibility",
+    "femtocraft:resource_optimization",
+    "femtocraft:geothermal_harnessing",
+    "femtocraft:pattern_recognition",
+    "femtocraft:atomic_manipulation"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

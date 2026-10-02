@@ -78,11 +78,19 @@ data class NaniteStack(val archetype: String, val strain: String, val version: N
 object NaniteRegistry {
     const val DUMB = "Dumb"
 
+    /**
+     * Tier 0: the stranded Archive's own nanites, carried by a nanite host (see
+     * [com.itszuvalex.femtocraft.archive.NaniteHost]).
+     */
+    const val ARCHIVE = "Archive"
+
     private val strains = LinkedHashMap<String, MutableSet<String>>()
 
     init {
         addArchetype(DUMB)
         addStrain(DUMB, DUMB)
+        addArchetype(ARCHIVE)
+        addStrain(ARCHIVE, ARCHIVE)
     }
 
     fun addArchetype(name: String) {
@@ -100,6 +108,8 @@ object NaniteRegistry {
     fun isKnown(stack: NaniteStack): Boolean = strains[stack.archetype]?.contains(stack.strain) == true
 
     fun dumb(amount: Int): NaniteStack = NaniteStack(DUMB, DUMB, NaniteStrainVersion.ZERO, amount)
+
+    fun archive(amount: Int): NaniteStack = NaniteStack(ARCHIVE, ARCHIVE, NaniteStrainVersion.ZERO, amount)
 }
 
 /**

@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:dimensional_superpositions"
+  ],
+  "cost": 5000,
+  "icon": "minecraft:ender_eye"
+}

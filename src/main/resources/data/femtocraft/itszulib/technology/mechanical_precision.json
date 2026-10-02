@@ -1,0 +1,10 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:machining",
+    "femtocraft:potentiality_harnessing",
+    "femtocraft:algorithms"
+  ],
+  "cost": 100,
+  "icon": "femtocraft:basic_circuit"
+}

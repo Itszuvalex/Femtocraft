@@ -117,12 +117,14 @@ BLOCKS = {
     "frame": ("Frame", ("animated_obj", "frame"), "none", "pickaxe", False),
     "germination_chamber": ("Germination Chamber", ("chamber_obj", "germination_chamber"), "none", "pickaxe", False),
     "crystal_focusing_chamber": ("Crystal Focusing Chamber", ("cube_all", "crystal_focusing_chamber"), "none", "pickaxe", False),
+    "archive": ("Archive", ("cube_all", "archive"), "none", "pickaxe", False),
 }
 
 ITEMS = {
     # name: (display name, texture); block items are generated from BLOCKS. A texture "block:<name>" uses that block
     # model; None means a special model below.
     "power_crystal": ("Power Crystal", None),
+    "codex": ("Archive Codex", "codex"),
     "crackling_dust": ("Crackling Dust", "dust_crystal"),
     "riftiron_dust": ("Riftiron Dust", "dust_riftiron"),
     "phasemetal_dust": ("Phasemetal Dust", "dust_phasemetal"),
@@ -161,6 +163,8 @@ PLACEHOLDERS = {
     "block/crystal_furnace_front": ((0, 0, 0, 0), (230, 120, 40, 255)),
     "block/crystal_crusher_front": ((0, 0, 0, 0), (140, 140, 160, 255)),
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
+    "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
+    "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
 }
 
 LANG = {
@@ -196,6 +200,21 @@ LANG = {
     "fluid.femtocraft.gritty_slurry": "Gritty Slurry",
     "multiblock.femtocraft.germination_chamber": "Germination Chamber",
     "multiblock.femtocraft.crystal_focusing_chamber": "Crystal Focusing Chamber",
+    "multiblock.femtocraft.archive": "Archive",
+    "archive.femtocraft.contact.title": "WE ARE THE ARCHIVE",
+    "archive.femtocraft.contact": "Something old and broken settles behind your eyes. It hums, and the dust it brought hums with it.",
+    "archive.femtocraft.researched": "The Archive remembers: %s",
+    "gui.femtocraft.archive.choose": "Choose a technology to research",
+    "gui.femtocraft.archive.researching": "Researching: %s",
+    "gui.femtocraft.archive.status.idle": "Idle",
+    "gui.femtocraft.archive.status.researching": "Drawing nanites from a host",
+    "gui.femtocraft.archive.status.no_host": "Needs a nanite host nearby",
+    "gui.femtocraft.archive.status.unavailable": "That technology cannot be researched now",
+    "gui.femtocraft.archive.host": "Your Archive nanites: %s / %s",
+    "gui.femtocraft.archive.not_host": "You are not a nanite host. Touch a crystal cluster.",
+    "hud.femtocraft.host.nanites": "Archive nanites %s / %s",
+    "hud.femtocraft.host.regrowing": "Regrowing",
+    "hud.femtocraft.host.hungry": "Too hungry to regrow",
     "tooltip.femtocraft.none": "none",
     "gui.femtocraft.conduit.mode": "Mode",
     "gui.femtocraft.conduit.interface": "Side",
@@ -293,6 +312,7 @@ RECIPES = {
     "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
     "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
     "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "codex": shapeless(["minecraft:book", f"{NS}:crackling_dust"], f"{NS}:codex"),
     "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:frame"),
     "logistics_fluid_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:lapisreplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_fluid_chip_basic", 8),
     "logistics_item_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_item_chip_basic", 8),
@@ -507,8 +527,42 @@ def configurator_item():
                       "fallback": model("item")}}
 
 
+# Femtocraft's tech tree, `femtocraft:archive`. Placeholder content: the 1.7.10 alpha's technologies
+# (tools/technologies.json: names, short descriptions, levels, prerequisites), costed and drawn by level. They gate
+# nothing yet; their unlocks are to be re-pointed at v3 machines.
+TECH_TREE = f"{NS}:archive"
+TECH_LEVELS = {
+    # level: (cost in research points, icon)
+    "macro": (20, "minecraft:book"),
+    "micro": (100, f"{NS}:basic_circuit"),
+    "nano": (400, f"{NS}:nanoweave_sheet"),
+    "femto": (1500, f"{NS}:power_crystal"),
+    "temporal": (5000, "minecraft:clock"),
+    "dimensional": (5000, "minecraft:ender_eye"),
+}
+TECH_UNLOCKED_BY_DEFAULT = {"macroscopic_structures"}
+
+
+def technologies(lang):
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "technologies.json"), encoding="utf-8") as fh:
+        techs = json.load(fh)
+    folder = os.path.join(DATA, "itszulib", "technology")
+    if os.path.isdir(folder):
+        for f in os.listdir(folder):
+            os.remove(os.path.join(folder, f))
+    for t in techs:
+        cost, icon = TECH_LEVELS[t["level"]]
+        obj = {"tree": TECH_TREE, "prerequisites": [f"{NS}:{p}" for p in t["prerequisites"]], "cost": cost, "icon": icon}
+        if t["id"] in TECH_UNLOCKED_BY_DEFAULT:
+            obj["unlocked_by_default"] = True
+        write(os.path.join(folder, f"{t['id']}.json"), obj)
+        lang[f"technology.{NS}.{t['id']}"] = t["name"]
+        lang[f"technology.{NS}.{t['id']}.desc"] = t["description"]
+
+
 def main():
     lang = dict(LANG)
+    technologies(lang)
     tools = {}
     for name, entry in BLOCKS.items():
         display, kind, drops, tool = entry[:4]

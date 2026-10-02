@@ -1,0 +1,10 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:artificial_materials",
+    "femtocraft:spacetime_manipulation",
+    "femtocraft:atomic_manipulation"
+  ],
+  "cost": 5000,
+  "icon": "minecraft:clock"
+}

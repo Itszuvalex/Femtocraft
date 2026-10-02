@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:machining"
+  ],
+  "cost": 100,
+  "icon": "femtocraft:basic_circuit"
+}

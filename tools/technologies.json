@@ -1,0 +1,570 @@
+[
+ {
+  "id": "metallurgy",
+  "name": "Metallurgy",
+  "description": "The metals that populate your world.",
+  "level": "macro",
+  "prerequisites": [
+   "macroscopic_structures"
+  ]
+ },
+ {
+  "id": "basic_circuits",
+  "name": "Basic Circuits",
+  "description": "Basic logic for basic machines.",
+  "level": "macro",
+  "prerequisites": [
+   "macroscopic_structures"
+  ]
+ },
+ {
+  "id": "machining",
+  "name": "Machining",
+  "description": "Start your industry!",
+  "level": "micro",
+  "prerequisites": [
+   "metallurgy",
+   "basic_circuits"
+  ]
+ },
+ {
+  "id": "scientific_theory",
+  "name": "Scientific Theory",
+  "description": "Gentlemen, start your research!",
+  "level": "macro",
+  "prerequisites": [
+   "macroscopic_structures"
+  ]
+ },
+ {
+  "id": "algorithms",
+  "name": "Algorithms",
+  "description": "Ordering machines to do your bidding.",
+  "level": "micro",
+  "prerequisites": [
+   "machining"
+  ]
+ },
+ {
+  "id": "mechanical_precision",
+  "name": "Mechanical Precision",
+  "description": "Mathematically precise.",
+  "level": "micro",
+  "prerequisites": [
+   "machining",
+   "potentiality_harnessing",
+   "algorithms"
+  ]
+ },
+ {
+  "id": "power_of_nothing",
+  "name": "Power of Nothing",
+  "description": "\"Poof!\" It's nothing!",
+  "level": "micro",
+  "prerequisites": [
+   "mechanical_precision"
+  ]
+ },
+ {
+  "id": "vacuum_tubes",
+  "name": "Vacuum Tubes",
+  "description": "These tubes blow!",
+  "level": "micro",
+  "prerequisites": [
+   "power_of_nothing"
+  ]
+ },
+ {
+  "id": "suction_pipes",
+  "name": "Suction Pipes",
+  "description": "These pipes suck!",
+  "level": "micro",
+  "prerequisites": [
+   "power_of_nothing"
+  ]
+ },
+ {
+  "id": "nano_circuits",
+  "name": "Nano Circuits",
+  "description": "Machine test, machine approved.",
+  "level": "nano",
+  "prerequisites": [
+   "mechanical_precision",
+   "basic_circuits"
+  ]
+ },
+ {
+  "id": "advanced_programming",
+  "name": "Advanced Programming",
+  "description": "Technology++",
+  "level": "nano",
+  "prerequisites": [
+   "nano_circuits"
+  ]
+ },
+ {
+  "id": "workload_scheduling",
+  "name": "Workload Scheduling",
+  "description": "Never be late again!",
+  "level": "nano",
+  "prerequisites": [
+   "advanced_programming"
+  ]
+ },
+ {
+  "id": "pattern_recognition",
+  "name": "Pattern Recognition",
+  "description": "Do you recognize the pattern?",
+  "level": "nano",
+  "prerequisites": [
+   "advanced_programming"
+  ]
+ },
+ {
+  "id": "resource_optimization",
+  "name": "Resource Optimization",
+  "description": "Waste not want not.",
+  "level": "nano",
+  "prerequisites": [
+   "advanced_programming"
+  ]
+ },
+ {
+  "id": "basic_chemistry",
+  "name": "Basic Chemistry",
+  "description": "Composition of matter.",
+  "level": "macro",
+  "prerequisites": [
+   "macroscopic_structures"
+  ]
+ },
+ {
+  "id": "potentiality",
+  "name": "Potentiality",
+  "description": "Power overwhelming.",
+  "level": "micro",
+  "prerequisites": [
+   "basic_circuits",
+   "basic_chemistry"
+  ]
+ },
+ {
+  "id": "potentiality_storage",
+  "name": "Potentiality Storage",
+  "description": "Power, cubed.",
+  "level": "micro",
+  "prerequisites": [
+   "potentiality",
+   "machining"
+  ]
+ },
+ {
+  "id": "potentiality_harnessing",
+  "name": "Potentiality Harnessing",
+  "description": "Harness the Potential all around you.",
+  "level": "micro",
+  "prerequisites": [
+   "potentiality_storage"
+  ]
+ },
+ {
+  "id": "potentiality_generation",
+  "name": "Potentiality Generation",
+  "description": "Build your potential!",
+  "level": "micro",
+  "prerequisites": [
+   "mechanical_precision",
+   "potentiality_harnessing"
+  ]
+ },
+ {
+  "id": "advanced_chemistry",
+  "name": "Advanced Chemistry",
+  "description": "Curiouser and curiouser!",
+  "level": "nano",
+  "prerequisites": [
+   "potentiality_generation",
+   "basic_chemistry",
+   "molecular_manipulation"
+  ]
+ },
+ {
+  "id": "artificial_materials",
+  "name": "Artificial Materials",
+  "description": "Artificial Improvements.",
+  "level": "nano",
+  "prerequisites": [
+   "nano_circuits",
+   "advanced_chemistry"
+  ]
+ },
+ {
+  "id": "farenite_stabilization",
+  "name": "Farenite Stabilization",
+  "description": "...somewhat.",
+  "level": "nano",
+  "prerequisites": [
+   "nano_circuits",
+   "advanced_chemistry",
+   "artificial_materials",
+   "thorium_fissibility"
+  ]
+ },
+ {
+  "id": "geothermal_harnessing",
+  "name": "Geothermal Harnessing",
+  "description": "Harness the geological thermal energy.",
+  "level": "nano",
+  "prerequisites": [
+   "farenite_stabilization",
+   "advanced_chemistry",
+   "potentiality_harnessing"
+  ]
+ },
+ {
+  "id": "potentiality_transformation",
+  "name": "Potentiality Transformation",
+  "description": "Photonic Oscillation Converter.",
+  "level": "nano",
+  "prerequisites": [
+   "farenite_stabilization",
+   "atomic_manipulation"
+  ]
+ },
+ {
+  "id": "industrial_storage",
+  "name": "Industrial Storage",
+  "description": "No longer portable.",
+  "level": "nano",
+  "prerequisites": [
+   "potentiality_transformation",
+   "resource_optimization"
+  ]
+ },
+ {
+  "id": "kinetic_dissociation",
+  "name": "Kinetic Dissociation",
+  "description": "Better materials, better furnace.",
+  "level": "nano",
+  "prerequisites": [
+   "workload_scheduling",
+   "artificial_materials",
+   "resource_optimization"
+  ]
+ },
+ {
+  "id": "atomic_manipulation",
+  "name": "Atomic Manipulation",
+  "description": "The natural progression.",
+  "level": "nano",
+  "prerequisites": [
+   "artificial_materials",
+   "workload_scheduling",
+   "resource_optimization"
+  ]
+ },
+ {
+  "id": "digitized_workloads",
+  "name": "Digitized Workloads",
+  "description": "Made for computers, by computers.",
+  "level": "nano",
+  "prerequisites": [
+   "atomic_manipulation",
+   "resource_optimization"
+  ]
+ },
+ {
+  "id": "spacetime_manipulation",
+  "name": "Spacetime Manipulation",
+  "description": "The question is: When did you ACTUALLY finish researching this?",
+  "level": "nano",
+  "prerequisites": [
+   "advanced_chemistry"
+  ]
+ },
+ {
+  "id": "dimensional_braiding",
+  "name": "Dimensional Braiding",
+  "description": "Interweave reality.",
+  "level": "dimensional",
+  "prerequisites": [
+   "artificial_materials",
+   "spacetime_manipulation",
+   "atomic_manipulation"
+  ]
+ },
+ {
+  "id": "locality_entangler",
+  "name": "Locality Entangler",
+  "description": "Integrate your machine's workspaces with other yous' other machines' workspaces.",
+  "level": "dimensional",
+  "prerequisites": [
+   "dimensional_braiding"
+  ]
+ },
+ {
+  "id": "dimensional_transformation",
+  "name": "Dimensional Transformation",
+  "description": "Look in the mirror.",
+  "level": "femto",
+  "prerequisites": [
+   "dimensional_braiding"
+  ]
+ },
+ {
+  "id": "temporal_pipelining",
+  "name": "Temporal Pipelining",
+  "description": "Start working in the next second, before it begins.",
+  "level": "temporal",
+  "prerequisites": [
+   "artificial_materials",
+   "spacetime_manipulation",
+   "atomic_manipulation"
+  ]
+ },
+ {
+  "id": "reality_overclocker",
+  "name": "Reality Overclocker",
+  "description": "Time flies when you're you!",
+  "level": "temporal",
+  "prerequisites": [
+   "temporal_pipelining"
+  ]
+ },
+ {
+  "id": "spacetime_exploitation",
+  "name": "Spacetime Exploitation",
+  "description": "Imagination is the only weapon in the war against reality.",
+  "level": "femto",
+  "prerequisites": [
+   "locality_entangler",
+   "reality_overclocker"
+  ]
+ },
+ {
+  "id": "quantum_interactivity",
+  "name": "Quantum Interactivity",
+  "description": "0|0> + 1|1>",
+  "level": "femto",
+  "prerequisites": [
+   "dimensional_transformation",
+   "nano_circuits",
+   "dimensional_braiding",
+   "temporal_pipelining"
+  ]
+ },
+ {
+  "id": "potential_harvesting",
+  "name": "Potential Harvesting",
+  "description": "Headhunters unite!",
+  "level": "micro",
+  "prerequisites": [
+   "potentiality_storage",
+   "potentiality_harnessing"
+  ]
+ },
+ {
+  "id": "thorium_fissibility",
+  "name": "Thorium Fissibility",
+  "description": "Split the Atom.",
+  "level": "nano",
+  "prerequisites": [
+   "potential_harvesting",
+   "advanced_chemistry"
+  ]
+ },
+ {
+  "id": "harnessed_nuclear_decay",
+  "name": "Harnessed Nuclear Decay",
+  "description": "Do you have what it takes?",
+  "level": "nano",
+  "prerequisites": [
+   "thorium_fissibility",
+   "resource_optimization",
+   "geothermal_harnessing",
+   "pattern_recognition",
+   "atomic_manipulation"
+  ]
+ },
+ {
+  "id": "applied_particle_physics",
+  "name": "Applied Particle Physics",
+  "description": "Like theoretical particle physics.",
+  "level": "femto",
+  "prerequisites": [
+   "harnessed_nuclear_decay",
+   "advanced_chemistry"
+  ]
+ },
+ {
+  "id": "quantum_computing",
+  "name": "Quantum Computing",
+  "description": "Solve the superposition of all your problems.",
+  "level": "femto",
+  "prerequisites": [
+   "quantum_interactivity",
+   "advanced_programming",
+   "applied_particle_physics",
+   "locality_entangler",
+   "reality_overclocker"
+  ]
+ },
+ {
+  "id": "element_manufacturing",
+  "name": "Element Manufacturing",
+  "description": "Manufacture your own building blocks of the Universe.",
+  "level": "femto",
+  "prerequisites": []
+ },
+ {
+  "id": "dimensional_superpositions",
+  "name": "Dimensional Superpositions",
+  "description": "It's a layer effect.",
+  "level": "dimensional",
+  "prerequisites": [
+   "spacetime_exploitation",
+   "element_manufacturing"
+  ]
+ },
+ {
+  "id": "multi_dimensional_industry",
+  "name": "Multi-Dimensional Industry",
+  "description": "Share the load.",
+  "level": "dimensional",
+  "prerequisites": [
+   "dimensional_superpositions"
+  ]
+ },
+ {
+  "id": "temporal_threading",
+  "name": "Temporal Threading",
+  "description": "Having multiple timelines do work at once.",
+  "level": "temporal",
+  "prerequisites": [
+   "spacetime_exploitation",
+   "element_manufacturing"
+  ]
+ },
+ {
+  "id": "causality_singularity",
+  "name": "Causality Singularity",
+  "description": "If you researched this, you never would have researched this.",
+  "level": "temporal",
+  "prerequisites": [
+   "temporal_threading"
+  ]
+ },
+ {
+  "id": "demonic_particulates",
+  "name": "Demonic Particulates",
+  "description": "Power from another dimension.",
+  "level": "femto",
+  "prerequisites": [
+   "dimensional_transformation",
+   "element_manufacturing"
+  ]
+ },
+ {
+  "id": "particle_excitation",
+  "name": "Particle Excitation",
+  "description": "Add heat directly where it counts.",
+  "level": "femto",
+  "prerequisites": [
+   "element_manufacturing"
+  ]
+ },
+ {
+  "id": "particle_manipulation",
+  "name": "Particle Manipulation",
+  "description": "The best of the best of the best.",
+  "level": "femto",
+  "prerequisites": [
+   "element_manufacturing"
+  ]
+ },
+ {
+  "id": "spin_retention",
+  "name": "Spin Retention",
+  "description": "Like a top.",
+  "level": "femto",
+  "prerequisites": [
+   "particle_manipulation"
+  ]
+ },
+ {
+  "id": "spontaneous_generation",
+  "name": "Spontaneous Generation",
+  "description": "Generate power where none appears to exist.",
+  "level": "femto",
+  "prerequisites": [
+   "demonic_particulates"
+  ]
+ },
+ {
+  "id": "corruption_stabilization",
+  "name": "Corruption Stabilization",
+  "description": "Contain the power of Hell itself.",
+  "level": "femto",
+  "prerequisites": [
+   "spontaneous_generation"
+  ]
+ },
+ {
+  "id": "stellar_mimicry",
+  "name": "Stellar Mimicry",
+  "description": "Make your own pet star!",
+  "level": "femto",
+  "prerequisites": [
+   "demonic_particulates",
+   "element_manufacturing",
+   "causality_singularity",
+   "multi_dimensional_industry"
+  ]
+ },
+ {
+  "id": "energy_conversion",
+  "name": "Energy Conversion",
+  "description": "Plasma to Energy.",
+  "level": "femto",
+  "prerequisites": [
+   "stellar_mimicry"
+  ]
+ },
+ {
+  "id": "matter_conversion",
+  "name": "Matter Conversion",
+  "description": "Plasma to Mass.",
+  "level": "femto",
+  "prerequisites": [
+   "stellar_mimicry"
+  ]
+ },
+ {
+  "id": "nether_star_fabrication",
+  "name": "Nether Star Fabrication",
+  "description": "Creating the unimaginable.",
+  "level": "femto",
+  "prerequisites": [
+   "stellar_mimicry",
+   "corruption_stabilization",
+   "particle_manipulation"
+  ]
+ },
+ {
+  "id": "molecular_manipulation",
+  "name": "Molecular Manipulation",
+  "description": "Many machines mathematically manipulate molecules, many more merely make massive messes.",
+  "level": "micro",
+  "prerequisites": [
+   "mechanical_precision",
+   "basic_chemistry"
+  ]
+ },
+ {
+  "id": "macroscopic_structures",
+  "name": "Macroscopic Structures",
+  "description": "The patterns everything take.",
+  "level": "macro",
+  "prerequisites": []
+ }
+]

@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:stellar_mimicry"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

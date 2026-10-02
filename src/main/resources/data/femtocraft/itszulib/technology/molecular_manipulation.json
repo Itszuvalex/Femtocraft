@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:mechanical_precision",
+    "femtocraft:basic_chemistry"
+  ],
+  "cost": 100,
+  "icon": "femtocraft:basic_circuit"
+}

@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:mechanical_precision",
+    "femtocraft:basic_circuits"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

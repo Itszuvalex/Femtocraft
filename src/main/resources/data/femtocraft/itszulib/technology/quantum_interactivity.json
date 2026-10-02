@@ -1,0 +1,11 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:dimensional_transformation",
+    "femtocraft:nano_circuits",
+    "femtocraft:dimensional_braiding",
+    "femtocraft:temporal_pipelining"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

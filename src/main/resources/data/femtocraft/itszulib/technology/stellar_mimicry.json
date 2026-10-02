@@ -1,0 +1,11 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:demonic_particulates",
+    "femtocraft:element_manufacturing",
+    "femtocraft:causality_singularity",
+    "femtocraft:multi_dimensional_industry"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}
