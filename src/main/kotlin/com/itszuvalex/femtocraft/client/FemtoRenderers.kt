@@ -83,8 +83,8 @@ object FemtoRenderers {
 
     /**
      * The grips turn one degree a tick about the mount's axis, holding the crystal in its color (fullbright, as v3 drew
-     * it without the light map). Without a crystal v3 drew a pulsing end portal crystal with a shader; that is left
-     * out.
+     * it without the light map). Without a crystal, the crystal's shape tumbles and pulses in the end portal's starfield
+     * (v3 drew it with its portal shader).
      */
     class CrystalMountRenderer : BlockEntityRenderer<CrystalMountBlockEntity, CrystalMountState> {
         override fun createRenderState() = CrystalMountState()
@@ -112,7 +112,9 @@ object FemtoRenderers {
             rotateAbout(poseStack, Vector3f(.5f, 0f, .5f), Vector3f(0f, 1f, 0f), state.rotation)
             if (state.bottom || !state.top) draw(poseStack, collector, ObjParts.MOUNT_BOTTOM_GRIP, -1, state.lightCoords)
             if (state.top) draw(poseStack, collector, ObjParts.MOUNT_TOP_GRIP, -1, state.lightCoords)
-            state.crystalColor?.let { draw(poseStack, collector, ObjParts.MOUNT_CRYSTAL, it, state.lightCoords) }
+            val crystalColor = state.crystalColor
+            if (crystalColor != null) draw(poseStack, collector, ObjParts.MOUNT_CRYSTAL, crystalColor, state.lightCoords)
+            else portalCrystal(poseStack, collector, state.rotation)
             poseStack.popPose()
             val color = state.crystalColor ?: BEAM_OUTER_COLOR
             for (target in state.beams) {
@@ -122,6 +124,25 @@ object FemtoRenderers {
             for (target in state.leaves) {
                 Beams.submit(poseStack, collector, camera, state.blockPos, target, state.time, DIFFUSION_BEAM, (color and 0xFFFFFF) or (64 shl 24))
             }
+        }
+
+        /**
+         * v3: about the crystal's middle, turned [rotation] degrees about (.25, 2, 3), squashed to half height and pulsing
+         * between 95% and 110%.
+         */
+        private fun portalCrystal(poseStack: PoseStack, collector: SubmitNodeCollector, rotation: Float) {
+            val part = ObjParts.get(ObjParts.MOUNT_CRYSTAL) ?: return
+            val quads = (listOf<net.minecraft.core.Direction?>(null) + net.minecraft.core.Direction.entries).flatMap { part.getQuads(it) }
+            val scale = kotlin.math.abs(Mth.sin(rotation / 10.0)) * .15f + .95f
+            poseStack.pushPose()
+            poseStack.translate(.5f, .5f, .5f)
+            poseStack.mulPose(Quaternionf().rotateAxis(Mth.DEG_TO_RAD * rotation, Vector3f(.25f, 2f, 3f).normalize()))
+            poseStack.scale(scale, .5f * scale, scale)
+            poseStack.translate(-.5f, -.5f, -.5f)
+            collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.endPortal()) { pose, buffer ->
+                for (quad in quads) for (i in 0..3) buffer.addVertex(pose, Vector3f(quad.position(i)))
+            }
+            poseStack.popPose()
         }
 
         override fun shouldRenderOffScreen(): Boolean = true

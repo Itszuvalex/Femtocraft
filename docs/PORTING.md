@@ -122,7 +122,7 @@ renderers (`client/FemtoRenderers.kt`, pass 2):
 
 | Block | v3 model | Block model | Block entity renderer |
 |---|---|---|---|
-| Crystal mount | `crystal mount/crystal_mount.obj` | Bottom plate, plus the top plate under a solid block (`top`/`bottom` block state, as v3 chose) | Grips turning one degree a tick, holding the crystal in its color (fullbright); the wireless beams (pass 3, below) |
+| Crystal mount | `crystal mount/crystal_mount.obj` | Bottom plate, plus the top plate under a solid block (`top`/`bottom` block state, as v3 chose) | Grips turning one degree a tick, holding the crystal in its color (fullbright), or with no crystal its shape tumbling and pulsing in the end portal starfield (v3's portal shader); the wireless beams (pass 3, below) |
 | Crystal power conduit, logistics conduit | `wire/wire_thin.obj` | Core, and an arm per connected face (`north`...`down` block state, set from the block entity's connections); v3's colour layer | - |
 | Frame | `frame/frame.obj` | Particle only | The edges of the structure's bounding box (v3's render marks); every edge outside a structure |
 | Germination chamber | `growth chamber/growth chamber.obj` | The whole chamber on the home block (`home` block state; the other blocks draw nothing): base, top, colour layer and the tinted glass | The three sprinklers swinging on their hinges |
@@ -172,13 +172,12 @@ machine's model tinted the same way); a shift device outlines the player-sized s
 
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
-only; the empty mount's end portal crystal (a shader in v3) and the frame's machine-in-progress preview are not drawn.
+only; the frame's machine-in-progress preview is not drawn.
 
 **Next passes:**
 
 - Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
-- The frame's machine-in-progress preview and the empty mount's end portal crystal (both shader or model ghost work);
-  germination chamber growth (already commented out in v3).
+- The frame's machine-in-progress preview (a model ghost); germination chamber growth (already commented out in v3).
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
 - Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
