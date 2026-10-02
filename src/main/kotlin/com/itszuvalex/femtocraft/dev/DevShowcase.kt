@@ -95,6 +95,12 @@ object DevShowcase {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
             return
         }
+        // The last view also fills the player's nanites, so the HUD shows the nanite gauge sliding in.
+        if (view == VIEWS.size - 1) {
+            val tank = com.itszuvalex.femtocraft.nanite.PlayerNanites.tank(p)
+            tank.fill(com.itszuvalex.femtocraft.nanite.NaniteRegistry.dumb(60), true)
+            com.itszuvalex.femtocraft.nanite.PlayerNanites.save(p, tank)
+        }
         look(p, view)
         Femtocraft.LOGGER.info("SHOWCASE view {}", view)
     }

@@ -26,6 +26,7 @@ object FemtoClient {
         modBus.addListener(ObjParts::register)
         modBus.addListener(FemtoRenderers::register)
         modBus.addListener(FemtoParticleProviders::register)
+        modBus.addListener(NaniteOverlay::register)
         modBus.addListener { event: EntityRenderersEvent.RegisterRenderers -> event.registerEntityRenderer(NaniteContent.NANO_LASH_ENTITY.get(), ::ThrownItemRenderer) }
     }
 

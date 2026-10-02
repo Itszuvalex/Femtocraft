@@ -160,6 +160,11 @@ builds, when dumb dust converts a block, and around a shift device teleport (v3'
 both ends and a stream flowing between them). The glow stick has v3's model at last (its `GlowStickRenderer` was never
 registered): a 4x4 stick with the colored texture over it in the stick's random pale colour.
 
+**Pass 5 (done): the nanite gauge.** `client/NaniteOverlay.kt` ports v3's `PlayerNaniteCapabilitiesOverlay`: a HUD
+layer at the right edge of the screen, halfway down, showing the player's nanites (`naniteoverlay_base`/`_fill`). It
+slides in when the amount changes, stays two seconds after the last change and slides out. The showcase fills the
+player's tank in its last view and shows the HUD from then on, to check it.
+
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
 only; the empty mount's end portal crystal (a shader in v3) and the frame's machine-in-progress preview are not drawn.
@@ -169,7 +174,6 @@ only; the empty mount's end portal crystal (a shader in v3) and the frame's mach
 - Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
 - Germination chamber growth, frame/multiblock/shift previewables, the frame's machine-in-progress preview, the empty
   mount's end portal crystal.
-- The player nanite overlay.
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
 - Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
