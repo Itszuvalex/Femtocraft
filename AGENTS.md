@@ -121,8 +121,9 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          configurator, shift device, gritty slurry fluid
 ├── nanite/                Nanite API (stack, tank, registry, sided configuration, auto IO), extractor/infuser,
 │                          player nanites (synced data attachment), nano lash
-├── archive/               The Archive (3x3x3 frame multiblock researching Femtocraft's tech tree), NaniteHost (the
-│                          player as host of tier 0 Archive nanites: first contact, regeneration, drawing)
+├── archive/               The Archive (3x3x3 frame multiblock researching the team's focus in Femtocraft's tech tree),
+│                          ArchiveRegistry (every claimed Archive and its status), Codex, NaniteHost (the player as host
+│                          of tier 0 Archive nanites: first contact, regeneration, drawing)
 ├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
 │                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
 │                          indexed item storages (storage/)
@@ -176,13 +177,17 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
 - **Archive and research** (DECISIONS D15): Femtocraft's tech tree is ItszuLib technologies in tree
   `femtocraft:archive` (`data/femtocraft/itszulib/technology`, generated from `tools/technologies.json`), researched per
-  team (ItszuLib DECISIONS D13). Touching a crystal cluster bare-handed makes the player a nanite host
+  team (ItszuLib DECISIONS D13). Touching a crystal cluster bare-handed, or using an Archive they have access to
+  (`ArchiveBlockEntity.canAccess`), makes the player a nanite host
   (`NaniteHost.contact`: a synced, death-surviving attachment plus 10 Archive nanites); a fed host regrows Archive
-  nanites to 10, costing hunger. The Archive (`ArchiveContent.MULTIBLOCK`, a frame multiblock) researches the technology
-  chosen in its screen for the chooser's team: once a second it draws an Archive nanite from that team's nearest host
-  within 8 blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Machines fed by a host take nanites
+  nanites to 10, costing hunger. The Archive (`ArchiveContent.MULTIBLOCK`, a frame multiblock) belongs to the first
+  player to use it and researches its team's focus (DECISIONS D17: the first available technology of the tree in the
+  team's ItszuLib research queue): once a second it draws an Archive nanite from that team's nearest host within 8
+  blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Its screen and the Codex edit the team's queue
+  (`ArchiveResearch`: click queues with prerequisites, right-click removes); claimed Archives and their last status are
+  kept in `ArchiveRegistry` (a crash-safe store) for the Codex's list. Machines fed by a host take nanites
   with `NaniteHost.drawTo(player, amount, level, target)`, which shows them flowing to the target
-  (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`) opens the tree read-only anywhere. Hosts see
+  (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`, `CodexItem.open`) opens the tree, queue and the team's Archives anywhere. Hosts see
   their status at the top left (`client/HostOverlay`; other systems add lines with `HostOverlay.addLine`). Gate content
   with `TechTree.isResearched(player, id)`.
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state

@@ -24,6 +24,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.registries.DeferredHolder
 import java.util.function.Consumer
 
@@ -101,18 +102,18 @@ class ConfiguratorItem(properties: Properties) : Item(properties) {
 }
 
 /**
- * Short-range nanite teleport. Port of v3's `ItemShiftTest`: moves the player up to [RANGE] blocks along the look
- * direction to the furthest spot their body fits, with a [COOLDOWN_TICKS] cooldown, in a stream of nanites (v3's
- * `MessageNaniteTeleport`, [com.itszuvalex.femtocraft.core.FemtoParticles.teleportEffect]).
+ * Short-range nanite teleport. Port of v3's `ItemShiftTest`: moves the player [RANGE] blocks along the look direction
+ * (free-floating, not snapped to blocks; see [destination]), with a [COOLDOWN_TICKS] cooldown, in a stream of nanites
+ * (v3's `MessageNaniteTeleport`, [com.itszuvalex.femtocraft.core.FemtoParticles.teleportEffect]).
  */
 class ShiftItem(properties: Properties) : Item(properties) {
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResult {
         if (!level.isClientSide) {
-            destination(level, player)?.let { pos ->
+            destination(level, player)?.let { dest ->
                 val start = player.position()
-                player.teleportTo(pos.x + 0.5, pos.y.toDouble(), pos.z + 0.5)
+                player.teleportTo(dest.x, dest.y, dest.z)
                 (level as? net.minecraft.server.level.ServerLevel)?.let { com.itszuvalex.femtocraft.core.FemtoParticles.teleportEffect(it, start, player.position()) }
-                level.playSound(null, pos, FemtoSounds.SHIFT.get(), SoundSource.PLAYERS, 1f, 1f)
+                level.playSound(null, dest.x, dest.y, dest.z, FemtoSounds.SHIFT.get(), SoundSource.PLAYERS, 1f, 1f)
                 player.cooldowns.addCooldown(player.getItemInHand(hand), COOLDOWN_TICKS)
             }
             player.fallDistance = 0.0
@@ -125,22 +126,80 @@ class ShiftItem(properties: Properties) : Item(properties) {
         const val RANGE = 8.0
 
         /**
-         * The furthest block along the look direction (stepping back from [RANGE] by quarter blocks) where the
-         * player's body fits, if it is not where they already stand.
+         * How far a blocked spot may be nudged to make the body fit.
          */
-        fun destination(level: Level, player: Player): BlockPos? {
+        const val MAX_DEFLECTION = 0.75
+
+        /**
+         * Steps back along the look direction when nothing near the target fits.
+         */
+        const val BACKOFF_STEP = 1.0 / 16
+
+        /**
+         * While backing off, how far a spot may be lifted onto the surface it clips (by [BACKOFF_STEP] * 2).
+         */
+        const val MAX_LIFT = 1.0
+
+        /**
+         * Shifts shorter than this do nothing.
+         */
+        const val MIN_DISTANCE = 0.5
+
+        /**
+         * Nudges tried around a blocked spot, shortest first, upward before sideways before down (stepping onto a
+         * ledge reads better than sinking into the floor).
+         */
+        private val DEFLECTIONS: List<Vec3> = buildList {
+            val steps = listOf(-0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75)
+            for (x in steps) for (y in steps) for (z in steps) {
+                val v = Vec3(x, y, z)
+                if (v.lengthSqr() > 0 && v.length() <= MAX_DEFLECTION + 1e-9) add(v)
+            }
+        }.sortedWith(compareBy<Vec3>({ it.lengthSqr() }, { -it.y }))
+
+        /**
+         * Where a shift puts the player's feet, or null if nowhere useful.
+         *
+         * 1. The point [RANGE] blocks along the look direction, if the player's body fits there.
+         * 2. Otherwise the nearest spot within [MAX_DEFLECTION] of it where the body fits.
+         * 3. Otherwise the furthest point back along the look direction (by [BACKOFF_STEP]) where the body fits, or
+         *    fits lifted by up to [MAX_LIFT] (onto the floor a downward look runs into).
+         *
+         * "Fits" means no collision box: water, cobwebs, grass and other blocks a player can move through are valid.
+         * Lava counts too (by design: the shift is a risk the player takes), and nothing between the player and the
+         * spot matters, so a shift passes through walls. The position is free-floating, so a shift can end in the
+         * air. Null if no spot at least [MIN_DISTANCE] away fits.
+         */
+        fun destination(level: Level, player: Player): Vec3? {
+            val start = player.position()
             val look = player.lookAngle.normalize()
-            val height = kotlin.math.ceil(player.bbHeight.toDouble()).toInt()
-            var step = RANGE
-            while (step >= 0) {
-                val at = player.position().add(look.scale(step))
-                val pos = BlockPos.containing(at.x, maxOf(at.y, level.minY.toDouble() + 1), at.z)
-                val fits = (0 until height).all { level.getBlockState(pos.above(it)).getCollisionShape(level, pos.above(it)).isEmpty }
-                if (fits) return if (pos == player.blockPosition()) null else pos
-                step -= 0.25
+            fun useful(at: Vec3) = at.distanceToSqr(start) >= MIN_DISTANCE * MIN_DISTANCE && fits(level, player, at)
+
+            val target = start.add(look.scale(RANGE))
+            if (useful(target)) return target
+            DEFLECTIONS.firstNotNullOfOrNull { d -> target.add(d).takeIf(::useful) }?.let { return it }
+
+            val lifts = (1..Math.round(MAX_LIFT / (BACKOFF_STEP * 2)).toInt()).map { it * BACKOFF_STEP * 2 }
+            for (i in Math.round(RANGE / BACKOFF_STEP).toInt() - 1 downTo 0) {
+                val distance = i * BACKOFF_STEP
+                if (distance < MIN_DISTANCE) break
+                val at = start.add(look.scale(distance))
+                if (useful(at)) return at
+                lifts.firstNotNullOfOrNull { lift -> at.add(0.0, lift, 0.0).takeIf(::useful) }?.let { return it }
             }
             return null
         }
 
+        /**
+         * Whether the player's current bounding box, moved so their feet are at [feet], is free of collisions, in
+         * loaded chunks and inside the world border.
+         */
+        fun fits(level: Level, player: Player, feet: Vec3): Boolean {
+            val box = player.boundingBox.move(feet.subtract(player.position()))
+            if (box.minY < level.minY || box.maxY > level.maxY + 1) return false
+            if (!level.hasChunksAt(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX, box.maxY, box.maxZ))) return false
+            if (!level.worldBorder.isWithinBounds(box)) return false
+            return level.noCollision(player, box)
+        }
     }
 }

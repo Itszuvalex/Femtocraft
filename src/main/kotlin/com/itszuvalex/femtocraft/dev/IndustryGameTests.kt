@@ -39,6 +39,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.fluids.FluidStack
 import kotlin.random.Random
 
@@ -69,6 +70,10 @@ object IndustryGameTests {
         DevGameTests.test("germination_chamber_teardown_drops_contents", body = ::germinationTeardown)
         DevGameTests.test("focusing_chamber_charges_large_crystal", body = ::focusingChamber)
         DevGameTests.test("shift_device_finds_destination", body = ::shiftDestination)
+        DevGameTests.test("shift_device_passes_water_and_cobwebs", body = ::shiftThroughPathable)
+        DevGameTests.test("shift_device_passes_walls_into_lava", body = ::shiftPassesWallsIntoLava)
+        DevGameTests.test("shift_device_deflects_around_small_obstacles", body = ::shiftDeflects)
+        DevGameTests.test("shift_device_stops_short_of_terrain", body = ::shiftStopsAtTerrain)
     }
 
     private fun stack(be: ProcessingMachineBlockEntity, slot: Int) = be.inventory.get(slot).toMinecraft()
@@ -323,12 +328,55 @@ object IndustryGameTests {
         }
     }
 
-    private fun shiftDestination(helper: GameTestHelper) {
+    /**
+     * A mock player floating at relative [at] with the given look, and where a shift would put them (relative).
+     */
+    private fun shiftFrom(helper: GameTestHelper, at: Vec3, yaw: Float, pitch: Float): Pair<Vec3, Vec3?> {
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val start = helper.absolutePos(BlockPos(0, 1, 4))
-        player.snapTo(start.x + 0.5, start.y.toDouble(), start.z + 0.5, -90f, 0f)
-        val dest = ShiftItem.destination(helper.level, player)
-        helper.assertTrue(dest != null && dest.x - start.x >= 7, "teleports about 8 blocks east, got $dest from $start")
+        val start = helper.absoluteVec(at)
+        player.snapTo(start.x, start.y, start.z, yaw, pitch)
+        val target = at.add(player.lookAngle.normalize().scale(ShiftItem.RANGE))
+        return target to ShiftItem.destination(helper.level, player)?.subtract(start.subtract(at))
+    }
+
+    private fun near(a: Vec3?, b: Vec3) = a != null && a.distanceTo(b) < 1e-6
+
+    private fun shiftDestination(helper: GameTestHelper) {
+        // Looking east-south-east and a little up: the full range, not snapped to a block.
+        val (target, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 0.5), -60f, -5f)
+        helper.assertTrue(near(dest, target), "free-floating destination $target, got $dest")
+        helper.succeed()
+    }
+
+    private fun shiftThroughPathable(helper: GameTestHelper) {
+        helper.setBlock(BlockPos(8, 2, 4), Blocks.WATER)
+        helper.setBlock(BlockPos(8, 3, 4), Blocks.COBWEB)
+        val (target, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 4.5), -90f, 0f)
+        helper.assertTrue(near(dest, target), "water and cobwebs do not block, expected $target, got $dest")
+        helper.succeed()
+    }
+
+    private fun shiftPassesWallsIntoLava(helper: GameTestHelper) {
+        for (y in 1..4) for (z in 3..5) helper.setBlock(BlockPos(4, y, z), Blocks.STONE)
+        helper.setBlock(BlockPos(8, 2, 4), Blocks.LAVA)
+        val (target, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 4.5), -90f, 0f)
+        helper.assertTrue(near(dest, target), "through the wall into the lava at $target, got $dest")
+        helper.succeed()
+    }
+
+    private fun shiftDeflects(helper: GameTestHelper) {
+        // A bottom slab under the target's feet: the nearest fit is half a block up.
+        helper.setBlock(BlockPos(8, 2, 4), Blocks.STONE_SLAB)
+        val (target, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 4.5), -90f, 0f)
+        helper.assertTrue(near(dest, target.add(0.0, 0.5, 0.0)), "nudged up onto the slab from $target, got $dest")
+        helper.succeed()
+    }
+
+    private fun shiftStopsAtTerrain(helper: GameTestHelper) {
+        for (x in 5..8) for (y in 1..4) for (z in 3..5) helper.setBlock(BlockPos(x, y, z), Blocks.STONE)
+        val (_, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 4.5), -90f, 0f)
+        // Body half-width 0.3 against the wall at x = 5: the furthest 1/16 step is 4.1875 blocks.
+        helper.assertTrue(near(dest, Vec3(4.6875, 2.0, 4.5)), "stops just short of the wall, got $dest")
         helper.succeed()
     }
 
