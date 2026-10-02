@@ -2,6 +2,7 @@
   "archive.femtocraft.contact": "Something old and broken settles behind your eyes. It hums, and the dust it brought hums with it.",
   "archive.femtocraft.contact.title": "WE ARE THE ARCHIVE",
   "archive.femtocraft.researched": "The Archive remembers: %s",
+  "archive.femtocraft.team_changed": "Your Archives (%s) now research for %s.",
   "block.femtocraft.archive": "Archive",
   "block.femtocraft.conduit": "Logistics Conduit",
   "block.femtocraft.crystal_charging_array": "Crystal Charging Array",

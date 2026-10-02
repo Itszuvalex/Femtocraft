@@ -47,6 +47,7 @@ object ArchiveGameTests {
         DevGameTests.test("archive_researches_with_host_nanites", body = ::researches)
         DevGameTests.test("archives_share_the_team_focus", body = ::shareFocus)
         DevGameTests.test("archive_and_codex_edit_the_team_queue", body = ::menuQueue)
+        DevGameTests.test("archives_follow_their_owner_between_teams", body = ::followOwner)
         DevGameTests.test("codex_opens_the_tech_tree", body = ::codexOpens)
         DevGameTests.test("host_draw_to_takes_nanites_for_a_consumer", body = ::drawTo)
     }
@@ -189,6 +190,43 @@ object ArchiveGameTests {
         a.onBreak(com.itszuvalex.itszulib.api.wrappers.WrapperLevel(helper.level), homeA.pos(), homeA.pos())
         helper.assertValueEqual(ArchiveRegistry.forTeam(team).map { it.pos }, listOf(homeB), "a broken Archive leaves the list")
         ArchiveRegistry.remove(homeB)
+        helper.succeed()
+    }
+
+    private fun followOwner(helper: GameTestHelper) {
+        val server = helper.level.server
+        val (owner, team) = player(helper)
+        val (joiner, solo) = player(helper)
+        fun research(id: UUID) = ItszuLib.TEAMS.state.team(id)!![Research.TYPE]
+        // The team has researched Metallurgy and moved on; the joiner's Archive is still on Metallurgy.
+        TechTree.unlock(server, team, METALLURGY)
+        TechTree.queue(server, team, BASIC_CIRCUITS)
+        TechTree.queue(server, solo, METALLURGY)
+        NaniteHost.contact(joiner)
+        val archive = ArchiveState {}
+        archive.claim(joiner.uuid)
+        val home = GlobalPos.of(helper.level.dimension(), helper.absolutePos(BlockPos(2, 1, 2)))
+        archive.step(helper.level, listOf(joiner), home = home)
+        helper.assertValueEqual(research(solo).progressOf(METALLURGY), 5L, "working on Metallurgy alone")
+
+        ItszuLib.TEAMS.change { it.invite(owner.uuid, joiner.uuid).accept(joiner.uuid, team) }
+        val focus = TechTree.focus(server, team, ArchiveContent.TREE)
+        helper.assertTrue(focus != null && focus != METALLURGY, "the team's focus is not the researched technology: $focus")
+        val before = research(team).progressOf(focus!!)
+        archive.step(helper.level, listOf(joiner), home = home)
+        helper.assertTrue(research(team).progressOf(focus) > before, "the joiner's Archive took up the team's focus")
+        helper.assertTrue(ArchiveRegistry.forTeam(team).any { it.pos == home }, "listed for the new team")
+
+        ItszuLib.TEAMS.change { it.leave(joiner.uuid) }
+        val alone = ItszuLib.TEAMS.state.teamOf(joiner.uuid)!!.id
+        helper.assertTrue(TechTree.focus(server, alone, ArchiveContent.TREE) == focus, "the leaver keeps the same focus")
+        val kept = research(alone).progressOf(focus)
+        archive.step(helper.level, listOf(joiner), home = home)
+        helper.assertTrue(research(alone).progressOf(focus) > kept, "and keeps working on it, for themselves")
+        helper.assertValueEqual(research(team).progressOf(focus), kept, "no longer for the old team")
+        helper.assertFalse(ArchiveRegistry.forTeam(team).any { it.pos == home }, "gone from the old team's list")
+        helper.assertTrue(ArchiveRegistry.forTeam(alone).any { it.pos == home }, "on the leaver's list")
+        ArchiveRegistry.remove(home)
         helper.succeed()
     }
 

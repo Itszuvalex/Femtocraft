@@ -17,6 +17,7 @@ import com.itszuvalex.itszulib.core.frag.addTickableFragment
 import com.itszuvalex.itszulib.menu.MenuSyncs
 import com.itszuvalex.itszulib.menu.MenuSync
 import com.itszuvalex.itszulib.research.TechnologyResearchedEvent
+import com.itszuvalex.itszulib.team.TeamMembershipChangedEvent
 import net.minecraft.core.GlobalPos
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.common.NeoForge
@@ -302,6 +303,21 @@ object ArchiveContent {
         NaniteHost.init()
         ArchiveRegistry.init()
         NeoForge.EVENT_BUS.addListener(::announce)
+        NeoForge.EVENT_BUS.addListener(::teamChanged)
+    }
+
+    /**
+     * When a player joins or leaves a team, their Archives go with them (an Archive researches for its owner's current
+     * team). Joining merged their research into the team's, so their Archives drop anything the team already
+     * researched and take up the team's focus; leaving gave them a copy of the team's research and queue, so their
+     * Archives carry on with the same focus, now for them alone. Each Archive picks this up on its next step; this
+     * tells the player.
+     */
+    private fun teamChanged(event: TeamMembershipChangedEvent) {
+        if (event.from == null) return
+        val count = ArchiveRegistry.state.values.count { it.owner == event.player }
+        if (count == 0) return
+        event.server.playerList.getPlayer(event.player)?.sendSystemMessage(Component.translatable("archive.femtocraft.team_changed", count, event.to.name))
     }
 
     /**

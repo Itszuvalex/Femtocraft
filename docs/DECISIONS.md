@@ -240,6 +240,11 @@ shared queue that Archives take items from), they chose the shared focus, and th
 - **Claiming.** An Archive belongs to the first player to use it and researches for that player's current team, so
   it follows them between teams (`ArchiveState.owner`). Access (`ArchiveBlockEntity.canAccess`: unclaimed, or claimed
   by a teammate) decides first contact; anyone can still open its screen, which edits only their own team's queue.
+- **Changing teams** (maintainer): a player's Archives go with them. Joining merges their research into the team's,
+  so an Archive working on something the team already researched drops it and takes up the team's focus; leaving
+  gives them a copy of the research and queue, so their Archives carry on with the same focus, for them alone, and
+  leave the old team's list. Archives pick this up on their next step; ItszuLib's `TeamMembershipChangedEvent` tells
+  the player how many Archives moved.
 - **The team's Archives.** Every claimed Archive is recorded by home block with its owner and last status in a
   crash-safe ItszuLib store (`ArchiveRegistry`, `<world>/data/femtocraft/archives.dat`), updated only when its status
   changes and removed when it breaks. The Codex lists the team's Archives with where they are and what they are doing

@@ -204,6 +204,7 @@ LANG = {
     "archive.femtocraft.contact.title": "WE ARE THE ARCHIVE",
     "archive.femtocraft.contact": "Something old and broken settles behind your eyes. It hums, and the dust it brought hums with it.",
     "archive.femtocraft.researched": "The Archive remembers: %s",
+    "archive.femtocraft.team_changed": "Your Archives (%s) now research for %s.",
     "gui.femtocraft.research.focus": "Focus: %s",
     "gui.femtocraft.research.next": "Then: %s",
     "gui.femtocraft.research.nothing_queued": "Nothing queued. Click a technology to queue it, right-click to remove.",
