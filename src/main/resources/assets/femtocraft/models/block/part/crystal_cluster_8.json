@@ -1,0 +1,22 @@
+{
+  "parent": "minecraft:block/block",
+  "loader": "neoforge:obj",
+  "model": "femtocraft:models/block/obj/crystal_cluster.obj",
+  "flip_v": true,
+  "textures": {
+    "particle": "femtocraft:block/obj/crystal_cluster",
+    "texture": "femtocraft:block/obj/crystal_cluster"
+  },
+  "visibility": {
+    "Gengon001": false,
+    "Gengon002": false,
+    "Gengon003": false,
+    "Gengon004": false,
+    "Gengon005": false,
+    "Gengon006": false,
+    "Gengon007": false,
+    "Gengon008": true,
+    "Gengon009": false,
+    "Gengon010": false
+  }
+}

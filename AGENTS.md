@@ -166,7 +166,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   ItszuLib `MenuActionPayload` actions that only reach the sender's open menu (D11).
 - **OBJ models** (crystal mount, conduits, frame, germination chamber, crystal cluster): `tools/gen_obj.py` normalizes
   v3's OBJs so no model or renderer needs scaling; model JSONs use `neoforge:obj` with `flip_v` and `visibility`;
-  tinted materials take tint index 0 from `client/FemtoTints.kt`. Conduit arms are block state (`core/ConduitArms.kt`,
+  tinted materials take tint index 0 from `client/FemtoTints.kt`; moving parts are single-group part models (`models/block/part`, `client/ObjParts.kt`) drawn by `client/FemtoRenderers.kt`. Conduit arms are block state (`core/ConduitArms.kt`,
   synced from the block entity's server tick). Check models in a client: `runClient -Pshowcase` (PORTING, Follow-up
   rendering work).
 - **Content data** (models, loot, tags, recipes, worldgen, lang) is generated: edit the tables in `tools/gen_assets.py`,

@@ -8,10 +8,10 @@
     "texture": "femtocraft:block/obj/crystal_mount"
   },
   "visibility": {
-    "BottomMount": true,
+    "BottomMount": false,
     "TopMount": false,
     "Crystal": false,
     "BottomGripBase": false,
-    "TopGripBase": false
+    "TopGripBase": true
   }
 }

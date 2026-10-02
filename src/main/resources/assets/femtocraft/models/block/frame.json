@@ -1,10 +1,5 @@
 {
-  "parent": "minecraft:block/block",
-  "loader": "neoforge:obj",
-  "model": "femtocraft:models/block/obj/frame.obj",
-  "flip_v": true,
   "textures": {
-    "particle": "femtocraft:block/obj/frame",
-    "texture": "femtocraft:block/obj/frame"
+    "particle": "femtocraft:block/obj/frame"
   }
 }

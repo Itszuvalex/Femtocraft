@@ -1,10 +1,5 @@
 {
-  "parent": "minecraft:block/block",
-  "loader": "neoforge:obj",
-  "model": "femtocraft:models/block/obj/crystal_cluster.obj",
-  "flip_v": true,
   "textures": {
-    "particle": "femtocraft:block/obj/crystal_cluster",
-    "texture": "femtocraft:block/obj/crystal_cluster"
+    "particle": "femtocraft:block/obj/crystal_cluster"
   }
 }

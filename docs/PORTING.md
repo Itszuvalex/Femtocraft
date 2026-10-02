@@ -116,48 +116,49 @@ All of this was client rendering in v3 and needs the 26.1 pipeline (`BlockEntity
 `RenderLevelStageEvent`, particle providers). It is done in passes; check each in a client (`./gradlew runClient`, or
 `-Pshowcase` for the stage below), since game tests cannot see rendering.
 
-**Pass 1 (done): static OBJ models.** v3 drew five OBJ models with its own GL renderer; they are now block models on
-NeoForge's OBJ loader (`neoforge:obj`):
+**Passes 1 and 2 (done): v3's OBJ models.** v3 drew five OBJ models with its own GL renderer. Their static parts are
+now block models on NeoForge's OBJ loader (`neoforge:obj`, pass 1), and their moving parts are drawn by block entity
+renderers (`client/FemtoRenderers.kt`, pass 2):
 
-| Block | v3 model | Static parts | Left for later passes |
+| Block | v3 model | Block model | Block entity renderer |
 |---|---|---|---|
-| Crystal mount | `crystal mount/crystal_mount.obj` | Bottom half, plus the top half under a solid block (`top`/`bottom` block state, as v3 chose) | The crystal (with the end portal shader when empty) and the grips turning |
-| Crystal power conduit, logistics conduit | `wire/wire_thin.obj` | Core, and an arm per connected face (`north`...`down` block state, set from the block entity's connections); v3's colour layer | Colour changes need a chunk re-render (see below) |
-| Frame | `frame/frame.obj` | Every edge of every block | v3 drew only the outer edges of the structure (`getRenderMark`) and the machine in progress |
-| Germination chamber | `growth chamber/growth chamber.obj` | The whole chamber on the home block (`home` block state; the other blocks draw nothing), its colour layer, sprinklers at rest | The glass (tinted, alpha 30 in v3), the sprinklers swinging, growing crops |
-| Crystal cluster | `crystal cluster/crystals.obj` | All ten crystals in the cluster's colour, fullbright | v3's per-crystal colour offsets, bobbing and turning |
+| Crystal mount | `crystal mount/crystal_mount.obj` | Bottom plate, plus the top plate under a solid block (`top`/`bottom` block state, as v3 chose) | Grips turning one degree a tick, holding the crystal in its color (fullbright) |
+| Crystal power conduit, logistics conduit | `wire/wire_thin.obj` | Core, and an arm per connected face (`north`...`down` block state, set from the block entity's connections); v3's colour layer | - |
+| Frame | `frame/frame.obj` | Particle only | The edges of the structure's bounding box (v3's render marks); every edge outside a structure |
+| Germination chamber | `growth chamber/growth chamber.obj` | The whole chamber on the home block (`home` block state; the other blocks draw nothing): base, top, colour layer and the tinted glass | The three sprinklers swinging on their hinges |
+| Crystal cluster | `crystal cluster/crystals.obj` | Particle only (the item uses the full model) | Ten crystals bobbing on their own phases, the first turning, each the cluster's colour shifted a little (from the position, so no sync) |
 
 How it is built:
 
-- `tools/gen_obj.py` converts `art/obj_models` (the same files v3 shipped) into
-  `models/block/obj/*.obj`, normalized to blocks with the origin at the block's lowest corner (the anchor block's for
-  the chamber; the cluster's 1/100 scale is applied), so model JSONs and renderers need no scaling. It adds the
-  materials the loader needs (`femtocraft.mtl`: `base`, the fullbright tinted `color` layer, pushed off the base faces so
-  they do not z-fight, and `tinted`) and copies the textures to `textures/block/obj/`.
-- `tools/gen_assets.py` writes the model JSONs (`flip_v`, since v3 drew `1 - v`; `visibility` picks the groups) and the
-  multipart/variant blockstates. `client/FemtoTints.kt` tints index 0 from the block entity: the cluster's colour, and
-  the `IColorable` colour (or a default) for conduits and the chamber.
+- `tools/gen_obj.py` converts `art/obj_models` (the same files v3 shipped) into `models/block/obj/*.obj`, normalized to
+  blocks with the origin at the block's lowest corner (the anchor block's for the chamber; the cluster's 1/100 scale
+  is applied), so model JSONs and renderers need no scaling. It adds the materials the loader needs (`femtocraft.mtl`:
+  `base`, the fullbright tinted `color` layer, pushed off the base faces so they do not z-fight, `tinted`, and
+  `glass`) and copies the textures to `textures/block/obj/`. The chamber's glass texture is v3's colour texture at
+  alpha 30 (`art/obj_models/growth_chamber/growth chamber_glass.png`).
+- `tools/gen_assets.py` writes the model JSONs (`flip_v`, since v3 drew `1 - v`; `visibility` picks the groups), the
+  multipart/variant blockstates, and `models/block/part/*.json`: one OBJ group each, baked as NeoForge standalone
+  models (`client/ObjParts.kt`) for the renderers to draw with a transform. `client/FemtoTints.kt` tints index 0 from
+  the block entity: the cluster's colour, and the `IColorable` colour (or a default) for conduits and the chamber.
 - `dev/DevShowcase.kt`: `./gradlew runClient -Pshowcase` opens `run/saves/showcase` (copy any world there, e.g. the dev
-  server's `run/world`), builds every OBJ block on a lit platform in the sky and moves the camera through fixed views,
-  logging `SHOWCASE view <i>`, with the HUD hidden. It was used to check this pass headless (Xvfb, Mesa llvmpipe).
+  server's `run/world`), builds every OBJ block (mounts with crystals) on a platform at the world's centre and moves
+  the camera through fixed views, logging `SHOWCASE view <i>`, with the HUD hidden. It was used to check both passes
+  headless (Xvfb, Mesa llvmpipe).
 
-Known limits of pass 1: tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's
-or chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home
-block only.
+Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
+chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
+only; the empty mount's end portal crystal (a shader in v3) and the frame's machine-in-progress preview are not drawn.
 
 **Next passes:**
 
-Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
-dragging, so the player configures each face on the model and sees what it connects to (REVIEW O8). Ender IO's IO
-configuration view works this way.
-
-- Block entity renderers for the dynamic parts listed above, on the same normalized OBJs (their groups can be
-  baked as separate models, e.g. with NeoForge's standalone models, and drawn with a transform each frame).
+- Wireless power beams between nodes (`WirelessPowerBeamRenderer`: the node syncs its spanning-tree render locations)
+  and diffusion beams to leaves, glow stick color.
+- Germination chamber growth, frame/multiblock/shift previewables, the frame's machine-in-progress preview, the empty
+  mount's end portal crystal.
+- Power and nanite particles, the nanite teleport effect, the player nanite overlay, dumb dust particles.
+- Cybermaterial colors (cyberleaves use the vanilla leaves model untinted).
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
-- Wireless power beams between nodes (`WirelessPowerBeamRenderer`; the spanning-tree render locations are computed and
-  synced), crystal mount crystal, glow stick and conduit colors.
-- Frame and multiblock renderers, germination chamber growth, frame/multiblock/shift previewables.
-- Power and nanite particles, the nanite teleport effect, the player nanite overlay, dumb dust particles.
-- Crystal cluster renderer (`CrystalRenderer`, with per-crystal color offsets), cybermaterial colors (cyberleaves use
-  the vanilla leaves model untinted).
+- Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
+  dragging, so the player configures each face on the model and sees what it connects to (REVIEW O8). Ender IO's IO
+  configuration view works this way.

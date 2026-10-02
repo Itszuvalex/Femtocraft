@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/crystal_cluster",
+    "model": "femtocraft:block/crystal_cluster_full",
     "tints": [
       {
         "type": "minecraft:constant",

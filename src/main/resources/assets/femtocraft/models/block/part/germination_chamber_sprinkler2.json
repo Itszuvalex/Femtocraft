@@ -10,12 +10,12 @@
     "glass": "femtocraft:block/obj/germination_chamber_glass"
   },
   "visibility": {
-    "Middle": true,
-    "Glass": true,
-    "Top": true,
+    "Middle": false,
+    "Glass": false,
+    "Top": false,
     "Sprinkler1": false,
-    "Sprinkler2": false,
+    "Sprinkler2": true,
     "Sprinkler3": false,
-    "Base": true
+    "Base": false
   }
 }

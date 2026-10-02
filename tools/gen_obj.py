@@ -12,7 +12,8 @@ The output OBJs are normalized, so model JSONs and renderers need no scaling or 
 - Every face has a material from models/block/obj/femtocraft.mtl (the loader draws nothing for faces without one).
   `base` uses the model's `#texture` slot; `color` is v3's colour layer (`#color`, tint index 0, fullbright), added as
   a copy of the base faces pushed out along their normals so the two do not z-fight; `tinted` is `#texture` with tint
-  index 0, fullbright.
+  index 0, fullbright; `glass` is `#glass` with tint index 0, fullbright (v3's glass: the colour texture at alpha 30,
+  saved as art/obj_models/growth_chamber/growth chamber_glass.png).
 - `o`/`g` nesting is flattened to top-level groups, named as in v3, for the model JSONs' `visibility` maps.
 - UVs keep v3's orientation; model JSONs set `flip_v` (v3's renderer drew `1 - v`).
 """
@@ -45,16 +46,22 @@ Ka 1 1 1
 Kd 1 1 1
 neoforge_TintIndex 0
 map_Kd #texture
+
+newmtl glass
+Ka 1 1 1
+Kd 1 1 1
+neoforge_TintIndex 0
+map_Kd #glass
 """
 
 # out name: (source obj, offset (x, y, z) added after scaling, scale, material per group, groups with a colour layer)
-# Material per group: a function from group name to "base" or "tinted".
+# Material per group: a function from group name to a material of femtocraft.mtl.
 MODELS = {
-    "crystal_mount": ("crystal_mount/crystal_mount.obj", (0.5, 0, 0.5), 1.0, lambda g: "base", set()),
+    "crystal_mount": ("crystal_mount/crystal_mount.obj", (0.5, 0, 0.5), 1.0, lambda g: "tinted" if g == "Crystal" else "base", set()),
     "wire_thin": ("wire/wire_thin.obj", (0.5, 0.5, 0.5), 1.0, lambda g: "base", "all"),
     "frame": ("frame/frame.obj", (0.5, 0, 0.5), 1.0, lambda g: "base", set()),
     # Anchored at the lowest corner of the 2x3x2 chamber; v3 centred it on the 2x2 footprint.
-    "germination_chamber": ("growth_chamber/growth chamber.obj", (1, 0, 1), 1.0, lambda g: "base", {"Base", "Middle", "Top", "Sprinkler1", "Sprinkler2", "Sprinkler3"}),
+    "germination_chamber": ("growth_chamber/growth chamber.obj", (1, 0, 1), 1.0, lambda g: "glass" if g == "Glass" else "base", {"Base", "Middle", "Top", "Sprinkler1", "Sprinkler2", "Sprinkler3"}),
     "crystal_cluster": ("crystal_cluster/crystals.obj", (0.5, 0, 0.5), 0.01, lambda g: "tinted", set()),
 }
 
@@ -68,6 +75,7 @@ TEXTURES = {
     "frame": "frame/frame.png",
     "germination_chamber": "growth_chamber/growth chamber.png",
     "germination_chamber_color": "growth_chamber/growth chamber_color.png",
+    "germination_chamber_glass": "growth_chamber/growth chamber_glass.png",
     "crystal_cluster": "crystal_cluster/crystals texture 64x64.png",
 }
 

@@ -9,9 +9,9 @@
   },
   "visibility": {
     "BottomMount": false,
-    "BottomGripBase": false,
     "TopMount": true,
-    "TopGripBase": true,
-    "Crystal": false
+    "Crystal": false,
+    "BottomGripBase": false,
+    "TopGripBase": false
   }
 }

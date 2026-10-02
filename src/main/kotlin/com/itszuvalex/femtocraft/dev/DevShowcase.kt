@@ -4,7 +4,11 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.FrameItem
 import com.itszuvalex.femtocraft.industry.FrameMultiblocks
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
+import com.itszuvalex.femtocraft.power.CrystalMountBlockEntity
 import com.itszuvalex.femtocraft.power.PowerContent
+import com.itszuvalex.femtocraft.power.PowerCrystalData
+import com.itszuvalex.femtocraft.power.PowerCrystals
+import com.itszuvalex.itszulib.api.adapters.IItemStack
 import com.itszuvalex.femtocraft.worldgen.WorldgenContent
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
@@ -47,6 +51,7 @@ object DevShowcase {
         Vec3(2.0, 1.6, 0.2) to Vec3(2.5, 0.7, 2.5),
         Vec3(7.5, 2.5, -2.0) to Vec3(7.5, 0.5, 2.5),
         Vec3(15.5, 4.5, -6.0) to Vec3(16.0, 1.5, 1.0),
+        Vec3(18.0, 4.0, -3.0) to Vec3(18.0, 2.2, 1.0),
         Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
     )
 
@@ -101,6 +106,12 @@ object DevShowcase {
         p.teleportTo(p.level() as ServerLevel, from.x, from.y - p.eyeHeight, from.z, setOf(), yaw, pitch, true)
     }
 
+    private fun mountCrystal(level: ServerLevel, pos: BlockPos, color: Int) {
+        val stack = net.minecraft.world.item.ItemStack(PowerContent.POWER_CRYSTAL.get())
+        PowerCrystals.set(stack, PowerCrystalData("Showcase", PowerCrystals.TYPE_SMALL, color, 0f, 100.0, 0.0, 0.0, 1000.0))
+        (level.getBlockEntity(pos) as? CrystalMountBlockEntity)?.storage?.setSlot(0, IItemStack.of(stack))
+    }
+
     private fun build(level: ServerLevel) {
         fun set(x: Int, y: Int, z: Int, block: Block) = level.setBlockAndUpdate(BASE.offset(x, y, z), block.defaultBlockState())
         for (x in -3..20) for (z in -3..8) {
@@ -112,6 +123,9 @@ object DevShowcase {
         set(2, 0, 2, PowerContent.CRYSTAL_MOUNT.get())
         set(2, 1, 2, Blocks.SMOOTH_STONE)
         set(4, 1, 2, PowerContent.CRYSTAL_MOUNT.get())
+        // Crystals in two of them (the renderer turns them with the grips, in the crystal's color).
+        mountCrystal(level, BASE.offset(0, 0, 2), 0x00FFFF)
+        mountCrystal(level, BASE.offset(2, 0, 2), 0xFF40C0)
         // Power conduits: a corner, so arms show along x and z.
         for (x in 6..8) set(x, 0, 2, PowerContent.POWER_CONDUIT.get())
         set(8, 0, 3, PowerContent.POWER_CONDUIT.get())

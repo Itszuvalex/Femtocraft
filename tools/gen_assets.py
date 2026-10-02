@@ -112,9 +112,9 @@ BLOCKS = {
     "lapisreplacement": ("Lapis Replacement", ("cube_all", "blocklapisreplacement"), drop_count("lapisreplacement", f"{NS}:lapisreplacement_dust", 3, 5), "pickaxe"),
     "diamondreplacement": ("Diamond Replacement", ("cube_all", "blockdiamondreplacement"), "self", "pickaxe"),
     # --- worldgen --- (the crystal cluster's block entity drops crystals and dust)
-    "crystal_cluster": ("Crystal Cluster", ("obj", "crystal_cluster", {"texture": "crystal_cluster"}), "none", None),
+    "crystal_cluster": ("Crystal Cluster", ("animated_obj", "crystal_cluster"), "none", None),
     # Placed by the frame item and by frame building; they drop through their teardown, not loot tables.
-    "frame": ("Frame", ("obj", "frame", {"texture": "frame"}), "none", "pickaxe", False),
+    "frame": ("Frame", ("animated_obj", "frame"), "none", "pickaxe", False),
     "germination_chamber": ("Germination Chamber", ("chamber_obj", "germination_chamber"), "none", "pickaxe", False),
     "crystal_focusing_chamber": ("Crystal Focusing Chamber", ("cube_all", "crystal_focusing_chamber"), "none", "pickaxe", False),
 }
@@ -326,8 +326,44 @@ def obj_model(obj, textures, visibility=None, particle=None):
     return model
 
 
+def obj_groups(obj):
+    """Group names of a converted OBJ (tools/gen_obj.py output)."""
+    with open(os.path.join(ASSETS, "models", "block", "obj", f"{obj}.obj"), encoding="utf-8") as f:
+        return [line.split()[1] for line in f if line.startswith("g ")]
+
+
+def show(obj, groups):
+    """A visibility map showing only [groups] of [obj]."""
+    return {g: g in groups for g in obj_groups(obj)}
+
+
+CHAMBER_TEXTURES = {"texture": "germination_chamber", "color": "germination_chamber_color", "glass": "germination_chamber_glass"}
+
+
+def part_models():
+    """
+    Models of single OBJ groups that block entity renderers draw (client/ObjParts.kt), at models/block/part/<name>.json:
+    the parts that move, and the frame edges (drawn per block).
+    """
+    mount = {"texture": "crystal_mount"}
+    parts = {
+        "crystal_mount_crystal": ("crystal_mount", mount, ["Crystal"]),
+        "crystal_mount_bottom_grip": ("crystal_mount", mount, ["BottomGripBase"]),
+        "crystal_mount_top_grip": ("crystal_mount", mount, ["TopGripBase"]),
+    }
+    for i in range(1, 4):
+        parts[f"germination_chamber_sprinkler{i}"] = ("germination_chamber", CHAMBER_TEXTURES, [f"Sprinkler{i}"])
+    for i in range(1, 11):
+        parts[f"crystal_cluster_{i}"] = ("crystal_cluster", {"texture": "crystal_cluster"}, [f"Gengon{i:03d}"])
+    for g in obj_groups("frame"):
+        parts[f"frame_{g.lower()}"] = ("frame", {"texture": "frame"}, [g])
+    return {name: obj_model(obj, textures, show(obj, groups)) for name, (obj, textures, groups) in parts.items()}
+
+
+# Block items whose item model is not the block model.
+ITEM_MODELS = {"crystal_cluster": "crystal_cluster_full"}
+
 CONDUIT_ARMS = ["north", "south", "east", "west", "up", "down"]
-MOUNT_GROUPS = ["BottomMount", "BottomGripBase", "TopMount", "TopGripBase", "Crystal"]
 WIRE_GROUPS = ["Core_Cube"] + [f"{d.capitalize()}_Cube" for d in CONDUIT_ARMS]
 
 
@@ -335,8 +371,9 @@ def extra_models(name, kind):
     """Models besides <name>.json that a block's blockstate uses."""
     k = kind[0]
     if k == "mount_obj":
-        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"},
-                                         {g: g in ("TopMount", "TopGripBase") for g in MOUNT_GROUPS})}
+        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["TopMount"]))}
+    if k == "animated_obj" and name in ITEM_MODELS:
+        return {ITEM_MODELS[name]: obj_model(kind[1], {"texture": kind[1]})}
     if k == "conduit_obj":
         textures = {"texture": kind[1], "color": kind[2]}
         return {f"{name}_{d}": obj_model("wire_thin", textures, {g: g == f"{d.capitalize()}_Cube" for g in WIRE_GROUPS})
@@ -351,14 +388,17 @@ def block_model(name, kind):
     k = kind[0]
     if k == "obj":
         return obj_model(kind[1], kind[2])
+    if k == "animated_obj":
+        # Drawn entirely by the block entity renderer; the block model only gives the particle texture.
+        return {"textures": {"particle": obj_tex(kind[1])}}
     if k == "mount_obj":
-        # The bottom half (also drawn when nothing is above or below), as in v3; the crystal is drawn by the renderer.
-        return obj_model("crystal_mount", {"texture": "crystal_mount"},
-                         {g: g in ("BottomMount", "BottomGripBase") for g in MOUNT_GROUPS})
+        # The bottom plate (also drawn when nothing is above or below), as in v3; the grips and crystal are drawn by
+        # the renderer.
+        return obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["BottomMount"]))
     if k == "conduit_obj":
         return obj_model("wire_thin", {"texture": kind[1], "color": kind[2]}, {g: g == "Core_Cube" for g in WIRE_GROUPS})
     if k == "chamber_obj":
-        return obj_model("germination_chamber", {"texture": kind[1], "color": f"{kind[1]}_color"})
+        return obj_model("germination_chamber", CHAMBER_TEXTURES, show("germination_chamber", ["Base", "Middle", "Top", "Glass"]))
     if k == "cube_all":
         return {"parent": "minecraft:block/cube_all", "textures": {"all": tex(kind[1])}}
     if k == "machine":
@@ -455,7 +495,7 @@ def main():
             write(os.path.join(ASSETS, "models", "block", f"{extra}.json"), model)
         write(os.path.join(ASSETS, "blockstates", f"{name}.json"), blockstate(name, kind))
         if has_item:
-            item_model = {"type": "minecraft:model", "model": f"{NS}:block/{name}"}
+            item_model = {"type": "minecraft:model", "model": f"{NS}:block/{ITEM_MODELS.get(name, name)}"}
             if name in ITEM_TINTS:
                 item_model["tints"] = [{"type": "minecraft:constant", "value": signed(ITEM_TINTS[name])}]
             write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": item_model})
@@ -463,6 +503,8 @@ def main():
         write(os.path.join(DATA, "loot_table", "blocks", f"{name}.json"), loot(name, drops))
         if tool:
             tools.setdefault(tool, []).append(f"{NS}:{name}")
+    for name, model in part_models().items():
+        write(os.path.join(ASSETS, "models", "block", "part", f"{name}.json"), model)
     for name, (display, texture) in ITEMS.items():
         lang[f"item.{NS}.{name}"] = display
         if name == "power_crystal":
@@ -501,7 +543,7 @@ def main():
 def check_textures():
     """Fails if a generated model points at a texture that does not exist."""
     missing = []
-    for folder in ("block", "item"):
+    for folder in ("block", "block/part", "item"):
         for f in os.listdir(os.path.join(ASSETS, "models", folder)):
             if not f.endswith(".json"):
                 continue
