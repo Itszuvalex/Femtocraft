@@ -27,6 +27,7 @@ logistics and cybermaterial "rifts" in the world. It is built on the ItszuLib li
 ./gradlew runClient             # dev client
 ./gradlew runServer             # dev dedicated server (run/eula.txt must say eula=true)
 python3 tools/gen_obj.py        # convert art/obj_models into normalized OBJ models + textures (run before gen_assets)
+tools/itszulib-ref.sh <ref> runClient  # build/run against an ItszuLib branch, tag or commit (see Dependencies)
 python3 tools/gen_assets.py     # regenerate models, blockstates, loot tables, tags, lang, recipes, worldgen JSON
 ./gradlew runClient -Pshowcase  # dev client in run/saves/showcase with every OBJ block on display (dev/DevShowcase.kt);
                                 # -Pshowcase=<n> starts at view n
@@ -49,6 +50,14 @@ downloads missing ones through the foojay resolver (`settings.gradle`). `gradlew
   `~/.gradle/gradle.properties` (or `-Pitszulib_dir=...`). The build stops with a clear error if the checkout is
   missing. ItszuLib changes are picked up by the next Femtocraft build without publishing. `neoforge.mods.toml` declares
   `itszulib` as a required dependency ordered `AFTER`.
+
+  To build or run against another ItszuLib branch, tag or commit without switching your checkout, use
+  `tools/itszulib-ref.sh <ref> [gradle args]` (Windows: `tools\itszulib-ref.ps1`), e.g.
+  `tools/itszulib-ref.sh some-branch runClient` or `tools/itszulib-ref.sh v0.2.0 build`. It fetches ItszuLib's remote,
+  resolves `<ref>` as a remote branch, then a tag, then any local ref or commit, keeps a detached worktree of your
+  ItszuLib checkout under `.itszulib/<ref>` (git-ignored; reused and updated on later runs, left alone if it has local
+  changes), and runs Gradle with `-Pitszulib_dir` pointing at it. `--list` shows the worktrees, `--clean` removes them;
+  `ITSZULIB_DIR` names the checkout (default `../ItszuLib`), `ITSZULIB_NO_FETCH=1` works offline.
 - **Kotlin for Forge** (required, `thedarkcolour:kotlinforforge-neoforge:${kff_version}`), see above.
 - **JEI** (optional, `mezz.jei`, version `jei_version`; DECISIONS D14). The plugin compiles against the API jars only;
   dev runs (`runClient`, `runServer`, `runGameTestServer`) include the full mod through `localRuntime`. Pass
@@ -130,6 +139,7 @@ src/main/resources/        assets (v3 textures under 26.1 paths, generated model
 tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,
                            worldgen JSON, technologies and placeholder textures from tables; validates texture references
 tools/technologies.json    The tech tree's placeholder technologies (from the 1.7.10 alpha), read by gen_assets.py
+tools/itszulib-ref.sh/.ps1 Builds or runs Femtocraft against an ItszuLib branch, tag or commit (worktrees in .itszulib/)
 tools/gen_obj.py           Converts art/obj_models into models/block/obj/*.obj (blocks, origin at the block's lowest
                            corner; shared femtocraft.mtl) and textures/block/obj/*.png
 art/                       Source art and OBJ models (not packaged; art/obj_models feeds gen_obj.py)
