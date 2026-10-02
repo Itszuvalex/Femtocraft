@@ -174,7 +174,8 @@ items act, as v3's `IPreviewable` items did: a frame item outlines the multibloc
 looking (the footprint and each block), green where it fits and the player has the frames, red otherwise (v3 drew the
 machine's model tinted the same way); a shift device outlines the player's box where it would teleport them. The
 shift is free-floating rather than snapped to blocks: the full 8 blocks along the look direction if the body fits
-there (blocks without collision, such as water and cobwebs, do not block), else the nearest spot within 0.75 blocks
+there (blocks without collision, such as water, cobwebs and lava, do not block, and walls in between do not
+matter), else the nearest spot within 0.75 blocks
 of it, else the furthest point back along the look direction that fits, lifted up to a block onto a floor it clips.
 
 **Pass 7 (done, first version): the 3D side configuration panel** (not in v3; REVIEW O8, after Ender IO's IO

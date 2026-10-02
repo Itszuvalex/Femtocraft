@@ -71,6 +71,7 @@ object IndustryGameTests {
         DevGameTests.test("focusing_chamber_charges_large_crystal", body = ::focusingChamber)
         DevGameTests.test("shift_device_finds_destination", body = ::shiftDestination)
         DevGameTests.test("shift_device_passes_water_and_cobwebs", body = ::shiftThroughPathable)
+        DevGameTests.test("shift_device_passes_walls_into_lava", body = ::shiftPassesWallsIntoLava)
         DevGameTests.test("shift_device_deflects_around_small_obstacles", body = ::shiftDeflects)
         DevGameTests.test("shift_device_stops_short_of_terrain", body = ::shiftStopsAtTerrain)
     }
@@ -352,6 +353,14 @@ object IndustryGameTests {
         helper.setBlock(BlockPos(8, 3, 4), Blocks.COBWEB)
         val (target, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 4.5), -90f, 0f)
         helper.assertTrue(near(dest, target), "water and cobwebs do not block, expected $target, got $dest")
+        helper.succeed()
+    }
+
+    private fun shiftPassesWallsIntoLava(helper: GameTestHelper) {
+        for (y in 1..4) for (z in 3..5) helper.setBlock(BlockPos(4, y, z), Blocks.STONE)
+        helper.setBlock(BlockPos(8, 2, 4), Blocks.LAVA)
+        val (target, dest) = shiftFrom(helper, Vec3(0.5, 2.0, 4.5), -90f, 0f)
+        helper.assertTrue(near(dest, target), "through the wall into the lava at $target, got $dest")
         helper.succeed()
     }
 

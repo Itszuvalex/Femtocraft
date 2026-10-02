@@ -166,8 +166,9 @@ class ShiftItem(properties: Properties) : Item(properties) {
          *    fits lifted by up to [MAX_LIFT] (onto the floor a downward look runs into).
          *
          * "Fits" means no collision box: water, cobwebs, grass and other blocks a player can move through are valid.
-         * The position is free-floating, so a shift can end in the air. Null if no spot at least [MIN_DISTANCE] away
-         * fits.
+         * Lava counts too (by design: the shift is a risk the player takes), and nothing between the player and the
+         * spot matters, so a shift passes through walls. The position is free-floating, so a shift can end in the
+         * air. Null if no spot at least [MIN_DISTANCE] away fits.
          */
         fun destination(level: Level, player: Player): Vec3? {
             val start = player.position()
