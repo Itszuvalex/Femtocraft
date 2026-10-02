@@ -17,6 +17,6 @@ rootProject.name = 'femtocraft'
 def itszulibDir = file(providers.gradleProperty('itszulib_dir').getOrElse('../ItszuLib'))
 if (!new File(itszulibDir, 'settings.gradle').isFile()) {
     throw new GradleException("ItszuLib checkout not found at ${itszulibDir}. Clone https://github.com/Itszuvalex/ItszuLib " +
-            "(branch neoforge-26.1) next to Femtocraft, or set itszulib_dir in ~/.gradle/gradle.properties.")
+            "(branch main) next to Femtocraft, or set itszulib_dir in ~/.gradle/gradle.properties.")
 }
 includeBuild(itszulibDir)

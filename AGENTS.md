@@ -13,7 +13,7 @@ logistics and cybermaterial "rifts" in the world. It is built on the ItszuLib li
   reflect, coroutines and serialization. Do not add a second copy of the stdlib (`kotlin.stdlib.default.dependency=false`).
 - Mod id `femtocraft`, package `com.itszuvalex.femtocraft`, GPL-2.0-or-later (from source headers; the repo has no
   LICENSE file).
-- Ported on branch `neoforge-26.1` from GitLab `develop-1.12.2-v3` (Minecraft 1.12.2, Scala). Every v3 area is ported
+- Ported on branch `neoforge-26.1` (merged into `main`, the default branch) from GitLab `develop-1.12.2-v3` (Minecraft 1.12.2, Scala). Every v3 area is ported
   (power, industry, nanite, logistics, cyber, worldgen); what was deliberately left out, the bugs fixed on the way and
   the follow-up rendering work are in [docs/PORTING.md](docs/PORTING.md). Decisions: [docs/DECISIONS.md](docs/DECISIONS.md).
   Review findings: [docs/REVIEW.md](docs/REVIEW.md). The 1.7.10-based attempt is kept as `neoforge-26.1-from-2016`.
@@ -45,7 +45,7 @@ downloads missing ones through the foojay resolver (`settings.gradle`). `gradlew
 - **ItszuLib** (required, mod id `itszulib`), as a **Gradle composite build** of a sibling checkout (DECISIONS D7).
   `settings.gradle` runs `includeBuild` on `../ItszuLib` and `build.gradle` depends on
   `com.itszuvalex.itszulib:itszulib:${itszulib_version}`, which Gradle substitutes with that project. Clone ItszuLib's
-  `neoforge-26.1` branch next to this repo, or point elsewhere with `itszulib_dir=/path/to/ItszuLib` in
+  `main` branch next to this repo, or point elsewhere with `itszulib_dir=/path/to/ItszuLib` in
   `~/.gradle/gradle.properties` (or `-Pitszulib_dir=...`). The build stops with a clear error if the checkout is
   missing. ItszuLib changes are picked up by the next Femtocraft build without publishing. `neoforge.mods.toml` declares
   `itszulib` as a required dependency ordered `AFTER`.
