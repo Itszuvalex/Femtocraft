@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:particle_manipulation"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

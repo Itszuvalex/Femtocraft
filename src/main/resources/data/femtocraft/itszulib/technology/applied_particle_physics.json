@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:harnessed_nuclear_decay",
+    "femtocraft:advanced_chemistry"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:temporal_pipelining"
+  ],
+  "cost": 5000,
+  "icon": "minecraft:clock"
+}

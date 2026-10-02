@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:spacetime_exploitation",
+    "femtocraft:element_manufacturing"
+  ],
+  "cost": 5000,
+  "icon": "minecraft:ender_eye"
+}

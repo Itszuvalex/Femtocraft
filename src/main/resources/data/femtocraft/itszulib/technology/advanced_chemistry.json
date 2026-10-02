@@ -1,0 +1,10 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:potentiality_generation",
+    "femtocraft:basic_chemistry",
+    "femtocraft:molecular_manipulation"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

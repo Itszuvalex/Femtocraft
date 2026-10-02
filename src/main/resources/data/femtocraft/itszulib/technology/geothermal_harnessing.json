@@ -1,0 +1,10 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:farenite_stabilization",
+    "femtocraft:advanced_chemistry",
+    "femtocraft:potentiality_harnessing"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

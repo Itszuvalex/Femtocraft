@@ -46,6 +46,7 @@ object DevGameTests {
         NaniteGameTests.register()
         LogisticsGameTests.register()
         CyberGameTests.register()
+        ArchiveGameTests.register()
     }
 
     fun register(modBus: IEventBus) {

@@ -48,6 +48,7 @@ object FemtoClient {
         event.register(IndustryContent.FRAME_SELECTION_MENU.get(), ::FrameSelectionScreen)
         event.register(IndustryContent.GERMINATION_CHAMBER_MENU.get(), ::GerminationChamberScreen)
         event.register(IndustryContent.FOCUSING_CHAMBER_MENU.get(), ::FocusingChamberScreen)
+        event.register(com.itszuvalex.femtocraft.archive.ArchiveContent.ARCHIVE_MENU.get(), ::ArchiveScreen)
         event.register(NaniteContent.NANITE_MACHINE_MENU.get(), ::NaniteMachineScreen)
         event.register(LogisticsContent.ITEM_REPOSITORY_MENU.get(), ::ItemRepositoryScreen)
         event.register(LogisticsContent.FLUID_REPOSITORY_MENU.get(), ::FluidRepositoryScreen)

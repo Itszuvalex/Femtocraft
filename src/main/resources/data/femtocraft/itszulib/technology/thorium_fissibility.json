@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:potential_harvesting",
+    "femtocraft:advanced_chemistry"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

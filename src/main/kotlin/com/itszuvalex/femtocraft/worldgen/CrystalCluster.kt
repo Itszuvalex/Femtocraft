@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.worldgen
 
+import com.itszuvalex.femtocraft.archive.NaniteHost
 import com.itszuvalex.femtocraft.core.FemtoBlockEntity
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.femtocraft.core.FragData
@@ -80,6 +81,16 @@ class CrystalClusterBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEn
 
 class CrystalClusterBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<CrystalClusterBlockEntity>(properties, { WorldgenContent.CRYSTAL_CLUSTER_BE.get() }) {
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
+
+    /**
+     * Touching a cluster with a bare hand is first contact with the Archive: the player becomes a nanite host
+     * ([NaniteHost.contact]). Hosts touching it again get nothing more.
+     */
+    override fun useWithoutItem(state: BlockState, level: net.minecraft.world.level.Level, pos: BlockPos, player: net.minecraft.world.entity.player.Player, hitResult: net.minecraft.world.phys.BlockHitResult): net.minecraft.world.InteractionResult {
+        if (NaniteHost.isHost(player)) return super.useWithoutItem(state, level, pos, player, hitResult)
+        if (!level.isClientSide) NaniteHost.contact(player)
+        return net.minecraft.world.InteractionResult.SUCCESS
+    }
 
     /**
      * A power particle somewhere in the block, in the cluster's color (v3 `BlockCrystalsWorldgen.randomDisplayTick`).

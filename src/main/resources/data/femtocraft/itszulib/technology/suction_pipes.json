@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:power_of_nothing"
+  ],
+  "cost": 100,
+  "icon": "femtocraft:basic_circuit"
+}

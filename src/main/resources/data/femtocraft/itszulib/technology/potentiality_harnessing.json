@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:potentiality_storage"
+  ],
+  "cost": 100,
+  "icon": "femtocraft:basic_circuit"
+}

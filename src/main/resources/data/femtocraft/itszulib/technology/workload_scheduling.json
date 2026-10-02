@@ -1,0 +1,8 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:advanced_programming"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

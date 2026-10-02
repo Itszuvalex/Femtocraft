@@ -1,0 +1,9 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:potentiality_transformation",
+    "femtocraft:resource_optimization"
+  ],
+  "cost": 400,
+  "icon": "femtocraft:nanoweave_sheet"
+}

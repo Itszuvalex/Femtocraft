@@ -1,0 +1,12 @@
+{
+  "tree": "femtocraft:archive",
+  "prerequisites": [
+    "femtocraft:quantum_interactivity",
+    "femtocraft:advanced_programming",
+    "femtocraft:applied_particle_physics",
+    "femtocraft:locality_entangler",
+    "femtocraft:reality_overclocker"
+  ],
+  "cost": 1500,
+  "icon": "femtocraft:power_crystal"
+}

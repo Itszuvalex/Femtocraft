@@ -105,6 +105,8 @@ DECISIONS D4 and D5 give the reasoning.
   rift was also checked in a generated world (dev server with the rarity raised: no far-chunk writes, converted
   chunks and crystal clusters saved).
 - [x] All v3 Scala/Java removed; what was not ported is listed above.
+- [x] After the port (new, not from v3): research on ItszuLib's tech trees, the Archive multiblock, the player as a
+  host of tier 0 Archive nanites, and the alpha's technologies as a placeholder tree (DECISIONS D15); 5 game tests.
 
 ## 1.12.2 bugs fixed
 
