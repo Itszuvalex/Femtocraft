@@ -62,10 +62,12 @@ object DevShowcase {
         Vec3(12.0, 3.0, 1.0) to Vec3(13.0, -0.5, 3.5),
         Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
         Vec3(16.5, 2.5, 3.0) to Vec3(16.5, 0.5, 6.5),
+        Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
     )
 
     private const val FRAMES_VIEW = 9
     private const val SIDE_CONFIG_VIEW = 10
+    private const val CODEX_VIEW = 11
     private const val MENU_DELAY = 40
     private val LIQUIFIER = BlockPos(16, 0, 6)
 
@@ -109,6 +111,11 @@ object DevShowcase {
             (level.getBlockEntity(BASE.offset(LIQUIFIER)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
+        // The Codex view queues research for the player's team, records two Archives and opens the Codex.
+        if (view == CODEX_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            codex(p, level)
+        }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
@@ -125,6 +132,22 @@ object DevShowcase {
         }
         look(p, view)
         Femtocraft.LOGGER.info("SHOWCASE view {}", view)
+    }
+
+    private fun codex(p: ServerPlayer, level: ServerLevel) {
+        val team = com.itszuvalex.itszulib.ItszuLib.TEAMS.state.teamOf(p.uuid)?.id ?: return
+        val tech = { path: String -> net.minecraft.resources.Identifier.fromNamespaceAndPath(Femtocraft.ID, path) }
+        com.itszuvalex.itszulib.research.TechTree.queue(level.server, team, tech("machining"))
+        com.itszuvalex.itszulib.research.TechTree.queue(level.server, team, tech("basic_circuits"))
+        com.itszuvalex.itszulib.research.TechTree.focus(level.server, team, com.itszuvalex.femtocraft.archive.ArchiveContent.TREE)
+            ?.let { com.itszuvalex.itszulib.research.TechTree.addProgress(level.server, team, it, 12) }
+        val archive = { x: Int, status: com.itszuvalex.femtocraft.archive.ArchiveStatus ->
+            com.itszuvalex.femtocraft.archive.ArchiveRegistry.report(
+                com.itszuvalex.femtocraft.archive.ArchiveRecord(net.minecraft.core.GlobalPos.of(level.dimension(), BASE.offset(x, 0, 12)), p.uuid, status))
+        }
+        archive(0, com.itszuvalex.femtocraft.archive.ArchiveStatus.RESEARCHING)
+        archive(6, com.itszuvalex.femtocraft.archive.ArchiveStatus.NO_HOST)
+        com.itszuvalex.femtocraft.archive.CodexItem.open(p)
     }
 
     private fun look(p: ServerPlayer, view: Int) {

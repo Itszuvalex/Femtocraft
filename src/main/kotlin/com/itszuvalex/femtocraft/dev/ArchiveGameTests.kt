@@ -4,6 +4,9 @@ import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.archive.ArchiveBlockEntity
 import com.itszuvalex.femtocraft.archive.ArchiveContent
 import com.itszuvalex.femtocraft.archive.ArchiveMenu
+import com.itszuvalex.femtocraft.archive.ArchiveRegistry
+import com.itszuvalex.femtocraft.archive.ArchiveResearch
+import com.itszuvalex.femtocraft.archive.ArchiveState
 import com.itszuvalex.femtocraft.archive.ArchiveStatus
 import com.itszuvalex.femtocraft.archive.CodexMenu
 import com.itszuvalex.femtocraft.archive.NaniteHost
@@ -14,6 +17,7 @@ import com.itszuvalex.itszulib.research.TechnologyState
 import com.itszuvalex.itszulib.team.Research
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.core.GlobalPos
 import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.resources.Identifier
 import net.minecraft.world.InteractionHand
@@ -41,7 +45,8 @@ object ArchiveGameTests {
         DevGameTests.test("archive_use_needs_access_for_first_contact", body = ::archiveContactNeedsAccess)
         DevGameTests.test("nanite_host_regenerates_archive_nanites", body = ::regenerates)
         DevGameTests.test("archive_researches_with_host_nanites", body = ::researches)
-        DevGameTests.test("archive_menu_chooses_only_available_technologies", body = ::menuChoose)
+        DevGameTests.test("archives_share_the_team_focus", body = ::shareFocus)
+        DevGameTests.test("archive_and_codex_edit_the_team_queue", body = ::menuQueue)
         DevGameTests.test("codex_opens_the_tech_tree", body = ::codexOpens)
         DevGameTests.test("host_draw_to_takes_nanites_for_a_consumer", body = ::drawTo)
     }
@@ -93,6 +98,7 @@ object ArchiveGameTests {
         val (player, _) = player(helper)
         useArchive(helper, player)
         helper.assertTrue(NaniteHost.isHost(player), "using the Archive made a host")
+        helper.assertTrue(helper.getBlockEntity(AT, ArchiveBlockEntity::class.java).state()!!.owner == player.uuid, "and claimed it")
         helper.assertValueEqual(NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP, "stocked with Archive nanites")
         NaniteHost.draw(player, 3)
         useArchive(helper, player)
@@ -102,10 +108,12 @@ object ArchiveGameTests {
 
     private fun archiveContactNeedsAccess(helper: GameTestHelper) {
         val be = formArchive(helper)
-        be.state()!!.choose(METALLURGY, UUID.randomUUID())
+        val (owner, _) = player(helper)
+        be.state()!!.claim(owner.uuid)
         val (player, _) = player(helper)
         useArchive(helper, player)
         helper.assertFalse(NaniteHost.isHost(player), "another team's Archive gives no first contact")
+        helper.assertTrue(be.state()!!.owner == owner.uuid, "still the owner's")
         helper.succeed()
     }
 
@@ -128,22 +136,27 @@ object ArchiveGameTests {
         val be = formArchive(helper)
         val state = be.state()!!
         val (player, team) = player(helper)
+        val server = helper.level.server
         NaniteHost.contact(player)
-        state.choose(METALLURGY, team)
+        state.claim(player.uuid)
+        helper.assertValueEqual(state.step(helper.level, listOf(player)), 0L, "nothing queued")
+        helper.assertValueEqual(state.status, ArchiveStatus.IDLE, "idle")
+        TechTree.queue(server, team, METALLURGY)
         val cost = TechTree.of(helper.level.registryAccess())[METALLURGY]!!.cost
+        fun research() = ItszuLib.TEAMS.state.team(team)!![Research.TYPE]
         var steps = 0
-        while (state.technology != null && steps < 50) {
+        while (!research().has(METALLURGY) && steps < 50) {
             state.step(helper.level, listOf(player))
             steps++
         }
-        val research = ItszuLib.TEAMS.state.team(team)!![Research.TYPE]
-        helper.assertTrue(research.has(METALLURGY), "researched after $steps steps")
+        helper.assertTrue(research().has(METALLURGY), "researched the focus after $steps steps")
         helper.assertValueEqual(steps.toLong(), cost / 5L, "5 points a step")
         helper.assertValueEqual(NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP - (cost / 10L).toInt(), "10 points a nanite")
-        helper.assertValueEqual(state.status, ArchiveStatus.IDLE, "choice cleared")
+        state.step(helper.level, listOf(player))
+        helper.assertValueEqual(state.status, ArchiveStatus.IDLE, "queue done")
 
         // No host in range: nothing is drawn and no progress is made.
-        state.choose(BASIC_CIRCUITS, team)
+        TechTree.queue(server, team, BASIC_CIRCUITS)
         helper.assertValueEqual(state.step(helper.level, listOf()), 0L, "no host, no progress")
         helper.assertValueEqual(state.status, ArchiveStatus.NO_HOST, "status")
         // A host from another team does not count.
@@ -154,16 +167,46 @@ object ArchiveGameTests {
         helper.succeed()
     }
 
-    private fun menuChoose(helper: GameTestHelper) {
+    private fun shareFocus(helper: GameTestHelper) {
+        val (player, team) = player(helper)
+        val (second, _) = player(helper)
+        ItszuLib.TEAMS.change { it.invite(player.uuid, second.uuid).accept(second.uuid, team) }
+        NaniteHost.contact(player)
+        NaniteHost.contact(second)
+        val a = ArchiveState {}
+        val b = ArchiveState {}
+        a.claim(player.uuid)
+        b.claim(second.uuid)
+        TechTree.queue(helper.level.server, team, METALLURGY)
+        val dimension = helper.level.dimension()
+        val homeA = GlobalPos.of(dimension, helper.absolutePos(BlockPos(0, 1, 0)))
+        val homeB = GlobalPos.of(dimension, helper.absolutePos(BlockPos(4, 1, 0)))
+        helper.assertValueEqual(a.step(helper.level, listOf(player), home = homeA) + b.step(helper.level, listOf(second), home = homeB), 10L, "both work on the focus")
+        helper.assertValueEqual(ItszuLib.TEAMS.state.team(team)!![Research.TYPE].progressOf(METALLURGY), 10L, "one shared progress")
+        val listed = ArchiveRegistry.forTeam(team)
+        helper.assertValueEqual(listed.map { it.pos }.toSet(), setOf(homeA, homeB), "both listed for the team")
+        helper.assertTrue(listed.all { it.status == ArchiveStatus.RESEARCHING }, "with their status")
+        a.onBreak(com.itszuvalex.itszulib.api.wrappers.WrapperLevel(helper.level), homeA.pos(), homeA.pos())
+        helper.assertValueEqual(ArchiveRegistry.forTeam(team).map { it.pos }, listOf(homeB), "a broken Archive leaves the list")
+        ArchiveRegistry.remove(homeB)
+        helper.succeed()
+    }
+
+    private fun menuQueue(helper: GameTestHelper) {
         val be = formArchive(helper)
-        val (player, _) = player(helper)
-        val menu = ArchiveMenu(1, player.inventory, be)
+        val (player, team) = player(helper)
         val access = helper.level.registryAccess()
-        helper.assertFalse(menu.handleAction(player, ArchiveMenu.ACTION_CHOOSE, ArchiveMenu.networkId(access, MACHINING)), "locked refused")
-        helper.assertFalse(menu.handleAction(player, ArchiveMenu.ACTION_CHOOSE, -1), "nothing refused")
-        helper.assertTrue(menu.handleAction(player, ArchiveMenu.ACTION_CHOOSE, ArchiveMenu.networkId(access, METALLURGY)), "available chosen")
-        helper.assertTrue(be.state()!!.technology == METALLURGY, "chosen")
-        helper.assertTrue(ArchiveMenu.byNetworkId(access, ArchiveMenu.networkId(access, METALLURGY)) == METALLURGY, "network id round trip")
+        fun queue() = ItszuLib.TEAMS.state.team(team)!![Research.TYPE].queue
+        val menu = ArchiveMenu(1, player.inventory, be)
+        helper.assertFalse(menu.handleAction(player, ArchiveResearch.ACTION_QUEUE, -1), "nothing refused")
+        helper.assertTrue(menu.handleAction(player, ArchiveResearch.ACTION_QUEUE, ArchiveResearch.networkId(access, MACHINING)), "queued")
+        val path = TechTree.of(access).pathTo(MACHINING, Research.EMPTY)
+        helper.assertTrue(path.size > 1 && queue() == path, "queued after its prerequisites: ${queue()}")
+        // The Codex edits the same queue, from anywhere.
+        val codex = CodexMenu(2, player.inventory)
+        helper.assertTrue(codex.handleAction(player, ArchiveResearch.ACTION_UNQUEUE, ArchiveResearch.networkId(access, MACHINING)), "unqueued from the Codex")
+        helper.assertTrue(queue() == path.dropLast(1), "only it left the queue")
+        helper.assertTrue(ArchiveResearch.byNetworkId(access, ArchiveResearch.networkId(access, METALLURGY)) == METALLURGY, "network id round trip")
         helper.succeed()
     }
 

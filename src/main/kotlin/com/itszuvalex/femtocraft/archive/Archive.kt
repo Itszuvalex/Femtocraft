@@ -15,9 +15,12 @@ import com.itszuvalex.itszulib.api.multiblock.MultiblockInstance
 import com.itszuvalex.itszulib.core.frag.FragMultiblockTickable
 import com.itszuvalex.itszulib.core.frag.addTickableFragment
 import com.itszuvalex.itszulib.menu.MenuSyncs
+import com.itszuvalex.itszulib.menu.MenuSync
+import com.itszuvalex.itszulib.research.TechnologyResearchedEvent
+import net.minecraft.core.GlobalPos
+import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.common.NeoForge
 import com.itszuvalex.itszulib.research.TechTree
-import com.itszuvalex.itszulib.research.TechnologyState
-import com.itszuvalex.itszulib.team.Research
 import net.minecraft.core.BlockPos
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.UUIDUtil
@@ -40,35 +43,32 @@ import java.util.UUID
 import java.util.function.UnaryOperator
 
 /**
- * What the Archive is doing, for its screen.
+ * What the Archive is doing, for its screen and the team's Archive list.
  */
 enum class ArchiveStatus {
-    /** No technology chosen. */
+    /** Unclaimed, or its team has nothing in Femtocraft's tree queued that it can research now. */
     IDLE,
 
-    /** Drawing nanites from a host and making progress. */
+    /** Drawing nanites from a host and making progress on the team's focus. */
     RESEARCHING,
 
-    /** Chosen, but no host of the researching team with Archive nanites is in range. */
+    /** The team has a focus, but no host of the team with Archive nanites is in range. */
     NO_HOST,
-
-    /** The chosen technology cannot be researched now (its prerequisites changed, or it vanished). */
-    UNAVAILABLE,
 }
 
 /**
- * Shared state of the Archive (on its home block): the technology it researches, the team it researches for (whoever
- * chose the technology), and research points bought with nanites but not yet spent.
+ * Shared state of the Archive (on its home block): who claimed it (the first player to use it; it researches for that
+ * player's team, whichever that is now), and research points bought with nanites but not yet spent.
  *
- * Every [STEP_TICKS] ticks: if fewer than [RATE] points are buffered, it draws one Archive nanite from the nearest host
- * of that team within [RADIUS] blocks ([NaniteHost.nearbyHosts]) for [POINTS_PER_NANITE] points, then spends up to
- * [RATE] points on the technology ([TechTree.addProgress], which keeps what is not needed). When the technology is
- * researched the choice clears; points left over stay for the next one.
+ * Every Archive of a team works on the team's focus: the first technology of Femtocraft's tree in the team's research
+ * queue that it can research now ([TechTree.focus]). Every [STEP_TICKS] ticks: if fewer than [RATE] points are
+ * buffered, it draws one Archive nanite from the nearest host of the team within [RADIUS] blocks
+ * ([NaniteHost.nearbyHosts]) for [POINTS_PER_NANITE] points, then spends up to [RATE] points on the focus
+ * ([TechTree.addProgress], which keeps what is not needed). Points left over go to the next focus. More Archives with
+ * more hosts research faster; one host feeds about one Archive.
  */
 class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
-    var technology: Identifier? = null
-        private set
-    var team: UUID? = null
+    var owner: UUID? = null
         private set
     var points: Long = 0L
         private set
@@ -76,45 +76,49 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
     /** Not saved: recomputed each step. */
     var status: ArchiveStatus = ArchiveStatus.IDLE
 
+    /** What was last reported to [ArchiveRegistry], so it is written only on change. Not saved. */
+    private var reported: ArchiveRecord? = null
+
     /**
-     * Researches [technology] for [team] from now on.
+     * The team this Archive researches for: its owner's current team.
      */
-    fun choose(technology: Identifier, team: UUID) {
-        this.technology = technology
-        this.team = team
-        status = ArchiveStatus.RESEARCHING
-        onChanged.run()
-    }
+    fun team(): UUID? = owner?.let { ItszuLib.TEAMS.state.teamOf(it)?.id }
 
-    fun clear() {
-        technology = null
-        status = ArchiveStatus.IDLE
+    /**
+     * Claims an unclaimed Archive for [player]. @return True if it was unclaimed.
+     */
+    fun claim(player: UUID): Boolean {
+        if (owner != null) return false
+        owner = player
         onChanged.run()
+        return true
     }
 
     /**
-     * One research step; [hosts] are the candidate hosts, nearest first, and [center] is where drawn nanites flow to.
+     * One research step; [hosts] are the candidate hosts, nearest first, [center] is where drawn nanites flow to, and
+     * [home] (the home block) keys this Archive in [ArchiveRegistry].
      *
      * @return The progress made.
      */
-    fun step(level: ServerLevel, hosts: List<Player>, center: net.minecraft.world.phys.Vec3 = net.minecraft.world.phys.Vec3.ZERO): Long {
-        val tech = technology
-        val team = team
-        if (tech == null || team == null) {
+    fun step(level: ServerLevel, hosts: List<Player>, center: Vec3 = Vec3.ZERO, home: GlobalPos? = null): Long {
+        val used = research(level, hosts, center)
+        val owner = owner
+        if (home != null && owner != null) {
+            val record = ArchiveRecord(home, owner, status)
+            if (record != reported) {
+                ArchiveRegistry.report(record)
+                reported = record
+            }
+        }
+        return used
+    }
+
+    private fun research(level: ServerLevel, hosts: List<Player>, center: Vec3): Long {
+        val team = team()
+        val tech = team?.let { TechTree.focus(level.server, it, ArchiveContent.TREE) }
+        if (team == null || tech == null) {
             status = ArchiveStatus.IDLE
             return 0L
-        }
-        val research = ItszuLib.TEAMS.state.team(team)?.get(Research.TYPE) ?: Research.EMPTY
-        when (TechTree.of(level.registryAccess()).state(tech, research)) {
-            TechnologyState.AVAILABLE -> {}
-            TechnologyState.RESEARCHED -> {
-                clear()
-                return 0L
-            }
-            else -> {
-                status = ArchiveStatus.UNAVAILABLE
-                return 0L
-            }
         }
         if (points < RATE) {
             val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team }
@@ -133,31 +137,21 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
             points -= used
             onChanged.run()
         }
-        val now = ItszuLib.TEAMS.state.team(team)?.get(Research.TYPE)
-        if (now?.has(tech) == true) {
-            announce(level, team, tech)
-            clear()
-        }
         return used
     }
 
-    private fun announce(level: ServerLevel, team: UUID, tech: Identifier) {
-        val name = TechTree.of(level.registryAccess())[tech]?.displayName(tech) ?: Component.literal(tech.toString())
-        val members = ItszuLib.TEAMS.state.team(team)?.members?.keys ?: return
-        for (player in level.server.playerList.players) {
-            if (player.uuid in members) player.sendSystemMessage(Component.translatable("archive.femtocraft.researched", name))
-        }
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) {
+        val mc = level.toMinecraft() as? ServerLevel ?: return
+        ArchiveRegistry.remove(GlobalPos.of(mc.dimension(), anchor))
     }
 
     override fun serialize(output: ValueOutput) {
-        technology?.let { output.store("Technology", Identifier.CODEC, it) }
-        team?.let { output.store("Team", UUIDUtil.CODEC, it) }
+        owner?.let { output.store("Owner", UUIDUtil.CODEC, it) }
         output.putLong("Points", points)
     }
 
     override fun deserialize(input: ValueInput) {
-        technology = input.read("Technology", Identifier.CODEC).orElse(null)
-        team = input.read("Team", UUIDUtil.CODEC).orElse(null)
+        owner = input.read("Owner", UUIDUtil.CODEC).orElse(null)
         points = input.getLongOr("Points", 0L)
     }
 
@@ -184,79 +178,97 @@ class ArchiveBlockEntity(pos: BlockPos, state: BlockState) :
                 if (server.gameTime % ArchiveState.STEP_TICKS != 0L) return
                 val state = instance.state as? ArchiveState ?: return
                 val center = instance.anchorPos.offset(1, 1, 1)
-                state.step(server, NaniteHost.nearbyHosts(server, center, ArchiveState.RADIUS), center.center)
+                state.step(server, NaniteHost.nearbyHosts(server, center, ArchiveState.RADIUS), center.center, GlobalPos.of(server.dimension(), instance.anchorPos))
             }
         })
     }
 
     /**
-     * Whether [player] may use this Archive: it is formed, and it researches for nobody yet or for [player]'s team.
+     * Whether [player] may use this Archive: it is formed, and unclaimed or claimed by someone in [player]'s team.
      */
     fun canAccess(player: Player): Boolean {
         val state = state() ?: return false
-        val team = state.team ?: return true
+        val team = state.owner?.let { ItszuLib.TEAMS.state.teamOf(it)?.id } ?: return true
         return ItszuLib.TEAMS.state.teamOf(player.uuid)?.id == team
     }
 }
 
 /**
- * Using an Archive opens its menu, and is first contact ([NaniteHost.contact]) for a player who has access
- * ([ArchiveBlockEntity.canAccess]) and is not a host yet: a second way in besides touching a crystal cluster, for
- * players joining a team that already built one.
+ * Using an Archive claims it if nobody has ([ArchiveState.claim]), opens its menu, and is first contact
+ * ([NaniteHost.contact]) for a player who has access ([ArchiveBlockEntity.canAccess]) and is not a host yet: a second
+ * way in besides touching a crystal cluster, for players joining a team that already built one.
  */
 class ArchiveBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<ArchiveBlockEntity>(p, { ArchiveContent.ARCHIVE_BE.get() }) {
     override fun useWithoutItem(state: BlockState, level: Level, pos: BlockPos, player: Player, hitResult: BlockHitResult): InteractionResult {
-        if (!level.isClientSide && (level.getBlockEntity(pos) as? ArchiveBlockEntity)?.canAccess(player) == true) NaniteHost.contact(player)
+        val be = level.getBlockEntity(pos) as? ArchiveBlockEntity
+        if (!level.isClientSide && be != null && be.canAccess(player)) {
+            be.state()?.claim(player.uuid)
+            NaniteHost.contact(player)
+        }
         return super.useWithoutItem(state, level, pos, player, hitResult)
     }
 }
 
 /**
- * The Archive's menu: no slots; syncs the chosen technology (by its synced registry id), points and status, and takes
- * [ACTION_CHOOSE] from the tech tree view.
+ * The Archive's menu: no slots; syncs this Archive's points and status and the team's Archives, and takes the research
+ * queue actions ([ArchiveResearch]).
  */
 class ArchiveMenu(containerId: Int, inventory: Inventory, be: ArchiveBlockEntity?) :
     FemtoMenu<ArchiveBlockEntity>(ArchiveContent.ARCHIVE_MENU.get(), containerId, inventory, be) {
-    private val access: RegistryAccess = inventory.player.level().registryAccess()
-
     /** Client copies. */
-    var technology: Identifier? = null
-        private set
     var points = 0L
         private set
     var status = ArchiveStatus.IDLE
         private set
+    var archives: List<ArchiveRecord> = emptyList()
+        private set
 
     init {
-        addSync(MenuSyncs.int({ networkId(access, be?.state()?.technology) }, { technology = byNetworkId(access, it) }))
         addSync(MenuSyncs.long({ be?.state()?.points ?: 0L }, { points = it }))
         addSync(MenuSyncs.int({ (be?.state()?.status ?: ArchiveStatus.IDLE).ordinal }, { status = ArchiveStatus.entries.getOrElse(it) { ArchiveStatus.IDLE } }))
+        addSync(ArchiveResearch.archivesSync(inventory.player) { archives = it })
     }
 
-    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
-        if (action != ACTION_CHOOSE) return false
-        val state = blockEntity?.state() ?: return false
-        val tech = byNetworkId(access, data) ?: return false
+    override fun handleAction(player: Player, action: Int, data: Int): Boolean = ArchiveResearch.handleAction(player, action, data)
+}
+
+/**
+ * Research actions shared by the Archive and the Codex: queue a technology of Femtocraft's tree (after its missing
+ * prerequisites) or take it off the player's team's queue, sent with the technology's synced registry id.
+ */
+object ArchiveResearch {
+    const val ACTION_QUEUE = 0
+    const val ACTION_UNQUEUE = 1
+
+    fun handleAction(player: Player, action: Int, data: Int): Boolean {
+        if (action != ACTION_QUEUE && action != ACTION_UNQUEUE) return false
+        val server = player.level().server ?: return false
+        val tech = byNetworkId(player.level().registryAccess(), data) ?: return false
+        if (TechTree.of(player.level().registryAccess())[tech]?.tree != ArchiveContent.TREE) return false
         val team = ItszuLib.TEAMS.state.teamOf(player.uuid) ?: return false
-        if (TechTree.of(access).state(tech, team[Research.TYPE]) != TechnologyState.AVAILABLE) return false
-        state.choose(tech, team.id)
+        if (action == ACTION_QUEUE) TechTree.queue(server, team.id, tech) else TechTree.unqueue(server, team.id, tech)
         return true
     }
 
-    companion object {
-        const val ACTION_CHOOSE = 0
+    /**
+     * Keeps a menu's copy of [player]'s team's Archives ([ArchiveRegistry.forTeam]) in step.
+     */
+    fun archivesSync(player: Player, setter: (List<ArchiveRecord>) -> Unit) = MenuSync(
+        { if (player.level().isClientSide) emptyList() else ArchiveRegistry.forTeam(ItszuLib.TEAMS.state.teamOf(player.uuid)?.id) },
+        setter,
+        ArchiveRecord.LIST_STREAM_CODEC,
+    )
 
-        /** The technology's id in the synced registry (the same on server and client), or -1. */
-        fun networkId(access: RegistryAccess, id: Identifier?): Int {
-            val registry = access.lookup(TechTree.KEY).orElse(null) ?: return -1
-            return id?.let(registry::getValue)?.let(registry::getId) ?: -1
-        }
+    /** The technology's id in the synced registry (the same on server and client), or -1. */
+    fun networkId(access: RegistryAccess, id: Identifier?): Int {
+        val registry = access.lookup(TechTree.KEY).orElse(null) ?: return -1
+        return id?.let(registry::getValue)?.let(registry::getId) ?: -1
+    }
 
-        fun byNetworkId(access: RegistryAccess, id: Int): Identifier? {
-            if (id < 0) return null
-            val registry = access.lookup(TechTree.KEY).orElse(null) ?: return null
-            return registry.byId(id)?.let(registry::getKey)
-        }
+    fun byNetworkId(access: RegistryAccess, id: Int): Identifier? {
+        if (id < 0) return null
+        val registry = access.lookup(TechTree.KEY).orElse(null) ?: return null
+        return registry.byId(id)?.let(registry::getKey)
     }
 }
 
@@ -288,5 +300,19 @@ object ArchiveContent {
     fun init() {
         NaniteHost.ATTACHMENT
         NaniteHost.init()
+        ArchiveRegistry.init()
+        NeoForge.EVENT_BUS.addListener(::announce)
+    }
+
+    /**
+     * Tells a team's online members when it researches a technology of Femtocraft's tree, once however many Archives
+     * worked on it.
+     */
+    private fun announce(event: TechnologyResearchedEvent) {
+        val tech = TechTree.of(event.server.registryAccess())[event.technology] ?: return
+        if (tech.tree != TREE) return
+        val members = ItszuLib.TEAMS.state.team(event.team)?.members?.keys ?: return
+        val message = Component.translatable("archive.femtocraft.researched", tech.displayName(event.technology))
+        for (player in event.server.playerList.players) if (player.uuid in members) player.sendSystemMessage(message)
     }
 }

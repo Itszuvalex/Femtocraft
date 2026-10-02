@@ -172,23 +172,23 @@ The maintainer asked for the 1.7.10 tech tree in ItszuLib (ItszuLib DECISIONS D1
 progress, and to start with the player as a nanite host carrying the absolute tier 0 nanites, the Archive's own.
 
 - **Research is per team**, through ItszuLib's team data: a solo player's team is theirs alone, and players who join
-  share research. The Archive researches for the team of whoever chose its technology.
+  share research. An Archive researches for the team of the player who claimed it (D17).
 - **The tech tree is placeholder content.** The alpha's 58 technologies (`tools/technologies.json`; the alpha listed 61
   names, three never defined, and two prerequisite links to the undefined "Quantum Robotics" are dropped) are generated
   into tree `femtocraft:archive`, costed by level (macro 20 points up to temporal and dimensional 5000) with
   placeholder icons. They refer to alpha machines that do not exist and gate nothing; they are to be replaced or
   re-pointed as v3's machines are designed. The layout is ItszuLib's automatic one; `position` fields can override it.
 - **The nanite host.** Touching a crystal cluster with a bare hand is first contact ("WE ARE THE ARCHIVE", Draft 1);
-  so is using an Archive the player has access to (it researches for nobody yet or for their team), so players joining
+  so is using an Archive the player has access to (unclaimed, or claimed by someone in their team), so players joining
   a team that already built one need not find a cluster:
   the player becomes a host for good (an attachment that survives death) and gets 10 Archive nanites, a new tier 0
   archetype and strain (`NaniteRegistry.ARCHIVE`). A fed host (food 7 or more) regrows one every 10 seconds up to 10,
   for 1.5 food points each. Machines draw from a host standing nearby: the 2016 "Back to Magic" idea of the player as
   the nanite source.
-- **The Archive** is a 3x3x3 frame multiblock (27 frames, 8 crackling dust, 9 glass: placeholder costs). Choosing an
-  available technology in its screen starts research; every second it draws one Archive nanite from the researching
-  team's nearest host within 8 blocks (10 points) and spends up to 5 points on the technology. Leftover points carry
-  over; the choice clears when the technology is researched, and the team's online members are told.
+- **The Archive** is a 3x3x3 frame multiblock (27 frames, 8 crackling dust, 9 glass: placeholder costs). Every
+  second it draws one Archive nanite from its team's nearest host within 8 blocks (10 points) and spends up to 5 points
+  on what the team is researching. Leftover points carry over, and the team's online members are told when a
+  technology is researched. (What it researches changed in D17: originally each Archive kept its own choice.)
 - **Also decided in the same discussion:**
   - Wired power stays a plain conduit network (the existing `WiredPowerNetwork`); the alpha's fill-percentage
     diffusion is not used for it.
@@ -205,8 +205,8 @@ Follow-ups to D15, asked for by the maintainer:
 - **Host status.** A host sees their Archive nanites against what their body keeps stocked, as a bar at the top left,
   with "Regrowing" or "Too hungry to regrow" while below it (`client/HostOverlay`). Bonuses and other host details will
   add lines to it (`HostOverlay.addLine`).
-- **The Archive Codex** (book + crackling dust) opens the tech tree anywhere, read-only. Research is still chosen at
-  an Archive.
+- **The Archive Codex** (book + crackling dust) opens the tech tree anywhere. (Originally read-only; since D17 it edits
+  the team's research queue too.)
 - **Visible nanite flow.** A machine fed by a host draws through `NaniteHost.drawTo`, which sends a stream of Archive
   nanite particles from the host to the machine; each particle's velocity is set so its drag brings it to rest on the
   target. The Archive uses it; future host-fed machines should too.
@@ -223,3 +223,29 @@ Follow-ups to D15, asked for by the maintainer:
   selection buttons list the frames and items too. JEI's list no longer covers the side configuration panel (ItszuLib
   DECISIONS D12).
 
+## D17. One research focus per team; Archives add capacity — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked how several Archives on a team should work, and whether the Codex should show what the Archives
+research. Of three directions (separate Archives with their own choices, one shared focus with Archives as capacity, a
+shared queue that Archives take items from), they chose the shared focus, and that the Codex can set it.
+
+- **One focus per team.** Teams keep an ordered research queue (ItszuLib `Research.queue`, ItszuLib DECISIONS D13
+  addendum). The focus is the first queued technology of Femtocraft's tree the team can research now. Every Archive of
+  the team works on it, so more Archives with more hosts research faster. It fits the fiction: one broken mind
+  speaking through many nodes, so every Archive is the same Archive.
+- **Choosing.** In the Archive's screen and in the Codex, clicking a technology queues it after its missing
+  prerequisites; right-clicking takes it (and queued technologies that need it) off. Both edit the player's own
+  team's queue (`ArchiveResearch`). The tree shows queue places as badges and the focus with a white frame; below it
+  the focus with its progress and what follows.
+- **Claiming.** An Archive belongs to the first player to use it and researches for that player's current team, so
+  it follows them between teams (`ArchiveState.owner`). Access (`ArchiveBlockEntity.canAccess`: unclaimed, or claimed
+  by a teammate) decides first contact; anyone can still open its screen, which edits only their own team's queue.
+- **The team's Archives.** Every claimed Archive is recorded by home block with its owner and last status in a
+  crash-safe ItszuLib store (`ArchiveRegistry`, `<world>/data/femtocraft/archives.dat`), updated only when its status
+  changes and removed when it breaks. The Codex lists the team's Archives with where they are and what they are doing
+  (researching, needs a host, idle), including ones in unloaded chunks (last known status).
+- **Balance as it stands:** a host regrows about one nanite in 10 seconds (1 point a second) and an Archive spends up
+  to 5 a second, so hosts, not Archives, limit research; a second Archive pays off with a second host.
+
+Open: whether the Codex item is needed at all (the host could reach the Archive's mind directly, e.g. a key), Archive
+tiers (more points held, longer host reach, faster spending), and per-Archive specialisation.
