@@ -263,6 +263,9 @@ the old per-pixel grain as a toggle, and for slots that show where items go on g
 - Femtocraft's screens default to `femtocraft:femtocraft` (`assets/femtocraft/itszulib/themes/femtocraft.json`):
   ItszuLib's dark theme (the old art's colours) with a teal output ring and cool light text. Players can force any
   theme, or turn grain off, in ItszuLib's client config.
+- Buttons are ItszuLib `ThemedButton`s (ItszuLib DECISIONS D16): drawn in the theme, with the IO accent on nanite
+  fill/drain and conduit chip buttons. The side configuration panel of a frame multiblock shows and configures the
+  whole structure.
 - `FemtoScreen` draws ItszuLib's themed panel and slots; its text, progress bars and tank wells (`inset`) take the
   theme's colours instead of fixed greys.
 - Crystal slots (crystal mount, crystal machines, crystal liquifier) show a faded power crystal while empty; outputs

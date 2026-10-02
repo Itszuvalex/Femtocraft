@@ -11,7 +11,8 @@ import com.itszuvalex.femtocraft.nanite.NaniteMachineMenu
 import com.itszuvalex.itszulib.client.ScreenHelpers
 import com.itszuvalex.itszulib.menu.MenuActionPayload
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.components.Button
+import com.itszuvalex.itszulib.client.screen.ButtonAccents
+import com.itszuvalex.itszulib.client.screen.ThemedButton
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -32,8 +33,8 @@ class FluidRepositoryScreen(menu: FluidRepositoryMenu, inventory: Inventory, tit
 class NaniteRepositoryScreen(menu: NaniteRepositoryMenu, inventory: Inventory, title: Component) : FemtoScreen<NaniteRepositoryMenu>(menu, inventory, title) {
     override fun init() {
         super.init()
-        addRenderableWidget(Button.builder(Component.translatable("gui.femtocraft.nanite.fill")) { send(NaniteMachineMenu.ACTION_FILL) }.bounds(leftPos + 128, topPos + 54, 40, 14).build())
-        addRenderableWidget(Button.builder(Component.translatable("gui.femtocraft.nanite.drain")) { send(NaniteMachineMenu.ACTION_DRAIN) }.bounds(leftPos + 128, topPos + 6, 40, 14).build())
+        addRenderableWidget(ThemedButton(leftPos + 128, topPos + 54, 40, 14, Component.translatable("gui.femtocraft.nanite.fill"), { send(NaniteMachineMenu.ACTION_FILL) }, accent = ButtonAccents.IO))
+        addRenderableWidget(ThemedButton(leftPos + 128, topPos + 6, 40, 14, Component.translatable("gui.femtocraft.nanite.drain"), { send(NaniteMachineMenu.ACTION_DRAIN) }, accent = ButtonAccents.IO))
     }
 
     private fun send(action: Int) = ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action, 0))
@@ -53,8 +54,8 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
 
     override fun init() {
         super.init()
-        addRenderableWidget(Button.builder(Component.translatable("gui.femtocraft.conduit.mode")) { send(ConduitMenu.ACTION_MODE) }.bounds(leftPos + 8, topPos + 80, 40, 14).build())
-        addRenderableWidget(Button.builder(Component.translatable("gui.femtocraft.conduit.interface")) { send(ConduitMenu.ACTION_INTERFACE) }.bounds(leftPos + 50, topPos + 80, 40, 14).build())
+        addRenderableWidget(ThemedButton(leftPos + 8, topPos + 80, 40, 14, Component.translatable("gui.femtocraft.conduit.mode"), { send(ConduitMenu.ACTION_MODE) }, accent = ButtonAccents.IO))
+        addRenderableWidget(ThemedButton(leftPos + 50, topPos + 80, 40, 14, Component.translatable("gui.femtocraft.conduit.interface"), { send(ConduitMenu.ACTION_INTERFACE) }, accent = ButtonAccents.IO))
     }
 
     private fun send(action: Int) {

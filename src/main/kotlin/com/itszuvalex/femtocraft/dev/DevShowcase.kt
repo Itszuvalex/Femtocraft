@@ -64,12 +64,15 @@ object DevShowcase {
         Vec3(16.5, 2.5, 3.0) to Vec3(16.5, 0.5, 6.5),
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
+        Vec3(17.5, 3.0, -2.5) to Vec3(17.5, 1.5, 1.0),
     )
 
     private const val FRAMES_VIEW = 9
     private const val SIDE_CONFIG_VIEW = 10
     private const val CODEX_VIEW = 11
     private const val MACHINE_VIEW = 12
+    private const val MULTIBLOCK_VIEW = 13
+    private val CHAMBER = BlockPos(17, 0, 0)
     private val FURNACE = BlockPos(9, 2, -7)
     private const val MENU_DELAY = 40
     private val LIQUIFIER = BlockPos(16, 0, 6)
@@ -131,6 +134,19 @@ object DevShowcase {
         }
         // ...and closes it again, so the furnace itself shows in the world (its colour layer behind the base texture).
         if (view == MACHINE_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY + 120) p.closeContainer()
+        // The multiblock view opens the germination chamber's screen: its side configuration panel shows the whole
+        // structure, with two outer faces of different members configured.
+        if (view == MULTIBLOCK_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            for ((offset, face) in listOf(BlockPos.ZERO to net.minecraft.core.Direction.NORTH, BlockPos(1, 2, 1) to net.minecraft.core.Direction.UP)) {
+                val member = level.getBlockEntity(BASE.offset(CHAMBER).offset(offset)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity
+                member?.getModule(com.itszuvalex.itszulib.api.Modules.ITEM_STORAGE_CONFIGURABLE, null)
+                    ?.let { com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, face, false) }
+                (member as? com.itszuvalex.itszulib.core.BlockEntityCore)?.markDirtyAndSync()
+            }
+            (level.getBlockEntity(BASE.offset(CHAMBER)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")

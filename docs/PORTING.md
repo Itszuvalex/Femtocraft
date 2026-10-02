@@ -187,7 +187,8 @@ pulled out around it, faces shaded by automatic IO (blue pulls in, orange pushes
 face's direction, IO and storage, click a face or its neighbour to cycle it (shift cycles backwards), and a button to
 switch mode. Power meters are ItszuLib `EnergyGauge`s (`FemtoScreen.addPowerGauge`) over `MenuCore.syncEnergy`.
 `-Pshowcase=10` opens a crystal liquifier's screen, with its panel, between a conduit, a chest and blocks (checked
-headless; hovering, dragging and clicking were not, since the headless client has no mouse input).
+headless; hovering, dragging and clicking were not, since the headless client has no mouse input). `-Pshowcase=13` opens the germination
+chamber's screen with the panel showing the whole structure, two members' faces configured (checked headless).
 
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
