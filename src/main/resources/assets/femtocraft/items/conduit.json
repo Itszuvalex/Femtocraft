@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/conduit"
+    "model": "femtocraft:block/conduit",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -20416
+      }
+    ]
   }
 }

@@ -61,7 +61,7 @@ object IndustryContent {
 
     // Frames and frame-built multiblocks (placed by the frame item; no block items, DECISIONS D8)
     @JvmField val FRAME = block("frame", false, ::FrameBlock) { machine(it).noOcclusion() }
-    @JvmField val GERMINATION_CHAMBER = block("germination_chamber", false, ::GerminationChamberBlock, ::machine)
+    @JvmField val GERMINATION_CHAMBER = block("germination_chamber", false, ::GerminationChamberBlock) { machine(it).noOcclusion() }
     @JvmField val CRYSTAL_FOCUSING_CHAMBER = block("crystal_focusing_chamber", false, ::CrystalFocusingChamberBlock, ::machine)
 
     @JvmField val NANO_FURNACE_BE = R.blockEntity("nano_furnace", ::NanoFurnaceBlockEntity, NANO_FURNACE::get)

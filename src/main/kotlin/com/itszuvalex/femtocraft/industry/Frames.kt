@@ -96,13 +96,23 @@ class FrameMultiblock(
     fun formAt(level: Level, anchor: BlockPos): Boolean {
         val lvl = ILevel.of(level)
         lvl.getIBlockEntity(anchor)?.getModule(Modules.MULTIBLOCK_MEMBER, null)?.let { MultiblockManager.SERVER.disband(lvl, anchor, it) }
-        takenLocations(anchor).forEach { level.setBlockAndUpdate(it, block.defaultBlockState()) }
+        val state = block.defaultBlockState()
+        takenLocations(anchor).forEach { pos ->
+            level.setBlockAndUpdate(pos, if (state.hasProperty(HOME)) state.setValue(HOME, pos == anchor) else state)
+        }
         return MultiblockManager.SERVER.form(lvl, shape, anchor) != null
     }
 
     companion object {
         const val FRAME_ROLE = "frame"
         const val MACHINE_ROLE = "machine"
+
+        /**
+         * On machine blocks whose home block's model draws the whole machine: true on the home block (the anchor).
+         */
+        @JvmField
+        val HOME: net.minecraft.world.level.block.state.properties.BooleanProperty =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("home")
     }
 }
 

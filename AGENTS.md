@@ -26,7 +26,9 @@ logistics and cybermaterial "rifts" in the world. It is built on the ItszuLib li
 ./gradlew runGameTestServer     # in-game tests; exits non-zero if a required test fails
 ./gradlew runClient             # dev client
 ./gradlew runServer             # dev dedicated server (run/eula.txt must say eula=true)
+python3 tools/gen_obj.py        # convert art/obj_models into normalized OBJ models + textures (run before gen_assets)
 python3 tools/gen_assets.py     # regenerate models, blockstates, loot tables, tags, lang, recipes, worldgen JSON
+./gradlew runClient -Pshowcase  # dev client in run/saves/showcase with every OBJ block on display (dev/DevShowcase.kt)
 ```
 
 `runGameTestServer` runs Femtocraft's tests, ItszuLib's dev tests (its dev content loads in Femtocraft's dev runs) and
@@ -116,7 +118,9 @@ src/main/resources/        assets (v3 textures under 26.1 paths, generated model
                            data/femtocraft/structure/test_area.nbt (empty 9x5x9 game test structure)
 tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,
                            worldgen JSON and placeholder textures from tables; validates texture references
-art/                       Source art and OBJ models (not packaged)
+tools/gen_obj.py           Converts art/obj_models into models/block/obj/*.obj (blocks, origin at the block's lowest
+                           corner; shared femtocraft.mtl) and textures/block/obj/*.png
+art/                       Source art and OBJ models (not packaged; art/obj_models feeds gen_obj.py)
 ```
 
 Each area has a `*Content` object (registrations, `init()` called from `Femtocraft`) and, where it has menus, a
@@ -160,6 +164,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   cylinder of terrain (radius capped to the feature region, DECISIONS D13) and drops crystal clusters on it.
 - **Menus**: ItszuLib `MenuCore`s with vanilla slots (DECISIONS D6); non-slot values use `MenuSync`s; buttons send
   ItszuLib `MenuActionPayload` actions that only reach the sender's open menu (D11).
+- **OBJ models** (crystal mount, conduits, frame, germination chamber, crystal cluster): `tools/gen_obj.py` normalizes
+  v3's OBJs so no model or renderer needs scaling; model JSONs use `neoforge:obj` with `flip_v` and `visibility`;
+  tinted materials take tint index 0 from `client/FemtoTints.kt`. Conduit arms are block state (`core/ConduitArms.kt`,
+  synced from the block entity's server tick). Check models in a client: `runClient -Pshowcase` (PORTING, Follow-up
+  rendering work).
 - **Content data** (models, loot, tags, recipes, worldgen, lang) is generated: edit the tables in `tools/gen_assets.py`,
   run it, commit the outputs. Hand-written JSON under those paths is overwritten.
 

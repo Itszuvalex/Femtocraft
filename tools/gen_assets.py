@@ -80,11 +80,11 @@ def drop_count(name, item, lo, hi):
 BLOCKS = {
     # name: (display name, model, drops, tool)
     # --- power ---
-    "crystal_mount": ("Crystal Mount", ("box", MACHINE_SIDE, [2, 0, 2, 14, 6.4, 14], [6.4, 4.8, 6.4, 9.6, 11.2, 9.6]), "self", "pickaxe"),
+    "crystal_mount": ("Crystal Mount", ("mount_obj",), "self", "pickaxe"),
     "crystal_charging_array": ("Crystal Charging Array", ("machine", "crystalchargingarray_front"), "self", "pickaxe"),
     "crystal_storage_array": ("Crystal Storage Array", ("machine", "crystalstoragearray_front"), "self", "pickaxe"),
     "crystal_heat_exchanger": ("Crystal Heat Exchanger", ("machine", "crystalheatexchanger_front"), "self", "pickaxe"),
-    "power_conduit_crystal": ("Crystal Power Conduit", ("box", "power_conduit_crystal", [6, 6, 6, 10, 10, 10]), "self", "pickaxe"),
+    "power_conduit_crystal": ("Crystal Power Conduit", ("conduit_obj", "wire_thin_power", "wire_thin_power_color"), "self", "pickaxe"),
     "glow_stick": ("Glow Stick", ("box", "blockglowstick", [7, 0, 7, 9, 12, 9]), "self", None),
     # --- industry ---
     "nano_furnace": ("Nano Furnace", ("machine", "nanofurnace_front"), "self", "pickaxe"),
@@ -99,7 +99,7 @@ BLOCKS = {
     "item_repository": ("Item Repository", ("orientable", "blockitemrepository_front", "blockitemrepository_side", "blockitemrepository_top"), "self", "pickaxe"),
     "fluid_repository": ("Fluid Repository", ("orientable", "blockfluidrepository_front", "blockfluidrepository_side", "blockfluidrepository_top"), "self", "pickaxe"),
     "nanite_repository": ("Nanite Repository", ("orientable", "blocknaniterepository_front", "blocknaniterepository_side", "blocknaniterepository_top"), "self", "pickaxe"),
-    "conduit": ("Logistics Conduit", ("box", "logistics_conduit", [6, 6, 6, 10, 10, 10]), "self", "pickaxe"),
+    "conduit": ("Logistics Conduit", ("conduit_obj", "wire_thin", "wire_thin_color"), "self", "pickaxe"),
     # --- cyber ---
     "substrate": ("Substrate", ("cube_all", "substrate"), "self", "pickaxe"),
     "refined_substrate": ("Refined Substrate", ("cube_all", "refinedsubstrate"), "self", "pickaxe"),
@@ -112,10 +112,10 @@ BLOCKS = {
     "lapisreplacement": ("Lapis Replacement", ("cube_all", "blocklapisreplacement"), drop_count("lapisreplacement", f"{NS}:lapisreplacement_dust", 3, 5), "pickaxe"),
     "diamondreplacement": ("Diamond Replacement", ("cube_all", "blockdiamondreplacement"), "self", "pickaxe"),
     # --- worldgen --- (the crystal cluster's block entity drops crystals and dust)
-    "crystal_cluster": ("Crystal Cluster", ("cross", "crystal_cluster"), "none", None),
+    "crystal_cluster": ("Crystal Cluster", ("obj", "crystal_cluster", {"texture": "crystal_cluster"}), "none", None),
     # Placed by the frame item and by frame building; they drop through their teardown, not loot tables.
-    "frame": ("Frame", ("box", "standin_frame", [0, 0, 0, 16, 16, 16]), "none", "pickaxe", False),
-    "germination_chamber": ("Germination Chamber", ("cube_all", "germination_chamber"), "none", "pickaxe", False),
+    "frame": ("Frame", ("obj", "frame", {"texture": "frame"}), "none", "pickaxe", False),
+    "germination_chamber": ("Germination Chamber", ("chamber_obj", "germination_chamber"), "none", "pickaxe", False),
     "crystal_focusing_chamber": ("Crystal Focusing Chamber", ("cube_all", "crystal_focusing_chamber"), "none", "pickaxe", False),
 }
 
@@ -158,13 +158,9 @@ ITEMS = {
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
 PLACEHOLDERS = {
-    "block/power_conduit_crystal": ((60, 200, 230, 255), (30, 110, 130, 255)),
     "block/crystal_furnace_front": ((0, 0, 0, 0), (230, 120, 40, 255)),
     "block/crystal_crusher_front": ((0, 0, 0, 0), (140, 140, 160, 255)),
-    "block/germination_chamber": ((70, 140, 60, 255), (40, 80, 35, 255)),
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
-    "block/logistics_conduit": ((200, 170, 60, 255), (110, 90, 30, 255)),
-    "block/crystal_cluster": ((0, 0, 0, 0), (150, 230, 255, 255)),
 }
 
 LANG = {
@@ -316,8 +312,53 @@ def element(box, texture="#all"):
             "faces": {d: {"texture": texture} for d in ["north", "south", "east", "west", "up", "down"]}}
 
 
+def obj_tex(name):
+    return f"{NS}:block/obj/{name}"
+
+
+def obj_model(obj, textures, visibility=None, particle=None):
+    """A `neoforge:obj` model of models/block/obj/<obj>.obj (see tools/gen_obj.py); textures name obj textures."""
+    model = {"parent": "minecraft:block/block", "loader": "neoforge:obj", "model": f"{NS}:models/block/obj/{obj}.obj",
+             "flip_v": True, "textures": {"particle": obj_tex(particle or next(iter(textures.values())))}}
+    model["textures"].update({slot: obj_tex(t) for slot, t in textures.items()})
+    if visibility is not None:
+        model["visibility"] = visibility
+    return model
+
+
+CONDUIT_ARMS = ["north", "south", "east", "west", "up", "down"]
+MOUNT_GROUPS = ["BottomMount", "BottomGripBase", "TopMount", "TopGripBase", "Crystal"]
+WIRE_GROUPS = ["Core_Cube"] + [f"{d.capitalize()}_Cube" for d in CONDUIT_ARMS]
+
+
+def extra_models(name, kind):
+    """Models besides <name>.json that a block's blockstate uses."""
+    k = kind[0]
+    if k == "mount_obj":
+        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"},
+                                         {g: g in ("TopMount", "TopGripBase") for g in MOUNT_GROUPS})}
+    if k == "conduit_obj":
+        textures = {"texture": kind[1], "color": kind[2]}
+        return {f"{name}_{d}": obj_model("wire_thin", textures, {g: g == f"{d.capitalize()}_Cube" for g in WIRE_GROUPS})
+                for d in CONDUIT_ARMS}
+    if k == "chamber_obj":
+        # Blocks other than the home block draw nothing; the home block's model covers the whole chamber.
+        return {f"{name}_part": {"textures": {"particle": obj_tex(kind[1])}}}
+    return {}
+
+
 def block_model(name, kind):
     k = kind[0]
+    if k == "obj":
+        return obj_model(kind[1], kind[2])
+    if k == "mount_obj":
+        # The bottom half (also drawn when nothing is above or below), as in v3; the crystal is drawn by the renderer.
+        return obj_model("crystal_mount", {"texture": "crystal_mount"},
+                         {g: g in ("BottomMount", "BottomGripBase") for g in MOUNT_GROUPS})
+    if k == "conduit_obj":
+        return obj_model("wire_thin", {"texture": kind[1], "color": kind[2]}, {g: g == "Core_Cube" for g in WIRE_GROUPS})
+    if k == "chamber_obj":
+        return obj_model("germination_chamber", {"texture": kind[1], "color": f"{kind[1]}_color"})
     if k == "cube_all":
         return {"parent": "minecraft:block/cube_all", "textures": {"all": tex(kind[1])}}
     if k == "machine":
@@ -345,6 +386,14 @@ def block_model(name, kind):
 
 def blockstate(name, kind):
     m = f"{NS}:block/{name}"
+    if kind[0] == "mount_obj":
+        return {"multipart": [
+            {"when": {"OR": [{"bottom": "true"}, {"top": "false"}]}, "apply": {"model": m}},
+            {"when": {"top": "true"}, "apply": {"model": f"{m}_top"}}]}
+    if kind[0] == "conduit_obj":
+        return {"multipart": [{"apply": {"model": m}}] + [{"when": {d: "true"}, "apply": {"model": f"{m}_{d}"}} for d in CONDUIT_ARMS]}
+    if kind[0] == "chamber_obj":
+        return {"variants": {"home=true": {"model": m}, "home=false": {"model": f"{m}_part"}}}
     if kind[0] in ("machine", "orientable"):
         return {"variants": {f"facing={f}": ({"model": m, "y": y} if y else {"model": m})
                              for f, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]}}
@@ -362,6 +411,18 @@ def loot(name, drops):
             "conditions": [{"condition": "minecraft:survives_explosion"}],
             "entries": [{"type": "minecraft:item", "name": f"{NS}:{name}"}]}]}
     return drops
+
+
+# Tint index 0 of block items whose OBJ model has a tinted material: the block's default tint (client/FemtoTints.kt).
+ITEM_TINTS = {
+    "crystal_cluster": 0xFF73E6FF,
+    "power_conduit_crystal": 0xFF33CCFF,
+    "conduit": 0xFFFFB040,
+}
+
+
+def signed(argb):
+    return argb - (1 << 32) if argb >= 1 << 31 else argb
 
 
 def power_crystal_item():
@@ -390,9 +451,14 @@ def main():
         display, kind, drops, tool = entry[:4]
         has_item = entry[4] if len(entry) > 4 else True
         write(os.path.join(ASSETS, "models", "block", f"{name}.json"), block_model(name, kind))
+        for extra, model in extra_models(name, kind).items():
+            write(os.path.join(ASSETS, "models", "block", f"{extra}.json"), model)
         write(os.path.join(ASSETS, "blockstates", f"{name}.json"), blockstate(name, kind))
         if has_item:
-            write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{name}"}})
+            item_model = {"type": "minecraft:model", "model": f"{NS}:block/{name}"}
+            if name in ITEM_TINTS:
+                item_model["tints"] = [{"type": "minecraft:constant", "value": signed(ITEM_TINTS[name])}]
+            write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": item_model})
         lang[f"block.{NS}.{name}"] = display
         write(os.path.join(DATA, "loot_table", "blocks", f"{name}.json"), loot(name, drops))
         if tool:
@@ -437,6 +503,8 @@ def check_textures():
     missing = []
     for folder in ("block", "item"):
         for f in os.listdir(os.path.join(ASSETS, "models", folder)):
+            if not f.endswith(".json"):
+                continue
             with open(os.path.join(ASSETS, "models", folder, f), encoding="utf-8") as fh:
                 textures = json.load(fh).get("textures", {})
             for ref in textures.values():

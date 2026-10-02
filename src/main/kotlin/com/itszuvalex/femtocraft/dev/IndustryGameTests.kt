@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.dev
 import com.itszuvalex.femtocraft.dev.DevGameTests.place
 import com.itszuvalex.femtocraft.dev.PowerGameTests.crystal
 import com.itszuvalex.femtocraft.industry.ConfiguratorItem
+import com.itszuvalex.femtocraft.industry.FrameMultiblock
 import com.itszuvalex.femtocraft.industry.CrystalFocusingChamberBlockEntity
 import com.itszuvalex.femtocraft.industry.CrystalFurnaceBlockEntity
 import com.itszuvalex.femtocraft.industry.CrystalItemMachineBlockEntity
@@ -174,6 +175,7 @@ object IndustryGameTests {
             val far = helper.getBlockEntity(FRAME_AT.offset(1, 2, 1), GerminationChamberBlockEntity::class.java)
             helper.assertTrue(far.part.membership?.structureId == be.part.membership?.structureId && far.part.membership?.offset == BlockPos(1, 2, 1), "every block joined the chamber")
             helper.assertTrue(far.state() === be.state() && be.state() != null, "every block reaches the shared state")
+            helper.assertTrue(be.blockState.getValue(FrameMultiblock.HOME) && !far.blockState.getValue(FrameMultiblock.HOME), "only the home block draws the chamber")
         }
     }
 

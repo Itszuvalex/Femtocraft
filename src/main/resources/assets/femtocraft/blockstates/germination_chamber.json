@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "home=true": {
       "model": "femtocraft:block/germination_chamber"
+    },
+    "home=false": {
+      "model": "femtocraft:block/germination_chamber_part"
     }
   }
 }

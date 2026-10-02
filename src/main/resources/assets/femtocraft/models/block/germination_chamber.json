@@ -1,6 +1,11 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/block",
+  "loader": "neoforge:obj",
+  "model": "femtocraft:models/block/obj/germination_chamber.obj",
+  "flip_v": true,
   "textures": {
-    "all": "femtocraft:block/germination_chamber"
+    "particle": "femtocraft:block/obj/germination_chamber",
+    "texture": "femtocraft:block/obj/germination_chamber",
+    "color": "femtocraft:block/obj/germination_chamber_color"
   }
 }

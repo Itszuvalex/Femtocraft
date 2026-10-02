@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/power_conduit_crystal"
+    "model": "femtocraft:block/power_conduit_crystal",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -13382401
+      }
+    ]
   }
 }

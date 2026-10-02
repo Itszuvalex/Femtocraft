@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.logistics
 
 import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.femtocraft.core.ConduitArms
 import com.itszuvalex.femtocraft.core.FemtoBlockEntity
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.femtocraft.nanite.NaniteModules
@@ -25,7 +26,9 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
@@ -211,13 +214,20 @@ class ConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Lo
         fragList.addInternalFragment(FragDropInventory(allChips))
         fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.conduit"), { id, inv, _ -> ConduitMenu(id, inv, this) }))
     }
+
+    /**
+     * Arms towards connected conduits and inventories (the model's, see [ConduitArms]).
+     */
+    override fun serverTick() = ConduitArms.sync(this) { conduit.isConnected(it) || conduit.inventoryFaces[it] }
 }
 
 class ConduitBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<ConduitBlockEntity>(properties, { LogisticsContent.CONDUIT_BE.get() }) {
-    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
-
-    companion object {
-        private val SHAPE: VoxelShape = box(6.0, 6.0, 6.0, 10.0, 10.0, 10.0)
+    init {
+        registerDefaultState(ConduitArms.withoutArms(stateDefinition.any()))
     }
+
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) = ConduitArms.addProperties(builder)
+
+    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ConduitArms.shape(state)
 }
 

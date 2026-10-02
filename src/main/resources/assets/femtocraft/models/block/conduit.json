@@ -1,42 +1,20 @@
 {
   "parent": "minecraft:block/block",
-  "render_type": "minecraft:cutout",
+  "loader": "neoforge:obj",
+  "model": "femtocraft:models/block/obj/wire_thin.obj",
+  "flip_v": true,
   "textures": {
-    "particle": "femtocraft:block/logistics_conduit",
-    "all": "femtocraft:block/logistics_conduit"
+    "particle": "femtocraft:block/obj/wire_thin",
+    "texture": "femtocraft:block/obj/wire_thin",
+    "color": "femtocraft:block/obj/wire_thin_color"
   },
-  "elements": [
-    {
-      "from": [
-        6,
-        6,
-        6
-      ],
-      "to": [
-        10,
-        10,
-        10
-      ],
-      "faces": {
-        "north": {
-          "texture": "#all"
-        },
-        "south": {
-          "texture": "#all"
-        },
-        "east": {
-          "texture": "#all"
-        },
-        "west": {
-          "texture": "#all"
-        },
-        "up": {
-          "texture": "#all"
-        },
-        "down": {
-          "texture": "#all"
-        }
-      }
-    }
-  ]
+  "visibility": {
+    "Core_Cube": true,
+    "North_Cube": false,
+    "South_Cube": false,
+    "East_Cube": false,
+    "West_Cube": false,
+    "Up_Cube": false,
+    "Down_Cube": false
+  }
 }

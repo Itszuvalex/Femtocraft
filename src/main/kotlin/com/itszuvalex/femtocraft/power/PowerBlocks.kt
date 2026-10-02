@@ -22,7 +22,15 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
+import com.itszuvalex.femtocraft.core.ConduitArms
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.ScheduledTickAccess
+import net.minecraft.util.RandomSource
+import net.minecraft.core.Direction as MountDirection
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityTicker
 import net.minecraft.world.level.block.entity.BlockEntityType
@@ -90,11 +98,40 @@ fun wirelessNetworkOf(be: BlockEntity): WirelessPowerNetwork? {
  * Holds one power crystal and is a wireless power node with the crystal as its storage. Port of v3's
  * `BlockCrystalMount`/`TileCrystalMount`: radius [RANGE], transfer rate the crystal's, trickle charges the crystal.
  */
+/**
+ * The crystal mount. Its model draws the bottom half when a solid face is below it (or nothing solid is above), and
+ * the top half when a solid face is above it, as v3's renderer did; [TOP] and [BOTTOM] follow the neighbours.
+ */
 class CrystalMountBlock(properties: BlockBehaviour.Properties) :
     FemtoEntityBlock<CrystalMountBlockEntity>(properties, { PowerContent.CRYSTAL_MOUNT_BE.get() }) {
+    init {
+        registerDefaultState(stateDefinition.any().setValue(TOP, false).setValue(BOTTOM, true))
+    }
+
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+        builder.add(TOP, BOTTOM)
+    }
+
+    override fun getStateForPlacement(context: BlockPlaceContext): BlockState = withMounts(defaultBlockState(), context.level, context.clickedPos)
+
+    override fun updateShape(
+        state: BlockState, level: LevelReader, ticks: ScheduledTickAccess, pos: BlockPos, direction: MountDirection,
+        neighborPos: BlockPos, neighborState: BlockState, random: RandomSource,
+    ): BlockState = if (direction.axis == MountDirection.Axis.Y) withMounts(state, level, pos) else state
+
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
 
     companion object {
+        @JvmField
+        val TOP: BooleanProperty = BooleanProperty.create("top")
+
+        @JvmField
+        val BOTTOM: BooleanProperty = BooleanProperty.create("bottom")
+
+        fun withMounts(state: BlockState, level: BlockGetter, pos: BlockPos): BlockState = state
+            .setValue(TOP, level.getBlockState(pos.above()).isFaceSturdy(level, pos.above(), MountDirection.DOWN))
+            .setValue(BOTTOM, level.getBlockState(pos.below()).isFaceSturdy(level, pos.below(), MountDirection.UP))
+
         private val SHAPE: VoxelShape = Shapes.or(box(2.0, 0.0, 2.0, 14.0, 6.4, 14.0), box(6.4, 4.8, 6.4, 9.6, 11.2, 9.6))
     }
 }
@@ -338,11 +375,13 @@ class CrystalHeatExchangerBlock(properties: BlockBehaviour.Properties) :
  */
 class PowerConduitBlock(properties: BlockBehaviour.Properties) :
     FemtoEntityBlock<PowerConduitBlockEntity>(properties, { PowerContent.POWER_CONDUIT_BE.get() }) {
-    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = SHAPE
-
-    companion object {
-        private val SHAPE: VoxelShape = box(6.0, 6.0, 6.0, 10.0, 10.0, 10.0)
+    init {
+        registerDefaultState(ConduitArms.withoutArms(stateDefinition.any()))
     }
+
+    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) = ConduitArms.addProperties(builder)
+
+    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ConduitArms.shape(state)
 }
 
 class PowerConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(PowerContent.POWER_CONDUIT_BE.get(), pos, state) {
@@ -352,6 +391,11 @@ class PowerConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEnti
     init {
         fragList.addFragment(conduit)
     }
+
+    /**
+     * Arms towards connected conduits and attached leaves (the model's, see [ConduitArms]).
+     */
+    override fun serverTick() = ConduitArms.sync(this) { conduit.isConnected(it) || conduit.leafFaces[it] }
 }
 
 /**

@@ -8,5 +8,7 @@ import net.neoforged.bus.api.IEventBus
 object DevContent {
     fun register(modBus: IEventBus) {
         DevGameTests.register(modBus)
+        DevShowcase.register()
+        if (net.neoforged.fml.loading.FMLEnvironment.getDist() == net.neoforged.api.distmarker.Dist.CLIENT) DevShowcaseClient.register()
     }
 }

@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/crystal_cluster"
+    "model": "femtocraft:block/crystal_cluster",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -9181441
+      }
+    ]
   }
 }

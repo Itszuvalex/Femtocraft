@@ -274,7 +274,19 @@ class GerminationChamberBlockEntity(pos: BlockPos, state: BlockState) :
     }
 }
 
-class GerminationChamberBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<GerminationChamberBlockEntity>(p, { IndustryContent.GERMINATION_CHAMBER_BE.get() })
+/**
+ * A germination chamber block. The home block's model draws the whole chamber (v3's `growth chamber.obj`), so the
+ * other blocks draw nothing: [FrameMultiblock.formAt] sets [FrameMultiblock.HOME] on the anchor only.
+ */
+class GerminationChamberBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<GerminationChamberBlockEntity>(p, { IndustryContent.GERMINATION_CHAMBER_BE.get() }) {
+    init {
+        registerDefaultState(stateDefinition.any().setValue(FrameMultiblock.HOME, false))
+    }
+
+    override fun createBlockStateDefinition(builder: net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState>) {
+        builder.add(FrameMultiblock.HOME)
+    }
+}
 
 // --- Crystal focusing chamber ----------------------------------------------------------------------------------------
 

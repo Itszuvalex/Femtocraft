@@ -1,42 +1,10 @@
 {
   "parent": "minecraft:block/block",
-  "render_type": "minecraft:cutout",
+  "loader": "neoforge:obj",
+  "model": "femtocraft:models/block/obj/frame.obj",
+  "flip_v": true,
   "textures": {
-    "particle": "femtocraft:block/standin_frame",
-    "all": "femtocraft:block/standin_frame"
-  },
-  "elements": [
-    {
-      "from": [
-        0,
-        0,
-        0
-      ],
-      "to": [
-        16,
-        16,
-        16
-      ],
-      "faces": {
-        "north": {
-          "texture": "#all"
-        },
-        "south": {
-          "texture": "#all"
-        },
-        "east": {
-          "texture": "#all"
-        },
-        "west": {
-          "texture": "#all"
-        },
-        "up": {
-          "texture": "#all"
-        },
-        "down": {
-          "texture": "#all"
-        }
-      }
-    }
-  ]
+    "particle": "femtocraft:block/obj/frame",
+    "texture": "femtocraft:block/obj/frame"
+  }
 }

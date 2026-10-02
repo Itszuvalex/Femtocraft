@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.dev
 
 import com.itszuvalex.femtocraft.dev.DevGameTests.place
+import com.itszuvalex.femtocraft.power.CrystalMountBlock
 import com.itszuvalex.femtocraft.power.CrystalChargingArrayBlockEntity
 import com.itszuvalex.femtocraft.power.CrystalHeatExchangerBlockEntity
 import com.itszuvalex.femtocraft.power.CrystalMountBlockEntity
@@ -38,8 +39,27 @@ object PowerGameTests {
         return be
     }
 
+    /**
+     * The mount's model draws its top half under a solid block and its bottom half over one (block state, as v3's
+     * renderer chose).
+     */
+    private fun mountHalves(helper: GameTestHelper) {
+        val at = BlockPos(2, 1, 2)
+        helper.setBlock(at, PowerContent.CRYSTAL_MOUNT.get())
+        helper.setBlock(at.below(), net.minecraft.world.level.block.Blocks.STONE)
+        helper.setBlock(at.above(), net.minecraft.world.level.block.Blocks.STONE)
+        helper.assertTrue(helper.getBlockState(at).getValue(CrystalMountBlock.TOP), "top half under stone")
+        helper.assertTrue(helper.getBlockState(at).getValue(CrystalMountBlock.BOTTOM), "bottom half on the floor")
+        helper.setBlock(at.above(), net.minecraft.world.level.block.Blocks.AIR)
+        helper.assertTrue(!helper.getBlockState(at).getValue(CrystalMountBlock.TOP), "no top half under air")
+        helper.setBlock(at.below(), net.minecraft.world.level.block.Blocks.AIR)
+        helper.assertTrue(!helper.getBlockState(at).getValue(CrystalMountBlock.BOTTOM), "no bottom half over air")
+        helper.succeed()
+    }
+
     fun register() {
         DevGameTests.test("power_crystal_battery_and_trickle", body = ::crystalBatteryAndTrickle)
+        DevGameTests.test("crystal_mount_model_follows_solid_neighbours", body = ::mountHalves)
         DevGameTests.test("power_crystal_codec_round_trip", body = ::crystalCodec)
         DevGameTests.test("mounts_form_wireless_network", body = ::mountsFormNetwork)
         DevGameTests.test("mount_bridging_two_networks_merges_them", body = ::mountMergesNetworks)

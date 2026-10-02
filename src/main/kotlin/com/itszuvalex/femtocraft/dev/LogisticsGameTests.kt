@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.dev
 import com.itszuvalex.femtocraft.dev.DevGameTests.place
 import com.itszuvalex.femtocraft.logistics.ConduitBlockEntity
 import com.itszuvalex.femtocraft.logistics.ConduitMenu
+import com.itszuvalex.femtocraft.core.ConduitArms
 import com.itszuvalex.femtocraft.logistics.ConnectionDirection
 import com.itszuvalex.femtocraft.logistics.FluidRepositoryBlockEntity
 import com.itszuvalex.femtocraft.logistics.ChipKind
@@ -54,11 +55,32 @@ object LogisticsGameTests {
         DevGameTests.test("conduit_fluid_chips_move_fluid_between_tanks", body = ::conduitMovesFluid)
         DevGameTests.test("conduit_nanite_chips_move_nanites_between_tanks", body = ::conduitMovesNanites)
         DevGameTests.test("conduit_drops_chips", body = ::conduitDrops)
+        DevGameTests.test("conduit_arms_follow_connections", body = ::conduitArms)
         DevGameTests.test("conduit_chip_progress_moves_with_the_chip", body = ::chipProgress)
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
         DevGameTests.test("nano_pack_saves_contents_and_locks_its_slot", body = ::nanoPack)
         DevGameTests.test("nano_pack_cannot_be_swapped_into_itself", body = ::nanoPackSwap)
         DevGameTests.test("indexed_storage_finds_slots_by_item_and_tag", body = ::indexedStorage)
+    }
+
+    /**
+     * The model's arms are block state set from the conduit's connections: towards another conduit and an inventory,
+     * and gone when the neighbour is.
+     */
+    private fun conduitArms(helper: GameTestHelper) {
+        helper.place<ConduitBlockEntity>(CENTER, LogisticsContent.CONDUIT.get())
+        helper.place<ConduitBlockEntity>(CENTER.east(), LogisticsContent.CONDUIT.get())
+        helper.place<ChestBlockEntity>(CENTER.west(), Blocks.CHEST)
+        fun arm(pos: BlockPos, face: Direction) = helper.getBlockState(pos).getValue(ConduitArms.PROPERTIES.getValue(face))
+        helper.startSequence()
+            .thenWaitUntil {
+                helper.assertTrue(arm(CENTER, Direction.EAST) && arm(CENTER.east(), Direction.WEST), "arms between the conduits")
+                helper.assertTrue(arm(CENTER, Direction.WEST), "arm into the chest")
+                helper.assertTrue(!arm(CENTER, Direction.NORTH) && !arm(CENTER, Direction.UP), "no arm towards air")
+            }
+            .thenExecute { helper.destroyBlock(CENTER.east()) }
+            .thenWaitUntil { helper.assertTrue(!arm(CENTER, Direction.EAST), "arm removed with the neighbour") }
+            .thenSucceed()
     }
 
     private fun itemRepository(helper: GameTestHelper) {

@@ -1,7 +1,27 @@
 {
-  "variants": {
-    "": {
-      "model": "femtocraft:block/crystal_mount"
+  "multipart": [
+    {
+      "when": {
+        "OR": [
+          {
+            "bottom": "true"
+          },
+          {
+            "top": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "femtocraft:block/crystal_mount"
+      }
+    },
+    {
+      "when": {
+        "top": "true"
+      },
+      "apply": {
+        "model": "femtocraft:block/crystal_mount_top"
+      }
     }
-  }
+  ]
 }

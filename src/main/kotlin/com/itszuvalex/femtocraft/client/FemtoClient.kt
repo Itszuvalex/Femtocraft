@@ -22,6 +22,7 @@ object FemtoClient {
     fun register(modBus: IEventBus) {
         modBus.addListener(::registerScreens)
         modBus.addListener(::registerFluidModels)
+        modBus.addListener(FemtoTints::register)
         modBus.addListener { event: EntityRenderersEvent.RegisterRenderers -> event.registerEntityRenderer(NaniteContent.NANO_LASH_ENTITY.get(), ::ThrownItemRenderer) }
     }
 
