@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/nanite_extractor"
+    "model": "femtocraft:block/nanite_extractor",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -16777216
+      }
+    ]
   }
 }

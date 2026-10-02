@@ -268,4 +268,9 @@ the old per-pixel grain as a toggle, and for slots that show where items go on g
 - Crystal slots (crystal mount, crystal machines, crystal liquifier) show a faded power crystal while empty; outputs
   are ringed.
 - The dev showcase has two more views for checking screens: the Codex (11) and a nano furnace (12).
+- **Machine colour layer** (maintainer: the coloured parts of the nano furnace and other machines were see-through).
+  v3's machine base textures have holes that v3 filled with a separately drawn colour layer; the port drew only the
+  base, so the holes showed through. The machine models (`tools/gen_assets.py` "machine") now put v3's colour textures
+  (`blockmachineblock_*_color`) under the base as a tinted layer: the machine's own colour if it has one
+  (`FemtoTints.MACHINE_DEFAULT` otherwise, black), and black for the items.
 

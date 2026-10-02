@@ -129,6 +129,8 @@ object DevShowcase {
             (level.getBlockEntity(BASE.offset(FURNACE)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
+        // ...and closes it again, so the furnace itself shows in the world (its colour layer behind the base texture).
+        if (view == MACHINE_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY + 120) p.closeContainer()
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")

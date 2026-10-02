@@ -56,6 +56,11 @@ def tex(name):
 
 MACHINE_SIDE = "blockmachineblock_side_base"
 MACHINE_FRONT = "blockmachineblock_front_base"
+# v3 drew the machine's colour through the holes in the base textures: a solid layer tinted with the block's colour
+# (tint index 0; black when it has none, FemtoTints.MACHINE_DEFAULT).
+MACHINE_SIDE_COLOR = "blockmachineblock_side_color"
+MACHINE_FRONT_COLOR = "blockmachineblock_front_color"
+MACHINE_TINT = 0xFF000000
 
 def drop_count(name, item, lo, hi):
     """Drops lo..hi of item, plus 0..fortune more (v3 quantityDroppedWithBonus)."""
@@ -70,7 +75,8 @@ def drop_count(name, item, lo, hi):
 
 # Block model kinds:
 #   ("cube_all", tex)                 one texture
-#   ("machine", front_overlay)        v3 machine: base cube plus the machine's front overlay, horizontal facing
+#   ("machine", front_overlay)        v3 machine: tinted colour cube, base cube with holes over it, the machine's front
+#                                     overlay; horizontal facing
 #   ("orientable", front, side, top)  front/side/top textures, horizontal facing
 #   ("column", side, end)             log-like with an axis property
 #   ("leaves", tex)
@@ -457,11 +463,13 @@ def block_model(name, kind):
         faces = ["north", "south", "east", "west", "up", "down"]
         base = {"from": [0, 0, 0], "to": [16, 16, 16],
                 "faces": {d: {"texture": "#front_base" if d == "north" else "#side", "cullface": d} for d in faces}}
+        color = {"from": [0, 0, 0], "to": [16, 16, 16],
+                 "faces": {d: {"texture": "#front_color" if d == "north" else "#side_color", "cullface": d, "tintindex": 0} for d in faces}}
         overlay = {"from": [0, 0, 0], "to": [16, 16, 16], "faces": {"north": {"texture": "#front", "cullface": "north"}}}
         return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
                 "textures": {"particle": tex(MACHINE_SIDE), "side": tex(MACHINE_SIDE), "front_base": tex(MACHINE_FRONT),
-                             "front": tex(kind[1])},
-                "elements": [base, overlay]}
+                             "side_color": tex(MACHINE_SIDE_COLOR), "front_color": tex(MACHINE_FRONT_COLOR), "front": tex(kind[1])},
+                "elements": [color, base, overlay]}
     if k == "orientable":
         return {"parent": "minecraft:block/orientable", "textures": {"front": tex(kind[1]), "side": tex(kind[2]), "top": tex(kind[3])}}
     if k == "column":
@@ -585,6 +593,8 @@ def main():
             item_model = {"type": "minecraft:model", "model": f"{NS}:block/{ITEM_MODELS.get(name, name)}"}
             if name in ITEM_TINTS:
                 item_model["tints"] = [{"type": "minecraft:constant", "value": signed(ITEM_TINTS[name])}]
+            elif kind[0] == "machine":
+                item_model["tints"] = [{"type": "minecraft:constant", "value": signed(MACHINE_TINT)}]
             write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": item_model})
         lang[f"block.{NS}.{name}"] = display
         write(os.path.join(DATA, "loot_table", "blocks", f"{name}.json"), loot(name, drops))

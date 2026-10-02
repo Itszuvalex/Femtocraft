@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/crystal_crusher"
+    "model": "femtocraft:block/crystal_crusher",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -16777216
+      }
+    ]
   }
 }

@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/crystal_heat_exchanger"
+    "model": "femtocraft:block/crystal_heat_exchanger",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -16777216
+      }
+    ]
   }
 }

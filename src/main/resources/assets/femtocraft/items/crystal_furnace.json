@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/crystal_furnace"
+    "model": "femtocraft:block/crystal_furnace",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -16777216
+      }
+    ]
   }
 }
