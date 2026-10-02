@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "femtocraft:crackling_dust"
+  ],
+  "result": {
+    "id": "femtocraft:codex",
+    "count": 1
+  }
+}

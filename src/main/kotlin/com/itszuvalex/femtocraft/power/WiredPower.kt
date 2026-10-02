@@ -5,7 +5,11 @@ import com.itszuvalex.itszulib.api.adapters.IBlockEntity
 import com.itszuvalex.itszulib.api.adapters.ILevel
 import com.itszuvalex.itszulib.api.adapters.IModule
 import com.itszuvalex.itszulib.api.utility.NBTSerializationScope
-import com.itszuvalex.itszulib.core.TileNetwork
+import com.itszuvalex.itszulib.core.DistributableBattery
+import com.itszuvalex.itszulib.core.DistributingTileNetwork
+import com.itszuvalex.itszulib.core.DistributionParticipant
+import com.itszuvalex.itszulib.core.DistributionRole
+import com.itszuvalex.itszulib.core.IDistributionNode
 import com.itszuvalex.itszulib.core.frag.FragNetworkedWire
 import com.itszuvalex.itszulib.util.FaceBitSet
 import net.minecraft.core.BlockPos
@@ -17,12 +21,13 @@ import net.minecraft.world.level.storage.ValueOutput
 import net.neoforged.fml.LogicalSide
 
 /**
- * Network of connected power conduits. Each tick it distributes power between the wired leaves attached to its
- * conduits (each block once, and each multiblock once). Port of v3's `WiredPowerNetwork`.
+ * Network of connected power conduits: an ItszuLib [DistributingTileNetwork], which each tick distributes power between
+ * the wired leaves attached to its conduits (each block once, and each multiblock once). Port of v3's
+ * `WiredPowerNetwork`.
  *
  * Difference from v3: a failure while distributing is no longer swallowed (v3 caught every `Throwable`).
  */
-class WiredPowerNetwork(id: Int) : TileNetwork<WiredPowerConduit, WiredPowerNetwork>(id, LogicalSide.SERVER) {
+class WiredPowerNetwork(id: Int) : DistributingTileNetwork<WiredPowerConduit, WiredPowerNetwork>(id, LogicalSide.SERVER) {
     override fun networkModule(): IModule<WiredPowerConduit> = PowerModules.WIRED_CONDUIT
 
     override fun create(): WiredPowerNetwork = WiredPowerNetwork(WirelessPowerNetwork.nextId())
@@ -37,15 +42,6 @@ class WiredPowerNetwork(id: Int) : TileNetwork<WiredPowerConduit, WiredPowerNetw
         }
         return seen.values
     }
-
-    override fun onTickEnd() {
-        val leaves = leaves()
-        DistributionAlgorithm(
-            leaves.filter { it.powerType == PowerStorageNodeType.PRODUCER }.map { DistributableBattery(it.battery, it::transferRate) },
-            leaves.filter { it.powerType == PowerStorageNodeType.STORAGE }.map { DistributableBattery(it.battery, it::transferRate) },
-            leaves.filter { it.powerType == PowerStorageNodeType.CONSUMER }.map { DistributableBattery(it.battery, it::transferRate) },
-        ).distribute()
-    }
 }
 
 /**
@@ -55,7 +51,7 @@ class WiredPowerNetwork(id: Int) : TileNetwork<WiredPowerConduit, WiredPowerNetw
  * Faces attached to a leaf are saved and synced (key `Leaf`) for the conduit's model.
  */
 class WiredPowerConduit(val tier: ConduitTier) :
-    FragNetworkedWire<WiredPowerConduit, WiredPowerNetwork>({ WiredPowerNetwork(WirelessPowerNetwork.nextId()) }) {
+    FragNetworkedWire<WiredPowerConduit, WiredPowerNetwork>({ WiredPowerNetwork(WirelessPowerNetwork.nextId()) }), IDistributionNode {
     @JvmField
     val leafFaces = FaceBitSet()
 
@@ -83,6 +79,16 @@ class WiredPowerConduit(val tier: ConduitTier) :
         val leaf = be.getModule(PowerModules.WIRED_LEAF, face.opposite) ?: return@mapNotNull null
         val key: Any = be.getModule(Modules.MULTIBLOCK_MEMBER, null)?.membership?.structureId ?: be.getBlockPos()
         key to leaf
+    }
+
+    override fun distributionParticipants(): Sequence<DistributionParticipant> = attachedLeaves().asSequence().mapNotNull { (key, leaf) ->
+        val role = when (leaf.powerType) {
+            PowerStorageNodeType.PRODUCER -> DistributionRole.PRODUCER
+            PowerStorageNodeType.STORAGE -> DistributionRole.STORAGE
+            PowerStorageNodeType.CONSUMER -> DistributionRole.CONSUMER
+            PowerStorageNodeType.NONE -> return@mapNotNull null
+        }
+        DistributionParticipant(key, role, DistributableBattery(leaf.battery, leaf::transferRate))
     }
 
     /**

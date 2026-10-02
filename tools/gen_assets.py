@@ -124,6 +124,7 @@ ITEMS = {
     # name: (display name, texture); block items are generated from BLOCKS. A texture "block:<name>" uses that block
     # model; None means a special model below.
     "power_crystal": ("Power Crystal", None),
+    "codex": ("Archive Codex", "codex"),
     "crackling_dust": ("Crackling Dust", "dust_crystal"),
     "riftiron_dust": ("Riftiron Dust", "dust_riftiron"),
     "phasemetal_dust": ("Phasemetal Dust", "dust_phasemetal"),
@@ -163,6 +164,7 @@ PLACEHOLDERS = {
     "block/crystal_crusher_front": ((0, 0, 0, 0), (140, 140, 160, 255)),
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
+    "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
 }
 
 LANG = {
@@ -210,6 +212,9 @@ LANG = {
     "gui.femtocraft.archive.status.unavailable": "That technology cannot be researched now",
     "gui.femtocraft.archive.host": "Your Archive nanites: %s / %s",
     "gui.femtocraft.archive.not_host": "You are not a nanite host. Touch a crystal cluster.",
+    "hud.femtocraft.host.nanites": "Archive nanites %s / %s",
+    "hud.femtocraft.host.regrowing": "Regrowing",
+    "hud.femtocraft.host.hungry": "Too hungry to regrow",
     "tooltip.femtocraft.none": "none",
     "gui.femtocraft.conduit.mode": "Mode",
     "gui.femtocraft.conduit.interface": "Side",
@@ -307,6 +312,7 @@ RECIPES = {
     "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
     "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
     "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "codex": shapeless(["minecraft:book", f"{NS}:crackling_dust"], f"{NS}:codex"),
     "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:frame"),
     "logistics_fluid_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:lapisreplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_fluid_chip_basic", 8),
     "logistics_item_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_item_chip_basic", 8),

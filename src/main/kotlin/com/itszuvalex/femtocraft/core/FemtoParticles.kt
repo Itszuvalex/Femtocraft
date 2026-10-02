@@ -62,6 +62,22 @@ object FemtoParticles {
         repeat(20) { sendNanite(level, around(start), randomColor(random, 100), velocity) }
     }
 
+    /**
+     * A stream of [count] nanites flowing from around [from] to [to] (a host feeding a machine, say). Each starts at
+     * the velocity that the particle's drag (0.96 a tick) brings to rest at [to], so they settle on the target over
+     * their three-second life rather than overshooting.
+     */
+    fun naniteFlow(level: ServerLevel, from: Vec3, to: Vec3, color: Int, count: Int = 6) {
+        val random = level.random
+        repeat(count) {
+            val start = from.add((random.nextDouble() - .5) * .4, (random.nextDouble() - .5) * .4, (random.nextDouble() - .5) * .4)
+            sendNanite(level, start, color, to.subtract(start).scale(1.0 - NANITE_FRICTION))
+        }
+    }
+
+    /** The nanite particle's drag (`FemtoParticleProviders.NaniteParticle`). */
+    const val NANITE_FRICTION = 0.96
+
     private const val OPAQUE = 0xFF000000.toInt()
 
     /**

@@ -1,6 +1,7 @@
 package com.itszuvalex.femtocraft.archive
 
 import com.itszuvalex.femtocraft.FemtoRegistries
+import com.itszuvalex.femtocraft.core.FemtoParticles
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteStack
 import com.itszuvalex.femtocraft.nanite.PlayerNanites
@@ -12,6 +13,7 @@ import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.attachment.AttachmentType
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.tick.PlayerTickEvent
@@ -113,6 +115,21 @@ object NaniteHost {
         if (drained.amount > 0) PlayerNanites.save(player, tank)
         return drained.amount
     }
+
+    /**
+     * Takes up to [amount] Archive nanites from [player] for a consumer at [target] and shows them flowing there
+     * ([FemtoParticles.naniteFlow]), as any machine fed by a host should.
+     *
+     * @return Nanites taken.
+     */
+    fun drawTo(player: Player, amount: Int, level: ServerLevel, target: Vec3): Int {
+        val taken = draw(player, amount)
+        if (taken > 0) FemtoParticles.naniteFlow(level, player.position().add(0.0, player.bbHeight * .6, 0.0), target, ARCHIVE_COLOR, 4 + 2 * taken)
+        return taken
+    }
+
+    /** Colour of Archive nanites in the world. */
+    const val ARCHIVE_COLOR = 0x5AE6FF
 
     /**
      * Hosts within [radius] blocks of [center] that carry Archive nanites, nearest first.

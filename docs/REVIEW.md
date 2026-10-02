@@ -13,7 +13,7 @@ on the old behaviour.
 |---|---|---|---|---|
 | F1 | Crystal charging/storage array, heat exchanger | Drained the crystal's full transfer rate into the battery and clamped the battery, destroying whatever did not fit | Only what fits is drained (`drainCrystalInto`) | game test `charging_array_full_battery_keeps_crystal_power` |
 | F2 | `WirelessPowerManager.addNode` | A node in range of two networks was added to each in turn; adding it to the second removed it from the first, so the networks never merged | Joins one network, then connects to the others (merging them) | game test `mount_bridging_two_networks_merges_them` |
-| F3 | `DistributionAlgorithm` | Removed power from the source before adding it to the sink and ignored how much the sink accepted | Removes only what the sink accepted | `DistributionAlgorithmTest.Distribute_SinkAcceptsLess_SourceKeepsTheRest` |
+| F3 | `DistributionAlgorithm` | Removed power from the source before adding it to the sink and ignored how much the sink accepted | Removes only what the sink accepted | ItszuLib `DistributionAlgorithmTests.Distribute_SinkAcceptsLess_SourceKeepsTheRest` |
 | F4 | `MinimalSpanningTree` | A Prim-style walk that revisited nodes and threw (`.get` on an empty search) on graphs it could not finish | Kruskal with union-find; disconnected parts get their own trees | `MinimalSpanningTreeTest.Calculate_Disconnected_GivesForest` |
 | F5 | `WirelessPowerNetwork` statistics | Read `changeForLastTick`, which every node left at `0 // TODO`, so the network screen always showed zeros | Counts the power the distribution moved | game test `wireless_network_distributes_power` |
 | F6 | `StorageUtils` (ItszuLib 1.12.2, used by frames) | Never compared items, so any ten items started a germination chamber build | Items are compared (ItszuLib R16) | game test `frame_ignores_wrong_items` |
@@ -48,4 +48,6 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 ## Framework changes
 
 Changes made to ItszuLib for Femtocraft are listed in `../ItszuLib/docs/REVIEW.md` (the fixed list) and its
-DECISIONS: `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port. The frame multiblocks moved onto ItszuLib's controller-less multiblocks with home-held state (ItszuLib DECISIONS D11), which also closed ItszuLib O3: a chamber straddling a chunk boundary keeps its state reachable from every block.
+DECISIONS: `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port. The frame multiblocks moved onto ItszuLib's controller-less multiblocks with home-held state (ItszuLib DECISIONS D11), which also closed ItszuLib O3: a chamber straddling a chunk boundary keeps its state reachable from every block. The power distribution algorithm
+(F3's fix included) moved into ItszuLib as `DistributionAlgorithm` with `DistributingTileNetwork` (ItszuLib DECISIONS
+D15); its unit tests moved with it.

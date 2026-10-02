@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.archive.ArchiveContent
 import com.itszuvalex.femtocraft.archive.ArchiveMenu
+import com.itszuvalex.femtocraft.archive.CodexMenu
 import com.itszuvalex.femtocraft.archive.NaniteHost
 import com.itszuvalex.itszulib.client.screen.TechTreeView
 import com.itszuvalex.itszulib.menu.MenuActionPayload
@@ -56,5 +57,22 @@ class ArchiveScreen(menu: ArchiveMenu, inventory: Inventory, title: Component) :
         const val WIDTH = 256
         const val HEIGHT = 210
         const val TREE_HEIGHT = 136
+    }
+}
+
+/**
+ * The Archive Codex: Femtocraft's tech tree, read-only, with the player's team's progress in the tooltips.
+ */
+class CodexScreen(menu: CodexMenu, inventory: Inventory, title: Component) : FemtoScreen<CodexMenu>(menu, inventory, title, ArchiveScreen.WIDTH, HEIGHT) {
+    override fun addComponents() {
+        addComponent(TechTreeView(ArchiveScreen.WIDTH - 16, HEIGHT - 26, ArchiveContent.TREE), 8, 18)
+    }
+
+    override fun extractLabels(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        graphics.text(font, title, titleLabelX, titleLabelY, TEXT, false)
+    }
+
+    companion object {
+        const val HEIGHT = 186
     }
 }

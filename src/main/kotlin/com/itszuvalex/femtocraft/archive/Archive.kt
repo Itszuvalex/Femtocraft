@@ -90,11 +90,11 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
     }
 
     /**
-     * One research step; [hosts] are the candidate hosts, nearest first.
+     * One research step; [hosts] are the candidate hosts, nearest first, and [center] is where drawn nanites flow to.
      *
      * @return The progress made.
      */
-    fun step(level: ServerLevel, hosts: List<Player>): Long {
+    fun step(level: ServerLevel, hosts: List<Player>, center: net.minecraft.world.phys.Vec3 = net.minecraft.world.phys.Vec3.ZERO): Long {
         val tech = technology
         val team = team
         if (tech == null || team == null) {
@@ -115,7 +115,7 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
         }
         if (points < RATE) {
             val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team }
-            if (host != null && NaniteHost.draw(host, 1) == 1) {
+            if (host != null && NaniteHost.drawTo(host, 1, level, center) == 1) {
                 points += POINTS_PER_NANITE
                 onChanged.run()
             }
@@ -180,7 +180,8 @@ class ArchiveBlockEntity(pos: BlockPos, state: BlockState) :
                 val server = level.toMinecraft() as? ServerLevel ?: return
                 if (server.gameTime % ArchiveState.STEP_TICKS != 0L) return
                 val state = instance.state as? ArchiveState ?: return
-                state.step(server, NaniteHost.nearbyHosts(server, instance.anchorPos.offset(1, 1, 1), ArchiveState.RADIUS))
+                val center = instance.anchorPos.offset(1, 1, 1)
+                state.step(server, NaniteHost.nearbyHosts(server, center, ArchiveState.RADIUS), center.center)
             }
         })
     }
@@ -250,6 +251,8 @@ object ArchiveContent {
     @JvmField val ARCHIVE = R.BLOCKS.registerBlock("archive", ::ArchiveBlock, UnaryOperator { it.strength(2f).sound(SoundType.METAL).requiresCorrectToolForDrops() })
     @JvmField val ARCHIVE_BE = R.blockEntity("archive", ::ArchiveBlockEntity, ARCHIVE::get)
     @JvmField val ARCHIVE_MENU = R.blockMenu<ArchiveBlockEntity, ArchiveMenu>("archive", ::ArchiveMenu)
+    @JvmField val CODEX = R.ITEMS.registerItem("codex", ::CodexItem, UnaryOperator { it.stacksTo(1) })
+    @JvmField val CODEX_MENU = R.MENUS.register("codex") { -> net.minecraft.world.inventory.MenuType(::CodexMenu, net.minecraft.world.flag.FeatureFlags.VANILLA_SET) }
 
     /**
      * 27 frames plus a first offering: crackling dust from crystal clusters and glass. Placeholder costs.

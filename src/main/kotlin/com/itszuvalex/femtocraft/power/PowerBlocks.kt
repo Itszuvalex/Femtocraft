@@ -391,6 +391,18 @@ class PowerConduitBlock(properties: BlockBehaviour.Properties) :
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) = ConduitArms.addProperties(builder)
 
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ConduitArms.shape(state)
+
+    /**
+     * A power particle somewhere inside the conduit and its arms, in its tier's colour, as the 1.7.10 alpha's cables
+     * gave off (`BlockMicroCable.randomDisplayTick`).
+     */
+    override fun animateTick(state: BlockState, level: Level, pos: BlockPos, random: net.minecraft.util.RandomSource) {
+        val tier = (level.getBlockEntity(pos) as? PowerConduitBlockEntity)?.conduit?.tier ?: return
+        val box = ConduitArms.shape(state).bounds()
+        level.addParticle(com.itszuvalex.femtocraft.core.FemtoParticles.power(tier.particleColor),
+            pos.x + box.minX + random.nextDouble() * box.xsize, pos.y + box.minY + random.nextDouble() * box.ysize, pos.z + box.minZ + random.nextDouble() * box.zsize,
+            0.0, 0.0, 0.0)
+    }
 }
 
 class PowerConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(PowerContent.POWER_CONDUIT_BE.get(), pos, state) {

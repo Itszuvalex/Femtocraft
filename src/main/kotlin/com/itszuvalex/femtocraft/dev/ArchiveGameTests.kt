@@ -5,6 +5,7 @@ import com.itszuvalex.femtocraft.archive.ArchiveBlockEntity
 import com.itszuvalex.femtocraft.archive.ArchiveContent
 import com.itszuvalex.femtocraft.archive.ArchiveMenu
 import com.itszuvalex.femtocraft.archive.ArchiveStatus
+import com.itszuvalex.femtocraft.archive.CodexMenu
 import com.itszuvalex.femtocraft.archive.NaniteHost
 import com.itszuvalex.femtocraft.worldgen.WorldgenContent
 import com.itszuvalex.itszulib.ItszuLib
@@ -15,7 +16,9 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.resources.Identifier
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.phys.BlockHitResult
 import java.util.UUID
@@ -37,6 +40,8 @@ object ArchiveGameTests {
         DevGameTests.test("nanite_host_regenerates_archive_nanites", body = ::regenerates)
         DevGameTests.test("archive_researches_with_host_nanites", body = ::researches)
         DevGameTests.test("archive_menu_chooses_only_available_technologies", body = ::menuChoose)
+        DevGameTests.test("codex_opens_the_tech_tree", body = ::codexOpens)
+        DevGameTests.test("host_draw_to_takes_nanites_for_a_consumer", body = ::drawTo)
     }
 
     private fun player(helper: GameTestHelper): Pair<Player, UUID> {
@@ -131,6 +136,25 @@ object ArchiveGameTests {
         helper.assertTrue(menu.handleAction(player, ArchiveMenu.ACTION_CHOOSE, ArchiveMenu.networkId(access, METALLURGY)), "available chosen")
         helper.assertTrue(be.state()!!.technology == METALLURGY, "chosen")
         helper.assertTrue(ArchiveMenu.byNetworkId(access, ArchiveMenu.networkId(access, METALLURGY)) == METALLURGY, "network id round trip")
+        helper.succeed()
+    }
+
+    private fun codexOpens(helper: GameTestHelper) {
+        val player = helper.makeMockServerPlayerInLevel()
+        val stack = ItemStack(ArchiveContent.CODEX.get())
+        player.setItemInHand(InteractionHand.MAIN_HAND, stack)
+        stack.use(helper.level, player, InteractionHand.MAIN_HAND)
+        helper.assertTrue(player.containerMenu is CodexMenu, "codex menu open, got ${player.containerMenu}")
+        helper.succeed()
+    }
+
+    private fun drawTo(helper: GameTestHelper) {
+        val (player, _) = player(helper)
+        NaniteHost.contact(player)
+        val taken = NaniteHost.drawTo(player, 3, helper.level, helper.absolutePos(AT).center)
+        helper.assertValueEqual(taken, 3, "taken")
+        helper.assertValueEqual(NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP - 3, "left")
+        helper.assertValueEqual(NaniteHost.drawTo(player, 100, helper.level, helper.absolutePos(AT).center), NaniteHost.REGEN_CAP - 3, "only what is there")
         helper.succeed()
     }
 }

@@ -28,7 +28,8 @@ object FemtoParticleProviders {
     }
 
     /**
-     * A short spark: eight frames over 8 to 40 ticks, drifting slowly; its color varies 0.64-1x per particle (v3).
+     * A short spark: eight frames over 8 to 40 ticks, drifting slowly. Each channel varies 0.8-1x and the whole
+     * particle 0.6-1x, as the 1.7.10 alpha's `EntityFxPower` (v3 narrowed the shade to 0.8-1x).
      */
     class PowerParticle(level: ClientLevel, x: Double, y: Double, z: Double, xd: Double, yd: Double, zd: Double, private val sprites: SpriteSet) :
         SingleQuadParticle(level, x, y, z, xd, yd, zd, sprites.first()) {
@@ -44,7 +45,7 @@ object FemtoParticleProviders {
         }
 
         override fun setColor(r: Float, g: Float, b: Float) {
-            val shade = random.nextFloat() * .2f + .8f
+            val shade = random.nextFloat() * .4f + .6f
             super.setColor((random.nextFloat() * .2f + .8f) * r * shade, (random.nextFloat() * .2f + .8f) * g * shade, (random.nextFloat() * .2f + .8f) * b * shade)
         }
 
@@ -70,7 +71,7 @@ object FemtoParticleProviders {
             this.xd = xd
             this.yd = yd
             this.zd = zd
-            friction = .96f
+            friction = FemtoParticles.NANITE_FRICTION.toFloat()
             gravity = 0f
             hasPhysics = false
             lifetime = 60

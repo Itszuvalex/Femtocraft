@@ -1,5 +1,7 @@
 package com.itszuvalex.femtocraft.power
 
+import com.itszuvalex.itszulib.core.DistributableBattery
+import com.itszuvalex.itszulib.core.DistributionAlgorithm
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.adapters.IModule

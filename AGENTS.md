@@ -145,9 +145,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 
 - **Power** (internal, no Forge Energy; DECISIONS D10). Wireless: `FragWirelessPowerNode` (crystal mounts) join
   `WirelessPowerNetwork`s by range through `WirelessPowerManager`; leaf fragments (arrays, heat exchanger, machines)
-  attach to the nearest node. Each tick a network distributes power over its minimal spanning tree
-  (`DistributionAlgorithm`). Wired: `WiredPowerConduit` is an ItszuLib `FragNetworkedWire`; `FragWiredPowerLeafNode`
-  machines connect to adjacent conduits. Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
+  attach to the nearest node. Each tick a network distributes power over its minimal spanning tree (ItszuLib's
+  `DistributionAlgorithm`, ItszuLib DECISIONS D15). Wired: `WiredPowerNetwork` is an ItszuLib
+  `DistributingTileNetwork` and `WiredPowerConduit` an ItszuLib `FragNetworkedWire` and `IDistributionNode`, whose
+  participants are the `FragWiredPowerLeafNode` machines on its faces (keyed by block or multiblock, so each counts
+  once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours). Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
   `femtocraft:power_crystal` component.
 - **Machines**: `ProcessingMachineBlockEntity` holds an `ItemStorageArray` behind ItszuLib sided configuration, item
   auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).
@@ -168,8 +170,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   (`NaniteHost.contact`: a synced, death-surviving attachment plus 10 Archive nanites); a fed host regrows Archive
   nanites to 10, costing hunger. The Archive (`ArchiveContent.MULTIBLOCK`, a frame multiblock) researches the technology
   chosen in its screen for the chooser's team: once a second it draws an Archive nanite from that team's nearest host
-  within 8 blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Gate content with
-  `TechTree.isResearched(player, id)`.
+  within 8 blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Machines fed by a host take nanites
+  with `NaniteHost.drawTo(player, amount, level, target)`, which shows them flowing to the target
+  (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`) opens the tree read-only anywhere. Hosts see
+  their status at the top left (`client/HostOverlay`; other systems add lines with `HostOverlay.addLine`). Gate content
+  with `TechTree.isResearched(player, id)`.
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
   in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
   operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how

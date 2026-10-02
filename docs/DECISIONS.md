@@ -196,3 +196,24 @@ progress, and to start with the player as a nanite host carrying the absolute ti
   what is built by hand and with crystals, Nano for what nanites do, Femto for reality-bending endgame; or nanite tiers
   only); scanning as a research source (for example scanning chunks with Archive nanites); what research unlocks.
 
+## D16. Host status, the Archive Codex, visible nanite flow — DECIDED (maintainer, 2026-10-02)
+
+Follow-ups to D15, asked for by the maintainer:
+
+- **Host status.** A host sees their Archive nanites against what their body keeps stocked, as a bar at the top left,
+  with "Regrowing" or "Too hungry to regrow" while below it (`client/HostOverlay`). Bonuses and other host details will
+  add lines to it (`HostOverlay.addLine`).
+- **The Archive Codex** (book + crackling dust) opens the tech tree anywhere, read-only. Research is still chosen at
+  an Archive.
+- **Visible nanite flow.** A machine fed by a host draws through `NaniteHost.drawTo`, which sends a stream of Archive
+  nanite particles from the host to the machine; each particle's velocity is set so its drag brings it to rest on the
+  target. The Archive uses it; future host-fed machines should too.
+- **The 1.7.10 alpha's power particle.** The alpha's (Femtocraft-alpha-1) particle sheet holds only the power
+  particle, and its eight frames are the ones v3 inherited and the port already used. What was missing was where the
+  alpha emitted it: its cables gave off power particles in their tier's colour (Micro blue, Nano green, Femto orange).
+  Power conduits now do (`ConduitTier.particleColor`), and the particle's brightness varies 0.6-1x again, as in the
+  alpha (v3 had narrowed it).
+- **Distribution moved to ItszuLib.** The power distribution algorithm (with its F3 fix) is now ItszuLib's
+  resource-agnostic `DistributionAlgorithm`, and the wired power network is an ItszuLib `DistributingTileNetwork`
+  (ItszuLib DECISIONS D15), so computation can reuse it. The minimal spanning tree stays here.
+
