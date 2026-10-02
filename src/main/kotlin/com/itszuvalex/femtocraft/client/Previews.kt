@@ -47,11 +47,25 @@ object Previews {
         }
 
         held.firstOrNull { it.item is ShiftItem }?.let {
-            val dest = ShiftItem.destination(level, player) ?: return@let
-            val w = player.bbWidth / 2.0
-            val box = AABB(dest.x + .5 - w, dest.y.toDouble(), dest.z + .5 - w, dest.x + .5 + w, dest.y + player.bbHeight.toDouble(), dest.z + .5 + w)
-            lines(event, camera, listOf(box to SHIFT))
+            val dest = shiftDestination(player, level) ?: return@let
+            lines(event, camera, listOf(player.boundingBox.move(dest.subtract(player.position())) to SHIFT))
         }
+    }
+
+    private var shiftKey: Triple<Long, Vec3, Vec3>? = null
+    private var shiftDest: Vec3? = null
+
+    /**
+     * [ShiftItem.destination], recomputed only when the tick, position or look changes (it can take a thousand
+     * collision checks when the way is blocked).
+     */
+    private fun shiftDestination(player: net.minecraft.world.entity.player.Player, level: net.minecraft.world.level.Level): Vec3? {
+        val key = Triple(level.gameTime, player.position(), player.lookAngle)
+        if (key != shiftKey) {
+            shiftKey = key
+            shiftDest = ShiftItem.destination(level, player)
+        }
+        return shiftDest
     }
 
     private fun hasFrames(player: net.minecraft.world.entity.player.Player, stack: ItemStack, needed: Int) =
