@@ -26,8 +26,11 @@ class CrystalMountScreen(menu: CrystalMountMenu, inventory: Inventory, title: Co
 }
 
 class CrystalMachineScreen(menu: CrystalMachineMenu, inventory: Inventory, title: Component) : FemtoScreen<CrystalMachineMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        powerMeter(graphics, mouseX, mouseY, 8, 18, menu.battery)
         text(graphics, Component.translatable("gui.femtocraft.power_per_tick", fmt1(menu.powerPerTick)), 22, 8 + 64)
         if (menu.blockEntity is CrystalHeatExchangerBlockEntity) {
             progress(graphics, 120, 64, 48, 4, if (menu.burnMax <= 0) 0.0 else menu.burnTime.toDouble() / menu.burnMax, 0xFFFF8833.toInt())

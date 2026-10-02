@@ -5,9 +5,7 @@ import com.itszuvalex.femtocraft.FemtoSounds
 import com.itszuvalex.itszulib.api.Modules
 import com.itszuvalex.itszulib.api.adapters.IBlockEntity
 import com.itszuvalex.itszulib.api.adapters.IModule
-import com.itszuvalex.itszulib.api.utility.DirectionUtil
 import com.itszuvalex.itszulib.core.BlockEntityCore
-import com.itszuvalex.itszulib.core.EnumAutomaticIO
 import com.itszuvalex.itszulib.core.SidedStorageConfiguration
 import com.mojang.serialization.Codec
 import net.minecraft.ChatFormatting
@@ -94,19 +92,11 @@ class ConfiguratorItem(properties: Properties) : Item(properties) {
         fun configModule(mode: ConfiguratorMode): IModule<SidedStorageConfiguration<*>>? = MODULES[mode] as IModule<SidedStorageConfiguration<*>>?
 
         /**
-         * v3's cycling: forward cycles IO and, when it wraps to NONE, the storage; backward cycles IO back and, when it
-         * lands on OUTPUT (wrapped from NONE), the storage back.
+         * v3's cycling (ItszuLib's [SideConfigCyclers.IO_THEN_STORAGE]): forward cycles IO and, when it wraps to NONE,
+         * the storage; backward cycles IO back and, when it lands on OUTPUT (wrapped from NONE), the storage back.
          */
-        fun cycle(config: SidedStorageConfiguration<*>, face: net.minecraft.core.Direction, backward: Boolean) {
-            val relative = DirectionUtil.getHorizontalRelativeDirectionFromAbsolute(face, config.front())
-            if (backward) {
-                config.cycleRelativeFacingIOBackward(relative)
-                if (config.getIOForAbsoluteFacing(face) == EnumAutomaticIO.OUTPUT) config.cycleRelativeFacingStorageBackward(relative)
-            } else {
-                config.cycleRelativeFacingIOForward(relative)
-                if (config.getIOForAbsoluteFacing(face) == EnumAutomaticIO.NONE) config.cycleRelativeFacingStorageForward(relative)
-            }
-        }
+        fun cycle(config: SidedStorageConfiguration<*>, face: net.minecraft.core.Direction, backward: Boolean) =
+            com.itszuvalex.itszulib.menu.SideConfigCyclers.IO_THEN_STORAGE.cycle(config, face, backward)
     }
 }
 

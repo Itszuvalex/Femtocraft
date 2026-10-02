@@ -96,8 +96,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          modules/capabilities) and blockMenu() helpers
 ├── FemtoSounds.kt         v3's three sounds
 ├── core/                  FemtoBlockEntity (serverTick/clientTick/onUse/onPlaced), FemtoEntityBlock and
-│                          FemtoHorizontalEntityBlock, FemtoMenu (BatteryView sync, ACTION_CONFIGURE;
-│                          subclasses override handleScreenAction), FragData, FragExpose,
+│                          FemtoHorizontalEntityBlock, FemtoMenu (ItszuLib side configuration with the
+│                          configurator's modes), FragData, FragExpose,
 │                          FragDerivedColor, Loc4 helpers
 ├── power/                 Power API (modules, node interfaces), wireless network + manager (distribution, spanning
 │                          tree), wired network on ItszuLib FragNetworkedWire, power fragments, power crystal item
@@ -112,12 +112,11 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          indexed item storages (storage/)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
-├── client/                FemtoScreen (plain functional screens, plus SideConfigView's 3D side configuration panel
-│                          for machines with a sided configuration) and each area's screens; fluid model and entity
-│                          renderer registration. Client only.
+├── client/                FemtoScreen (plain functional screens on ItszuLib's ComponentScreen: power gauges, the 3D
+│                          side configuration panel behind the "IO" tab) and each area's screens; fluid model and
+│                          entity renderer registration. Client only.
 └── dev/                   Game tests (one object per area), registered only outside production
-src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree, distributed task manager, side
-                           configuration panel geometry)
+src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree, distributed task manager)
 src/main/resources/        assets (v3 textures under 26.1 paths, generated models/lang) and data (generated), plus
                            data/femtocraft/structure/test_area.nbt (empty 9x5x9 game test structure)
 tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,

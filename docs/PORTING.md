@@ -171,17 +171,15 @@ looking (the footprint and each block), green where it fits and the player has t
 machine's model tinted the same way); a shift device outlines the player-sized spot it would teleport to.
 
 **Pass 7 (done, first version): the 3D side configuration panel** (not in v3; REVIEW O8, after Ender IO's IO
-configuration view). Every machine screen whose block entity has a sided configuration (item, fluid or nanite) shows a
-panel to its right (`client/SideConfigView.kt`): the machine in the middle and its six neighbours pulled out around it
-at half size, drawn from their block models (a block drawn only by a block entity renderer, such as a chest, is a faint
-box), with each machine face shaded by its automatic IO (blue pulls in, orange pushes out). Drag to rotate (it starts
-with the front towards the player); hover a face for its direction, IO and storage; click a face, or the neighbour on
-that side, to cycle it as the configurator does (shift cycles backwards); the button under the panel switches between
-the configurations the machine has. Clicks send `FemtoMenu.ACTION_CONFIGURE`; the panel reads the configuration from
-the client block entity, which syncs it. It is a NeoForge picture-in-picture renderer (`SideConfigRenderer`): the
-texture's pose has y down and z away, so the panel turns it half a turn about x first. `-Pshowcase=10` opens a crystal
-liquifier's screen with a conduit, a chest and blocks around it (checked headless; hovering and dragging were not,
-since the headless client has no mouse input).
+configuration view). Built here first, then moved into ItszuLib (its DECISIONS D12) as screen components: `FemtoScreen`
+is an ItszuLib `ComponentScreen`, and every `FemtoMenu` enables ItszuLib's side configuration with the configurator's
+modes (item, fluid, nanite; `FemtoMenu.sideConfigModes`) and the configurator's cycling (`IO_THEN_STORAGE`). A machine
+screen with a sided configuration gets an "IO" tab beside it that opens the panel: the machine and its six neighbours
+pulled out around it, faces shaded by automatic IO (blue pulls in, orange pushes out), drag to rotate, hover for a
+face's direction, IO and storage, click a face or its neighbour to cycle it (shift cycles backwards), and a button to
+switch mode. Power meters are ItszuLib `EnergyGauge`s (`FemtoScreen.addPowerGauge`) over `MenuCore.syncEnergy`.
+`-Pshowcase=10` opens a crystal liquifier's screen, with its panel, between a conduit, a chest and blocks (checked
+headless; hovering, dragging and clicking were not, since the headless client has no mouse input).
 
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block

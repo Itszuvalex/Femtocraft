@@ -17,8 +17,11 @@ import net.minecraft.world.level.material.Fluids
 import net.neoforged.neoforge.fluids.FluidStack
 
 class MachineScreen(menu: MachineMenu, inventory: Inventory, title: Component) : FemtoScreen<MachineMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        powerMeter(graphics, mouseX, mouseY, 8, 18, menu.battery)
         progress(graphics, 79, 40, 24, 6, menu.progress)
         if (menu.blockEntity is CrystalLiquifierBlockEntity) {
             graphics.fill(leftPos + 151, topPos + 17, leftPos + 169, topPos + 71, SLOT)
@@ -29,8 +32,11 @@ class MachineScreen(menu: MachineMenu, inventory: Inventory, title: Component) :
 }
 
 class GerminationChamberScreen(menu: GerminationChamberMenu, inventory: Inventory, title: Component) : FemtoScreen<GerminationChamberMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        powerMeter(graphics, mouseX, mouseY, 8, 18, menu.battery)
         progress(graphics, 66, 40, 24, 6, menu.progress)
         val water = FluidStack(Fluids.WATER, menu.water)
         graphics.fill(leftPos + 151, topPos + 17, leftPos + 169, topPos + 71, SLOT)

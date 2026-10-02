@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Inventory
 class MachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMachineBlockEntity?) :
     FemtoMenu<ProcessingMachineBlockEntity>(IndustryContent.MACHINE_MENU.get(), containerId, inventory, be) {
     @JvmField
-    val battery = FemtoMenu.BatteryView()
+    var battery = com.itszuvalex.itszulib.menu.EnergyView()
 
     var progress = 0.0
     var tank: IFluidStack = IFluidStack.Empty
@@ -35,7 +35,7 @@ class MachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMachineB
         }
         addPlayerInventorySlots(inventory)
         if (be != null) {
-            syncBattery({ be.battery }, battery)
+            battery = syncEnergy { be.battery }
             addSync(MenuSyncs.double(be::progressFraction) { progress = it })
             if (be is CrystalLiquifierBlockEntity) addSync(MenuSyncs.fluid(object : com.itszuvalex.itszulib.api.storage.FluidStorageArray(1, 1) {
                 override fun get(index: Int): IFluidStack = be.tank.get(0)
@@ -57,7 +57,7 @@ class MachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMachineB
 class GerminationChamberMenu(containerId: Int, inventory: Inventory, be: GerminationChamberBlockEntity?) :
     FemtoMenu<GerminationChamberBlockEntity>(IndustryContent.GERMINATION_CHAMBER_MENU.get(), containerId, inventory, be) {
     @JvmField
-    val battery = FemtoMenu.BatteryView()
+    var battery = com.itszuvalex.itszulib.menu.EnergyView()
 
     var progress = 0.0
     var water = 0
@@ -68,7 +68,7 @@ class GerminationChamberMenu(containerId: Int, inventory: Inventory, be: Germina
         addStorageSlots(storage, 98, 35, first = 1, count = if (be == null) 0 else 3, output = true)
         addPlayerInventorySlots(inventory)
         if (be != null) {
-            syncBattery({ be.battery }, battery)
+            battery = syncEnergy { be.battery }
             addSync(MenuSyncs.double({ be.state()?.task?.fraction(0.0) ?: 0.0 }, { progress = it }))
             addSync(MenuSyncs.int({ be.tank.get(0).amount() }, { water = it }))
         }

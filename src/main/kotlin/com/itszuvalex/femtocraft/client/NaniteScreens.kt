@@ -19,8 +19,11 @@ class NaniteMachineScreen(menu: NaniteMachineMenu, inventory: Inventory, title: 
 
     private fun send(action: Int) = ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action, 0))
 
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        powerMeter(graphics, mouseX, mouseY, 8, 18, menu.battery)
         progress(graphics, 79, 40, 24, 6, menu.progress)
         text(graphics, Component.translatable("gui.femtocraft.nanite.tank", total(menu.tank), NaniteExtractorBlockEntity.TANK_SIZE), 22, 18)
         text(graphics, Component.translatable("gui.femtocraft.nanite.player", total(menu.playerTank)), 22, 60)

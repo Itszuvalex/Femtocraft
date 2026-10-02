@@ -20,7 +20,7 @@ import net.minecraft.world.entity.player.Player
 class NaniteMachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMachineBlockEntity?) :
     FemtoMenu<ProcessingMachineBlockEntity>(NaniteContent.NANITE_MACHINE_MENU.get(), containerId, inventory, be) {
     @JvmField
-    val battery = FemtoMenu.BatteryView()
+    var battery = com.itszuvalex.itszulib.menu.EnergyView()
 
     var progress = 0.0
     var tank: List<NaniteStack> = listOf()
@@ -38,14 +38,14 @@ class NaniteMachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMa
         }
         addPlayerInventorySlots(inventory)
         if (be != null) {
-            syncBattery({ be.battery }, battery)
+            battery = syncEnergy { be.battery }
             addSync(MenuSyncs.double(be::progressFraction) { progress = it })
             addSync(MenuSync({ (be as NaniteMachine).naniteTank.contents() }, { tank = it }, LIST))
         }
         addSync(MenuSync({ PlayerNanites.tank(inventory.player).contents() }, { playerTank = it }, LIST))
     }
 
-    override fun handleScreenAction(player: Player, action: Int, data: Int): Boolean {
+    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
         val tank = (blockEntity as? NaniteMachine)?.naniteTank ?: return false
         when (action) {
             ACTION_FILL -> PlayerNanites.fill(player, tank)

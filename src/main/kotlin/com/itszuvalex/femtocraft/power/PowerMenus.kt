@@ -67,7 +67,7 @@ class CrystalMountMenu(containerId: Int, inventory: Inventory, be: CrystalMountB
 class CrystalMachineMenu(containerId: Int, inventory: Inventory, be: CrystalMachineBlockEntity?) :
     FemtoMenu<CrystalMachineBlockEntity>(PowerContent.CRYSTAL_MACHINE_MENU.get(), containerId, inventory, be) {
     @JvmField
-    val battery = FemtoMenu.BatteryView()
+    var battery = com.itszuvalex.itszulib.menu.EnergyView()
 
     @JvmField
     val network = PowerNetworkView()
@@ -81,7 +81,7 @@ class CrystalMachineMenu(containerId: Int, inventory: Inventory, be: CrystalMach
         addStorageSlots(storage, SLOTS_X, SLOTS_Y, columns = 3)
         addPlayerInventorySlots(inventory)
         if (be != null) {
-            syncBattery({ be.battery }, battery)
+            battery = syncEnergy { be.battery }
             addSync(MenuSyncs.double(be::powerPerTick) { powerPerTick = it })
             if (be is CrystalHeatExchangerBlockEntity) {
                 addSync(MenuSyncs.int({ be.burnTime }, { burnTime = it }))
