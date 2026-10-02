@@ -5,17 +5,21 @@ import com.itszuvalex.femtocraft.core.FemtoBlockEntity
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.itszulib.api.adapters.IItemStack
 import com.itszuvalex.itszulib.api.adapters.ILevel
-import com.itszuvalex.itszulib.api.multiblock.BlockPatternStatic
-import com.itszuvalex.itszulib.api.multiblock.MultiblockStatic
+import com.itszuvalex.femtocraft.Femtocraft
+import com.itszuvalex.itszulib.api.Modules
+import com.itszuvalex.itszulib.api.multiblock.IMultiblockState
+import com.itszuvalex.itszulib.api.multiblock.MultiblockBreakPolicy
+import com.itszuvalex.itszulib.api.multiblock.MultiblockInstance
+import com.itszuvalex.itszulib.api.multiblock.MultiblockManager
+import com.itszuvalex.itszulib.api.multiblock.MultiblockRoleRef
+import com.itszuvalex.itszulib.api.multiblock.MultiblockShape
+import net.minecraft.resources.Identifier
 import com.itszuvalex.itszulib.api.storage.DynamicIItemStorage
 import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
-import com.itszuvalex.itszulib.api.utility.NBTSerializationScope
 import com.itszuvalex.itszulib.core.frag.FragMenu
-import com.itszuvalex.itszulib.core.frag.FragMultiBlockInfo
-import com.itszuvalex.itszulib.core.frag.FragMultiblockState
+import com.itszuvalex.itszulib.core.frag.FragMultiblockPart
 import com.itszuvalex.itszulib.core.frag.FragMultiblockTickable
-import com.itszuvalex.itszulib.core.frag.InternalBlockEntityFragment
 import com.itszuvalex.itszulib.core.frag.addTickableFragment
 import com.itszuvalex.itszulib.menu.MenuCore
 import com.itszuvalex.itszulib.util.StorageUtils
@@ -39,7 +43,6 @@ import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
@@ -49,7 +52,12 @@ import java.util.function.Consumer
 
 /**
  * A multiblock built from frames. Port of v3's `IFrameMultiblock`/`RectangularSimpleFrameMultiblock`: a box of
- * [size] blocks of [block], with its controller at the lowest corner, built after the frame receives [required].
+ * [size] blocks of [block], anchored (home member) at its lowest corner, built after the frame receives [required].
+ *
+ * Two ItszuLib multiblock shapes: [frameShape] for the frames while they collect resources and build (shared state
+ * [FrameState]), and [shape] for the finished machine (shared state from [state]). Both are formed explicitly (by the
+ * frame item and by finishing the build), and breaking any block destroys the rest; the shared state drops the
+ * contents.
  */
 class FrameMultiblock(
     val id: String,
@@ -57,6 +65,7 @@ class FrameMultiblock(
     val size: Triple<Int, Int, Int>,
     private val requiredItems: () -> List<ItemStack>,
     private val blockSupplier: () -> Block,
+    state: (Runnable) -> IMultiblockState,
 ) {
     val displayName: Component get() = Component.translatable("multiblock.femtocraft.$id")
 
@@ -66,20 +75,34 @@ class FrameMultiblock(
 
     val block: Block get() = blockSupplier()
 
-    fun takenLocations(controller: BlockPos): List<BlockPos> {
-        val (x, y, z) = size
-        return (0 until x).flatMap { dx -> (0 until y).flatMap { dy -> (0 until z).map { dz -> controller.offset(dx, dy, dz) } } }
-    }
+    val frameShape: MultiblockShape = MultiblockShape.register(
+        Identifier.fromNamespaceAndPath(Femtocraft.ID, "frame_$id"), MultiblockShape.box(size.first, size.second, size.third, FRAME_ROLE),
+        MultiblockBreakPolicy.DESTROY_ALL,
+    ) { FrameState(this, it) }
 
-    fun canPlaceAt(level: Level, controller: BlockPos): Boolean = takenLocations(controller).all { level.getBlockState(it).canBeReplaced() }
+    val shape: MultiblockShape = MultiblockShape.register(
+        Identifier.fromNamespaceAndPath(Femtocraft.ID, id), MultiblockShape.box(size.first, size.second, size.third, MACHINE_ROLE),
+        MultiblockBreakPolicy.DESTROY_ALL, state,
+    )
+
+    fun takenLocations(anchor: BlockPos): List<BlockPos> = shape.positions(anchor)
+
+    fun canPlaceAt(level: Level, anchor: BlockPos): Boolean = takenLocations(anchor).all { level.getBlockState(it).canBeReplaced() }
 
     /**
-     * Replaces the frames with [block] and forms the multiblock (v3's `formMultiblockWithLocsAtLoc`).
+     * Replaces the frames anchored at [anchor] with [block] and forms the machine (v3's `formMultiblockWithLocsAtLoc`).
+     * The frame structure is disbanded first, so replacing its blocks breaks nothing.
      */
-    fun formAt(level: Level, controller: BlockPos): Boolean = MultiblockBreak.suppress {
-        takenLocations(controller).forEach { level.setBlockAndUpdate(it, block.defaultBlockState()) }
-        val pattern = BlockPatternStatic(takenLocations(controller).associate { it.subtract(controller) to block })
-        MultiblockStatic(pattern).form(ILevel.of(level), controller, pattern)
+    fun formAt(level: Level, anchor: BlockPos): Boolean {
+        val lvl = ILevel.of(level)
+        lvl.getIBlockEntity(anchor)?.getModule(Modules.MULTIBLOCK_MEMBER, null)?.let { MultiblockManager.SERVER.disband(lvl, anchor, it) }
+        takenLocations(anchor).forEach { level.setBlockAndUpdate(it, block.defaultBlockState()) }
+        return MultiblockManager.SERVER.form(lvl, shape, anchor) != null
+    }
+
+    companion object {
+        const val FRAME_ROLE = "frame"
+        const val MACHINE_ROLE = "machine"
     }
 }
 
@@ -93,85 +116,58 @@ object FrameMultiblocks {
 
     @JvmField
     val GERMINATION_CHAMBER = register(FrameMultiblock("germination_chamber", setOf(BASIC), Triple(2, 3, 2),
-        { listOf(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 10)) }, { IndustryContent.GERMINATION_CHAMBER.get() }))
+        { listOf(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 10)) }, { IndustryContent.GERMINATION_CHAMBER.get() }, ::GerminationState))
 
     @JvmField
     val CRYSTAL_FOCUSING_CHAMBER = register(FrameMultiblock("crystal_focusing_chamber", setOf(BASIC), Triple(2, 2, 2),
-        { listOf() }, { IndustryContent.CRYSTAL_FOCUSING_CHAMBER.get() }))
+        { listOf() }, { IndustryContent.CRYSTAL_FOCUSING_CHAMBER.get() }, ::FocusingState))
 
     fun register(multi: FrameMultiblock): FrameMultiblock = multi.also { all += it }
 
     fun get(id: String?): FrameMultiblock? = all.firstOrNull { it.id == id }
 
+    fun all(): List<FrameMultiblock> = all
+
     fun forFrameType(type: String): List<FrameMultiblock> = all.filter { type in it.frameTypes }
+
+    /**
+     * Registers the shapes; call during mod construction, before any world loads.
+     */
+    fun init() {}
 }
 
 /**
- * Guards multiblock teardown, so the blocks it removes do not each start their own (v3's `TileFrame.shouldFullyRemove`
- * and `MultiBlockComponent` flags).
+ * Shared state of a frame structure, on its home frame. Port of v3's `TileFrameState`: a 9-slot inventory for the
+ * required resources and build progress. Breaking the structure drops the frames (keeping their selection), the
+ * inventory, and the resources if building had started.
  */
-object MultiblockBreak {
-    private var active = false
-
-    val isActive: Boolean get() = active
-
-    fun <T> suppress(action: () -> T): T {
-        val was = active
-        active = true
-        try {
-            return action()
-        } finally {
-            active = was
-        }
-    }
-}
-
-/**
- * Tears the whole multiblock down when any of its blocks is removed (server side): every other block becomes air and
- * the controller's [drops] are dropped. Port of v3's `onBlockBreak` handlers on frames and frame multiblocks.
- */
-class FragMultiblockTeardown(
-    private val info: FragMultiBlockInfo,
-    private val locations: (controller: BlockPos) -> List<BlockPos>,
-    private val drops: (level: Level, controller: BlockPos) -> List<ItemStack>,
-) : InternalBlockEntityFragment() {
-    override fun name(): String = "Teardown"
-
-    override fun onRemove(level: ILevel, pos: BlockPos, blockStatePrev: BlockState) {
-        if (MultiblockBreak.isActive) return
-        val controller = info.info.controller ?: return
-        val lvl = level.toMinecraft()
-        MultiblockBreak.suppress {
-            val toDrop = drops(lvl, controller)
-            locations(controller).filter { it != pos && lvl.isLoaded(it) }.forEach { lvl.setBlockAndUpdate(it, Blocks.AIR.defaultBlockState()) }
-            toDrop.filter { !it.isEmpty }.forEach { Block.popResource(lvl, controller, it) }
-        }
-    }
-}
-
-/**
- * Multiblock state of a frame structure, held by its controller. Port of v3's `TileFrameState`: a 9-slot inventory
- * for the required resources, the selected multiblock, and build progress.
- */
-class FrameState(onChanged: Runnable) : net.neoforged.neoforge.common.util.ValueIOSerializable {
+class FrameState(val multiblock: FrameMultiblock, onChanged: Runnable) : IMultiblockState {
     @JvmField
     val storage = ItemStorageArray(9, onChanged)
 
-    var multiblock: String = ""
     var building = false
     var progress = 0
     var ticks = 0
 
+    fun drops(): List<ItemStack> {
+        val drops = ArrayList<ItemStack>()
+        repeat(multiblock.numFrames) { drops += FrameItem.withSelection(ItemStack(IndustryContent.FRAME_ITEM.get()), multiblock.id) }
+        if (building) drops += multiblock.required()
+        for (i in 0 until storage.size()) drops += storage.get(i).toMinecraft().copy()
+        return drops.filter { !it.isEmpty }
+    }
+
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) =
+        drops().forEach { Block.popResource(level.toMinecraft(), anchor, it) }
+
     override fun serialize(output: ValueOutput) {
         storage.serialize(output.child("Storage"))
-        output.putString("Multiblock", multiblock)
         output.putBoolean("Building", building)
         output.putInt("BuildProgress", progress)
     }
 
     override fun deserialize(input: ValueInput) {
         input.child("Storage").ifPresent(storage::deserialize)
-        multiblock = input.getStringOr("Multiblock", "")
         building = input.getBooleanOr("Building", false)
         progress = input.getIntOr("BuildProgress", 0)
     }
@@ -185,70 +181,54 @@ class FrameState(onChanged: Runnable) : net.neoforged.neoforge.common.util.Value
 class FrameBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<FrameBlockEntity>(properties, { IndustryContent.FRAME_BE.get() })
 
 /**
- * One block of a frame structure. Port of v3's `TileFrame`: the controller checks its inventory for the selected
+ * One block of a frame structure. Port of v3's `TileFrame`: the structure checks its inventory for the selected
  * multiblock's resources every [FrameState.TICKS_TO_CHECK] ticks, then builds for [FrameState.BUILD_TIME] ticks and
- * replaces the frames with the multiblock. Breaking any frame removes the structure and drops the frames (keeping their
- * selection), the inventory, and the resources if building had started.
+ * replaces the frames with the multiblock. Breaking any frame removes the structure (see [FrameState]).
  */
 class FrameBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(IndustryContent.FRAME_BE.get(), pos, state) {
     @JvmField
-    val info = FragMultiBlockInfo()
+    val part = FragMultiblockPart(FrameMultiblocks.all().map { MultiblockRoleRef(it.frameShape, FrameMultiblock.FRAME_ROLE) }, autoForm = false)
 
     @JvmField
-    val frameState: FragMultiblockState<FrameState> = FragMultiblockState(info, { FrameState { markDirty() } }, { (it as? FrameBlockEntity)?.frameState })
-
-    @JvmField
-    val storage: IItemStorage = DynamicIItemStorage { frameState.get()?.storage ?: IItemStorage.Empty }
+    val storage: IItemStorage = DynamicIItemStorage { frameState()?.storage ?: IItemStorage.Empty }
 
     init {
-        fragList.addFragment(info)
-        fragList.addInternalFragment(frameState)
-        fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.frame"), { id, inv, _ -> FrameMenu(id, inv, this) }, info))
-        fragList.addInternalFragment(FragMultiblockTeardown(info, ::locations, ::teardownDrops))
-        fragList.addTickableFragment(object : FragMultiblockTickable(info.info) {
+        fragList.addFragment(part)
+        fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.frame"), { id, inv, _ -> FrameMenu(id, inv, this) }, part))
+        fragList.addTickableFragment(object : FragMultiblockTickable(part) {
             override fun name(): String = "FrameBuild"
-            override fun serverControllerTick(level: ILevel, pos: BlockPos) = buildTick(level.toMinecraft(), pos)
+            override fun serverStructureTick(level: ILevel, instance: MultiblockInstance) = buildTick(level.toMinecraft(), instance)
         })
     }
 
-    fun multiblock(): FrameMultiblock? = FrameMultiblocks.get(frameState.get()?.multiblock)
+    /**
+     * The frame structure's shared state (null while not formed, or while its home frame's chunk loads).
+     */
+    fun frameState(): FrameState? = part.sharedState() as? FrameState
 
-    private fun locations(controller: BlockPos): List<BlockPos> = controllerEntity(controller)?.multiblock()?.takenLocations(controller) ?: listOf()
+    fun multiblock(): FrameMultiblock? = FrameMultiblocks.all().firstOrNull { it.frameShape == part.membership?.shape }
 
-    private fun controllerEntity(controller: BlockPos): FrameBlockEntity? =
-        if (controller == blockPos) this else level?.getBlockEntity(controller) as? FrameBlockEntity
-
-    private fun teardownDrops(level: Level, controller: BlockPos): List<ItemStack> {
-        val ctrl = controllerEntity(controller) ?: return listOf()
-        val s = ctrl.frameState.get() ?: return listOf()
-        val multi = ctrl.multiblock() ?: return listOf()
-        val drops = ArrayList<ItemStack>()
-        repeat(multi.numFrames) { drops += FrameItem.withSelection(ItemStack(IndustryContent.FRAME_ITEM.get()), multi.id) }
-        if (s.building) drops += multi.required()
-        for (i in 0 until s.storage.size()) drops += s.storage.get(i).toMinecraft().copy()
-        return drops
-    }
-
-    private fun buildTick(level: Level, pos: BlockPos) {
-        val s = frameState.get() ?: return
-        val multi = FrameMultiblocks.get(s.multiblock) ?: return
+    private fun buildTick(level: Level, instance: MultiblockInstance) {
+        val s = instance.state as? FrameState ?: return
+        val multi = s.multiblock
+        val anchor = instance.anchorPos
         if (!s.building) {
             s.ticks = Math.floorMod(s.ticks - 1, FrameState.TICKS_TO_CHECK)
             if (s.ticks == 0 && StorageUtils.removeItemsFromStorage(s.storage, multi.required().map(IItemStack::of))) {
                 // v3 dropped whatever else was in the frame once building started.
                 for (i in 0 until s.storage.size()) {
                     val left = s.storage.get(i).toMinecraft()
-                    if (!left.isEmpty) Block.popResource(level, pos, left.copy())
+                    if (!left.isEmpty) Block.popResource(level, anchor, left.copy())
                     s.storage.setSlot(i, IItemStack.Empty)
                 }
                 s.building = true
-                markDirtyAndSync()
+                (level.getBlockEntity(anchor) as? FrameBlockEntity)?.markDirtyAndSync()
             }
             return
         }
         s.progress++
-        markDirty()
-        if (s.progress >= FrameState.BUILD_TIME) multi.formAt(level, pos)
+        (level.getBlockEntity(anchor) as? FrameBlockEntity)?.markDirty()
+        if (s.progress >= FrameState.BUILD_TIME) multi.formAt(level, anchor)
     }
 }
 
@@ -305,16 +285,11 @@ class FrameItem(properties: Properties) : Item(properties) {
         fun withSelection(stack: ItemStack, id: String): ItemStack = stack.also { it.set(SELECTION.get(), id) }
 
         /**
-         * Places the frame blocks of [multi] with their controller at [controller] and forms them.
+         * Places the frame blocks of [multi] anchored at [anchor] and forms them.
          */
-        fun place(level: Level, controller: BlockPos, multi: FrameMultiblock) {
-            val locations = multi.takenLocations(controller)
-            locations.forEach { level.setBlockAndUpdate(it, IndustryContent.FRAME.get().defaultBlockState()) }
-            for (loc in locations) {
-                val frame = level.getBlockEntity(loc) as? FrameBlockEntity ?: continue
-                frame.info.info.form(loc, controller)
-            }
-            (level.getBlockEntity(controller) as? FrameBlockEntity)?.frameState?.get()?.let { it.multiblock = multi.id }
+        fun place(level: Level, anchor: BlockPos, multi: FrameMultiblock) {
+            multi.takenLocations(anchor).forEach { level.setBlockAndUpdate(it, IndustryContent.FRAME.get().defaultBlockState()) }
+            MultiblockManager.SERVER.form(ILevel.of(level), multi.frameShape, anchor)
         }
     }
 }
@@ -354,7 +329,7 @@ class FrameMenu(containerId: Int, inventory: Inventory, be: FrameBlockEntity?) :
     init {
         addStorageSlots(be?.storage ?: IItemStorage.Empty, 62, 17, columns = 3, count = if (be == null) 0 else 9)
         addPlayerInventorySlots(inventory)
-        addSync(com.itszuvalex.itszulib.menu.MenuSyncs.int({ be?.frameState?.get()?.progress ?: 0 }, { progress = it }))
-        addSync(com.itszuvalex.itszulib.menu.MenuSyncs.boolean({ be?.frameState?.get()?.building ?: false }, { building = it }))
+        addSync(com.itszuvalex.itszulib.menu.MenuSyncs.int({ be?.frameState()?.progress ?: 0 }, { progress = it }))
+        addSync(com.itszuvalex.itszulib.menu.MenuSyncs.boolean({ be?.frameState()?.building ?: false }, { building = it }))
     }
 }

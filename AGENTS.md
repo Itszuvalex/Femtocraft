@@ -137,8 +137,13 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).
   Recipes are Kotlin tables (DECISIONS D12); ore dictionary lookups are `c:ores/*`/`c:dusts/*` tags.
 - **Frames**: the frame item places frame blocks; when the frame's inventory holds a multiblock's materials it
-  builds the multiblock (`FrameMultiblocks`), using ItszuLib `MultiblockStatic`/`FragMultiBlockInfo` and shared state
-  in `FragMultiblockState`. `FragMultiblockTeardown` drops the controller's contents when any part breaks.
+  builds the multiblock (`FrameMultiblocks`). Each `FrameMultiblock` registers two ItszuLib multiblock shapes (ItszuLib
+  DECISIONS D11): `frame_<id>` for the frames and `<id>` for the machine, both 2-3 block boxes anchored at the lowest
+  corner, formed explicitly (`autoForm = false`: `FrameItem.place`, `FrameMultiblock.formAt`, which disbands the frames
+  first) and `DESTROY_ALL` on break. Shared state (`FrameState`, `GerminationState`, `FocusingState`) is an
+  `IMultiblockState` on the home block (the anchor), reached from every block through `FragMultiblockPart.sharedState()`;
+  its `onBreak` drops the contents at the anchor. `FragMultiblockTickable` runs each structure once per tick; the home
+  block is the chamber's wireless power consumer.
 - **Nanites**: one API (DECISIONS D5): `NaniteStack(archetype, strain, version, amount)` in `NaniteTank`s, exposed by
   `FragNaniteTank` and moved by `FragNaniteAutoIO`; the player's tank is a synced data attachment (`PlayerNanites`).
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state

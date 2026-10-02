@@ -18,7 +18,7 @@ import net.neoforged.fml.LogicalSide
 
 /**
  * Network of connected power conduits. Each tick it distributes power between the wired leaves attached to its
- * conduits (each block once, and each multiblock once through its controller). Port of v3's `WiredPowerNetwork`.
+ * conduits (each block once, and each multiblock once). Port of v3's `WiredPowerNetwork`.
  *
  * Difference from v3: a failure while distributing is no longer swallowed (v3 caught every `Throwable`).
  */
@@ -28,7 +28,7 @@ class WiredPowerNetwork(id: Int) : TileNetwork<WiredPowerConduit, WiredPowerNetw
     override fun create(): WiredPowerNetwork = WiredPowerNetwork(WirelessPowerNetwork.nextId())
 
     /**
-     * The loaded leaves attached to this network's conduits, deduplicated by block (or multiblock controller).
+     * The loaded leaves attached to this network's conduits, deduplicated by block (or multiblock structure).
      */
     fun leaves(): Collection<IWiredPowerLeafNode> {
         val seen = LinkedHashMap<Any, IWiredPowerLeafNode>()
@@ -76,12 +76,12 @@ class WiredPowerConduit(val tier: ConduitTier) :
     }
 
     /**
-     * Leaves on attached faces, keyed by their multiblock controller (or position).
+     * Leaves on attached faces, keyed by their multiblock structure (or position).
      */
     fun attachedLeaves(): List<Pair<Any, IWiredPowerLeafNode>> = leafFaces.faces().mapNotNull { face ->
         val be = leafAt(face) ?: return@mapNotNull null
         val leaf = be.getModule(PowerModules.WIRED_LEAF, face.opposite) ?: return@mapNotNull null
-        val key: Any = be.getModule(Modules.MULTIBLOCK, null)?.controller ?: be.getBlockPos()
+        val key: Any = be.getModule(Modules.MULTIBLOCK_MEMBER, null)?.membership?.structureId ?: be.getBlockPos()
         key to leaf
     }
 

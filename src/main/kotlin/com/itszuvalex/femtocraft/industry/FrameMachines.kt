@@ -16,6 +16,9 @@ import com.itszuvalex.itszulib.api.adapters.IBattery
 import com.itszuvalex.itszulib.api.adapters.IFluidStack
 import com.itszuvalex.itszulib.api.adapters.IItemStack
 import com.itszuvalex.itszulib.api.adapters.ILevel
+import com.itszuvalex.itszulib.api.multiblock.IMultiblockState
+import com.itszuvalex.itszulib.api.multiblock.MultiblockInstance
+import com.itszuvalex.itszulib.api.multiblock.MultiblockRoleRef
 import com.itszuvalex.itszulib.api.multiblock.MultiblockSidedFluidStorageConfiguration
 import com.itszuvalex.itszulib.api.multiblock.MultiblockSidedItemStorageConfiguration
 import com.itszuvalex.itszulib.api.storage.DynamicIBattery
@@ -34,8 +37,7 @@ import com.itszuvalex.itszulib.core.frag.FragFluidStorage
 import com.itszuvalex.itszulib.core.frag.FragItemAutoIO
 import com.itszuvalex.itszulib.core.frag.FragItemStorage
 import com.itszuvalex.itszulib.core.frag.FragMenu
-import com.itszuvalex.itszulib.core.frag.FragMultiBlockInfo
-import com.itszuvalex.itszulib.core.frag.FragMultiblockState
+import com.itszuvalex.itszulib.core.frag.FragMultiblockPart
 import com.itszuvalex.itszulib.core.frag.FragMultiblockTickable
 import com.itszuvalex.itszulib.core.frag.FragSidedConfiguration
 import com.itszuvalex.itszulib.core.frag.addFluidStorage
@@ -51,20 +53,21 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
-import net.neoforged.neoforge.common.util.ValueIOSerializable
+import net.minecraft.world.level.block.Block
 import net.neoforged.neoforge.fluids.FluidStack
 import kotlin.random.Random
 
 // --- Germination chamber ---------------------------------------------------------------------------------------------
 
 /**
- * Shared state of a germination chamber, held by its controller. Port of v3's `GerminationChamberState` and
+ * Shared state of a germination chamber, on its home block. Port of v3's `GerminationChamberState` and
  * `GerminationTask`: a 30k battery, a 10 000 mB tank, an input slot and three output slots, and the task.
  *
- * Difference from v3: rolled results wait in [pending] until they all fit (v3 kept them in the task and discarded them
- * when it started the next seed, so a full output lost the harvest).
+ * Differences from v3: rolled results wait in [pending] until they all fit (v3 kept them in the task and discarded them
+ * when it started the next seed, so a full output lost the harvest); breaking the chamber drops its contents (v3 lost
+ * them).
  */
-class GerminationState(onChanged: Runnable) : ValueIOSerializable {
+class GerminationState(onChanged: Runnable) : IMultiblockState {
     @JvmField
     val battery = PowerBattery(BATTERY_SIZE.toDouble(), onChanged)
 
@@ -133,6 +136,12 @@ class GerminationState(onChanged: Runnable) : ValueIOSerializable {
         }
     }
 
+    fun drops(): List<ItemStack> =
+        ((0 until storage.size()).map { storage.get(it).toMinecraft().copy() } + pending.map { it.copy() } + seed.copy()).filter { !it.isEmpty }
+
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) =
+        drops().forEach { Block.popResource(level.toMinecraft(), anchor, it) }
+
     override fun serialize(output: ValueOutput) {
         battery.serialize(output.child("Battery"))
         tank.serialize(output.child("Tank"))
@@ -160,34 +169,43 @@ class GerminationState(onChanged: Runnable) : ValueIOSerializable {
 }
 
 /**
- * Base for blocks of a frame-built multiblock: multiblock membership, controller state, teardown and menu.
+ * Base for blocks of a frame-built multiblock: membership of [multiblock]'s shape (formed only by finishing a frame
+ * build) and the menu. The shared state [S] lives on the home block (see [FrameMultiblock]).
  */
-abstract class FrameMachineBlockEntity<S : ValueIOSerializable>(
+abstract class FrameMachineBlockEntity<S : IMultiblockState>(
     type: net.minecraft.world.level.block.entity.BlockEntityType<*>,
     pos: BlockPos,
     state: BlockState,
-    private val multiblock: () -> FrameMultiblock,
+    multiblock: () -> FrameMultiblock,
 ) : FemtoBlockEntity(type, pos, state) {
     @JvmField
-    val info = FragMultiBlockInfo()
+    val part = FragMultiblockPart(listOf(MultiblockRoleRef(multiblock().shape, FrameMultiblock.MACHINE_ROLE)), autoForm = false)
 
-    abstract val mbState: FragMultiblockState<S>
+    /**
+     * Whether this is the structure's home block (offset (0,0,0)), which holds the state and is its power consumer.
+     */
+    val isHome: Boolean get() = part.isHome
 
-    val isController: Boolean get() = info.info.isFormed && info.info.isController
+    /**
+     * The shared state (null while not formed, or while the home block's chunk loads).
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun state(): S? = part.sharedState() as? S
 
-    fun state(): S? = mbState.get()
-
-    protected abstract fun drops(state: S): List<ItemStack>
+    /**
+     * The home block's entity, if loaded.
+     */
+    protected inline fun <reified T : FrameMachineBlockEntity<*>> homeEntity(): T? {
+        val m = part.membership ?: return null
+        if (m.isHome) return this as? T
+        val lvl = level ?: return null
+        val at = blockPos.subtract(m.offset)
+        return if (lvl.isLoaded(at)) lvl.getBlockEntity(at) as? T else null
+    }
 
     protected fun addFrameMachineFragments(title: String, menu: (Int, net.minecraft.world.entity.player.Inventory) -> net.minecraft.world.inventory.AbstractContainerMenu) {
-        fragList.addFragment(info)
-        fragList.addInternalFragment(mbState)
-        fragList.addFragment(FragMenu(Component.translatable(title), { id, inv, _ -> menu(id, inv) }, info))
-        fragList.addInternalFragment(FragMultiblockTeardown(info, { multiblock().takenLocations(it) }) { level, controller ->
-            val ctrl = if (controller == blockPos) this else level.getBlockEntity(controller) as? FrameMachineBlockEntity<*>
-            @Suppress("UNCHECKED_CAST")
-            (ctrl as? FrameMachineBlockEntity<S>)?.state()?.let { drops(it) } ?: listOf()
-        })
+        fragList.addFragment(part)
+        fragList.addFragment(FragMenu(Component.translatable(title), { id, inv, _ -> menu(id, inv) }, part))
     }
 }
 
@@ -195,14 +213,10 @@ abstract class FrameMachineBlockEntity<S : ValueIOSerializable>(
  * A block of the germination chamber (2x3x2, built from frames). Port of v3's `TileGerminationChamber`: grows seeds
  * into crops with water and power. Every block exposes the chamber's input, outputs and tank on its outer faces (side
  * configuration per block; faces between chamber blocks expose nothing) and moves items and fluid automatically; the
- * controller is a wireless power consumer.
- *
- * Difference from v3: breaking the chamber drops its contents (v3 removed the blocks and lost them).
+ * home block is a wireless power consumer.
  */
 class GerminationChamberBlockEntity(pos: BlockPos, state: BlockState) :
     FrameMachineBlockEntity<GerminationState>(IndustryContent.GERMINATION_CHAMBER_BE.get(), pos, state, { FrameMultiblocks.GERMINATION_CHAMBER }) {
-    override val mbState: FragMultiblockState<GerminationState> = FragMultiblockState(info, { GerminationState { markDirty() } }, { (it as? GerminationChamberBlockEntity)?.mbState })
-
     @JvmField
     val storage: IItemStorage = DynamicIItemStorage { state()?.storage ?: IItemStorage.Empty }
 
@@ -213,7 +227,7 @@ class GerminationChamberBlockEntity(pos: BlockPos, state: BlockState) :
     val battery: IBattery = DynamicIBattery { state()?.battery ?: IBattery.Empty }
 
     @JvmField
-    val leaf = FragWirelessPowerLeafNode({ battery }, PowerStorageNodeType.CONSUMER, rate = { GerminationState.LEAF_TRANSFER_RATE }, active = { isController })
+    val leaf = FragWirelessPowerLeafNode({ battery }, PowerStorageNodeType.CONSUMER, rate = { GerminationState.LEAF_TRANSFER_RATE }, active = { isHome })
 
     init {
         addFrameMachineFragments("block.femtocraft.germination_chamber") { id, inv -> GerminationChamberMenu(id, inv, this) }
@@ -221,13 +235,13 @@ class GerminationChamberBlockEntity(pos: BlockPos, state: BlockState) :
         val output = DynamicIItemStorage { state()?.output ?: IItemStorage.Empty }
         fragList.addFragment(FragSidedConfiguration<SidedItemStorageConfiguration>(
             "ItemConfig",
-            MultiblockSidedItemStorageConfiguration({ level?.let(ILevel::of) }, { blockPos }, info.info, NONE, { INPUT },
+            MultiblockSidedItemStorageConfiguration({ level?.let(ILevel::of) }, { blockPos }, part, NONE, { INPUT },
                 mapOf(NONE to IItemStorage.Empty, INPUT to input, OUTPUT to output), { Direction.NORTH }),
             Modules.ITEM_STORAGE_CONFIGURABLE,
         ))
         fragList.addFragment(FragSidedConfiguration<SidedFluidStorageConfiguration>(
             "FluidConfig",
-            MultiblockSidedFluidStorageConfiguration({ level?.let(ILevel::of) }, { blockPos }, info.info, NONE, { TANK },
+            MultiblockSidedFluidStorageConfiguration({ level?.let(ILevel::of) }, { blockPos }, part, NONE, { TANK },
                 mapOf(NONE to IFluidStorage.Empty, TANK to tank), { Direction.NORTH }),
             Modules.FLUID_STORAGE_CONFIGURABLE,
         ))
@@ -238,22 +252,19 @@ class GerminationChamberBlockEntity(pos: BlockPos, state: BlockState) :
         fragList.addFragment(FragPowerStorage({ battery }, persist = false))
         fragList.addWirelessLeaf(leaf)
         fragList.addFragment(FragDerivedColor { controllerLeafColor() })
-        fragList.addTickableFragment(object : FragMultiblockTickable(info.info) {
+        fragList.addTickableFragment(object : FragMultiblockTickable(part) {
             override fun name(): String = "Germination"
-            override fun serverControllerTick(level: ILevel, pos: BlockPos) {
-                state()?.tick(Random)
+            override fun serverStructureTick(level: ILevel, instance: MultiblockInstance) {
+                (instance.state as? GerminationState)?.tick(Random)
             }
         })
     }
 
-    private fun controllerLeafColor() = (info.controller() as? GerminationChamberBlockEntity)?.let { parentColor(it, it.leaf) } ?: FragDerivedColor.NONE
+    private fun controllerLeafColor() = homeEntity<GerminationChamberBlockEntity>()?.let { parentColor(it, it.leaf) } ?: FragDerivedColor.NONE
 
     override fun serverTick() {
         leaf.refreshRegistration()
     }
-
-    override fun drops(state: GerminationState): List<ItemStack> =
-        (0 until state.storage.size()).map { state.storage.get(it).toMinecraft().copy() } + state.pending.map { it.copy() } + listOfNotNull(state.seed.copy().takeIf { !it.isEmpty })
 
     companion object {
         const val INPUT = "Input"
@@ -269,9 +280,9 @@ class GerminationChamberBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<G
 
 /**
  * Shared state of a crystal focusing chamber. Port of v3's `FocusingChamberState`: four small/medium crystals and one
- * large crystal.
+ * large crystal, dropped when the chamber breaks.
  */
-class FocusingState(onChanged: Runnable) : ValueIOSerializable {
+class FocusingState(onChanged: Runnable) : IMultiblockState {
     @JvmField
     val small = object : ItemStorageArray(4, onChanged) {
         override fun canInsert(index: Int, stack: IItemStack): Boolean = PowerCrystals.data(stack.toMinecraft())?.let { it.type != PowerCrystals.TYPE_LARGE } ?: false
@@ -310,6 +321,11 @@ class FocusingState(onChanged: Runnable) : ValueIOSerializable {
         return changed
     }
 
+    fun drops(): List<ItemStack> = ((0 until small.size()).map { small.get(it).toMinecraft().copy() } + large.get(0).toMinecraft().copy()).filter { !it.isEmpty }
+
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) =
+        drops().forEach { Block.popResource(level.toMinecraft(), anchor, it) }
+
     override fun serialize(output: ValueOutput) {
         small.serialize(output.child("SmallCrystals"))
         large.serialize(output.child("LargeCrystal"))
@@ -332,8 +348,6 @@ class FocusingState(onChanged: Runnable) : ValueIOSerializable {
  */
 class CrystalFocusingChamberBlockEntity(pos: BlockPos, state: BlockState) :
     FrameMachineBlockEntity<FocusingState>(IndustryContent.CRYSTAL_FOCUSING_CHAMBER_BE.get(), pos, state, { FrameMultiblocks.CRYSTAL_FOCUSING_CHAMBER }) {
-    override val mbState: FragMultiblockState<FocusingState> = FragMultiblockState(info, { FocusingState { markDirty() } }, { (it as? CrystalFocusingChamberBlockEntity)?.mbState })
-
     @JvmField
     val small: IItemStorage = DynamicIItemStorage { state()?.small ?: IItemStorage.Empty }
 
@@ -342,16 +356,13 @@ class CrystalFocusingChamberBlockEntity(pos: BlockPos, state: BlockState) :
 
     init {
         addFrameMachineFragments("block.femtocraft.crystal_focusing_chamber") { id, inv -> FocusingChamberMenu(id, inv, this) }
-        fragList.addTickableFragment(object : FragMultiblockTickable(info.info) {
+        fragList.addTickableFragment(object : FragMultiblockTickable(part) {
             override fun name(): String = "Focusing"
-            override fun serverControllerTick(level: ILevel, pos: BlockPos) {
-                if (state()?.tick() == true) markDirty()
+            override fun serverStructureTick(level: ILevel, instance: MultiblockInstance) {
+                if ((instance.state as? FocusingState)?.tick() == true) homeEntity<CrystalFocusingChamberBlockEntity>()?.markDirty()
             }
         })
     }
-
-    override fun drops(state: FocusingState): List<ItemStack> =
-        (0 until 4).map { state.small.get(it).toMinecraft().copy() } + state.large.get(0).toMinecraft().copy()
 }
 
 class CrystalFocusingChamberBlock(p: BlockBehaviour.Properties) : FemtoEntityBlock<CrystalFocusingChamberBlockEntity>(p, { IndustryContent.CRYSTAL_FOCUSING_CHAMBER_BE.get() })

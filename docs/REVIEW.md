@@ -19,7 +19,7 @@ on the old behaviour.
 | F6 | `StorageUtils` (ItszuLib 1.12.2, used by frames) | Never compared items, so any ten items started a germination chamber build | Items are compared (ItszuLib R16) | game test `frame_ignores_wrong_items` |
 | F7 | `TileGerminationChamber` results | Rolled results stayed in the task; with a full output the next seed reset the task and the harvest was lost | Results wait in a pending list until they fit; no new seed starts meanwhile | game test `germination_chamber_output_full_keeps_harvest` |
 | F8 | `GerminationChamberRecipe` ranges | `nextInt(max - min) + min` never reached the top of a range (cactus 2-3 always gave 2) | Inclusive ranges | game test `germination_results_reach_range_top` |
-| F9 | Germination chamber teardown | Breaking the chamber removed its blocks and lost its inventory | The controller's contents drop | game test `germination_chamber_teardown_drops_contents` |
+| F9 | Germination chamber teardown | Breaking the chamber removed its blocks and lost its inventory | The shared state's contents drop at the anchor (`GerminationState.onBreak`) | game test `germination_chamber_teardown_drops_contents` |
 | F10 | `ModuleFocusingChamber` | Written but never attached to the tile; the frame built an inert block | Attached, with a menu (D13) | game test `focusing_chamber_charges_large_crystal` |
 | F11 | `TileCrystalHeatExchanger` | Burning a lava bucket lost the bucket | The container stays in the fuel slot | game test `heat_exchanger_keeps_lava_bucket` |
 | F12 | `FemtocraftOreGenerator` sizes | The medium branch tested `rand < MEDIUM_WEIGHT` after `rand < SMALL_WEIGHT` failed, which is never true (30 < 50), so medium rifts never spawned | Cumulative weights | game test `rift_sizes_include_medium_and_fit_the_feature_region` |
@@ -46,4 +46,4 @@ menu slots, was decided as DECISIONS D6; O1, power interop, as D10; O3, machine 
 ## Framework changes
 
 Changes made to ItszuLib for Femtocraft are listed in `../ItszuLib/docs/REVIEW.md` ("Framework changes to mirror into
-TechnoLich" and the fixed list): `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port.
+TechnoLich" and the fixed list): `StorageUtils` (R16), `StorageSlot.mayPlace` (R17), the `MenuCore` write-back (R18) and `insert` honouring `canInsert` (R19; machines fill their output slots with `insertUnchecked`) came out of this port. The frame multiblocks moved onto ItszuLib's controller-less multiblocks with home-held state (ItszuLib DECISIONS D11), which also closed ItszuLib O3: a chamber straddling a chunk boundary keeps its state reachable from every block.

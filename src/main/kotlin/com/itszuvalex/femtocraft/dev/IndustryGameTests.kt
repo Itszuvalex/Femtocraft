@@ -163,15 +163,17 @@ object IndustryGameTests {
 
     private fun frameBuilds(helper: GameTestHelper) {
         val controller = placeFrame(helper, FrameMultiblocks.GERMINATION_CHAMBER)
-        helper.assertTrue(controller.info.info.isController, "frame controller formed")
+        helper.assertTrue(controller.part.isHome, "frame structure formed, anchored here")
         controller.storage.setSlot(0, IItemStack.of(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 10)))
         helper.succeedWhen {
             for (loc in FrameMultiblocks.GERMINATION_CHAMBER.takenLocations(FRAME_AT)) {
                 helper.assertBlockPresent(IndustryContent.GERMINATION_CHAMBER.get(), loc)
             }
             val be = helper.getBlockEntity(FRAME_AT, GerminationChamberBlockEntity::class.java)
-            helper.assertTrue(be.isController, "chamber controller formed")
-            helper.assertTrue(helper.getBlockEntity(FRAME_AT.offset(1, 2, 1), GerminationChamberBlockEntity::class.java).info.info.controller == helper.absolutePos(FRAME_AT), "parts point at the controller")
+            helper.assertTrue(be.isHome, "chamber formed, anchored at the frames' anchor")
+            val far = helper.getBlockEntity(FRAME_AT.offset(1, 2, 1), GerminationChamberBlockEntity::class.java)
+            helper.assertTrue(far.part.membership?.structureId == be.part.membership?.structureId && far.part.membership?.offset == BlockPos(1, 2, 1), "every block joined the chamber")
+            helper.assertTrue(far.state() === be.state() && be.state() != null, "every block reaches the shared state")
         }
     }
 
@@ -182,7 +184,7 @@ object IndustryGameTests {
         val controller = placeFrame(helper, FrameMultiblocks.GERMINATION_CHAMBER)
         controller.storage.setSlot(0, IItemStack.of(ItemStack(Items.IRON_INGOT, 10)))
         helper.runAfterDelay(100) {
-            helper.assertFalse(controller.frameState.get()!!.building, "iron ingots do not start the build")
+            helper.assertFalse(controller.frameState()!!.building, "iron ingots do not start the build")
             helper.assertValueEqual(controller.storage.get(0).stackSize(), 10, "and are not consumed")
             helper.succeed()
         }

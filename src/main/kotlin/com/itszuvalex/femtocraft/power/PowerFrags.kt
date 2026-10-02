@@ -205,7 +205,7 @@ class FragWirelessPowerStorageNode(
  * A battery that attaches to the nearest wireless power node. Port of v3's `ModuleWirelessPowerLeafNode`. Saves its
  * parent (LEVEL and DESCRIPTION, key `Parent`). Add it with [addWirelessLeaf], which also exposes it as a storage node.
  *
- * @param active Whether the leaf takes part at all; a multiblock part that is not a formed controller is inactive.
+ * @param active Whether the leaf takes part at all; e.g. a multiblock block that is not its structure's home block is inactive.
  */
 class FragWirelessPowerLeafNode @JvmOverloads constructor(
     private val batteryOf: () -> IBattery,
