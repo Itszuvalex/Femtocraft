@@ -28,6 +28,8 @@ import com.itszuvalex.itszulib.api.Modules
 import com.itszuvalex.itszulib.api.adapters.IFluidStack
 import com.itszuvalex.itszulib.api.adapters.IItemStack
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
+import com.itszuvalex.femtocraft.core.FemtoMenu
+import com.itszuvalex.femtocraft.industry.ConfiguratorMode
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.gametest.framework.GameTestHelper
@@ -55,6 +57,7 @@ object IndustryGameTests {
         DevGameTests.test("wired_conduit_charges_crystal_machine", body = ::wiredPower)
         DevGameTests.test("machine_output_full_keeps_result", 400, ::outputFull)
         DevGameTests.test("configurator_cycles_face_io_then_storage", body = ::configurator)
+        DevGameTests.test("side_config_panel_action_cycles_face", body = ::sideConfigAction)
         DevGameTests.test("frame_builds_germination_chamber", 400, ::frameBuilds)
         DevGameTests.test("frame_ignores_wrong_items", 200, ::frameWrongItems)
         DevGameTests.test("frame_teardown_drops_frames", body = ::frameTeardown)
@@ -152,6 +155,22 @@ object IndustryGameTests {
         ConfiguratorItem.cycle(config, face, backward = false)
         helper.assertValueEqual(config.getIOForAbsoluteFacing(face), EnumAutomaticIO.NONE, "IO wrapped")
         helper.assertValueEqual(config.getStorageNameForAbsoluteFacing(face), ProcessingMachineBlockEntity.NONE, "storage cycled on wrap")
+        helper.succeed()
+    }
+
+    private fun sideConfigAction(helper: GameTestHelper) {
+        val be = helper.place<NanoFurnaceBlockEntity>(CENTER, IndustryContent.NANO_FURNACE.get())
+        val config = be.getModule(Modules.ITEM_STORAGE_CONFIGURABLE, null)!!
+        val player = helper.makeMockServerPlayerInLevel()
+        val menu = com.itszuvalex.femtocraft.industry.MachineMenu(1, player.inventory, be)
+        val face = Direction.UP
+        helper.assertValueEqual(FemtoMenu.configurationModes(be), listOf(ConfiguratorMode.ITEM), "panel modes")
+        helper.assertTrue(menu.handleAction(player, FemtoMenu.ACTION_CONFIGURE, FemtoMenu.configureData(face, ConfiguratorMode.ITEM, false)), "handled")
+        helper.assertValueEqual(config.getIOForAbsoluteFacing(face), EnumAutomaticIO.INPUT, "cycled forward")
+        menu.handleAction(player, FemtoMenu.ACTION_CONFIGURE, FemtoMenu.configureData(face, ConfiguratorMode.ITEM, true))
+        helper.assertValueEqual(config.getIOForAbsoluteFacing(face), EnumAutomaticIO.NONE, "cycled back")
+        helper.assertFalse(menu.handleAction(player, FemtoMenu.ACTION_CONFIGURE, FemtoMenu.configureData(face, ConfiguratorMode.FLUID, false)), "no fluid configuration")
+        helper.assertFalse(menu.handleAction(player, FemtoMenu.ACTION_CONFIGURE, 7), "bad face")
         helper.succeed()
     }
 

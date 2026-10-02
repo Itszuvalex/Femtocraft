@@ -3,6 +3,8 @@ package com.itszuvalex.femtocraft.client
 import com.itszuvalex.femtocraft.core.FemtoMenu
 import com.itszuvalex.itszulib.client.ScreenHelpers
 import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.components.Button
+import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
@@ -15,12 +17,40 @@ import java.util.Locale
  */
 abstract class FemtoScreen<M : AbstractContainerMenu>(menu: M, inventory: Inventory, title: Component, width: Int = 176, height: Int = 166) :
     AbstractContainerScreen<M>(menu, inventory, title, width, height) {
+    /**
+     * The 3D side configuration panel right of the screen, for machines with a sided configuration.
+     */
+    private var sidePanel: SideConfigPanel? = null
+
+    override fun init() {
+        super.init()
+        val femtoMenu = menu as? FemtoMenu<*> ?: return
+        val panel = sidePanel ?: FemtoMenu.configurationModes(femtoMenu.blockEntity).takeIf { it.isNotEmpty() }?.let { SideConfigPanel(femtoMenu, it) } ?: return
+        sidePanel = panel
+        panel.x = leftPos + imageWidth + 6
+        panel.y = topPos
+        addRenderableWidget(Button.builder(modeLabel(panel)) { button -> panel.cycleMode(); button.message = modeLabel(panel) }
+            .bounds(panel.x, panel.y + SideConfigPanel.SIZE + 4, SideConfigPanel.SIZE, 14).build())
+    }
+
+    private fun modeLabel(panel: SideConfigPanel): Component =
+        Component.translatable("tooltip.femtocraft.configurator.${panel.mode.name.lowercase()}")
+
+    override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean =
+        sidePanel?.mouseClicked(event.x(), event.y()) == true || super.mouseClicked(event, doubleClick)
+
+    override fun mouseDragged(event: MouseButtonEvent, dx: Double, dy: Double): Boolean =
+        sidePanel?.mouseDragged(event.x(), event.y(), dx, dy) == true || super.mouseDragged(event, dx, dy)
+
+    override fun mouseReleased(event: MouseButtonEvent): Boolean =
+        sidePanel?.mouseReleased(event.x(), event.y(), minecraft.hasShiftDown()) == true || super.mouseReleased(event)
 
     override fun extractBackground(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         super.extractBackground(graphics, mouseX, mouseY, a)
         graphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL)
         for (slot in menu.slots) graphics.fill(leftPos + slot.x - 1, topPos + slot.y - 1, leftPos + slot.x + 17, topPos + slot.y + 17, SLOT)
         extractContents(graphics, mouseX, mouseY)
+        sidePanel?.extract(graphics, mouseX, mouseY, font)
     }
 
     /**

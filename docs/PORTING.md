@@ -78,8 +78,8 @@ DECISIONS D4 and D5 give the reasoning.
 - **Multiblock item** (`ItemMultiblock`): placing it did nothing (`onItemUse` returned success without acting) and nothing
   created one except an unused helper.
 - **Machine side-configuration tabs** (`GuiSidedInventoryConfig`/`Fluid`/`Nanite`, `ContainerSided*Config` and their
-  messages): GUI only; faces are configured with the configurator, which v3 also had. Their replacement is planned
-  with the rendering work (REVIEW O8): a 3D view of the machine and its neighbours in the machine screen.
+  messages): GUI only; faces are configured with the configurator, which v3 also had, and with the 3D side
+  configuration panel in each machine screen (REVIEW O8, rendering pass 7).
 - **Fluid placeholders** `cybermass`, `biomass`, `ambrosia` (aliases of water, unused).
 - **Rendering** (B2): TESRs, OBJ models, beams, previewable ghosts, particles, the nanite HUD overlay, GUI tabs and
   icons. Listed under [Follow-up rendering work](#follow-up-rendering-work).
@@ -140,7 +140,7 @@ How it is built:
   multipart/variant blockstates, and `models/block/part/*.json`: one OBJ group each, baked as NeoForge standalone
   models (`client/ObjParts.kt`) for the renderers to draw with a transform. `client/FemtoTints.kt` tints index 0 from
   the block entity: the cluster's colour, and the `IColorable` colour (or a default) for conduits and the chamber.
-- `dev/DevShowcase.kt`: `./gradlew runClient -Pshowcase` opens `run/saves/showcase` (copy any world there, e.g. the dev
+- `dev/DevShowcase.kt`: `./gradlew runClient -Pshowcase` (or `-Pshowcase=<n>` to start at view n) opens `run/saves/showcase` (copy any world there, e.g. the dev
   server's `run/world`), builds every OBJ block (mounts with crystals) on a platform at the world's centre and moves
   the camera through fixed views, logging `SHOWCASE view <i>`, with the HUD hidden. It was used to check both passes
   headless (Xvfb, Mesa llvmpipe).
@@ -170,6 +170,19 @@ items act, as v3's `IPreviewable` items did: a frame item outlines the multibloc
 looking (the footprint and each block), green where it fits and the player has the frames, red otherwise (v3 drew the
 machine's model tinted the same way); a shift device outlines the player-sized spot it would teleport to.
 
+**Pass 7 (done, first version): the 3D side configuration panel** (not in v3; REVIEW O8, after Ender IO's IO
+configuration view). Every machine screen whose block entity has a sided configuration (item, fluid or nanite) shows a
+panel to its right (`client/SideConfigView.kt`): the machine in the middle and its six neighbours pulled out around it
+at half size, drawn from their block models (a block drawn only by a block entity renderer, such as a chest, is a faint
+box), with each machine face shaded by its automatic IO (blue pulls in, orange pushes out). Drag to rotate (it starts
+with the front towards the player); hover a face for its direction, IO and storage; click a face, or the neighbour on
+that side, to cycle it as the configurator does (shift cycles backwards); the button under the panel switches between
+the configurations the machine has. Clicks send `FemtoMenu.ACTION_CONFIGURE`; the panel reads the configuration from
+the client block entity, which syncs it. It is a NeoForge picture-in-picture renderer (`SideConfigRenderer`): the
+texture's pose has y down and z away, so the panel turns it half a turn about x first. `-Pshowcase=10` opens a crystal
+liquifier's screen with a conduit, a chest and blocks around it (checked headless; hovering and dragging were not,
+since the headless client has no mouse input).
+
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
 only; the frame's machine-in-progress preview is not drawn.
@@ -180,6 +193,3 @@ only; the frame's machine-in-progress preview is not drawn.
 - The frame's machine-in-progress preview (a model ghost); germination chamber growth (already commented out in v3).
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
-- Planned with it (not in v3): machine screens render the machine and its neighbouring blocks in 3D, rotated by
-  dragging, so the player configures each face on the model and sees what it connects to (REVIEW O8). Ender IO's IO
-  configuration view works this way.

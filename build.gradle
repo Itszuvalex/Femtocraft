@@ -58,9 +58,9 @@ neoForge {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
             // ./gradlew runClient -Pshowcase: open the run/saves/showcase world and build the model showcase
-            // (dev/DevShowcase.kt).
+            // (dev/DevShowcase.kt). -Pshowcase=<n> starts at view n.
             if (project.hasProperty('showcase')) {
-                systemProperty 'femtocraft.showcase', 'true'
+                systemProperty 'femtocraft.showcase', project.property('showcase').toString() ?: ''
                 programArguments.addAll '--quickPlaySingleplayer', 'showcase', '--width', '1280', '--height', '720'
             }
         }

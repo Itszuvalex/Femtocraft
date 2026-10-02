@@ -91,7 +91,7 @@ class ConfiguratorItem(properties: Properties) : Item(properties) {
         fun mode(stack: ItemStack): ConfiguratorMode = stack.get(MODE.get()) ?: ConfiguratorMode.ITEM
 
         @Suppress("UNCHECKED_CAST")
-        private fun configModule(mode: ConfiguratorMode): IModule<SidedStorageConfiguration<*>>? = MODULES[mode] as IModule<SidedStorageConfiguration<*>>?
+        fun configModule(mode: ConfiguratorMode): IModule<SidedStorageConfiguration<*>>? = MODULES[mode] as IModule<SidedStorageConfiguration<*>>?
 
         /**
          * v3's cycling: forward cycles IO and, when it wraps to NONE, the storage; backward cycles IO back and, when it

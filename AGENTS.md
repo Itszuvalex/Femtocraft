@@ -28,7 +28,8 @@ logistics and cybermaterial "rifts" in the world. It is built on the ItszuLib li
 ./gradlew runServer             # dev dedicated server (run/eula.txt must say eula=true)
 python3 tools/gen_obj.py        # convert art/obj_models into normalized OBJ models + textures (run before gen_assets)
 python3 tools/gen_assets.py     # regenerate models, blockstates, loot tables, tags, lang, recipes, worldgen JSON
-./gradlew runClient -Pshowcase  # dev client in run/saves/showcase with every OBJ block on display (dev/DevShowcase.kt)
+./gradlew runClient -Pshowcase  # dev client in run/saves/showcase with every OBJ block on display (dev/DevShowcase.kt);
+                                # -Pshowcase=<n> starts at view n
 ```
 
 `runGameTestServer` runs Femtocraft's tests, ItszuLib's dev tests (its dev content loads in Femtocraft's dev runs) and
@@ -95,7 +96,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          modules/capabilities) and blockMenu() helpers
 ├── FemtoSounds.kt         v3's three sounds
 ├── core/                  FemtoBlockEntity (serverTick/clientTick/onUse/onPlaced), FemtoEntityBlock and
-│                          FemtoHorizontalEntityBlock, FemtoMenu (BatteryView sync), FragData, FragExpose,
+│                          FemtoHorizontalEntityBlock, FemtoMenu (BatteryView sync, ACTION_CONFIGURE;
+│                          subclasses override handleScreenAction), FragData, FragExpose,
 │                          FragDerivedColor, Loc4 helpers
 ├── power/                 Power API (modules, node interfaces), wireless network + manager (distribution, spanning
 │                          tree), wired network on ItszuLib FragNetworkedWire, power fragments, power crystal item
@@ -110,10 +112,12 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          indexed item storages (storage/)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
-├── client/                FemtoScreen (plain functional screens) and each area's screens; fluid model and entity
+├── client/                FemtoScreen (plain functional screens, plus SideConfigView's 3D side configuration panel
+│                          for machines with a sided configuration) and each area's screens; fluid model and entity
 │                          renderer registration. Client only.
 └── dev/                   Game tests (one object per area), registered only outside production
-src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree, distributed task manager)
+src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree, distributed task manager, side
+                           configuration panel geometry)
 src/main/resources/        assets (v3 textures under 26.1 paths, generated models/lang) and data (generated), plus
                            data/femtocraft/structure/test_area.nbt (empty 9x5x9 game test structure)
 tools/gen_assets.py        Generates models, blockstates, item model definitions, loot tables, tags, lang, recipes,

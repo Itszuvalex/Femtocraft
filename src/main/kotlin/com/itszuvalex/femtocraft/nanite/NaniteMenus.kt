@@ -45,7 +45,7 @@ class NaniteMachineMenu(containerId: Int, inventory: Inventory, be: ProcessingMa
         addSync(MenuSync({ PlayerNanites.tank(inventory.player).contents() }, { playerTank = it }, LIST))
     }
 
-    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
+    override fun handleScreenAction(player: Player, action: Int, data: Int): Boolean {
         val tank = (blockEntity as? NaniteMachine)?.naniteTank ?: return false
         when (action) {
             ACTION_FILL -> PlayerNanites.fill(player, tank)

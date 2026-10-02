@@ -27,6 +27,7 @@ object FemtoClient {
         modBus.addListener(FemtoRenderers::register)
         modBus.addListener(FemtoParticleProviders::register)
         modBus.addListener(NaniteOverlay::register)
+        modBus.addListener(SideConfigRenderer::register)
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(Previews::submit)
         modBus.addListener { event: EntityRenderersEvent.RegisterRenderers -> event.registerEntityRenderer(NaniteContent.NANO_LASH_ENTITY.get(), ::ThrownItemRenderer) }
     }

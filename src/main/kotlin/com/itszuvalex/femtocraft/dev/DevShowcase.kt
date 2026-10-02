@@ -24,7 +24,7 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 
 /**
- * A stage for checking models without playing: with `-Dfemtocraft.showcase=true` (`./gradlew runClient -Pshowcase`),
+ * A stage for checking models without playing: with `-Dfemtocraft.showcase` set (`./gradlew runClient -Pshowcase`),
  * the first player to join is made a spectator, the Femtocraft blocks with OBJ models are built on a platform on the
  * ground at the world's centre, and the camera moves through [VIEWS], logging `SHOWCASE view <i>` at each and
  * `SHOWCASE done` at the end (for screenshots taken from outside the game). The client half hides the HUD (see
@@ -32,7 +32,12 @@ import kotlin.math.sqrt
  */
 object DevShowcase {
     @JvmStatic
-    val enabled: Boolean get() = System.getProperty("femtocraft.showcase") == "true"
+    val enabled: Boolean get() = System.getProperty("femtocraft.showcase") != null
+
+    /**
+     * The first view to show (`-Pshowcase=<n>`), 0 by default.
+     */
+    private val firstView: Int get() = System.getProperty("femtocraft.showcase")?.toIntOrNull() ?: 0
 
     /**
      * The stage's origin, on the ground at the world's centre (found when the stage is built). Sections high in open sky
@@ -56,7 +61,13 @@ object DevShowcase {
         Vec3(8.0, 2.5, 2.0) to Vec3(9.0, 0.8, 6.0),
         Vec3(12.0, 3.0, 1.0) to Vec3(13.0, -0.5, 3.5),
         Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        Vec3(16.5, 2.5, 3.0) to Vec3(16.5, 0.5, 6.5),
     )
+
+    private const val FRAMES_VIEW = 9
+    private const val SIDE_CONFIG_VIEW = 10
+    private const val MENU_DELAY = 40
+    private val LIQUIFIER = BlockPos(16, 0, 6)
 
     private var player: ServerPlayer? = null
     private var ticks = 0
@@ -90,7 +101,14 @@ object DevShowcase {
         }
         if (ticks < BUILD_AT) return
         building()?.progress = 0
-        val view = (ticks - BUILD_AT) / VIEW_TICKS
+        val view = firstView + (ticks - BUILD_AT) / VIEW_TICKS
+        // The side configuration view opens the crystal liquifier's screen, with its 3D side configuration panel, a
+        // little after the view starts (once the client has the block entity).
+        if (view == SIDE_CONFIG_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY)
+            (level.getBlockEntity(BASE.offset(LIQUIFIER)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
@@ -98,7 +116,7 @@ object DevShowcase {
         }
         // The last view also fills the player's nanites, so the HUD shows the nanite gauge sliding in, and hands the
         // player frames for a germination chamber, so the frame preview outlines it where the camera looks.
-        if (view == VIEWS.size - 1) {
+        if (view == FRAMES_VIEW) {
             p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
                 FrameItem.withSelection(net.minecraft.world.item.ItemStack(com.itszuvalex.femtocraft.industry.IndustryContent.FRAME_ITEM.get(), 64), FrameMultiblocks.GERMINATION_CHAMBER.id))
             val tank = com.itszuvalex.femtocraft.nanite.PlayerNanites.tank(p)
@@ -162,5 +180,19 @@ object DevShowcase {
         // A frame structure that keeps building (nanite particles; [tick] holds its progress at 0).
         FrameItem.place(level, BASE.offset(10, 0, 5), FrameMultiblocks.GERMINATION_CHAMBER)
         building()?.building = true
+        // A crystal liquifier between a logistics conduit and a chest, under a block, with its top set to pull items
+        // in and its east face to push fluid out.
+        level.setBlockAndUpdate(BASE.offset(LIQUIFIER), com.itszuvalex.femtocraft.industry.IndustryContent.CRYSTAL_LIQUIFIER.get().defaultBlockState()
+            .setValue(com.itszuvalex.itszulib.core.HorizontalFacing.FACING, net.minecraft.core.Direction.NORTH))
+        set(LIQUIFIER.x - 1, 0, LIQUIFIER.z, LogisticsContent.CONDUIT.get())
+        set(LIQUIFIER.x + 1, 0, LIQUIFIER.z, Blocks.CHEST)
+        set(LIQUIFIER.x, 1, LIQUIFIER.z, Blocks.SMOOTH_STONE)
+        val liquifier = level.getBlockEntity(BASE.offset(LIQUIFIER)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity
+        liquifier?.getModule(com.itszuvalex.itszulib.api.Modules.ITEM_STORAGE_CONFIGURABLE, null)?.let {
+            com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, net.minecraft.core.Direction.UP, false)
+            com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, net.minecraft.core.Direction.WEST, false)
+            com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, net.minecraft.core.Direction.WEST, false)
+        }
+        (liquifier as? com.itszuvalex.itszulib.core.BlockEntityCore)?.markDirtyAndSync()
     }
 }

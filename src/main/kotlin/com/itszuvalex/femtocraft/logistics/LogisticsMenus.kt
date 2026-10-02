@@ -52,7 +52,7 @@ class NaniteRepositoryMenu(containerId: Int, inventory: Inventory, be: NaniteRep
         addSync(MenuSync({ PlayerNanites.tank(inventory.player).contents() }, { playerTank = it }, NaniteMachineMenu.LIST))
     }
 
-    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
+    override fun handleScreenAction(player: Player, action: Int, data: Int): Boolean {
         val tank = blockEntity?.naniteTank ?: return false
         when (action) {
             NaniteMachineMenu.ACTION_FILL -> PlayerNanites.fill(player, tank)
@@ -77,7 +77,7 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
         addPlayerInventorySlots(inventory, 8, 104)
     }
 
-    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
+    override fun handleScreenAction(player: Player, action: Int, data: Int): Boolean {
         val be = blockEntity ?: return false
         if (action != ACTION_MODE && action != ACTION_INTERFACE) return false
         val slot = data and SLOT_MASK
