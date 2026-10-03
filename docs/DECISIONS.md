@@ -368,8 +368,21 @@ things.
   search), sorting by count, name or id, five rows of nine per page, click to take a stack (right-click half,
   shift-click to the inventory), click with a carried stack to put it in, shift-click from the inventory to store.
   Five rows keep the screen 232 pixels high, inside a 720p window at GUI scale 3. Breaking any block drops the items.
-- **Fluid reservoir.** Four 64,000 mB tanks in an ItszuLib `IndexedFluidStorage` (a fluid fills the tanks that hold it,
-  then an empty one) with a `FluidStorageIndex`; the screen shows the four tanks. Fluids are lost when it breaks.
+- **Fluid reservoir.** Four cells of 64,000 mB (`ReservoirTanks`) behind an ItszuLib `IndexedFluidStorage` with a
+  `FluidStorageIndex`. Fluids are lost when it breaks.
+  - **Locking** (maintainer): a tank can be locked to one fluid; it then takes only that fluid, even while empty, so
+    several flows can share a reservoir without one spilling into another's tank. A fluid fills the tanks holding it,
+    then empty tanks locked to it, then free empty tanks. Locking an empty tank locks it to the fluid in the carried
+    container (a bucket); a tank holding fluid locks to that fluid. Unlocking keeps the contents.
+  - **Linking** (maintainer): neighbouring cells link into one tank of their combined capacity, and split again when
+    unlinked. Only tanks with no two different fluids or locks link (the merged tank keeps the lock). A tank's fluid
+    fills its cells in order, so after a split each part keeps its cells' share. Links run along the row of cells
+    (1-2, 2-3, 3-4), so a tank is always a run of cells; in the world the cells sit in a ring around the floor so
+    linked cells touch, and a linked tank draws as one body at one level.
+  - Saved as the cells (the old four-tank format, so existing reservoirs load), a lock per cell and a bit per link.
+  - **Screen**: one gauge per tank, as wide as its cells; "+"/"-" buttons between cells to link or split (inactive,
+    with the reason in the tooltip, when the tanks cannot link); a Lock/Unlock button under each tank. A locked tank
+    shows a padlock and, while empty, a faint fill of its fluid; tooltips give contents, lock and links.
 - **Nanite vault.** One 10,000-nanite tank for any number of strains; the screen lists the largest strains and fills
   from or drains into the player. Nanites are lost when it breaks.
 - **Seeing the reservoir's tanks** (maintainer): its blocks use the fluid repository's windowed textures (cutout), and

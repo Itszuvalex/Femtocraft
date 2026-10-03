@@ -71,6 +71,7 @@ object DevShowcase {
         Vec3(23.5, 3.0, -3.5) to Vec3(23.5, 1.5, 1.5),
         Vec3(27.0, 5.0, -7.0) to Vec3(27.0, 1.5, 1.5),
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
+        Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
     )
 
     private const val FRAMES_VIEW = 9
@@ -174,6 +175,11 @@ object DevShowcase {
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
         if (view == VAULT_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        // ...then the fluid reservoir's screen.
+        if (view == VAULT_VIEW + 3 && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
         // The lightning view strikes the atmospheric pole every half second (harmless bolts on the capacitor's top).
         if (view == LIGHTNING_VIEW && (ticks - BUILD_AT) % 10 == 5) {
             (level.getBlockEntity(BASE.offset(POLE)) as? com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity)?.let { pole ->
@@ -311,12 +317,14 @@ object DevShowcase {
         FrameMultiblocks.ITEM_VAULT.formAt(level, BASE.offset(ITEM_VAULT))
         FrameMultiblocks.FLUID_RESERVOIR.formAt(level, BASE.offset(ITEM_VAULT).offset(4, 0, 0))
         FrameMultiblocks.NANITE_VAULT.formAt(level, BASE.offset(ITEM_VAULT).offset(8, 0, 0))
-        // The reservoir's tanks at different levels (seen through its windows): water, lava, slurry, and water again.
-        (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity)?.state()?.tanks?.let { tanks ->
+        // The reservoir: tank 2 locked to lava, cells 3 and 4 linked into one tank, then water, lava and slurry poured in.
+        (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity)?.state()?.let { res ->
+            res.toggleLock(1, net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(net.minecraft.world.level.material.Fluids.LAVA))
+            res.toggleLink(2)
             val cap = com.itszuvalex.femtocraft.logistics.FluidReservoirState.CAPACITY
             listOf(net.minecraft.world.level.material.Fluids.WATER to cap * 3 / 4, net.minecraft.world.level.material.Fluids.LAVA to cap / 3,
-                com.itszuvalex.femtocraft.industry.FemtoFluids.GRITTY_SLURRY.get() to cap, net.minecraft.world.level.material.Fluids.WATER to cap / 2)
-                .forEach { (fluid, amount) -> tanks.fill(com.itszuvalex.itszulib.api.adapters.IFluidStack.of(net.neoforged.neoforge.fluids.FluidStack(fluid, amount)), true) }
+                com.itszuvalex.femtocraft.industry.FemtoFluids.GRITTY_SLURRY.get() to cap * 3 / 2)
+                .forEach { (fluid, amount) -> res.tanks.fill(com.itszuvalex.itszulib.api.adapters.IFluidStack.of(net.neoforged.neoforge.fluids.FluidStack(fluid, amount)), true) }
         }
         (level.getBlockEntity(BASE.offset(ITEM_VAULT)) as? com.itszuvalex.femtocraft.logistics.ItemVaultBlockEntity)?.state()?.storage?.let { vault ->
             net.minecraft.core.registries.BuiltInRegistries.ITEM.stream().filter { it != net.minecraft.world.item.Items.AIR }.limit(80).toList().forEachIndexed { i, item ->

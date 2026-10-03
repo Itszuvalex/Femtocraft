@@ -46,6 +46,7 @@ import com.itszuvalex.itszulib.menu.MenuSync
 import com.itszuvalex.itszulib.menu.MenuSyncs
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.block.Block
@@ -91,12 +92,16 @@ class ItemVaultState(onChanged: Runnable) : IMultiblockState {
 }
 
 /**
- * The fluid reservoir's contents: [TANKS] tanks of [CAPACITY] mB in an [IndexedFluidStorage] (a fluid goes to the tanks
- * holding it first, then to an empty one), with an [index] over it.
+ * The fluid reservoir's contents: [TANKS] cells of [CAPACITY] mB ([ReservoirTanks]: neighbouring cells link into one
+ * tank, and a tank can be locked to a fluid) behind an [IndexedFluidStorage] (a fluid goes to the tanks holding it,
+ * then to empty tanks locked to it, then to any empty one), with an [index] over it.
  */
 class FluidReservoirState(onChanged: Runnable) : IMultiblockState {
     @JvmField
-    val tanks = IndexedFluidStorage(FluidStorageArray(TANKS, CAPACITY, onChanged))
+    val cells = ReservoirTanks(TANKS, CAPACITY, onChanged)
+
+    @JvmField
+    val tanks = ReservoirIndexedStorage(cells)
 
     @JvmField
     val index = FluidStorageIndex().apply { add(tanks) }
@@ -107,6 +112,19 @@ class FluidReservoirState(onChanged: Runnable) : IMultiblockState {
 
     override fun deserialize(input: ValueInput) {
         input.child("Tanks").ifPresent(tanks::deserialize)
+    }
+
+    /** Links or unlinks the cells either side of [boundary] (the index follows the tanks changing). */
+    fun toggleLink(boundary: Int): Boolean {
+        val done = if (cells.isLinked(boundary)) cells.unlink(boundary) else cells.link(boundary)
+        if (done) tanks.rebuild()
+        return done
+    }
+
+    /** Locks or unlocks the tank holding [cell] (see [ReservoirTanks.toggleLock]). */
+    fun toggleLock(cell: Int, fallback: Identifier?): Boolean {
+        if (cell !in 0 until TANKS) return false
+        return cells.toggleLock(cells.tankOfCell(cell), fallback)
     }
 
     companion object {
@@ -257,7 +275,7 @@ class FluidReservoirBlockEntity(pos: BlockPos, state: BlockState) :
 
     /** Client side, on the home block: the tanks as last synced, for the renderer. */
     @JvmField
-    val clientTanks = FluidStorageArray(FluidReservoirState.TANKS, FluidReservoirState.CAPACITY)
+    val clientTanks = ReservoirTanks(FluidReservoirState.TANKS, FluidReservoirState.CAPACITY)
 
     private var synced: List<IFluidStack> = emptyList()
     private var ticksSinceSync = 0
@@ -341,19 +359,44 @@ class ItemVaultMenu(containerId: Int, inventory: Inventory, be: ItemVaultBlockEn
 }
 
 /**
- * The fluid reservoir's menu: its four tanks (client copies in [tanks]).
+ * The fluid reservoir's menu: its cells, locks and links (client copies in [view]), and actions to lock a tank
+ * ([ACTION_LOCK], data: one of its cells; an empty tank locks to the fluid in the carried container) and to link or
+ * unlink neighbouring cells ([ACTION_LINK], data: the boundary).
  */
 class FluidReservoirMenu(containerId: Int, inventory: Inventory, be: FluidReservoirBlockEntity?) :
     FemtoMenu<FluidReservoirBlockEntity>(LogisticsContent.FLUID_RESERVOIR_MENU.get(), containerId, inventory, be) {
     @JvmField
-    val tanks = FluidStorageArray(FluidReservoirState.TANKS, FluidReservoirState.CAPACITY)
+    val view = ReservoirTanks(FluidReservoirState.TANKS, FluidReservoirState.CAPACITY)
 
     init {
-        addPlayerInventorySlots(inventory)
+        addPlayerInventorySlots(inventory, 8, INVENTORY_Y)
+        fun cells() = be?.state()?.cells
         for (i in 0 until FluidReservoirState.TANKS) {
-            addSync(MenuSync({ be?.tanks?.get(i) ?: IFluidStack.Empty }, { tanks.setQuietly(i, it) }, MenuSyncs.FLUID,
+            addSync(MenuSync({ cells()?.cell(i) ?: IFluidStack.Empty }, { view.mirrorCell(i, it) }, MenuSyncs.FLUID,
                 { a, b -> a.amount() == b.amount() && a.isFluidEqual(b) }, { it.copy() }))
+            addSync(MenuSyncs.string({ cells()?.let { c -> c.lockOf(c.tankOfCell(i))?.toString() } ?: "" }, { view.mirrorLock(i, it.takeIf { s -> s.isNotEmpty() }?.let(Identifier::tryParse)) }))
         }
+        addSync(MenuSyncs.int({ cells()?.linkMask() ?: 0 }, { view.mirrorLinks(it) }))
+    }
+
+    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
+        val state = blockEntity?.state() ?: return false
+        return when (action) {
+            ACTION_LOCK -> {
+                val held = net.neoforged.neoforge.fluids.FluidUtil.getFluidContained(carried).orElse(null)
+                val fallback = held?.takeUnless { it.isEmpty }?.let { net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(it.fluid) }
+                state.toggleLock(data, fallback)
+            }
+            ACTION_LINK -> state.toggleLink(data)
+            else -> false
+        }
+    }
+
+    companion object {
+        const val ACTION_LOCK = 0
+        const val ACTION_LINK = 1
+        const val INVENTORY_Y = 113
+        const val HEIGHT = INVENTORY_Y + 58 + 18 + 6
     }
 }
 

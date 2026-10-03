@@ -468,9 +468,12 @@ object FemtoRenderers {
         var shell: net.minecraft.client.renderer.texture.TextureAtlasSprite? = null
         var light = 0
 
-        /** Per tank: its still sprite, tint and how full (0-1). */
+        /** Per cell: its tank's still sprite, tint and how full (0-1). */
         val fluids = ArrayList<Triple<net.minecraft.client.renderer.texture.TextureAtlasSprite, Int, Float>?>()
         val fluidLight = ArrayList<Int>()
+
+        /** Per cell: a bit for each cell of the same tank it touches. */
+        val linkedTo = IntArray(com.itszuvalex.femtocraft.logistics.FluidReservoirState.TANKS)
     }
 
     /**
@@ -496,18 +499,31 @@ object FemtoRenderers {
             state.size = com.itszuvalex.femtocraft.industry.FrameMultiblocks.FLUID_RESERVOIR.size.first.toFloat()
             state.shell = mc.modelManager.blockStateModelSet.get(be.blockState).particleMaterial().sprite()
             state.light = net.minecraft.client.renderer.LevelRenderer.getLightCoords(level, be.blockPos.offset(1, state.size.toInt(), 1))
-            for (i in 0 until be.clientTanks.size()) {
-                val stack = be.clientTanks.get(i).toMinecraft()
-                if (stack.isEmpty) {
-                    state.fluids += null
-                    state.fluidLight += state.light
-                    continue
+            val tanks = be.clientTanks
+            for (i in 0 until tanks.cellCount) state.linkedTo[i] = 0
+            for (t in tanks.groups.indices) {
+                val group = tanks.groups[t]
+                val stack = tanks.get(t).toMinecraft()
+                // Neighbouring cells of one tank join: no gap and no wall between them.
+                for (c in group) {
+                    if (c + 1 in group) {
+                        state.linkedTo[c] = state.linkedTo[c] or (1 shl c + 1)
+                        state.linkedTo[c + 1] = state.linkedTo[c + 1] or (1 shl c)
+                    }
                 }
-                val model = mc.modelManager.fluidStateModelSet.get(stack.fluid.defaultFluidState())
-                val tint = model.fluidTintSource()?.colorAsStack(stack) ?: -1
-                state.fluids += Triple(model.stillMaterial().sprite(), tint or (0xFF shl 24), stack.amount.toFloat() / be.clientTanks.capacity(i))
-                val glow = stack.fluid.fluidType.getLightLevel(stack)
-                state.fluidLight += net.minecraft.util.LightCoordsUtil.withBlock(state.light, maxOf(glow, net.minecraft.util.LightCoordsUtil.block(state.light)))
+                for (c in group) {
+                    if (stack.isEmpty) {
+                        state.fluids += null
+                        state.fluidLight += state.light
+                        continue
+                    }
+                    val model = mc.modelManager.fluidStateModelSet.get(stack.fluid.defaultFluidState())
+                    val tint = model.fluidTintSource()?.colorAsStack(stack) ?: -1
+                    // Every cell of a tank stands at the tank's level.
+                    state.fluids += Triple(model.stillMaterial().sprite(), tint or (0xFF shl 24), stack.amount.toFloat() / tanks.capacity(t))
+                    val glow = stack.fluid.fluidType.getLightLevel(stack)
+                    state.fluidLight += net.minecraft.util.LightCoordsUtil.withBlock(state.light, maxOf(glow, net.minecraft.util.LightCoordsUtil.block(state.light)))
+                }
             }
         }
 
@@ -524,14 +540,28 @@ object FemtoRenderers {
             collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.translucentMovingBlock()) { pose, buffer ->
                 state.fluids.forEachIndexed { i, fluid ->
                     if (fluid == null || fluid.third <= 0f) return@forEachIndexed
-                    // Tank i takes quarter i of the floor: west/east by bit 0, north/south by bit 1.
-                    val x0 = if (i and 1 == 0) MARGIN else half + GAP
-                    val x1 = if (i and 1 == 0) half - GAP else s - MARGIN
-                    val z0 = if (i and 2 == 0) MARGIN else half + GAP
-                    val z1 = if (i and 2 == 0) half - GAP else s - MARGIN
+                    // Cell i takes one quarter of the floor, in a ring (north-west, north-east, south-east,
+                    // south-west), so linkable neighbours always share a side.
+                    val east = i == 1 || i == 2
+                    val south = i >= 2
+                    val linked = state.linkedTo[i]
+                    fun joins(other: Int) = (linked shr other) and 1 != 0
+                    val westNeighbour = if (east) (if (south) 3 else 0) else -1
+                    val eastNeighbour = if (!east) (if (south) 2 else 1) else -1
+                    val northNeighbour = if (south) (if (east) 1 else 0) else -1
+                    val southNeighbour = if (!south) (if (east) 2 else 3) else -1
+                    val x0 = if (!east) MARGIN else half + if (joins(westNeighbour)) 0f else GAP
+                    val x1 = if (!east) half - (if (joins(eastNeighbour)) 0f else GAP) else s - MARGIN
+                    val z0 = if (!south) MARGIN else half + if (joins(northNeighbour)) 0f else GAP
+                    val z1 = if (!south) half - (if (joins(southNeighbour)) 0f else GAP) else s - MARGIN
                     val top = MARGIN + height * fluid.third.coerceIn(0f, 1f)
-                    Boxes.box(pose, buffer, fluid.first, x0, MARGIN, z0, x1, top, z1, fluid.second, state.fluidLight[i],
-                        faces = net.minecraft.core.Direction.entries.toSet() - net.minecraft.core.Direction.DOWN)
+                    val faces = net.minecraft.core.Direction.entries.toMutableSet()
+                    faces -= net.minecraft.core.Direction.DOWN
+                    if (westNeighbour >= 0 && joins(westNeighbour)) faces -= net.minecraft.core.Direction.WEST
+                    if (eastNeighbour >= 0 && joins(eastNeighbour)) faces -= net.minecraft.core.Direction.EAST
+                    if (northNeighbour >= 0 && joins(northNeighbour)) faces -= net.minecraft.core.Direction.NORTH
+                    if (southNeighbour >= 0 && joins(southNeighbour)) faces -= net.minecraft.core.Direction.SOUTH
+                    Boxes.box(pose, buffer, fluid.first, x0, MARGIN, z0, x1, top, z1, fluid.second, state.fluidLight[i], faces = faces)
                 }
             }
         }
