@@ -57,13 +57,13 @@ fresh on ItszuLib fragments when it is designed; machine recipes move to datapac
   synthesizer (recipe registries only).
 - Logistics: item vault, fluid reservoir.
 - Nanites: nanite hive, holding tank, behavior modeller.
-- Computation: archive interface, mainframe, information conduit.
+- Computation: information conduit (the archive interface and mainframe are built, DECISIONS D19).
 
 ## Not ported
 
 DECISIONS D4 and D5 give the reasoning.
 
-- **Computation** (`api/computation/*`, `computation/*`, `common/ComputationLimitedBatteryTask`, the computation
+- **Computation** as v3 wrote it (`api/computation/*`, `computation/*`, `common/ComputationLimitedBatteryTask`, the computation
   modules): unfinished; its tiles are stubs and its dummy capability implementations are all `???`.
 - **Tech tree** (`tech/*`): a skeleton with no content or consumer.
 - **Logistics test blocks** (`logistics/test/*`, `BlockTest`): debug content. The job/task system and indexed
@@ -189,6 +189,8 @@ switch mode. Power meters are ItszuLib `EnergyGauge`s (`FemtoScreen.addPowerGaug
 `-Pshowcase=10` opens a crystal liquifier's screen, with its panel, between a conduit, a chest and blocks (checked
 headless; hovering, dragging and clicking were not, since the headless client has no mouse input). `-Pshowcase=13` opens the germination
 chamber's screen with the panel showing the whole structure, two members' faces configured (checked headless).
+`-Pshowcase=14` builds a mainframe (two Micro Logic Cores, packed ice beside it) on computation conduits to an
+Archive Interface and a logistics conduit, and opens its screen (checked headless).
 
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
 chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block

@@ -124,6 +124,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── archive/               The Archive (3x3x3 frame multiblock researching the team's focus in Femtocraft's tech tree),
 │                          ArchiveRegistry (every claimed Archive and its status), Codex, NaniteHost (the player as host
 │                          of tier 0 Archive nanites: first contact, regeneration, drawing)
+├── computation/           Computation (DECISIONS D19): ComputationConduit network (ItszuLib distribution), leaves
+│                          (FragComputationLeaf), mainframe + processors + heat, Archive Interface (FLOPS to research)
 ├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
 │                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
 │                          indexed item storages (storage/)
@@ -191,6 +193,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`, `CodexItem.open`) opens the tree, queue and the team's Archives anywhere. Hosts see
   their status at the top left (`client/HostOverlay`; other systems add lines with `HostOverlay.addLine`). Gate content
   with `TechTree.isResearched(player, id)`.
+- **Computation** (DECISIONS D19): computation conduits (`ComputationConduit`, on `core/LeafConduit` like the power
+  conduit) form an ItszuLib `DistributingTileNetwork` over `ComputationModules.LEAF` leaves: mainframes are producers
+  (`MainframeComputer`: processors' FLOPS at the mainframe's speed, power spent per FLOP taken, most efficient first),
+  jobs are consumers (`ArchiveJob` behind the Archive Interface: 200 FLOPS per research point; logistics conduits'
+  active chips). Mainframes heat up and slow down from 60 °C (`MainframeHeat`); cold blocks beside them cool them.
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
   in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
   operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how
@@ -226,7 +233,8 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 ## Game tests
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
-`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`. Add one with
+`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`,
+`ComputationGameTests`. Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode

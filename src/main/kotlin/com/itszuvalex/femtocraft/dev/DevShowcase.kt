@@ -65,6 +65,7 @@ object DevShowcase {
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
         Vec3(17.5, 3.0, -2.5) to Vec3(17.5, 1.5, 1.0),
+        Vec3(12.5, 2.5, 4.0) to Vec3(12.5, 0.5, 7.0),
     )
 
     private const val FRAMES_VIEW = 9
@@ -72,6 +73,8 @@ object DevShowcase {
     private const val CODEX_VIEW = 11
     private const val MACHINE_VIEW = 12
     private const val MULTIBLOCK_VIEW = 13
+    private const val COMPUTATION_VIEW = 14
+    private val MAINFRAME = BlockPos(11, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
     private val FURNACE = BlockPos(9, 2, -7)
     private const val MENU_DELAY = 40
@@ -145,6 +148,12 @@ object DevShowcase {
                 (member as? com.itszuvalex.itszulib.core.BlockEntityCore)?.markDirtyAndSync()
             }
             (level.getBlockEntity(BASE.offset(CHAMBER)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The computation view opens the mainframe's screen (it computes for the logistics conduit beside it).
+        if (view == COMPUTATION_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
@@ -248,5 +257,19 @@ object DevShowcase {
             com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, net.minecraft.core.Direction.WEST, false)
         }
         (liquifier as? com.itszuvalex.itszulib.core.BlockEntityCore)?.markDirtyAndSync()
+        // Computation: a mainframe with two Micro Logic Cores and ice beside it, a computation conduit to an Archive
+        // Interface and a logistics conduit.
+        val computation = com.itszuvalex.femtocraft.computation.ComputationContent
+        level.setBlockAndUpdate(BASE.offset(MAINFRAME), computation.MAINFRAME.get().defaultBlockState()
+            .setValue(com.itszuvalex.itszulib.core.HorizontalFacing.FACING, net.minecraft.core.Direction.NORTH))
+        (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.femtocraft.computation.MainframeBlockEntity)?.let { mf ->
+            repeat(2) { mf.processors.setSlot(it, IItemStack.of(net.minecraft.world.item.ItemStack(computation.MICRO_LOGIC_CORE.get()))) }
+            mf.battery.setStorage(com.itszuvalex.femtocraft.computation.MainframeBlockEntity.BATTERY_SIZE)
+        }
+        set(MAINFRAME.x - 1, 0, MAINFRAME.z, Blocks.PACKED_ICE)
+        for (x in MAINFRAME.x + 1..MAINFRAME.x + 2) set(x, 0, MAINFRAME.z, computation.COMPUTATION_CONDUIT.get())
+        set(MAINFRAME.x + 2, 1, MAINFRAME.z, computation.COMPUTATION_CONDUIT.get())
+        set(MAINFRAME.x + 3, 0, MAINFRAME.z, computation.ARCHIVE_INTERFACE.get())
+        set(MAINFRAME.x + 2, 0, MAINFRAME.z + 1, LogisticsContent.CONDUIT.get())
     }
 }

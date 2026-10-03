@@ -101,7 +101,8 @@ abstract class ResearchScreen<M : AbstractContainerMenu>(menu: M, inventory: Inv
 }
 
 /**
- * The Archive: the tech tree and the team's queue, what this Archive is doing, and the player's own Archive nanites.
+ * The Archive: the tech tree and the team's queue, what this Archive is doing, the player's own Archive nanites and the
+ * computed points waiting (from Archive Interfaces).
  */
 class ArchiveScreen(menu: ArchiveMenu, inventory: Inventory, title: Component) : ResearchScreen<ArchiveMenu>(menu, inventory, title, HEIGHT) {
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
@@ -112,10 +113,11 @@ class ArchiveScreen(menu: ArchiveMenu, inventory: Inventory, title: Component) :
         val own = if (NaniteHost.isHost(player)) Component.translatable("gui.femtocraft.archive.host", NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP)
         else Component.translatable("gui.femtocraft.archive.not_host")
         line(graphics, own, 8, y + 12)
+        line(graphics, Component.translatable("gui.femtocraft.archive.computed", menu.computedPoints), 8, y + 24)
     }
 
     companion object {
-        const val HEIGHT = BELOW_TREE + 30 + 24 + 4
+        const val HEIGHT = BELOW_TREE + 30 + 36 + 4
     }
 }
 

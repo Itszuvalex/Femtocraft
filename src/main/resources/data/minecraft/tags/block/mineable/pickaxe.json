@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "femtocraft:archive",
+    "femtocraft:archive_interface",
+    "femtocraft:computation_conduit_crystal",
     "femtocraft:conduit",
     "femtocraft:crystal_charging_array",
     "femtocraft:crystal_crusher",
@@ -18,6 +20,7 @@
     "femtocraft:germination_chamber",
     "femtocraft:item_repository",
     "femtocraft:lapisreplacement",
+    "femtocraft:mainframe",
     "femtocraft:nanite_extractor",
     "femtocraft:nanite_infuser",
     "femtocraft:nanite_repository",

@@ -320,6 +320,9 @@ class Connection<B : Any>(
 
     val passiveFlopGen: Double get() = kind.flopsRequired / (20 * 10)
 
+    /** Flops left before the next operation. */
+    val flopsRemaining: Double get() = counter.flops
+
     private val target: BlockPos get() = conduit.relative(face)
 
     private fun canAcceptMoreInput(): Boolean = kind.amount(buffer) < kind.limit(buffer)

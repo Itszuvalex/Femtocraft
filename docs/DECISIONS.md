@@ -277,3 +277,28 @@ the old per-pixel grain as a toggle, and for slots that show where items go on g
   (`blockmachineblock_*_color`) under the base as a tinted layer: the machine's own colour if it has one
   (`FemtoTints.MACHINE_DEFAULT` otherwise, black), and black for the items.
 
+
+## D19. Computation: mainframes, computation conduits, FLOPS for research and logistics — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked for computation next, after v3's unfinished `api/computation` (computers turning power into
+FLOPS for jobs over a wired computation network; its tiles were stubs). Built on ItszuLib's producer/consumer
+distribution (ItszuLib DECISIONS D15), as power is.
+
+- **Network.** `ComputationConduit` (block `computation_conduit_crystal`, v3's computation conduit textures) is an
+  ItszuLib `DistributingTileNetwork`; leaves expose `ComputationModules.LEAF` (`FragComputationLeaf`) and bring a
+  computer (producer) or a job (consumer) each tick. FLOPS are not stored. The conduit's leaf attachment is shared
+  with the power conduit (`core/LeafConduit`).
+- **Mainframe** (block `mainframe`): four processor slots, a battery charged by wired or wireless power. Processors:
+  the 1.7.10 alpha's Micro Logic Core (20 FLOPS/t, 0.5 DE per FLOP) and Orpheus Processor (60 FLOPS/t, 0.3 DE per
+  FLOP), with the alpha's textures. A mainframe spends power only on the FLOPS jobs take, most efficient first
+  (ItszuLib `Distributable.priority`).
+- **Heat.** Computing heats a mainframe; each tick it loses a share of its excess over the biome's ambient temperature
+  (plains 20 °C), more with ice, snow or water beside it. It slows down from 60 °C and stops at 100 °C, so four Micro
+  Logic Cores settle at about two thirds of their speed uncooled and run fully with two ice blocks beside them. This
+  is the processor throttling v3's `IProcessor` asked for, kept simple.
+- **Jobs.** The Archive Interface (block `archive_interface`), placed against an Archive with a focus, turns every 200
+  FLOPS into a research point: the Archive spends up to 20 computed points a step on top of the nanite points, keeping
+  at most 80 waiting. Logistics conduits are jobs too, as v3 intended (chips count down flops): FLOPS run their active
+  chips' countdowns down on top of the passive rate, at most one operation per chip per tick.
+- Recipes are placeholders from existing parts; nothing is gated by research yet. Not done: v3's information conduit
+  (no design survives), a mainframe model (placeholder front texture), heat sources other than the biome.

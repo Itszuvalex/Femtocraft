@@ -106,6 +106,10 @@ BLOCKS = {
     "fluid_repository": ("Fluid Repository", ("orientable", "blockfluidrepository_front", "blockfluidrepository_side", "blockfluidrepository_top"), "self", "pickaxe"),
     "nanite_repository": ("Nanite Repository", ("orientable", "blocknaniterepository_front", "blocknaniterepository_side", "blocknaniterepository_top"), "self", "pickaxe"),
     "conduit": ("Logistics Conduit", ("conduit_obj", "wire_thin", "wire_thin_color"), "self", "pickaxe"),
+    # --- computation ---
+    "computation_conduit_crystal": ("Crystal Computation Conduit", ("conduit_obj", "wire_thin_computation", "wire_thin_computation_color"), "self", "pickaxe"),
+    "mainframe": ("Mainframe", ("machine", "mainframe_front"), "self", "pickaxe"),
+    "archive_interface": ("Archive Interface", ("machine", "archive_interface_front"), "self", "pickaxe"),
     # --- cyber ---
     "substrate": ("Substrate", ("cube_all", "substrate"), "self", "pickaxe"),
     "refined_substrate": ("Refined Substrate", ("cube_all", "refinedsubstrate"), "self", "pickaxe"),
@@ -162,6 +166,9 @@ ITEMS = {
     "cyberleaf": ("Cyberleaf", "itemcyberleaf"),
     "nanoweave_thread": ("Nanoweave Thread", "nanoweave_thread"),
     "nanoweave_sheet": ("Nanoweave Sheet", "nanoweave_sheet"),
+    # The 1.7.10 alpha's textures.
+    "micro_logic_core": ("Micro Logic Core", "micro_logic_core"),
+    "orpheus_processor": ("Orpheus Processor", "orpheus_processor"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
@@ -171,6 +178,8 @@ PLACEHOLDERS = {
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
     "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
+    "block/mainframe_front": ((0, 0, 0, 0), (90, 255, 150, 255)),
+    "block/archive_interface_front": ((0, 0, 0, 0), (90, 200, 220, 255)),
 }
 
 LANG = {
@@ -220,7 +229,7 @@ LANG = {
     "gui.femtocraft.archive.this": "This Archive: %s",
     "gui.femtocraft.archive.status.idle": "Idle",
     "gui.femtocraft.archive.status.researching": "Researching",
-    "gui.femtocraft.archive.status.no_host": "Needs a nanite host nearby",
+    "gui.femtocraft.archive.status.no_host": "Needs a nanite host nearby or computation",
     "gui.femtocraft.archive.host": "Your Archive nanites: %s / %s",
     "gui.femtocraft.archive.not_host": "You are not a nanite host. Touch a crystal cluster.",
     "hud.femtocraft.host.nanites": "Archive nanites %s / %s",
@@ -252,6 +261,14 @@ LANG = {
     "gui.femtocraft.nanite.tank": "Nanites: %s/%s",
     "gui.femtocraft.nanite.player": "Yours: %s",
     "entity.femtocraft.nano_lash": "Nano Lash",
+    "tooltip.femtocraft.processor.flops": "%s FLOPS/t",
+    "tooltip.femtocraft.processor.power": "%s DE per FLOP",
+    "gui.femtocraft.mainframe.flops": "FLOPS: %s/t",
+    "gui.femtocraft.mainframe.capacity": "Max: %s/t",
+    "gui.femtocraft.mainframe.temperature": "Heat: %s °C",
+    "gui.femtocraft.mainframe.ambient": "Ambient: %s °C",
+    "gui.femtocraft.mainframe.throttle": "Slows from %s °C, stops at %s °C",
+    "gui.femtocraft.archive.computed": "Computed points waiting: %s",
 }
 
 TAGS = {
@@ -328,6 +345,11 @@ RECIPES = {
     "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
     "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
     "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "computation_conduit_crystal": shaped(["SSS", "RCR", "SSS"], {"S": f"{NS}:nanoweave_sheet", "R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:basic_circuit"}, f"{NS}:computation_conduit_crystal", 6),
+    "micro_logic_core": shaped(["RCR", "CDC", "RCR"], {"R": "minecraft:redstone", "C": f"{NS}:basic_circuit", "D": f"{NS}:crackling_dust"}, f"{NS}:micro_logic_core"),
+    "orpheus_processor": shaped(["PMP", "MDM", "PMP"], {"P": f"{NS}:phasemetal_ingot_devoid", "M": f"{NS}:micro_logic_core", "D": f"{NS}:diamond_dust"}, f"{NS}:orpheus_processor"),
+    "mainframe": shaped(["SCS", "CFC", "SRS"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:mainframe"),
+    "archive_interface": shaped(["SDS", "CFC", "SCS"], {"S": f"{NS}:nanoweave_sheet", "D": f"{NS}:crackling_dust", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame"}, f"{NS}:archive_interface"),
     "codex": shapeless(["minecraft:book", f"{NS}:crackling_dust"], f"{NS}:codex"),
     "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:frame"),
     "logistics_fluid_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:lapisreplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_fluid_chip_basic", 8),
@@ -519,6 +541,7 @@ ITEM_TINTS = {
     "crystal_cluster": 0xFF73E6FF,
     "power_conduit_crystal": 0xFF33CCFF,
     "conduit": 0xFFFFB040,
+    "computation_conduit_crystal": 0xFF66FF99,
 }
 
 

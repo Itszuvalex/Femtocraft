@@ -47,6 +47,7 @@ object DevGameTests {
         LogisticsGameTests.register()
         CyberGameTests.register()
         ArchiveGameTests.register()
+        ComputationGameTests.register()
     }
 
     fun register(modBus: IEventBus) {
