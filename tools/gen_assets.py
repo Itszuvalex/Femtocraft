@@ -82,7 +82,9 @@ def drop_count(name, item, lo, hi):
 #   ("leaves", tex)
 #   ("cross", tex)                    crossed planes
 #   ("box", tex, [x0,y0,z0,x1,y1,z1], ...)   one or more boxes with one texture
-#   ("pillar", side, end, [x0,y0,z0,x1,y1,z1])   one box: [side] stretched over each side face, [end] on top and bottom
+#   ("pillar", side, end, [x0,y0,z0,x1,y1,z1][, bottom])   one box: [side] stretched over each side face, [end] on top
+#                                     and bottom (or [bottom] on the bottom)
+#   ("cube_bottom_top", side, top, bottom)
 # drops: "self", "none", or a loot table dict
 BLOCKS = {
     # name: (display name, model, drops, tool)
@@ -94,6 +96,9 @@ BLOCKS = {
     "power_conduit_crystal": ("Crystal Power Conduit", ("conduit_obj", "wire_thin_power", "wire_thin_power_color"), "self", "pickaxe"),
     "glow_stick": ("Glow Stick", ("glow_stick",), "self", None),
     # The 1.7.10 alpha's cryo-endothermal generator (DECISIONS D21), with its textures.
+    "atmospheric_charging_base": ("Atmospheric Charging Base", ("cube_bottom_top", "atmospheric_charging_base_side", "atmospheric_charging_base_top", "atmospheric_charging_base_bottom"), "self", "pickaxe"),
+    "atmospheric_charging_coil": ("Atmospheric Charging Coil", ("pillar", "atmospheric_charging_coil", "atmospheric_charging_coil_top", [4, 0, 4, 12, 16, 12]), "self", "pickaxe"),
+    "atmospheric_charging_capacitor": ("Atmospheric Charging Capacitor", ("pillar", "atmospheric_charging_capacitor_side", "atmospheric_charging_capacitor_top", [2, 0, 2, 14, 14, 14], "atmospheric_charging_capacitor_bottom"), "self", "pickaxe"),
     "cryo_endothermal_charging_base": ("Cryo-Endothermal Charging Base", ("cube_all", "cryo_endothermal_charging_base"), "self", "pickaxe"),
     "cryo_endothermal_charging_coil": ("Cryo-Endothermal Charging Coil", ("pillar", "cryo_endothermal_charging_coil", "cryo_endothermal_charging_coil_top", [4, 0, 4, 12, 16, 12]), "self", "pickaxe"),
     # --- industry ---
@@ -277,6 +282,10 @@ LANG = {
     "gui.femtocraft.mainframe.throttle": "Slows from %s °C, stops at %s °C",
     "gui.femtocraft.archive.computed": "Computed points waiting: %s",
     "gui.femtocraft.cryo.coils": "Coils: %s / %s",
+    "gui.femtocraft.atmospheric.coils": "Coils: %s / %s",
+    "gui.femtocraft.atmospheric.capped": "Capped by a capacitor",
+    "gui.femtocraft.atmospheric.uncapped": "No capacitor on top",
+    "gui.femtocraft.atmospheric.strikes": "Lightning strikes: %s",
     "gui.femtocraft.cryo.generation": "Generating %s DE/t",
 }
 
@@ -354,6 +363,9 @@ RECIPES = {
     "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
     "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
     "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "atmospheric_charging_base": shaped(["SCS", "IFI", "SRS"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "I": "minecraft:iron_ingot", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:atmospheric_charging_base"),
+    "atmospheric_charging_coil": shaped([" I ", "CRC", " I "], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, f"{NS}:atmospheric_charging_coil", 2),
+    "atmospheric_charging_capacitor": shaped(["CRC", "RBR", "CRC"], {"C": "minecraft:copper_ingot", "R": "minecraft:redstone", "B": f"{NS}:crystal_battery"}, f"{NS}:atmospheric_charging_capacitor"),
     "cryo_endothermal_charging_base": shaped(["SBS", "CFC", "SRS"], {"S": f"{NS}:nanoweave_sheet", "B": f"{NS}:crystal_battery", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:cryo_endothermal_charging_base"),
     "cryo_endothermal_charging_coil": shaped([" I ", "RCR", " I "], {"I": "minecraft:packed_ice", "R": f"{NS}:riftiron_ingot_devoid", "C": f"{NS}:nano_channel"}, f"{NS}:cryo_endothermal_charging_coil", 2),
     "computation_conduit_crystal": shaped(["SSS", "RCR", "SSS"], {"S": f"{NS}:nanoweave_sheet", "R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:basic_circuit"}, f"{NS}:computation_conduit_crystal", 6),
@@ -514,10 +526,13 @@ def block_model(name, kind):
     if k == "pillar":
         x0, y0, z0, x1, y1, z1 = kind[3]
         sides = {d: {"texture": "#side", "uv": [0, 0, 16, 16]} for d in ["north", "south", "east", "west"]}
-        ends = {d: {"texture": "#end", "uv": [x0, z0, x1, z1]} for d in ["up", "down"]}
+        ends = {"up": {"texture": "#end", "uv": [x0, z0, x1, z1]}, "down": {"texture": "#bottom", "uv": [x0, z0, x1, z1]}}
+        bottom = kind[4] if len(kind) > 4 else kind[2]
         return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
-                "textures": {"particle": tex(kind[2]), "side": tex(kind[1]), "end": tex(kind[2])},
+                "textures": {"particle": tex(kind[2]), "side": tex(kind[1]), "end": tex(kind[2]), "bottom": tex(bottom)},
                 "elements": [{"from": [x0, y0, z0], "to": [x1, y1, z1], "faces": {**sides, **ends}}]}
+    if k == "cube_bottom_top":
+        return {"parent": "minecraft:block/cube_bottom_top", "textures": {"side": tex(kind[1]), "top": tex(kind[2]), "bottom": tex(kind[3])}}
     if k == "box":
         return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
                 "textures": {"particle": tex(kind[1]), "all": tex(kind[1])}, "elements": [element(b) for b in kind[2:]]}

@@ -3,6 +3,9 @@
   "values": [
     "femtocraft:archive",
     "femtocraft:archive_interface",
+    "femtocraft:atmospheric_charging_base",
+    "femtocraft:atmospheric_charging_capacitor",
+    "femtocraft:atmospheric_charging_coil",
     "femtocraft:computation_conduit_crystal",
     "femtocraft:conduit",
     "femtocraft:cryo_endothermal_charging_base",

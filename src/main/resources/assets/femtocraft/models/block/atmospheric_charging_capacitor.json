@@ -2,22 +2,22 @@
   "parent": "minecraft:block/block",
   "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "femtocraft:block/cryo_endothermal_charging_coil_top",
-    "side": "femtocraft:block/cryo_endothermal_charging_coil",
-    "end": "femtocraft:block/cryo_endothermal_charging_coil_top",
-    "bottom": "femtocraft:block/cryo_endothermal_charging_coil_top"
+    "particle": "femtocraft:block/atmospheric_charging_capacitor_top",
+    "side": "femtocraft:block/atmospheric_charging_capacitor_side",
+    "end": "femtocraft:block/atmospheric_charging_capacitor_top",
+    "bottom": "femtocraft:block/atmospheric_charging_capacitor_bottom"
   },
   "elements": [
     {
       "from": [
-        4,
+        2,
         0,
-        4
+        2
       ],
       "to": [
-        12,
-        16,
-        12
+        14,
+        14,
+        14
       ],
       "faces": {
         "north": {
@@ -59,19 +59,19 @@
         "up": {
           "texture": "#end",
           "uv": [
-            4,
-            4,
-            12,
-            12
+            2,
+            2,
+            14,
+            14
           ]
         },
         "down": {
           "texture": "#bottom",
           "uv": [
-            4,
-            4,
-            12,
-            12
+            2,
+            2,
+            14,
+            14
           ]
         }
       }

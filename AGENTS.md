@@ -165,7 +165,9 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   participants are the `FragWiredPowerLeafNode` machines on its faces (keyed by block or multiblock, so each counts
   once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours).
   The alpha's cryo-endothermal generator (`power/Cryo.kt`, DECISIONS D21): coils stacked under a charging base draw
-  power from ice and snow beside them and freeze water, lava and air nearby for bursts (`CryogenRegistry` handlers). Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
+  power from ice and snow beside them and freeze water, lava and air nearby for bursts (`CryogenRegistry` handlers).
+  The alpha's atmospheric charging pole (`power/Atmospheric.kt`, D22): coils and a capacitor stacked on a base, more
+  in rain and storms, and harmless (visual-only) lightning strikes on the capacitor during thunderstorms for bursts. Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
   `femtocraft:power_crystal` component.
 - **Machines**: `ProcessingMachineBlockEntity` holds an `ItemStorageArray` behind ItszuLib sided configuration, item
   auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).

@@ -189,7 +189,7 @@ switch mode. Power meters are ItszuLib `EnergyGauge`s (`FemtoScreen.addPowerGaug
 `-Pshowcase=10` opens a crystal liquifier's screen, with its panel, between a conduit, a chest and blocks (checked
 headless; hovering, dragging and clicking were not, since the headless client has no mouse input). `-Pshowcase=13` opens the germination
 chamber's screen with the panel showing the whole structure, two members' faces configured (checked headless).
-`-Pshowcase=15` shows the cryo-endothermal charging base on two coils beside them. `-Pshowcase=14` builds a mainframe (two Micro Logic Cores, packed ice beside it) on computation conduits to an
+`-Pshowcase=16` strikes an atmospheric charging pole with lightning every half second. `-Pshowcase=15` shows the cryo-endothermal charging base on two coils beside them. `-Pshowcase=14` builds a mainframe (two Micro Logic Cores, packed ice beside it) on computation conduits to an
 Archive Interface and a logistics conduit, and opens its screen (checked headless).
 
 Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or

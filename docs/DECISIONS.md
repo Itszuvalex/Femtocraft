@@ -331,4 +331,21 @@ alpha's values and textures (`power/Cryo.kt`):
   their average output.
 - `CryogenRegistry` keeps the alpha's handler lists, so other blocks can be made cryogens (passive or active).
 - Recipes are placeholders. The alpha's other generators (steam, magnetohydrodynamic, magnetic induction, atmospheric
-  charging) are not ported; DECISIONS asks which come next.
+  charging) were not ported at first; the atmospheric charger was the one meant (D22).
+
+## D22. The alpha's atmospheric charging pole, with lightning — DECIDED (maintainer, 2026-10-03)
+
+The generator the maintainer meant for D21 was the alpha's Atmospheric Charging Base. It is ported with its values and
+textures (`power/Atmospheric.kt`); the cryo-endothermal generator of D21 stays.
+
+- **The pole.** A base with up to 10 addons stacked on it: coils (0.1 DE/t each) and, on top, a capacitor that adds a
+  share of the coils below it: 20%, 40% in rain, 80% in a thunderstorm. Rain and storm count only where the capacitor
+  is out in the weather (the alpha checked the world's weather alone). Addons need the base or a coil below them and
+  air on all four sides, and break (dropping themselves) when that stops being true; nothing stands on a capacitor;
+  two bases may not stand side by side.
+- **Lightning** (maintainer): during a thunderstorm a capped pole out in the weather is struck about once a minute.
+  The bolt lands on the capacitor's top and is visual only, so it sets no fire, damages no block and hurts nothing; it
+  gives the base 1,000 DE. The base holds 2,500 DE (the alpha's 250 could not take a strike) and is a producer on the
+  wireless and wired networks; its screen shows the coils, the capacitor, power per tick and strikes taken.
+- Recipes are placeholders (iron, copper, redstone, a crystal battery). Natural lightning is not drawn to the pole
+  (it is not a vanilla lightning rod).

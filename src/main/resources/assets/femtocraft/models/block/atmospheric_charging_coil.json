@@ -2,10 +2,10 @@
   "parent": "minecraft:block/block",
   "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "femtocraft:block/cryo_endothermal_charging_coil_top",
-    "side": "femtocraft:block/cryo_endothermal_charging_coil",
-    "end": "femtocraft:block/cryo_endothermal_charging_coil_top",
-    "bottom": "femtocraft:block/cryo_endothermal_charging_coil_top"
+    "particle": "femtocraft:block/atmospheric_charging_coil_top",
+    "side": "femtocraft:block/atmospheric_charging_coil",
+    "end": "femtocraft:block/atmospheric_charging_coil_top",
+    "bottom": "femtocraft:block/atmospheric_charging_coil_top"
   },
   "elements": [
     {

@@ -320,7 +320,7 @@ object ArchiveResearch {
         val server = player.level().server ?: return 0
         val team = ItszuLib.TEAMS.state.teamOf(player.uuid)?.id ?: return 0
         val focus = TechTree.focus(server, team, ArchiveContent.TREE) ?: return 0
-        val taken = TechTree.deliver(server, team, focus, player.inventory.nonEquipmentItems)
+        val taken = TechTree.deliverFrom(server, team, focus, player.inventory.nonEquipmentItems)
         if (taken > 0) player.inventory.setChanged()
         return taken
     }

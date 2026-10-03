@@ -53,3 +53,20 @@ class CryoChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.CryoChargingB
         text(graphics, Component.translatable("gui.femtocraft.cryo.generation", fmt1(menu.generation)), 24, 38)
     }
 }
+
+/**
+ * The atmospheric charging base: its battery, the pole (coils, capacitor), power per tick and lightning strikes taken.
+ */
+class AtmosphericChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.AtmosphericChargingBaseMenu, inventory: Inventory, title: Component) :
+    FemtoScreen<com.itszuvalex.femtocraft.power.AtmosphericChargingBaseMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
+    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        text(graphics, Component.translatable("gui.femtocraft.atmospheric.coils", menu.coils, com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_ADDONS), 24, 20)
+        text(graphics, Component.translatable(if (menu.capped) "gui.femtocraft.atmospheric.capped" else "gui.femtocraft.atmospheric.uncapped"), 24, 32)
+        text(graphics, Component.translatable("gui.femtocraft.cryo.generation", "%.2f".format(java.util.Locale.ROOT, menu.powerPerTick)), 24, 44)
+        text(graphics, Component.translatable("gui.femtocraft.atmospheric.strikes", menu.strikes), 24, 56)
+    }
+}

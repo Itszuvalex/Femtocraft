@@ -67,6 +67,7 @@ object DevShowcase {
         Vec3(17.5, 3.0, -2.5) to Vec3(17.5, 1.5, 1.0),
         Vec3(12.5, 2.5, 4.0) to Vec3(12.5, 0.5, 7.0),
         Vec3(13.0, 3.0, 2.5) to Vec3(14.5, 1.0, 6.5),
+        Vec3(16.0, 3.5, 1.0) to Vec3(19.5, 3.0, 7.5),
     )
 
     private const val FRAMES_VIEW = 9
@@ -76,6 +77,8 @@ object DevShowcase {
     private const val MULTIBLOCK_VIEW = 13
     private const val COMPUTATION_VIEW = 14
     private val MAINFRAME = BlockPos(11, 0, 7)
+    private const val LIGHTNING_VIEW = 16
+    private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
     private val FURNACE = BlockPos(9, 2, -7)
     private const val MENU_DELAY = 40
@@ -158,6 +161,12 @@ object DevShowcase {
             p.closeContainer()
             (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The lightning view strikes the atmospheric pole every half second (harmless bolts on the capacitor's top).
+        if (view == LIGHTNING_VIEW && (ticks - BUILD_AT) % 10 == 5) {
+            (level.getBlockEntity(BASE.offset(POLE)) as? com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity)?.let { pole ->
+                pole.capacitorPos()?.let { pole.strike(level, it) }
+            }
         }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
@@ -281,5 +290,9 @@ object DevShowcase {
         set(16, 0, 5, Blocks.ICE)
         set(15, 0, 4, Blocks.PACKED_ICE)
         set(16, 0, 4, Blocks.WATER)
+        // The alpha's atmospheric charging pole: a base, three coils and a capacitor.
+        set(POLE.x, 0, POLE.z, PowerContent.ATMOSPHERIC_BASE.get())
+        for (y in 1..3) set(POLE.x, y, POLE.z, PowerContent.ATMOSPHERIC_COIL.get())
+        set(POLE.x, 4, POLE.z, PowerContent.ATMOSPHERIC_CAPACITOR.get())
     }
 }

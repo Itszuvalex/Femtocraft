@@ -57,6 +57,21 @@ object PowerContent {
     val CRYO_BASE_MENU = R.blockMenu<CryoChargingBaseBlockEntity, CryoChargingBaseMenu>("cryo_endothermal_charging_base", ::CryoChargingBaseMenu)
 
     @JvmField
+    val ATMOSPHERIC_BASE = blockWithItem("atmospheric_charging_base", ::AtmosphericChargingBaseBlock) { machine(it) }
+
+    @JvmField
+    val ATMOSPHERIC_COIL = blockWithItem("atmospheric_charging_coil", ::AtmosphericChargingCoilBlock) { it.strength(1f).sound(SoundType.METAL).noOcclusion() }
+
+    @JvmField
+    val ATMOSPHERIC_CAPACITOR = blockWithItem("atmospheric_charging_capacitor", ::AtmosphericChargingCapacitorBlock) { it.strength(1f).sound(SoundType.METAL).noOcclusion() }
+
+    @JvmField
+    val ATMOSPHERIC_BASE_BE = R.blockEntity("atmospheric_charging_base", ::AtmosphericChargingBaseBlockEntity, ATMOSPHERIC_BASE::get)
+
+    @JvmField
+    val ATMOSPHERIC_BASE_MENU = R.blockMenu<AtmosphericChargingBaseBlockEntity, AtmosphericChargingBaseMenu>("atmospheric_charging_base", ::AtmosphericChargingBaseMenu)
+
+    @JvmField
     val CRYSTAL_MOUNT_BE = R.blockEntity("crystal_mount", ::CrystalMountBlockEntity, CRYSTAL_MOUNT::get)
 
     @JvmField
