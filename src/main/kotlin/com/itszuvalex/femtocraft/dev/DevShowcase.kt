@@ -72,6 +72,7 @@ object DevShowcase {
         Vec3(27.0, 5.0, -7.0) to Vec3(27.0, 1.5, 1.5),
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
+        Vec3(10.5, 2.5, -1.0) to Vec3(10.5, 0.5, 2.0),
     )
 
     private const val FRAMES_VIEW = 9
@@ -83,6 +84,7 @@ object DevShowcase {
     private val MAINFRAME = BlockPos(11, 0, 7)
     private const val LIGHTNING_VIEW = 16
     private const val VAULT_VIEW = 17
+    private const val CONDUIT_VIEW = 21
     private val ITEM_VAULT = BlockPos(22, 0, 0)
     private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
@@ -178,6 +180,12 @@ object DevShowcase {
         // ...then the fluid reservoir's screen.
         if (view == VAULT_VIEW + 3 && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
             (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The conduit view opens a logistics conduit holding filtered chips.
+        if (view == CONDUIT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        if (view == CONDUIT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            (level.getBlockEntity(BASE.offset(10, 0, 2)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
         // The lightning view strikes the atmospheric pole every half second (harmless bolts on the capacitor's top).
@@ -313,6 +321,20 @@ object DevShowcase {
         set(POLE.x, 0, POLE.z, PowerContent.ATMOSPHERIC_BASE.get())
         for (y in 1..3) set(POLE.x, y, POLE.z, PowerContent.ATMOSPHERIC_COIL.get())
         set(POLE.x, 4, POLE.z, PowerContent.ATMOSPHERIC_CAPACITOR.get())
+        // Filtered chips in the first logistics conduit: items (diamonds, iron, redstone) and fluids (water, lava).
+        (level.getBlockEntity(BASE.offset(10, 0, 2)) as? com.itszuvalex.femtocraft.logistics.ConduitBlockEntity)?.let { conduit ->
+            val up = net.minecraft.core.Direction.UP
+            val item = com.itszuvalex.femtocraft.logistics.ItemChipKind
+            val fluid = com.itszuvalex.femtocraft.logistics.FluidChipKind
+            val itemChip = net.minecraft.world.item.ItemStack(LogisticsContent.ITEM_CHIP.get()).also { st ->
+                st.set(item.component, item.defaults(up).with(filter = listOf(net.minecraft.world.item.Items.DIAMOND, net.minecraft.world.item.Items.IRON_INGOT, net.minecraft.world.item.Items.REDSTONE).map { net.minecraft.world.item.ItemStack(it) }))
+            }
+            val fluidChip = net.minecraft.world.item.ItemStack(LogisticsContent.FLUID_CHIP.get()).also { st ->
+                st.set(fluid.component, fluid.defaults(up).with(filter = listOf(net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.LAVA).map { net.neoforged.neoforge.fluids.FluidStack(it, 1) }))
+            }
+            conduit.conduit.chips[up.get3DDataValue()].setSlot(0, IItemStack.of(itemChip))
+            conduit.conduit.chips[up.get3DDataValue()].setSlot(1, IItemStack.of(fluidChip))
+        }
         // The storage multiblocks; the item vault holds a little of many items (more than a terminal page).
         FrameMultiblocks.ITEM_VAULT.formAt(level, BASE.offset(ITEM_VAULT))
         FrameMultiblocks.FLUID_RESERVOIR.formAt(level, BASE.offset(ITEM_VAULT).offset(4, 0, 0))

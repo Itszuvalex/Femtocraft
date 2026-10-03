@@ -209,7 +209,10 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   much (1 item, 250 mB, 5 nanites), and the network routes each kind separately by channel. A chip's countdown lives in the
   conduit's `ChipSlots` while it is inserted and is written back to the chip whenever the slot is read from outside
   (`get`); the conduit itself uses `chip(index)`, which does not write. Add a kind by
-  subclassing `ChipKind` and listing it in `Chips.KINDS`. `DistributedManager` matches
+  subclassing `ChipKind` and listing it in `Chips.KINDS`. Chips carry a nine-entry allowlist (`ChipData.filter`,
+  `ChipKind.passes`; set in the conduit screen by clicking with the item or a fluid container held, DECISIONS D24);
+  item chips pull through a block's `LogisticsModules.ITEM_INDEX` (an ItszuLib `ItemStorageIndex`, e.g. the item
+  vault's) when it has one. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
   or broken); it has no block using it yet (DECISIONS D4). Indexed storage is ItszuLib's (`IndexedItemStorage`,
   `ItemStorageIndex`: writes through the wrapper keep it current); `IItemLogisticsNetwork` hands out an

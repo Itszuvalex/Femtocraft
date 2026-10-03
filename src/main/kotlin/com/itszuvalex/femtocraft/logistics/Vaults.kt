@@ -63,6 +63,35 @@ import net.minecraft.world.level.storage.ValueOutput
 private const val NONE = "None"
 
 /**
+ * Logistics modules: [ITEM_INDEX] is an indexed inventory's [ItemStorageIndex] on the faces that expose it, so logistics
+ * chips can take exactly what they are filtered for without scanning slots.
+ */
+object LogisticsModules {
+    @JvmField
+    val ITEM_INDEX: com.itszuvalex.itszulib.api.adapters.IModule<ItemStorageIndex> =
+        com.itszuvalex.itszulib.api.adapters.Module.registerModule(Identifier.fromNamespaceAndPath(com.itszuvalex.femtocraft.Femtocraft.ID, "item_index"), null)
+
+    fun init() {}
+}
+
+/**
+ * Exposes [index] through [LogisticsModules.ITEM_INDEX] on the faces whose item configuration shows [storage] (so a
+ * face set to expose nothing gives no index either). Saves nothing.
+ */
+class FragItemIndex(private val storage: IItemStorage, private val index: () -> ItemStorageIndex?) :
+    com.itszuvalex.itszulib.core.frag.BlockEntityFragment<ItemStorageIndex>() {
+    override fun name(): String = "ItemIndex"
+    override fun module(): com.itszuvalex.itszulib.api.adapters.IModule<ItemStorageIndex> = LogisticsModules.ITEM_INDEX
+    override fun faceToModuleMapper(be: com.itszuvalex.itszulib.api.adapters.IBlockEntity): (Direction?) -> ItemStorageIndex? = { side ->
+        val config = host?.blockEntity()?.getModule(Modules.ITEM_STORAGE_CONFIGURABLE, null)
+        if (side == null || config == null || config.getStorageForGlobalFacing(side) === storage) index() else null
+    }
+    override fun handlesScope(scope: com.itszuvalex.itszulib.api.utility.NBTSerializationScope): Boolean = false
+    override fun serializeTo(scope: com.itszuvalex.itszulib.api.utility.NBTSerializationScope, output: ValueOutput) {}
+    override fun deserialize(input: ValueInput, scope: com.itszuvalex.itszulib.api.utility.NBTSerializationScope) {}
+}
+
+/**
  * The item vault's contents: [SLOTS] slots in an ItszuLib [IndexedItemStorage], so finding, counting and taking an
  * item reads only the slots holding it, and an [index] over it for the terminal (and for anything that wants several
  * vaults searched as one).
@@ -239,6 +268,7 @@ class ItemVaultBlockEntity(pos: BlockPos, state: BlockState) :
         ))
         fragList.addItemStorage(FragItemStorage(storage, persist = false))
         fragList.addTickableFragment(FragItemAutoIO())
+        fragList.addFragment(FragItemIndex(storage) { index() })
     }
 
     /** The vault's index (null while not formed, or while the home block's chunk loads). */

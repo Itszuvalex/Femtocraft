@@ -58,6 +58,7 @@ object LogisticsContent {
     fun init() {
         Chips.KINDS
         LogisticsConduit.MODULE
+        LogisticsModules.init()
     }
 
 }

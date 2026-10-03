@@ -56,10 +56,16 @@ class NaniteRepositoryScreen(menu: NaniteRepositoryMenu, inventory: Inventory, t
 
 /**
  * Click a chip to select it; the buttons cycle the selected chip's direction and interface face (shift goes
- * backwards).
+ * backwards). The row of nine cells below is the selected chip's filter, as in AE2: click a cell holding an item (item
+ * chips) or a filled container (fluid chips) to allow that, empty-handed to clear it; a chip with no entries takes
+ * anything.
  */
-class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) : FemtoScreen<ConduitMenu>(menu, inventory, title, 176, 186) {
+class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) : FemtoScreen<ConduitMenu>(menu, inventory, title, 176, ConduitMenu.HEIGHT) {
     private var selected = -1
+
+    init {
+        inventoryLabelY = ConduitMenu.INVENTORY_Y - 11
+    }
 
     override fun init() {
         super.init()
@@ -73,7 +79,28 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
         ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action, ConduitMenu.data(selected / 4, selected % 4, backward)))
     }
 
+    private fun selectedChip(): net.minecraft.world.item.ItemStack =
+        menu.slots.getOrNull(selected)?.item?.takeIf { com.itszuvalex.femtocraft.logistics.Chips.isChip(it) } ?: net.minecraft.world.item.ItemStack.EMPTY
+
+    /** The filter cell under ([mx], [my]), or -1. */
+    private fun filterCell(mx: Double, my: Double): Int {
+        val fx = mx - (leftPos + FILTER_X)
+        val fy = my - (topPos + FILTER_Y)
+        if (fx < 0 || fy < 0 || fy >= 18) return -1
+        val cell = (fx / 18).toInt()
+        return if (cell < com.itszuvalex.femtocraft.logistics.ChipKind.FILTER_SLOTS) cell else -1
+    }
+
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
+        val cell = filterCell(event.x(), event.y())
+        if (cell >= 0) {
+            val chip = selectedChip()
+            val kind = com.itszuvalex.femtocraft.logistics.Chips.kindOf(chip)
+            if (selected >= 0 && kind != null && kind.filterable) {
+                ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, ConduitMenu.ACTION_FILTER, ConduitMenu.filterData(selected / 4, selected % 4, cell)))
+            }
+            return true
+        }
         hoveredSlot?.let { if (it.container !is Inventory && it.index < 24) selected = it.index }
         return super.mouseClicked(event, doubleClick)
     }
@@ -83,14 +110,59 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
             val i = face.get3DDataValue()
             text(graphics, Component.literal(face.serializedName.substring(0, 1).uppercase()), 16 + (i % 2) * 76, 22 + (i / 2) * 20)
         }
+        filterRow(graphics, mouseX, mouseY)
         val slot = menu.slots.getOrNull(selected) ?: return
         graphics.fill(leftPos + slot.x - 1, topPos + slot.y + 16, leftPos + slot.x + 17, topPos + slot.y + 17, SELECTED)
-        val data = Chips.settingsOf(slot.item) ?: return
+        val data = com.itszuvalex.femtocraft.logistics.Chips.settingsOf(slot.item) ?: return
         text(graphics, Component.literal("${data.direction.name.lowercase()} / ${data.interfaceDirection.serializedName}"), 94, 83)
     }
 
+    private fun filterRow(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        val chip = selectedChip()
+        val kind = com.itszuvalex.femtocraft.logistics.Chips.kindOf(chip)
+        val usable = kind != null && kind.filterable
+        val entries = if (usable) filterEntries(kind!!, chip) else emptyList()
+        for (i in 0 until com.itszuvalex.femtocraft.logistics.ChipKind.FILTER_SLOTS) {
+            val x = leftPos + FILTER_X + i * 18 + 1
+            val y = topPos + FILTER_Y + 1
+            com.itszuvalex.itszulib.client.screen.ScreenStyle.slot(graphics, x, y)
+            if (!usable) graphics.fill(x, y, x + 16, y + 16, (com.itszuvalex.itszulib.client.screen.ScreenStyle.PANEL and 0xFFFFFF) or (0xA0 shl 24))
+            when (val entry = entries.getOrNull(i)) {
+                is net.minecraft.world.item.ItemStack -> if (!entry.isEmpty) graphics.fakeItem(entry, x, y)
+                is net.neoforged.neoforge.fluids.FluidStack -> if (!entry.isEmpty) ScreenHelpers.fluidTank(graphics, x, y, 16, 16, entry, entry.amount)
+            }
+        }
+        val cell = filterCell(mouseX.toDouble(), mouseY.toDouble())
+        if (cell < 0) return
+        val tip = ArrayList<Component>()
+        when {
+            selected < 0 || kind == null -> tip += Component.translatable("gui.femtocraft.conduit.filter.select")
+            !usable -> tip += Component.translatable("gui.femtocraft.conduit.filter.unsupported")
+            else -> {
+                val entry = entries.getOrNull(cell)
+                val name = when (entry) {
+                    is net.minecraft.world.item.ItemStack -> entry.takeUnless { it.isEmpty }?.hoverName
+                    is net.neoforged.neoforge.fluids.FluidStack -> entry.takeUnless { it.isEmpty }?.hoverName
+                    else -> null
+                }
+                tip += if (name != null) Component.translatable("gui.femtocraft.conduit.filter.allowed", name) else Component.translatable("gui.femtocraft.conduit.filter.empty")
+                tip += Component.translatable(if (kind == com.itszuvalex.femtocraft.logistics.FluidChipKind) "gui.femtocraft.conduit.filter.set_fluid" else "gui.femtocraft.conduit.filter.set_item")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY)
+                if (entries.all { (it as? net.minecraft.world.item.ItemStack)?.isEmpty ?: (it as? net.neoforged.neoforge.fluids.FluidStack)?.isEmpty ?: true }) {
+                    tip += Component.translatable("gui.femtocraft.conduit.filter.none").withStyle(net.minecraft.ChatFormatting.GRAY)
+                }
+            }
+        }
+        graphics.setTooltipForNextFrame(font, tip, java.util.Optional.empty(), mouseX, mouseY)
+    }
+
+    private fun <B : Any> filterEntries(kind: com.itszuvalex.femtocraft.logistics.ChipKind<B>, chip: net.minecraft.world.item.ItemStack): List<Any> =
+        kind.data(chip, null).filter
+
     companion object {
         private const val SELECTED = 0xFFFFFF55.toInt()
+        const val FILTER_X = 7
+        const val FILTER_Y = 99
     }
 }
 
