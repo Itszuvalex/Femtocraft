@@ -70,6 +70,7 @@ object DevShowcase {
         Vec3(16.0, 3.5, 1.0) to Vec3(19.5, 3.0, 7.5),
         Vec3(23.5, 3.0, -3.5) to Vec3(23.5, 1.5, 1.5),
         Vec3(27.0, 5.0, -7.0) to Vec3(27.0, 1.5, 1.5),
+        Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
     )
 
     private const val FRAMES_VIEW = 9
@@ -310,6 +311,13 @@ object DevShowcase {
         FrameMultiblocks.ITEM_VAULT.formAt(level, BASE.offset(ITEM_VAULT))
         FrameMultiblocks.FLUID_RESERVOIR.formAt(level, BASE.offset(ITEM_VAULT).offset(4, 0, 0))
         FrameMultiblocks.NANITE_VAULT.formAt(level, BASE.offset(ITEM_VAULT).offset(8, 0, 0))
+        // The reservoir's tanks at different levels (seen through its windows): water, lava, slurry, and water again.
+        (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity)?.state()?.tanks?.let { tanks ->
+            val cap = com.itszuvalex.femtocraft.logistics.FluidReservoirState.CAPACITY
+            listOf(net.minecraft.world.level.material.Fluids.WATER to cap * 3 / 4, net.minecraft.world.level.material.Fluids.LAVA to cap / 3,
+                com.itszuvalex.femtocraft.industry.FemtoFluids.GRITTY_SLURRY.get() to cap, net.minecraft.world.level.material.Fluids.WATER to cap / 2)
+                .forEach { (fluid, amount) -> tanks.fill(com.itszuvalex.itszulib.api.adapters.IFluidStack.of(net.neoforged.neoforge.fluids.FluidStack(fluid, amount)), true) }
+        }
         (level.getBlockEntity(BASE.offset(ITEM_VAULT)) as? com.itszuvalex.femtocraft.logistics.ItemVaultBlockEntity)?.state()?.storage?.let { vault ->
             net.minecraft.core.registries.BuiltInRegistries.ITEM.stream().filter { it != net.minecraft.world.item.Items.AIR }.limit(80).toList().forEachIndexed { i, item ->
                 vault.insert(IItemStack.of(net.minecraft.world.item.ItemStack(item, minOf(item.defaultMaxStackSize, 1 + (i * 37) % 64))))

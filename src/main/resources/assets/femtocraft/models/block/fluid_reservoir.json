@@ -1,8 +1,10 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "side": "femtocraft:block/blockfluidrepository_side_empty",
-    "top": "femtocraft:block/blockfluidrepository_top_empty",
-    "bottom": "femtocraft:block/blockfluidrepository_top_empty"
+    "side": "femtocraft:block/blockfluidrepository_side",
+    "top": "femtocraft:block/blockfluidrepository_top",
+    "bottom": "femtocraft:block/blockfluidrepository_top",
+    "particle": "femtocraft:block/blockfluidrepository_side_empty"
   }
 }

@@ -112,6 +112,29 @@ class FluidReservoirState(onChanged: Runnable) : IMultiblockState {
     companion object {
         const val TANKS = 4
         const val CAPACITY = 64_000
+
+        /** A change of at least this much syncs at once; smaller ones wait for [SYNC_TICKS]. */
+        const val SYNC_STEP = CAPACITY / 64
+        const val SYNC_TICKS = 20
+
+        /**
+         * Whether clients need the tanks again: a tank's fluid changed, an amount moved by [SYNC_STEP] or more, or
+         * anything changed and [SYNC_TICKS] have passed since the last sync.
+         */
+        @JvmStatic
+        fun needsSync(last: List<IFluidStack>, now: List<IFluidStack>, ticksSince: Int): Boolean {
+            if (last.size != now.size) return true
+            var changed = false
+            for (i in now.indices) {
+                val a = last[i]
+                val b = now[i]
+                if (a.isEmpty() != b.isEmpty() || (!a.isEmpty() && !a.isFluidEqual(b))) return true
+                val delta = kotlin.math.abs(a.amount() - b.amount())
+                if (delta >= SYNC_STEP) return true
+                if (delta > 0) changed = true
+            }
+            return changed && ticksSince >= SYNC_TICKS
+        }
     }
 }
 
@@ -209,7 +232,9 @@ class ItemVaultBlockEntity(pos: BlockPos, state: BlockState) :
 }
 
 /**
- * A block of the fluid reservoir (3x3x3, built from frames): four large tanks.
+ * A block of the fluid reservoir (3x3x3, built from frames): four large tanks. Its walls have windows; the home block
+ * syncs the tanks to clients ([clientTanks]) so the renderer can draw them inside
+ * ([com.itszuvalex.femtocraft.client.FemtoRenderers.ReservoirRenderer]).
  */
 class FluidReservoirBlockEntity(pos: BlockPos, state: BlockState) :
     FrameMachineBlockEntity<FluidReservoirState>(LogisticsContent.FLUID_RESERVOIR_BE.get(), pos, state, { FrameMultiblocks.FLUID_RESERVOIR }) {
@@ -226,6 +251,26 @@ class FluidReservoirBlockEntity(pos: BlockPos, state: BlockState) :
         ))
         fragList.addFluidStorage(FragFluidStorage(tanks, persist = false))
         fragList.addTickableFragment(FragFluidAutoIO())
+        fragList.addInternalFragment(com.itszuvalex.femtocraft.core.FragData("TankView", setOf(com.itszuvalex.itszulib.api.utility.NBTSerializationScope.DESCRIPTION),
+            { _, o -> if (isHome) tanks.serialize(o) }, { _, i -> clientTanks.deserialize(i) }))
+    }
+
+    /** Client side, on the home block: the tanks as last synced, for the renderer. */
+    @JvmField
+    val clientTanks = FluidStorageArray(FluidReservoirState.TANKS, FluidReservoirState.CAPACITY)
+
+    private var synced: List<IFluidStack> = emptyList()
+    private var ticksSinceSync = 0
+
+    /** On the home block: sends the tanks to clients when [FluidReservoirState.needsSync] says they changed enough. */
+    override fun serverTick() {
+        if (!isHome) return
+        val now = (0 until tanks.size()).map { tanks.get(it).copy() }
+        ticksSinceSync++
+        if (!FluidReservoirState.needsSync(synced, now, ticksSinceSync)) return
+        synced = now
+        ticksSinceSync = 0
+        markDirtyAndSync()
     }
 
     companion object {

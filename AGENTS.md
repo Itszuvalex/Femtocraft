@@ -218,7 +218,9 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   shared storage on its outer faces (`MultiblockSided*StorageConfiguration`, and
   `MultiblockSidedNaniteStorageConfiguration` for nanites) with auto IO. The item vault's 243 slots are an ItszuLib
   `IndexedItemStorage` with an `ItemStorageIndex`; its menu is an ItszuLib storage terminal (`enableStorageTerminal`,
-  `StorageTerminalView`: search by name, `@mod`, `#tooltip`, `$tag`, `*id`, `-` to exclude; sort; pages).
+  `StorageTerminalView`: search by name, `@mod`, `#tooltip`, `$tag`, `*id`, `-` to exclude; sort; pages). The fluid
+  reservoir's windows show its tanks: the home block syncs them (`clientTanks`) and `FemtoRenderers.ReservoirRenderer`
+  draws an inner shell and four fluid columns (`FemtoRenderers.Boxes` draws tiled boxes).
 - **Cyber/worldgen**: `Cybermaterials.replacement(state)` drives both dumb dust and the rift feature, which converts a
   cylinder of terrain (radius capped to the feature region, DECISIONS D13) and drops crystal clusters on it.
 - **Menus**: ItszuLib `MenuCore`s with vanilla slots (DECISIONS D6); non-slot values use `MenuSync`s; buttons send

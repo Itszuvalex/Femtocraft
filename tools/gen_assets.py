@@ -85,6 +85,8 @@ def drop_count(name, item, lo, hi):
 #   ("pillar", side, end, [x0,y0,z0,x1,y1,z1][, bottom])   one box: [side] stretched over each side face, [end] on top
 #                                     and bottom (or [bottom] on the bottom)
 #   ("cube_bottom_top", side, top, bottom)
+#   ("windowed", side, top, bottom, particle)   cube_bottom_top with see-through (cutout) windows; [particle] also names
+#                                     the opaque texture a renderer draws behind the windows
 # drops: "self", "none", or a loot table dict
 BLOCKS = {
     # name: (display name, model, drops, tool)
@@ -139,7 +141,7 @@ BLOCKS = {
     "archive": ("Archive", ("cube_all", "archive"), "none", "pickaxe", False),
     # Frame-built storage multiblocks, in the repositories' textures.
     "item_vault": ("Item Vault", ("cube_bottom_top", "blockitemrepository_side", "blockitemrepository_top", "blockitemrepository_top"), "none", "pickaxe", False),
-    "fluid_reservoir": ("Fluid Reservoir", ("cube_bottom_top", "blockfluidrepository_side_empty", "blockfluidrepository_top_empty", "blockfluidrepository_top_empty"), "none", "pickaxe", False),
+    "fluid_reservoir": ("Fluid Reservoir", ("windowed", "blockfluidrepository_side", "blockfluidrepository_top", "blockfluidrepository_top", "blockfluidrepository_side_empty"), "none", "pickaxe", False),
     "nanite_vault": ("Nanite Vault", ("cube_bottom_top", "blocknaniterepository_side", "blocknaniterepository_top", "blocknaniterepository_top"), "none", "pickaxe", False),
 }
 
@@ -540,6 +542,9 @@ def block_model(name, kind):
         return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
                 "textures": {"particle": tex(kind[2]), "side": tex(kind[1]), "end": tex(kind[2]), "bottom": tex(bottom)},
                 "elements": [{"from": [x0, y0, z0], "to": [x1, y1, z1], "faces": {**sides, **ends}}]}
+    if k == "windowed":
+        return {"parent": "minecraft:block/cube_bottom_top", "render_type": "minecraft:cutout",
+                "textures": {"side": tex(kind[1]), "top": tex(kind[2]), "bottom": tex(kind[3]), "particle": tex(kind[4])}}
     if k == "cube_bottom_top":
         return {"parent": "minecraft:block/cube_bottom_top", "textures": {"side": tex(kind[1]), "top": tex(kind[2]), "bottom": tex(kind[3])}}
     if k == "box":

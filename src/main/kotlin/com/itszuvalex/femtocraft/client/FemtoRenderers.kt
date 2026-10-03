@@ -39,6 +39,7 @@ object FemtoRenderers {
         event.registerBlockEntityRenderer(WorldgenContent.CRYSTAL_CLUSTER_BE.get()) { CrystalClusterRenderer() }
         event.registerBlockEntityRenderer(IndustryContent.GERMINATION_CHAMBER_BE.get()) { GerminationChamberRenderer() }
         event.registerBlockEntityRenderer(IndustryContent.FRAME_BE.get()) { FrameRenderer() }
+        event.registerBlockEntityRenderer(com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR_BE.get()) { ReservoirRenderer() }
     }
 
     /**
@@ -396,6 +397,155 @@ object FemtoRenderers {
             const val GHOST_MAX = 0.65f
             private const val FULL_BRIGHT = 0xF000F0
             private val GHOST_SIDES: List<net.minecraft.core.Direction?> = net.minecraft.core.Direction.entries + listOf(null)
+        }
+    }
+
+    /**
+     * Axis-aligned boxes drawn as quads, each face tiled in one-block squares of a sprite (so textures keep their size on
+     * faces larger than a block).
+     */
+    object Boxes {
+        /**
+         * The faces of the box ([x0], [y0], [z0]) to ([x1], [y1], [z1]) in [faces], facing out of the box, or into it if
+         * [inward].
+         */
+        fun box(
+            pose: PoseStack.Pose, buffer: com.mojang.blaze3d.vertex.VertexConsumer, sprite: net.minecraft.client.renderer.texture.TextureAtlasSprite,
+            x0: Float, y0: Float, z0: Float, x1: Float, y1: Float, z1: Float, color: Int, light: Int,
+            faces: Set<net.minecraft.core.Direction> = net.minecraft.core.Direction.entries.toSet(), inward: Boolean = false,
+        ) {
+            val dx = x1 - x0
+            val dy = y1 - y0
+            val dz = z1 - z0
+            for (face in faces) {
+                // Origin and two edges whose cross product points out of the box (see the face list).
+                val (o, u, v) = when (face) {
+                    net.minecraft.core.Direction.UP -> Triple(Vector3f(x0, y1, z0), Vector3f(0f, 0f, dz), Vector3f(dx, 0f, 0f))
+                    net.minecraft.core.Direction.DOWN -> Triple(Vector3f(x0, y0, z0), Vector3f(dx, 0f, 0f), Vector3f(0f, 0f, dz))
+                    net.minecraft.core.Direction.NORTH -> Triple(Vector3f(x0, y0, z0), Vector3f(0f, dy, 0f), Vector3f(dx, 0f, 0f))
+                    net.minecraft.core.Direction.SOUTH -> Triple(Vector3f(x0, y0, z1), Vector3f(dx, 0f, 0f), Vector3f(0f, dy, 0f))
+                    net.minecraft.core.Direction.WEST -> Triple(Vector3f(x0, y0, z0), Vector3f(0f, 0f, dz), Vector3f(0f, dy, 0f))
+                    net.minecraft.core.Direction.EAST -> Triple(Vector3f(x1, y0, z0), Vector3f(0f, dy, 0f), Vector3f(0f, 0f, dz))
+                }
+                val n = face.unitVec3f
+                if (inward) face(pose, buffer, sprite, o, v, u, -n.x(), -n.y(), -n.z(), color, light)
+                else face(pose, buffer, sprite, o, u, v, n.x(), n.y(), n.z(), color, light)
+            }
+        }
+
+        /** The rectangle [o] + a[u] + b[v] (a, b in 0..1), front side where u x v points, in one-block tiles. */
+        private fun face(
+            pose: PoseStack.Pose, buffer: com.mojang.blaze3d.vertex.VertexConsumer, sprite: net.minecraft.client.renderer.texture.TextureAtlasSprite,
+            o: Vector3f, u: Vector3f, v: Vector3f, nx: Float, ny: Float, nz: Float, color: Int, light: Int,
+        ) {
+            val lu = u.length()
+            val lv = v.length()
+            if (lu <= 0f || lv <= 0f) return
+            val cu = kotlin.math.ceil(lu - 1e-4f).toInt()
+            val cv = kotlin.math.ceil(lv - 1e-4f).toInt()
+            for (i in 0 until cu) for (j in 0 until cv) {
+                val a0 = i.toFloat()
+                val a1 = minOf(lu, i + 1f)
+                val b0 = j.toFloat()
+                val b1 = minOf(lv, j + 1f)
+                fun corner(a: Float, b: Float) {
+                    val p = Vector3f(o).add(Vector3f(u).mul(a / lu)).add(Vector3f(v).mul(b / lv))
+                    buffer.addVertex(pose, p.x, p.y, p.z).setColor(color)
+                        .setUv(sprite.getU(a - a0), sprite.getV(1f - (b - b0)))
+                        .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, nx, ny, nz)
+                }
+                corner(a0, b0)
+                corner(a1, b0)
+                corner(a1, b1)
+                corner(a0, b1)
+            }
+        }
+    }
+
+    class ReservoirState : BlockEntityRenderState() {
+        var formed = false
+        var size = 3f
+        var shell: net.minecraft.client.renderer.texture.TextureAtlasSprite? = null
+        var light = 0
+
+        /** Per tank: its still sprite, tint and how full (0-1). */
+        val fluids = ArrayList<Triple<net.minecraft.client.renderer.texture.TextureAtlasSprite, Int, Float>?>()
+        val fluidLight = ArrayList<Int>()
+    }
+
+    /**
+     * Draws the inside of a formed fluid reservoir, seen through its windows: an opaque inner shell (floor, walls and
+     * ceiling, so nothing behind the reservoir shows through) and its four tanks as four columns of fluid, one per
+     * quarter of the floor, each filled to its tank's level. Drawn from the home block, lit with the light above the
+     * reservoir (the inside is solid blocks, which are dark).
+     */
+    class ReservoirRenderer : BlockEntityRenderer<com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity, ReservoirState> {
+        override fun createRenderState() = ReservoirState()
+
+        override fun extractRenderState(
+            be: com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity, state: ReservoirState, partialTicks: Float, cameraPosition: Vec3,
+            breakProgress: ModelFeatureRenderer.CrumblingOverlay?,
+        ) {
+            super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress)
+            state.formed = be.isHome
+            state.fluids.clear()
+            state.fluidLight.clear()
+            if (!state.formed) return
+            val level = be.level ?: return
+            val mc = net.minecraft.client.Minecraft.getInstance()
+            state.size = com.itszuvalex.femtocraft.industry.FrameMultiblocks.FLUID_RESERVOIR.size.first.toFloat()
+            state.shell = mc.modelManager.blockStateModelSet.get(be.blockState).particleMaterial().sprite()
+            state.light = net.minecraft.client.renderer.LevelRenderer.getLightCoords(level, be.blockPos.offset(1, state.size.toInt(), 1))
+            for (i in 0 until be.clientTanks.size()) {
+                val stack = be.clientTanks.get(i).toMinecraft()
+                if (stack.isEmpty) {
+                    state.fluids += null
+                    state.fluidLight += state.light
+                    continue
+                }
+                val model = mc.modelManager.fluidStateModelSet.get(stack.fluid.defaultFluidState())
+                val tint = model.fluidTintSource()?.colorAsStack(stack) ?: -1
+                state.fluids += Triple(model.stillMaterial().sprite(), tint or (0xFF shl 24), stack.amount.toFloat() / be.clientTanks.capacity(i))
+                val glow = stack.fluid.fluidType.getLightLevel(stack)
+                state.fluidLight += net.minecraft.util.LightCoordsUtil.withBlock(state.light, maxOf(glow, net.minecraft.util.LightCoordsUtil.block(state.light)))
+            }
+        }
+
+        override fun submit(state: ReservoirState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
+            if (!state.formed) return
+            val s = state.size
+            val shell = state.shell ?: return
+            // Just inside the walls, facing in.
+            collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.solidMovingBlock()) { pose, buffer ->
+                Boxes.box(pose, buffer, shell, SHELL, SHELL, SHELL, s - SHELL, s - SHELL, s - SHELL, -1, state.light, inward = true)
+            }
+            val half = s / 2
+            val height = s - 2 * MARGIN
+            collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.translucentMovingBlock()) { pose, buffer ->
+                state.fluids.forEachIndexed { i, fluid ->
+                    if (fluid == null || fluid.third <= 0f) return@forEachIndexed
+                    // Tank i takes quarter i of the floor: west/east by bit 0, north/south by bit 1.
+                    val x0 = if (i and 1 == 0) MARGIN else half + GAP
+                    val x1 = if (i and 1 == 0) half - GAP else s - MARGIN
+                    val z0 = if (i and 2 == 0) MARGIN else half + GAP
+                    val z1 = if (i and 2 == 0) half - GAP else s - MARGIN
+                    val top = MARGIN + height * fluid.third.coerceIn(0f, 1f)
+                    Boxes.box(pose, buffer, fluid.first, x0, MARGIN, z0, x1, top, z1, fluid.second, state.fluidLight[i],
+                        faces = net.minecraft.core.Direction.entries.toSet() - net.minecraft.core.Direction.DOWN)
+                }
+            }
+        }
+
+        override fun shouldRenderOffScreen(): Boolean = true
+
+        override fun getRenderBoundingBox(be: com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity): AABB =
+            AABB(be.blockPos).expandTowards(2.0, 2.0, 2.0)
+
+        companion object {
+            /** How far inside the walls the shell sits, and the fluid columns' margin and the gap between them. */
+            const val SHELL = 0.01f
+            const val MARGIN = 1f / 16f
+            const val GAP = 1f / 32f
         }
     }
 }

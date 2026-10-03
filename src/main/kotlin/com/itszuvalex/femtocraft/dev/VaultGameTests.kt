@@ -45,6 +45,7 @@ object VaultGameTests {
         DevGameTests.test("item_vault_drops_its_items_when_broken", body = ::itemVaultDrops)
         DevGameTests.test("fluid_reservoir_fills_tanks_by_fluid", body = ::fluidReservoir)
         DevGameTests.test("nanite_vault_holds_many_strains", body = ::naniteVault)
+        DevGameTests.test("fluid_reservoir_syncs_tanks_for_rendering", body = ::reservoirSync)
     }
 
     private fun itemVault(helper: GameTestHelper) {
@@ -126,6 +127,32 @@ object VaultGameTests {
         face.fill(NaniteRegistry.archive(25), true)
         helper.assertValueEqual(home.state()!!.tank.contents().size, 3, "three strains")
         helper.assertValueEqual(home.tank.amount, 175, "amount")
+        helper.succeed()
+    }
+
+    /**
+     * The home block sends its tanks to clients (the renderer draws them through the windows), at once for a new fluid
+     * or a large change, and small changes after a while.
+     */
+    private fun reservoirSync(helper: GameTestHelper) {
+        helper.assertTrue(FrameMultiblocks.FLUID_RESERVOIR.formAt(helper.level, helper.absolutePos(AT)), "reservoir formed")
+        val home = helper.getBlockEntity(AT, FluidReservoirBlockEntity::class.java)
+        home.tanks.fill(IFluidStack.of(FluidStack(Fluids.WATER, 70_000)), true)
+        home.tanks.fill(IFluidStack.of(FluidStack(Fluids.LAVA, 2_000)), true)
+        val registries = helper.level.registryAccess()
+        val client = FluidReservoirBlockEntity(home.blockPos, home.blockState)
+        client.handleUpdateTag(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, registries, home.getUpdateTag(registries)))
+        val water = (0 until client.clientTanks.size()).map { client.clientTanks.get(it) }.filter { it.toMinecraft().`is`(Fluids.WATER) }
+        helper.assertValueEqual(water.sumOf { it.amount() }, 70_000, "client sees the water")
+        helper.assertValueEqual((0 until client.clientTanks.size()).count { client.clientTanks.get(it).toMinecraft().`is`(Fluids.LAVA) }, 1, "and the lava tank")
+
+        fun stacks(vararg amounts: Int) = amounts.map { if (it == 0) IFluidStack.Empty else IFluidStack.of(FluidStack(Fluids.WATER, it)) }
+        val step = FluidReservoirState.SYNC_STEP
+        helper.assertFalse(FluidReservoirState.needsSync(stacks(1000, 0), stacks(1000, 0), 100), "unchanged")
+        helper.assertTrue(FluidReservoirState.needsSync(stacks(1000, 0), stacks(1000, 5), 0), "a new fluid at once")
+        helper.assertTrue(FluidReservoirState.needsSync(stacks(1000, 0), stacks(1000 + step, 0), 0), "a large change at once")
+        helper.assertFalse(FluidReservoirState.needsSync(stacks(1000, 0), stacks(1010, 0), 5), "a small change waits")
+        helper.assertTrue(FluidReservoirState.needsSync(stacks(1000, 0), stacks(1010, 0), FluidReservoirState.SYNC_TICKS), "then syncs")
         helper.succeed()
     }
 }

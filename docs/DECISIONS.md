@@ -372,6 +372,11 @@ things.
   then an empty one) with a `FluidStorageIndex`; the screen shows the four tanks. Fluids are lost when it breaks.
 - **Nanite vault.** One 10,000-nanite tank for any number of strains; the screen lists the largest strains and fills
   from or drains into the player. Nanites are lost when it breaks.
-- Looks are placeholders in the repositories' textures (the reservoir uses the opaque "empty" fluid repository
-  textures, since the barred ones see through a solid block).
+- **Seeing the reservoir's tanks** (maintainer): its blocks use the fluid repository's windowed textures (cutout), and
+  a renderer on the home block (`FemtoRenderers.ReservoirRenderer`) draws the inside: an opaque inner shell (floor,
+  walls and ceiling facing in, in the opaque repository texture, so the world never shows through the windows) and
+  the four tanks as four columns of fluid, one per quarter of the floor, each filled to its tank's level, lit with the
+  light above the reservoir (glowing fluids glow). The home block syncs its tanks to clients at once for a new fluid
+  or a change of 1,000 mB or more, smaller changes after a second (`FluidReservoirState.needsSync`).
+- Other looks are placeholders in the repositories' textures.
 - Femtocraft's own `IndexedItemStorage` (v3's `IIndexedInventory`) was replaced by ItszuLib's.
