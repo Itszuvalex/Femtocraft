@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "CFC",
+    "SRS"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "C": "femtocraft:basic_circuit",
+    "F": "femtocraft:frame",
+    "R": "femtocraft:energy_regulator"
+  },
+  "result": {
+    "id": "femtocraft:mainframe",
+    "count": 1
+  }
+}

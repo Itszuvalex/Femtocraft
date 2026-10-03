@@ -1,0 +1,20 @@
+{
+  "parent": "minecraft:block/block",
+  "loader": "neoforge:obj",
+  "model": "femtocraft:models/block/obj/wire_thin.obj",
+  "flip_v": true,
+  "textures": {
+    "particle": "femtocraft:block/obj/wire_thin_computation",
+    "texture": "femtocraft:block/obj/wire_thin_computation",
+    "color": "femtocraft:block/obj/wire_thin_computation_color"
+  },
+  "visibility": {
+    "Core_Cube": true,
+    "North_Cube": false,
+    "South_Cube": false,
+    "East_Cube": false,
+    "West_Cube": false,
+    "Up_Cube": false,
+    "Down_Cube": false
+  }
+}

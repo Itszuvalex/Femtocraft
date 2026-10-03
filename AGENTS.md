@@ -124,9 +124,11 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── archive/               The Archive (3x3x3 frame multiblock researching the team's focus in Femtocraft's tech tree),
 │                          ArchiveRegistry (every claimed Archive and its status), Codex, NaniteHost (the player as host
 │                          of tier 0 Archive nanites: first contact, regeneration, drawing)
+├── computation/           Computation (DECISIONS D19): ComputationConduit network (ItszuLib distribution), leaves
+│                          (FragComputationLeaf), mainframe + processors + heat, Archive Interface (FLOPS to research)
 ├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
-│                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
-│                          indexed item storages (storage/)
+│                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt); frame-built
+│                          storage multiblocks (Vaults.kt: item vault, fluid reservoir, nanite vault; DECISIONS D23)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
 ├── compat/jei/            JEI plugin: a category per machine recipe table, furnaces as smelting catalysts (D14)
@@ -161,7 +163,11 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   `DistributionAlgorithm`, ItszuLib DECISIONS D15). Wired: `WiredPowerNetwork` is an ItszuLib
   `DistributingTileNetwork` and `WiredPowerConduit` an ItszuLib `FragNetworkedWire` and `IDistributionNode`, whose
   participants are the `FragWiredPowerLeafNode` machines on its faces (keyed by block or multiblock, so each counts
-  once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours). Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
+  once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours).
+  The alpha's cryo-endothermal generator (`power/Cryo.kt`, DECISIONS D21): coils stacked under a charging base draw
+  power from ice and snow beside them and freeze water, lava and air nearby for bursts (`CryogenRegistry` handlers).
+  The alpha's atmospheric charging pole (`power/Atmospheric.kt`, D22): coils and a capacitor stacked on a base, more
+  in rain and storms, and harmless (visual-only) lightning strikes on the capacitor during thunderstorms for bursts. Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
   `femtocraft:power_crystal` component.
 - **Machines**: `ProcessingMachineBlockEntity` holds an `ItemStorageArray` behind ItszuLib sided configuration, item
   auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).
@@ -185,22 +191,40 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   player to use it and researches its team's focus (DECISIONS D17: the first available technology of the tree in the
   team's ItszuLib research queue): once a second it draws an Archive nanite from that team's nearest host within 8
   blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Its screen and the Codex edit the team's queue
-  (`ArchiveResearch`: click queues with prerequisites, right-click removes); claimed Archives and their last status are
+  (`ArchiveResearch`: click queues with prerequisites, right-click removes) and hand in the items a focus needs
+  ("Offer items", `ArchiveResearch.deliver`; DECISIONS D20); claimed Archives and their last status are
   kept in `ArchiveRegistry` (a crash-safe store) for the Codex's list. Machines fed by a host take nanites
   with `NaniteHost.drawTo(player, amount, level, target)`, which shows them flowing to the target
   (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`, `CodexItem.open`) opens the tree, queue and the team's Archives anywhere. Hosts see
   their status at the top left (`client/HostOverlay`; other systems add lines with `HostOverlay.addLine`). Gate content
   with `TechTree.isResearched(player, id)`.
+- **Computation** (DECISIONS D19): computation conduits (`ComputationConduit`, on `core/LeafConduit` like the power
+  conduit) form an ItszuLib `DistributingTileNetwork` over `ComputationModules.LEAF` leaves: mainframes are producers
+  (`MainframeComputer`: processors' FLOPS at the mainframe's speed, power spent per FLOP taken, most efficient first),
+  jobs are consumers (`ArchiveJob` behind the Archive Interface: 200 FLOPS per research point; logistics conduits'
+  active chips). Mainframes heat up and slow down from 60 °C (`MainframeHeat`); cold blocks beside them cool them.
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
   in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
   operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how
   much (1 item, 250 mB, 5 nanites), and the network routes each kind separately by channel. A chip's countdown lives in the
   conduit's `ChipSlots` while it is inserted and is written back to the chip whenever the slot is read from outside
   (`get`); the conduit itself uses `chip(index)`, which does not write. Add a kind by
-  subclassing `ChipKind` and listing it in `Chips.KINDS`. `DistributedManager` matches
+  subclassing `ChipKind` and listing it in `Chips.KINDS`. Chips carry an ItszuLib `ResourceFilter` (`ChipData.filter`, nine entries, allow
+  or deny; edited with ItszuLib's `FilterRow` in the conduit screen, DECISIONS D24);
+  item chips pull through a block's `LogisticsModules.ITEM_INDEX` (an ItszuLib `ItemStorageIndex`, e.g. the item
+  vault's) when it has one. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
-  or broken); `IndexedItemStorage` indexes an `IItemStorage` by item id and answers tag lookups (keep it current with
-  `slotChanged` or `invalidateCache` from the storage's `onChanged`). Neither has a block using it yet (DECISIONS D4).
+  or broken); it has no block using it yet (DECISIONS D4). Indexed storage is ItszuLib's (`IndexedItemStorage`,
+  `ItemStorageIndex`: writes through the wrapper keep it current); `IItemLogisticsNetwork` hands out an
+  `ItemStorageIndex` per key.
+- **Storage multiblocks** (DECISIONS D23): 3x3x3 frame multiblocks in `logistics/Vaults.kt`, each block exposing the
+  shared storage on its outer faces (`MultiblockSided*StorageConfiguration`, and
+  `MultiblockSidedNaniteStorageConfiguration` for nanites) with auto IO. The item vault's 243 slots are an ItszuLib
+  `IndexedItemStorage` with an `ItemStorageIndex`; its menu is an ItszuLib storage terminal (`enableStorageTerminal`,
+  `StorageTerminalView`: search by name, `@mod`, `#tooltip`, `$tag`, `*id`, `-` to exclude; sort; pages). The fluid
+  reservoir's tanks are `ReservoirTanks` (cells that link into tanks, each lockable to a fluid; menu actions
+  `ACTION_LOCK`/`ACTION_LINK`), and its windows show them: the home block syncs them (`clientTanks`) and `FemtoRenderers.ReservoirRenderer`
+  draws an inner shell and four fluid columns (`FemtoRenderers.Boxes` draws tiled boxes).
 - **Cyber/worldgen**: `Cybermaterials.replacement(state)` drives both dumb dust and the rift feature, which converts a
   cylinder of terrain (radius capped to the feature region, DECISIONS D13) and drops crystal clusters on it.
 - **Menus**: ItszuLib `MenuCore`s with vanilla slots (DECISIONS D6); non-slot values use `MenuSync`s; buttons send
@@ -226,7 +250,8 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 ## Game tests
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
-`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`. Add one with
+`PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`,
+`ComputationGameTests`, `VaultGameTests`. Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode

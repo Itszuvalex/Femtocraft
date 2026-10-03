@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "femtocraft:block/atmospheric_charging_base_side",
+    "top": "femtocraft:block/atmospheric_charging_base_top",
+    "bottom": "femtocraft:block/atmospheric_charging_base_bottom"
+  }
+}

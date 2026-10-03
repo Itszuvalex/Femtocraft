@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "RCR",
+    " I "
+  ],
+  "key": {
+    "I": "minecraft:packed_ice",
+    "R": "femtocraft:riftiron_ingot_devoid",
+    "C": "femtocraft:nano_channel"
+  },
+  "result": {
+    "id": "femtocraft:cryo_endothermal_charging_coil",
+    "count": 2
+  }
+}

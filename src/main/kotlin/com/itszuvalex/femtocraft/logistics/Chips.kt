@@ -5,6 +5,11 @@ import com.itszuvalex.femtocraft.nanite.INaniteTank
 import com.itszuvalex.femtocraft.nanite.NaniteModules
 import com.itszuvalex.femtocraft.nanite.NaniteStack
 import com.itszuvalex.itszulib.api.adapters.IBlockEntity
+import com.itszuvalex.itszulib.api.adapters.IItemStack
+import com.itszuvalex.itszulib.api.filter.FilterKind
+import com.itszuvalex.itszulib.api.filter.FilterKinds
+import com.itszuvalex.itszulib.api.filter.FilterMode
+import com.itszuvalex.itszulib.api.filter.ResourceFilter
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -92,17 +97,23 @@ data class ConnectionSettings(
 }
 
 /**
- * A chip's state, kept on the chip as a data component: its [settings] and the [buffer] of whatever it moves.
- * Equality goes through [kind], since item and fluid stacks do not compare by value.
+ * A chip's state, kept on the chip as a data component: its [settings], the [buffer] of whatever it moves, and its
+ * [filter] (an ItszuLib allow- or denylist of [ChipKind.FILTER_SLOTS] entries; nothing listed lets everything
+ * through). Equality goes through [kind], since item and fluid stacks do not compare by value.
  */
-class ChipData<B : Any>(val settings: ConnectionSettings, val buffer: B, val kind: ChipKind<B>) {
-    fun with(settings: ConnectionSettings = this.settings, buffer: B = this.buffer) = ChipData(settings, buffer, kind)
+class ChipData<B : Any>(val settings: ConnectionSettings, val buffer: B, val kind: ChipKind<B>, filter: ResourceFilter<B>? = null) {
+    val filter: ResourceFilter<B> = filter ?: kind.emptyFilter()
+
+    fun with(settings: ConnectionSettings = this.settings, buffer: B = this.buffer, filter: ResourceFilter<B> = this.filter) = ChipData(settings, buffer, kind, filter)
+
+    /** Whether the filter lets [b] through. */
+    fun allows(b: B): Boolean = filter.test(b)
 
     @Suppress("UNCHECKED_CAST")
     override fun equals(other: Any?): Boolean =
-        other is ChipData<*> && other.kind === kind && settings == other.settings && kind.matches(buffer, other.buffer as B)
+        other is ChipData<*> && other.kind === kind && settings == other.settings && kind.matches(buffer, other.buffer as B) && filter == other.filter
 
-    override fun hashCode(): Int = Objects.hash(settings, kind.hash(buffer))
+    override fun hashCode(): Int = Objects.hash(settings, kind.hash(buffer), filter)
 
     override fun toString(): String = "ChipData(${kind.name}, $settings, ${kind.amount(buffer)})"
 }
@@ -120,12 +131,18 @@ abstract class ChipKind<B : Any>(
 ) {
     val flopsRequired: Double = 5000.0
 
+    companion object {
+        /** Filter entries per chip. */
+        const val FILTER_SLOTS = 9
+    }
+
     val codec: Codec<ChipData<B>> by lazy {
         RecordCodecBuilder.create { i ->
             i.group(
                 ConnectionSettings.MAP_CODEC.forGetter(ChipData<B>::settings),
                 bufferCodec.optionalFieldOf("buffer", empty).forGetter(ChipData<B>::buffer),
-            ).apply(i) { s, b -> ChipData(s, b, this) }
+                ResourceFilter.codec(filterKind, FILTER_SLOTS).lenientOptionalFieldOf("filter", emptyFilter()).forGetter(ChipData<B>::filter),
+            ).apply(i) { s, b, f -> ChipData(s, b, this, f) }
         }
     }
 
@@ -154,10 +171,21 @@ abstract class ChipKind<B : Any>(
 
     fun isEmpty(b: B): Boolean = amount(b) <= 0
 
+    /** What this kind's filters list (ItszuLib's item and fluid kinds, or Femtocraft's nanites). */
+    abstract val filterKind: FilterKind<B>
+
+    fun emptyFilter(): ResourceFilter<B> = ResourceFilter(filterKind, FILTER_SLOTS)
+
+    /** Whether players can set this kind's filters in the conduit screen (by clicking with what to list held). */
+    open val filterable: Boolean get() = false
+
     /** How much the buffer may hold of [b]. */
     open fun limit(b: B): Int = bufferLimit
 
     abstract fun describe(b: B): Component
+
+    /** What [b] is, without an amount (filter entries). */
+    open fun typeName(b: B): Component = describe(b)
 
     /** Orders output buffers in the network. */
     abstract fun sortKey(b: B): String
@@ -165,8 +193,12 @@ abstract class ChipKind<B : Any>(
     /** Whether the block at [pos], accessed from [side], would take some of [offer]. */
     abstract fun canAccept(level: Level, pos: BlockPos, side: Direction, offer: B): Boolean
 
-    /** Pulls up to [max] matching [buffer] (anything, if empty) from the block at [pos]. @return The new buffer. */
-    abstract fun pull(level: Level, pos: BlockPos, side: Direction, buffer: B, max: Int): B
+    /**
+     * Pulls up to [max] matching [buffer] (anything [filter] allows, if empty) from the block at [pos].
+     *
+     * @return The new buffer.
+     */
+    abstract fun pull(level: Level, pos: BlockPos, side: Direction, buffer: B, max: Int, filter: ResourceFilter<B>): B
 
     /** Pushes up to [max] of [buffer] into the block at [pos]. @return How much went in. */
     abstract fun push(level: Level, pos: BlockPos, side: Direction, buffer: B, max: Int): Int
@@ -193,10 +225,34 @@ object ItemChipKind : ChipKind<ItemStack>("item", ItemStack.OPTIONAL_CODEC, Item
         return (0 until handler.size()).any { handler.isValid(it, resource) }
     }
 
-    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: ItemStack, max: Int): ItemStack {
+    override val filterKind: FilterKind<ItemStack> get() = FilterKinds.ITEM
+    override val filterable: Boolean get() = true
+
+    /**
+     * From an indexed inventory ([LogisticsModules.ITEM_INDEX] on that face, e.g. an item vault) straight through its
+     * index: only the slots holding what is wanted are read. Otherwise the first matching item through the block's item
+     * handler.
+     */
+    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: ItemStack, max: Int, filter: ResourceFilter<ItemStack>): ItemStack {
+        index(level, pos, side)?.let { return pullIndexed(it, buffer, max, filter) }
         val handler = handler(level, pos, side) ?: return buffer
-        val got = ResourceHandlerUtil.extractFirst(handler, { r -> buffer.isEmpty || r.matches(buffer) }, max, null)
+        val got = ResourceHandlerUtil.extractFirst(handler, { r -> if (buffer.isEmpty) filter.test(r.toStack(1)) else r.matches(buffer) }, max, null)
         return if (got == null || got.amount() <= 0) buffer else got.resource().toStack(buffer.count + got.amount())
+    }
+
+    private fun index(level: Level, pos: BlockPos, side: Direction): com.itszuvalex.itszulib.api.storage.ItemStorageIndex? {
+        if (!level.isLoaded(pos)) return null
+        return level.getBlockEntity(pos)?.let(IBlockEntity::of)?.getModule(LogisticsModules.ITEM_INDEX, side)
+    }
+
+    /** Takes from [index]: more of the buffer's kind, or the first item held that [filter] lets through. */
+    fun pullIndexed(index: com.itszuvalex.itszulib.api.storage.ItemStorageIndex, buffer: ItemStack, max: Int, filter: ResourceFilter<ItemStack>): ItemStack {
+        val taken = if (buffer.isEmpty) {
+            index.extract(filter.map(FilterKinds.I_ITEM, IItemStack::of), max)
+        } else {
+            index.extract(BuiltInRegistries.ITEM.getKey(buffer.item), max) { ItemStack.isSameItemSameComponents(it.toMinecraft(), buffer) }
+        }
+        return if (taken.isEmpty()) buffer else taken.toMinecraft().let { it.copyWithCount(buffer.count + it.count) }
     }
 
     override fun push(level: Level, pos: BlockPos, side: Direction, buffer: ItemStack, max: Int): Int {
@@ -216,6 +272,7 @@ object FluidChipKind : ChipKind<FluidStack>("fluid", FluidStack.OPTIONAL_CODEC, 
     override fun amount(b: FluidStack) = b.amount
     override fun withAmount(b: FluidStack, amount: Int): FluidStack = if (amount <= 0) FluidStack.EMPTY else b.copyWithAmount(amount)
     override fun describe(b: FluidStack): Component = Component.literal("${b.amount} mB ").append(b.hoverName)
+    override fun typeName(b: FluidStack): Component = b.hoverName
     override fun sortKey(b: FluidStack) = BuiltInRegistries.FLUID.getKey(b.fluid).toString()
 
     private fun handler(level: Level, pos: BlockPos, side: Direction) = level.getCapability(Capabilities.Fluid.BLOCK, pos, side)
@@ -226,9 +283,12 @@ object FluidChipKind : ChipKind<FluidStack>("fluid", FluidStack.OPTIONAL_CODEC, 
         return (0 until handler.size()).any { handler.isValid(it, resource) }
     }
 
-    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: FluidStack, max: Int): FluidStack {
+    override val filterKind: FilterKind<FluidStack> get() = FilterKinds.FLUID
+    override val filterable: Boolean get() = true
+
+    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: FluidStack, max: Int, filter: ResourceFilter<FluidStack>): FluidStack {
         val handler = handler(level, pos, side) ?: return buffer
-        val got = ResourceHandlerUtil.extractFirst(handler, { r -> buffer.isEmpty || r.matches(buffer) }, max, null)
+        val got = ResourceHandlerUtil.extractFirst(handler, { r -> if (buffer.isEmpty) filter.test(r.toStack(1)) else r.matches(buffer) }, max, null)
         return if (got == null || got.amount() <= 0) buffer else got.resource().toStack(buffer.amount + got.amount())
     }
 
@@ -261,9 +321,11 @@ object NaniteChipKind : ChipKind<NaniteStack>("nanite", NaniteStack.CODEC, Nanit
         return tank.fill(offer.withAmount(1), false).isEmpty
     }
 
-    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: NaniteStack, max: Int): NaniteStack {
+    override val filterKind: FilterKind<NaniteStack> get() = NaniteFilterKind
+
+    override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: NaniteStack, max: Int, filter: ResourceFilter<NaniteStack>): NaniteStack {
         val tank = tank(level, pos, side) ?: return buffer
-        val source = if (buffer.isEmpty) tank.contents().firstOrNull() ?: return buffer else buffer
+        val source = if (buffer.isEmpty) tank.contents().firstOrNull { filter.test(it) } ?: return buffer else buffer
         val got = tank.drain(source.withAmount(max), true)
         return if (got.isEmpty) buffer else got.withAmount(buffer.amount + got.amount)
     }
@@ -273,6 +335,21 @@ object NaniteChipKind : ChipKind<NaniteStack>("nanite", NaniteStack.CODEC, Nanit
         val offer = buffer.withAmount(min(max, buffer.amount))
         return offer.amount - tank.fill(offer, true).amount
     }
+}
+
+/**
+ * Nanite filter entries: the same strain, and with component matching the same version too. A held item names no
+ * nanites, so these filters are not set by clicking (yet).
+ */
+object NaniteFilterKind : FilterKind<NaniteStack> {
+    override val empty: NaniteStack get() = NaniteStack.EMPTY
+    override val codec: Codec<NaniteStack> get() = NaniteStack.CODEC
+    override fun isEmpty(t: NaniteStack) = t.isEmpty
+    override fun same(a: NaniteStack, b: NaniteStack, components: Boolean) = if (components) a.isSameNanite(b) else a.isSameStrain(b)
+    override fun entryOf(t: NaniteStack) = t.withAmount(1)
+    override fun fromHeld(held: ItemStack): NaniteStack? = if (held.isEmpty) NaniteStack.EMPTY else null
+    override fun equal(a: NaniteStack, b: NaniteStack) = (a.isEmpty && b.isEmpty) || a == b
+    override fun hash(t: NaniteStack) = if (t.isEmpty) 0 else t.hashCode()
 }
 
 /**
@@ -320,6 +397,9 @@ class Connection<B : Any>(
 
     val passiveFlopGen: Double get() = kind.flopsRequired / (20 * 10)
 
+    /** Flops left before the next operation. */
+    val flopsRemaining: Double get() = counter.flops
+
     private val target: BlockPos get() = conduit.relative(face)
 
     private fun canAcceptMoreInput(): Boolean = kind.amount(buffer) < kind.limit(buffer)
@@ -347,7 +427,8 @@ class Connection<B : Any>(
     /**
      * Whether the block on this face would take [offer].
      */
-    fun canInsert(offer: B): Boolean = !settings.paused && !kind.isEmpty(offer) && kind.canAccept(level, target, settings.interfaceDirection, offer)
+    fun canInsert(offer: B): Boolean =
+        !settings.paused && !kind.isEmpty(offer) && data.allows(offer) && kind.canAccept(level, target, settings.interfaceDirection, offer)
 
     /**
      * Adds [offer] to the buffer.
@@ -371,7 +452,7 @@ class Connection<B : Any>(
         if (!canAcceptMoreInput()) return
         val current = buffer
         val want = min(kind.perOp, kind.limit(current) - kind.amount(current))
-        val next = kind.pull(level, target, settings.interfaceDirection, current, want)
+        val next = kind.pull(level, target, settings.interfaceDirection, current, want, data.filter)
         if (!kind.matches(next, current)) setBuffer(next)
     }
 
@@ -433,6 +514,23 @@ object Chips {
         return chip.copy().also { cycle(kind, it, face, mode, forward) }
     }
 
+    /**
+     * A copy of [chip] (in conduit face [face]) with its filter changed by [action] (ItszuLib's
+     * [com.itszuvalex.itszulib.api.filter.FilterActions]) with [held] in hand, or null if nothing changes.
+     */
+    fun withFilter(chip: ItemStack, face: Direction, action: Int, held: ItemStack): ItemStack? {
+        val kind = kindOf(chip) ?: return null
+        return applyFilter(kind, chip.copy(), face, action, held)
+    }
+
+    private fun <B : Any> applyFilter(kind: ChipKind<B>, chip: ItemStack, face: Direction, action: Int, held: ItemStack): ItemStack? {
+        if (!kind.filterable) return null
+        val d = kind.data(chip, face)
+        val changed = d.filter.apply(action, held) ?: return null
+        write(kind, chip, d.with(filter = changed))
+        return chip
+    }
+
     private fun <B : Any> cycle(kind: ChipKind<B>, chip: ItemStack, face: Direction, mode: Boolean, forward: Boolean) {
         val d = kind.data(chip, face)
         write(kind, chip, d.with(settings = d.settings.cycled(mode, forward)))
@@ -463,5 +561,10 @@ class ChipItem(val kind: ChipKind<*>, properties: Properties) : Item(properties)
         line("channel", s.channel)
         line("mode", s.direction.name)
         line("interface", s.interfaceDirection.serializedName)
+        val allowed = d.filter.listed()
+        if (allowed.isNotEmpty()) {
+            line(if (d.filter.mode == FilterMode.DENY) "filter.deny" else "filter", allowed.size)
+            for (entry in allowed) builder.accept(Component.literal("  ").append(kind.typeName(entry)).withStyle(ChatFormatting.DARK_GRAY))
+        }
     }
 }

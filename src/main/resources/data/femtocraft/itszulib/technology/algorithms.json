@@ -4,5 +4,17 @@
     "femtocraft:machining"
   ],
   "cost": 100,
-  "icon": "femtocraft:basic_circuit"
+  "icon": "femtocraft:basic_circuit",
+  "items": [
+    {
+      "ingredient": "femtocraft:micro_logic_core",
+      "count": 1
+    }
+  ],
+  "rewards": [
+    {
+      "id": "femtocraft:micro_logic_core",
+      "count": 2
+    }
+  ]
 }

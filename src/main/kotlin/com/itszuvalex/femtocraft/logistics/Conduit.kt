@@ -133,6 +133,29 @@ class LogisticsConduit : FragNetworkedWire<LogisticsConduit, LogisticsNetwork>({
 
     override fun module(): IModule<LogisticsConduit> = MODULE
 
+    /**
+     * The conduit's active chips as a computation job (DECISIONS D19): FLOPS from a computation network run their
+     * countdowns down on top of the passive rate, at most one operation per chip per tick.
+     */
+    @JvmField
+    val computationJob = object : com.itszuvalex.itszulib.core.Distributable {
+        private fun remaining(): Double = connections().filter { it.active }.sumOf { it.flopsRemaining }
+        override val max: Double get() = remaining()
+        override val amount: Double get() = 0.0
+        override val transferMax: Double get() = remaining()
+        override fun add(amount: Double): Double {
+            var left = amount
+            for (connection in connections()) {
+                if (left <= 0.0) break
+                if (!connection.active) continue
+                val give = minOf(left, connection.flopsRemaining)
+                left -= give - connection.contributeFlops(give)
+            }
+            return amount - left
+        }
+        override fun remove(amount: Double): Double = 0.0
+    }
+
     fun connections(): List<Connection<*>> {
         val level = lvl ?: return listOf()
         val pos = host?.blockEntity()?.getBlockPos() ?: return listOf()
@@ -213,6 +236,9 @@ class ConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Lo
         fragList.addFragment(conduit)
         fragList.addInternalFragment(FragDropInventory(allChips))
         fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.conduit"), { id, inv, _ -> ConduitMenu(id, inv, this) }))
+        fragList.addFragment(com.itszuvalex.femtocraft.computation.FragComputationLeaf {
+            if (conduit.connections().any { it.active }) com.itszuvalex.femtocraft.computation.ComputationParticipant(com.itszuvalex.itszulib.core.DistributionRole.CONSUMER, conduit.computationJob) else null
+        })
     }
 
     /**

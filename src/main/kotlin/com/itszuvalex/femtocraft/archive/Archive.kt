@@ -55,6 +55,9 @@ enum class ArchiveStatus {
 
     /** The team has a focus, but no host of the team with Archive nanites is in range. */
     NO_HOST,
+
+    /** The focus has all its points and waits for items to be handed in (the Archive's or Codex's "Offer items"). */
+    NEEDS_ITEMS,
 }
 
 /**
@@ -67,11 +70,18 @@ enum class ArchiveStatus {
  * ([NaniteHost.nearbyHosts]) for [POINTS_PER_NANITE] points, then spends up to [RATE] points on the focus
  * ([TechTree.addProgress], which keeps what is not needed). Points left over go to the next focus. More Archives with
  * more hosts research faster; one host feeds about one Archive.
+ *
+ * Archive Interfaces add computed points ([addComputed], from FLOPS; DECISIONS D19), spent at up to [COMPUTED_RATE] a
+ * step on top of the nanite points, so computation speeds research up without replacing the host.
  */
 class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
     var owner: UUID? = null
         private set
     var points: Long = 0L
+        private set
+
+    /** Research points computed by Archive Interfaces ([addComputed]), spent alongside the nanite points. */
+    var computedPoints: Long = 0L
         private set
 
     /** Not saved: recomputed each step. */
@@ -94,6 +104,26 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
         onChanged.run()
         return true
     }
+
+    /** How many more computed points this Archive takes now (it keeps at most [COMPUTED_CAP]). */
+    fun computedRoom(): Long = (COMPUTED_CAP - computedPoints).coerceAtLeast(0L)
+
+    /**
+     * Adds computed research points (up to [computedRoom]). @return How many were taken.
+     */
+    fun addComputed(amount: Long): Long {
+        val taken = amount.coerceIn(0L, computedRoom())
+        if (taken > 0L) {
+            computedPoints += taken
+            onChanged.run()
+        }
+        return taken
+    }
+
+    /**
+     * Whether this Archive has something to research now: claimed, and its team has a focus in Femtocraft's tree.
+     */
+    fun hasFocus(server: net.minecraft.server.MinecraftServer): Boolean = team()?.let { TechTree.focus(server, it, ArchiveContent.TREE) } != null
 
     /**
      * One research step; [hosts] are the candidate hosts, nearest first, [center] is where drawn nanites flow to, and
@@ -121,6 +151,12 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
             status = ArchiveStatus.IDLE
             return 0L
         }
+        val research = ItszuLib.TEAMS.state.team(team)?.get(com.itszuvalex.itszulib.team.Research.TYPE)
+        val remaining = research?.let { TechTree.of(level.registryAccess()).remaining(tech, it) }
+        if (remaining != null && remaining.points <= 0L && !remaining.complete) {
+            status = ArchiveStatus.NEEDS_ITEMS
+            return 0L
+        }
         if (points < RATE) {
             val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team }
             if (host != null && NaniteHost.drawTo(host, 1, level, center) == 1) {
@@ -128,16 +164,25 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
                 onChanged.run()
             }
         }
-        if (points <= 0L) {
+        if (points <= 0L && computedPoints <= 0L) {
             status = ArchiveStatus.NO_HOST
             return 0L
         }
         status = ArchiveStatus.RESEARCHING
-        val used = TechTree.addProgress(level.server, team, tech, minOf(points, RATE))
-        if (used > 0L) {
-            points -= used
-            onChanged.run()
+        var used = 0L
+        if (points > 0L) {
+            val spent = TechTree.addProgress(level.server, team, tech, minOf(points, RATE))
+            points -= spent
+            used += spent
         }
+        // Computed points go to the focus as it is now (the nanite points may just have finished the last one).
+        val next = if (computedPoints > 0L) TechTree.focus(level.server, team, ArchiveContent.TREE) else null
+        if (next != null) {
+            val spent = TechTree.addProgress(level.server, team, next, minOf(computedPoints, COMPUTED_RATE))
+            computedPoints -= spent
+            used += spent
+        }
+        if (used > 0L) onChanged.run()
         return used
     }
 
@@ -149,11 +194,13 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
     override fun serialize(output: ValueOutput) {
         owner?.let { output.store("Owner", UUIDUtil.CODEC, it) }
         output.putLong("Points", points)
+        output.putLong("Computed", computedPoints)
     }
 
     override fun deserialize(input: ValueInput) {
         owner = input.read("Owner", UUIDUtil.CODEC).orElse(null)
         points = input.getLongOr("Points", 0L)
+        computedPoints = input.getLongOr("Computed", 0L)
     }
 
     companion object {
@@ -161,6 +208,12 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
         const val RATE = 5L
         const val POINTS_PER_NANITE = 10L
         const val RADIUS = 8.0
+
+        /** Computed points spent per step, on top of [RATE] from nanites. */
+        const val COMPUTED_RATE = 20L
+
+        /** At most this many computed points wait to be spent. */
+        const val COMPUTED_CAP = COMPUTED_RATE * 4
     }
 }
 
@@ -219,6 +272,8 @@ class ArchiveMenu(containerId: Int, inventory: Inventory, be: ArchiveBlockEntity
     /** Client copies. */
     var points = 0L
         private set
+    var computedPoints = 0L
+        private set
     var status = ArchiveStatus.IDLE
         private set
     var archives: List<ArchiveRecord> = emptyList()
@@ -226,6 +281,7 @@ class ArchiveMenu(containerId: Int, inventory: Inventory, be: ArchiveBlockEntity
 
     init {
         addSync(MenuSyncs.long({ be?.state()?.points ?: 0L }, { points = it }))
+        addSync(MenuSyncs.long({ be?.state()?.computedPoints ?: 0L }, { computedPoints = it }))
         addSync(MenuSyncs.int({ (be?.state()?.status ?: ArchiveStatus.IDLE).ordinal }, { status = ArchiveStatus.entries.getOrElse(it) { ArchiveStatus.IDLE } }))
         addSync(ArchiveResearch.archivesSync(inventory.player) { archives = it })
     }
@@ -241,7 +297,11 @@ object ArchiveResearch {
     const val ACTION_QUEUE = 0
     const val ACTION_UNQUEUE = 1
 
+    /** Hand in what the team's focus still needs of its items, from the player's inventory. */
+    const val ACTION_DELIVER = 2
+
     fun handleAction(player: Player, action: Int, data: Int): Boolean {
+        if (action == ACTION_DELIVER) return deliver(player) > 0
         if (action != ACTION_QUEUE && action != ACTION_UNQUEUE) return false
         val server = player.level().server ?: return false
         val tech = byNetworkId(player.level().registryAccess(), data) ?: return false
@@ -249,6 +309,20 @@ object ArchiveResearch {
         val team = ItszuLib.TEAMS.state.teamOf(player.uuid) ?: return false
         if (action == ACTION_QUEUE) TechTree.queue(server, team.id, tech) else TechTree.unqueue(server, team.id, tech)
         return true
+    }
+
+    /**
+     * Hands in what [player]'s team's focus in Femtocraft's tree still needs of its items, from their inventory.
+     *
+     * @return How many items were taken.
+     */
+    fun deliver(player: Player): Int {
+        val server = player.level().server ?: return 0
+        val team = ItszuLib.TEAMS.state.teamOf(player.uuid)?.id ?: return 0
+        val focus = TechTree.focus(server, team, ArchiveContent.TREE) ?: return 0
+        val taken = TechTree.deliverFrom(server, team, focus, player.inventory.nonEquipmentItems)
+        if (taken > 0) player.inventory.setChanged()
+        return taken
     }
 
     /**

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "IFI",
+    "SRS"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "C": "femtocraft:basic_circuit",
+    "I": "minecraft:iron_ingot",
+    "F": "femtocraft:frame",
+    "R": "femtocraft:energy_regulator"
+  },
+  "result": {
+    "id": "femtocraft:atmospheric_charging_base",
+    "count": 1
+  }
+}

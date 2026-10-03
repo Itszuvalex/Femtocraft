@@ -44,6 +44,8 @@ object FemtoClient {
     private fun registerScreens(event: RegisterMenuScreensEvent) {
         event.register(PowerContent.CRYSTAL_MOUNT_MENU.get(), ::CrystalMountScreen)
         event.register(PowerContent.CRYSTAL_MACHINE_MENU.get(), ::CrystalMachineScreen)
+        event.register(PowerContent.CRYO_BASE_MENU.get(), ::CryoChargingBaseScreen)
+        event.register(PowerContent.ATMOSPHERIC_BASE_MENU.get(), ::AtmosphericChargingBaseScreen)
         event.register(IndustryContent.MACHINE_MENU.get(), ::MachineScreen)
         event.register(IndustryContent.FRAME_MENU.get(), ::FrameScreen)
         event.register(IndustryContent.FRAME_SELECTION_MENU.get(), ::FrameSelectionScreen)
@@ -56,6 +58,10 @@ object FemtoClient {
         event.register(LogisticsContent.FLUID_REPOSITORY_MENU.get(), ::FluidRepositoryScreen)
         event.register(LogisticsContent.NANITE_REPOSITORY_MENU.get(), ::NaniteRepositoryScreen)
         event.register(LogisticsContent.CONDUIT_MENU.get(), ::ConduitScreen)
+        event.register(LogisticsContent.ITEM_VAULT_MENU.get(), ::ItemVaultScreen)
+        event.register(LogisticsContent.FLUID_RESERVOIR_MENU.get(), ::FluidReservoirScreen)
+        event.register(LogisticsContent.NANITE_VAULT_MENU.get(), ::NaniteVaultScreen)
         event.register(LogisticsContent.NANO_PACK_MENU.get(), ::NanoPackScreen)
+        event.register(com.itszuvalex.femtocraft.computation.ComputationContent.MAINFRAME_MENU.get(), ::MainframeScreen)
     }
 }

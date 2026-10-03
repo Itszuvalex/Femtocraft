@@ -10,8 +10,7 @@ import com.itszuvalex.femtocraft.industry.GerminationState
 import com.itszuvalex.femtocraft.industry.MachineMenu
 import com.itszuvalex.itszulib.client.ScreenHelpers
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.components.Tooltip
+import com.itszuvalex.itszulib.client.screen.ThemedButton
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.level.material.Fluids
@@ -93,9 +92,11 @@ class FrameSelectionScreen(menu: FrameSelectionMenu, inventory: Inventory, title
         menu.options.forEachIndexed { i, multi ->
             val needs = listOf(Component.translatable("tooltip.femtocraft.frame.needs"), Component.translatable("tooltip.femtocraft.frame.needs.frames", multi.numFrames)) +
                 multi.required().map { Component.translatable("tooltip.femtocraft.frame.needs.item", it.count, it.hoverName) }
-            addRenderableWidget(Button.builder(multi.displayName) { minecraft!!.gameMode!!.handleInventoryButtonClick(menu.containerId, i) }
-                .bounds(leftPos + 8, topPos + 20 + i * 22, imageWidth - 16, 20)
-                .tooltip(Tooltip.create(needs.reduce { a, b -> a.copy().append("\n").append(b) })).build())
+            addRenderableWidget(ThemedButton(
+                leftPos + 8, topPos + 20 + i * 22, imageWidth - 16, 20, multi.displayName,
+                { minecraft!!.gameMode!!.handleInventoryButtonClick(menu.containerId, i) },
+                needs.reduce { a, b -> a.copy().append("\n").append(b) },
+            ))
         }
     }
 

@@ -38,3 +38,38 @@ class CrystalMachineScreen(menu: CrystalMachineMenu, inventory: Inventory, title
         networkLines(menu.network).take(1).forEach { text(graphics, it, 62, 18 + 40) }
     }
 }
+
+/**
+ * The cryo-endothermal charging base: its battery, how many coils feed it and their average output.
+ */
+class CryoChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.CryoChargingBaseMenu, inventory: Inventory, title: Component) :
+    FemtoScreen<com.itszuvalex.femtocraft.power.CryoChargingBaseMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        addComponent(com.itszuvalex.itszulib.client.screen.Row(listOf(
+            powerGauge { menu.battery },
+            com.itszuvalex.itszulib.client.screen.Column(listOf(
+                com.itszuvalex.itszulib.client.screen.Label({ Component.translatable("gui.femtocraft.cryo.coils", menu.coils, com.itszuvalex.femtocraft.power.CryoChargingBaseBlockEntity.MAX_COILS) }, fixedWidth = 120),
+                com.itszuvalex.itszulib.client.screen.Label({ Component.translatable("gui.femtocraft.cryo.generation", fmt1(menu.generation)) }, fixedWidth = 120),
+            ), gap = 5),
+        ), gap = 8), 8, 18)
+    }
+}
+
+/**
+ * The atmospheric charging base: its battery, the pole (coils, capacitor), power per tick and lightning strikes taken.
+ */
+class AtmosphericChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.AtmosphericChargingBaseMenu, inventory: Inventory, title: Component) :
+    FemtoScreen<com.itszuvalex.femtocraft.power.AtmosphericChargingBaseMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        fun label(text: () -> Component) = com.itszuvalex.itszulib.client.screen.Label(text, fixedWidth = 120)
+        addComponent(com.itszuvalex.itszulib.client.screen.Row(listOf(
+            powerGauge { menu.battery },
+            com.itszuvalex.itszulib.client.screen.Column(listOf(
+                label { Component.translatable("gui.femtocraft.atmospheric.coils", menu.coils, com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_ADDONS) },
+                label { Component.translatable(if (menu.capped) "gui.femtocraft.atmospheric.capped" else "gui.femtocraft.atmospheric.uncapped") },
+                label { Component.translatable("gui.femtocraft.cryo.generation", "%.2f".format(java.util.Locale.ROOT, menu.powerPerTick)) },
+                label { Component.translatable("gui.femtocraft.atmospheric.strikes", menu.strikes) },
+            ), gap = 3),
+        ), gap = 8), 8, 18)
+    }
+}

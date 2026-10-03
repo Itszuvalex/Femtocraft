@@ -58,6 +58,12 @@ object PowerGameTests {
     }
 
     fun register() {
+        DevGameTests.test("atmospheric_pole_charges_its_base", 80, ::atmosphericCharges)
+        DevGameTests.test("atmospheric_addons_need_support_and_air", 20, ::atmosphericSupport)
+        DevGameTests.test("atmospheric_lightning_strike_is_harmless_power", 20, ::atmosphericStrike)
+        DevGameTests.test("cryo_coils_charge_the_base_from_ice", 80, ::cryoCharges)
+        DevGameTests.test("cryo_active_handler_freezes_water_lava_and_air", body = ::cryoActive)
+        DevGameTests.test("cryo_coil_without_base_does_nothing", 60, ::cryoNoBase)
         DevGameTests.test("power_crystal_battery_and_trickle", body = ::crystalBatteryAndTrickle)
         DevGameTests.test("crystal_mount_model_follows_solid_neighbours", body = ::mountHalves)
         DevGameTests.test("power_crystal_codec_round_trip", body = ::crystalCodec)
@@ -246,6 +252,117 @@ object PowerGameTests {
             helper.assertTrue(loaded.getModule(PowerModules.WIRELESS_LEAF, null)?.parent == m.node.getLoc(), "parent saved")
             val loadedMount = BlockEntity.loadStatic(m.blockPos, m.blockState, m.saveWithFullMetadata(registries), registries) as CrystalMountBlockEntity
             helper.assertTrue(array.getModule(PowerModules.WIRELESS_LEAF, null)!!.storageLoc in loadedMount.node.leafLocs(), "leaf list saved")
+        }
+    }
+
+    /**
+     * A base on two coils, the lower one surrounded by ice: the coils count, and the base charges at about 1.25 DE a
+     * tick per ice block.
+     */
+    private fun cryoCharges(helper: GameTestHelper) {
+        val base = helper.place<com.itszuvalex.femtocraft.power.CryoChargingBaseBlockEntity>(BlockPos(4, 3, 4), PowerContent.CRYO_BASE.get())
+        helper.place<com.itszuvalex.femtocraft.power.CryoChargingCoilBlockEntity>(BlockPos(4, 2, 4), PowerContent.CRYO_COIL.get())
+        helper.place<com.itszuvalex.femtocraft.power.CryoChargingCoilBlockEntity>(BlockPos(4, 1, 4), PowerContent.CRYO_COIL.get())
+        for (face in listOf(net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST)) {
+            helper.setBlock(BlockPos(4, 1, 4).relative(face), net.minecraft.world.level.block.Blocks.ICE)
+        }
+        helper.assertValueEqual(base.coils(), 2, "coils under the base")
+        helper.runAfterDelay(40) {
+            helper.assertTrue(base.battery.storage() >= 40 * 4 * com.itszuvalex.femtocraft.power.CryogenRegistry.ICE_PER_TICK - 10, "charged ${base.battery.storage()}")
+            helper.succeed()
+        }
+    }
+
+    private fun cryoActive(helper: GameTestHelper) {
+        val level = helper.level
+        val registry = com.itszuvalex.femtocraft.power.CryogenRegistry
+        val water = BlockPos(2, 1, 2)
+        val lava = BlockPos(4, 1, 2)
+        helper.setBlock(water, net.minecraft.world.level.block.Blocks.WATER)
+        helper.setBlock(lava, net.minecraft.world.level.block.Blocks.LAVA)
+        helper.setBlock(BlockPos(6, 1, 2), net.minecraft.world.level.block.Blocks.STONE)
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(water)), registry.WATER_TO_ICE, "water")
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.ICE, water)
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(lava)), registry.LAVA_TO_OBSIDIAN, "lava")
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.OBSIDIAN, lava)
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(BlockPos(6, 2, 2))), registry.AIR_TO_SNOW_LAYER, "air over stone")
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.SNOW, BlockPos(6, 2, 2))
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(BlockPos(6, 4, 2))), 0.0, "air over air")
+        helper.succeed()
+    }
+
+    /**
+     * A coil with no base above it makes and freezes nothing.
+     */
+    private fun cryoNoBase(helper: GameTestHelper) {
+        val coil = helper.place<com.itszuvalex.femtocraft.power.CryoChargingCoilBlockEntity>(BlockPos(4, 1, 4), PowerContent.CRYO_COIL.get())
+        helper.setBlock(BlockPos(4, 2, 4), net.minecraft.world.level.block.Blocks.STONE)
+        helper.assertTrue(coil.base() == null, "no base")
+        helper.succeed()
+    }
+
+    private val ATMO_BASE = BlockPos(4, 1, 4)
+
+    private fun pole(helper: GameTestHelper, coils: Int, cap: Boolean): com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity {
+        val base = helper.place<com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity>(ATMO_BASE, PowerContent.ATMOSPHERIC_BASE.get())
+        for (i in 1..coils) helper.setBlock(ATMO_BASE.above(i), PowerContent.ATMOSPHERIC_COIL.get())
+        if (cap) helper.setBlock(ATMO_BASE.above(coils + 1), PowerContent.ATMOSPHERIC_CAPACITOR.get())
+        return base
+    }
+
+    /**
+     * Three coils and a capacitor (the game test server keeps the weather clear): 0.1 DE/t a coil plus the
+     * capacitor's 20%.
+     */
+    private fun atmosphericCharges(helper: GameTestHelper) {
+        val base = pole(helper, 3, true)
+        helper.runAfterDelay(50) {
+            helper.assertValueEqual(base.coils, 3, "coils")
+            helper.assertTrue(base.capped, "capped")
+            helper.assertTrue(kotlin.math.abs(base.powerPerTick - 0.36) < 1e-9, "power per tick ${base.powerPerTick}")
+            helper.assertTrue(base.battery.storage() in 15.0..19.0, "charged ${base.battery.storage()}")
+            helper.succeed()
+        }
+    }
+
+    /**
+     * Addons stand only on the base or a coil (not on a capacitor), with air on all four sides; a block placed beside
+     * one breaks it. Two bases may not stand side by side.
+     */
+    private fun atmosphericSupport(helper: GameTestHelper) {
+        val level = helper.level
+        val coil = PowerContent.ATMOSPHERIC_COIL.get().defaultBlockState()
+        pole(helper, 1, true)
+        helper.assertFalse(coil.canSurvive(level, helper.absolutePos(ATMO_BASE.above(3))), "nothing on a capacitor")
+        helper.setBlock(BlockPos(1, 1, 1), net.minecraft.world.level.block.Blocks.STONE)
+        helper.assertFalse(coil.canSurvive(level, helper.absolutePos(BlockPos(1, 2, 1))), "not on stone")
+        helper.assertFalse(PowerContent.ATMOSPHERIC_BASE.get().defaultBlockState().canSurvive(level, helper.absolutePos(ATMO_BASE.east())), "not beside a base")
+        helper.setBlock(ATMO_BASE.above().east(), net.minecraft.world.level.block.Blocks.STONE)
+        helper.runAfterDelay(3) {
+            helper.assertBlockNotPresent(PowerContent.ATMOSPHERIC_COIL.get(), ATMO_BASE.above())
+            helper.assertBlockNotPresent(PowerContent.ATMOSPHERIC_CAPACITOR.get(), ATMO_BASE.above(2))
+            helper.succeed()
+        }
+    }
+
+    /**
+     * A strike lands on the capacitor's top, stores its power, and sets no fire.
+     */
+    private fun atmosphericStrike(helper: GameTestHelper) {
+        val base = pole(helper, 2, true)
+        val top = helper.absolutePos(ATMO_BASE.above(3))
+        base.strike(helper.level, top)
+        helper.assertValueEqual(base.battery.storage(), com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.STRIKE_POWER, "strike power")
+        helper.assertValueEqual(base.strikes, 1, "counted")
+        val bolts = helper.level.getEntitiesOfClass(net.minecraft.world.entity.LightningBolt::class.java, net.minecraft.world.phys.AABB(top).inflate(1.0))
+        helper.assertValueEqual(bolts.size, 1, "a bolt at the top")
+        helper.assertTrue(bolts.single().y >= top.y + 0.8, "on the capacitor's top: ${bolts.single().y}")
+        helper.runAfterDelay(10) {
+            for (pos in BlockPos.betweenClosed(top.offset(-2, -4, -2), top.offset(2, 2, 2))) {
+                helper.assertFalse(helper.level.getBlockState(pos).`is`(net.minecraft.tags.BlockTags.FIRE), "fire at $pos")
+            }
+            helper.assertBlockPresent(PowerContent.ATMOSPHERIC_CAPACITOR.get(), ATMO_BASE.above(3))
+            helper.succeed()
         }
     }
 }

@@ -42,6 +42,7 @@ object Femtocraft {
         com.itszuvalex.femtocraft.archive.ArchiveContent.init()
         NaniteContent.init()
         LogisticsContent.init()
+        com.itszuvalex.femtocraft.computation.ComputationContent.init()
         CyberContent.init()
         WorldgenContent.init()
         FemtoRegistries.register(MOD_BUS)

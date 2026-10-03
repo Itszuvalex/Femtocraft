@@ -26,6 +26,7 @@ object FemtoTints {
     const val LOGISTICS_CONDUIT_DEFAULT = 0xFFFFB040.toInt()
     const val CHAMBER_DEFAULT = 0xFF60E060.toInt()
     const val GLOW_STICK_DEFAULT = 0xFFFFE0C0.toInt()
+    const val COMPUTATION_CONDUIT_DEFAULT = 0xFF66FF99.toInt()
 
     /**
      * The colour behind the holes in v3's machine textures (tools/gen_assets.py "machine" models): the machine's own
@@ -39,12 +40,14 @@ object FemtoTints {
         event.register(listOf(ColorableTint(LOGISTICS_CONDUIT_DEFAULT)), LogisticsContent.CONDUIT.get())
         event.register(listOf(ColorableTint(CHAMBER_DEFAULT)), IndustryContent.GERMINATION_CHAMBER.get())
         event.register(listOf(GlowStickTint), PowerContent.GLOW_STICK.get())
+        event.register(listOf(ColorableTint(COMPUTATION_CONDUIT_DEFAULT)), com.itszuvalex.femtocraft.computation.ComputationContent.COMPUTATION_CONDUIT.get())
         event.register(
             listOf(ColorableTint(MACHINE_DEFAULT)),
             IndustryContent.NANO_FURNACE.get(), IndustryContent.DEMOLISHER.get(), IndustryContent.CRYSTAL_FURNACE.get(),
             IndustryContent.CRYSTAL_CRUSHER.get(), IndustryContent.CRYSTAL_LIQUIFIER.get(),
             PowerContent.CRYSTAL_CHARGING_ARRAY.get(), PowerContent.CRYSTAL_STORAGE_ARRAY.get(), PowerContent.CRYSTAL_HEAT_EXCHANGER.get(),
             com.itszuvalex.femtocraft.nanite.NaniteContent.NANITE_EXTRACTOR.get(), com.itszuvalex.femtocraft.nanite.NaniteContent.NANITE_INFUSER.get(),
+            com.itszuvalex.femtocraft.computation.ComputationContent.MAINFRAME.get(), com.itszuvalex.femtocraft.computation.ComputationContent.ARCHIVE_INTERFACE.get(),
         )
     }
 

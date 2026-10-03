@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SDS",
+    "CFC",
+    "SCS"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "D": "femtocraft:crackling_dust",
+    "C": "femtocraft:basic_circuit",
+    "F": "femtocraft:frame"
+  },
+  "result": {
+    "id": "femtocraft:archive_interface",
+    "count": 1
+  }
+}
