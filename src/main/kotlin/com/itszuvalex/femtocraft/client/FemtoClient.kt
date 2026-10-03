@@ -58,6 +58,9 @@ object FemtoClient {
         event.register(LogisticsContent.FLUID_REPOSITORY_MENU.get(), ::FluidRepositoryScreen)
         event.register(LogisticsContent.NANITE_REPOSITORY_MENU.get(), ::NaniteRepositoryScreen)
         event.register(LogisticsContent.CONDUIT_MENU.get(), ::ConduitScreen)
+        event.register(LogisticsContent.ITEM_VAULT_MENU.get(), ::ItemVaultScreen)
+        event.register(LogisticsContent.FLUID_RESERVOIR_MENU.get(), ::FluidReservoirScreen)
+        event.register(LogisticsContent.NANITE_VAULT_MENU.get(), ::NaniteVaultScreen)
         event.register(LogisticsContent.NANO_PACK_MENU.get(), ::NanoPackScreen)
         event.register(com.itszuvalex.femtocraft.computation.ComputationContent.MAINFRAME_MENU.get(), ::MainframeScreen)
     }

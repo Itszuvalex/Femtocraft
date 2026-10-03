@@ -349,3 +349,29 @@ textures (`power/Atmospheric.kt`); the cryo-endothermal generator of D21 stays.
   wireless and wired networks; its screen shows the coils, the capacitor, power per tick and strikes taken.
 - Recipes are placeholders (iron, copper, redstone, a crystal battery). Natural lightning is not drawn to the pole
   (it is not a vanilla lightning rod).
+
+## D23. Storage multiblocks: item vault, fluid reservoir, nanite vault — DECIDED (maintainer, 2026-10-03)
+
+The maintainer asked for multiblock storage as fixed frame multiblocks (item, fluid and nanite), on indexed storage
+that can be searched across storages without scanning every slot, with a paged screen that searches by several
+things.
+
+- **Shapes.** Each is a 3x3x3 frame multiblock (`FrameMultiblocks.ITEM_VAULT`, `FLUID_RESERVOIR`, `NANITE_VAULT`),
+  built like the germination chamber; the shared storage is on the home block. Costs are placeholders (activated
+  riftiron with circuits or nano channels; activated phasemetal with nanite beacons) until storage research exists.
+- **Faces.** Every block exposes the storage on its outer faces, with a side configuration per block and automatic
+  IO; faces between vault blocks expose nothing. Nanites needed a multiblock face configuration of their own
+  (`MultiblockSidedNaniteStorageConfiguration`, on ItszuLib's `MultiblockFaces`).
+- **Item vault.** 243 slots (nine per block) in an ItszuLib `IndexedItemStorage`, with an `ItemStorageIndex` over it
+  (ItszuLib D17), so lookups and the terminal read only the slots that hold something. Its screen is ItszuLib's storage
+  terminal: a search box (name; `@` mod, `#` tooltip, `$` tag, `*` id; `-` excludes; a button picks what plain terms
+  search), sorting by count, name or id, five rows of nine per page, click to take a stack (right-click half,
+  shift-click to the inventory), click with a carried stack to put it in, shift-click from the inventory to store.
+  Five rows keep the screen 232 pixels high, inside a 720p window at GUI scale 3. Breaking any block drops the items.
+- **Fluid reservoir.** Four 64,000 mB tanks in an ItszuLib `IndexedFluidStorage` (a fluid fills the tanks that hold it,
+  then an empty one) with a `FluidStorageIndex`; the screen shows the four tanks. Fluids are lost when it breaks.
+- **Nanite vault.** One 10,000-nanite tank for any number of strains; the screen lists the largest strains and fills
+  from or drains into the player. Nanites are lost when it breaks.
+- Looks are placeholders in the repositories' textures (the reservoir uses the opaque "empty" fluid repository
+  textures, since the barred ones see through a solid block).
+- Femtocraft's own `IndexedItemStorage` (v3's `IIndexedInventory`) was replaced by ItszuLib's.

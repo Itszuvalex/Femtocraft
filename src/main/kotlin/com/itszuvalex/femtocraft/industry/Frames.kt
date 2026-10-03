@@ -1,6 +1,9 @@
 package com.itszuvalex.femtocraft.industry
 
 import com.itszuvalex.femtocraft.FemtoRegistries
+import com.itszuvalex.femtocraft.logistics.FluidReservoirState
+import com.itszuvalex.femtocraft.logistics.ItemVaultState
+import com.itszuvalex.femtocraft.logistics.NaniteVaultState
 import com.itszuvalex.femtocraft.core.FemtoBlockEntity
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.itszulib.api.adapters.IItemStack
@@ -134,6 +137,22 @@ object FrameMultiblocks {
     @JvmField
     val CRYSTAL_FOCUSING_CHAMBER = register(FrameMultiblock("crystal_focusing_chamber", setOf(BASIC), Triple(2, 2, 2),
         { listOf() }, { IndustryContent.CRYSTAL_FOCUSING_CHAMBER.get() }, ::FocusingState))
+
+    // Storage multiblocks (logistics). Costs are placeholders until the storage technologies are designed.
+    @JvmField
+    val ITEM_VAULT = register(FrameMultiblock("item_vault", setOf(BASIC), Triple(3, 3, 3),
+        { listOf(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 16), ItemStack(IndustryContent.BASIC_CIRCUIT.get(), 4)) },
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.ITEM_VAULT.get() }, ::ItemVaultState))
+
+    @JvmField
+    val FLUID_RESERVOIR = register(FrameMultiblock("fluid_reservoir", setOf(BASIC), Triple(3, 3, 3),
+        { listOf(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 16), ItemStack(IndustryContent.NANO_CHANNEL.get(), 4)) },
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR.get() }, ::FluidReservoirState))
+
+    @JvmField
+    val NANITE_VAULT = register(FrameMultiblock("nanite_vault", setOf(BASIC), Triple(3, 3, 3),
+        { listOf(ItemStack(IndustryContent.PHASEMETAL_INGOT_ACTIVATED.get(), 8), ItemStack(IndustryContent.NANITE_BEACON.get(), 2)) },
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.NANITE_VAULT.get() }, ::NaniteVaultState))
 
     fun register(multi: FrameMultiblock): FrameMultiblock = multi.also { all += it }
 

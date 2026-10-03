@@ -15,7 +15,7 @@ import com.itszuvalex.femtocraft.logistics.ItemRepositoryBlockEntity
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.logistics.NanoPackMenu
 import com.itszuvalex.femtocraft.logistics.NaniteRepositoryBlockEntity
-import com.itszuvalex.femtocraft.logistics.storage.IndexedItemStorage
+import com.itszuvalex.itszulib.api.storage.IndexedItemStorage
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteStack
 import com.itszuvalex.femtocraft.nanite.NaniteStrainVersion
@@ -105,35 +105,22 @@ object LogisticsGameTests {
         }
     }
 
+    /** Femtocraft indexes storage with ItszuLib's IndexedItemStorage: by item id and tag, kept current by writes. */
     private fun indexedStorage(helper: GameTestHelper) {
-        lateinit var index: IndexedItemStorage
-        val storage = ItemStorageArray(4) { index.invalidateCache() }
-        index = IndexedItemStorage(storage)
+        val index = IndexedItemStorage(ItemStorageArray(4))
         val diamond = BuiltInRegistries.ITEM.getKey(Items.DIAMOND)
-        storage.setSlot(0, IItemStack.of(ItemStack(Items.OAK_LOG, 3)))
-        storage.setSlot(2, IItemStack.of(ItemStack(Items.DIAMOND)))
-        storage.setSlot(3, IItemStack.of(ItemStack(Items.BIRCH_LOG)))
-        helper.assertValueEqual(index.getSlotsByItem(diamond), setOf(2), "diamond slot")
-        helper.assertValueEqual(index.getSlotsByTag(ItemTags.LOGS), setOf(0, 3), "log slots")
-        helper.assertTrue(ItemTags.LOGS in index.getContainedTags(), "contained tags")
-        helper.assertTrue(index.isCacheValid(), "rebuilt on lookup")
+        index.setSlot(0, IItemStack.of(ItemStack(Items.OAK_LOG, 3)))
+        index.setSlot(2, IItemStack.of(ItemStack(Items.DIAMOND)))
+        index.setSlot(3, IItemStack.of(ItemStack(Items.BIRCH_LOG)))
+        helper.assertValueEqual(index.slotsOf(diamond), setOf(2), "diamond slot")
+        helper.assertValueEqual(index.slotsOfTag(ItemTags.LOGS), setOf(0, 3), "log slots")
 
-        // A named diamond still counts as a diamond: callers check components themselves.
-        storage.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND).also { it.set(DataComponents.CUSTOM_NAME, Component.literal("x")) }))
-        helper.assertTrue(!index.isCacheValid(), "onChanged invalidates")
-        helper.assertValueEqual(index.getSlotsByItemStack(IItemStack.of(ItemStack(Items.DIAMOND))), setOf(1, 2), "diamonds by item id")
-
-        // Incremental updates without invalidation.
-        val quiet = ItemStorageArray(2)
-        val quietIndex = IndexedItemStorage(quiet)
-        helper.assertTrue(quietIndex.getContainedItems().isEmpty(), "empty")
-        quiet.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND)))
-        quietIndex.slotChanged(1)
-        helper.assertValueEqual(quietIndex.getSlotsByItem(diamond), setOf(1), "added")
-        quiet.setSlot(1, IItemStack.of(ItemStack(Items.OAK_LOG)))
-        quietIndex.slotChanged(1)
-        helper.assertTrue(!quietIndex.containsItemStack(IItemStack.of(ItemStack(Items.DIAMOND))), "replaced")
-        helper.assertTrue(quietIndex.containsTag(ItemTags.LOGS), "now a log")
+        // A named diamond is still a diamond to the index; count tells them apart with a matcher.
+        index.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND).also { it.set(DataComponents.CUSTOM_NAME, Component.literal("x")) }))
+        helper.assertValueEqual(index.slotsOf(diamond), setOf(1, 2), "diamonds by item id")
+        helper.assertValueEqual(index.count(diamond) { !it.hasComponents() }, 1, "plain diamonds")
+        index.setSlot(1, IItemStack.of(ItemStack(Items.OAK_LOG)))
+        helper.assertValueEqual(index.slotsOf(diamond), setOf(2), "replaced")
         helper.succeed()
     }
 

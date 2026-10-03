@@ -137,6 +137,10 @@ BLOCKS = {
     "germination_chamber": ("Germination Chamber", ("chamber_obj", "germination_chamber"), "none", "pickaxe", False),
     "crystal_focusing_chamber": ("Crystal Focusing Chamber", ("cube_all", "crystal_focusing_chamber"), "none", "pickaxe", False),
     "archive": ("Archive", ("cube_all", "archive"), "none", "pickaxe", False),
+    # Frame-built storage multiblocks, in the repositories' textures.
+    "item_vault": ("Item Vault", ("cube_bottom_top", "blockitemrepository_side", "blockitemrepository_top", "blockitemrepository_top"), "none", "pickaxe", False),
+    "fluid_reservoir": ("Fluid Reservoir", ("cube_bottom_top", "blockfluidrepository_side_empty", "blockfluidrepository_top_empty", "blockfluidrepository_top_empty"), "none", "pickaxe", False),
+    "nanite_vault": ("Nanite Vault", ("cube_bottom_top", "blocknaniterepository_side", "blocknaniterepository_top", "blocknaniterepository_top"), "none", "pickaxe", False),
 }
 
 ITEMS = {
@@ -224,6 +228,9 @@ LANG = {
     "fluid.femtocraft.gritty_slurry": "Gritty Slurry",
     "multiblock.femtocraft.germination_chamber": "Germination Chamber",
     "multiblock.femtocraft.crystal_focusing_chamber": "Crystal Focusing Chamber",
+    "multiblock.femtocraft.item_vault": "Item Vault",
+    "multiblock.femtocraft.fluid_reservoir": "Fluid Reservoir",
+    "multiblock.femtocraft.nanite_vault": "Nanite Vault",
     "multiblock.femtocraft.archive": "Archive",
     "archive.femtocraft.contact.title": "WE ARE THE ARCHIVE",
     "archive.femtocraft.contact": "Something old and broken settles behind your eyes. It hums, and the dust it brought hums with it.",
@@ -272,6 +279,8 @@ LANG = {
     "gui.femtocraft.nanite.drain": "Drain",
     "gui.femtocraft.nanite.tank": "Nanites: %s/%s",
     "gui.femtocraft.nanite.player": "Yours: %s",
+    "gui.femtocraft.nanite_vault.strain": "%s v%s: %s",
+    "gui.femtocraft.nanite_vault.more": "... and %s more strains",
     "entity.femtocraft.nano_lash": "Nano Lash",
     "tooltip.femtocraft.processor.flops": "%s FLOPS/t",
     "tooltip.femtocraft.processor.power": "%s DE per FLOP",

@@ -1,6 +1,15 @@
 package com.itszuvalex.femtocraft.client
 
 import com.itszuvalex.femtocraft.logistics.ConduitMenu
+import com.itszuvalex.femtocraft.logistics.FluidReservoirMenu
+import com.itszuvalex.femtocraft.logistics.FluidReservoirState
+import com.itszuvalex.femtocraft.logistics.ItemVaultMenu
+import com.itszuvalex.femtocraft.logistics.NaniteVaultMenu
+import com.itszuvalex.femtocraft.logistics.NaniteVaultState
+import com.itszuvalex.itszulib.client.screen.Anchor
+import com.itszuvalex.itszulib.client.screen.FluidGauge
+import com.itszuvalex.itszulib.client.screen.Row
+import com.itszuvalex.itszulib.client.screen.StorageTerminalView
 import com.itszuvalex.femtocraft.logistics.FluidRepositoryBlockEntity
 import com.itszuvalex.femtocraft.logistics.FluidRepositoryMenu
 import com.itszuvalex.femtocraft.logistics.ItemRepositoryMenu
@@ -86,3 +95,57 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
 }
 
 class NanoPackScreen(menu: NanoPackMenu, inventory: Inventory, title: Component) : FemtoScreen<NanoPackMenu>(menu, inventory, title)
+
+/**
+ * The item vault: a storage terminal (search box with search modes, sort, paged grid with counts) over the vault, and
+ * the player's inventory below.
+ */
+class ItemVaultScreen(menu: ItemVaultMenu, inventory: Inventory, title: Component) :
+    FemtoScreen<ItemVaultMenu>(menu, inventory, title, 176, ItemVaultMenu.HEIGHT) {
+    init {
+        inventoryLabelY = ItemVaultMenu.INVENTORY_Y - 11
+    }
+
+    override fun addComponents() {
+        addComponent(StorageTerminalView(menu.vault, 9, ItemVaultMenu.ROWS), 8, 17)
+    }
+}
+
+/**
+ * The fluid reservoir: its four tanks.
+ */
+class FluidReservoirScreen(menu: FluidReservoirMenu, inventory: Inventory, title: Component) : FemtoScreen<FluidReservoirMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        val gauges = (0 until FluidReservoirState.TANKS).map { i ->
+            FluidGauge({ menu.tanks.get(i).toMinecraft() }, { FluidReservoirState.CAPACITY }, 24, 56)
+        }
+        addComponent(Row(gauges, gap = 14), Anchor.TOP, 0, 18)
+    }
+}
+
+/**
+ * The nanite vault: its strains (the largest first), the player's nanites, and fill and drain buttons.
+ */
+class NaniteVaultScreen(menu: NaniteVaultMenu, inventory: Inventory, title: Component) : FemtoScreen<NaniteVaultMenu>(menu, inventory, title) {
+    override fun init() {
+        super.init()
+        addRenderableWidget(ThemedButton(leftPos + 128, topPos + 54, 40, 14, Component.translatable("gui.femtocraft.nanite.fill"), { send(NaniteMachineMenu.ACTION_FILL) }, accent = ButtonAccents.IO))
+        addRenderableWidget(ThemedButton(leftPos + 128, topPos + 6, 40, 14, Component.translatable("gui.femtocraft.nanite.drain"), { send(NaniteMachineMenu.ACTION_DRAIN) }, accent = ButtonAccents.IO))
+    }
+
+    private fun send(action: Int) = ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action, 0))
+
+    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        text(graphics, Component.translatable("gui.femtocraft.nanite.tank", menu.tank.sumOf { it.amount }, NaniteVaultState.VOLUME), 8, 20)
+        val strains = menu.tank.sortedByDescending { it.amount }
+        strains.take(STRAIN_LINES).forEachIndexed { i, s ->
+            text(graphics, Component.translatable("gui.femtocraft.nanite_vault.strain", s.strain, "${s.version.major}.${s.version.minor}", s.amount), 12, 32 + i * 10)
+        }
+        if (strains.size > STRAIN_LINES) text(graphics, Component.translatable("gui.femtocraft.nanite_vault.more", strains.size - STRAIN_LINES), 12, 32 + STRAIN_LINES * 10)
+        text(graphics, Component.translatable("gui.femtocraft.nanite.player", menu.playerTank.sumOf { it.amount }), 8, 72)
+    }
+
+    companion object {
+        const val STRAIN_LINES = 3
+    }
+}

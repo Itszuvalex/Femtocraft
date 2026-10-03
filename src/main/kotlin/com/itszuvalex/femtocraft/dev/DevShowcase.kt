@@ -68,6 +68,8 @@ object DevShowcase {
         Vec3(12.5, 2.5, 4.0) to Vec3(12.5, 0.5, 7.0),
         Vec3(13.0, 3.0, 2.5) to Vec3(14.5, 1.0, 6.5),
         Vec3(16.0, 3.5, 1.0) to Vec3(19.5, 3.0, 7.5),
+        Vec3(23.5, 3.0, -3.5) to Vec3(23.5, 1.5, 1.5),
+        Vec3(27.0, 5.0, -7.0) to Vec3(27.0, 1.5, 1.5),
     )
 
     private const val FRAMES_VIEW = 9
@@ -78,6 +80,8 @@ object DevShowcase {
     private const val COMPUTATION_VIEW = 14
     private val MAINFRAME = BlockPos(11, 0, 7)
     private const val LIGHTNING_VIEW = 16
+    private const val VAULT_VIEW = 17
+    private val ITEM_VAULT = BlockPos(22, 0, 0)
     private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
     private val FURNACE = BlockPos(9, 2, -7)
@@ -162,6 +166,13 @@ object DevShowcase {
             (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
+        // The vault view opens the item vault's terminal; the next shows the three vaults.
+        if (view == VAULT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            (level.getBlockEntity(BASE.offset(ITEM_VAULT)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        if (view == VAULT_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
         // The lightning view strikes the atmospheric pole every half second (harmless bolts on the capacitor's top).
         if (view == LIGHTNING_VIEW && (ticks - BUILD_AT) % 10 == 5) {
             (level.getBlockEntity(BASE.offset(POLE)) as? com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity)?.let { pole ->
@@ -223,7 +234,7 @@ object DevShowcase {
 
     private fun build(level: ServerLevel) {
         fun set(x: Int, y: Int, z: Int, block: Block) = level.setBlockAndUpdate(BASE.offset(x, y, z), block.defaultBlockState())
-        for (x in -3..20) for (z in -3..8) {
+        for (x in -3..34) for (z in -3..8) {
             set(x, -1, z, Blocks.SMOOTH_STONE)
             for (y in 0..8) set(x, y, z, Blocks.AIR)
         }
@@ -295,5 +306,15 @@ object DevShowcase {
         set(POLE.x, 0, POLE.z, PowerContent.ATMOSPHERIC_BASE.get())
         for (y in 1..3) set(POLE.x, y, POLE.z, PowerContent.ATMOSPHERIC_COIL.get())
         set(POLE.x, 4, POLE.z, PowerContent.ATMOSPHERIC_CAPACITOR.get())
+        // The storage multiblocks; the item vault holds a little of many items (more than a terminal page).
+        FrameMultiblocks.ITEM_VAULT.formAt(level, BASE.offset(ITEM_VAULT))
+        FrameMultiblocks.FLUID_RESERVOIR.formAt(level, BASE.offset(ITEM_VAULT).offset(4, 0, 0))
+        FrameMultiblocks.NANITE_VAULT.formAt(level, BASE.offset(ITEM_VAULT).offset(8, 0, 0))
+        (level.getBlockEntity(BASE.offset(ITEM_VAULT)) as? com.itszuvalex.femtocraft.logistics.ItemVaultBlockEntity)?.state()?.storage?.let { vault ->
+            net.minecraft.core.registries.BuiltInRegistries.ITEM.stream().filter { it != net.minecraft.world.item.Items.AIR }.limit(80).toList().forEachIndexed { i, item ->
+                vault.insert(IItemStack.of(net.minecraft.world.item.ItemStack(item, minOf(item.defaultMaxStackSize, 1 + (i * 37) % 64))))
+                if (i % 7 == 0) repeat(4) { vault.insert(IItemStack.of(net.minecraft.world.item.ItemStack(item, item.defaultMaxStackSize))) }
+            }
+        }
     }
 }

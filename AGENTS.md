@@ -127,8 +127,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── computation/           Computation (DECISIONS D19): ComputationConduit network (ItszuLib distribution), leaves
 │                          (FragComputationLeaf), mainframe + processors + heat, Archive Interface (FLOPS to research)
 ├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
-│                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt),
-│                          indexed item storages (storage/)
+│                          distributed task/worker manager, job interfaces and ProviderManager (Jobs.kt); frame-built
+│                          storage multiblocks (Vaults.kt: item vault, fluid reservoir, nanite vault; DECISIONS D23)
 ├── cyber/                 Cybermaterial blocks/items, the replacement table (Cybermaterials), dumb dust
 ├── worldgen/              Crystal cluster block/block entity, rift feature
 ├── compat/jei/            JEI plugin: a category per machine recipe table, furnaces as smelting catalysts (D14)
@@ -211,8 +211,14 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   (`get`); the conduit itself uses `chip(index)`, which does not write. Add a kind by
   subclassing `ChipKind` and listing it in `Chips.KINDS`. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
-  or broken); `IndexedItemStorage` indexes an `IItemStorage` by item id and answers tag lookups (keep it current with
-  `slotChanged` or `invalidateCache` from the storage's `onChanged`). Neither has a block using it yet (DECISIONS D4).
+  or broken); it has no block using it yet (DECISIONS D4). Indexed storage is ItszuLib's (`IndexedItemStorage`,
+  `ItemStorageIndex`: writes through the wrapper keep it current); `IItemLogisticsNetwork` hands out an
+  `ItemStorageIndex` per key.
+- **Storage multiblocks** (DECISIONS D23): 3x3x3 frame multiblocks in `logistics/Vaults.kt`, each block exposing the
+  shared storage on its outer faces (`MultiblockSided*StorageConfiguration`, and
+  `MultiblockSidedNaniteStorageConfiguration` for nanites) with auto IO. The item vault's 243 slots are an ItszuLib
+  `IndexedItemStorage` with an `ItemStorageIndex`; its menu is an ItszuLib storage terminal (`enableStorageTerminal`,
+  `StorageTerminalView`: search by name, `@mod`, `#tooltip`, `$tag`, `*id`, `-` to exclude; sort; pages).
 - **Cyber/worldgen**: `Cybermaterials.replacement(state)` drives both dumb dust and the rift feature, which converts a
   cylinder of terrain (radius capped to the feature region, DECISIONS D13) and drops crystal clusters on it.
 - **Menus**: ItszuLib `MenuCore`s with vanilla slots (DECISIONS D6); non-slot values use `MenuSync`s; buttons send
@@ -239,7 +245,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
 `PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`,
-`ComputationGameTests`. Add one with
+`ComputationGameTests`, `VaultGameTests`. Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode
