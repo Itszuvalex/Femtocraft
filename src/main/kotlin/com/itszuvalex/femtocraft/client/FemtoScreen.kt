@@ -36,8 +36,10 @@ abstract class FemtoScreen<M : AbstractContainerMenu>(menu: M, inventory: Invent
     /**
      * Adds a vertical power gauge (v3's `GuiPowerMeter`) at ([x], [y]) in the image, over a synced battery.
      */
-    protected fun addPowerGauge(x: Int, y: Int, view: () -> EnergyView) =
-        addComponent(EnergyGauge(view, Component.translatable("gui.femtocraft.power_unit"), POWER, METER_W, METER_H), x, y)
+    protected fun addPowerGauge(x: Int, y: Int, view: () -> EnergyView) = addComponent(powerGauge(view), x, y)
+
+    /** A power gauge for a layout ([com.itszuvalex.itszulib.client.screen.Row] and the like). */
+    protected fun powerGauge(view: () -> EnergyView) = EnergyGauge(view, Component.translatable("gui.femtocraft.power_unit"), POWER, METER_W, METER_H)
 
     /**
      * A horizontal progress bar filled to [fraction].

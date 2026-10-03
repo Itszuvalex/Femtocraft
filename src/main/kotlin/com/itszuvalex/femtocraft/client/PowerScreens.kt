@@ -45,12 +45,13 @@ class CrystalMachineScreen(menu: CrystalMachineMenu, inventory: Inventory, title
 class CryoChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.CryoChargingBaseMenu, inventory: Inventory, title: Component) :
     FemtoScreen<com.itszuvalex.femtocraft.power.CryoChargingBaseMenu>(menu, inventory, title) {
     override fun addComponents() {
-        addPowerGauge(8, 18) { menu.battery }
-    }
-
-    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        text(graphics, Component.translatable("gui.femtocraft.cryo.coils", menu.coils, com.itszuvalex.femtocraft.power.CryoChargingBaseBlockEntity.MAX_COILS), 24, 24)
-        text(graphics, Component.translatable("gui.femtocraft.cryo.generation", fmt1(menu.generation)), 24, 38)
+        addComponent(com.itszuvalex.itszulib.client.screen.Row(listOf(
+            powerGauge { menu.battery },
+            com.itszuvalex.itszulib.client.screen.Column(listOf(
+                com.itszuvalex.itszulib.client.screen.Label({ Component.translatable("gui.femtocraft.cryo.coils", menu.coils, com.itszuvalex.femtocraft.power.CryoChargingBaseBlockEntity.MAX_COILS) }, fixedWidth = 120),
+                com.itszuvalex.itszulib.client.screen.Label({ Component.translatable("gui.femtocraft.cryo.generation", fmt1(menu.generation)) }, fixedWidth = 120),
+            ), gap = 5),
+        ), gap = 8), 8, 18)
     }
 }
 
@@ -60,13 +61,15 @@ class CryoChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.CryoChargingB
 class AtmosphericChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.AtmosphericChargingBaseMenu, inventory: Inventory, title: Component) :
     FemtoScreen<com.itszuvalex.femtocraft.power.AtmosphericChargingBaseMenu>(menu, inventory, title) {
     override fun addComponents() {
-        addPowerGauge(8, 18) { menu.battery }
-    }
-
-    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        text(graphics, Component.translatable("gui.femtocraft.atmospheric.coils", menu.coils, com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_ADDONS), 24, 20)
-        text(graphics, Component.translatable(if (menu.capped) "gui.femtocraft.atmospheric.capped" else "gui.femtocraft.atmospheric.uncapped"), 24, 32)
-        text(graphics, Component.translatable("gui.femtocraft.cryo.generation", "%.2f".format(java.util.Locale.ROOT, menu.powerPerTick)), 24, 44)
-        text(graphics, Component.translatable("gui.femtocraft.atmospheric.strikes", menu.strikes), 24, 56)
+        fun label(text: () -> Component) = com.itszuvalex.itszulib.client.screen.Label(text, fixedWidth = 120)
+        addComponent(com.itszuvalex.itszulib.client.screen.Row(listOf(
+            powerGauge { menu.battery },
+            com.itszuvalex.itszulib.client.screen.Column(listOf(
+                label { Component.translatable("gui.femtocraft.atmospheric.coils", menu.coils, com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_ADDONS) },
+                label { Component.translatable(if (menu.capped) "gui.femtocraft.atmospheric.capped" else "gui.femtocraft.atmospheric.uncapped") },
+                label { Component.translatable("gui.femtocraft.cryo.generation", "%.2f".format(java.util.Locale.ROOT, menu.powerPerTick)) },
+                label { Component.translatable("gui.femtocraft.atmospheric.strikes", menu.strikes) },
+            ), gap = 3),
+        ), gap = 8), 8, 18)
     }
 }
