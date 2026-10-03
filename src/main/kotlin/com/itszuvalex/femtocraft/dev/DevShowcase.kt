@@ -255,6 +255,7 @@ object DevShowcase {
         // A frame structure that keeps building (nanite particles; [tick] holds its progress at 0).
         FrameItem.place(level, BASE.offset(10, 0, 5), FrameMultiblocks.GERMINATION_CHAMBER)
         building()?.building = true
+        (level.getBlockEntity(BASE.offset(10, 0, 5)) as? com.itszuvalex.femtocraft.industry.FrameBlockEntity)?.markDirtyAndSync()
         // A crystal liquifier between a logistics conduit and a chest, under a block, with its top set to pull items
         // in and its east face to push fluid out.
         level.setBlockAndUpdate(BASE.offset(LIQUIFIER), com.itszuvalex.femtocraft.industry.IndustryContent.CRYSTAL_LIQUIFIER.get().defaultBlockState()

@@ -314,6 +314,10 @@ object FemtoRenderers {
          * Which [ObjParts.FRAME_GROUPS] to draw.
          */
         val groups = BooleanArray(ObjParts.FRAME_GROUPS.size)
+
+        /** On a building home frame: the machine's blocks (offset from the anchor, model parts) and how solid. */
+        val ghost = ArrayList<Pair<BlockPos, List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart>>>()
+        var ghostAlpha = 0f
     }
 
     /**
@@ -341,12 +345,57 @@ object FemtoRenderers {
                 val onBox = group.count { sides.getValue(it) }
                 state.groups[i] = if (group.length == 2) onBox == 2 else onBox >= 2
             }
+            state.ghost.clear()
+            val multi = be.multiblock()
+            if (membership.isHome && be.clientBuilding && multi != null) {
+                val level = be.level as? net.minecraft.client.multiplayer.ClientLevel ?: return
+                val models = net.minecraft.client.Minecraft.getInstance().modelManager.blockStateModelSet
+                for (offset in multi.shape.slots.keys) {
+                    val machine = multi.machineState(offset == BlockPos.ZERO)
+                    val parts = ArrayList<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart>()
+                    val at = be.blockPos.offset(offset)
+                    models.get(machine).collectParts(level, at, machine, net.minecraft.util.RandomSource.create(at.asLong()), parts)
+                    if (parts.isNotEmpty()) state.ghost += offset to parts
+                }
+                // Fades in as it builds, with a slow shimmer: nanites at work.
+                val progress = (be.clientProgress + partialTicks) / com.itszuvalex.femtocraft.industry.FrameState.BUILD_TIME
+                val shimmer = 0.08f * kotlin.math.sin(time(be, partialTicks) * 0.25f)
+                state.ghostAlpha = (GHOST_MIN + (GHOST_MAX - GHOST_MIN) * progress.coerceIn(0f, 1f) + shimmer).coerceIn(0f, 1f)
+            }
         }
 
         override fun submit(state: FrameState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
             ObjParts.FRAME_GROUPS.forEachIndexed { i, group ->
                 if (state.groups[i]) draw(poseStack, collector, ObjParts.frame(group), -1, state.lightCoords)
             }
+            if (state.ghost.isEmpty()) return
+            // The machine taking shape inside the frames: its models, translucent, untinted, full bright.
+            val quad = com.mojang.blaze3d.vertex.QuadInstance()
+            quad.setColor(((state.ghostAlpha * 255).toInt() shl 24) or 0xFFFFFF)
+            quad.setLightCoords(FULL_BRIGHT)
+            quad.setOverlayCoords(OverlayTexture.NO_OVERLAY)
+            for ((offset, parts) in state.ghost) {
+                poseStack.pushPose()
+                poseStack.translate(offset.x.toFloat(), offset.y.toFloat(), offset.z.toFloat())
+                collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.translucentMovingBlock()) { pose, buffer ->
+                    for (part in parts) for (side in GHOST_SIDES) for (baked in part.getQuads(side)) buffer.putBakedQuad(pose, baked, quad)
+                }
+                poseStack.popPose()
+            }
+        }
+
+        override fun shouldRenderOffScreen(): Boolean = true
+
+        override fun getRenderBoundingBox(be: FrameBlockEntity): AABB {
+            val multi = be.multiblock() ?: return AABB(be.blockPos)
+            return AABB(be.blockPos).expandTowards(multi.size.first - 1.0, multi.size.second - 1.0, multi.size.third - 1.0)
+        }
+
+        companion object {
+            const val GHOST_MIN = 0.15f
+            const val GHOST_MAX = 0.65f
+            private const val FULL_BRIGHT = 0xF000F0
+            private val GHOST_SIDES: List<net.minecraft.core.Direction?> = net.minecraft.core.Direction.entries + listOf(null)
         }
     }
 }

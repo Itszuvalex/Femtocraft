@@ -31,7 +31,27 @@ abstract class FemtoBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: 
 
     final override fun tick(level: ILevel, blockPos: BlockPos, blockState: BlockState) {
         super.tick(level, blockPos, blockState)
-        if (level.isClientSide()) clientTick() else serverTick()
+        if (level.isClientSide()) {
+            watchTint()
+            clientTick()
+        } else {
+            serverTick()
+        }
+    }
+
+    private var lastTint: Int? = null
+
+    /**
+     * Block tints are baked into the chunk mesh, so a colour worked out from synced data (a crystal, a power parent)
+     * would only show at the section's next rebuild. Twice a second, if this block's colour changed, ask for one.
+     */
+    private fun watchTint() {
+        val level = level ?: return
+        if ((level.gameTime + blockPos.hashCode()) % TINT_CHECK_TICKS != 0L) return
+        val color = getModule(com.itszuvalex.itszulib.api.Modules.COLORABLE, null)?.getColor()?.toInt() ?: return
+        val last = lastTint
+        lastTint = color
+        if (last != null && last != color) level.sendBlockUpdated(blockPos, blockState, blockState, net.minecraft.world.level.block.Block.UPDATE_CLIENTS)
     }
 
     /**
@@ -58,6 +78,10 @@ abstract class FemtoBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: 
      * Saves, and on the server re-sends client (DESCRIPTION) data.
      */
     fun sync() = markDirtyAndSync()
+
+    companion object {
+        const val TINT_CHECK_TICKS = 10
+    }
 }
 
 /**

@@ -93,13 +93,16 @@ class FrameMultiblock(
      * Replaces the frames anchored at [anchor] with [block] and forms the machine (v3's `formMultiblockWithLocsAtLoc`).
      * The frame structure is disbanded first, so replacing its blocks breaks nothing.
      */
+    /** The machine's block state at its anchor ([home]) or elsewhere. */
+    fun machineState(home: Boolean): BlockState {
+        val state = block.defaultBlockState()
+        return if (state.hasProperty(HOME)) state.setValue(HOME, home) else state
+    }
+
     fun formAt(level: Level, anchor: BlockPos): Boolean {
         val lvl = ILevel.of(level)
         lvl.getIBlockEntity(anchor)?.getModule(Modules.MULTIBLOCK_MEMBER, null)?.let { MultiblockManager.SERVER.disband(lvl, anchor, it) }
-        val state = block.defaultBlockState()
-        takenLocations(anchor).forEach { pos ->
-            level.setBlockAndUpdate(pos, if (state.hasProperty(HOME)) state.setValue(HOME, pos == anchor) else state)
-        }
+        takenLocations(anchor).forEach { pos -> level.setBlockAndUpdate(pos, machineState(pos == anchor)) }
         return MultiblockManager.SERVER.form(lvl, shape, anchor) != null
     }
 
@@ -196,6 +199,11 @@ class FrameBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<Frame
  * replaces the frames with the multiblock. Breaking any frame removes the structure (see [FrameState]).
  */
 class FrameBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(IndustryContent.FRAME_BE.get(), pos, state) {
+    companion object {
+        /** How often a building frame re-sends its progress to clients. */
+        const val SYNC_TICKS = 20
+    }
+
     @JvmField
     val part = FragMultiblockPart(FrameMultiblocks.all().map { MultiblockRoleRef(it.frameShape, FrameMultiblock.FRAME_ROLE) }, autoForm = false)
 
@@ -205,6 +213,14 @@ class FrameBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Indu
     init {
         fragList.addFragment(part)
         fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.frame"), { id, inv, _ -> FrameMenu(id, inv, this) }, part))
+        fragList.addInternalFragment(com.itszuvalex.femtocraft.core.FragData("BuildView", setOf(com.itszuvalex.itszulib.api.utility.NBTSerializationScope.DESCRIPTION), { _, o ->
+            val s = frameState()
+            o.putBoolean("Building", s?.building == true)
+            o.putInt("Progress", s?.progress ?: 0)
+        }, { _, i ->
+            clientBuilding = i.getBooleanOr("Building", false)
+            clientProgress = i.getIntOr("Progress", 0).toFloat()
+        }))
         fragList.addTickableFragment(object : FragMultiblockTickable(part) {
             override fun name(): String = "FrameBuild"
             override fun serverStructureTick(level: ILevel, instance: MultiblockInstance) = buildTick(level.toMinecraft(), instance)
@@ -217,6 +233,19 @@ class FrameBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Indu
     fun frameState(): FrameState? = part.sharedState() as? FrameState
 
     fun multiblock(): FrameMultiblock? = FrameMultiblocks.all().firstOrNull { it.frameShape == part.membership?.shape }
+
+    /**
+     * Client side, on the home frame: whether the structure is building and how far (in ticks, advanced between
+     * syncs), for the machine preview ([com.itszuvalex.femtocraft.client.FemtoRenderers.FrameRenderer]).
+     */
+    var clientBuilding = false
+        private set
+    var clientProgress = 0f
+        private set
+
+    override fun clientTick() {
+        if (clientBuilding && clientProgress < FrameState.BUILD_TIME) clientProgress++
+    }
 
     private fun buildTick(level: Level, instance: MultiblockInstance) {
         val s = instance.state as? FrameState ?: return
@@ -237,7 +266,9 @@ class FrameBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Indu
             return
         }
         s.progress++
-        (level.getBlockEntity(anchor) as? FrameBlockEntity)?.markDirty()
+        // Clients draw the machine taking shape; they advance the progress themselves between these syncs.
+        val home = level.getBlockEntity(anchor) as? FrameBlockEntity
+        if (s.progress % SYNC_TICKS == 0) home?.markDirtyAndSync() else home?.markDirty()
         // Nanites at work: now and then one in a random frame block (v3 `BlockFrame.randomDisplayTick`).
         if (level is net.minecraft.server.level.ServerLevel) {
             for (pos in multi.takenLocations(anchor)) {

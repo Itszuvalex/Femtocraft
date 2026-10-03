@@ -192,9 +192,15 @@ chamber's screen with the panel showing the whole structure, two members' faces 
 `-Pshowcase=16` strikes an atmospheric charging pole with lightning every half second. `-Pshowcase=15` shows the cryo-endothermal charging base on two coils beside them. `-Pshowcase=14` builds a mainframe (two Micro Logic Cores, packed ice beside it) on computation conduits to an
 Archive Interface and a logistics conduit, and opens its screen (checked headless).
 
-Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
-chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
-only; the frame's machine-in-progress preview is not drawn.
+**Pass 8 (started): the frame's build preview and tint refresh.** While a frame structure builds, its home frame draws
+the machine it will become inside the frames: the machine's block models, translucent and full bright, fading in with
+progress and shimmering (`FemtoRenderers.FrameRenderer`; the home frame syncs `building` and progress every second and
+clients advance it between syncs). Block tints are baked into the chunk mesh, so a colour worked out from synced data
+(a conduit's or chamber's derived colour) used to show only at the section's next rebuild; `FemtoBlockEntity` now
+checks its colour twice a second on the client and asks for a rebuild when it changed. `-Pshowcase=7` shows a
+germination chamber taking shape in its frames (checked headless).
+
+Known limits: the chamber model is lit by its home block only.
 
 **After the port: research visuals** (DECISIONS D16). Power conduits give off power particles in their tier's colour,
 as the 1.7.10 alpha's cables did; Archive nanites stream from a host to the Archive while it draws them; hosts have a
@@ -203,6 +209,8 @@ status line at the top left of the HUD. Not yet checked in a client.
 **Next passes:**
 
 - Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
-- The frame's machine-in-progress preview (a model ghost); germination chamber growth (already commented out in v3).
+- Germination chamber growth (already commented out in v3). Still to check in a client: the research visuals below;
+  placeholder looks to replace: the mainframe's and Archive Interface's fronts, the atmospheric base (the alpha drew
+  it with insets and a pillar on top).
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
