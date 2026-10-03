@@ -327,10 +327,12 @@ object DevShowcase {
             val item = com.itszuvalex.femtocraft.logistics.ItemChipKind
             val fluid = com.itszuvalex.femtocraft.logistics.FluidChipKind
             val itemChip = net.minecraft.world.item.ItemStack(LogisticsContent.ITEM_CHIP.get()).also { st ->
-                st.set(item.component, item.defaults(up).with(filter = listOf(net.minecraft.world.item.Items.DIAMOND, net.minecraft.world.item.Items.IRON_INGOT, net.minecraft.world.item.Items.REDSTONE).map { net.minecraft.world.item.ItemStack(it) }))
+                st.set(item.component, item.defaults(up).with(filter = com.itszuvalex.itszulib.api.filter.ResourceFilter(item.filterKind, com.itszuvalex.femtocraft.logistics.ChipKind.FILTER_SLOTS,
+                    listOf(net.minecraft.world.item.Items.DIAMOND, net.minecraft.world.item.Items.IRON_INGOT, net.minecraft.world.item.Items.REDSTONE).map { net.minecraft.world.item.ItemStack(it) })))
             }
             val fluidChip = net.minecraft.world.item.ItemStack(LogisticsContent.FLUID_CHIP.get()).also { st ->
-                st.set(fluid.component, fluid.defaults(up).with(filter = listOf(net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.LAVA).map { net.neoforged.neoforge.fluids.FluidStack(it, 1) }))
+                st.set(fluid.component, fluid.defaults(up).with(filter = com.itszuvalex.itszulib.api.filter.ResourceFilter(fluid.filterKind, com.itszuvalex.femtocraft.logistics.ChipKind.FILTER_SLOTS,
+                    listOf(net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.LAVA).map { net.neoforged.neoforge.fluids.FluidStack(it, 1) }, com.itszuvalex.itszulib.api.filter.FilterMode.DENY)))
             }
             conduit.conduit.chips[up.get3DDataValue()].setSlot(0, IItemStack.of(itemChip))
             conduit.conduit.chips[up.get3DDataValue()].setSlot(1, IItemStack.of(fluidChip))

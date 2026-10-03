@@ -65,8 +65,10 @@ class NaniteRepositoryMenu(containerId: Int, inventory: Inventory, be: NaniteRep
 
 /**
  * Logistics conduit: one row of four chip slots per face (down, up, north, south, west, east), and actions that cycle a
- * chip's connection direction or interface face, or set one of its filter entries from the carried stack
- * ([ACTION_FILTER]: the item itself for item chips, the fluid it holds for fluid chips; an empty hand clears). Port of
+ * chip's connection direction or interface face, or change its filter ([ACTION_FILTER]: an ItszuLib
+ * [com.itszuvalex.itszulib.api.filter.FilterActions] action above the slot bits, applied with the carried stack: a cell
+ * set to the held item or the fluid it holds, cleared by an empty hand, or the allow/deny mode or component matching
+ * toggled). Port of
  * v3's `ContainerConduit`, `ContainerConduitSide` (a per-face view of one row) and the conduit messages (DECISIONS
  * D11).
  */
@@ -102,14 +104,14 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
         const val ACTION_MODE = 0
         const val ACTION_INTERFACE = 1
         const val ACTION_FILTER = 2
-        const val INVENTORY_Y = 131
+        const val INVENTORY_Y = 145
         const val HEIGHT = INVENTORY_Y + 58 + 18 + 6
 
-        /** In [ACTION_FILTER]'s data: the filter entry, above the slot bits. */
+        /** In [ACTION_FILTER]'s data: the filter action, above the slot bits. */
         const val FILTER_SHIFT = 6
 
-        /** [ACTION_FILTER] data: set filter entry [entry] of chip [index] in conduit face [face]. */
-        fun filterData(face: Int, index: Int, entry: Int): Int = (face * LogisticsConduit.CHIPS_PER_FACE + index) or (entry shl FILTER_SHIFT)
+        /** [ACTION_FILTER] data: filter [action] ([com.itszuvalex.itszulib.api.filter.FilterActions]) on chip [index] in conduit face [face]. */
+        fun filterData(face: Int, index: Int, action: Int): Int = (face * LogisticsConduit.CHIPS_PER_FACE + index) or (action shl FILTER_SHIFT)
         const val SLOT_MASK = 0x1F
 
         /** Flag in an action's data: cycle backwards. */

@@ -397,20 +397,22 @@ things.
 ## D24. Chip filters, and pulling through indexed inventories — DECIDED (maintainer, 2026-10-03)
 
 The maintainer asked for AE2-style allowlists on logistics chips, set by clicking with the item held, so chips pull
-from the network's indexed inventories only what they are meant to.
+from the network's indexed inventories only what they are meant to; then for the filter itself to live in ItszuLib
+for reuse (ItszuLib D18).
 
-- **Filters.** Every chip carries nine filter entries in its data component (`ChipData.filter`, saved only when one is
-  set). No entries allow everything, as before; otherwise only things the same as an entry (same item and
-  components, same fluid) pass. An **input** chip pulls only allowed things from its block; an **output** chip
-  accepts only allowed things from the network (the rest wait in the input buffers, or go to other outputs).
-- **Setting them.** In the conduit screen, select a chip; the row of nine cells under the buttons is its filter.
-  Clicking a cell while holding an item sets it (one of the item, components included; the held stack is not used
-  up); for fluid chips, holding a bucket or any fluid container sets its fluid; an empty hand clears the cell
-  (`ConduitMenu.ACTION_FILTER`). Nanite chips have no filter yet (there is no item to click with); their data
-  supports one.
+- **Filters.** Every chip carries an ItszuLib `ResourceFilter` of nine entries in its data component
+  (`ChipData.filter`, over `ChipKind.filterKind`: ItszuLib's item and fluid kinds, Femtocraft's `NaniteFilterKind`).
+  Allow (only listed things pass) or deny (listed things are kept out), matching data components or not; nothing
+  listed lets everything through, as before. An **input** chip pulls only what passes from its block; an **output**
+  chip accepts only what passes from the network (the rest waits in the input buffers or goes to other outputs).
+- **Setting them.** In the conduit screen, select a chip; ItszuLib's `FilterRow` under the buttons edits its filter:
+  Allow/Deny, Exact/Any data, and nine cells. Clicking a cell while holding an item lists it (one of it; the held
+  stack is not used up); for fluid chips, holding a bucket or any fluid container lists its fluid; an empty hand
+  clears the cell (`ConduitMenu.ACTION_FILTER` carrying an ItszuLib `FilterActions` action). Nanite chips have no
+  filter controls yet (no item names a strain); their data supports one.
 - **Indexed inventories.** A block may expose an ItszuLib `ItemStorageIndex` on a face through
   `LogisticsModules.ITEM_INDEX` (the item vault does, on the outer faces its item configuration exposes). An item chip
-  facing one pulls through the index: more of its buffer's item, else the first allowed item the index holds, reading
-  only the slots that hold it; without a filter it takes the first item the index lists. Other blocks are pulled
-  through their NeoForge item handler as before.
+  facing one pulls through the index (`ItemStorageIndex.extract(filter, amount)`): more of its buffer's item, else
+  the first item that passes, asking only for an allowlist's items and reading only the slots that hold them. Other
+  blocks are pulled through their NeoForge item handler as before.
 - Chips still move one item (250 mB, 5 nanites) per operation; filters change what, not how fast.

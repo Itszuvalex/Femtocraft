@@ -329,7 +329,7 @@ object LogisticsGameTests {
     private fun <B : Any> filtered(kind: ChipKind<B>, face: Direction, direction: ConnectionDirection, vararg allowed: B): ItemStack {
         val stack = ItemStack(chipItem(kind))
         val d = kind.defaults(face)
-        stack.set(kind.component, d.with(settings = d.settings.copy(flops = 1.0, direction = direction), filter = allowed.toList()))
+        stack.set(kind.component, d.with(settings = d.settings.copy(flops = 1.0, direction = direction), filter = com.itszuvalex.itszulib.api.filter.ResourceFilter(kind.filterKind, ChipKind.FILTER_SLOTS, allowed.toList())))
         return stack
     }
 
@@ -386,7 +386,7 @@ object LogisticsGameTests {
         val index = west.getModule(com.itszuvalex.femtocraft.logistics.LogisticsModules.ITEM_INDEX, Direction.WEST)
         helper.assertTrue(index != null, "an outer face exposes the index")
         helper.assertTrue(west.getModule(com.itszuvalex.femtocraft.logistics.LogisticsModules.ITEM_INDEX, Direction.EAST) == null, "an inner face does not")
-        val direct = ItemChipKind.pullIndexed(index!!, ItemStack.EMPTY, 2, listOf(ItemStack(Items.EMERALD)))
+        val direct = ItemChipKind.pullIndexed(index!!, ItemStack.EMPTY, 2, com.itszuvalex.itszulib.api.filter.ResourceFilter(ItemChipKind.filterKind, ChipKind.FILTER_SLOTS, listOf(ItemStack(Items.EMERALD))))
         helper.assertTrue(direct.`is`(Items.EMERALD) && direct.count == 2, "the index gives emeralds, got $direct")
         storage.insert(IItemStack.of(direct))
 
@@ -404,7 +404,10 @@ object LogisticsGameTests {
         }
     }
 
-    /** Clicking a filter cell sets it from the held item (or the held bucket's fluid) and an empty hand clears it. */
+    /**
+     * The conduit menu changes a chip's ItszuLib filter: cells set from the held item (or the held bucket's fluid), an
+     * empty hand clears, and allow/deny and component matching toggle; nanite chips take no filter.
+     */
     private fun filterMenu(helper: GameTestHelper) {
         val be = helper.place<ConduitBlockEntity>(CENTER, LogisticsContent.CONDUIT.get())
         val chips = be.conduit.chips[Direction.UP.get3DDataValue()]
@@ -414,23 +417,30 @@ object LogisticsGameTests {
         val player = helper.makeMockServerPlayerInLevel()
         val menu = ConduitMenu(1, player.inventory, be)
         val up = Direction.UP.get3DDataValue()
-        fun act(index: Int, entry: Int) = menu.handleAction(player, ConduitMenu.ACTION_FILTER, ConduitMenu.filterData(up, index, entry))
+        val actions = com.itszuvalex.itszulib.api.filter.FilterActions
+        fun act(index: Int, action: Int) = menu.handleAction(player, ConduitMenu.ACTION_FILTER, ConduitMenu.filterData(up, index, action))
+        fun itemFilter() = chips.get(0).toMinecraft().get(ItemChipKind.component)!!.filter
 
         menu.setCarried(ItemStack(Items.DIAMOND, 7))
-        helper.assertTrue(act(0, 3), "item filter set")
-        val itemFilter = chips.get(0).toMinecraft().get(ItemChipKind.component)!!.filter
-        helper.assertTrue(itemFilter[3].`is`(Items.DIAMOND) && itemFilter[3].count == 1, "one diamond in entry 3, got ${itemFilter[3]}")
+        helper.assertTrue(act(0, actions.set(3)), "item filter set")
+        helper.assertTrue(itemFilter().entries[3].`is`(Items.DIAMOND) && itemFilter().entries[3].count == 1, "one diamond in entry 3, got ${itemFilter().entries[3]}")
         helper.assertValueEqual(menu.carried.count, 7, "the held stack is not used up")
-        helper.assertFalse(act(1, 0), "a diamond is no fluid filter")
-        helper.assertFalse(act(2, 0), "nanite chips take no filter")
+        helper.assertFalse(act(1, actions.set(0)), "a diamond is no fluid filter")
+        helper.assertFalse(act(2, actions.set(0)), "nanite chips take no filter")
+
+        helper.assertTrue(act(0, actions.mode()), "mode toggled")
+        helper.assertTrue(itemFilter().mode == com.itszuvalex.itszulib.api.filter.FilterMode.DENY, "now a denylist")
+        helper.assertFalse(itemFilter().test(ItemStack(Items.DIAMOND)), "diamonds kept out")
+        helper.assertTrue(act(0, actions.components()), "component matching toggled")
+        helper.assertFalse(itemFilter().matchComponents, "matching the item alone")
 
         menu.setCarried(ItemStack(Items.WATER_BUCKET))
-        helper.assertTrue(act(1, 0), "fluid filter set from a bucket")
-        helper.assertTrue(chips.get(1).toMinecraft().get(FluidChipKind.component)!!.filter[0].fluid == Fluids.WATER, "water allowed")
+        helper.assertTrue(act(1, actions.set(0)), "fluid filter set from a bucket")
+        helper.assertTrue(chips.get(1).toMinecraft().get(FluidChipKind.component)!!.filter.entries[0].fluid == Fluids.WATER, "water listed")
 
         menu.setCarried(ItemStack.EMPTY)
-        helper.assertTrue(act(0, 3), "cleared")
-        helper.assertTrue(chips.get(0).toMinecraft().get(ItemChipKind.component)!!.filter.all { it.isEmpty }, "the item chip allows anything again")
+        helper.assertTrue(act(0, actions.set(3)), "cleared")
+        helper.assertTrue(itemFilter().isEmpty, "nothing listed: the item chip takes anything again")
         helper.succeed()
     }
 }
