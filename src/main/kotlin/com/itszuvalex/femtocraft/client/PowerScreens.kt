@@ -38,3 +38,18 @@ class CrystalMachineScreen(menu: CrystalMachineMenu, inventory: Inventory, title
         networkLines(menu.network).take(1).forEach { text(graphics, it, 62, 18 + 40) }
     }
 }
+
+/**
+ * The cryo-endothermal charging base: its battery, how many coils feed it and their average output.
+ */
+class CryoChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.CryoChargingBaseMenu, inventory: Inventory, title: Component) :
+    FemtoScreen<com.itszuvalex.femtocraft.power.CryoChargingBaseMenu>(menu, inventory, title) {
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
+    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        text(graphics, Component.translatable("gui.femtocraft.cryo.coils", menu.coils, com.itszuvalex.femtocraft.power.CryoChargingBaseBlockEntity.MAX_COILS), 24, 24)
+        text(graphics, Component.translatable("gui.femtocraft.cryo.generation", fmt1(menu.generation)), 24, 38)
+    }
+}

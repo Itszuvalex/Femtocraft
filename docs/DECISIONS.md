@@ -315,3 +315,20 @@ DECISIONS D13 addendum). Femtocraft uses the items and rewards:
   Scientific Theory takes a book and eight paper and gives a Codex; Algorithms takes a Micro Logic Core and gives two;
   Mechanical Precision takes two pistons and gives four frames.
 - Resources are not used yet; computation could become one (FLOPS for some technologies instead of points).
+
+## D21. The alpha's cryo-endothermal generator, re-added — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked to bring back the 1.7.10 alpha's thermal generators (Femtocraft-alpha-1) for now. Its
+Cryo-Endothermal Charging Base and Coil ("Geothermal Harnessing": cold around the coil gives power) are ported with the
+alpha's values and textures (`power/Cryo.kt`):
+
+- **Coils** stack under a **base** (up to 15). Each tick a coil takes power from ice (1.25 DE/t; packed and blue ice
+  too) and snow blocks (0.5 DE/t; powder snow too) on its four sides; every 1-10 seconds it freezes a random block
+  within 5 for a burst: a water source to ice (100 DE), a lava source to obsidian (300 DE), a snow layer on open ground
+  (10 DE). Its power goes up the stack into the base. Without a base a coil does nothing and freezes nothing (the alpha
+  froze blocks and dropped the power).
+- The **base** holds 25,000 DE and is a producer on the wireless and wired networks; its screen shows the coils and
+  their average output.
+- `CryogenRegistry` keeps the alpha's handler lists, so other blocks can be made cryogens (passive or active).
+- Recipes are placeholders. The alpha's other generators (steam, magnetohydrodynamic, magnetic induction, atmospheric
+  charging) are not ported; DECISIONS asks which come next.

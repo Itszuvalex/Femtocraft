@@ -82,6 +82,7 @@ def drop_count(name, item, lo, hi):
 #   ("leaves", tex)
 #   ("cross", tex)                    crossed planes
 #   ("box", tex, [x0,y0,z0,x1,y1,z1], ...)   one or more boxes with one texture
+#   ("pillar", side, end, [x0,y0,z0,x1,y1,z1])   one box: [side] stretched over each side face, [end] on top and bottom
 # drops: "self", "none", or a loot table dict
 BLOCKS = {
     # name: (display name, model, drops, tool)
@@ -92,6 +93,9 @@ BLOCKS = {
     "crystal_heat_exchanger": ("Crystal Heat Exchanger", ("machine", "crystalheatexchanger_front"), "self", "pickaxe"),
     "power_conduit_crystal": ("Crystal Power Conduit", ("conduit_obj", "wire_thin_power", "wire_thin_power_color"), "self", "pickaxe"),
     "glow_stick": ("Glow Stick", ("glow_stick",), "self", None),
+    # The 1.7.10 alpha's cryo-endothermal generator (DECISIONS D21), with its textures.
+    "cryo_endothermal_charging_base": ("Cryo-Endothermal Charging Base", ("cube_all", "cryo_endothermal_charging_base"), "self", "pickaxe"),
+    "cryo_endothermal_charging_coil": ("Cryo-Endothermal Charging Coil", ("pillar", "cryo_endothermal_charging_coil", "cryo_endothermal_charging_coil_top", [4, 0, 4, 12, 16, 12]), "self", "pickaxe"),
     # --- industry ---
     "nano_furnace": ("Nano Furnace", ("machine", "nanofurnace_front"), "self", "pickaxe"),
     "demolisher": ("Demolisher", ("machine", "demolisher_front"), "self", "pickaxe"),
@@ -272,6 +276,8 @@ LANG = {
     "gui.femtocraft.mainframe.ambient": "Ambient: %s °C",
     "gui.femtocraft.mainframe.throttle": "Slows from %s °C, stops at %s °C",
     "gui.femtocraft.archive.computed": "Computed points waiting: %s",
+    "gui.femtocraft.cryo.coils": "Coils: %s / %s",
+    "gui.femtocraft.cryo.generation": "Generating %s DE/t",
 }
 
 TAGS = {
@@ -348,6 +354,8 @@ RECIPES = {
     "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
     "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
     "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "cryo_endothermal_charging_base": shaped(["SBS", "CFC", "SRS"], {"S": f"{NS}:nanoweave_sheet", "B": f"{NS}:crystal_battery", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:cryo_endothermal_charging_base"),
+    "cryo_endothermal_charging_coil": shaped([" I ", "RCR", " I "], {"I": "minecraft:packed_ice", "R": f"{NS}:riftiron_ingot_devoid", "C": f"{NS}:nano_channel"}, f"{NS}:cryo_endothermal_charging_coil", 2),
     "computation_conduit_crystal": shaped(["SSS", "RCR", "SSS"], {"S": f"{NS}:nanoweave_sheet", "R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:basic_circuit"}, f"{NS}:computation_conduit_crystal", 6),
     "micro_logic_core": shaped(["RCR", "CDC", "RCR"], {"R": "minecraft:redstone", "C": f"{NS}:basic_circuit", "D": f"{NS}:crackling_dust"}, f"{NS}:micro_logic_core"),
     "orpheus_processor": shaped(["PMP", "MDM", "PMP"], {"P": f"{NS}:phasemetal_ingot_devoid", "M": f"{NS}:micro_logic_core", "D": f"{NS}:diamond_dust"}, f"{NS}:orpheus_processor"),
@@ -503,6 +511,13 @@ def block_model(name, kind):
         return {"parent": "minecraft:block/leaves", "textures": {"all": tex(kind[1])}, "render_type": "minecraft:cutout_mipped"}
     if k == "cross":
         return {"parent": "minecraft:block/cross", "textures": {"cross": tex(kind[1])}, "render_type": "minecraft:cutout"}
+    if k == "pillar":
+        x0, y0, z0, x1, y1, z1 = kind[3]
+        sides = {d: {"texture": "#side", "uv": [0, 0, 16, 16]} for d in ["north", "south", "east", "west"]}
+        ends = {d: {"texture": "#end", "uv": [x0, z0, x1, z1]} for d in ["up", "down"]}
+        return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+                "textures": {"particle": tex(kind[2]), "side": tex(kind[1]), "end": tex(kind[2])},
+                "elements": [{"from": [x0, y0, z0], "to": [x1, y1, z1], "faces": {**sides, **ends}}]}
     if k == "box":
         return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
                 "textures": {"particle": tex(kind[1]), "all": tex(kind[1])}, "elements": [element(b) for b in kind[2:]]}

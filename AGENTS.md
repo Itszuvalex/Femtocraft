@@ -163,7 +163,9 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   `DistributionAlgorithm`, ItszuLib DECISIONS D15). Wired: `WiredPowerNetwork` is an ItszuLib
   `DistributingTileNetwork` and `WiredPowerConduit` an ItszuLib `FragNetworkedWire` and `IDistributionNode`, whose
   participants are the `FragWiredPowerLeafNode` machines on its faces (keyed by block or multiblock, so each counts
-  once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours). Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
+  once). Conduits give off power particles in their tier's colour (the 1.7.10 alpha's Micro/Nano/Femto colours).
+  The alpha's cryo-endothermal generator (`power/Cryo.kt`, DECISIONS D21): coils stacked under a charging base draw
+  power from ice and snow beside them and freeze water, lava and air nearby for bursts (`CryogenRegistry` handlers). Batteries are ItszuLib `IBattery`s; power crystals keep their battery in the
   `femtocraft:power_crystal` component.
 - **Machines**: `ProcessingMachineBlockEntity` holds an `ItemStorageArray` behind ItszuLib sided configuration, item
   auto IO, a battery and a `Task`; subclasses supply the recipe and the start cost (power, crystal power, nanites).

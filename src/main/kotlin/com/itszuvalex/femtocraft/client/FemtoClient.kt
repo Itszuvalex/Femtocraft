@@ -44,6 +44,7 @@ object FemtoClient {
     private fun registerScreens(event: RegisterMenuScreensEvent) {
         event.register(PowerContent.CRYSTAL_MOUNT_MENU.get(), ::CrystalMountScreen)
         event.register(PowerContent.CRYSTAL_MACHINE_MENU.get(), ::CrystalMachineScreen)
+        event.register(PowerContent.CRYO_BASE_MENU.get(), ::CryoChargingBaseScreen)
         event.register(IndustryContent.MACHINE_MENU.get(), ::MachineScreen)
         event.register(IndustryContent.FRAME_MENU.get(), ::FrameScreen)
         event.register(IndustryContent.FRAME_SELECTION_MENU.get(), ::FrameSelectionScreen)

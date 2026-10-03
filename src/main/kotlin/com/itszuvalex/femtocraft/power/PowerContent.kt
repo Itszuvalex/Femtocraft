@@ -42,6 +42,21 @@ object PowerContent {
     val GLOW_STICK = blockWithItem("glow_stick", ::GlowStickBlock) { it.strength(0f).noCollision().noOcclusion().lightLevel { 15 }.sound(SoundType.GLASS) }
 
     @JvmField
+    val CRYO_BASE = blockWithItem("cryo_endothermal_charging_base", ::CryoChargingBaseBlock) { machine(it) }
+
+    @JvmField
+    val CRYO_COIL = blockWithItem("cryo_endothermal_charging_coil", ::CryoChargingCoilBlock) { machine(it).noOcclusion() }
+
+    @JvmField
+    val CRYO_BASE_BE = R.blockEntity("cryo_endothermal_charging_base", ::CryoChargingBaseBlockEntity, CRYO_BASE::get)
+
+    @JvmField
+    val CRYO_COIL_BE = R.blockEntity("cryo_endothermal_charging_coil", ::CryoChargingCoilBlockEntity, CRYO_COIL::get)
+
+    @JvmField
+    val CRYO_BASE_MENU = R.blockMenu<CryoChargingBaseBlockEntity, CryoChargingBaseMenu>("cryo_endothermal_charging_base", ::CryoChargingBaseMenu)
+
+    @JvmField
     val CRYSTAL_MOUNT_BE = R.blockEntity("crystal_mount", ::CrystalMountBlockEntity, CRYSTAL_MOUNT::get)
 
     @JvmField

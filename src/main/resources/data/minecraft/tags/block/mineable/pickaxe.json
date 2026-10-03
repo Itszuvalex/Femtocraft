@@ -5,6 +5,8 @@
     "femtocraft:archive_interface",
     "femtocraft:computation_conduit_crystal",
     "femtocraft:conduit",
+    "femtocraft:cryo_endothermal_charging_base",
+    "femtocraft:cryo_endothermal_charging_coil",
     "femtocraft:crystal_charging_array",
     "femtocraft:crystal_crusher",
     "femtocraft:crystal_focusing_chamber",

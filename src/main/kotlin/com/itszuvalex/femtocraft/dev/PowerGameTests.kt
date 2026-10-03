@@ -58,6 +58,9 @@ object PowerGameTests {
     }
 
     fun register() {
+        DevGameTests.test("cryo_coils_charge_the_base_from_ice", 80, ::cryoCharges)
+        DevGameTests.test("cryo_active_handler_freezes_water_lava_and_air", body = ::cryoActive)
+        DevGameTests.test("cryo_coil_without_base_does_nothing", 60, ::cryoNoBase)
         DevGameTests.test("power_crystal_battery_and_trickle", body = ::crystalBatteryAndTrickle)
         DevGameTests.test("crystal_mount_model_follows_solid_neighbours", body = ::mountHalves)
         DevGameTests.test("power_crystal_codec_round_trip", body = ::crystalCodec)
@@ -247,5 +250,51 @@ object PowerGameTests {
             val loadedMount = BlockEntity.loadStatic(m.blockPos, m.blockState, m.saveWithFullMetadata(registries), registries) as CrystalMountBlockEntity
             helper.assertTrue(array.getModule(PowerModules.WIRELESS_LEAF, null)!!.storageLoc in loadedMount.node.leafLocs(), "leaf list saved")
         }
+    }
+
+    /**
+     * A base on two coils, the lower one surrounded by ice: the coils count, and the base charges at about 1.25 DE a
+     * tick per ice block.
+     */
+    private fun cryoCharges(helper: GameTestHelper) {
+        val base = helper.place<com.itszuvalex.femtocraft.power.CryoChargingBaseBlockEntity>(BlockPos(4, 3, 4), PowerContent.CRYO_BASE.get())
+        helper.place<com.itszuvalex.femtocraft.power.CryoChargingCoilBlockEntity>(BlockPos(4, 2, 4), PowerContent.CRYO_COIL.get())
+        helper.place<com.itszuvalex.femtocraft.power.CryoChargingCoilBlockEntity>(BlockPos(4, 1, 4), PowerContent.CRYO_COIL.get())
+        for (face in listOf(net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST)) {
+            helper.setBlock(BlockPos(4, 1, 4).relative(face), net.minecraft.world.level.block.Blocks.ICE)
+        }
+        helper.assertValueEqual(base.coils(), 2, "coils under the base")
+        helper.runAfterDelay(40) {
+            helper.assertTrue(base.battery.storage() >= 40 * 4 * com.itszuvalex.femtocraft.power.CryogenRegistry.ICE_PER_TICK - 10, "charged ${base.battery.storage()}")
+            helper.succeed()
+        }
+    }
+
+    private fun cryoActive(helper: GameTestHelper) {
+        val level = helper.level
+        val registry = com.itszuvalex.femtocraft.power.CryogenRegistry
+        val water = BlockPos(2, 1, 2)
+        val lava = BlockPos(4, 1, 2)
+        helper.setBlock(water, net.minecraft.world.level.block.Blocks.WATER)
+        helper.setBlock(lava, net.minecraft.world.level.block.Blocks.LAVA)
+        helper.setBlock(BlockPos(6, 1, 2), net.minecraft.world.level.block.Blocks.STONE)
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(water)), registry.WATER_TO_ICE, "water")
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.ICE, water)
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(lava)), registry.LAVA_TO_OBSIDIAN, "lava")
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.OBSIDIAN, lava)
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(BlockPos(6, 2, 2))), registry.AIR_TO_SNOW_LAYER, "air over stone")
+        helper.assertBlockPresent(net.minecraft.world.level.block.Blocks.SNOW, BlockPos(6, 2, 2))
+        helper.assertValueEqual(registry.activePower(level, helper.absolutePos(BlockPos(6, 4, 2))), 0.0, "air over air")
+        helper.succeed()
+    }
+
+    /**
+     * A coil with no base above it makes and freezes nothing.
+     */
+    private fun cryoNoBase(helper: GameTestHelper) {
+        val coil = helper.place<com.itszuvalex.femtocraft.power.CryoChargingCoilBlockEntity>(BlockPos(4, 1, 4), PowerContent.CRYO_COIL.get())
+        helper.setBlock(BlockPos(4, 2, 4), net.minecraft.world.level.block.Blocks.STONE)
+        helper.assertTrue(coil.base() == null, "no base")
+        helper.succeed()
     }
 }

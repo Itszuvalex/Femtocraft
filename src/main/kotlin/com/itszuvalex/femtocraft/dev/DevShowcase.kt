@@ -66,6 +66,7 @@ object DevShowcase {
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
         Vec3(17.5, 3.0, -2.5) to Vec3(17.5, 1.5, 1.0),
         Vec3(12.5, 2.5, 4.0) to Vec3(12.5, 0.5, 7.0),
+        Vec3(13.0, 3.0, 2.5) to Vec3(14.5, 1.0, 6.5),
     )
 
     private const val FRAMES_VIEW = 9
@@ -151,6 +152,8 @@ object DevShowcase {
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
         // The computation view opens the mainframe's screen (it computes for the logistics conduit beside it).
+        // The next view closes it again to show the blocks (and the cryo-endothermal stack beside them).
+        if (view == COMPUTATION_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
         if (view == COMPUTATION_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
             p.closeContainer()
             (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
@@ -271,5 +274,12 @@ object DevShowcase {
         set(MAINFRAME.x + 2, 1, MAINFRAME.z, computation.COMPUTATION_CONDUIT.get())
         set(MAINFRAME.x + 3, 0, MAINFRAME.z, computation.ARCHIVE_INTERFACE.get())
         set(MAINFRAME.x + 2, 0, MAINFRAME.z + 1, LogisticsContent.CONDUIT.get())
+        // The alpha's cryo-endothermal charging base on two coils, ice beside the lower one, water in reach.
+        set(15, 0, 5, PowerContent.CRYO_COIL.get())
+        set(15, 1, 5, PowerContent.CRYO_COIL.get())
+        set(15, 2, 5, PowerContent.CRYO_BASE.get())
+        set(16, 0, 5, Blocks.ICE)
+        set(15, 0, 4, Blocks.PACKED_ICE)
+        set(16, 0, 4, Blocks.WATER)
     }
 }
