@@ -187,7 +187,8 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   player to use it and researches its team's focus (DECISIONS D17: the first available technology of the tree in the
   team's ItszuLib research queue): once a second it draws an Archive nanite from that team's nearest host within 8
   blocks for 10 points and spends up to 5 points (`ArchiveState.step`). Its screen and the Codex edit the team's queue
-  (`ArchiveResearch`: click queues with prerequisites, right-click removes); claimed Archives and their last status are
+  (`ArchiveResearch`: click queues with prerequisites, right-click removes) and hand in the items a focus needs
+  ("Offer items", `ArchiveResearch.deliver`; DECISIONS D20); claimed Archives and their last status are
   kept in `ArchiveRegistry` (a crash-safe store) for the Codex's list. Machines fed by a host take nanites
   with `NaniteHost.drawTo(player, amount, level, target)`, which shows them flowing to the target
   (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`, `CodexItem.open`) opens the tree, queue and the team's Archives anywhere. Hosts see

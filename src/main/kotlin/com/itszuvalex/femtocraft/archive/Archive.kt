@@ -55,6 +55,9 @@ enum class ArchiveStatus {
 
     /** The team has a focus, but no host of the team with Archive nanites is in range. */
     NO_HOST,
+
+    /** The focus has all its points and waits for items to be handed in (the Archive's or Codex's "Offer items"). */
+    NEEDS_ITEMS,
 }
 
 /**
@@ -146,6 +149,12 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
         val tech = team?.let { TechTree.focus(level.server, it, ArchiveContent.TREE) }
         if (team == null || tech == null) {
             status = ArchiveStatus.IDLE
+            return 0L
+        }
+        val research = ItszuLib.TEAMS.state.team(team)?.get(com.itszuvalex.itszulib.team.Research.TYPE)
+        val remaining = research?.let { TechTree.of(level.registryAccess()).remaining(tech, it) }
+        if (remaining != null && remaining.points <= 0L && !remaining.complete) {
+            status = ArchiveStatus.NEEDS_ITEMS
             return 0L
         }
         if (points < RATE) {
@@ -288,7 +297,11 @@ object ArchiveResearch {
     const val ACTION_QUEUE = 0
     const val ACTION_UNQUEUE = 1
 
+    /** Hand in what the team's focus still needs of its items, from the player's inventory. */
+    const val ACTION_DELIVER = 2
+
     fun handleAction(player: Player, action: Int, data: Int): Boolean {
+        if (action == ACTION_DELIVER) return deliver(player) > 0
         if (action != ACTION_QUEUE && action != ACTION_UNQUEUE) return false
         val server = player.level().server ?: return false
         val tech = byNetworkId(player.level().registryAccess(), data) ?: return false
@@ -296,6 +309,20 @@ object ArchiveResearch {
         val team = ItszuLib.TEAMS.state.teamOf(player.uuid) ?: return false
         if (action == ACTION_QUEUE) TechTree.queue(server, team.id, tech) else TechTree.unqueue(server, team.id, tech)
         return true
+    }
+
+    /**
+     * Hands in what [player]'s team's focus in Femtocraft's tree still needs of its items, from their inventory.
+     *
+     * @return How many items were taken.
+     */
+    fun deliver(player: Player): Int {
+        val server = player.level().server ?: return 0
+        val team = ItszuLib.TEAMS.state.teamOf(player.uuid)?.id ?: return 0
+        val focus = TechTree.focus(server, team, ArchiveContent.TREE) ?: return 0
+        val taken = TechTree.deliver(server, team, focus, player.inventory.nonEquipmentItems)
+        if (taken > 0) player.inventory.setChanged()
+        return taken
     }
 
     /**

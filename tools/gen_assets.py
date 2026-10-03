@@ -230,6 +230,9 @@ LANG = {
     "gui.femtocraft.archive.status.idle": "Idle",
     "gui.femtocraft.archive.status.researching": "Researching",
     "gui.femtocraft.archive.status.no_host": "Needs a nanite host nearby or computation",
+    "gui.femtocraft.archive.status.needs_items": "Waiting for items: offer them from the Archive or Codex",
+    "gui.femtocraft.research.offer": "Offer items",
+    "gui.femtocraft.research.offer.tooltip": "Hand in the items the focus still needs from your inventory",
     "gui.femtocraft.archive.host": "Your Archive nanites: %s / %s",
     "gui.femtocraft.archive.not_host": "You are not a nanite host. Touch a crystal cluster.",
     "hud.femtocraft.host.nanites": "Archive nanites %s / %s",
@@ -582,6 +585,12 @@ TECH_LEVELS = {
     "dimensional": (5000, "minecraft:ender_eye"),
 }
 TECH_UNLOCKED_BY_DEFAULT = {"macroscopic_structures"}
+# Placeholder items to hand in at an Archive (ItszuLib DECISIONS D13 addendum) and rewards, to try the mechanism.
+TECH_EXTRAS = {
+    "scientific_theory": {"items": [("minecraft:book", 1), ("minecraft:paper", 8)], "rewards": [(f"{NS}:codex", 1)]},
+    "algorithms": {"items": [(f"{NS}:micro_logic_core", 1)], "rewards": [(f"{NS}:micro_logic_core", 2)]},
+    "mechanical_precision": {"items": [("minecraft:piston", 2)], "rewards": [(f"{NS}:frame", 4)]},
+}
 
 
 def technologies(lang):
@@ -596,6 +605,11 @@ def technologies(lang):
         obj = {"tree": TECH_TREE, "prerequisites": [f"{NS}:{p}" for p in t["prerequisites"]], "cost": cost, "icon": icon}
         if t["id"] in TECH_UNLOCKED_BY_DEFAULT:
             obj["unlocked_by_default"] = True
+        extras = TECH_EXTRAS.get(t["id"], {})
+        if extras.get("items"):
+            obj["items"] = [{"ingredient": item, "count": n} for item, n in extras["items"]]
+        if extras.get("rewards"):
+            obj["rewards"] = [{"id": item, "count": n} for item, n in extras["rewards"]]
         write(os.path.join(folder, f"{t['id']}.json"), obj)
         lang[f"technology.{NS}.{t['id']}"] = t["name"]
         lang[f"technology.{NS}.{t['id']}.desc"] = t["description"]

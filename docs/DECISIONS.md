@@ -302,3 +302,16 @@ distribution (ItszuLib DECISIONS D15), as power is.
   chips' countdowns down on top of the passive rate, at most one operation per chip per tick.
 - Recipes are placeholders from existing parts; nothing is gated by research yet. Not done: v3's information conduit
   (no design survives), a mainframe model (placeholder front texture), heat sources other than the biome.
+
+## D20. Items to hand in and rewards in the tech tree — DECIDED (maintainer, 2026-10-02)
+
+ItszuLib's technologies can now need resources and items besides their points, and give item rewards (ItszuLib
+DECISIONS D13 addendum). Femtocraft uses the items and rewards:
+
+- **Offering items.** The Archive's and the Codex's "Offer items" button (upgrade accent) hands in, from the player's
+  inventory, what the team's focus still needs (`ArchiveResearch.deliver`). An Archive whose focus has all its points
+  but not its items waits (status "Waiting for items") and draws no nanites meanwhile.
+- **Placeholder content** (`tools/gen_assets.py` `TECH_EXTRAS`), to try the mechanism until the tree is redesigned:
+  Scientific Theory takes a book and eight paper and gives a Codex; Algorithms takes a Micro Logic Core and gives two;
+  Mechanical Precision takes two pistons and gives four frames.
+- Resources are not used yet; computation could become one (FLOPS for some technologies instead of points).

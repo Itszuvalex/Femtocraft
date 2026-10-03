@@ -6,7 +6,9 @@ import com.itszuvalex.femtocraft.archive.ArchiveRecord
 import com.itszuvalex.femtocraft.archive.ArchiveResearch
 import com.itszuvalex.femtocraft.archive.CodexMenu
 import com.itszuvalex.femtocraft.archive.NaniteHost
+import com.itszuvalex.itszulib.client.screen.ButtonAccents
 import com.itszuvalex.itszulib.client.screen.TechTreeView
+import com.itszuvalex.itszulib.client.screen.ThemedButton
 import com.itszuvalex.itszulib.menu.MenuActionPayload
 import com.itszuvalex.itszulib.research.TechTree
 import com.itszuvalex.itszulib.research.Technologies
@@ -26,6 +28,23 @@ abstract class ResearchScreen<M : AbstractContainerMenu>(menu: M, inventory: Inv
     FemtoScreen<M>(menu, inventory, title, WIDTH, height) {
     override fun addComponents() {
         addComponent(TechTreeView(WIDTH - 16, TREE_HEIGHT, ArchiveContent.TREE, selected = ::focus, onSelect = { send(ArchiveResearch.ACTION_QUEUE, it) }, onAlternate = { send(ArchiveResearch.ACTION_UNQUEUE, it) }), 8, 18)
+    }
+
+    private var offer: ThemedButton? = null
+
+    override fun init() {
+        super.init()
+        offer = addRenderableWidget(ThemedButton(
+            leftPos + WIDTH - 8 - OFFER_W, topPos + 4, OFFER_W, 12, Component.translatable("gui.femtocraft.research.offer"),
+            { ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, ArchiveResearch.ACTION_DELIVER, 0)) },
+            Component.translatable("gui.femtocraft.research.offer.tooltip"), accent = ButtonAccents.UPGRADE,
+        ))
+    }
+
+    /** The offer button is live while the focus still needs items. */
+    override fun containerTick() {
+        super.containerTick()
+        offer?.active = focus()?.let { f -> technologies().remaining(f, research())?.items?.any { it.second > 0 } } == true
     }
 
     private fun send(action: Int, technology: Identifier) {
@@ -94,6 +113,7 @@ abstract class ResearchScreen<M : AbstractContainerMenu>(menu: M, inventory: Inv
     }
 
     companion object {
+        const val OFFER_W = 64
         const val WIDTH = 256
         const val TREE_HEIGHT = 136
         const val BELOW_TREE = 18 + TREE_HEIGHT + 6
