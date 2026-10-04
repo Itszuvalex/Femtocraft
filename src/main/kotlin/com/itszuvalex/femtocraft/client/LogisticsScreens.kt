@@ -7,7 +7,6 @@ import com.itszuvalex.femtocraft.logistics.ItemVaultMenu
 import com.itszuvalex.femtocraft.logistics.NaniteVaultMenu
 import com.itszuvalex.femtocraft.logistics.NaniteVaultState
 import com.itszuvalex.itszulib.client.screen.Anchor
-import com.itszuvalex.itszulib.client.screen.FilterRow
 import com.itszuvalex.itszulib.client.screen.FluidGauge
 import com.itszuvalex.itszulib.client.screen.Row
 import com.itszuvalex.itszulib.client.screen.StorageTerminalView
@@ -23,10 +22,8 @@ import com.itszuvalex.itszulib.menu.MenuActionPayload
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import com.itszuvalex.itszulib.client.screen.ButtonAccents
 import com.itszuvalex.itszulib.client.screen.ThemedButton
-import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
-import com.itszuvalex.femtocraft.logistics.Chips
 import net.minecraft.world.entity.player.Inventory
 import net.neoforged.neoforge.client.network.ClientPacketDistributor
 
@@ -56,45 +53,16 @@ class NaniteRepositoryScreen(menu: NaniteRepositoryMenu, inventory: Inventory, t
 }
 
 /**
- * Click a chip to select it; the buttons cycle the selected chip's direction and interface face (shift goes
- * backwards). Below them, ItszuLib's [FilterRow] edits the selected chip's filter, as in AE2: allow or deny, exact or
- * any data, and nine cells set by clicking with the item (item chips) or a filled container (fluid chips) held.
+ * The logistics conduit: four chip slots on each face, for putting chips in and taking them out. Chips are configured
+ * in the chips tab ([ConduitChipsTab]), where clicking a chip only selects it.
  */
 class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) : FemtoScreen<ConduitMenu>(menu, inventory, title, 176, ConduitMenu.HEIGHT) {
-    private var selected = -1
-
     init {
         inventoryLabelY = ConduitMenu.INVENTORY_Y - 11
     }
 
-    override fun init() {
-        super.init()
-        addRenderableWidget(ThemedButton(leftPos + 8, topPos + 80, 40, 14, Component.translatable("gui.femtocraft.conduit.mode"), { send(ConduitMenu.ACTION_MODE) }, accent = ButtonAccents.IO))
-        addRenderableWidget(ThemedButton(leftPos + 50, topPos + 80, 40, 14, Component.translatable("gui.femtocraft.conduit.interface"), { send(ConduitMenu.ACTION_INTERFACE) }, accent = ButtonAccents.IO))
-    }
-
     override fun addComponents() {
-        addComponent(FilterRow({ selectedFilter() }, { action ->
-            if (selected >= 0) ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, ConduitMenu.ACTION_FILTER, ConduitMenu.filterData(selected / 4, selected % 4, action)))
-        }, setHint = Component.translatable("gui.femtocraft.conduit.filter.set")), FILTER_X, FILTER_Y)
-    }
-
-    private fun send(action: Int) {
-        if (selected < 0) return
-        val backward = minecraft.hasShiftDown()
-        ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action, ConduitMenu.data(selected / 4, selected % 4, backward)))
-    }
-
-    /** The selected chip's filter, or null if no chip that takes one is selected. */
-    private fun selectedFilter(): com.itszuvalex.itszulib.api.filter.ResourceFilter<*>? {
-        val chip = menu.slots.getOrNull(selected)?.item ?: return null
-        val kind = com.itszuvalex.femtocraft.logistics.Chips.kindOf(chip)?.takeIf { it.filterable } ?: return null
-        return kind.data(chip, null).filter
-    }
-
-    override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
-        hoveredSlot?.let { if (it.container !is Inventory && it.index < 24) selected = it.index }
-        return super.mouseClicked(event, doubleClick)
+        addPanel(ConduitChipsTab.panel(menu))
     }
 
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
@@ -102,16 +70,6 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
             val i = face.get3DDataValue()
             text(graphics, Component.literal(face.serializedName.substring(0, 1).uppercase()), 16 + (i % 2) * 76, 22 + (i / 2) * 20)
         }
-        val slot = menu.slots.getOrNull(selected) ?: return
-        graphics.fill(leftPos + slot.x - 1, topPos + slot.y + 16, leftPos + slot.x + 17, topPos + slot.y + 17, SELECTED)
-        val data = com.itszuvalex.femtocraft.logistics.Chips.settingsOf(slot.item) ?: return
-        text(graphics, Component.literal("${data.direction.name.lowercase()} / ${data.interfaceDirection.serializedName}"), 94, 83)
-    }
-
-    companion object {
-        private const val SELECTED = 0xFFFFFF55.toInt()
-        const val FILTER_X = 7
-        const val FILTER_Y = 99
     }
 }
 

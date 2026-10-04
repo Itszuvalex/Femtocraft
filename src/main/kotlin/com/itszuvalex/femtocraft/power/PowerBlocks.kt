@@ -82,7 +82,7 @@ fun parentColor(be: BlockEntity, leaf: IWirelessPowerLeafNode): Color {
 }
 
 /**
- * The wireless network a power block belongs to: its own node's, or its leaf parent's. For the network screen.
+ * The wireless network a power block belongs to: its own node's, or its leaf parent's. For the power tab.
  */
 fun wirelessNetworkOf(be: BlockEntity): WirelessPowerNetwork? {
     val ibe = be as? com.itszuvalex.itszulib.api.adapters.IBlockEntity ?: return null
@@ -90,6 +90,23 @@ fun wirelessNetworkOf(be: BlockEntity): WirelessPowerNetwork? {
     val leaf = ibe.getModule(PowerModules.WIRELESS_LEAF, null) ?: return null
     val parent = leaf.parent ?: return null
     return WirelessPowerManager.nodeAt(leaf.storageLoc, parent)?.getNetwork()
+}
+
+/**
+ * The wired network a power block is on: that of a conduit on one of its connected faces. For the power tab.
+ */
+fun wiredNetworkOf(be: BlockEntity): WiredPowerNetwork? {
+    val ibe = be as? com.itszuvalex.itszulib.api.adapters.IBlockEntity ?: return null
+    val leaf = ibe.getModule(PowerModules.WIRED_LEAF, null) ?: return null
+    val level = be.level ?: return null
+    for (face in net.minecraft.core.Direction.entries) {
+        if (!leaf.isConnectedWiredPower(face)) continue
+        val at = be.blockPos.relative(face)
+        if (!level.isLoaded(at)) continue
+        val conduit = (level.getBlockEntity(at) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(PowerModules.WIRED_CONDUIT, face.opposite) ?: continue
+        conduit.getNetwork()?.let { return it }
+    }
+    return null
 }
 
 // --- Crystal mount ---------------------------------------------------------------------------------------------------

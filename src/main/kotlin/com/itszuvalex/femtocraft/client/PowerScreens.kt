@@ -3,27 +3,14 @@ package com.itszuvalex.femtocraft.client
 import com.itszuvalex.femtocraft.power.CrystalHeatExchangerBlockEntity
 import com.itszuvalex.femtocraft.power.CrystalMachineMenu
 import com.itszuvalex.femtocraft.power.CrystalMountMenu
-import com.itszuvalex.femtocraft.power.PowerNetworkView
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 
 /**
- * Network summary lines shared by the power screens (v3's network tab, `GuiWirelessPowerNetwork`).
+ * The crystal mount: its crystal slot. The network statistics are in the power tab ([PowerTab]).
  */
-private fun FemtoScreen<*>.networkLines(view: PowerNetworkView): List<Component> =
-    if (!view.connected) listOf(Component.translatable("gui.femtocraft.network.none"))
-    else listOf(
-        Component.translatable("gui.femtocraft.network.nodes", view.producers, view.storage, view.consumers),
-        Component.translatable("gui.femtocraft.network.flow", FemtoScreen.fmt1(view.produced), FemtoScreen.fmt1(view.consumed)),
-        Component.translatable("gui.femtocraft.network.storage", FemtoScreen.fmt(view.totalStored), FemtoScreen.fmt(view.totalStorage)),
-    )
-
-class CrystalMountScreen(menu: CrystalMountMenu, inventory: Inventory, title: Component) : FemtoScreen<CrystalMountMenu>(menu, inventory, title) {
-    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
-        networkLines(menu.network).forEachIndexed { i, line -> text(graphics, line, 8, 18 + i * 10 + 38) }
-    }
-}
+class CrystalMountScreen(menu: CrystalMountMenu, inventory: Inventory, title: Component) : FemtoScreen<CrystalMountMenu>(menu, inventory, title)
 
 class CrystalMachineScreen(menu: CrystalMachineMenu, inventory: Inventory, title: Component) : FemtoScreen<CrystalMachineMenu>(menu, inventory, title) {
     override fun addComponents() {
@@ -35,7 +22,6 @@ class CrystalMachineScreen(menu: CrystalMachineMenu, inventory: Inventory, title
         if (menu.blockEntity is CrystalHeatExchangerBlockEntity) {
             progress(graphics, 120, 64, 48, 4, if (menu.burnMax <= 0) 0.0 else menu.burnTime.toDouble() / menu.burnMax, 0xFFFF8833.toInt())
         }
-        networkLines(menu.network).take(1).forEach { text(graphics, it, 62, 18 + 40) }
     }
 }
 
@@ -65,7 +51,7 @@ class AtmosphericChargingBaseScreen(menu: com.itszuvalex.femtocraft.power.Atmosp
         addComponent(com.itszuvalex.itszulib.client.screen.Row(listOf(
             powerGauge { menu.battery },
             com.itszuvalex.itszulib.client.screen.Column(listOf(
-                label { Component.translatable("gui.femtocraft.atmospheric.coils", menu.coils, com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_ADDONS) },
+                label { Component.translatable("gui.femtocraft.atmospheric.coils", menu.coils, com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_COILS) },
                 label { Component.translatable(if (menu.capped) "gui.femtocraft.atmospheric.capped" else "gui.femtocraft.atmospheric.uncapped") },
                 label { Component.translatable("gui.femtocraft.cryo.generation", "%.2f".format(java.util.Locale.ROOT, menu.powerPerTick)) },
                 label { Component.translatable("gui.femtocraft.atmospheric.strikes", menu.strikes) },

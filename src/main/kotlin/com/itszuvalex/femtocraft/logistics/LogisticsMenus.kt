@@ -104,7 +104,7 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
         const val ACTION_MODE = 0
         const val ACTION_INTERFACE = 1
         const val ACTION_FILTER = 2
-        const val INVENTORY_Y = 145
+        const val INVENTORY_Y = 94
         const val HEIGHT = INVENTORY_Y + 58 + 18 + 6
 
         /** In [ACTION_FILTER]'s data: the filter action, above the slot bits. */

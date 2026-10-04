@@ -85,6 +85,11 @@ def drop_count(name, item, lo, hi):
 #   ("pillar", side, end, [x0,y0,z0,x1,y1,z1][, bottom])   one box: [side] stretched over each side face, [end] on top
 #                                     and bottom (or [bottom] on the bottom)
 #   ("cube_bottom_top", side, top, bottom)
+#   ("charging_base",)                the 1.7.10 alpha's atmospheric charging base (RenderChargingBase): cutout planes
+#                                     layered at several depths, whose textures each show only their part
+#   ("charging_coil", side, top)      the alpha's charging coils (RenderChargingCoil): two 8-high segments, [side] on each
+#                                     segment's sides and a full-block [top] plane (coloured in its middle) at each end
+#   ("charging_capacitor",)           the alpha's capacitor (RenderChargingCapacitor): a 12-pixel body on a connector stub
 #   ("windowed", side, top, bottom, particle)   cube_bottom_top with see-through (cutout) windows; [particle] also names
 #                                     the opaque texture a renderer draws behind the windows
 # drops: "self", "none", or a loot table dict
@@ -98,11 +103,11 @@ BLOCKS = {
     "power_conduit_crystal": ("Crystal Power Conduit", ("conduit_obj", "wire_thin_power", "wire_thin_power_color"), "self", "pickaxe"),
     "glow_stick": ("Glow Stick", ("glow_stick",), "self", None),
     # The 1.7.10 alpha's cryo-endothermal generator (DECISIONS D21), with its textures.
-    "atmospheric_charging_base": ("Atmospheric Charging Base", ("cube_bottom_top", "atmospheric_charging_base_side", "atmospheric_charging_base_top", "atmospheric_charging_base_bottom"), "self", "pickaxe"),
-    "atmospheric_charging_coil": ("Atmospheric Charging Coil", ("pillar", "atmospheric_charging_coil", "atmospheric_charging_coil_top", [4, 0, 4, 12, 16, 12]), "self", "pickaxe"),
-    "atmospheric_charging_capacitor": ("Atmospheric Charging Capacitor", ("pillar", "atmospheric_charging_capacitor_side", "atmospheric_charging_capacitor_top", [2, 0, 2, 14, 14, 14], "atmospheric_charging_capacitor_bottom"), "self", "pickaxe"),
+    "atmospheric_charging_base": ("Atmospheric Charging Base", ("charging_base",), "self", "pickaxe"),
+    "atmospheric_charging_coil": ("Atmospheric Charging Coil", ("charging_coil", "atmospheric_charging_coil", "atmospheric_charging_coil_top"), "self", "pickaxe"),
+    "atmospheric_charging_capacitor": ("Atmospheric Charging Capacitor", ("charging_capacitor",), "self", "pickaxe"),
     "cryo_endothermal_charging_base": ("Cryo-Endothermal Charging Base", ("cube_all", "cryo_endothermal_charging_base"), "self", "pickaxe"),
-    "cryo_endothermal_charging_coil": ("Cryo-Endothermal Charging Coil", ("pillar", "cryo_endothermal_charging_coil", "cryo_endothermal_charging_coil_top", [4, 0, 4, 12, 16, 12]), "self", "pickaxe"),
+    "cryo_endothermal_charging_coil": ("Cryo-Endothermal Charging Coil", ("charging_coil", "cryo_endothermal_charging_coil", "cryo_endothermal_charging_coil_top"), "self", "pickaxe"),
     # --- industry ---
     "nano_furnace": ("Nano Furnace", ("machine", "nanofurnace_front"), "self", "pickaxe"),
     "demolisher": ("Demolisher", ("machine", "demolisher_front"), "self", "pickaxe"),
@@ -169,7 +174,7 @@ ITEMS = {
     "nanite_beacon": ("Nanite Beacon", "itemnanitebeacon"),
     "nano_channel": ("Nano Channel", "itemnanochannel"),
     "solar_panel": ("Solar Panel", "itemsolarpanel"),
-    "frame": ("Frame", "block:frame"),
+    "frame": ("Frame", "block:frame_full"),
     "configurator": ("Configurator", None),
     "shift_test": ("Shift Device", "itemshifttest"),
     "nano_lash": ("Nano Lash", "itemnanolash"),
@@ -220,10 +225,19 @@ LANG = {
     "tooltip.femtocraft.power": "Power: %s/%s",
     "gui.femtocraft.power_per_tick": "%s DE/t",
     "gui.femtocraft.power_unit": "DE",
-    "gui.femtocraft.network.none": "No wireless network",
-    "gui.femtocraft.network.nodes": "Producers %s  Storage %s  Consumers %s",
-    "gui.femtocraft.network.flow": "Produced %s  Consumed %s",
-    "gui.femtocraft.network.storage": "Stored %s/%s DE",
+    "gui.femtocraft.power_tab.tab": "Pwr",
+    "gui.femtocraft.power_tab.title": "Power networks",
+    "gui.femtocraft.power_tab.wireless": "Wireless network",
+    "gui.femtocraft.power_tab.wired": "Wired network",
+    "gui.femtocraft.power_tab.not_connected": "%s: none",
+    "gui.femtocraft.power_tab.wireless.blocks": "Crystal mounts",
+    "gui.femtocraft.power_tab.wired.blocks": "Conduits",
+    "gui.femtocraft.power_tab.members": "Make / store / use",
+    "gui.femtocraft.power_tab.produced": "Produced",
+    "gui.femtocraft.power_tab.consumed": "Consumed",
+    "gui.femtocraft.power_tab.trend": "Storage trend",
+    "gui.femtocraft.power_tab.stored": "Stored",
+    "gui.femtocraft.power_tab.stored_value": "%s / %s DE",
     "femtocraft.subtitle.shiftsound": "Nanites shift",
     "femtocraft.subtitle.crystalbreak": "Crystal shatters",
     "femtocraft.subtitle.riftloop": "Rift hums",
@@ -259,6 +273,12 @@ LANG = {
     "tooltip.femtocraft.none": "none",
     "gui.femtocraft.conduit.mode": "Mode",
     "gui.femtocraft.conduit.interface": "Side",
+    "gui.femtocraft.conduit.mode.tip": "Cycle the selected chip between pulling in and pushing out (shift: backwards)",
+    "gui.femtocraft.conduit.interface.tip": "Cycle which face of the neighbouring block the selected chip uses (shift: backwards)",
+    "gui.femtocraft.conduit.chips.tab": "Chips",
+    "gui.femtocraft.conduit.chips.title": "Configure chips",
+    "gui.femtocraft.conduit.chips.none": "Click a chip to configure it",
+    "gui.femtocraft.conduit.chips.settings": "Face %s: %s, via %s side",
     "tooltip.femtocraft.chip.item": "Buffer: %s",
     "tooltip.femtocraft.chip.flops": "Flops: %s/%s",
     "tooltip.femtocraft.chip.channel": "Channel: %s",
@@ -478,7 +498,8 @@ def part_models():
 
 
 # Block items whose item model is not the block model.
-ITEM_MODELS = {"crystal_cluster": "crystal_cluster_full"}
+# The frame's and mount's block models leave their renderers' parts out, so their items show the whole thing.
+ITEM_MODELS = {"crystal_cluster": "crystal_cluster_full", "frame": "frame_full", "crystal_mount": "crystal_mount_item"}
 
 CONDUIT_ARMS = ["north", "south", "east", "west", "up", "down"]
 WIRE_GROUPS = ["Core_Cube"] + [f"{d.capitalize()}_Cube" for d in CONDUIT_ARMS]
@@ -488,7 +509,10 @@ def extra_models(name, kind):
     """Models besides <name>.json that a block's blockstate uses."""
     k = kind[0]
     if k == "mount_obj":
-        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["TopMount"]))}
+        # The item: the bottom plate with its grip and the crystal's shape, as a lone mount looks in the world (where the
+        # renderer turns the grip and draws the crystal).
+        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["TopMount"])),
+                ITEM_MODELS[name]: obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["BottomMount", "BottomGripBase", "Crystal"]))}
     if k == "animated_obj" and name in ITEM_MODELS:
         return {ITEM_MODELS[name]: obj_model(kind[1], {"texture": kind[1]})}
     if k == "conduit_obj":
@@ -501,8 +525,87 @@ def extra_models(name, kind):
     return {}
 
 
+def plane(axis_box, face, texture, uv=(0, 0, 16, 16), cull=None):
+    """A flat element (zero thickness along one axis) showing one [face], as the alpha's single quads."""
+    f = {"texture": texture, "uv": list(uv)}
+    if cull:
+        f["cullface"] = cull
+    x0, y0, z0, x1, y1, z1 = axis_box
+    return {"from": [x0, y0, z0], "to": [x1, y1, z1], "faces": {face: f}}
+
+
+def charging_base():
+    """
+    The alpha's RenderChargingBase: outer sides (cut out to an I-beam) and a top with a hole, over planes set in at
+    1, 2 and 3 pixels (coil, coil column and side insets) and horizontal planes inside (the recess's ceiling and floor,
+    and three coil rings), with a pillar stub on top.
+    """
+    els = []
+    sides = {"north": lambda d: [0, 0, d, 16, 16, d], "south": lambda d: [0, 0, 16 - d, 16, 16, 16 - d],
+             "west": lambda d: [d, 0, 0, d, 16, 16], "east": lambda d: [16 - d, 0, 0, 16 - d, 16, 16]}
+    for face, box in sides.items():
+        els.append(plane(box(0), face, "#side", cull=face))
+        els.append(plane(box(3), face, "#side_inset"))
+        els.append(plane(box(1), face, "#coil_inset"))
+        els.append(plane(box(2), face, "#coil_column_inset"))
+    els.append(plane([0, 0, 0, 16, 0, 16], "down", "#bottom", cull="down"))
+    els.append(plane([0, 14, 0, 16, 14, 16], "up", "#top"))
+    els.append(plane([0, 12, 0, 16, 12, 16], "down", "#top_inset"))
+    els.append(plane([0, 2, 0, 16, 2, 16], "up", "#top_inset"))
+    for y in (3, 6, 9):
+        els.append(plane([0, y, 0, 16, y, 16], "down", "#coil_top_inset"))
+    for y in (5, 8, 11):
+        els.append(plane([0, y, 0, 16, y, 16], "up", "#coil_top_inset"))
+    els.append(plane([0, 16, 0, 16, 16, 16], "up", "#pillar_top", cull="up"))
+    pillar = {d: {"texture": "#pillar_side", "uv": [0, 0, 6, 16]} for d in ["north", "south", "east", "west"]}
+    els.append({"from": [4, 13, 4], "to": [12, 16, 12], "faces": pillar})
+    p = "atmospheric_charging_base"
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": tex(f"{p}_bottom"), "side": tex(f"{p}_side"), "top": tex(f"{p}_top"), "bottom": tex(f"{p}_bottom"),
+                         "side_inset": tex(f"{p}_side_inset"), "coil_inset": tex(f"{p}_coil_inset"),
+                         "coil_column_inset": tex(f"{p}_coil_column_inset"), "top_inset": tex(f"{p}_top_inset"),
+                         "coil_top_inset": tex(f"{p}_coil_top_inset"), "pillar_top": tex(f"{p}_pillar_top"), "pillar_side": tex(f"{p}_pillar_side")},
+            "elements": els}
+
+
+def charging_coil(side, top):
+    """The alpha's RenderChargingCoil: two 8-high segments, each with [side] on its sides and [top] planes at its ends."""
+    els = []
+    for y0 in (0, 8):
+        y1 = y0 + 8
+        els.append({"from": [4, y0, 4], "to": [12, y1, 12],
+                    "faces": {d: {"texture": "#side"} for d in ["north", "south", "east", "west"]}})
+        els.append(plane([0, y0, 0, 16, y0, 16], "down", "#end", cull="down" if y0 == 0 else None))
+        els.append(plane([0, y1, 0, 16, y1, 16], "up", "#end", cull="up" if y1 == 16 else None))
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": tex(top), "side": tex(side), "end": tex(top)}, "elements": els}
+
+
+def charging_capacitor():
+    """
+    The alpha's RenderChargingCapacitor: a body from 2 to 14 on every axis (each face the middle 12 pixels of its
+    texture, the sides upside down) on a connector stub from 4 to 12, 2 pixels high.
+    """
+    p = "atmospheric_charging_capacitor"
+    body = {d: {"texture": "#side", "uv": [2, 14, 14, 2]} for d in ["north", "south", "east", "west"]}
+    body["up"] = {"texture": "#top", "uv": [2, 2, 14, 14]}
+    body["down"] = {"texture": "#bottom", "uv": [2, 2, 14, 14]}
+    stub = {d: {"texture": "#connector", "uv": [0, 12, 16, 16]} for d in ["north", "south", "east", "west"]}
+    stub["down"] = {"texture": "#connector_bottom", "cullface": "down"}
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": tex(f"{p}_top"), "side": tex(f"{p}_side"), "top": tex(f"{p}_top"), "bottom": tex(f"{p}_bottom"),
+                         "connector": tex(f"{p}_connector"), "connector_bottom": tex(f"{p}_connector_bottom")},
+            "elements": [{"from": [2, 2, 2], "to": [14, 14, 14], "faces": body}, {"from": [4, 0, 4], "to": [12, 2, 12], "faces": stub}]}
+
+
 def block_model(name, kind):
     k = kind[0]
+    if k == "charging_base":
+        return charging_base()
+    if k == "charging_coil":
+        return charging_coil(kind[1], kind[2])
+    if k == "charging_capacitor":
+        return charging_capacitor()
     if k == "obj":
         return obj_model(kind[1], kind[2])
     if k == "glow_stick":

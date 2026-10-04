@@ -3,6 +3,7 @@ package com.itszuvalex.femtocraft.core
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.ConfiguratorItem
 import com.itszuvalex.femtocraft.industry.ConfiguratorMode
+import com.itszuvalex.femtocraft.power.PowerNetworksView
 import com.itszuvalex.itszulib.menu.BlockMenus
 import com.itszuvalex.itszulib.menu.MenuCore
 import com.itszuvalex.itszulib.menu.SideConfigCyclers
@@ -19,12 +20,19 @@ import net.minecraft.world.level.block.entity.BlockEntity
  * over a block entity, valid while the player is in reach of it. Port of v3's `ContainerInv` subclasses.
  *
  * Every menu offers side configuration ([MenuCore.enableSideConfig]) for the configurator's modes the block entity has
- * ([sideConfigModes]), so screens show ItszuLib's 3D side configuration panel.
+ * ([sideConfigModes]), so screens show ItszuLib's 3D side configuration panel, and every menu over a block with power
+ * syncs its networks' statistics ([power]) for the screen's power tab.
  *
  * @param blockEntity Null only if the client could not find the block entity the server named.
  */
 abstract class FemtoMenu<T : BlockEntity>(type: MenuType<*>, containerId: Int, inventory: Inventory, @JvmField val blockEntity: T?) :
     MenuCore(type, containerId, inventory.player) {
+
+    /**
+     * The power tab's networks, for a block with power ([PowerNetworksView.hasPower]); null otherwise.
+     */
+    @JvmField
+    val power: PowerNetworksView? = blockEntity?.takeIf(PowerNetworksView::hasPower)?.let { PowerNetworksView.addTo(this, it) }
 
     init {
         enableSideConfig(blockEntity, sideConfigModes())

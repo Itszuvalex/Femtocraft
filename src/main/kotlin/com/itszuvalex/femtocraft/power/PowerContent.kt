@@ -57,7 +57,7 @@ object PowerContent {
     val CRYO_BASE_MENU = R.blockMenu<CryoChargingBaseBlockEntity, CryoChargingBaseMenu>("cryo_endothermal_charging_base", ::CryoChargingBaseMenu)
 
     @JvmField
-    val ATMOSPHERIC_BASE = blockWithItem("atmospheric_charging_base", ::AtmosphericChargingBaseBlock) { machine(it) }
+    val ATMOSPHERIC_BASE = blockWithItem("atmospheric_charging_base", ::AtmosphericChargingBaseBlock) { machine(it).noOcclusion() }
 
     @JvmField
     val ATMOSPHERIC_COIL = blockWithItem("atmospheric_charging_coil", ::AtmosphericChargingCoilBlock) { it.strength(1f).sound(SoundType.METAL).noOcclusion() }

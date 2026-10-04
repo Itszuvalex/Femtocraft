@@ -405,7 +405,7 @@ for reuse (ItszuLib D18).
   Allow (only listed things pass) or deny (listed things are kept out), matching data components or not; nothing
   listed lets everything through, as before. An **input** chip pulls only what passes from its block; an **output**
   chip accepts only what passes from the network (the rest waits in the input buffers or goes to other outputs).
-- **Setting them.** In the conduit screen, select a chip; ItszuLib's `FilterRow` under the buttons edits its filter:
+- **Setting them.** In the conduit screen's chips tab (D25), select a chip; ItszuLib's `FilterRow` under the buttons edits its filter:
   Allow/Deny, Exact/Any data, and nine cells. Clicking a cell while holding an item lists it (one of it; the held
   stack is not used up); for fluid chips, holding a bucket or any fluid container lists its fluid; an empty hand
   clears the cell (`ConduitMenu.ACTION_FILTER` carrying an ItszuLib `FilterActions` action). Nanite chips have no
@@ -416,3 +416,32 @@ for reuse (ItszuLib D18).
   the first item that passes, asking only for an allowlist's items and reading only the slots that hold them. Other
   blocks are pulled through their NeoForge item handler as before.
 - Chips still move one item (250 mB, 5 nanites) per operation; filters change what, not how fast.
+
+## D25. Power and conduit chips tabs; the alpha's charging models — DECIDED (maintainer, 2026-10-03)
+
+- **Power tab.** Every screen over a block with power (a wireless node or leaf, or a wired leaf) has a power tab
+  (`client/PowerTab.kt`) beside the IO tab, instead of network lines on the main page. For each kind of network the
+  block can join, wireless and wired, it shows the block count (crystal mounts, conduits), producers / storage /
+  consumers, last tick's produced and consumed, the storage trend and stored / capacity. `FemtoMenu` syncs it
+  (`PowerNetworksView`) for any part of a multiblock, through whichever loaded part is on the network. The figures are
+  ItszuLib's `DistributionStatistics` (ItszuLib D19), which wired networks now record too.
+- **Conduit chips tab.** The conduit's main page only holds the chips (taking them in and out); clicking a slot no
+  longer also selects it. The chips tab (`client/ConduitChipsTab.kt`) shows the chips by face, where clicking one only
+  selects it, then its mode and side buttons, its settings and its filter.
+- **Charging models.** The atmospheric base, coil and capacitor and the cryo coil are built as the 1.7.10 alpha's
+  renderers drew them (`tools/gen_assets.py`): the base's layered cutout planes and pillar stub with all of its alpha
+  textures, coils as two 8-high segments with full-block end planes, and the capacitor's 12-pixel body on its
+  connector stub. Each texture shows only its own part, as in the alpha; before, whole textures were squeezed onto
+  smaller faces. The frame and crystal mount items have their own models (the whole frame; the mount's plate, grip
+  and crystal), since their block models leave out what the renderers draw.
+- **Atmospheric pole.** At most ten coils (`MAX_COILS`); a capacitor may still cap the pole in the eleventh place, but
+  an eleventh coil may not stand there.
+- **Frames collect by requirement.** A frame structure has one slot per required stack (split where it is more than a
+  stack), each taking only its item up to the amount needed, and nothing comes back out until the structure is
+  broken (which drops it). The screen, titled with the multiblock being built, uses ItszuLib's requirement slots (the
+  wanted item faded with how many are still needed in red, then the full amount in green) with each item's name
+  beside its slot. Using an item on any frame puts in what the structure still needs, so the screen is optional.
+  Inside the structure, at its centre, a list facing the player shows each requirement's icon, name and `have/need`,
+  from counts the home frame syncs when they change; it stays within the structure's size, scrolling long names
+  through their line and stepping through the lines when there are more than fit. Building starts as soon as every slot is full (it no longer waits for a 2-second
+  check) and uses exactly what the slots hold.

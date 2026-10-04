@@ -60,6 +60,7 @@ object PowerGameTests {
     fun register() {
         DevGameTests.test("atmospheric_pole_charges_its_base", 80, ::atmosphericCharges)
         DevGameTests.test("atmospheric_addons_need_support_and_air", 20, ::atmosphericSupport)
+        DevGameTests.test("atmospheric_pole_takes_ten_coils_and_a_cap", 20, DevGameTests.TALL, ::atmosphericTenCoils)
         DevGameTests.test("atmospheric_lightning_strike_is_harmless_power", 20, ::atmosphericStrike)
         DevGameTests.test("cryo_coils_charge_the_base_from_ice", 80, ::cryoCharges)
         DevGameTests.test("cryo_active_handler_freezes_water_lava_and_air", body = ::cryoActive)
@@ -341,6 +342,22 @@ object PowerGameTests {
         helper.runAfterDelay(3) {
             helper.assertBlockNotPresent(PowerContent.ATMOSPHERIC_COIL.get(), ATMO_BASE.above())
             helper.assertBlockNotPresent(PowerContent.ATMOSPHERIC_CAPACITOR.get(), ATMO_BASE.above(2))
+            helper.succeed()
+        }
+    }
+
+    /**
+     * Ten coils with a capacitor in the eleventh place count fully; an eleventh coil may not stand there.
+     */
+    private fun atmosphericTenCoils(helper: GameTestHelper) {
+        val max = com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity.MAX_COILS
+        val base = pole(helper, max, true)
+        val coil = PowerContent.ATMOSPHERIC_COIL.get().defaultBlockState()
+        helper.assertFalse(coil.canSurvive(helper.level, helper.absolutePos(ATMO_BASE.above(max + 1))), "no eleventh coil")
+        helper.assertTrue(coil.canSurvive(helper.level, helper.absolutePos(ATMO_BASE.above(max))), "the tenth coil stands")
+        helper.runAfterDelay(2) {
+            helper.assertValueEqual(max, base.coils, "coils")
+            helper.assertTrue(base.capped, "capped above the tenth coil")
             helper.succeed()
         }
     }

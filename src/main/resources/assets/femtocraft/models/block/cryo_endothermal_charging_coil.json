@@ -4,8 +4,7 @@
   "textures": {
     "particle": "femtocraft:block/cryo_endothermal_charging_coil_top",
     "side": "femtocraft:block/cryo_endothermal_charging_coil",
-    "end": "femtocraft:block/cryo_endothermal_charging_coil_top",
-    "bottom": "femtocraft:block/cryo_endothermal_charging_coil_top"
+    "end": "femtocraft:block/cryo_endothermal_charging_coil_top"
   },
   "elements": [
     {
@@ -16,63 +15,141 @@
       ],
       "to": [
         12,
+        8,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        0,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#end",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        8,
+        0
+      ],
+      "to": [
+        16,
+        8,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#end",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        8,
+        4
+      ],
+      "to": [
+        12,
         16,
         12
       ],
       "faces": {
         "north": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#side"
         },
         "south": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#side"
         },
         "east": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#side"
         },
         "west": {
-          "texture": "#side",
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        8,
+        0
+      ],
+      "to": [
+        16,
+        8,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#end",
           "uv": [
             0,
             0,
             16,
             16
           ]
-        },
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        16,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
         "up": {
           "texture": "#end",
           "uv": [
-            4,
-            4,
-            12,
-            12
-          ]
-        },
-        "down": {
-          "texture": "#bottom",
-          "uv": [
-            4,
-            4,
-            12,
-            12
-          ]
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "up"
         }
       }
     }

@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/crystal_mount"
+    "model": "femtocraft:block/crystal_mount_item"
   }
 }

@@ -210,7 +210,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   conduit's `ChipSlots` while it is inserted and is written back to the chip whenever the slot is read from outside
   (`get`); the conduit itself uses `chip(index)`, which does not write. Add a kind by
   subclassing `ChipKind` and listing it in `Chips.KINDS`. Chips carry an ItszuLib `ResourceFilter` (`ChipData.filter`, nine entries, allow
-  or deny; edited with ItszuLib's `FilterRow` in the conduit screen, DECISIONS D24);
+  or deny; edited with ItszuLib's `FilterRow` in the conduit screen's chips tab, DECISIONS D24, D25);
   item chips pull through a block's `LogisticsModules.ITEM_INDEX` (an ItszuLib `ItemStorageIndex`, e.g. the item
   vault's) when it has one. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded

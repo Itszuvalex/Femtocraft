@@ -48,38 +48,29 @@ class GerminationChamberScreen(menu: GerminationChamberMenu, inventory: Inventor
 class FocusingChamberScreen(menu: FocusingChamberMenu, inventory: Inventory, title: Component) : FemtoScreen<FocusingChamberMenu>(menu, inventory, title)
 
 /**
- * A frame structure: its resource slots, and on the left what the multiblock it builds needs, each as the item with
- * `held/needed` (green once the frame holds enough). The frame starts building once everything is in.
+ * A frame structure, titled with the multiblock it builds: what that needs, one slot each with the item's name beside
+ * it (ItszuLib's requirement slots: the wanted item faded with how many are still needed in red, then the full amount
+ * in green; nothing comes back out), or its build progress.
  */
 class FrameScreen(menu: FrameMenu, inventory: Inventory, title: Component) : FemtoScreen<FrameMenu>(menu, inventory, title) {
     override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         if (menu.building) {
-            text(graphics, Component.translatable("gui.femtocraft.constructing"), 8, 72 - 4)
-            progress(graphics, 120, 70, 48, 4, menu.progress.toDouble() / FrameState.BUILD_TIME)
+            text(graphics, Component.translatable("gui.femtocraft.constructing"), 8, 22)
+            progress(graphics, 8, 34, 160, 4, menu.progress.toDouble() / FrameState.BUILD_TIME)
             return
         }
-        val multi = menu.multiblock ?: return
-        text(graphics, multi.displayName, 8, 72 - 4)
-        val needs = menu.requirements()
-        if (needs.isEmpty()) {
-            text(graphics, Component.translatable("gui.femtocraft.frame.needs_nothing"), 8, 20)
+        if (menu.needs.isEmpty()) {
+            text(graphics, Component.translatable("gui.femtocraft.frame.needs_nothing"), 8, 22)
             return
         }
-        needs.forEachIndexed { i, (need, have) ->
-            val x = leftPos + 8 + (i / ROWS) * COLUMN
-            val y = topPos + 17 + (i % ROWS) * 18
-            graphics.fakeItem(need, x, y)
-            val done = have >= need.count
-            graphics.text(font, "$have/${need.count}", x + 18, y + 4, if (done) DONE else MISSING, false)
-            ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, x, y, 16, 16, listOf(need.hoverName, Component.translatable("gui.femtocraft.frame.held", have, need.count)))
+        val nameWidth = FrameMenu.COLUMN_WIDTH - 22
+        menu.needs.forEachIndexed { i, need ->
+            val slot = menu.slots.getOrNull(i) ?: return@forEachIndexed
+            val name = need.hoverName.string
+            val shown = if (font.width(name) <= nameWidth) name else font.plainSubstrByWidth(name, nameWidth - font.width("...")) + "..."
+            graphics.text(font, shown, leftPos + slot.x + 20, topPos + slot.y + 4, TEXT, false)
+            if (shown != name) ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, leftPos + slot.x + 20, topPos + slot.y, nameWidth, 16, listOf(need.hoverName))
         }
-    }
-
-    companion object {
-        private const val ROWS = 3
-        private const val COLUMN = 26
-        private const val DONE = 0xFF2E8B2E.toInt()
-        private const val MISSING = 0xFFB02020.toInt()
     }
 }
 

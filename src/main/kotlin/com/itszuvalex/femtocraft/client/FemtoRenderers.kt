@@ -310,6 +310,14 @@ object FemtoRenderers {
 
     // --- Frame -----------------------------------------------------------------------------------------------------
 
+    /** One line of a frame's needs list: the item, its (possibly scrolled) name, and have/need. */
+    class NeedLine(
+        val item: net.minecraft.client.renderer.item.ItemStackRenderState,
+        val name: net.minecraft.util.FormattedCharSequence,
+        val count: net.minecraft.util.FormattedCharSequence,
+        val countWidth: Int,
+    )
+
     class FrameState : BlockEntityRenderState() {
         /**
          * Which [ObjParts.FRAME_GROUPS] to draw.
@@ -319,6 +327,15 @@ object FemtoRenderers {
         /** On a building home frame: the machine's blocks (offset from the anchor, model parts) and how solid. */
         val ghost = ArrayList<Pair<BlockPos, List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart>>>()
         var ghostAlpha = 0f
+
+        /** On a home frame still collecting: the lines of what it needs that show now. */
+        val needs = ArrayList<NeedLine>()
+
+        /** The list's width in text pixels. */
+        var needsWidth = 0
+
+        /** Where the list floats, from the anchor: the structure's middle. */
+        var needsAt: Vec3 = Vec3.ZERO
     }
 
     /**
@@ -347,7 +364,11 @@ object FemtoRenderers {
                 state.groups[i] = if (group.length == 2) onBox == 2 else onBox >= 2
             }
             state.ghost.clear()
+            state.needs.clear()
             val multi = be.multiblock()
+            if (membership.isHome && !be.clientBuilding && multi != null && cameraPosition.distanceToSqr(Vec3.atCenterOf(be.blockPos)) < NEEDS_RANGE * NEEDS_RANGE) {
+                extractNeeds(be, multi, state, time(be, partialTicks))
+            }
             if (membership.isHome && be.clientBuilding && multi != null) {
                 val level = be.level as? net.minecraft.client.multiplayer.ClientLevel ?: return
                 val models = net.minecraft.client.Minecraft.getInstance().modelManager.blockStateModelSet
@@ -365,10 +386,52 @@ object FemtoRenderers {
             }
         }
 
+        /**
+         * The floating list: each requirement slot's item, name and `have/need` (red until met, then green), from the
+         * counts the home frame syncs. It stays inside the structure: at most as wide as its narrower side and as tall
+         * as it is. A name too long for its line scrolls through it a character at a time; with more lines than fit,
+         * the list steps through them a line at a time ([time] in ticks).
+         */
+        private fun extractNeeds(be: FrameBlockEntity, multi: FrameMultiblock, state: FrameState, time: Float) {
+            val mc = net.minecraft.client.Minecraft.getInstance()
+            val font = mc.font
+            val size = multi.size
+            val maxWidth = ((minOf(size.first, size.third) - MARGIN) / TEXT_SCALE).toInt()
+            val maxLines = maxOf(1, ((size.second - MARGIN) / (LINE * TEXT_SCALE)).toInt())
+            val needs = multi.requirementSlots()
+            val first = if (needs.size > maxLines) (time / LINE_STEP_TICKS).toInt() % (needs.size - maxLines + 1) else 0
+            val shown = needs.indices.drop(first).take(maxLines)
+            val counts = shown.associateWith { i ->
+                val have = be.clientHave.getOrElse(i) { 0 }
+                net.minecraft.network.chat.Component.literal("$have/${needs[i].count}")
+                    .withStyle(if (have >= needs[i].count) net.minecraft.ChatFormatting.GREEN else net.minecraft.ChatFormatting.RED)
+            }
+            val countWidth = counts.values.maxOf { font.width(it) }
+            val nameRoom = maxWidth - ICON - GAP - countWidth - GAP
+            var widest = 0
+            for (i in shown) {
+                val need = needs[i]
+                val item = net.minecraft.client.renderer.item.ItemStackRenderState()
+                mc.itemModelResolver.updateForTopItem(item, need, net.minecraft.world.item.ItemDisplayContext.GUI, be.level, null, i)
+                val full = need.hoverName.string
+                val name = if (font.width(full) <= nameRoom) full else {
+                    val loop = full + MARQUEE_GAP
+                    val offset = (time / TICKS_PER_CHAR).toInt() % loop.length
+                    font.plainSubstrByWidth((loop + full).substring(offset), nameRoom)
+                }
+                widest = maxOf(widest, font.width(name))
+                val count = counts.getValue(i)
+                state.needs += NeedLine(item, net.minecraft.util.FormattedCharSequence.forward(name, net.minecraft.network.chat.Style.EMPTY), count.visualOrderText, font.width(count))
+            }
+            state.needsWidth = ICON + GAP + widest + GAP + countWidth
+            state.needsAt = Vec3(size.first / 2.0, size.second / 2.0, size.third / 2.0)
+        }
+
         override fun submit(state: FrameState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
             ObjParts.FRAME_GROUPS.forEachIndexed { i, group ->
                 if (state.groups[i]) draw(poseStack, collector, ObjParts.frame(group), -1, state.lightCoords)
             }
+            if (state.needs.isNotEmpty()) submitNeeds(state, poseStack, collector, camera)
             if (state.ghost.isEmpty()) return
             // The machine taking shape inside the frames: its models, translucent, untinted, full bright.
             val quad = com.mojang.blaze3d.vertex.QuadInstance()
@@ -385,6 +448,37 @@ object FemtoRenderers {
             }
         }
 
+        /**
+         * The list, facing the camera and centred in the structure: a line per requirement, the item icon on the left,
+         * its name, and have/need on the right, over a faint background as a name tag's.
+         */
+        private fun submitNeeds(state: FrameState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
+            poseStack.pushPose()
+            poseStack.translate(state.needsAt.x, state.needsAt.y, state.needsAt.z)
+            poseStack.mulPose(camera.orientation)
+            val left = -state.needsWidth / 2f
+            val right = state.needsWidth / 2f
+            val top = -state.needs.size * LINE / 2f
+            state.needs.forEachIndexed { i, line ->
+                val y = top + i * LINE
+                // Icons: an item's GUI model is one unit across; this one is ICON text pixels, centred on its line.
+                poseStack.pushPose()
+                poseStack.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE)
+                poseStack.translate(left + ICON / 2f, y + LINE / 2f - 1f, 0f)
+                poseStack.scale(ICON.toFloat(), -ICON.toFloat(), 0.01f)
+                line.item.submit(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
+                poseStack.popPose()
+                poseStack.pushPose()
+                poseStack.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE)
+                collector.submitText(poseStack, left + ICON + GAP, y + 1f, line.name, false, net.minecraft.client.gui.Font.DisplayMode.NORMAL,
+                    FULL_BRIGHT, -1, NEEDS_BACKGROUND, 0)
+                collector.submitText(poseStack, right - line.countWidth, y + 1f, line.count, false, net.minecraft.client.gui.Font.DisplayMode.NORMAL,
+                    FULL_BRIGHT, -1, NEEDS_BACKGROUND, 0)
+                poseStack.popPose()
+            }
+            poseStack.popPose()
+        }
+
         override fun shouldRenderOffScreen(): Boolean = true
 
         override fun getRenderBoundingBox(be: FrameBlockEntity): AABB {
@@ -396,6 +490,20 @@ object FemtoRenderers {
             const val GHOST_MIN = 0.15f
             const val GHOST_MAX = 0.65f
             private const val FULL_BRIGHT = 0xF000F0
+
+            /** The needs list: blocks per text pixel (a name tag's), line height and icon size in text pixels. */
+            private const val TEXT_SCALE = 0.025f
+            private const val LINE = 10
+            private const val ICON = 8
+            private const val NEEDS_BACKGROUND = 0x40000000
+            private const val NEEDS_RANGE = 24.0
+            private const val GAP = 3
+
+            /** Blocks left free around the list inside the structure. */
+            private const val MARGIN = 0.25f
+            private const val TICKS_PER_CHAR = 4f
+            private const val LINE_STEP_TICKS = 40f
+            private const val MARQUEE_GAP = "   "
             private val GHOST_SIDES: List<net.minecraft.core.Direction?> = net.minecraft.core.Direction.entries + listOf(null)
         }
     }

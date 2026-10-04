@@ -76,12 +76,25 @@ abstract class AtmosphericAddonBlock(properties: BlockBehaviour.Properties, priv
     }
 }
 
-/** A coil: 0.1 DE a tick (the alpha's value). */
+/**
+ * A coil: 0.1 DE a tick (the alpha's value). A pole takes at most [AtmosphericChargingBaseBlockEntity.MAX_COILS] coils;
+ * only a capacitor goes above the last.
+ */
 class AtmosphericChargingCoilBlock(properties: BlockBehaviour.Properties) : AtmosphericAddonBlock(properties, box(4.0, 0.0, 4.0, 12.0, 16.0, 12.0)) {
     override val supportsAddons: Boolean get() = true
 
+    override fun canSurvive(state: BlockState, level: LevelReader, pos: BlockPos): Boolean =
+        super.canSurvive(state, level, pos) && coilsBelow(level, pos) < AtmosphericChargingBaseBlockEntity.MAX_COILS
+
     companion object {
         const val POWER_PER_TICK = 0.1
+
+        /** The coils stacked directly under [pos]. */
+        fun coilsBelow(level: LevelReader, pos: BlockPos): Int {
+            var n = 0
+            while (n <= AtmosphericChargingBaseBlockEntity.MAX_COILS && level.getBlockState(pos.below(n + 1)).block is AtmosphericChargingCoilBlock) n++
+            return n
+        }
     }
 }
 
@@ -102,7 +115,7 @@ class AtmosphericChargingCapacitorBlock(properties: BlockBehaviour.Properties) :
 
 /**
  * The atmospheric charging base (the 1.7.10 alpha's, micro tier): sums the power of the addons stacked on it (up to
- * [MAX_ADDONS]) into its battery, a producer on the wireless and wired power networks. Two bases may not stand side by
+ * [MAX_COILS] coils, and a capacitor on top) into its battery, a producer on the wireless and wired power networks. Two bases may not stand side by
  * side. During a thunderstorm a capped pole out in the weather is struck by lightning now and then (about once every
  * [STRIKE_CHANCE] ticks): the bolt lands on the capacitor's top, harms nothing and sets no fire, and gives
  * [STRIKE_POWER].
@@ -148,9 +161,9 @@ class AtmosphericChargingBaseBlockEntity(pos: BlockPos, state: BlockState) : Fem
         val level = level as? ServerLevel ?: return
         coils = 0
         capped = false
-        for (up in 1..MAX_ADDONS) {
+        for (up in 1..MAX_COILS + 1) {
             when (level.getBlockState(blockPos.above(up)).block) {
-                is AtmosphericChargingCoilBlock -> coils++
+                is AtmosphericChargingCoilBlock -> if (coils < MAX_COILS) coils++ else break
                 is AtmosphericChargingCapacitorBlock -> {
                     capped = true
                     break
@@ -195,8 +208,8 @@ class AtmosphericChargingBaseBlockEntity(pos: BlockPos, state: BlockState) : Fem
         const val POWER_STORAGE = 2500.0
         const val LEAF_TRANSFER_RATE = 20.0
 
-        /** The alpha's `maxAddonsSupported`. */
-        const val MAX_ADDONS = 10
+        /** The alpha's `maxAddonsSupported`, counting coils: the capacitor may still cap the pole above the last. */
+        const val MAX_COILS = 10
         const val STRIKE_POWER = 1000.0
 
         /** One in this many ticks, during a thunderstorm: about once a minute. */
