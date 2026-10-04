@@ -15,7 +15,7 @@ import com.itszuvalex.femtocraft.logistics.ItemRepositoryBlockEntity
 import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.logistics.NanoPackMenu
 import com.itszuvalex.femtocraft.logistics.NaniteRepositoryBlockEntity
-import com.itszuvalex.femtocraft.logistics.storage.IndexedItemStorage
+import com.itszuvalex.itszulib.api.storage.IndexedItemStorage
 import com.itszuvalex.femtocraft.nanite.NaniteRegistry
 import com.itszuvalex.femtocraft.nanite.NaniteStack
 import com.itszuvalex.femtocraft.nanite.NaniteStrainVersion
@@ -58,6 +58,10 @@ object LogisticsGameTests {
         DevGameTests.test("conduit_arms_follow_connections", body = ::conduitArms)
         DevGameTests.test("conduit_chip_progress_moves_with_the_chip", body = ::chipProgress)
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
+        DevGameTests.test("chip_filter_limits_what_an_input_chip_pulls", body = ::filteredInput)
+        DevGameTests.test("chip_filter_limits_what_an_output_chip_takes", body = ::filteredOutput)
+        DevGameTests.test("chip_pulls_filtered_items_through_a_vault_index", body = ::filteredVault)
+        DevGameTests.test("conduit_menu_sets_chip_filters_from_the_held_stack", body = ::filterMenu)
         DevGameTests.test("nano_pack_saves_contents_and_locks_its_slot", body = ::nanoPack)
         DevGameTests.test("nano_pack_cannot_be_swapped_into_itself", body = ::nanoPackSwap)
         DevGameTests.test("indexed_storage_finds_slots_by_item_and_tag", body = ::indexedStorage)
@@ -105,35 +109,22 @@ object LogisticsGameTests {
         }
     }
 
+    /** Femtocraft indexes storage with ItszuLib's IndexedItemStorage: by item id and tag, kept current by writes. */
     private fun indexedStorage(helper: GameTestHelper) {
-        lateinit var index: IndexedItemStorage
-        val storage = ItemStorageArray(4) { index.invalidateCache() }
-        index = IndexedItemStorage(storage)
+        val index = IndexedItemStorage(ItemStorageArray(4))
         val diamond = BuiltInRegistries.ITEM.getKey(Items.DIAMOND)
-        storage.setSlot(0, IItemStack.of(ItemStack(Items.OAK_LOG, 3)))
-        storage.setSlot(2, IItemStack.of(ItemStack(Items.DIAMOND)))
-        storage.setSlot(3, IItemStack.of(ItemStack(Items.BIRCH_LOG)))
-        helper.assertValueEqual(index.getSlotsByItem(diamond), setOf(2), "diamond slot")
-        helper.assertValueEqual(index.getSlotsByTag(ItemTags.LOGS), setOf(0, 3), "log slots")
-        helper.assertTrue(ItemTags.LOGS in index.getContainedTags(), "contained tags")
-        helper.assertTrue(index.isCacheValid(), "rebuilt on lookup")
+        index.setSlot(0, IItemStack.of(ItemStack(Items.OAK_LOG, 3)))
+        index.setSlot(2, IItemStack.of(ItemStack(Items.DIAMOND)))
+        index.setSlot(3, IItemStack.of(ItemStack(Items.BIRCH_LOG)))
+        helper.assertValueEqual(index.slotsOf(diamond), setOf(2), "diamond slot")
+        helper.assertValueEqual(index.slotsOfTag(ItemTags.LOGS), setOf(0, 3), "log slots")
 
-        // A named diamond still counts as a diamond: callers check components themselves.
-        storage.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND).also { it.set(DataComponents.CUSTOM_NAME, Component.literal("x")) }))
-        helper.assertTrue(!index.isCacheValid(), "onChanged invalidates")
-        helper.assertValueEqual(index.getSlotsByItemStack(IItemStack.of(ItemStack(Items.DIAMOND))), setOf(1, 2), "diamonds by item id")
-
-        // Incremental updates without invalidation.
-        val quiet = ItemStorageArray(2)
-        val quietIndex = IndexedItemStorage(quiet)
-        helper.assertTrue(quietIndex.getContainedItems().isEmpty(), "empty")
-        quiet.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND)))
-        quietIndex.slotChanged(1)
-        helper.assertValueEqual(quietIndex.getSlotsByItem(diamond), setOf(1), "added")
-        quiet.setSlot(1, IItemStack.of(ItemStack(Items.OAK_LOG)))
-        quietIndex.slotChanged(1)
-        helper.assertTrue(!quietIndex.containsItemStack(IItemStack.of(ItemStack(Items.DIAMOND))), "replaced")
-        helper.assertTrue(quietIndex.containsTag(ItemTags.LOGS), "now a log")
+        // A named diamond is still a diamond to the index; count tells them apart with a matcher.
+        index.setSlot(1, IItemStack.of(ItemStack(Items.DIAMOND).also { it.set(DataComponents.CUSTOM_NAME, Component.literal("x")) }))
+        helper.assertValueEqual(index.slotsOf(diamond), setOf(1, 2), "diamonds by item id")
+        helper.assertValueEqual(index.count(diamond) { !it.hasComponents() }, 1, "plain diamonds")
+        index.setSlot(1, IItemStack.of(ItemStack(Items.OAK_LOG)))
+        helper.assertValueEqual(index.slotsOf(diamond), setOf(2), "replaced")
         helper.succeed()
     }
 
@@ -331,6 +322,125 @@ object LogisticsGameTests {
         helper.assertTrue(menu.storage.get(1).isEmpty(), "the pack is not inside itself")
         helper.assertTrue(!menu.slots[1].mayPlace(ItemStack(LogisticsContent.NANO_PACK.get())), "no nano packs in nano packs")
         helper.assertValueEqual(menu.storage.get(0).stackSize(), 5, "contents kept")
+        helper.succeed()
+    }
+
+    /** A chip of [kind] in face [face] set to [direction], allowing [allowed] (anything if none). */
+    private fun <B : Any> filtered(kind: ChipKind<B>, face: Direction, direction: ConnectionDirection, vararg allowed: B): ItemStack {
+        val stack = ItemStack(chipItem(kind))
+        val d = kind.defaults(face)
+        stack.set(kind.component, d.with(settings = d.settings.copy(flops = 1.0, direction = direction), filter = com.itszuvalex.itszulib.api.filter.ResourceFilter(kind.filterKind, ChipKind.FILTER_SLOTS, allowed.toList())))
+        return stack
+    }
+
+    /** chest - conduit - conduit - chest, as [line], with the chips given. */
+    private fun filteredLine(helper: GameTestHelper, input: ItemStack, output: ItemStack): Pair<ChestBlockEntity, ChestBlockEntity> {
+        val source = helper.place<ChestBlockEntity>(BlockPos(2, 1, 4), Blocks.CHEST)
+        val first = helper.place<ConduitBlockEntity>(BlockPos(3, 1, 4), LogisticsContent.CONDUIT.get())
+        val second = helper.place<ConduitBlockEntity>(BlockPos(4, 1, 4), LogisticsContent.CONDUIT.get())
+        val target = helper.place<ChestBlockEntity>(BlockPos(5, 1, 4), Blocks.CHEST)
+        first.conduit.chips[Direction.WEST.get3DDataValue()].setSlot(0, IItemStack.of(input))
+        second.conduit.chips[Direction.EAST.get3DDataValue()].setSlot(0, IItemStack.of(output))
+        return source to target
+    }
+
+    /** An input chip allowing diamonds skips the cobblestone before them. */
+    private fun filteredInput(helper: GameTestHelper) {
+        val (source, target) = filteredLine(helper,
+            filtered(ItemChipKind, Direction.WEST, ConnectionDirection.INPUT, ItemStack(Items.DIAMOND)),
+            filtered(ItemChipKind, Direction.EAST, ConnectionDirection.OUTPUT))
+        source.setItem(0, ItemStack(Items.COBBLESTONE, 3))
+        source.setItem(1, ItemStack(Items.DIAMOND, 2))
+        helper.succeedWhen {
+            // One item per operation, then a 200-tick countdown: the first diamond is enough.
+            helper.assertTrue((0 until target.containerSize).any { target.getItem(it).`is`(Items.DIAMOND) }, "a diamond arrived")
+            helper.assertTrue((0 until target.containerSize).none { target.getItem(it).`is`(Items.COBBLESTONE) }, "no cobblestone arrived")
+            helper.assertValueEqual(source.getItem(0).count, 3, "cobblestone stayed")
+        }
+    }
+
+    /** An output chip allowing only dirt takes no cobblestone, which waits in the input chip's buffer. */
+    private fun filteredOutput(helper: GameTestHelper) {
+        val (source, target) = filteredLine(helper,
+            filtered(ItemChipKind, Direction.WEST, ConnectionDirection.INPUT),
+            filtered(ItemChipKind, Direction.EAST, ConnectionDirection.OUTPUT, ItemStack(Items.DIRT)))
+        source.setItem(0, ItemStack(Items.COBBLESTONE, 3))
+        helper.runAfterDelay(20) {
+            helper.assertTrue(target.isEmpty, "the dirt-only output took nothing")
+            helper.succeed()
+        }
+    }
+
+    /**
+     * An input chip on a vault's outer face, filtered to emeralds, takes them through the vault's index (iron in the
+     * vault stays); an inner face exposes no index.
+     */
+    private fun filteredVault(helper: GameTestHelper) {
+        val at = BlockPos(3, 1, 3)
+        helper.assertTrue(com.itszuvalex.femtocraft.industry.FrameMultiblocks.ITEM_VAULT.formAt(helper.level, helper.absolutePos(at)), "vault formed")
+        val vault = helper.getBlockEntity(at, com.itszuvalex.femtocraft.logistics.ItemVaultBlockEntity::class.java)
+        val storage = vault.state()!!.storage
+        repeat(3) { storage.insert(IItemStack.of(ItemStack(Items.IRON_INGOT, 64))) }
+        storage.insert(IItemStack.of(ItemStack(Items.EMERALD, 5)))
+        val west = helper.getBlockEntity(at.offset(0, 1, 1), com.itszuvalex.femtocraft.logistics.ItemVaultBlockEntity::class.java)
+        val index = west.getModule(com.itszuvalex.femtocraft.logistics.LogisticsModules.ITEM_INDEX, Direction.WEST)
+        helper.assertTrue(index != null, "an outer face exposes the index")
+        helper.assertTrue(west.getModule(com.itszuvalex.femtocraft.logistics.LogisticsModules.ITEM_INDEX, Direction.EAST) == null, "an inner face does not")
+        val direct = ItemChipKind.pullIndexed(index!!, ItemStack.EMPTY, 2, com.itszuvalex.itszulib.api.filter.ResourceFilter(ItemChipKind.filterKind, ChipKind.FILTER_SLOTS, listOf(ItemStack(Items.EMERALD))))
+        helper.assertTrue(direct.`is`(Items.EMERALD) && direct.count == 2, "the index gives emeralds, got $direct")
+        storage.insert(IItemStack.of(direct))
+
+        val conduit = helper.place<ConduitBlockEntity>(BlockPos(2, 2, 4), LogisticsContent.CONDUIT.get())
+        val chest = helper.place<ChestBlockEntity>(BlockPos(1, 2, 4), Blocks.CHEST)
+        conduit.conduit.chips[Direction.EAST.get3DDataValue()].setSlot(0, IItemStack.of(filtered(ItemChipKind, Direction.EAST, ConnectionDirection.INPUT, ItemStack(Items.EMERALD))))
+        conduit.conduit.chips[Direction.WEST.get3DDataValue()].setSlot(0, IItemStack.of(filtered(ItemChipKind, Direction.WEST, ConnectionDirection.OUTPUT)))
+        val emerald = BuiltInRegistries.ITEM.getKey(Items.EMERALD)
+        val iron = BuiltInRegistries.ITEM.getKey(Items.IRON_INGOT)
+        helper.succeedWhen {
+            helper.assertTrue((0 until chest.containerSize).any { chest.getItem(it).`is`(Items.EMERALD) }, "an emerald arrived")
+            helper.assertTrue((0 until chest.containerSize).none { chest.getItem(it).`is`(Items.IRON_INGOT) }, "no iron arrived")
+            helper.assertTrue(vault.index()!!.count(emerald) < 5L, "emeralds left the vault")
+            helper.assertValueEqual(vault.index()!!.count(iron), 192L, "iron stayed")
+        }
+    }
+
+    /**
+     * The conduit menu changes a chip's ItszuLib filter: cells set from the held item (or the held bucket's fluid), an
+     * empty hand clears, and allow/deny and component matching toggle; nanite chips take no filter.
+     */
+    private fun filterMenu(helper: GameTestHelper) {
+        val be = helper.place<ConduitBlockEntity>(CENTER, LogisticsContent.CONDUIT.get())
+        val chips = be.conduit.chips[Direction.UP.get3DDataValue()]
+        chips.setSlot(0, IItemStack.of(chip(Direction.UP)))
+        chips.setSlot(1, IItemStack.of(chip(Direction.UP, kind = FluidChipKind)))
+        chips.setSlot(2, IItemStack.of(chip(Direction.UP, kind = NaniteChipKind)))
+        val player = helper.makeMockServerPlayerInLevel()
+        val menu = ConduitMenu(1, player.inventory, be)
+        val up = Direction.UP.get3DDataValue()
+        val actions = com.itszuvalex.itszulib.api.filter.FilterActions
+        fun act(index: Int, action: Int) = menu.handleAction(player, ConduitMenu.ACTION_FILTER, ConduitMenu.filterData(up, index, action))
+        fun itemFilter() = chips.get(0).toMinecraft().get(ItemChipKind.component)!!.filter
+
+        menu.setCarried(ItemStack(Items.DIAMOND, 7))
+        helper.assertTrue(act(0, actions.set(3)), "item filter set")
+        helper.assertTrue(itemFilter().entries[3].`is`(Items.DIAMOND) && itemFilter().entries[3].count == 1, "one diamond in entry 3, got ${itemFilter().entries[3]}")
+        helper.assertValueEqual(menu.carried.count, 7, "the held stack is not used up")
+        helper.assertFalse(act(1, actions.set(0)), "a diamond is no fluid filter")
+        helper.assertFalse(act(2, actions.set(0)), "nanite chips take no filter")
+
+        helper.assertTrue(act(0, actions.mode()), "mode toggled")
+        helper.assertTrue(itemFilter().mode == com.itszuvalex.itszulib.api.filter.FilterMode.DENY, "now a denylist")
+        helper.assertFalse(itemFilter().test(ItemStack(Items.DIAMOND)), "diamonds kept out")
+        helper.assertTrue(act(0, actions.components()), "component matching toggled")
+        helper.assertFalse(itemFilter().matchComponents, "matching the item alone")
+
+        menu.setCarried(ItemStack(Items.WATER_BUCKET))
+        helper.assertTrue(act(1, actions.set(0)), "fluid filter set from a bucket")
+        helper.assertTrue(chips.get(1).toMinecraft().get(FluidChipKind.component)!!.filter.entries[0].fluid == Fluids.WATER, "water listed")
+
+        menu.setCarried(ItemStack.EMPTY)
+        helper.assertTrue(act(0, actions.set(3)), "cleared")
+        helper.assertTrue(itemFilter().isEmpty, "nothing listed: the item chip takes anything again")
         helper.succeed()
     }
 }

@@ -4,5 +4,21 @@
     "femtocraft:macroscopic_structures"
   ],
   "cost": 20,
-  "icon": "minecraft:book"
+  "icon": "minecraft:book",
+  "items": [
+    {
+      "ingredient": "minecraft:book",
+      "count": 1
+    },
+    {
+      "ingredient": "minecraft:paper",
+      "count": 8
+    }
+  ],
+  "rewards": [
+    {
+      "id": "femtocraft:codex",
+      "count": 1
+    }
+  ]
 }

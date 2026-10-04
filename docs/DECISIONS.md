@@ -263,6 +263,9 @@ the old per-pixel grain as a toggle, and for slots that show where items go on g
 - Femtocraft's screens default to `femtocraft:femtocraft` (`assets/femtocraft/itszulib/themes/femtocraft.json`):
   ItszuLib's dark theme (the old art's colours) with a teal output ring and cool light text. Players can force any
   theme, or turn grain off, in ItszuLib's client config.
+- Buttons are ItszuLib `ThemedButton`s (ItszuLib DECISIONS D16): drawn in the theme, with the IO accent on nanite
+  fill/drain and conduit chip buttons. The side configuration panel of a frame multiblock shows and configures the
+  whole structure.
 - `FemtoScreen` draws ItszuLib's themed panel and slots; its text, progress bars and tank wells (`inset`) take the
   theme's colours instead of fixed greys.
 - Crystal slots (crystal mount, crystal machines, crystal liquifier) show a faded power crystal while empty; outputs
@@ -274,3 +277,171 @@ the old per-pixel grain as a toggle, and for slots that show where items go on g
   (`blockmachineblock_*_color`) under the base as a tinted layer: the machine's own colour if it has one
   (`FemtoTints.MACHINE_DEFAULT` otherwise, black), and black for the items.
 
+
+## D19. Computation: mainframes, computation conduits, FLOPS for research and logistics — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked for computation next, after v3's unfinished `api/computation` (computers turning power into
+FLOPS for jobs over a wired computation network; its tiles were stubs). Built on ItszuLib's producer/consumer
+distribution (ItszuLib DECISIONS D15), as power is.
+
+- **Network.** `ComputationConduit` (block `computation_conduit_crystal`, v3's computation conduit textures) is an
+  ItszuLib `DistributingTileNetwork`; leaves expose `ComputationModules.LEAF` (`FragComputationLeaf`) and bring a
+  computer (producer) or a job (consumer) each tick. FLOPS are not stored. The conduit's leaf attachment is shared
+  with the power conduit (`core/LeafConduit`).
+- **Mainframe** (block `mainframe`): four processor slots, a battery charged by wired or wireless power. Processors:
+  the 1.7.10 alpha's Micro Logic Core (20 FLOPS/t, 0.5 DE per FLOP) and Orpheus Processor (60 FLOPS/t, 0.3 DE per
+  FLOP), with the alpha's textures. A mainframe spends power only on the FLOPS jobs take, most efficient first
+  (ItszuLib `Distributable.priority`).
+- **Heat.** Computing heats a mainframe; each tick it loses a share of its excess over the biome's ambient temperature
+  (plains 20 °C), more with ice, snow or water beside it. It slows down from 60 °C and stops at 100 °C, so four Micro
+  Logic Cores settle at about two thirds of their speed uncooled and run fully with two ice blocks beside them. This
+  is the processor throttling v3's `IProcessor` asked for, kept simple.
+- **Jobs.** The Archive Interface (block `archive_interface`), placed against an Archive with a focus, turns every 200
+  FLOPS into a research point: the Archive spends up to 20 computed points a step on top of the nanite points, keeping
+  at most 80 waiting. Logistics conduits are jobs too, as v3 intended (chips count down flops): FLOPS run their active
+  chips' countdowns down on top of the passive rate, at most one operation per chip per tick.
+- Recipes are placeholders from existing parts; nothing is gated by research yet. Not done: v3's information conduit
+  (no design survives), a mainframe model (placeholder front texture), heat sources other than the biome.
+
+## D20. Items to hand in and rewards in the tech tree — DECIDED (maintainer, 2026-10-02)
+
+ItszuLib's technologies can now need resources and items besides their points, and give item rewards (ItszuLib
+DECISIONS D13 addendum). Femtocraft uses the items and rewards:
+
+- **Offering items.** The Archive's and the Codex's "Offer items" button (upgrade accent) hands in, from the player's
+  inventory, what the team's focus still needs (`ArchiveResearch.deliver`). An Archive whose focus has all its points
+  but not its items waits (status "Waiting for items") and draws no nanites meanwhile.
+- **Placeholder content** (`tools/gen_assets.py` `TECH_EXTRAS`), to try the mechanism until the tree is redesigned:
+  Scientific Theory takes a book and eight paper and gives a Codex; Algorithms takes a Micro Logic Core and gives two;
+  Mechanical Precision takes two pistons and gives four frames.
+- Resources are not used yet; computation could become one (FLOPS for some technologies instead of points).
+
+## D21. The alpha's cryo-endothermal generator, re-added — DECIDED (maintainer, 2026-10-02)
+
+The maintainer asked to bring back the 1.7.10 alpha's thermal generators (Femtocraft-alpha-1) for now. Its
+Cryo-Endothermal Charging Base and Coil ("Geothermal Harnessing": cold around the coil gives power) are ported with the
+alpha's values and textures (`power/Cryo.kt`):
+
+- **Coils** stack under a **base** (up to 15). Each tick a coil takes power from ice (1.25 DE/t; packed and blue ice
+  too) and snow blocks (0.5 DE/t; powder snow too) on its four sides; every 1-10 seconds it freezes a random block
+  within 5 for a burst: a water source to ice (100 DE), a lava source to obsidian (300 DE), a snow layer on open ground
+  (10 DE). Its power goes up the stack into the base. Without a base a coil does nothing and freezes nothing (the alpha
+  froze blocks and dropped the power).
+- The **base** holds 25,000 DE and is a producer on the wireless and wired networks; its screen shows the coils and
+  their average output.
+- `CryogenRegistry` keeps the alpha's handler lists, so other blocks can be made cryogens (passive or active).
+- Recipes are placeholders. The alpha's other generators (steam, magnetohydrodynamic, magnetic induction, atmospheric
+  charging) were not ported at first; the atmospheric charger was the one meant (D22).
+
+## D22. The alpha's atmospheric charging pole, with lightning — DECIDED (maintainer, 2026-10-03)
+
+The generator the maintainer meant for D21 was the alpha's Atmospheric Charging Base. It is ported with its values and
+textures (`power/Atmospheric.kt`); the cryo-endothermal generator of D21 stays.
+
+- **The pole.** A base with up to 10 addons stacked on it: coils (0.1 DE/t each) and, on top, a capacitor that adds a
+  share of the coils below it: 20%, 40% in rain, 80% in a thunderstorm. Rain and storm count only where the capacitor
+  is out in the weather (the alpha checked the world's weather alone). Addons need the base or a coil below them and
+  air on all four sides, and break (dropping themselves) when that stops being true; nothing stands on a capacitor;
+  two bases may not stand side by side.
+- **Lightning** (maintainer): during a thunderstorm a capped pole out in the weather is struck about once a minute.
+  The bolt lands on the capacitor's top and is visual only, so it sets no fire, damages no block and hurts nothing; it
+  gives the base 1,000 DE. The base holds 2,500 DE (the alpha's 250 could not take a strike) and is a producer on the
+  wireless and wired networks; its screen shows the coils, the capacitor, power per tick and strikes taken.
+- Recipes are placeholders (iron, copper, redstone, a crystal battery). Natural lightning is not drawn to the pole
+  (it is not a vanilla lightning rod).
+
+## D23. Storage multiblocks: item vault, fluid reservoir, nanite vault — DECIDED (maintainer, 2026-10-03)
+
+The maintainer asked for multiblock storage as fixed frame multiblocks (item, fluid and nanite), on indexed storage
+that can be searched across storages without scanning every slot, with a paged screen that searches by several
+things.
+
+- **Shapes.** Each is a 3x3x3 frame multiblock (`FrameMultiblocks.ITEM_VAULT`, `FLUID_RESERVOIR`, `NANITE_VAULT`),
+  built like the germination chamber; the shared storage is on the home block. Costs are placeholders (activated
+  riftiron with circuits or nano channels; activated phasemetal with nanite beacons) until storage research exists.
+- **Faces.** Every block exposes the storage on its outer faces, with a side configuration per block and automatic
+  IO; faces between vault blocks expose nothing. Nanites needed a multiblock face configuration of their own
+  (`MultiblockSidedNaniteStorageConfiguration`, on ItszuLib's `MultiblockFaces`).
+- **Item vault.** 243 slots (nine per block) in an ItszuLib `IndexedItemStorage`, with an `ItemStorageIndex` over it
+  (ItszuLib D17), so lookups and the terminal read only the slots that hold something. Its screen is ItszuLib's storage
+  terminal: a search box (name; `@` mod, `#` tooltip, `$` tag, `*` id; `-` excludes; a button picks what plain terms
+  search), sorting by count, name or id, five rows of nine per page, click to take a stack (right-click half,
+  shift-click to the inventory), click with a carried stack to put it in, shift-click from the inventory to store.
+  Five rows keep the screen 232 pixels high, inside a 720p window at GUI scale 3. Breaking any block drops the items.
+- **Fluid reservoir.** Four cells of 64,000 mB (`ReservoirTanks`) behind an ItszuLib `IndexedFluidStorage` with a
+  `FluidStorageIndex`. Fluids are lost when it breaks.
+  - **Locking** (maintainer): a tank can be locked to one fluid; it then takes only that fluid, even while empty, so
+    several flows can share a reservoir without one spilling into another's tank. A fluid fills the tanks holding it,
+    then empty tanks locked to it, then free empty tanks. Locking an empty tank locks it to the fluid in the carried
+    container (a bucket); a tank holding fluid locks to that fluid. Unlocking keeps the contents.
+  - **Linking** (maintainer): neighbouring cells link into one tank of their combined capacity, and split again when
+    unlinked. Only tanks with no two different fluids or locks link (the merged tank keeps the lock). A tank's fluid
+    fills its cells in order, so after a split each part keeps its cells' share. Links run along the row of cells
+    (1-2, 2-3, 3-4), so a tank is always a run of cells; in the world the cells sit in a ring around the floor so
+    linked cells touch, and a linked tank draws as one body at one level.
+  - Saved as the cells (the old four-tank format, so existing reservoirs load), a lock per cell and a bit per link.
+  - **Screen**: one gauge per tank, as wide as its cells; "+"/"-" buttons between cells to link or split (inactive,
+    with the reason in the tooltip, when the tanks cannot link); a Lock/Unlock button under each tank. A locked tank
+    shows a padlock and, while empty, a faint fill of its fluid; tooltips give contents, lock and links.
+- **Nanite vault.** One 10,000-nanite tank for any number of strains; the screen lists the largest strains and fills
+  from or drains into the player. Nanites are lost when it breaks.
+- **Seeing the reservoir's tanks** (maintainer): its blocks use the fluid repository's windowed textures (cutout), and
+  a renderer on the home block (`FemtoRenderers.ReservoirRenderer`) draws the inside: an opaque inner shell (floor,
+  walls and ceiling facing in, in the opaque repository texture, so the world never shows through the windows) and
+  the four tanks as four columns of fluid, one per quarter of the floor, each filled to its tank's level, lit with the
+  light above the reservoir (glowing fluids glow). The home block syncs its tanks to clients at once for a new fluid
+  or a change of 1,000 mB or more, smaller changes after a second (`FluidReservoirState.needsSync`).
+- Other looks are placeholders in the repositories' textures.
+- Femtocraft's own `IndexedItemStorage` (v3's `IIndexedInventory`) was replaced by ItszuLib's.
+
+## D24. Chip filters, and pulling through indexed inventories — DECIDED (maintainer, 2026-10-03)
+
+The maintainer asked for AE2-style allowlists on logistics chips, set by clicking with the item held, so chips pull
+from the network's indexed inventories only what they are meant to; then for the filter itself to live in ItszuLib
+for reuse (ItszuLib D18).
+
+- **Filters.** Every chip carries an ItszuLib `ResourceFilter` of nine entries in its data component
+  (`ChipData.filter`, over `ChipKind.filterKind`: ItszuLib's item and fluid kinds, Femtocraft's `NaniteFilterKind`).
+  Allow (only listed things pass) or deny (listed things are kept out), matching data components or not; nothing
+  listed lets everything through, as before. An **input** chip pulls only what passes from its block; an **output**
+  chip accepts only what passes from the network (the rest waits in the input buffers or goes to other outputs).
+- **Setting them.** In the conduit screen's chips tab (D25), select a chip; ItszuLib's `FilterRow` under the buttons edits its filter:
+  Allow/Deny, Exact/Any data, and nine cells. Clicking a cell while holding an item lists it (one of it; the held
+  stack is not used up); for fluid chips, holding a bucket or any fluid container lists its fluid; an empty hand
+  clears the cell (`ConduitMenu.ACTION_FILTER` carrying an ItszuLib `FilterActions` action). Nanite chips have no
+  filter controls yet (no item names a strain); their data supports one.
+- **Indexed inventories.** A block may expose an ItszuLib `ItemStorageIndex` on a face through
+  `LogisticsModules.ITEM_INDEX` (the item vault does, on the outer faces its item configuration exposes). An item chip
+  facing one pulls through the index (`ItemStorageIndex.extract(filter, amount)`): more of its buffer's item, else
+  the first item that passes, asking only for an allowlist's items and reading only the slots that hold them. Other
+  blocks are pulled through their NeoForge item handler as before.
+- Chips still move one item (250 mB, 5 nanites) per operation; filters change what, not how fast.
+
+## D25. Power and conduit chips tabs; the alpha's charging models — DECIDED (maintainer, 2026-10-03)
+
+- **Power tab.** Every screen over a block with power (a wireless node or leaf, or a wired leaf) has a power tab
+  (`client/PowerTab.kt`) beside the IO tab, instead of network lines on the main page. For each kind of network the
+  block can join, wireless and wired, it shows the block count (crystal mounts, conduits), producers / storage /
+  consumers, last tick's produced and consumed, the storage trend and stored / capacity. `FemtoMenu` syncs it
+  (`PowerNetworksView`) for any part of a multiblock, through whichever loaded part is on the network. The figures are
+  ItszuLib's `DistributionStatistics` (ItszuLib D19), which wired networks now record too.
+- **Conduit chips tab.** The conduit's main page only holds the chips (taking them in and out); clicking a slot no
+  longer also selects it. The chips tab (`client/ConduitChipsTab.kt`) shows the chips by face, where clicking one only
+  selects it, then its mode and side buttons, its settings and its filter.
+- **Charging models.** The atmospheric base, coil and capacitor and the cryo coil are built as the 1.7.10 alpha's
+  renderers drew them (`tools/gen_assets.py`): the base's layered cutout planes and pillar stub with all of its alpha
+  textures, coils as two 8-high segments with full-block end planes, and the capacitor's 12-pixel body on its
+  connector stub. Each texture shows only its own part, as in the alpha; before, whole textures were squeezed onto
+  smaller faces. The frame and crystal mount items have their own models (the whole frame; the mount's plate, grip
+  and crystal), since their block models leave out what the renderers draw.
+- **Atmospheric pole.** At most ten coils (`MAX_COILS`); a capacitor may still cap the pole in the eleventh place, but
+  an eleventh coil may not stand there.
+- **Frames collect by requirement.** A frame structure has one slot per required stack (split where it is more than a
+  stack), each taking only its item up to the amount needed, and nothing comes back out until the structure is
+  broken (which drops it). The screen, titled with the multiblock being built, uses ItszuLib's requirement slots (the
+  wanted item faded with how many are still needed in red, then the full amount in green) with each item's name
+  beside its slot. Using an item on any frame puts in what the structure still needs, so the screen is optional.
+  Inside the structure, at its centre, a list facing the player shows each requirement's icon, name and `have/need`,
+  from counts the home frame syncs when they change; it stays within the structure's size, scrolling long names
+  through their line and stepping through the lines when there are more than fit. Building starts as soon as every slot is full (it no longer waits for a 2-second
+  check) and uses exactly what the slots hold.

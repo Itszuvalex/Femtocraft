@@ -1,6 +1,6 @@
 package com.itszuvalex.femtocraft.logistics
 
-import com.itszuvalex.femtocraft.logistics.storage.IIndexedItemStorage
+import com.itszuvalex.itszulib.api.storage.ItemStorageIndex
 import com.itszuvalex.itszulib.api.adapters.IItemStack
 import com.itszuvalex.itszulib.api.utility.Loc4
 import com.itszuvalex.itszulib.api.utility.LocationTracker
@@ -100,12 +100,13 @@ object ProviderManager {
 }
 
 /**
- * Items spread over indexed storages, grouped by key. Port of v3's `IItemLogisticsNetwork` (no implementation in v3).
+ * Items spread over indexed storages, grouped by key. Port of v3's `IItemLogisticsNetwork` (no implementation in v3);
+ * each key's storages are an ItszuLib [ItemStorageIndex], so lookups ask only the storages holding an item.
  */
 interface IItemLogisticsNetwork {
     val keys: Set<String>
 
-    fun getInventories(key: String): Set<IIndexedItemStorage>
+    fun getInventories(key: String): ItemStorageIndex?
 
     fun containsItem(item: IItemStack, amount: Int, key: String): Boolean
 

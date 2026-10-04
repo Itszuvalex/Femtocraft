@@ -65,8 +65,12 @@ class NaniteRepositoryMenu(containerId: Int, inventory: Inventory, be: NaniteRep
 
 /**
  * Logistics conduit: one row of four chip slots per face (down, up, north, south, west, east), and actions that cycle a
- * chip's connection direction or interface face. Port of v3's `ContainerConduit`, `ContainerConduitSide` (a per-face
- * view of one row) and the conduit messages (DECISIONS D11).
+ * chip's connection direction or interface face, or change its filter ([ACTION_FILTER]: an ItszuLib
+ * [com.itszuvalex.itszulib.api.filter.FilterActions] action above the slot bits, applied with the carried stack: a cell
+ * set to the held item or the fluid it holds, cleared by an empty hand, or the allow/deny mode or component matching
+ * toggled). Port of
+ * v3's `ContainerConduit`, `ContainerConduitSide` (a per-face view of one row) and the conduit messages (DECISIONS
+ * D11).
  */
 class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity?) :
     FemtoMenu<ConduitBlockEntity>(LogisticsContent.CONDUIT_MENU.get(), containerId, inventory, be) {
@@ -74,12 +78,12 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
         if (be != null) {
             for (face in 0 until 6) addStorageSlots(be.conduit.chips[face], 26 + (face % 2) * 76, 18 + (face / 2) * 20, columns = 4)
         }
-        addPlayerInventorySlots(inventory, 8, 104)
+        addPlayerInventorySlots(inventory, 8, INVENTORY_Y)
     }
 
     override fun handleAction(player: Player, action: Int, data: Int): Boolean {
         val be = blockEntity ?: return false
-        if (action != ACTION_MODE && action != ACTION_INTERFACE) return false
+        if (action != ACTION_MODE && action != ACTION_INTERFACE && action != ACTION_FILTER) return false
         val slot = data and SLOT_MASK
         if (slot >= 6 * LogisticsConduit.CHIPS_PER_FACE) return false
         val face = slot / LogisticsConduit.CHIPS_PER_FACE
@@ -87,13 +91,27 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
         val storage = be.conduit.chips[face]
         val chip = storage.get(index).toMinecraft()
         if (!Chips.isChip(chip)) return false
-        storage.setSlot(index, IItemStack.of(Chips.cycled(chip, Direction.from3DDataValue(face), action == ACTION_MODE, data and BACKWARD == 0)))
+        val changed = if (action == ACTION_FILTER) {
+            Chips.withFilter(chip, Direction.from3DDataValue(face), data ushr FILTER_SHIFT, carried) ?: return false
+        } else {
+            Chips.cycled(chip, Direction.from3DDataValue(face), action == ACTION_MODE, data and BACKWARD == 0)
+        }
+        storage.setSlot(index, IItemStack.of(changed))
         return true
     }
 
     companion object {
         const val ACTION_MODE = 0
         const val ACTION_INTERFACE = 1
+        const val ACTION_FILTER = 2
+        const val INVENTORY_Y = 94
+        const val HEIGHT = INVENTORY_Y + 58 + 18 + 6
+
+        /** In [ACTION_FILTER]'s data: the filter action, above the slot bits. */
+        const val FILTER_SHIFT = 6
+
+        /** [ACTION_FILTER] data: filter [action] ([com.itszuvalex.itszulib.api.filter.FilterActions]) on chip [index] in conduit face [face]. */
+        fun filterData(face: Int, index: Int, action: Int): Int = (face * LogisticsConduit.CHIPS_PER_FACE + index) or (action shl FILTER_SHIFT)
         const val SLOT_MASK = 0x1F
 
         /** Flag in an action's data: cycle backwards. */

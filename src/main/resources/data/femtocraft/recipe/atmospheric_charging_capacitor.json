@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CRC",
+    "RBR",
+    "CRC"
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "R": "minecraft:redstone",
+    "B": "femtocraft:crystal_battery"
+  },
+  "result": {
+    "id": "femtocraft:atmospheric_charging_capacitor",
+    "count": 1
+  }
+}

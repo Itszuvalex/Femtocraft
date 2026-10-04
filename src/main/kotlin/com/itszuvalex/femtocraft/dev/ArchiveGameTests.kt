@@ -48,6 +48,7 @@ object ArchiveGameTests {
         DevGameTests.test("archives_share_the_team_focus", body = ::shareFocus)
         DevGameTests.test("archive_and_codex_edit_the_team_queue", body = ::menuQueue)
         DevGameTests.test("archives_follow_their_owner_between_teams", body = ::followOwner)
+        DevGameTests.test("archive_waits_for_items_then_rewards", body = ::items)
         DevGameTests.test("codex_opens_the_tech_tree", body = ::codexOpens)
         DevGameTests.test("host_draw_to_takes_nanites_for_a_consumer", body = ::drawTo)
     }
@@ -130,6 +131,37 @@ object ArchiveGameTests {
         player.foodData.setFoodLevel(20)
         NaniteHost.give(player, NaniteHost.REGEN_CAP)
         helper.assertFalse(NaniteHost.regenerate(player), "stops at the cap")
+        helper.succeed()
+    }
+
+    /**
+     * A focus that needs items: the Archive stops at its cost and waits (drawing no nanites), offering the items from
+     * the player's inventory researches it, and its reward goes to the player.
+     */
+    private fun items(helper: GameTestHelper) {
+        val theory = tech("scientific_theory")
+        val be = formArchive(helper)
+        val state = be.state()!!
+        val player = helper.makeMockServerPlayerInLevel()
+        player.setGameMode(GameType.SURVIVAL)
+        ItszuLib.TEAMS.change { it.ensurePlayer(player.uuid, "archive_items") }
+        val team = ItszuLib.TEAMS.state.teamOf(player.uuid)!!.id
+        val server = helper.level.server
+        NaniteHost.contact(player)
+        state.claim(player.uuid)
+        TechTree.queue(server, team, theory)
+        val cost = TechTree.of(helper.level.registryAccess())[theory]!!.cost
+        TechTree.addProgress(server, team, theory, cost)
+        val nanites = NaniteHost.archiveNanites(player)
+        helper.assertValueEqual(state.step(helper.level, listOf(player)), 0L, "nothing more to research with points")
+        helper.assertValueEqual(state.status, ArchiveStatus.NEEDS_ITEMS, "waits for items")
+        helper.assertValueEqual(NaniteHost.archiveNanites(player), nanites, "draws no nanites meanwhile")
+        player.inventory.add(ItemStack(net.minecraft.world.item.Items.BOOK))
+        player.inventory.add(ItemStack(net.minecraft.world.item.Items.PAPER, 12))
+        helper.assertValueEqual(ArchiveResearch.deliver(player), 9, "book and eight paper taken")
+        helper.assertValueEqual(player.inventory.countItem(net.minecraft.world.item.Items.PAPER), 4, "the rest kept")
+        helper.assertTrue(ItszuLib.TEAMS.state.team(team)!![Research.TYPE].has(theory), "researched")
+        helper.assertValueEqual(player.inventory.countItem(ArchiveContent.CODEX.get()), 1, "reward: a Codex")
         helper.succeed()
     }
 

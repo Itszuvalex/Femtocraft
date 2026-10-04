@@ -2,6 +2,7 @@ package com.itszuvalex.femtocraft.power
 
 import com.itszuvalex.itszulib.core.DistributableBattery
 import com.itszuvalex.itszulib.core.DistributionAlgorithm
+import com.itszuvalex.itszulib.core.DistributionStatistics
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.itszulib.ItszuLib
 import com.itszuvalex.itszulib.api.adapters.IModule
@@ -19,8 +20,9 @@ import net.neoforged.fml.LogicalSide
  * the network's shape changes, not only on add/remove calls (splits and takeovers skipped them).
  */
 class WirelessPowerNetwork(id: Int) : TileNetwork<IWirelessPowerNetworkNode, WirelessPowerNetwork>(id, LogicalSide.SERVER) {
+    /** Last-tick figures for the network tab (ItszuLib's, shared with the wired and computation networks). */
     @JvmField
-    val statistics = Statistics()
+    val statistics = DistributionStatistics()
 
     private var shape = -1
 
@@ -42,12 +44,11 @@ class WirelessPowerNetwork(id: Int) : TileNetwork<IWirelessPowerNetworkNode, Wir
         val producers = nodes.filter { it.storageType == PowerStorageNodeType.PRODUCER }
         val storage = nodes.filter { it.storageType == PowerStorageNodeType.STORAGE }
         val consumers = nodes.filter { it.storageType == PowerStorageNodeType.CONSUMER }
-        val result = DistributionAlgorithm(
-            producers.map { DistributableBattery(it.battery, it::transferRate) },
-            storage.map { DistributableBattery(it.battery, it::transferRate) },
-            consumers.map { DistributableBattery(it.battery, it::transferRate) },
-        ).distribute()
-        statistics.record(producers, storage, consumers, result)
+        val producing = producers.map { DistributableBattery(it.battery, it::transferRate) }
+        val storing = storage.map { DistributableBattery(it.battery, it::transferRate) }
+        val consuming = consumers.map { DistributableBattery(it.battery, it::transferRate) }
+        val result = DistributionAlgorithm(producing, storing, consuming).distribute()
+        statistics.record(producing, storing, consuming, result)
         updateRenderLocations()
     }
 
@@ -63,71 +64,7 @@ class WirelessPowerNetwork(id: Int) : TileNetwork<IWirelessPowerNetworkNode, Wir
         getNodes().filter { it.rendersConnections }.forEach { it.renderLocations = tree[it.getLoc()] ?: emptySet() }
     }
 
-    /**
-     * Last-tick figures for the network screen. Port of v3's `WirelessPowerNetwork.Statistics`.
-     */
-    class Statistics {
-        private val trend = DoubleArray(TICKS_TO_AVERAGE)
-        private var trendCount = 0
-        private var trendIndex = 0
-
-        var producerCount = 0
-            private set
-        var storageCount = 0
-            private set
-        var consumerCount = 0
-            private set
-
-        /** Power taken from producers last tick. */
-        var produced = 0.0
-            private set
-
-        /** Power given to consumers last tick. */
-        var consumed = 0.0
-            private set
-
-        /** Net change of dedicated storage last tick (positive: charging). */
-        var storageDelta = 0.0
-            private set
-
-        var dedicatedStored = 0.0
-            private set
-        var dedicatedStorage = 0.0
-            private set
-        var totalStored = 0.0
-            private set
-        var totalStorage = 0.0
-            private set
-
-        /** Average over [TICKS_TO_AVERAGE] ticks of [storageDelta]; positive means the network is filling up. */
-        val averageTrend: Double get() = if (trendCount == 0) 0.0 else trend.sum() / trendCount
-
-        fun record(
-            producers: Collection<IWirelessPowerStorageNode>,
-            storage: Collection<IWirelessPowerStorageNode>,
-            consumers: Collection<IWirelessPowerStorageNode>,
-            result: DistributionAlgorithm.Result,
-        ) {
-            producerCount = producers.size
-            storageCount = storage.size
-            consumerCount = consumers.size
-            produced = result.fromProducers
-            consumed = result.toConsumers
-            storageDelta = result.toStorage - result.fromStorage
-            dedicatedStored = storage.sumOf { it.battery.storage() }
-            dedicatedStorage = storage.sumOf { it.battery.maxStorage() }
-            val all = producers + storage + consumers
-            totalStored = all.sumOf { it.battery.storage() }
-            totalStorage = all.sumOf { it.battery.maxStorage() }
-            trend[trendIndex] = storageDelta
-            trendIndex = (trendIndex + 1) % TICKS_TO_AVERAGE
-            trendCount = minOf(TICKS_TO_AVERAGE, trendCount + 1)
-        }
-    }
-
     companion object {
-        const val TICKS_TO_AVERAGE = 20 * 10
-
         fun nextId(): Int = ItszuLib.NETWORK_MANAGER.get(LogicalSide.SERVER)?.getNextID() ?: 0
     }
 }

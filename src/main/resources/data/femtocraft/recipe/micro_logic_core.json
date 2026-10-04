@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RCR",
+    "CDC",
+    "RCR"
+  ],
+  "key": {
+    "R": "minecraft:redstone",
+    "C": "femtocraft:basic_circuit",
+    "D": "femtocraft:crackling_dust"
+  },
+  "result": {
+    "id": "femtocraft:micro_logic_core",
+    "count": 1
+  }
+}

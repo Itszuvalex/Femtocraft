@@ -72,6 +72,8 @@ TEXTURES = {
     "wire_thin_color": "wire/wire_thin_color.png",
     "wire_thin_power": "wire/wire_thin_power.png",
     "wire_thin_power_color": "wire/wire_thin_power_color.png",
+    "wire_thin_computation": "wire/wire_thin_computation.png",
+    "wire_thin_computation_color": "wire/wire_thin_computation_color.png",
     "frame": "frame/frame.png",
     "germination_chamber": "growth_chamber/growth chamber.png",
     "germination_chamber_color": "growth_chamber/growth chamber_color.png",

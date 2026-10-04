@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "femtocraft:block/computation_conduit_crystal",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -10027111
+      }
+    ]
+  }
+}

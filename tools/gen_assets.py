@@ -82,6 +82,16 @@ def drop_count(name, item, lo, hi):
 #   ("leaves", tex)
 #   ("cross", tex)                    crossed planes
 #   ("box", tex, [x0,y0,z0,x1,y1,z1], ...)   one or more boxes with one texture
+#   ("pillar", side, end, [x0,y0,z0,x1,y1,z1][, bottom])   one box: [side] stretched over each side face, [end] on top
+#                                     and bottom (or [bottom] on the bottom)
+#   ("cube_bottom_top", side, top, bottom)
+#   ("charging_base",)                the 1.7.10 alpha's atmospheric charging base (RenderChargingBase): cutout planes
+#                                     layered at several depths, whose textures each show only their part
+#   ("charging_coil", side, top)      the alpha's charging coils (RenderChargingCoil): two 8-high segments, [side] on each
+#                                     segment's sides and a full-block [top] plane (coloured in its middle) at each end
+#   ("charging_capacitor",)           the alpha's capacitor (RenderChargingCapacitor): a 12-pixel body on a connector stub
+#   ("windowed", side, top, bottom, particle)   cube_bottom_top with see-through (cutout) windows; [particle] also names
+#                                     the opaque texture a renderer draws behind the windows
 # drops: "self", "none", or a loot table dict
 BLOCKS = {
     # name: (display name, model, drops, tool)
@@ -92,6 +102,12 @@ BLOCKS = {
     "crystal_heat_exchanger": ("Crystal Heat Exchanger", ("machine", "crystalheatexchanger_front"), "self", "pickaxe"),
     "power_conduit_crystal": ("Crystal Power Conduit", ("conduit_obj", "wire_thin_power", "wire_thin_power_color"), "self", "pickaxe"),
     "glow_stick": ("Glow Stick", ("glow_stick",), "self", None),
+    # The 1.7.10 alpha's cryo-endothermal generator (DECISIONS D21), with its textures.
+    "atmospheric_charging_base": ("Atmospheric Charging Base", ("charging_base",), "self", "pickaxe"),
+    "atmospheric_charging_coil": ("Atmospheric Charging Coil", ("charging_coil", "atmospheric_charging_coil", "atmospheric_charging_coil_top"), "self", "pickaxe"),
+    "atmospheric_charging_capacitor": ("Atmospheric Charging Capacitor", ("charging_capacitor",), "self", "pickaxe"),
+    "cryo_endothermal_charging_base": ("Cryo-Endothermal Charging Base", ("cube_all", "cryo_endothermal_charging_base"), "self", "pickaxe"),
+    "cryo_endothermal_charging_coil": ("Cryo-Endothermal Charging Coil", ("charging_coil", "cryo_endothermal_charging_coil", "cryo_endothermal_charging_coil_top"), "self", "pickaxe"),
     # --- industry ---
     "nano_furnace": ("Nano Furnace", ("machine", "nanofurnace_front"), "self", "pickaxe"),
     "demolisher": ("Demolisher", ("machine", "demolisher_front"), "self", "pickaxe"),
@@ -106,6 +122,10 @@ BLOCKS = {
     "fluid_repository": ("Fluid Repository", ("orientable", "blockfluidrepository_front", "blockfluidrepository_side", "blockfluidrepository_top"), "self", "pickaxe"),
     "nanite_repository": ("Nanite Repository", ("orientable", "blocknaniterepository_front", "blocknaniterepository_side", "blocknaniterepository_top"), "self", "pickaxe"),
     "conduit": ("Logistics Conduit", ("conduit_obj", "wire_thin", "wire_thin_color"), "self", "pickaxe"),
+    # --- computation ---
+    "computation_conduit_crystal": ("Crystal Computation Conduit", ("conduit_obj", "wire_thin_computation", "wire_thin_computation_color"), "self", "pickaxe"),
+    "mainframe": ("Mainframe", ("machine", "mainframe_front"), "self", "pickaxe"),
+    "archive_interface": ("Archive Interface", ("machine", "archive_interface_front"), "self", "pickaxe"),
     # --- cyber ---
     "substrate": ("Substrate", ("cube_all", "substrate"), "self", "pickaxe"),
     "refined_substrate": ("Refined Substrate", ("cube_all", "refinedsubstrate"), "self", "pickaxe"),
@@ -124,6 +144,10 @@ BLOCKS = {
     "germination_chamber": ("Germination Chamber", ("chamber_obj", "germination_chamber"), "none", "pickaxe", False),
     "crystal_focusing_chamber": ("Crystal Focusing Chamber", ("cube_all", "crystal_focusing_chamber"), "none", "pickaxe", False),
     "archive": ("Archive", ("cube_all", "archive"), "none", "pickaxe", False),
+    # Frame-built storage multiblocks, in the repositories' textures.
+    "item_vault": ("Item Vault", ("cube_bottom_top", "blockitemrepository_side", "blockitemrepository_top", "blockitemrepository_top"), "none", "pickaxe", False),
+    "fluid_reservoir": ("Fluid Reservoir", ("windowed", "blockfluidrepository_side", "blockfluidrepository_top", "blockfluidrepository_top", "blockfluidrepository_side_empty"), "none", "pickaxe", False),
+    "nanite_vault": ("Nanite Vault", ("cube_bottom_top", "blocknaniterepository_side", "blocknaniterepository_top", "blocknaniterepository_top"), "none", "pickaxe", False),
 }
 
 ITEMS = {
@@ -150,7 +174,7 @@ ITEMS = {
     "nanite_beacon": ("Nanite Beacon", "itemnanitebeacon"),
     "nano_channel": ("Nano Channel", "itemnanochannel"),
     "solar_panel": ("Solar Panel", "itemsolarpanel"),
-    "frame": ("Frame", "block:frame"),
+    "frame": ("Frame", "block:frame_full"),
     "configurator": ("Configurator", None),
     "shift_test": ("Shift Device", "itemshifttest"),
     "nano_lash": ("Nano Lash", "itemnanolash"),
@@ -162,6 +186,9 @@ ITEMS = {
     "cyberleaf": ("Cyberleaf", "itemcyberleaf"),
     "nanoweave_thread": ("Nanoweave Thread", "nanoweave_thread"),
     "nanoweave_sheet": ("Nanoweave Sheet", "nanoweave_sheet"),
+    # The 1.7.10 alpha's textures.
+    "micro_logic_core": ("Micro Logic Core", "micro_logic_core"),
+    "orpheus_processor": ("Orpheus Processor", "orpheus_processor"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
@@ -171,6 +198,8 @@ PLACEHOLDERS = {
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
     "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
+    "block/mainframe_front": ((0, 0, 0, 0), (90, 255, 150, 255)),
+    "block/archive_interface_front": ((0, 0, 0, 0), (90, 200, 220, 255)),
 }
 
 LANG = {
@@ -196,16 +225,28 @@ LANG = {
     "tooltip.femtocraft.power": "Power: %s/%s",
     "gui.femtocraft.power_per_tick": "%s DE/t",
     "gui.femtocraft.power_unit": "DE",
-    "gui.femtocraft.network.none": "No wireless network",
-    "gui.femtocraft.network.nodes": "Producers %s  Storage %s  Consumers %s",
-    "gui.femtocraft.network.flow": "Produced %s  Consumed %s",
-    "gui.femtocraft.network.storage": "Stored %s/%s DE",
+    "gui.femtocraft.power_tab.tab": "Pwr",
+    "gui.femtocraft.power_tab.title": "Power networks",
+    "gui.femtocraft.power_tab.wireless": "Wireless network",
+    "gui.femtocraft.power_tab.wired": "Wired network",
+    "gui.femtocraft.power_tab.not_connected": "%s: none",
+    "gui.femtocraft.power_tab.wireless.blocks": "Crystal mounts",
+    "gui.femtocraft.power_tab.wired.blocks": "Conduits",
+    "gui.femtocraft.power_tab.members": "Make / store / use",
+    "gui.femtocraft.power_tab.produced": "Produced",
+    "gui.femtocraft.power_tab.consumed": "Consumed",
+    "gui.femtocraft.power_tab.trend": "Storage trend",
+    "gui.femtocraft.power_tab.stored": "Stored",
+    "gui.femtocraft.power_tab.stored_value": "%s / %s DE",
     "femtocraft.subtitle.shiftsound": "Nanites shift",
     "femtocraft.subtitle.crystalbreak": "Crystal shatters",
     "femtocraft.subtitle.riftloop": "Rift hums",
     "fluid.femtocraft.gritty_slurry": "Gritty Slurry",
     "multiblock.femtocraft.germination_chamber": "Germination Chamber",
     "multiblock.femtocraft.crystal_focusing_chamber": "Crystal Focusing Chamber",
+    "multiblock.femtocraft.item_vault": "Item Vault",
+    "multiblock.femtocraft.fluid_reservoir": "Fluid Reservoir",
+    "multiblock.femtocraft.nanite_vault": "Nanite Vault",
     "multiblock.femtocraft.archive": "Archive",
     "archive.femtocraft.contact.title": "WE ARE THE ARCHIVE",
     "archive.femtocraft.contact": "Something old and broken settles behind your eyes. It hums, and the dust it brought hums with it.",
@@ -220,7 +261,10 @@ LANG = {
     "gui.femtocraft.archive.this": "This Archive: %s",
     "gui.femtocraft.archive.status.idle": "Idle",
     "gui.femtocraft.archive.status.researching": "Researching",
-    "gui.femtocraft.archive.status.no_host": "Needs a nanite host nearby",
+    "gui.femtocraft.archive.status.no_host": "Needs a nanite host nearby or computation",
+    "gui.femtocraft.archive.status.needs_items": "Waiting for items: offer them from the Archive or Codex",
+    "gui.femtocraft.research.offer": "Offer items",
+    "gui.femtocraft.research.offer.tooltip": "Hand in the items the focus still needs from your inventory",
     "gui.femtocraft.archive.host": "Your Archive nanites: %s / %s",
     "gui.femtocraft.archive.not_host": "You are not a nanite host. Touch a crystal cluster.",
     "hud.femtocraft.host.nanites": "Archive nanites %s / %s",
@@ -229,10 +273,18 @@ LANG = {
     "tooltip.femtocraft.none": "none",
     "gui.femtocraft.conduit.mode": "Mode",
     "gui.femtocraft.conduit.interface": "Side",
+    "gui.femtocraft.conduit.mode.tip": "Cycle the selected chip between pulling in and pushing out (shift: backwards)",
+    "gui.femtocraft.conduit.interface.tip": "Cycle which face of the neighbouring block the selected chip uses (shift: backwards)",
+    "gui.femtocraft.conduit.chips.tab": "Chips",
+    "gui.femtocraft.conduit.chips.title": "Configure chips",
+    "gui.femtocraft.conduit.chips.none": "Click a chip to configure it",
+    "gui.femtocraft.conduit.chips.settings": "Face %s: %s, via %s side",
     "tooltip.femtocraft.chip.item": "Buffer: %s",
     "tooltip.femtocraft.chip.flops": "Flops: %s/%s",
     "tooltip.femtocraft.chip.channel": "Channel: %s",
     "tooltip.femtocraft.chip.mode": "Mode: %s",
+    "tooltip.femtocraft.chip.filter": "Allows %s:",
+    "tooltip.femtocraft.chip.filter.deny": "Keeps out %s:",
     "tooltip.femtocraft.chip.interface": "Interface: %s",
     "tooltip.femtocraft.frame.type": "Frame: %s",
     "tooltip.femtocraft.frame.selected": "Selected: %s",
@@ -251,7 +303,34 @@ LANG = {
     "gui.femtocraft.nanite.drain": "Drain",
     "gui.femtocraft.nanite.tank": "Nanites: %s/%s",
     "gui.femtocraft.nanite.player": "Yours: %s",
+    "gui.femtocraft.nanite_vault.strain": "%s v%s: %s",
+    "gui.femtocraft.conduit.filter.set": "Click holding an item (item chips) or a filled bucket (fluid chips) to list it, empty-handed to clear",
+    "gui.femtocraft.reservoir.lock": "Lock",
+    "gui.femtocraft.reservoir.unlock": "Unlock",
+    "gui.femtocraft.reservoir.lock.tip": "Lock this tank to its fluid, so it takes nothing else (hold a filled bucket to lock an empty tank)",
+    "gui.femtocraft.reservoir.unlock.tip": "Let this tank take any fluid once it is empty",
+    "gui.femtocraft.reservoir.locked": "Locked to %s",
+    "gui.femtocraft.reservoir.unlocked": "Takes any fluid",
+    "gui.femtocraft.reservoir.linked": "%s tanks linked as one",
+    "gui.femtocraft.reservoir.link": "Link tanks %s and %s into one",
+    "gui.femtocraft.reservoir.unlink": "Split tanks %s and %s apart",
+    "gui.femtocraft.reservoir.link.blocked": "Tanks %s and %s hold different fluids or locks",
+    "gui.femtocraft.nanite_vault.more": "... and %s more strains",
     "entity.femtocraft.nano_lash": "Nano Lash",
+    "tooltip.femtocraft.processor.flops": "%s FLOPS/t",
+    "tooltip.femtocraft.processor.power": "%s DE per FLOP",
+    "gui.femtocraft.mainframe.flops": "FLOPS: %s/t",
+    "gui.femtocraft.mainframe.capacity": "Max: %s/t",
+    "gui.femtocraft.mainframe.temperature": "Heat: %s °C",
+    "gui.femtocraft.mainframe.ambient": "Ambient: %s °C",
+    "gui.femtocraft.mainframe.throttle": "Slows from %s °C, stops at %s °C",
+    "gui.femtocraft.archive.computed": "Computed points waiting: %s",
+    "gui.femtocraft.cryo.coils": "Coils: %s / %s",
+    "gui.femtocraft.atmospheric.coils": "Coils: %s / %s",
+    "gui.femtocraft.atmospheric.capped": "Capped by a capacitor",
+    "gui.femtocraft.atmospheric.uncapped": "No capacitor on top",
+    "gui.femtocraft.atmospheric.strikes": "Lightning strikes: %s",
+    "gui.femtocraft.cryo.generation": "Generating %s DE/t",
 }
 
 TAGS = {
@@ -328,6 +407,16 @@ RECIPES = {
     "basic_circuit": shaped(["NRN", "SIS"], {"N": f"{NS}:nanoweave_thread", "R": "minecraft:redstone", "S": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:basic_circuit"),
     "crystal_battery": shaped([" R ", "ICI", "DCD"], {"R": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust", "D": f"{NS}:riftiron_ingot_devoid"}, f"{NS}:crystal_battery"),
     "energy_regulator": shaped(["LIL", "ICI", "LIL"], {"L": f"{NS}:cyberleaf", "I": "minecraft:iron_ingot", "C": f"{NS}:crackling_dust"}, f"{NS}:energy_regulator"),
+    "atmospheric_charging_base": shaped(["SCS", "IFI", "SRS"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "I": "minecraft:iron_ingot", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:atmospheric_charging_base"),
+    "atmospheric_charging_coil": shaped([" I ", "CRC", " I "], {"I": "minecraft:iron_ingot", "C": "minecraft:copper_ingot", "R": "minecraft:redstone"}, f"{NS}:atmospheric_charging_coil", 2),
+    "atmospheric_charging_capacitor": shaped(["CRC", "RBR", "CRC"], {"C": "minecraft:copper_ingot", "R": "minecraft:redstone", "B": f"{NS}:crystal_battery"}, f"{NS}:atmospheric_charging_capacitor"),
+    "cryo_endothermal_charging_base": shaped(["SBS", "CFC", "SRS"], {"S": f"{NS}:nanoweave_sheet", "B": f"{NS}:crystal_battery", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:cryo_endothermal_charging_base"),
+    "cryo_endothermal_charging_coil": shaped([" I ", "RCR", " I "], {"I": "minecraft:packed_ice", "R": f"{NS}:riftiron_ingot_devoid", "C": f"{NS}:nano_channel"}, f"{NS}:cryo_endothermal_charging_coil", 2),
+    "computation_conduit_crystal": shaped(["SSS", "RCR", "SSS"], {"S": f"{NS}:nanoweave_sheet", "R": f"{NS}:redstonereplacement_dust", "C": f"{NS}:basic_circuit"}, f"{NS}:computation_conduit_crystal", 6),
+    "micro_logic_core": shaped(["RCR", "CDC", "RCR"], {"R": "minecraft:redstone", "C": f"{NS}:basic_circuit", "D": f"{NS}:crackling_dust"}, f"{NS}:micro_logic_core"),
+    "orpheus_processor": shaped(["PMP", "MDM", "PMP"], {"P": f"{NS}:phasemetal_ingot_devoid", "M": f"{NS}:micro_logic_core", "D": f"{NS}:diamond_dust"}, f"{NS}:orpheus_processor"),
+    "mainframe": shaped(["SCS", "CFC", "SRS"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:mainframe"),
+    "archive_interface": shaped(["SDS", "CFC", "SCS"], {"S": f"{NS}:nanoweave_sheet", "D": f"{NS}:crackling_dust", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame"}, f"{NS}:archive_interface"),
     "codex": shapeless(["minecraft:book", f"{NS}:crackling_dust"], f"{NS}:codex"),
     "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:frame"),
     "logistics_fluid_chip_basic": shaped([" C ", "RBR"], {"R": f"{NS}:lapisreplacement_dust", "C": f"{NS}:nanite_beacon", "B": f"{NS}:basic_circuit"}, f"{NS}:logistics_fluid_chip_basic", 8),
@@ -409,7 +498,8 @@ def part_models():
 
 
 # Block items whose item model is not the block model.
-ITEM_MODELS = {"crystal_cluster": "crystal_cluster_full"}
+# The frame's and mount's block models leave their renderers' parts out, so their items show the whole thing.
+ITEM_MODELS = {"crystal_cluster": "crystal_cluster_full", "frame": "frame_full", "crystal_mount": "crystal_mount_item"}
 
 CONDUIT_ARMS = ["north", "south", "east", "west", "up", "down"]
 WIRE_GROUPS = ["Core_Cube"] + [f"{d.capitalize()}_Cube" for d in CONDUIT_ARMS]
@@ -419,7 +509,10 @@ def extra_models(name, kind):
     """Models besides <name>.json that a block's blockstate uses."""
     k = kind[0]
     if k == "mount_obj":
-        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["TopMount"]))}
+        # The item: the bottom plate with its grip and the crystal's shape, as a lone mount looks in the world (where the
+        # renderer turns the grip and draws the crystal).
+        return {f"{name}_top": obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["TopMount"])),
+                ITEM_MODELS[name]: obj_model("crystal_mount", {"texture": "crystal_mount"}, show("crystal_mount", ["BottomMount", "BottomGripBase", "Crystal"]))}
     if k == "animated_obj" and name in ITEM_MODELS:
         return {ITEM_MODELS[name]: obj_model(kind[1], {"texture": kind[1]})}
     if k == "conduit_obj":
@@ -432,8 +525,87 @@ def extra_models(name, kind):
     return {}
 
 
+def plane(axis_box, face, texture, uv=(0, 0, 16, 16), cull=None):
+    """A flat element (zero thickness along one axis) showing one [face], as the alpha's single quads."""
+    f = {"texture": texture, "uv": list(uv)}
+    if cull:
+        f["cullface"] = cull
+    x0, y0, z0, x1, y1, z1 = axis_box
+    return {"from": [x0, y0, z0], "to": [x1, y1, z1], "faces": {face: f}}
+
+
+def charging_base():
+    """
+    The alpha's RenderChargingBase: outer sides (cut out to an I-beam) and a top with a hole, over planes set in at
+    1, 2 and 3 pixels (coil, coil column and side insets) and horizontal planes inside (the recess's ceiling and floor,
+    and three coil rings), with a pillar stub on top.
+    """
+    els = []
+    sides = {"north": lambda d: [0, 0, d, 16, 16, d], "south": lambda d: [0, 0, 16 - d, 16, 16, 16 - d],
+             "west": lambda d: [d, 0, 0, d, 16, 16], "east": lambda d: [16 - d, 0, 0, 16 - d, 16, 16]}
+    for face, box in sides.items():
+        els.append(plane(box(0), face, "#side", cull=face))
+        els.append(plane(box(3), face, "#side_inset"))
+        els.append(plane(box(1), face, "#coil_inset"))
+        els.append(plane(box(2), face, "#coil_column_inset"))
+    els.append(plane([0, 0, 0, 16, 0, 16], "down", "#bottom", cull="down"))
+    els.append(plane([0, 14, 0, 16, 14, 16], "up", "#top"))
+    els.append(plane([0, 12, 0, 16, 12, 16], "down", "#top_inset"))
+    els.append(plane([0, 2, 0, 16, 2, 16], "up", "#top_inset"))
+    for y in (3, 6, 9):
+        els.append(plane([0, y, 0, 16, y, 16], "down", "#coil_top_inset"))
+    for y in (5, 8, 11):
+        els.append(plane([0, y, 0, 16, y, 16], "up", "#coil_top_inset"))
+    els.append(plane([0, 16, 0, 16, 16, 16], "up", "#pillar_top", cull="up"))
+    pillar = {d: {"texture": "#pillar_side", "uv": [0, 0, 6, 16]} for d in ["north", "south", "east", "west"]}
+    els.append({"from": [4, 13, 4], "to": [12, 16, 12], "faces": pillar})
+    p = "atmospheric_charging_base"
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": tex(f"{p}_bottom"), "side": tex(f"{p}_side"), "top": tex(f"{p}_top"), "bottom": tex(f"{p}_bottom"),
+                         "side_inset": tex(f"{p}_side_inset"), "coil_inset": tex(f"{p}_coil_inset"),
+                         "coil_column_inset": tex(f"{p}_coil_column_inset"), "top_inset": tex(f"{p}_top_inset"),
+                         "coil_top_inset": tex(f"{p}_coil_top_inset"), "pillar_top": tex(f"{p}_pillar_top"), "pillar_side": tex(f"{p}_pillar_side")},
+            "elements": els}
+
+
+def charging_coil(side, top):
+    """The alpha's RenderChargingCoil: two 8-high segments, each with [side] on its sides and [top] planes at its ends."""
+    els = []
+    for y0 in (0, 8):
+        y1 = y0 + 8
+        els.append({"from": [4, y0, 4], "to": [12, y1, 12],
+                    "faces": {d: {"texture": "#side"} for d in ["north", "south", "east", "west"]}})
+        els.append(plane([0, y0, 0, 16, y0, 16], "down", "#end", cull="down" if y0 == 0 else None))
+        els.append(plane([0, y1, 0, 16, y1, 16], "up", "#end", cull="up" if y1 == 16 else None))
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": tex(top), "side": tex(side), "end": tex(top)}, "elements": els}
+
+
+def charging_capacitor():
+    """
+    The alpha's RenderChargingCapacitor: a body from 2 to 14 on every axis (each face the middle 12 pixels of its
+    texture, the sides upside down) on a connector stub from 4 to 12, 2 pixels high.
+    """
+    p = "atmospheric_charging_capacitor"
+    body = {d: {"texture": "#side", "uv": [2, 14, 14, 2]} for d in ["north", "south", "east", "west"]}
+    body["up"] = {"texture": "#top", "uv": [2, 2, 14, 14]}
+    body["down"] = {"texture": "#bottom", "uv": [2, 2, 14, 14]}
+    stub = {d: {"texture": "#connector", "uv": [0, 12, 16, 16]} for d in ["north", "south", "east", "west"]}
+    stub["down"] = {"texture": "#connector_bottom", "cullface": "down"}
+    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+            "textures": {"particle": tex(f"{p}_top"), "side": tex(f"{p}_side"), "top": tex(f"{p}_top"), "bottom": tex(f"{p}_bottom"),
+                         "connector": tex(f"{p}_connector"), "connector_bottom": tex(f"{p}_connector_bottom")},
+            "elements": [{"from": [2, 2, 2], "to": [14, 14, 14], "faces": body}, {"from": [4, 0, 4], "to": [12, 2, 12], "faces": stub}]}
+
+
 def block_model(name, kind):
     k = kind[0]
+    if k == "charging_base":
+        return charging_base()
+    if k == "charging_coil":
+        return charging_coil(kind[1], kind[2])
+    if k == "charging_capacitor":
+        return charging_capacitor()
     if k == "obj":
         return obj_model(kind[1], kind[2])
     if k == "glow_stick":
@@ -478,6 +650,19 @@ def block_model(name, kind):
         return {"parent": "minecraft:block/leaves", "textures": {"all": tex(kind[1])}, "render_type": "minecraft:cutout_mipped"}
     if k == "cross":
         return {"parent": "minecraft:block/cross", "textures": {"cross": tex(kind[1])}, "render_type": "minecraft:cutout"}
+    if k == "pillar":
+        x0, y0, z0, x1, y1, z1 = kind[3]
+        sides = {d: {"texture": "#side", "uv": [0, 0, 16, 16]} for d in ["north", "south", "east", "west"]}
+        ends = {"up": {"texture": "#end", "uv": [x0, z0, x1, z1]}, "down": {"texture": "#bottom", "uv": [x0, z0, x1, z1]}}
+        bottom = kind[4] if len(kind) > 4 else kind[2]
+        return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+                "textures": {"particle": tex(kind[2]), "side": tex(kind[1]), "end": tex(kind[2]), "bottom": tex(bottom)},
+                "elements": [{"from": [x0, y0, z0], "to": [x1, y1, z1], "faces": {**sides, **ends}}]}
+    if k == "windowed":
+        return {"parent": "minecraft:block/cube_bottom_top", "render_type": "minecraft:cutout",
+                "textures": {"side": tex(kind[1]), "top": tex(kind[2]), "bottom": tex(kind[3]), "particle": tex(kind[4])}}
+    if k == "cube_bottom_top":
+        return {"parent": "minecraft:block/cube_bottom_top", "textures": {"side": tex(kind[1]), "top": tex(kind[2]), "bottom": tex(kind[3])}}
     if k == "box":
         return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
                 "textures": {"particle": tex(kind[1]), "all": tex(kind[1])}, "elements": [element(b) for b in kind[2:]]}
@@ -519,6 +704,7 @@ ITEM_TINTS = {
     "crystal_cluster": 0xFF73E6FF,
     "power_conduit_crystal": 0xFF33CCFF,
     "conduit": 0xFFFFB040,
+    "computation_conduit_crystal": 0xFF66FF99,
 }
 
 
@@ -559,6 +745,12 @@ TECH_LEVELS = {
     "dimensional": (5000, "minecraft:ender_eye"),
 }
 TECH_UNLOCKED_BY_DEFAULT = {"macroscopic_structures"}
+# Placeholder items to hand in at an Archive (ItszuLib DECISIONS D13 addendum) and rewards, to try the mechanism.
+TECH_EXTRAS = {
+    "scientific_theory": {"items": [("minecraft:book", 1), ("minecraft:paper", 8)], "rewards": [(f"{NS}:codex", 1)]},
+    "algorithms": {"items": [(f"{NS}:micro_logic_core", 1)], "rewards": [(f"{NS}:micro_logic_core", 2)]},
+    "mechanical_precision": {"items": [("minecraft:piston", 2)], "rewards": [(f"{NS}:frame", 4)]},
+}
 
 
 def technologies(lang):
@@ -573,6 +765,11 @@ def technologies(lang):
         obj = {"tree": TECH_TREE, "prerequisites": [f"{NS}:{p}" for p in t["prerequisites"]], "cost": cost, "icon": icon}
         if t["id"] in TECH_UNLOCKED_BY_DEFAULT:
             obj["unlocked_by_default"] = True
+        extras = TECH_EXTRAS.get(t["id"], {})
+        if extras.get("items"):
+            obj["items"] = [{"ingredient": item, "count": n} for item, n in extras["items"]]
+        if extras.get("rewards"):
+            obj["rewards"] = [{"id": item, "count": n} for item, n in extras["rewards"]]
         write(os.path.join(folder, f"{t['id']}.json"), obj)
         lang[f"technology.{NS}.{t['id']}"] = t["name"]
         lang[f"technology.{NS}.{t['id']}.desc"] = t["description"]

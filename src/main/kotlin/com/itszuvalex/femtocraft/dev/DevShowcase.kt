@@ -64,12 +64,30 @@ object DevShowcase {
         Vec3(16.5, 2.5, 3.0) to Vec3(16.5, 0.5, 6.5),
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
+        Vec3(17.5, 3.0, -2.5) to Vec3(17.5, 1.5, 1.0),
+        Vec3(12.5, 2.5, 4.0) to Vec3(12.5, 0.5, 7.0),
+        Vec3(13.0, 3.0, 2.5) to Vec3(14.5, 1.0, 6.5),
+        Vec3(16.0, 3.5, 1.0) to Vec3(19.5, 3.0, 7.5),
+        Vec3(23.5, 3.0, -3.5) to Vec3(23.5, 1.5, 1.5),
+        Vec3(27.0, 5.0, -7.0) to Vec3(27.0, 1.5, 1.5),
+        Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
+        Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
+        Vec3(10.5, 2.5, -1.0) to Vec3(10.5, 0.5, 2.0),
     )
 
     private const val FRAMES_VIEW = 9
     private const val SIDE_CONFIG_VIEW = 10
     private const val CODEX_VIEW = 11
     private const val MACHINE_VIEW = 12
+    private const val MULTIBLOCK_VIEW = 13
+    private const val COMPUTATION_VIEW = 14
+    private val MAINFRAME = BlockPos(11, 0, 7)
+    private const val LIGHTNING_VIEW = 16
+    private const val VAULT_VIEW = 17
+    private const val CONDUIT_VIEW = 21
+    private val ITEM_VAULT = BlockPos(22, 0, 0)
+    private val POLE = BlockPos(19, 0, 7)
+    private val CHAMBER = BlockPos(17, 0, 0)
     private val FURNACE = BlockPos(9, 2, -7)
     private const val MENU_DELAY = 40
     private val LIQUIFIER = BlockPos(16, 0, 6)
@@ -131,6 +149,51 @@ object DevShowcase {
         }
         // ...and closes it again, so the furnace itself shows in the world (its colour layer behind the base texture).
         if (view == MACHINE_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY + 120) p.closeContainer()
+        // The multiblock view opens the germination chamber's screen: its side configuration panel shows the whole
+        // structure, with two outer faces of different members configured.
+        if (view == MULTIBLOCK_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            for ((offset, face) in listOf(BlockPos.ZERO to net.minecraft.core.Direction.NORTH, BlockPos(1, 2, 1) to net.minecraft.core.Direction.UP)) {
+                val member = level.getBlockEntity(BASE.offset(CHAMBER).offset(offset)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity
+                member?.getModule(com.itszuvalex.itszulib.api.Modules.ITEM_STORAGE_CONFIGURABLE, null)
+                    ?.let { com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, face, false) }
+                (member as? com.itszuvalex.itszulib.core.BlockEntityCore)?.markDirtyAndSync()
+            }
+            (level.getBlockEntity(BASE.offset(CHAMBER)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The computation view opens the mainframe's screen (it computes for the logistics conduit beside it).
+        // The next view closes it again to show the blocks (and the cryo-endothermal stack beside them).
+        if (view == COMPUTATION_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        if (view == COMPUTATION_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The vault view opens the item vault's terminal; the next shows the three vaults.
+        if (view == VAULT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            p.closeContainer()
+            (level.getBlockEntity(BASE.offset(ITEM_VAULT)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        if (view == VAULT_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        // ...then the fluid reservoir's screen.
+        if (view == VAULT_VIEW + 3 && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The conduit view opens a logistics conduit holding filtered chips.
+        if (view == CONDUIT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        if (view == CONDUIT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            (level.getBlockEntity(BASE.offset(10, 0, 2)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
+                ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // The lightning view strikes the atmospheric pole every half second (harmless bolts on the capacitor's top).
+        if (view == LIGHTNING_VIEW && (ticks - BUILD_AT) % 10 == 5) {
+            (level.getBlockEntity(BASE.offset(POLE)) as? com.itszuvalex.femtocraft.power.AtmosphericChargingBaseBlockEntity)?.let { pole ->
+                pole.capacitorPos()?.let { pole.strike(level, it) }
+            }
+        }
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
@@ -186,7 +249,7 @@ object DevShowcase {
 
     private fun build(level: ServerLevel) {
         fun set(x: Int, y: Int, z: Int, block: Block) = level.setBlockAndUpdate(BASE.offset(x, y, z), block.defaultBlockState())
-        for (x in -3..20) for (z in -3..8) {
+        for (x in -3..34) for (z in -3..8) {
             set(x, -1, z, Blocks.SMOOTH_STONE)
             for (y in 0..8) set(x, y, z, Blocks.AIR)
         }
@@ -218,6 +281,7 @@ object DevShowcase {
         // A frame structure that keeps building (nanite particles; [tick] holds its progress at 0).
         FrameItem.place(level, BASE.offset(10, 0, 5), FrameMultiblocks.GERMINATION_CHAMBER)
         building()?.building = true
+        (level.getBlockEntity(BASE.offset(10, 0, 5)) as? com.itszuvalex.femtocraft.industry.FrameBlockEntity)?.markDirtyAndSync()
         // A crystal liquifier between a logistics conduit and a chest, under a block, with its top set to pull items
         // in and its east face to push fluid out.
         level.setBlockAndUpdate(BASE.offset(LIQUIFIER), com.itszuvalex.femtocraft.industry.IndustryContent.CRYSTAL_LIQUIFIER.get().defaultBlockState()
@@ -232,5 +296,65 @@ object DevShowcase {
             com.itszuvalex.femtocraft.industry.ConfiguratorItem.cycle(it, net.minecraft.core.Direction.WEST, false)
         }
         (liquifier as? com.itszuvalex.itszulib.core.BlockEntityCore)?.markDirtyAndSync()
+        // Computation: a mainframe with two Micro Logic Cores and ice beside it, a computation conduit to an Archive
+        // Interface and a logistics conduit.
+        val computation = com.itszuvalex.femtocraft.computation.ComputationContent
+        level.setBlockAndUpdate(BASE.offset(MAINFRAME), computation.MAINFRAME.get().defaultBlockState()
+            .setValue(com.itszuvalex.itszulib.core.HorizontalFacing.FACING, net.minecraft.core.Direction.NORTH))
+        (level.getBlockEntity(BASE.offset(MAINFRAME)) as? com.itszuvalex.femtocraft.computation.MainframeBlockEntity)?.let { mf ->
+            repeat(2) { mf.processors.setSlot(it, IItemStack.of(net.minecraft.world.item.ItemStack(computation.MICRO_LOGIC_CORE.get()))) }
+            mf.battery.setStorage(com.itszuvalex.femtocraft.computation.MainframeBlockEntity.BATTERY_SIZE)
+        }
+        set(MAINFRAME.x - 1, 0, MAINFRAME.z, Blocks.PACKED_ICE)
+        for (x in MAINFRAME.x + 1..MAINFRAME.x + 2) set(x, 0, MAINFRAME.z, computation.COMPUTATION_CONDUIT.get())
+        set(MAINFRAME.x + 2, 1, MAINFRAME.z, computation.COMPUTATION_CONDUIT.get())
+        set(MAINFRAME.x + 3, 0, MAINFRAME.z, computation.ARCHIVE_INTERFACE.get())
+        set(MAINFRAME.x + 2, 0, MAINFRAME.z + 1, LogisticsContent.CONDUIT.get())
+        // The alpha's cryo-endothermal charging base on two coils, ice beside the lower one, water in reach.
+        set(15, 0, 5, PowerContent.CRYO_COIL.get())
+        set(15, 1, 5, PowerContent.CRYO_COIL.get())
+        set(15, 2, 5, PowerContent.CRYO_BASE.get())
+        set(16, 0, 5, Blocks.ICE)
+        set(15, 0, 4, Blocks.PACKED_ICE)
+        set(16, 0, 4, Blocks.WATER)
+        // The alpha's atmospheric charging pole: a base, three coils and a capacitor.
+        set(POLE.x, 0, POLE.z, PowerContent.ATMOSPHERIC_BASE.get())
+        for (y in 1..3) set(POLE.x, y, POLE.z, PowerContent.ATMOSPHERIC_COIL.get())
+        set(POLE.x, 4, POLE.z, PowerContent.ATMOSPHERIC_CAPACITOR.get())
+        // Filtered chips in the first logistics conduit: items (diamonds, iron, redstone) and fluids (water, lava).
+        (level.getBlockEntity(BASE.offset(10, 0, 2)) as? com.itszuvalex.femtocraft.logistics.ConduitBlockEntity)?.let { conduit ->
+            val up = net.minecraft.core.Direction.UP
+            val item = com.itszuvalex.femtocraft.logistics.ItemChipKind
+            val fluid = com.itszuvalex.femtocraft.logistics.FluidChipKind
+            val itemChip = net.minecraft.world.item.ItemStack(LogisticsContent.ITEM_CHIP.get()).also { st ->
+                st.set(item.component, item.defaults(up).with(filter = com.itszuvalex.itszulib.api.filter.ResourceFilter(item.filterKind, com.itszuvalex.femtocraft.logistics.ChipKind.FILTER_SLOTS,
+                    listOf(net.minecraft.world.item.Items.DIAMOND, net.minecraft.world.item.Items.IRON_INGOT, net.minecraft.world.item.Items.REDSTONE).map { net.minecraft.world.item.ItemStack(it) })))
+            }
+            val fluidChip = net.minecraft.world.item.ItemStack(LogisticsContent.FLUID_CHIP.get()).also { st ->
+                st.set(fluid.component, fluid.defaults(up).with(filter = com.itszuvalex.itszulib.api.filter.ResourceFilter(fluid.filterKind, com.itszuvalex.femtocraft.logistics.ChipKind.FILTER_SLOTS,
+                    listOf(net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.LAVA).map { net.neoforged.neoforge.fluids.FluidStack(it, 1) }, com.itszuvalex.itszulib.api.filter.FilterMode.DENY)))
+            }
+            conduit.conduit.chips[up.get3DDataValue()].setSlot(0, IItemStack.of(itemChip))
+            conduit.conduit.chips[up.get3DDataValue()].setSlot(1, IItemStack.of(fluidChip))
+        }
+        // The storage multiblocks; the item vault holds a little of many items (more than a terminal page).
+        FrameMultiblocks.ITEM_VAULT.formAt(level, BASE.offset(ITEM_VAULT))
+        FrameMultiblocks.FLUID_RESERVOIR.formAt(level, BASE.offset(ITEM_VAULT).offset(4, 0, 0))
+        FrameMultiblocks.NANITE_VAULT.formAt(level, BASE.offset(ITEM_VAULT).offset(8, 0, 0))
+        // The reservoir: tank 2 locked to lava, cells 3 and 4 linked into one tank, then water, lava and slurry poured in.
+        (level.getBlockEntity(BASE.offset(ITEM_VAULT).offset(4, 0, 0)) as? com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity)?.state()?.let { res ->
+            res.toggleLock(1, net.minecraft.core.registries.BuiltInRegistries.FLUID.getKey(net.minecraft.world.level.material.Fluids.LAVA))
+            res.toggleLink(2)
+            val cap = com.itszuvalex.femtocraft.logistics.FluidReservoirState.CAPACITY
+            listOf(net.minecraft.world.level.material.Fluids.WATER to cap * 3 / 4, net.minecraft.world.level.material.Fluids.LAVA to cap / 3,
+                com.itszuvalex.femtocraft.industry.FemtoFluids.GRITTY_SLURRY.get() to cap * 3 / 2)
+                .forEach { (fluid, amount) -> res.tanks.fill(com.itszuvalex.itszulib.api.adapters.IFluidStack.of(net.neoforged.neoforge.fluids.FluidStack(fluid, amount)), true) }
+        }
+        (level.getBlockEntity(BASE.offset(ITEM_VAULT)) as? com.itszuvalex.femtocraft.logistics.ItemVaultBlockEntity)?.state()?.storage?.let { vault ->
+            net.minecraft.core.registries.BuiltInRegistries.ITEM.stream().filter { it != net.minecraft.world.item.Items.AIR }.limit(80).toList().forEachIndexed { i, item ->
+                vault.insert(IItemStack.of(net.minecraft.world.item.ItemStack(item, minOf(item.defaultMaxStackSize, 1 + (i * 37) % 64))))
+                if (i % 7 == 0) repeat(4) { vault.insert(IItemStack.of(net.minecraft.world.item.ItemStack(item, item.defaultMaxStackSize))) }
+            }
+        }
     }
 }

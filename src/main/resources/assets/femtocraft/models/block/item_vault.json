@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "femtocraft:block/blockitemrepository_side",
+    "top": "femtocraft:block/blockitemrepository_top",
+    "bottom": "femtocraft:block/blockitemrepository_top"
+  }
+}

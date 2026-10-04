@@ -19,21 +19,28 @@ import java.util.function.Consumer
 
 /**
  * Femtocraft game tests, run with `./gradlew runGameTestServer`. Tests run in `femtocraft:test_area`, an empty
- * 9x5x9 structure, so multi-block setups fit.
+ * 9x5x9 structure, so multi-block setups fit, or in [TALL] (9x14x9) for tall ones.
  */
 object DevGameTests {
     private val TEST_FUNCTIONS: DeferredRegister<Consumer<GameTestHelper>> =
         DeferredRegister.create(Registries.TEST_FUNCTION, Femtocraft.ID)
 
-    private val TESTS = mutableListOf<Pair<DeferredHolder<Consumer<GameTestHelper>, Consumer<GameTestHelper>>, Int>>()
+    private val TESTS = mutableListOf<Triple<DeferredHolder<Consumer<GameTestHelper>, Consumer<GameTestHelper>>, Int, Identifier>>()
 
     private val AREA = Identifier.fromNamespaceAndPath(Femtocraft.ID, "test_area")
 
+    /** An empty 9x14x9 test structure, for setups taller than [AREA]. */
+    @JvmField
+    val TALL: Identifier = Identifier.fromNamespaceAndPath(Femtocraft.ID, "test_area_tall")
+
     /**
      * @param maxTicks Timeout for tests that wait (`succeedWhen`).
+     * @param structure The structure the test runs in.
      */
-    fun test(name: String, maxTicks: Int = 100, body: (GameTestHelper) -> Unit) {
-        TESTS += TEST_FUNCTIONS.register(name) { -> Consumer<GameTestHelper> { body(it) } } to maxTicks
+    fun test(name: String, maxTicks: Int = 100, body: (GameTestHelper) -> Unit) = test(name, maxTicks, AREA, body)
+
+    fun test(name: String, maxTicks: Int, structure: Identifier, body: (GameTestHelper) -> Unit) {
+        TESTS += Triple(TEST_FUNCTIONS.register(name) { -> Consumer<GameTestHelper> { body(it) } }, maxTicks, structure)
     }
 
     init {
@@ -47,6 +54,8 @@ object DevGameTests {
         LogisticsGameTests.register()
         CyberGameTests.register()
         ArchiveGameTests.register()
+        ComputationGameTests.register()
+        VaultGameTests.register()
     }
 
     fun register(modBus: IEventBus) {
@@ -56,10 +65,10 @@ object DevGameTests {
 
     private fun registerTests(event: RegisterGameTestsEvent) {
         val environment = event.registerEnvironment(Identifier.fromNamespaceAndPath(Femtocraft.ID, "default"))
-        TESTS.forEach { (test, maxTicks) ->
+        TESTS.forEach { (test, maxTicks, structure) ->
             event.registerTest(
                 test.id,
-                FunctionGameTestInstance(test.key, TestData(environment, AREA, maxTicks, 0, true, Rotation.NONE, false, 1, 1, false, 2)),
+                FunctionGameTestInstance(test.key, TestData(environment, structure, maxTicks, 0, true, Rotation.NONE, false, 1, 1, false, 2)),
             )
         }
     }

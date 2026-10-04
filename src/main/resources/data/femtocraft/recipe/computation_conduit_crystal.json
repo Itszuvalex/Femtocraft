@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "RCR",
+    "SSS"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "R": "femtocraft:redstonereplacement_dust",
+    "C": "femtocraft:basic_circuit"
+  },
+  "result": {
+    "id": "femtocraft:computation_conduit_crystal",
+    "count": 6
+  }
+}

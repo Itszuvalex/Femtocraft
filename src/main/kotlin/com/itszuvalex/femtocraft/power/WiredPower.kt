@@ -1,23 +1,13 @@
 package com.itszuvalex.femtocraft.power
 
-import com.itszuvalex.itszulib.api.Modules
-import com.itszuvalex.itszulib.api.adapters.IBlockEntity
-import com.itszuvalex.itszulib.api.adapters.ILevel
+import com.itszuvalex.femtocraft.core.LeafConduit
 import com.itszuvalex.itszulib.api.adapters.IModule
-import com.itszuvalex.itszulib.api.utility.NBTSerializationScope
 import com.itszuvalex.itszulib.core.DistributableBattery
 import com.itszuvalex.itszulib.core.DistributingTileNetwork
 import com.itszuvalex.itszulib.core.DistributionParticipant
 import com.itszuvalex.itszulib.core.DistributionRole
 import com.itszuvalex.itszulib.core.IDistributionNode
-import com.itszuvalex.itszulib.core.frag.FragNetworkedWire
-import com.itszuvalex.itszulib.util.FaceBitSet
-import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.storage.ValueInput
-import net.minecraft.world.level.storage.ValueOutput
 import net.neoforged.fml.LogicalSide
 
 /**
@@ -45,40 +35,25 @@ class WiredPowerNetwork(id: Int) : DistributingTileNetwork<WiredPowerConduit, Wi
 }
 
 /**
- * A power conduit: joins neighbouring conduits of the same [tier] into a [WiredPowerNetwork] (ItszuLib's
- * `FragNetworkedWire`) and attaches to wired leaves on its other faces. Port of v3's `ModulePowerConduitCrystal`.
- *
- * Faces attached to a leaf are saved and synced (key `Leaf`) for the conduit's model.
+ * A power conduit: joins neighbouring conduits of the same [tier] into a [WiredPowerNetwork] and attaches to wired
+ * leaves on its other faces ([LeafConduit]). Port of v3's `ModulePowerConduitCrystal`.
  */
 class WiredPowerConduit(val tier: ConduitTier) :
-    FragNetworkedWire<WiredPowerConduit, WiredPowerNetwork>({ WiredPowerNetwork(WirelessPowerNetwork.nextId()) }), IDistributionNode {
-    @JvmField
-    val leafFaces = FaceBitSet()
-
-    private var lvl: Level? = null
-
+    LeafConduit<WiredPowerConduit, WiredPowerNetwork, IWiredPowerLeafNode>({ WiredPowerNetwork(WirelessPowerNetwork.nextId()) }), IDistributionNode {
     override fun module(): IModule<WiredPowerConduit> = PowerModules.WIRED_CONDUIT
+
+    override fun leafModule(): IModule<IWiredPowerLeafNode> = PowerModules.WIRED_LEAF
 
     override fun shouldConnect(face: Direction, other: WiredPowerConduit): Boolean = other.tier == tier
 
-    /**
-     * The leaf on [face], if its chunk is loaded.
-     */
-    fun leafAt(face: Direction): IBlockEntity? {
-        val level = lvl ?: return null
-        val at = (host?.blockEntity()?.getBlockPos() ?: return null).relative(face)
-        if (!level.isLoaded(at)) return null
-        return level.getBlockEntity(at)?.let(IBlockEntity::of)
+    override fun canAttach(leaf: IWiredPowerLeafNode, face: Direction): Boolean = leaf.canConnectWiredPower(face)
+
+    override fun attach(leaf: IWiredPowerLeafNode, face: Direction) {
+        leaf.connectWiredPower(face)
     }
 
-    /**
-     * Leaves on attached faces, keyed by their multiblock structure (or position).
-     */
-    fun attachedLeaves(): List<Pair<Any, IWiredPowerLeafNode>> = leafFaces.faces().mapNotNull { face ->
-        val be = leafAt(face) ?: return@mapNotNull null
-        val leaf = be.getModule(PowerModules.WIRED_LEAF, face.opposite) ?: return@mapNotNull null
-        val key: Any = be.getModule(Modules.MULTIBLOCK_MEMBER, null)?.membership?.structureId ?: be.getBlockPos()
-        key to leaf
+    override fun detach(leaf: IWiredPowerLeafNode, face: Direction) {
+        leaf.disconnectWiredPower(face)
     }
 
     override fun distributionParticipants(): Sequence<DistributionParticipant> = attachedLeaves().asSequence().mapNotNull { (key, leaf) ->
@@ -89,58 +64,5 @@ class WiredPowerConduit(val tier: ConduitTier) :
             PowerStorageNodeType.NONE -> return@mapNotNull null
         }
         DistributionParticipant(key, role, DistributableBattery(leaf.battery, leaf::transferRate))
-    }
-
-    /**
-     * Attaches to willing leaves and detaches from faces whose leaf is gone. Faces towards unloaded chunks keep their
-     * state.
-     */
-    fun refreshLeaves() {
-        val level = lvl ?: return
-        if (level.isClientSide) return
-        val pos = host?.blockEntity()?.getBlockPos() ?: return
-        var changed = false
-        for (face in Direction.entries) {
-            if (!level.isLoaded(pos.relative(face))) continue
-            val leaf = leafAt(face)?.getModule(PowerModules.WIRED_LEAF, face.opposite)
-            val attach = !isBlocked(face) && leaf != null && leaf.canConnectWiredPower(face.opposite)
-            if (attach) leaf!!.connectWiredPower(face.opposite)
-            if (leafFaces[face] != attach) {
-                leafFaces[face] = attach
-                changed = true
-            }
-        }
-        if (changed) markDirtyAndSync()
-    }
-
-    override fun onLoad(level: ILevel, pos: BlockPos) {
-        lvl = level.toMinecraft()
-        super.onLoad(level, pos)
-        refreshLeaves()
-    }
-
-    override fun onNeighborChanged(level: ILevel, pos: BlockPos) {
-        lvl = level.toMinecraft()
-        super.onNeighborChanged(level, pos)
-        refreshLeaves()
-    }
-
-    override fun onRemove(level: ILevel, pos: BlockPos, blockStatePrev: BlockState) {
-        for (face in leafFaces.faces()) leafAt(face)?.getModule(PowerModules.WIRED_LEAF, face.opposite)?.disconnectWiredPower(face.opposite)
-        super.onRemove(level, pos, blockStatePrev)
-    }
-
-    override fun serializeTo(scope: NBTSerializationScope, output: ValueOutput) {
-        super.serializeTo(scope, output)
-        output.putInt(LEAF_KEY, leafFaces.bits)
-    }
-
-    override fun deserialize(input: ValueInput, scope: NBTSerializationScope) {
-        super.deserialize(input, scope)
-        leafFaces.load(input.getIntOr(LEAF_KEY, 0))
-    }
-
-    companion object {
-        const val LEAF_KEY = "Leaf"
     }
 }

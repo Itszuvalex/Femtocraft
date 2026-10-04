@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "femtocraft:block/mainframe"
+    },
+    "facing=east": {
+      "model": "femtocraft:block/mainframe",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "femtocraft:block/mainframe",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "femtocraft:block/mainframe",
+      "y": 270
+    }
+  }
+}

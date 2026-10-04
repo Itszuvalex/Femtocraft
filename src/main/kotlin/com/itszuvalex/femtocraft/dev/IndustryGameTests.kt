@@ -62,7 +62,9 @@ object IndustryGameTests {
         DevGameTests.test("side_config_panel_action_cycles_face", body = ::sideConfigAction)
         DevGameTests.test("frame_builds_germination_chamber", 400, ::frameBuilds)
         DevGameTests.test("frame_ignores_wrong_items", 200, ::frameWrongItems)
-        DevGameTests.test("frame_menu_lists_what_the_multiblock_needs", body = ::frameRequirements)
+        DevGameTests.test("frame_slots_take_only_what_is_needed", body = ::frameRequirements)
+        DevGameTests.test("frame_takes_needed_items_used_on_it", body = ::frameUseInserts)
+        DevGameTests.test("frame_slot_clicks_fill_up_to_the_need", body = ::frameSlotClicks)
         DevGameTests.test("frame_teardown_drops_frames", body = ::frameTeardown)
         DevGameTests.test("germination_chamber_grows_seeds", 200, ::germinationGrows)
         DevGameTests.test("germination_chamber_output_full_keeps_harvest", 200, ::germinationOutputFull)
@@ -207,7 +209,8 @@ object IndustryGameTests {
     private fun frameBuilds(helper: GameTestHelper) {
         val controller = placeFrame(helper, FrameMultiblocks.GERMINATION_CHAMBER)
         helper.assertTrue(controller.part.isHome, "frame structure formed, anchored here")
-        controller.storage.setSlot(0, IItemStack.of(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 10)))
+        val held = ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 12)
+        helper.assertValueEqual(controller.frameState()!!.insert(held), 10, "takes the ten it needs")
         helper.succeedWhen {
             for (loc in FrameMultiblocks.GERMINATION_CHAMBER.takenLocations(FRAME_AT)) {
                 helper.assertBlockPresent(IndustryContent.GERMINATION_CHAMBER.get(), loc)
@@ -222,14 +225,17 @@ object IndustryGameTests {
     }
 
     /**
-     * v3's StorageUtils never compared items, so any ten items started the build.
+     * v3's StorageUtils never compared items, so any ten items started the build. Each slot now takes only its item.
      */
     private fun frameWrongItems(helper: GameTestHelper) {
         val controller = placeFrame(helper, FrameMultiblocks.GERMINATION_CHAMBER)
-        controller.storage.setSlot(0, IItemStack.of(ItemStack(Items.IRON_INGOT, 10)))
-        helper.runAfterDelay(100) {
-            helper.assertFalse(controller.frameState()!!.building, "iron ingots do not start the build")
-            helper.assertValueEqual(controller.storage.get(0).stackSize(), 10, "and are not consumed")
+        val s = controller.frameState()!!
+        helper.assertValueEqual(s.insert(ItemStack(Items.IRON_INGOT, 10)), 0, "iron ingots are not taken")
+        helper.assertFalse(controller.storage.canInsert(0, IItemStack.of(ItemStack(Items.IRON_INGOT))), "nor fit the slot")
+        s.insert(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 9))
+        helper.runAfterDelay(40) {
+            helper.assertFalse(s.building, "nine of ten do not start the build")
+            helper.assertValueEqual(s.have(0), 9, "and stay in the frame")
             helper.succeed()
         }
     }
@@ -380,13 +386,64 @@ object IndustryGameTests {
         helper.succeed()
     }
 
+    /**
+     * One slot per requirement, each taking only its item up to the amount needed, and giving nothing back.
+     */
     private fun frameRequirements(helper: GameTestHelper) {
         val frame = placeFrame(helper, com.itszuvalex.femtocraft.archive.ArchiveContent.MULTIBLOCK)
-        frame.storage.setSlot(0, IItemStack.of(ItemStack(IndustryContent.CRACKLING_DUST.get(), 3)))
+        val dust = IndustryContent.CRACKLING_DUST.get()
+        helper.assertValueEqual(frame.frameState()!!.insert(ItemStack(dust, 3)), 3, "takes some dust")
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
-        val needs = com.itszuvalex.femtocraft.industry.FrameMenu(1, player.inventory, frame).requirements()
-        helper.assertValueEqual(needs.map { it.first.item to it.first.count }, listOf(IndustryContent.CRACKLING_DUST.get() to 8, Items.GLASS to 9), "needed")
-        helper.assertValueEqual(needs.map { it.second }, listOf(3, 0), "held")
+        val menu = com.itszuvalex.femtocraft.industry.FrameMenu(1, player.inventory, frame)
+        helper.assertValueEqual(menu.needs.map { it.item to it.count }, listOf(dust to 8, Items.GLASS to 9), "a slot per requirement")
+        val slot = menu.slots[0] as com.itszuvalex.itszulib.menu.RequirementSlot
+        helper.assertValueEqual(slot.item.count, 3, "holds what was put in")
+        helper.assertFalse(slot.mayPickup(player), "nothing comes back out")
+        helper.assertFalse(slot.mayPlace(ItemStack(Items.GLASS)), "the dust slot takes no glass")
+        helper.assertValueEqual(slot.getMaxStackSize(ItemStack(dust)), 8, "and only as much dust as needed")
+        helper.assertValueEqual(frame.frameState()!!.insert(ItemStack(dust, 20)), 5, "the rest of the dust")
+        helper.succeed()
+    }
+
+    /**
+     * Clicking a requirement slot with a stack puts in as much as it needs, and clicking again tops it up.
+     */
+    private fun frameSlotClicks(helper: GameTestHelper) {
+        val frame = placeFrame(helper, com.itszuvalex.femtocraft.archive.ArchiveContent.MULTIBLOCK)
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        val menu = com.itszuvalex.femtocraft.industry.FrameMenu(1, player.inventory, frame)
+        val glass = 1
+        menu.setCarried(ItemStack(Items.GLASS, 48))
+        menu.clicked(glass, 1, net.minecraft.world.inventory.ContainerInput.PICKUP, player)
+        helper.assertValueEqual(menu.slots[glass].item.count, 1, "a right click puts one in")
+        menu.clicked(glass, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player)
+        helper.assertValueEqual(menu.slots[glass].item.count, 9, "a left click tops it up to the need")
+        helper.assertValueEqual(menu.carried.count, 39, "and keeps the rest carried")
+        menu.clicked(glass, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player)
+        helper.assertValueEqual(menu.slots[glass].item.count, 9, "a full slot takes no more")
+        menu.setCarried(ItemStack.EMPTY)
+        menu.clicked(glass, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player)
+        helper.assertTrue(menu.carried.isEmpty, "nothing comes back out")
+        val dust = 0
+        menu.setCarried(ItemStack(IndustryContent.CRACKLING_DUST.get(), 48))
+        menu.clicked(dust, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player)
+        helper.assertValueEqual(menu.slots[dust].item.count, 8, "a left click on an empty slot puts in what it needs")
+        helper.succeed()
+    }
+
+    /**
+     * Using an item the frame needs puts in as much as it needs; using one it does not need takes nothing.
+     */
+    private fun frameUseInserts(helper: GameTestHelper) {
+        val frame = placeFrame(helper, com.itszuvalex.femtocraft.archive.ArchiveContent.MULTIBLOCK)
+        val player = helper.makeMockPlayer(GameType.SURVIVAL)
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack(Items.GLASS, 12))
+        helper.useBlock(FRAME_AT, player)
+        helper.assertValueEqual(frame.frameState()!!.have(1), 9, "nine glass in")
+        helper.assertValueEqual(player.mainHandItem.count, 3, "three left in hand")
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack(Items.IRON_INGOT, 5))
+        helper.useBlock(FRAME_AT, player)
+        helper.assertValueEqual(player.mainHandItem.count, 5, "iron is not taken")
         helper.succeed()
     }
 }

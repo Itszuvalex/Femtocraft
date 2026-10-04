@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PMP",
+    "MDM",
+    "PMP"
+  ],
+  "key": {
+    "P": "femtocraft:phasemetal_ingot_devoid",
+    "M": "femtocraft:micro_logic_core",
+    "D": "femtocraft:diamond_dust"
+  },
+  "result": {
+    "id": "femtocraft:orpheus_processor",
+    "count": 1
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SBS",
+    "CFC",
+    "SRS"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "B": "femtocraft:crystal_battery",
+    "C": "femtocraft:basic_circuit",
+    "F": "femtocraft:frame",
+    "R": "femtocraft:energy_regulator"
+  },
+  "result": {
+    "id": "femtocraft:cryo_endothermal_charging_base",
+    "count": 1
+  }
+}

@@ -1,7 +1,9 @@
 package com.itszuvalex.femtocraft.client
 
+import com.itszuvalex.femtocraft.core.FemtoMenu
 import com.itszuvalex.itszulib.client.screen.ComponentScreen
 import com.itszuvalex.itszulib.client.screen.EnergyGauge
+import com.itszuvalex.itszulib.client.screen.SidePanel
 import com.itszuvalex.itszulib.menu.EnergyView
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
@@ -15,13 +17,19 @@ import java.util.Locale
 /**
  * Functional screen on ItszuLib's [ComponentScreen] (DECISIONS B2): the theme's panel and slots (Femtocraft's theme,
  * `femtocraft:femtocraft`, by default), title and inventory label, the side configuration panel behind the "IO" tab
- * when the machine has a sided configuration, and helpers for power gauges, progress bars and text. v3's textured GUIs
+ * when the machine has a sided configuration, the power tab when it has power, and helpers for power gauges, progress bars and text. v3's textured GUIs
  * and widget toolkit are follow-up work.
  */
 abstract class FemtoScreen<M : AbstractContainerMenu>(menu: M, inventory: Inventory, title: Component, width: Int = 176, height: Int = 166) :
     ComponentScreen<M>(menu, inventory, title, width, height) {
 
     override fun defaultTheme(): Identifier = THEME
+
+    /**
+     * ItszuLib's (the side configuration tab), then the power tab for a block with power ([PowerTab]).
+     */
+    override fun defaultPanels(): List<SidePanel> =
+        super.defaultPanels() + listOfNotNull((menu as? FemtoMenu<*>)?.power?.let(PowerTab::panel))
 
     override fun extractPanel(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         super.extractPanel(graphics, mouseX, mouseY)
@@ -36,8 +44,10 @@ abstract class FemtoScreen<M : AbstractContainerMenu>(menu: M, inventory: Invent
     /**
      * Adds a vertical power gauge (v3's `GuiPowerMeter`) at ([x], [y]) in the image, over a synced battery.
      */
-    protected fun addPowerGauge(x: Int, y: Int, view: () -> EnergyView) =
-        addComponent(EnergyGauge(view, Component.translatable("gui.femtocraft.power_unit"), POWER, METER_W, METER_H), x, y)
+    protected fun addPowerGauge(x: Int, y: Int, view: () -> EnergyView) = addComponent(powerGauge(view), x, y)
+
+    /** A power gauge for a layout ([com.itszuvalex.itszulib.client.screen.Row] and the like). */
+    protected fun powerGauge(view: () -> EnergyView) = EnergyGauge(view, Component.translatable("gui.femtocraft.power_unit"), POWER, METER_W, METER_H)
 
     /**
      * A horizontal progress bar filled to [fraction].

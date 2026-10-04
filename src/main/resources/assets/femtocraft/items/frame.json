@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "femtocraft:block/frame"
+    "model": "femtocraft:block/frame_full"
   }
 }

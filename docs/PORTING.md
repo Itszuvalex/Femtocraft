@@ -57,13 +57,13 @@ fresh on ItszuLib fragments when it is designed; machine recipes move to datapac
   synthesizer (recipe registries only).
 - Logistics: item vault, fluid reservoir.
 - Nanites: nanite hive, holding tank, behavior modeller.
-- Computation: archive interface, mainframe, information conduit.
+- Computation: information conduit (the archive interface and mainframe are built, DECISIONS D19).
 
 ## Not ported
 
 DECISIONS D4 and D5 give the reasoning.
 
-- **Computation** (`api/computation/*`, `computation/*`, `common/ComputationLimitedBatteryTask`, the computation
+- **Computation** as v3 wrote it (`api/computation/*`, `computation/*`, `common/ComputationLimitedBatteryTask`, the computation
   modules): unfinished; its tiles are stubs and its dummy capability implementations are all `???`.
 - **Tech tree** (`tech/*`): a skeleton with no content or consumer.
 - **Logistics test blocks** (`logistics/test/*`, `BlockTest`): debug content. The job/task system and indexed
@@ -107,6 +107,8 @@ DECISIONS D4 and D5 give the reasoning.
 - [x] All v3 Scala/Java removed; what was not ported is listed above.
 - [x] After the port (new, not from v3): research on ItszuLib's tech trees, the Archive multiblock, the player as a
   host of tier 0 Archive nanites, and the alpha's technologies as a placeholder tree (DECISIONS D15); 5 game tests.
+- [x] Storage multiblocks: item vault (indexed, with a searchable paged terminal), fluid reservoir, nanite vault
+  (DECISIONS D23); 4 game tests.
 - [x] The Archive Codex, host status on the HUD, nanite flow from host to Archive, conduit power particles; power
   distribution moved onto ItszuLib's `DistributingTileNetwork` (DECISIONS D16); 2 game tests.
 
@@ -187,11 +189,20 @@ pulled out around it, faces shaded by automatic IO (blue pulls in, orange pushes
 face's direction, IO and storage, click a face or its neighbour to cycle it (shift cycles backwards), and a button to
 switch mode. Power meters are ItszuLib `EnergyGauge`s (`FemtoScreen.addPowerGauge`) over `MenuCore.syncEnergy`.
 `-Pshowcase=10` opens a crystal liquifier's screen, with its panel, between a conduit, a chest and blocks (checked
-headless; hovering, dragging and clicking were not, since the headless client has no mouse input).
+headless; hovering, dragging and clicking were not, since the headless client has no mouse input). `-Pshowcase=13` opens the germination
+chamber's screen with the panel showing the whole structure, two members' faces configured (checked headless).
+`-Pshowcase=16` strikes an atmospheric charging pole with lightning every half second. `-Pshowcase=15` shows the cryo-endothermal charging base on two coils beside them. `-Pshowcase=14` builds a mainframe (two Micro Logic Cores, packed ice beside it) on computation conduits to an
+Archive Interface and a logistics conduit, and opens its screen (checked headless).
 
-Known limits: block tints are baked into the chunk mesh, so a block entity colour that changes later (a conduit's or
-chamber's derived colour) shows after the next re-render of its section; the chamber model is lit by its home block
-only; the frame's machine-in-progress preview is not drawn.
+**Pass 8 (started): the frame's build preview and tint refresh.** While a frame structure builds, its home frame draws
+the machine it will become inside the frames: the machine's block models, translucent and full bright, fading in with
+progress and shimmering (`FemtoRenderers.FrameRenderer`; the home frame syncs `building` and progress every second and
+clients advance it between syncs). Block tints are baked into the chunk mesh, so a colour worked out from synced data
+(a conduit's or chamber's derived colour) used to show only at the section's next rebuild; `FemtoBlockEntity` now
+checks its colour twice a second on the client and asks for a rebuild when it changed. `-Pshowcase=7` shows a
+germination chamber taking shape in its frames (checked headless).
+
+Known limits: the chamber model is lit by its home block only.
 
 **After the port: research visuals** (DECISIONS D16). Power conduits give off power particles in their tier's colour,
 as the 1.7.10 alpha's cables did; Archive nanites stream from a host to the Archive while it draws them; hosts have a
@@ -200,6 +211,8 @@ status line at the top left of the HUD. Not yet checked in a client.
 **Next passes:**
 
 - Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
-- The frame's machine-in-progress preview (a model ghost); germination chamber growth (already commented out in v3).
+- Germination chamber growth (already commented out in v3). Still to check in a client: the research visuals below;
+  placeholder looks to replace: the mainframe's and Archive Interface's fronts, the atmospheric base (the alpha drew
+  it with insets and a pillar on top).
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.
