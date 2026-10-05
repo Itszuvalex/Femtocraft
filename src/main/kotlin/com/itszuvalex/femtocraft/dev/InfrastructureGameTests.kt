@@ -2,6 +2,8 @@ package com.itszuvalex.femtocraft.dev
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblocks
 import com.itszuvalex.femtocraft.logistics.ChipData
+import com.itszuvalex.femtocraft.logistics.ItemRepositoryBlockEntity
+import com.itszuvalex.femtocraft.logistics.LogisticsContent
 import com.itszuvalex.femtocraft.logistics.ChipKind
 import com.itszuvalex.femtocraft.logistics.Chips
 import com.itszuvalex.femtocraft.logistics.ConnectionDirection
@@ -29,6 +31,29 @@ object InfrastructureGameTests {
     fun register() {
         DevGameTests.test("frame_requirement_slots_cover_every_requirement", body = ::frameSlots)
         DevGameTests.test("chip_data_round_trips_through_its_codec", body = ::chipCodec)
+        DevGameTests.test("repositories_keep_their_contents_and_say_what_they_hold", body = ::repositories)
+    }
+
+    private fun lines(helper: GameTestHelper, stack: ItemStack): List<String> =
+        stack.getTooltipLines(net.minecraft.world.item.Item.TooltipContext.of(helper.level), null, net.minecraft.world.item.TooltipFlag.NORMAL).map { it.string }
+
+    /** Repositories keep what they hold on the dropped item, which says how much it holds and can hold. */
+    private fun repositories(helper: GameTestHelper) {
+        val at = net.minecraft.core.BlockPos(4, 1, 4)
+        fun fresh(item: net.minecraft.world.item.Item) = lines(helper, ItemStack(item))
+        helper.assertTrue(fresh(LogisticsContent.ITEM_REPOSITORY.get().asItem()).any { "0 / 54 slots" in it }, "item repository holds 54 slots")
+        helper.assertTrue(fresh(LogisticsContent.FLUID_REPOSITORY.get().asItem()).any { "0 / 5,000 mB" in it }, "fluid repository holds 5,000 mB")
+        helper.assertTrue(fresh(LogisticsContent.NANITE_REPOSITORY.get().asItem()).any { "Nanites: 0 / 250" in it }, "nanite repository holds 250 nanites")
+
+        helper.setBlock(at, LogisticsContent.ITEM_REPOSITORY.get())
+        val repository = helper.getBlockEntity(at, ItemRepositoryBlockEntity::class.java)
+        repository.storage.setSlot(0, com.itszuvalex.itszulib.api.adapters.IItemStack.of(ItemStack(Items.DIAMOND, 40)))
+        repository.storage.setSlot(5, com.itszuvalex.itszulib.api.adapters.IItemStack.of(ItemStack(Items.GOLD_INGOT, 3)))
+        helper.level.destroyBlock(helper.absolutePos(at), true)
+        val drops = helper.level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity::class.java, net.minecraft.world.phys.AABB(helper.absolutePos(at)).inflate(3.0)).map { it.item }
+        helper.assertValueEqual(drops.size, 1, "one item drops, not its contents: $drops")
+        helper.assertTrue(lines(helper, drops[0]).any { "2 / 54 slots used (43 items)" in it }, "it says what it holds: ${lines(helper, drops[0])}")
+        helper.succeed()
     }
 
     /** Each requirement is covered exactly, in slots no bigger than a stack, in every frame multiblock. */

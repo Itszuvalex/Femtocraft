@@ -16,10 +16,10 @@ import com.itszuvalex.itszulib.api.storage.IFluidStorage
 import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.api.storage.ItemStorageArray
 import com.itszuvalex.itszulib.api.utility.NBTSerializationScope
+import com.itszuvalex.itszulib.core.BreakBehavior
 import com.itszuvalex.itszulib.core.HorizontalFacing
 import com.itszuvalex.itszulib.core.SidedFluidStorageConfiguration
 import com.itszuvalex.itszulib.core.SidedItemStorageConfiguration
-import com.itszuvalex.itszulib.core.frag.FragDropInventory
 import com.itszuvalex.itszulib.core.frag.FragFluidAutoIO
 import com.itszuvalex.itszulib.core.frag.FragFluidStorage
 import com.itszuvalex.itszulib.core.frag.FragItemAutoIO
@@ -40,7 +40,8 @@ import net.neoforged.neoforge.fluids.FluidStack
 private const val NONE = "None"
 
 /**
- * 54-slot chest exposed on every face, with automatic IO. Port of v3's `TileItemRepository`.
+ * 54-slot chest exposed on every face, with automatic IO. Port of v3's `TileItemRepository`. Keeps its items when
+ * broken (the dropped item carries them, ItszuLib D20).
  */
 class ItemRepositoryBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(LogisticsContent.ITEM_REPOSITORY_BE.get(), pos, state) {
     @JvmField
@@ -51,8 +52,7 @@ class ItemRepositoryBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEn
             "ItemConfig", SidedItemStorageConfiguration({ INVENTORY }, mapOf(NONE to IItemStorage.Empty, INVENTORY to storage)) { HorizontalFacing.front(blockState) },
             Modules.ITEM_STORAGE_CONFIGURABLE,
         ))
-        fragList.addItemStorage(FragItemStorage(storage))
-        fragList.addInternalFragment(FragDropInventory(storage))
+        fragList.addItemStorage(FragItemStorage(storage, breakBehavior = BreakBehavior.KEEP))
         fragList.addTickableFragment(FragItemAutoIO())
         fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.item_repository"), { id, inv, _ -> ItemRepositoryMenu(id, inv, this) }))
     }
@@ -78,7 +78,7 @@ class FluidRepositoryBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockE
             "FluidConfig", SidedFluidStorageConfiguration({ TANK }, mapOf(NONE to IFluidStorage.Empty, TANK to tank)) { HorizontalFacing.front(blockState) },
             Modules.FLUID_STORAGE_CONFIGURABLE,
         ))
-        fragList.addFluidStorage(FragFluidStorage(tank))
+        fragList.addFluidStorage(FragFluidStorage(tank, breakBehavior = BreakBehavior.KEEP))
         fragList.addInternalFragment(FragData("TankSync", setOf(NBTSerializationScope.DESCRIPTION), { _, o -> tank.serialize(o) }, { _, i -> tank.deserialize(i) }))
         fragList.addTickableFragment(FragFluidAutoIO())
         fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.fluid_repository"), { id, inv, _ -> FluidRepositoryMenu(id, inv, this) }))
@@ -113,7 +113,7 @@ class NaniteRepositoryBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlock
             "NaniteConfig", SidedNaniteStorageConfiguration({ TANK }, mapOf(NONE to INaniteTank.EMPTY, TANK to naniteTank)) { HorizontalFacing.front(blockState) },
             NaniteModules.NANITE_STORAGE_CONFIGURABLE,
         ))
-        fragList.addFragment(FragNaniteTank(naniteTank))
+        fragList.addFragment(FragNaniteTank(naniteTank, breakBehavior = BreakBehavior.KEEP))
         fragList.addTickableFragment(FragNaniteAutoIO())
         fragList.addFragment(FragMenu(Component.translatable("block.femtocraft.nanite_repository"), { id, inv, _ -> NaniteRepositoryMenu(id, inv, this) }))
     }

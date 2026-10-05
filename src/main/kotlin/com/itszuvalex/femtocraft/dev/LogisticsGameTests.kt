@@ -47,7 +47,7 @@ object LogisticsGameTests {
     private val CENTER = BlockPos(4, 1, 4)
 
     fun register() {
-        DevGameTests.test("item_repository_exposes_slots_and_drops_contents", body = ::itemRepository)
+        DevGameTests.test("item_repository_exposes_slots_and_keeps_contents", body = ::itemRepository)
         DevGameTests.test("fluid_repository_fills_from_water_below", body = ::fluidRepository)
         DevGameTests.test("nanite_repository_holds_one_strain", body = ::naniteRepository)
         DevGameTests.test("conduit_chips_move_items_between_inventories", body = ::conduitMovesItems)
@@ -94,8 +94,9 @@ object LogisticsGameTests {
         helper.assertValueEqual(handler!!.size(), ItemRepositoryBlockEntity.SIZE, "54 slots")
         helper.assertValueEqual(ResourceHandlerUtil.insertStacking(handler, ItemResource.of(Items.DIAMOND), 70, null), 70, "inserted")
         helper.assertValueEqual(be.storage.get(1).stackSize(), 6, "spilled into the next slot")
-        helper.destroyBlock(CENTER)
-        helper.assertItemEntityCountIs(Items.DIAMOND, CENTER, 2.0, 70)
+        helper.level.destroyBlock(helper.absolutePos(CENTER), true)
+        helper.assertItemEntityCountIs(Items.DIAMOND, CENTER, 2.0, 0)
+        helper.assertItemEntityCountIs(LogisticsContent.ITEM_REPOSITORY.get().asItem(), CENTER, 2.0, 1)
         helper.succeed()
     }
 

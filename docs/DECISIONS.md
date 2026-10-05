@@ -457,3 +457,9 @@ drop (`FragDropInventory`, or `FragItemStorage`'s default), fluids and nanites (
 behaviour, ticking, menus, capabilities), with a nanite probe so nanite tanks are filled and measured too;
 `ReachabilityGameTests` checks which Femtocraft items can be obtained and writes the full report to
 `run/build/reports/femtocraft-reachability.txt`. Its baseline of unobtainable items is REVIEW O13.
+
+**Addendum (maintainer, 2026-10-05).** The item, fluid and nanite repositories use `BreakBehavior.KEEP`: the dropped item
+carries what they hold and its tooltip says how much is used of how much it can hold ("Items: 2 / 54 slots used (43
+items)", "Water: 1,200 / 5,000 mB", "Nanites: 37 / 250"). Their block items are ItszuLib's `ContentBlockItem`
+(`LogisticsContent.keepingBlock`), which builds an unplaced block entity from the item's data and asks its fragments
+(`IBreakContents.describe`).

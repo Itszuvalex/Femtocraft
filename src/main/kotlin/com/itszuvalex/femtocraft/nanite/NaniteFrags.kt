@@ -35,6 +35,9 @@ class FragNaniteTank @JvmOverloads constructor(
 
     override fun isContentEmpty(): Boolean = tank.amount <= 0
 
+    override fun describe(): List<net.minecraft.network.chat.Component> =
+        listOf(net.minecraft.network.chat.Component.translatable("tooltip.femtocraft.contents.nanites", tank.amount, tank.capacity))
+
     fun tankFor(side: Direction?): INaniteTank? {
         if (side == null) return tank
         val config = host?.blockEntity()?.getModule(NaniteModules.NANITE_STORAGE_CONFIGURABLE, null) ?: return tank

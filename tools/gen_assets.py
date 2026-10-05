@@ -317,6 +317,7 @@ LANG = {
     "gui.femtocraft.reservoir.link.blocked": "Tanks %s and %s hold different fluids or locks",
     "gui.femtocraft.nanite_vault.more": "... and %s more strains",
     "entity.femtocraft.nano_lash": "Nano Lash",
+    "tooltip.femtocraft.contents.nanites": "Nanites: %s / %s",
     "tooltip.femtocraft.processor.flops": "%s FLOPS/t",
     "tooltip.femtocraft.processor.power": "%s DE per FLOP",
     "gui.femtocraft.mainframe.flops": "FLOPS: %s/t",

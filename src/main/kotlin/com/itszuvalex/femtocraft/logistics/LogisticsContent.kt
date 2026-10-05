@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.logistics
 
+import com.itszuvalex.itszulib.core.ContentBlockItem
 import com.itszuvalex.femtocraft.FemtoRegistries
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
@@ -17,9 +18,15 @@ object LogisticsContent {
     private fun <B : net.minecraft.world.level.block.Block> block(name: String, factory: (BlockBehaviour.Properties) -> B, props: (BlockBehaviour.Properties) -> BlockBehaviour.Properties = ::machine) =
         R.BLOCKS.registerBlock(name, factory, UnaryOperator { props(it) }).also { R.ITEMS.registerSimpleBlockItem(name, it) }
 
-    @JvmField val ITEM_REPOSITORY = block("item_repository", ::ItemRepositoryBlock)
-    @JvmField val FLUID_REPOSITORY = block("fluid_repository", ::FluidRepositoryBlock) { machine(it).noOcclusion() }
-    @JvmField val NANITE_REPOSITORY = block("nanite_repository", ::NaniteRepositoryBlock)
+    /** A block whose item shows what the block keeps when broken (ItszuLib's [ContentBlockItem]). */
+    private fun <B : net.minecraft.world.level.block.Block> keepingBlock(name: String, factory: (BlockBehaviour.Properties) -> B, props: (BlockBehaviour.Properties) -> BlockBehaviour.Properties = ::machine) =
+        R.BLOCKS.registerBlock(name, factory, UnaryOperator { props(it) }).also { b ->
+            R.ITEMS.registerItem(name, { ContentBlockItem(b.get(), it.useBlockDescriptionPrefix()) })
+        }
+
+    @JvmField val ITEM_REPOSITORY = keepingBlock("item_repository", ::ItemRepositoryBlock)
+    @JvmField val FLUID_REPOSITORY = keepingBlock("fluid_repository", ::FluidRepositoryBlock) { machine(it).noOcclusion() }
+    @JvmField val NANITE_REPOSITORY = keepingBlock("nanite_repository", ::NaniteRepositoryBlock)
     @JvmField val CONDUIT = block("conduit", ::ConduitBlock) { machine(it).noOcclusion() }
 
     // Frame-built storage multiblocks (placed by frame building; no block items)

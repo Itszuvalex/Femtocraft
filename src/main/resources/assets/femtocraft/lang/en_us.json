@@ -319,6 +319,7 @@
   "tooltip.femtocraft.frame.type": "Frame: %s",
   "tooltip.femtocraft.none": "none",
   "tooltip.femtocraft.power": "Power: %s/%s",
+  "tooltip.femtocraft.contents.nanites": "Nanites: %s / %s",
   "tooltip.femtocraft.processor.flops": "%s FLOPS/t",
   "tooltip.femtocraft.processor.power": "%s DE per FLOP"
 }
