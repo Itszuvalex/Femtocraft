@@ -73,6 +73,8 @@ object DevShowcase {
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
         Vec3(10.5, 2.5, -1.0) to Vec3(10.5, 0.5, 2.0),
+        Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
+        Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
     )
 
     private const val FRAMES_VIEW = 9
@@ -85,6 +87,9 @@ object DevShowcase {
     private const val LIGHTNING_VIEW = 16
     private const val VAULT_VIEW = 17
     private const val CONDUIT_VIEW = 21
+
+    /** A close look at the chips shown on a conduit, then one chip's own screen. */
+    private const val CHIPS_VIEW = 22
     private val ITEM_VAULT = BlockPos(22, 0, 0)
     private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
@@ -187,6 +192,11 @@ object DevShowcase {
         if (view == CONDUIT_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
             (level.getBlockEntity(BASE.offset(10, 0, 2)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
+        }
+        if (view == CHIPS_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        if (view == CHIPS_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
+            (level.getBlockEntity(BASE.offset(11, 0, 2)) as? com.itszuvalex.femtocraft.logistics.ConduitBlockEntity)
+                ?.openChipMenu(p, net.minecraft.core.Direction.EAST.get3DDataValue() * com.itszuvalex.femtocraft.logistics.LogisticsConduit.CHIPS_PER_FACE)
         }
         // The lightning view strikes the atmospheric pole every half second (harmless bolts on the capacitor's top).
         if (view == LIGHTNING_VIEW && (ticks - BUILD_AT) % 10 == 5) {
@@ -317,6 +327,9 @@ object DevShowcase {
         set(16, 0, 5, Blocks.ICE)
         set(15, 0, 4, Blocks.PACKED_ICE)
         set(16, 0, 4, Blocks.WATER)
+        // Walls keep the water in reach of the base without flowing off across the stage (it washed away conduits).
+        set(17, 0, 4, Blocks.SMOOTH_STONE)
+        set(16, 0, 3, Blocks.SMOOTH_STONE)
         // The alpha's atmospheric charging pole: a base, three coils and a capacitor.
         set(POLE.x, 0, POLE.z, PowerContent.ATMOSPHERIC_BASE.get())
         for (y in 1..3) set(POLE.x, y, POLE.z, PowerContent.ATMOSPHERIC_COIL.get())
@@ -336,6 +349,16 @@ object DevShowcase {
             }
             conduit.conduit.chips[up.get3DDataValue()].setSlot(0, IItemStack.of(itemChip))
             conduit.conduit.chips[up.get3DDataValue()].setSlot(1, IItemStack.of(fluidChip))
+            // The second conduit shows a chip of every kind on its arm to the chest, and one on the arm between the
+            // conduits; the first item chip keeps the filter, for its own screen.
+            (level.getBlockEntity(BASE.offset(11, 0, 2)) as? com.itszuvalex.femtocraft.logistics.ConduitBlockEntity)?.let { second ->
+                val east = second.conduit.chips[net.minecraft.core.Direction.EAST.get3DDataValue()]
+                east.setSlot(0, IItemStack.of(itemChip.copy()))
+                east.setSlot(1, IItemStack.of(net.minecraft.world.item.ItemStack(LogisticsContent.ITEM_CHIP.get())))
+                east.setSlot(2, IItemStack.of(net.minecraft.world.item.ItemStack(LogisticsContent.FLUID_CHIP.get())))
+                east.setSlot(3, IItemStack.of(net.minecraft.world.item.ItemStack(LogisticsContent.NANITE_CHIP.get())))
+                second.conduit.chips[net.minecraft.core.Direction.WEST.get3DDataValue()].setSlot(3, IItemStack.of(net.minecraft.world.item.ItemStack(LogisticsContent.FLUID_CHIP.get())))
+            }
         }
         // The storage multiblocks; the item vault holds a little of many items (more than a terminal page).
         FrameMultiblocks.ITEM_VAULT.formAt(level, BASE.offset(ITEM_VAULT))

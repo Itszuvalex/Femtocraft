@@ -279,6 +279,7 @@ LANG = {
     "gui.femtocraft.conduit.chips.title": "Configure chips",
     "gui.femtocraft.conduit.chips.none": "Click a chip to configure it",
     "gui.femtocraft.conduit.chips.settings": "Face %s: %s, via %s side",
+    "gui.femtocraft.chip.face": "In the conduit's %s face",
     "tooltip.femtocraft.chip.item": "Buffer: %s",
     "tooltip.femtocraft.chip.flops": "Flops: %s/%s",
     "tooltip.femtocraft.chip.channel": "Channel: %s",

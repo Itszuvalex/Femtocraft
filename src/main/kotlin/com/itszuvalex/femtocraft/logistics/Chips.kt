@@ -179,6 +179,9 @@ abstract class ChipKind<B : Any>(
     /** Whether players can set this kind's filters in the conduit screen (by clicking with what to list held). */
     open val filterable: Boolean get() = false
 
+    /** The colour (ARGB) of this kind's chips where a conduit shows them in the world, as on the chip's texture. */
+    abstract val color: Int
+
     /** How much the buffer may hold of [b]. */
     open fun limit(b: B): Int = bufferLimit
 
@@ -226,6 +229,7 @@ object ItemChipKind : ChipKind<ItemStack>("item", ItemStack.OPTIONAL_CODEC, Item
     }
 
     override val filterKind: FilterKind<ItemStack> get() = FilterKinds.ITEM
+    override val color: Int = 0xFFDC1E1E.toInt()
     override val filterable: Boolean get() = true
 
     /**
@@ -284,6 +288,7 @@ object FluidChipKind : ChipKind<FluidStack>("fluid", FluidStack.OPTIONAL_CODEC, 
     }
 
     override val filterKind: FilterKind<FluidStack> get() = FilterKinds.FLUID
+    override val color: Int = 0xFF3A3AFF.toInt()
     override val filterable: Boolean get() = true
 
     override fun pull(level: Level, pos: BlockPos, side: Direction, buffer: FluidStack, max: Int, filter: ResourceFilter<FluidStack>): FluidStack {
@@ -303,6 +308,7 @@ object FluidChipKind : ChipKind<FluidStack>("fluid", FluidStack.OPTIONAL_CODEC, 
  * module ([NaniteModules.NANITE_TANK]). v3 had the item but no connection; the amounts are new.
  */
 object NaniteChipKind : ChipKind<NaniteStack>("nanite", NaniteStack.CODEC, NaniteStack.EMPTY, 5, 25) {
+    override val color: Int = 0xFFFFF030.toInt()
     override fun matches(a: NaniteStack, b: NaniteStack) = (a.isEmpty && b.isEmpty) || a == b
     override fun hash(b: NaniteStack) = if (b.isEmpty) 0 else b.hashCode()
     override fun sameType(a: NaniteStack, b: NaniteStack) = a.isSameNanite(b)

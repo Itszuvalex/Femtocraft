@@ -40,6 +40,7 @@ object FemtoRenderers {
         event.registerBlockEntityRenderer(IndustryContent.GERMINATION_CHAMBER_BE.get()) { GerminationChamberRenderer() }
         event.registerBlockEntityRenderer(IndustryContent.FRAME_BE.get()) { FrameRenderer() }
         event.registerBlockEntityRenderer(com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR_BE.get()) { ReservoirRenderer() }
+        event.registerBlockEntityRenderer(com.itszuvalex.femtocraft.logistics.LogisticsContent.CONDUIT_BE.get()) { ConduitChipRenderer() }
     }
 
     /**
@@ -684,6 +685,51 @@ object FemtoRenderers {
             const val SHELL = 0.01f
             const val MARGIN = 1f / 16f
             const val GAP = 1f / 32f
+        }
+    }
+
+    class ConduitChipState : BlockEntityRenderState() {
+        var layout = 0L
+        var arms = 0
+        var light = 0
+        var sprite: net.minecraft.client.renderer.texture.TextureAtlasSprite? = null
+    }
+
+    /**
+     * The chips in a logistics conduit, shown on it ([com.itszuvalex.femtocraft.logistics.ChipNodes]): a small cube per
+     * chip at a corner of its face's arm, in its kind's colour.
+     */
+    class ConduitChipRenderer : BlockEntityRenderer<com.itszuvalex.femtocraft.logistics.ConduitBlockEntity, ConduitChipState> {
+        override fun createRenderState() = ConduitChipState()
+
+        override fun extractRenderState(
+            be: com.itszuvalex.femtocraft.logistics.ConduitBlockEntity, state: ConduitChipState, partialTicks: Float, cameraPosition: Vec3,
+            breakProgress: ModelFeatureRenderer.CrumblingOverlay?,
+        ) {
+            super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress)
+            state.layout = be.conduit.chipLayout
+            if (state.layout == 0L) return
+            state.arms = net.minecraft.core.Direction.entries.fold(0) { m, d -> if (be.hasArm(be.blockState, d)) m or (1 shl d.ordinal) else m }
+            state.light = be.level?.let { net.minecraft.client.renderer.LevelRenderer.getLightCoords(it, be.blockPos) } ?: 0
+            state.sprite = net.minecraft.client.Minecraft.getInstance().modelManager.blockStateModelSet
+                .get(net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState()).particleMaterial().sprite()
+        }
+
+        override fun submit(state: ConduitChipState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
+            if (state.layout == 0L) return
+            val sprite = state.sprite ?: return
+            val kinds = com.itszuvalex.femtocraft.logistics.Chips.KINDS
+            collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.solidMovingBlock()) { pose, buffer ->
+                for (slot in 0 until com.itszuvalex.femtocraft.logistics.ChipNodes.SLOTS) {
+                    val kind = com.itszuvalex.femtocraft.logistics.ChipNodes.kindAt(state.layout, slot)
+                    if (kind == 0) continue
+                    val face = slot / com.itszuvalex.femtocraft.logistics.LogisticsConduit.CHIPS_PER_FACE
+                    val armed = state.arms and (1 shl net.minecraft.core.Direction.from3DDataValue(face).ordinal) != 0
+                    val b = com.itszuvalex.femtocraft.logistics.ChipNodes.box(slot, armed)
+                    val color = kinds.getOrNull(kind - 1)?.color ?: -1
+                    Boxes.box(pose, buffer, sprite, b.minX.toFloat(), b.minY.toFloat(), b.minZ.toFloat(), b.maxX.toFloat(), b.maxY.toFloat(), b.maxZ.toFloat(), color, state.light)
+                }
+            }
         }
     }
 }

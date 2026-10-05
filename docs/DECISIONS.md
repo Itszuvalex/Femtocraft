@@ -445,3 +445,16 @@ for reuse (ItszuLib D18).
   from counts the home frame syncs when they change; it stays within the structure's size, scrolling long names
   through their line and stepping through the lines when there are more than fit. Building starts as soon as every slot is full (it no longer waits for a 2-second
   check) and uses exactly what the slots hold.
+
+## D26. Chips shown on the conduit, each with its own screen — DECIDED (maintainer, 2026-10-05)
+
+- **Shown in the world.** A conduit draws each chip as a small cube in its kind's colour (item red, fluid blue,
+  nanite yellow, as on the chip textures; `ChipKind.color`): the four slots of a face are the four corners of its
+  arm's square end, touching the neighbouring block, or touching the core on a face without an arm
+  (`logistics/ChipNodes.kt`). The conduit keeps a layout of the kinds per slot (2 bits a slot, `chipLayout`), syncs it
+  only when it changes (key `Chips`) and draws it with a block entity renderer (`ConduitChipRenderer`).
+- **Own screen.** The cubes are part of the block's shape, so they can be aimed at; using one opens that chip's
+  screen (`ChipMenu`, `ChipScreen`): its slot, which face it is in, its settings, mode and side buttons and filter,
+  the same controls as the chips tab, acting on that chip only. Using the conduit anywhere else opens the conduit's
+  screen as before.
+
