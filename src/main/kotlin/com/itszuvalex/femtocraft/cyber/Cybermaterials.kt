@@ -44,6 +44,11 @@ object Cybermaterials {
         Blocks.POLISHED_ANDESITE, Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.DEEPSLATE,
     )
 
+
+    /**
+     * Every block the rift feature and dumb dust can produce: the sources of the cybermaterials.
+     */
+    fun producedBlocks(): List<Block> = listOf(CyberContent.SUBSTRATE.get()) + tagReplacements.map { it.second() }
     /**
      * The cybermaterial [state] turns into, or null. Logs keep their axis.
      */

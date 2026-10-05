@@ -445,3 +445,15 @@ for reuse (ItszuLib D18).
   from counts the home frame syncs when they change; it stays within the structure's size, scrolling long names
   through their line and stepping through the lines when there are more than fit. Building starts as soon as every slot is full (it no longer waits for a 2-second
   check) and uses exactly what the slots hold.
+
+## D26. Break behaviour and automated checks — DECIDED (maintainer, 2026-10-05)
+
+Break behaviour is ItszuLib's (ItszuLib D20): each fragment holding contents says whether breaking its block drops them
+(`DROP`), keeps them on the item (`KEEP`) or loses them (`DISCARD`). Femtocraft's machines keep what they did: items
+drop (`FragDropInventory`, or `FragItemStorage`'s default), fluids and nanites (`FragNaniteTank`, which now takes a
+`breakBehavior`) are lost. Which blocks should `KEEP` instead is a design call, listed as REVIEW O12.
+
+`dev/IntegrityGameTests` runs ItszuLib's checks over everything Femtocraft registers (assets, save/load/sync, break
+behaviour, ticking, menus, capabilities), with a nanite probe so nanite tanks are filled and measured too;
+`ReachabilityGameTests` checks which Femtocraft items can be obtained and writes the full report to
+`run/build/reports/femtocraft-reachability.txt`. Its baseline of unobtainable items is REVIEW O13.

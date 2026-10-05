@@ -251,7 +251,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
 `PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`,
-`ComputationGameTests`, `VaultGameTests`, `IntegrityGameTests` (every registered block and item has its assets and data, via ItszuLib's `ContentIntegrity`; technologies and machine recipe tables are sound; every block entity saves, loads and syncs intact via `BlockEntityRoundTrip`), `InfrastructureGameTests` (frame requirement slots, chip data codecs). Add one with
+`ComputationGameTests`, `VaultGameTests`, `IntegrityGameTests` (ItszuLib's checks over everything registered: assets, save/load/sync, break behaviour, ticking, menus, capabilities; technologies and machine recipe tables are sound), `ReachabilityGameTests` (which items can be obtained; baseline in REVIEW O13), `InfrastructureGameTests` (frame requirement slots, chip data codecs). Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode

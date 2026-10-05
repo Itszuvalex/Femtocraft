@@ -6,7 +6,16 @@ import com.itszuvalex.femtocraft.industry.GerminationRecipes
 import com.itszuvalex.femtocraft.industry.LiquifierRecipes
 import com.itszuvalex.itszulib.research.TechTree
 import com.itszuvalex.itszulib.research.Technology
+import com.itszuvalex.femtocraft.nanite.FragNaniteTank
+import com.itszuvalex.femtocraft.nanite.NaniteRegistry
+import com.itszuvalex.itszulib.core.BlockEntityCore
+import com.itszuvalex.itszulib.core.BreakBehavior
+import com.itszuvalex.itszulib.verify.BlockEntityContents
 import com.itszuvalex.itszulib.verify.BlockEntityRoundTrip
+import com.itszuvalex.itszulib.verify.BreakChecks
+import com.itszuvalex.itszulib.verify.CapabilityChecks
+import com.itszuvalex.itszulib.verify.MenuChecks
+import com.itszuvalex.itszulib.verify.TickChecks
 import com.itszuvalex.itszulib.verify.ContentIntegrity
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.GameTestHelper
@@ -17,10 +26,15 @@ import net.minecraft.gametest.framework.GameTestHelper
  */
 object IntegrityGameTests {
     fun register() {
+        BlockEntityContents.register(NaniteContentsProbe)
         DevGameTests.test("content_has_its_assets_and_data", body = ::content)
         DevGameTests.test("technologies_are_sound", body = ::technologies)
         DevGameTests.test("machine_recipes_are_usable", body = ::machineRecipes)
         DevGameTests.test("block_entities_save_load_and_sync", body = ::roundTrips)
+        DevGameTests.test("block_entities_break_as_they_declare", body = ::breaks)
+        DevGameTests.test("block_entities_run_without_failing", 600, ::ticks)
+        DevGameTests.test("capabilities_match_modules", body = ::capabilities)
+        DevGameTests.test("menus_neither_lose_nor_make_items", 600, ::menus)
     }
 
     private fun content(helper: GameTestHelper) {
@@ -46,6 +60,27 @@ object IntegrityGameTests {
         helper.succeed()
     }
 
+    private fun menus(helper: GameTestHelper) {
+        val player = helper.makeMockServerPlayerInLevel()
+        helper.assertValueEqual(MenuChecks.problems(helper.level, helper.absolutePos(BlockPos(4, 2, 4)), Femtocraft.ID, player), emptyList<String>(), "menu problems")
+        helper.succeed()
+    }
+
+    private fun capabilities(helper: GameTestHelper) {
+        helper.assertValueEqual(CapabilityChecks.problems(helper.level, helper.absolutePos(BlockPos(4, 2, 4)), Femtocraft.ID), emptyList<String>(), "capability problems")
+        helper.succeed()
+    }
+
+    private fun ticks(helper: GameTestHelper) {
+        helper.assertValueEqual(TickChecks.problems(helper.level, helper.absolutePos(BlockPos(4, 2, 4)), Femtocraft.ID), emptyList<String>(), "tick problems")
+        helper.succeed()
+    }
+
+    private fun breaks(helper: GameTestHelper) {
+        helper.assertValueEqual(BreakChecks.problems(helper.level, helper.absolutePos(BlockPos(4, 1, 4)), Femtocraft.ID), emptyList<String>(), "break problems")
+        helper.succeed()
+    }
+
     private fun machineRecipes(helper: GameTestHelper) {
         val problems = ArrayList<String>()
         for ((input, output) in DustRecipes.all()) if (output.isEmpty) problems += "dust recipe for ${input.item} makes nothing"
@@ -60,5 +95,30 @@ object IntegrityGameTests {
         }
         helper.assertValueEqual(problems, emptyList<String>(), "recipe problems")
         helper.succeed()
+    }
+}
+
+/**
+ * Nanites in a block entity's tanks, for ItszuLib's content checks: filled with a distinctive amount, measured per strain.
+ */
+object NaniteContentsProbe : BlockEntityContents.Probe {
+    private fun tanks(be: BlockEntityCore, behaviors: Set<BreakBehavior>) =
+        be.contentFragments().filter { it.breakBehavior in behaviors }.filterIsInstance<FragNaniteTank>().filter { it.persist }
+
+    override fun fill(be: BlockEntityCore, behaviors: Set<BreakBehavior>): Boolean {
+        var filled = false
+        for (frag in tanks(be, behaviors)) {
+            val amount = minOf(frag.tank.capacity, 37)
+            if (amount > 0 && frag.tank.fill(NaniteRegistry.dumb(amount), true).isEmpty) filled = true
+        }
+        return filled
+    }
+
+    override fun tally(be: BlockEntityCore, behaviors: Set<BreakBehavior>): BlockEntityContents.Tally {
+        val counts = java.util.TreeMap<String, Long>()
+        for (frag in tanks(be, behaviors)) for (stack in frag.tank.contents()) {
+            counts.merge("nanites:${stack.archetype}/${stack.strain}/${stack.version}", stack.amount.toLong(), Long::plus)
+        }
+        return BlockEntityContents.Tally(counts)
     }
 }
