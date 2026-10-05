@@ -1,5 +1,9 @@
 package com.itszuvalex.femtocraft.logistics
 
+import com.itszuvalex.femtocraft.industry.PackedMultiblocks
+import net.neoforged.neoforge.registries.DeferredItem
+import com.itszuvalex.femtocraft.industry.FrameMultiblocks
+import com.itszuvalex.femtocraft.industry.PackedMultiblockItem
 import com.itszuvalex.itszulib.core.ContentBlockItem
 import com.itszuvalex.femtocraft.FemtoRegistries
 import net.minecraft.world.level.block.SoundType
@@ -29,12 +33,20 @@ object LogisticsContent {
     @JvmField val NANITE_REPOSITORY = keepingBlock("nanite_repository", ::NaniteRepositoryBlock)
     @JvmField val CONDUIT = block("conduit", ::ConduitBlock) { machine(it).noOcclusion() }
 
-    // Frame-built storage multiblocks (placed by frame building; no block items)
+    // Frame-built storage multiblocks (placed by frame building or by their packed items)
     private fun <B : net.minecraft.world.level.block.Block> frameBlock(name: String, factory: (BlockBehaviour.Properties) -> B, props: (BlockBehaviour.Properties) -> BlockBehaviour.Properties = ::machine) =
         R.BLOCKS.registerBlock(name, factory, UnaryOperator { props(it) })
     @JvmField val ITEM_VAULT = frameBlock("item_vault", ::ItemVaultBlock)
     @JvmField val FLUID_RESERVOIR = frameBlock("fluid_reservoir", ::FluidReservoirBlock)
     @JvmField val NANITE_VAULT = frameBlock("nanite_vault", ::NaniteVaultBlock)
+
+    // The machines as items: dropped when a storage multiblock is broken or wrenched, carrying its contents, and placed
+    // to build the whole machine again (PackedMultiblockItem).
+    private fun packed(name: String, multiblock: () -> com.itszuvalex.femtocraft.industry.FrameMultiblock): DeferredItem<PackedMultiblockItem> =
+        R.ITEMS.registerItem(name, { PackedMultiblockItem(multiblock, it) }, UnaryOperator { it.stacksTo(16) })
+    @JvmField val ITEM_VAULT_ITEM: DeferredItem<PackedMultiblockItem> = packed("item_vault") { FrameMultiblocks.ITEM_VAULT }
+    @JvmField val FLUID_RESERVOIR_ITEM: DeferredItem<PackedMultiblockItem> = packed("fluid_reservoir") { FrameMultiblocks.FLUID_RESERVOIR }
+    @JvmField val NANITE_VAULT_ITEM: DeferredItem<PackedMultiblockItem> = packed("nanite_vault") { FrameMultiblocks.NANITE_VAULT }
 
     private fun chip(name: String, kind: ChipKind<*>) = R.ITEMS.registerItem(name, { ChipItem(kind, it) })
 
@@ -63,6 +75,7 @@ object LogisticsContent {
     }
 
     fun init() {
+        PackedMultiblocks.init() // registers its data component
         Chips.KINDS
         LogisticsConduit.MODULE
         LogisticsModules.init()

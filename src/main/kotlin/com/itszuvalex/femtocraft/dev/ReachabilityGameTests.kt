@@ -81,7 +81,7 @@ object ReachabilityGameTests {
         for (r in GerminationRecipes.all()) producers += Producer("germinating ${r.input}", listOf(setOf(r.input)), r.results.map { it.first }.toSet())
         for (r in NaniteInfusionRecipes.all()) producers += Producer("infusing ${r.input()}", listOf(setOf(r.input())), setOf(r.output()))
         for (mb in FrameMultiblocks.all()) {
-            producers += Producer("building ${mb.id}", mb.required().map { setOf(it.item) }, setOf(mb.block.asItem()))
+            producers += Producer("building ${mb.id}", mb.required().map { setOf(it.item) }, setOf(mb.packedItem?.invoke() ?: mb.block.asItem()))
         }
         // A crystal cluster's drops are rolled in code (CrystalClusterBlock.getDrops), so sample them.
         val clusterDrops = (1L..200L).flatMap { CrystalClusterBlockEntity.rollDrops(RandomSource.create(it), 0xFFFFFF) }.map { it.item }.toSet()

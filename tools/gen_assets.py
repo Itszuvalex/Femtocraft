@@ -176,6 +176,11 @@ ITEMS = {
     "solar_panel": ("Solar Panel", "itemsolarpanel"),
     "frame": ("Frame", "block:frame_full"),
     "configurator": ("Configurator", None),
+    "wrench": ("Wrench", "itemwrench"),
+    # Storage multiblocks as items: the whole machine, drawn at the size of one block (see packed_model).
+    "item_vault": ("Item Vault", "packed:item_vault"),
+    "fluid_reservoir": ("Fluid Reservoir", "packed:fluid_reservoir"),
+    "nanite_vault": ("Nanite Vault", "packed:nanite_vault"),
     "shift_test": ("Shift Device", "itemshifttest"),
     "nano_lash": ("Nano Lash", "itemnanolash"),
     "logistics_item_chip_basic": ("Basic Item Logistics Chip", "itemlogisticsitemchipbasic"),
@@ -198,6 +203,7 @@ PLACEHOLDERS = {
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
     "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
+    "item/itemwrench": ((0, 0, 0, 0), (190, 195, 210, 255)),
     "block/mainframe_front": ((0, 0, 0, 0), (90, 255, 150, 255)),
     "block/archive_interface_front": ((0, 0, 0, 0), (90, 200, 220, 255)),
 }
@@ -287,6 +293,8 @@ LANG = {
     "tooltip.femtocraft.chip.filter.deny": "Keeps out %s:",
     "tooltip.femtocraft.chip.interface": "Interface: %s",
     "tooltip.femtocraft.frame.type": "Frame: %s",
+    "tooltip.femtocraft.wrench": "Sneak and use on a machine to break it at once",
+    "tooltip.femtocraft.packed.size": "Builds a %sx%sx%s machine where placed",
     "tooltip.femtocraft.frame.selected": "Selected: %s",
     "tooltip.femtocraft.frame.needs": "Needs:",
     "tooltip.femtocraft.frame.needs.frames": "  %s frames",
@@ -337,6 +345,8 @@ LANG = {
 TAGS = {
     # (registry, namespace, path): values
     ("item", NS, "power_crystals"): [f"{NS}:power_crystal"],
+    # ItszuLib: a sneaking player using one of these on a machine breaks it at once.
+    ("item", "itszulib", "wrenches"): [f"{NS}:wrench"],
     # Ore dictionary names (v3 registerOre) become common tags; the demolisher grinds c:ores/<x> into c:dusts/<x>.
     ("item", "c", "dusts/riftiron"): [f"{NS}:riftiron_dust"],
     ("item", "c", "dusts/phasemetal"): [f"{NS}:phasemetal_dust"],
@@ -390,6 +400,7 @@ def smelting(ingredient, result, xp=0.1):
 
 # v3's assets/femtocraft/recipes/*.json and FemtoRecipes smelting, translated to 26.1 ids and recipe formats.
 RECIPES = {
+    "wrench": shaped(["I I", " I ", " I "], {"I": "minecraft:iron_ingot"}, f"{NS}:wrench"),
     # FemtoRecipes.addSmeltingRecipes (dusts; the ore blocks are added with the cyber area)
     "smelting/riftiron_ingot_from_dust": smelting(f"{NS}:riftiron_dust", f"{NS}:riftiron_ingot_devoid"),
     "smelting/phasemetal_ingot_from_dust": smelting(f"{NS}:phasemetal_dust", f"{NS}:phasemetal_ingot_devoid"),
@@ -817,6 +828,11 @@ def main():
                 write(os.path.join(ASSETS, "models", "item", f"configurator_{mode}.json"),
                       {"parent": "minecraft:item/handheld", "textures": {"layer0": f"{NS}:item/itemconfigurator_{mode}"}})
             continue
+        if texture.startswith("packed:"):
+            block = texture[7:]
+            write(os.path.join(ASSETS, "models", "item", f"{name}.json"), packed_model(BLOCKS[block][1], 3))
+            write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:item/{name}"}})
+            continue
         if texture.startswith("block:"):
             write(os.path.join(ASSETS, "items", f"{name}.json"), {"model": {"type": "minecraft:model", "model": f"{NS}:block/{texture[6:]}"}})
             continue
@@ -836,6 +852,33 @@ def main():
         write(os.path.join(mc_tags, f"{tool}.json"), {"replace": False, "values": sorted(blocks)})
     write(os.path.join(ASSETS, "lang", "en_us.json"), dict(sorted(lang.items())))
     check_textures()
+
+
+def packed_model(kind, n):
+    """
+    An n x n x n box of the cube [kind] as one model, for an item: the whole multiblock drawn at the size of one block,
+    each of its blocks 1/n as big with the texture on every outer face (so a face shows n x n copies, as in the world).
+    """
+    assert kind[0] in ("cube_bottom_top", "windowed"), kind
+    step = 16 / n
+    side, top, bottom = (tex(kind[1]), tex(kind[2]), tex(kind[3]))
+    elements = []
+    for x in range(n):
+        for y in range(n):
+            for z in range(n):
+                faces = {}
+                for d, outer, texture in (("west", x == 0, "#side"), ("east", x == n - 1, "#side"), ("down", y == 0, "#bottom"),
+                                          ("up", y == n - 1, "#top"), ("north", z == 0, "#side"), ("south", z == n - 1, "#side")):
+                    if outer:
+                        faces[d] = {"texture": texture, "uv": [0, 0, 16, 16]}
+                if faces:
+                    elements.append({"from": [round(x * step, 4), round(y * step, 4), round(z * step, 4)],
+                                     "to": [round((x + 1) * step, 4), round((y + 1) * step, 4), round((z + 1) * step, 4)], "faces": faces})
+    model = {"parent": "minecraft:block/block", "textures": {"particle": side, "side": side, "top": top, "bottom": bottom},
+             "elements": elements}
+    if kind[0] == "windowed":
+        model["render_type"] = "minecraft:cutout"
+    return model
 
 
 def check_textures():

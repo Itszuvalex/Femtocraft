@@ -1,6 +1,19 @@
 package com.itszuvalex.femtocraft.dev
 
 import com.itszuvalex.femtocraft.industry.FrameMultiblocks
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.Item
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.InteractionHand
+import com.itszuvalex.femtocraft.industry.PackedState
+import com.itszuvalex.femtocraft.industry.PackedMultiblocks
+import com.itszuvalex.femtocraft.industry.IndustryContent
+import com.itszuvalex.femtocraft.industry.FrameMultiblock
+import com.itszuvalex.femtocraft.industry.FrameMachineBlockEntity
 import com.itszuvalex.femtocraft.logistics.FluidReservoirBlockEntity
 import com.itszuvalex.femtocraft.logistics.FluidReservoirMenu
 import com.itszuvalex.femtocraft.logistics.FluidReservoirState
@@ -42,7 +55,7 @@ object VaultGameTests {
 
     fun register() {
         DevGameTests.test("item_vault_stores_through_outer_faces_and_terminal", body = ::itemVault)
-        DevGameTests.test("item_vault_drops_its_items_when_broken", body = ::itemVaultDrops)
+        DevGameTests.test("storage_multiblocks_pack_into_one_item_and_rebuild", 200, DevGameTests.TALL, ::packing)
         DevGameTests.test("fluid_reservoir_fills_tanks_by_fluid", body = ::fluidReservoir)
         DevGameTests.test("nanite_vault_holds_many_strains", body = ::naniteVault)
         DevGameTests.test("fluid_reservoir_syncs_tanks_for_rendering", body = ::reservoirSync)
@@ -84,13 +97,84 @@ object VaultGameTests {
         helper.succeed()
     }
 
-    private fun itemVaultDrops(helper: GameTestHelper) {
-        helper.assertTrue(FrameMultiblocks.ITEM_VAULT.formAt(helper.level, helper.absolutePos(AT)), "vault formed")
-        val home = helper.getBlockEntity(AT, ItemVaultBlockEntity::class.java)
-        home.storage.insert(0, IItemStack.of(ItemStack(Items.EMERALD, 7)))
-        helper.destroyBlock(AT.offset(1, 1, 1))
-        helper.assertBlockNotPresent(com.itszuvalex.femtocraft.logistics.LogisticsContent.ITEM_VAULT.get(), AT)
-        helper.assertItemEntityPresent(Items.EMERALD, AT, 2.0)
+    /** What each storage multiblock holds when it is filled: [fill] puts something distinctive in it. */
+    private class Packable(val name: String, val multiblock: FrameMultiblock, val fill: (GameTestHelper) -> Unit)
+
+    private val PACKABLES = listOf(
+        Packable("item vault", FrameMultiblocks.ITEM_VAULT) { helper ->
+            val home = helper.getBlockEntity(AT, ItemVaultBlockEntity::class.java)
+            home.storage.insert(0, IItemStack.of(ItemStack(Items.EMERALD, 7)))
+            home.storage.insert(5, IItemStack.of(ItemStack(Items.GOLD_INGOT, 3)))
+        },
+        Packable("fluid reservoir", FrameMultiblocks.FLUID_RESERVOIR) { helper ->
+            val face = helper.getBlockEntity(AT, FluidReservoirBlockEntity::class.java).getModule(Modules.FLUID_STORAGE, Direction.WEST)!!
+            face.fill(IFluidStack.of(FluidStack(Fluids.WATER, 70_000)), true)
+            face.fill(IFluidStack.of(FluidStack(Fluids.LAVA, 500)), true)
+        },
+        Packable("nanite vault", FrameMultiblocks.NANITE_VAULT) { helper ->
+            val face = helper.getBlockEntity(AT, NaniteVaultBlockEntity::class.java).getModule(NaniteModules.NANITE_TANK, Direction.DOWN)!!
+            face.fill(NaniteRegistry.dumb(100), true)
+            face.fill(NaniteRegistry.archive(25), true)
+        },
+    )
+
+    private fun homeState(helper: GameTestHelper): PackedState =
+        (helper.level.getBlockEntity(helper.absolutePos(AT)) as FrameMachineBlockEntity<*>).state() as PackedState
+
+    private fun drops(helper: GameTestHelper): List<ItemStack> =
+        helper.level.getEntitiesOfClass(ItemEntity::class.java, AABB(helper.absolutePos(AT)).inflate(6.0)).map { it.item }
+
+    /**
+     * A storage multiblock broken by hand or with a wrench drops one item for the whole machine, carrying its contents
+     * (and saying what they are), and using that item builds the machine again holding the same.
+     */
+    private fun packing(helper: GameTestHelper) {
+        helper.setBlock(AT.below(), Blocks.STONE)
+        val player = helper.makeMockServerPlayerInLevel()
+        player.setGameMode(GameType.SURVIVAL)
+        val ground = helper.absolutePos(AT.below())
+        val hit = BlockHitResult(ground.center.add(0.0, 0.5, 0.0), Direction.UP, ground, false)
+        for (case in PACKABLES) {
+            val multi = case.multiblock
+            val packedItem = multi.packedItem!!()
+            helper.assertTrue(multi.formAt(helper.level, helper.absolutePos(AT)), "${case.name} formed")
+            case.fill(helper)
+            val before = homeState(helper).describe().map { it.string }
+            helper.assertTrue(homeState(helper).isPackedEmpty().not(), "${case.name} holds something")
+
+            for (how in listOf("by hand", "with a wrench")) {
+                val corner = helper.absolutePos(AT.offset(2, 2, 2))
+                if (how == "by hand") {
+                    helper.level.destroyBlock(corner, true)
+                } else {
+                    player.isShiftKeyDown = true
+                    helper.level.getBlockState(corner).useItemOn(ItemStack(IndustryContent.WRENCH.get()), helper.level, player, InteractionHand.MAIN_HAND, BlockHitResult(corner.center, Direction.UP, corner, false))
+                }
+                helper.assertBlockNotPresent(multi.block, AT)
+                val dropped = drops(helper)
+                helper.assertValueEqual(dropped.size, 1, "${case.name} broken $how drops one item, got $dropped")
+                val stack = dropped[0]
+                helper.assertTrue(stack.`is`(packedItem), "${case.name} broken $how drops its machine item, got $stack")
+                helper.assertTrue(stack.has(PackedMultiblocks.STATE.get()), "${case.name} broken $how carries its contents")
+                val tooltip = stack.getTooltipLines(Item.TooltipContext.of(helper.level), null, TooltipFlag.NORMAL).map { it.string }
+                helper.assertTrue(before.all { it in tooltip }, "${case.name}'s item says what it holds ($before), got $tooltip")
+                drops(helper).let { helper.level.getEntitiesOfClass(ItemEntity::class.java, AABB(helper.absolutePos(AT)).inflate(6.0)).forEach { e -> e.discard() } }
+
+                val result = stack.copy().useOn(UseOnContext(helper.level, player, InteractionHand.MAIN_HAND, stack.copy(), hit))
+                helper.assertTrue(result.consumesAction(), "${case.name}'s item places: $result")
+                helper.assertBlockPresent(multi.block, AT.offset(2, 2, 2))
+                helper.assertValueEqual(homeState(helper).describe().map { it.string }, before, "${case.name} holds the same after placing its item ($how)")
+            }
+            // An empty machine drops a plain item, so empty ones stack.
+            helper.level.destroyBlock(helper.absolutePos(AT.offset(1, 1, 1)), true)
+            helper.level.getEntitiesOfClass(ItemEntity::class.java, AABB(helper.absolutePos(AT)).inflate(6.0)).forEach { it.discard() }
+            helper.assertTrue(multi.formAt(helper.level, helper.absolutePos(AT)), "${case.name} formed again, empty")
+            helper.assertTrue(homeState(helper).isPackedEmpty(), "a fresh ${case.name} is empty")
+            helper.level.destroyBlock(helper.absolutePos(AT), true)
+            val plain = drops(helper)
+            helper.assertTrue(plain.size == 1 && !plain[0].has(PackedMultiblocks.STATE.get()), "an empty ${case.name} drops a plain item: $plain")
+            helper.level.getEntitiesOfClass(ItemEntity::class.java, AABB(helper.absolutePos(AT)).inflate(6.0)).forEach { it.discard() }
+        }
         helper.succeed()
     }
 

@@ -463,3 +463,18 @@ carries what they hold and its tooltip says how much is used of how much it can 
 items)", "Water: 1,200 / 5,000 mB", "Nanites: 37 / 250"). Their block items are ItszuLib's `ContentBlockItem`
 (`LogisticsContent.keepingBlock`), which builds an unplaced block entity from the item's data and asks its fragments
 (`IBreakContents.describe`).
+
+**Addendum: storage multiblocks and the wrench (maintainer, 2026-10-05).** The item vault, fluid reservoir and nanite
+vault keep their contents in one item. Breaking any block of one (by hand, an explosion, a wrench) drops a single
+machine item (`item_vault`, `fluid_reservoir`, `nanite_vault`; `PackedMultiblockItem`) carrying the shared state in the
+`femtocraft:packed_state` component (what `IMultiblockState.serialize` writes); an empty machine drops a plain item, so
+empty ones stack. Using the item where a frame would go builds the whole machine at once, if there is room, with its
+contents restored (`PackedMultiblocks.restore`). The item's tooltip says what it holds, used out of capacity
+(`PackedState.describe`), and its model is the whole 3x3x3 drawn at the size of one block (`gen_assets.py`
+`packed_model`: 27 blocks at a third of the size, outer faces only, each face showing the texture three times across).
+Not checked in a client. Other frame multiblocks (archive, chambers, mainframe) still drop their contents; they
+become packable by implementing `PackedState` and giving their `FrameMultiblock` a `packedItem`.
+
+The **wrench** (`femtocraft:wrench`, shaped from iron ingots) is in ItszuLib's `itszulib:wrenches` tag: a sneaking player
+using it on any `EntityBlockCore` block (every Femtocraft machine) breaks it at once with its drops, kept contents
+included, whatever the tool rules and mining time. It is a dismantler, not a configurator.
