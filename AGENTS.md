@@ -211,7 +211,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   (`get`); the conduit itself uses `chip(index)`, which does not write. Add a kind by
   subclassing `ChipKind` and listing it in `Chips.KINDS`. Chips carry an ItszuLib `ResourceFilter` (`ChipData.filter`, nine entries, allow
   or deny; edited with ItszuLib's `FilterRow` in the conduit screen's chips tab, DECISIONS D24, D25); the conduit shows
-  its chips as coloured cubes on its arms (`ChipNodes`, synced as `chipLayout`), and using one opens that chip's
+  its chips as cubes on its arms, faced with the chip (`chip_node_<kind>` textures from `gen_assets.py`) (`ChipNodes`, synced as `chipLayout`), and using one opens that chip's
   `ChipMenu` (D26);
   item chips pull through a block's `LogisticsModules.ITEM_INDEX` (an ItszuLib `ItemStorageIndex`, e.g. the item
   vault's) when it has one. `DistributedManager` matches

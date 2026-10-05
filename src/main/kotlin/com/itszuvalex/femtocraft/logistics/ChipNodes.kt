@@ -8,7 +8,7 @@ import net.minecraft.world.phys.shapes.VoxelShape
 
 /**
  * Where a conduit shows its chips in the world: a small cube per chip at a corner of the square end of its face's arm,
- * touching the neighbouring block (or, on a face without an arm, touching the core), coloured by the chip's kind. The
+ * touching the neighbouring block (or, on a face without an arm, touching the core), each face showing the chip. The
  * renderer draws them, the block's shape includes them so they can be aimed at, and using one opens that chip's own
  * menu ([ChipMenu]).
  *
