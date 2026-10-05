@@ -267,9 +267,50 @@ PLACEHOLDERS = {
     "block/crystal_focusing_chamber": ((120, 90, 200, 255), (70, 50, 120, 255)),
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
     "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
-    "block/mainframe_front": ((0, 0, 0, 0), (90, 255, 150, 255)),
-    "block/archive_interface_front": ((0, 0, 0, 0), (90, 200, 220, 255)),
 }
+
+# Machine fronts drawn as the v3 fronts are: a 10x10 dark panel in the middle of the face ("#"), the glyph cut out of
+# it ("."), so the machine base and its tinted colour layer show through.
+FRONT_DARK = (37, 38, 38, 255)
+FRONT_GLYPHS = {
+    # A server rack: three drive bays, each with its light, over a vent grille.
+    "mainframe_front": [
+        "##########",
+        "#.....#..#",
+        "##########",
+        "#.....#..#",
+        "##########",
+        "#.....#..#",
+        "##########",
+        "#.#.#.#.##",
+        "##.#.#.#.#",
+        "##########",
+    ],
+    # A socket into the Archive: rings around its core.
+    "archive_interface_front": [
+        "##########",
+        "#........#",
+        "#.######.#",
+        "#.#....#.#",
+        "#.#.##.#.#",
+        "#.#.##.#.#",
+        "#.#....#.#",
+        "#.######.#",
+        "#........#",
+        "##########",
+    ],
+}
+
+
+def front_glyphs():
+    for name, glyph in FRONT_GLYPHS.items():
+        rows = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
+        for y, line in enumerate(glyph):
+            for x, c in enumerate(line):
+                if c == "#":
+                    rows[3 + y][3 + x] = FRONT_DARK
+        write_png(os.path.join(ASSETS, "textures", "block", f"{name}.png"), rows)
+
 
 LANG = {
     "itemGroup.femtocraft": "Femtocraft",
@@ -848,6 +889,7 @@ def technologies(lang):
 def main():
     lang = dict(LANG)
     chip_nodes()
+    front_glyphs()
     technologies(lang)
     tools = {}
     for name, entry in BLOCKS.items():
