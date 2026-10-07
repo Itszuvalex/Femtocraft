@@ -478,3 +478,16 @@ become packable by implementing `PackedState` and giving their `FrameMultiblock`
 The **wrench** (`femtocraft:wrench`, shaped from iron ingots) is in ItszuLib's `itszulib:wrenches` tag: a sneaking player
 using it on any `EntityBlockCore` block (every Femtocraft machine) breaks it at once with its drops, kept contents
 included, whatever the tool rules and mining time. It is a dismantler, not a configurator.
+
+## D27. Chips shown on the conduit, each with its own screen — DECIDED (maintainer, 2026-10-05)
+
+- **Shown in the world.** A conduit draws each chip as a small cube whose faces show the chip: its texture's chip
+  (pins, body, light and the kind's coloured pads) on a dark square, `textures/block/chip_node_<kind>.png`, made from
+  the chip item textures by `tools/gen_assets.py`; on the cube's sides the pins point along the arm, outwards. The
+  four slots of a face are the four corners of its arm's square end, touching the neighbouring block, or touching the
+  core on a face without an arm (`logistics/ChipNodes.kt`). The conduit keeps a layout of the kinds per slot (2 bits a slot, `chipLayout`), syncs it
+  only when it changes (key `Chips`) and draws it with a block entity renderer (`ConduitChipRenderer`).
+- **Own screen.** The cubes are part of the block's shape, so they can be aimed at; using one opens that chip's
+  screen (`ChipMenu`, `ChipScreen`): its slot, which face it is in, its settings, mode and side buttons and filter,
+  the same controls as the chips tab, acting on that chip only. Using the conduit anywhere else opens the conduit's
+  screen as before.

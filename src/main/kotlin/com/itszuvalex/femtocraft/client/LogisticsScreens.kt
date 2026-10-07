@@ -1,5 +1,6 @@
 package com.itszuvalex.femtocraft.client
 
+import com.itszuvalex.femtocraft.logistics.ChipMenu
 import com.itszuvalex.femtocraft.logistics.ConduitMenu
 import com.itszuvalex.femtocraft.logistics.FluidReservoirMenu
 import com.itszuvalex.femtocraft.logistics.FluidReservoirState
@@ -70,6 +71,30 @@ class ConduitScreen(menu: ConduitMenu, inventory: Inventory, title: Component) :
             val i = face.get3DDataValue()
             text(graphics, Component.literal(face.serializedName.substring(0, 1).uppercase()), 16 + (i % 2) * 76, 22 + (i / 2) * 20)
         }
+    }
+}
+
+/**
+ * One chip of a conduit, opened by using the chip on the conduit in the world: the chip's slot, which face it is in,
+ * then its settings, direction and interface buttons and filter, as in the conduit's chips tab ([ConduitChipsTab]).
+ */
+class ChipScreen(menu: ChipMenu, inventory: Inventory, title: Component) : FemtoScreen<ChipMenu>(menu, inventory, title, 176, ChipMenu.HEIGHT) {
+    init {
+        inventoryLabelY = ChipMenu.INVENTORY_Y - 11
+    }
+
+    override fun addComponents() {
+        val selection = ConduitChipsTab.Selection(menu.containerId) { i -> if (i == menu.chipSlot) menu.slots.getOrNull(0)?.item ?: net.minecraft.world.item.ItemStack.EMPTY else net.minecraft.world.item.ItemStack.EMPTY }
+        selection.index = menu.chipSlot
+        addComponent(com.itszuvalex.itszulib.client.screen.Column(ConduitChipsTab.controls(selection, CONTROLS_W), gap = 5), 7, ChipMenu.CHIP_Y + 22)
+    }
+
+    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        text(graphics, Component.translatable("gui.femtocraft.chip.face", menu.face.serializedName), ChipMenu.CHIP_X + 22, ChipMenu.CHIP_Y + 5)
+    }
+
+    companion object {
+        const val CONTROLS_W = 162
     }
 }
 

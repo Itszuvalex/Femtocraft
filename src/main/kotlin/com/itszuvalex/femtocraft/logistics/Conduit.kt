@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.fml.LogicalSide
 import net.neoforged.neoforge.capabilities.Capabilities
@@ -86,11 +87,32 @@ class LogisticsConduit : FragNetworkedWire<LogisticsConduit, LogisticsNetwork>({
     val chips: Array<ChipSlots> = Array(6) { ChipSlots(Direction.from3DDataValue(it)) }
 
     /**
+     * Which kind of chip sits in each slot ([ChipNodes]), for the chips shown in the world: kept current on the server
+     * and synced (key `Chips`) whenever it changes.
+     */
+    var chipLayout: Long = 0L
+        private set
+
+    private fun computeLayout(): Long = (0 until ChipNodes.SLOTS).fold(0L) { layout, slot ->
+        ChipNodes.withKind(layout, slot, ChipNodes.kindOf(chips[slot / CHIPS_PER_FACE].chip(slot % CHIPS_PER_FACE)))
+    }
+
+    /** A chip slot changed: save, and sync if the chips shown in the world changed. */
+    private fun chipsChanged() {
+        val layout = computeLayout()
+        if (layout == chipLayout) markDirty()
+        else {
+            chipLayout = layout
+            markDirtyAndSync()
+        }
+    }
+
+    /**
      * The chips of one face. Each chip's flop countdown lives here while the chip is in the conduit, so ticking does not
      * rewrite the chip (REVIEW O5): it is read from the chip when the chip is placed or loaded, and written back
      * whenever the slot is read from outside ([get]: taking it out, dropping it, saving, an open menu).
      */
-    inner class ChipSlots(private val face: Direction) : ItemStorageArray(CHIPS_PER_FACE, { markDirty() }) {
+    inner class ChipSlots(private val face: Direction) : ItemStorageArray(CHIPS_PER_FACE, { chipsChanged() }) {
         /** Each slot's countdown; null until read from its chip. */
         private val flops = arrayOfNulls<Double>(CHIPS_PER_FACE)
 
@@ -201,6 +223,7 @@ class LogisticsConduit : FragNetworkedWire<LogisticsConduit, LogisticsNetwork>({
     override fun serializeTo(scope: NBTSerializationScope, output: ValueOutput) {
         super.serializeTo(scope, output)
         output.putInt(INV_KEY, inventoryFaces.bits)
+        if (scope == NBTSerializationScope.DESCRIPTION) output.putLong(CHIPS_KEY, chipLayout)
         if (scope == NBTSerializationScope.LEVEL) {
             val storage = output.child(STORAGE_KEY)
             Direction.entries.forEach { chips[it.get3DDataValue()].serialize(storage.child(it.serializedName)) }
@@ -212,13 +235,16 @@ class LogisticsConduit : FragNetworkedWire<LogisticsConduit, LogisticsNetwork>({
         inventoryFaces.load(input.getIntOr(INV_KEY, 0))
         if (scope == NBTSerializationScope.LEVEL) {
             input.child(STORAGE_KEY).ifPresent { storage -> Direction.entries.forEach { d -> storage.child(d.serializedName).ifPresent(chips[d.get3DDataValue()]::deserialize) } }
+            chipLayout = computeLayout()
         }
+        if (scope == NBTSerializationScope.DESCRIPTION) chipLayout = input.getLongOr(CHIPS_KEY, 0L)
     }
 
     companion object {
         const val CHIPS_PER_FACE = 4
         const val INV_KEY = "Inv"
         const val STORAGE_KEY = "storage"
+        const val CHIPS_KEY = "Chips"
 
         @JvmField
         val MODULE: IModule<LogisticsConduit> = Module.registerModule(Identifier.fromNamespaceAndPath(Femtocraft.ID, "logistics_node"), null)
@@ -245,6 +271,35 @@ class ConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlockEntity(Lo
      * Arms towards connected conduits and inventories (the model's, see [ConduitArms]).
      */
     override fun serverTick() = ConduitArms.sync(this) { conduit.isConnected(it) || conduit.inventoryFaces[it] }
+
+    /** Whether [state] (this block's) shows an arm on [face]. */
+    fun hasArm(state: BlockState, face: Direction): Boolean = ConduitArms.PROPERTIES.getValue(face).let { it in state.properties && state.getValue(it) }
+
+    /** The last shape and what it was made for, as one value (shapes are also read off-thread by chunk rendering). */
+    @Volatile
+    private var cachedShape: Triple<BlockState, Long, VoxelShape>? = null
+
+    /** [state]'s arms and core plus the cubes of the chips in the conduit ([ChipNodes]). */
+    fun shape(state: BlockState): VoxelShape {
+        val layout = conduit.chipLayout
+        cachedShape?.let { (s, l, shape) -> if (s === state && l == layout) return shape }
+        val shape = Shapes.or(ConduitArms.shape(state), ChipNodes.shape(layout) { hasArm(state, it) })
+        cachedShape = Triple(state, layout, shape)
+        return shape
+    }
+
+    /** The chip slot whose cube [hit] (a point in the world) is on, or -1. */
+    fun chipSlotAt(hit: net.minecraft.world.phys.Vec3): Int =
+        ChipNodes.slotAt(conduit.chipLayout, { hasArm(blockState, it) }, hit.subtract(net.minecraft.world.phys.Vec3.atLowerCornerOf(blockPos)))
+
+    /** Opens the menu of the chip in [slot] ([ChipMenu]) for [player]. */
+    fun openChipMenu(player: net.minecraft.server.level.ServerPlayer, slot: Int) {
+        val pos = blockPos
+        player.openMenu(net.minecraft.world.SimpleMenuProvider({ id, inv, _ -> ChipMenu(id, inv, this, slot) }, conduit.chips[slot / LogisticsConduit.CHIPS_PER_FACE].chip(slot % LogisticsConduit.CHIPS_PER_FACE).hoverName)) { buf ->
+            buf.writeBlockPos(pos)
+            buf.writeVarInt(slot)
+        }
+    }
 }
 
 class ConduitBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<ConduitBlockEntity>(properties, { LogisticsContent.CONDUIT_BE.get() }) {
@@ -254,6 +309,16 @@ class ConduitBlock(properties: BlockBehaviour.Properties) : FemtoEntityBlock<Con
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) = ConduitArms.addProperties(builder)
 
-    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ConduitArms.shape(state)
+    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape =
+        (level.getBlockEntity(pos) as? ConduitBlockEntity)?.shape(state) ?: ConduitArms.shape(state)
+
+    /** Using one of the chips shown on the conduit opens that chip's menu; anywhere else, the conduit's. */
+    override fun useWithoutItem(state: BlockState, level: Level, pos: BlockPos, player: net.minecraft.world.entity.player.Player, hitResult: net.minecraft.world.phys.BlockHitResult): net.minecraft.world.InteractionResult {
+        val be = level.getBlockEntity(pos) as? ConduitBlockEntity ?: return super.useWithoutItem(state, level, pos, player, hitResult)
+        val slot = be.chipSlotAt(hitResult.location)
+        if (slot < 0) return super.useWithoutItem(state, level, pos, player, hitResult)
+        if (player is net.minecraft.server.level.ServerPlayer) be.openChipMenu(player, slot)
+        return net.minecraft.world.InteractionResult.SUCCESS
+    }
 }
 

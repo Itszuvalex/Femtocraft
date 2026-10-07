@@ -50,6 +50,75 @@ def png(path, rgba, size=16, border=None):
         f.write(data)
 
 
+def read_png(path):
+    """An 8-bit RGBA, non-interlaced PNG as rows of (r, g, b, a) tuples (zlib only, all five row filters)."""
+    with open(path, "rb") as f:
+        data = f.read()
+    pos, idat, width, height = 8, b"", 0, 0
+    while pos < len(data):
+        length, kind = struct.unpack(">I4s", data[pos:pos + 8])
+        body = data[pos + 8:pos + 8 + length]
+        if kind == b"IHDR":
+            width, height, depth, color = struct.unpack(">IIBB", body[:10])
+            assert depth == 8 and color == 6, f"{path}: only 8-bit RGBA is read"
+        elif kind == b"IDAT":
+            idat += body
+        pos += 12 + length
+    raw, stride, rows, prev = zlib.decompress(idat), width * 4, [], bytearray(width * 4)
+    for y in range(height):
+        kind, line = raw[y * (stride + 1)], bytearray(raw[y * (stride + 1) + 1:(y + 1) * (stride + 1)])
+        for i in range(stride):
+            a = line[i - 4] if i >= 4 else 0
+            b = prev[i]
+            c = prev[i - 4] if i >= 4 else 0
+            if kind == 1:
+                line[i] = (line[i] + a) & 0xFF
+            elif kind == 2:
+                line[i] = (line[i] + b) & 0xFF
+            elif kind == 3:
+                line[i] = (line[i] + (a + b) // 2) & 0xFF
+            elif kind == 4:
+                pa, pb, pc = abs(b - c), abs(a - c), abs(a + b - 2 * c)
+                line[i] = (line[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 0xFF
+        rows.append([tuple(line[x * 4:x * 4 + 4]) for x in range(width)])
+        prev = line
+    return rows
+
+
+def write_png(path, rows):
+    """Writes rows of (r, g, b, a) tuples as an RGBA PNG (overwriting: for textures derived from others)."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    raw = b"".join(b"\x00" + b"".join(bytes(p) for p in row) for row in rows)
+
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+
+    data = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", len(rows[0]), len(rows), 8, 6, 0, 0, 0))
+    data += chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+    with open(path, "wb") as f:
+        f.write(data)
+
+
+# The cubes a conduit draws for its chips (ChipNodes) wear their chip: the item texture's 8x6 chip (its pins, then the
+# body with the light and the kind's coloured pads) on a dark square, 8x8 doubled to 16x16 (so the atlas keeps its mip
+# levels), one per chip kind.
+CHIP_NODES = {"item": "itemlogisticsitemchipbasic", "fluid": "itemlogisticsfluidchipbasic", "nanite": "itemlogisticsnanitechipbasic"}
+CHIP_BODY = (4, 5, 12, 11)  # x0, y0, x1, y1 of the chip in its item texture
+
+
+def chip_nodes():
+    for kind, item in CHIP_NODES.items():
+        src = read_png(os.path.join(ASSETS, "textures", "item", f"{item}.png"))
+        x0, y0, x1, y1 = CHIP_BODY
+        dark = src[y0 + 1][x0]
+        face = [[dark] * 8]
+        for y in range(y0, y1):
+            face.append([p if p[3] else dark for p in src[y][x0:x1]])
+        face.append([dark] * 8)
+        doubled = [[p for p in row for _ in (0, 1)] for row in face for _ in (0, 1)]
+        write_png(os.path.join(ASSETS, "textures", "block", f"chip_node_{kind}.png"), doubled)
+
+
 def tex(name):
     return f"{NS}:block/{name}"
 
@@ -204,9 +273,50 @@ PLACEHOLDERS = {
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
     "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
     "item/itemwrench": ((0, 0, 0, 0), (190, 195, 210, 255)),
-    "block/mainframe_front": ((0, 0, 0, 0), (90, 255, 150, 255)),
-    "block/archive_interface_front": ((0, 0, 0, 0), (90, 200, 220, 255)),
 }
+
+# Machine fronts drawn as the v3 fronts are: a 10x10 dark panel in the middle of the face ("#"), the glyph cut out of
+# it ("."), so the machine base and its tinted colour layer show through.
+FRONT_DARK = (37, 38, 38, 255)
+FRONT_GLYPHS = {
+    # A server rack: three drive bays, each with its light, over a vent grille.
+    "mainframe_front": [
+        "##########",
+        "#.....#..#",
+        "##########",
+        "#.....#..#",
+        "##########",
+        "#.....#..#",
+        "##########",
+        "#.#.#.#.##",
+        "##.#.#.#.#",
+        "##########",
+    ],
+    # A socket into the Archive: rings around its core.
+    "archive_interface_front": [
+        "##########",
+        "#........#",
+        "#.######.#",
+        "#.#....#.#",
+        "#.#.##.#.#",
+        "#.#.##.#.#",
+        "#.#....#.#",
+        "#.######.#",
+        "#........#",
+        "##########",
+    ],
+}
+
+
+def front_glyphs():
+    for name, glyph in FRONT_GLYPHS.items():
+        rows = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
+        for y, line in enumerate(glyph):
+            for x, c in enumerate(line):
+                if c == "#":
+                    rows[3 + y][3 + x] = FRONT_DARK
+        write_png(os.path.join(ASSETS, "textures", "block", f"{name}.png"), rows)
+
 
 LANG = {
     "itemGroup.femtocraft": "Femtocraft",
@@ -285,6 +395,7 @@ LANG = {
     "gui.femtocraft.conduit.chips.title": "Configure chips",
     "gui.femtocraft.conduit.chips.none": "Click a chip to configure it",
     "gui.femtocraft.conduit.chips.settings": "Face %s: %s, via %s side",
+    "gui.femtocraft.chip.face": "In the conduit's %s face",
     "tooltip.femtocraft.chip.item": "Buffer: %s",
     "tooltip.femtocraft.chip.flops": "Flops: %s/%s",
     "tooltip.femtocraft.chip.channel": "Channel: %s",
@@ -789,6 +900,8 @@ def technologies(lang):
 
 def main():
     lang = dict(LANG)
+    chip_nodes()
+    front_glyphs()
     technologies(lang)
     tools = {}
     for name, entry in BLOCKS.items():

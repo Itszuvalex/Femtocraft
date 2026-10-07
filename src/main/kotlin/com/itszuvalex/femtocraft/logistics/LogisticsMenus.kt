@@ -83,24 +83,32 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
 
     override fun handleAction(player: Player, action: Int, data: Int): Boolean {
         val be = blockEntity ?: return false
-        if (action != ACTION_MODE && action != ACTION_INTERFACE && action != ACTION_FILTER) return false
-        val slot = data and SLOT_MASK
-        if (slot >= 6 * LogisticsConduit.CHIPS_PER_FACE) return false
-        val face = slot / LogisticsConduit.CHIPS_PER_FACE
-        val index = slot % LogisticsConduit.CHIPS_PER_FACE
-        val storage = be.conduit.chips[face]
-        val chip = storage.get(index).toMinecraft()
-        if (!Chips.isChip(chip)) return false
-        val changed = if (action == ACTION_FILTER) {
-            Chips.withFilter(chip, Direction.from3DDataValue(face), data ushr FILTER_SHIFT, carried) ?: return false
-        } else {
-            Chips.cycled(chip, Direction.from3DDataValue(face), action == ACTION_MODE, data and BACKWARD == 0)
-        }
-        storage.setSlot(index, IItemStack.of(changed))
-        return true
+        return applyChipAction(be, carried, action, data)
     }
 
     companion object {
+        /**
+         * Applies a chip action ([ACTION_MODE], [ACTION_INTERFACE] or [ACTION_FILTER], with its [data]) to the chip in
+         * [be] it names, with [carried] in hand. @return False if the action or its chip does not exist.
+         */
+        fun applyChipAction(be: ConduitBlockEntity, carried: net.minecraft.world.item.ItemStack, action: Int, data: Int): Boolean {
+            if (action != ACTION_MODE && action != ACTION_INTERFACE && action != ACTION_FILTER) return false
+            val slot = data and SLOT_MASK
+            if (slot >= 6 * LogisticsConduit.CHIPS_PER_FACE) return false
+            val face = slot / LogisticsConduit.CHIPS_PER_FACE
+            val index = slot % LogisticsConduit.CHIPS_PER_FACE
+            val storage = be.conduit.chips[face]
+            val chip = storage.get(index).toMinecraft()
+            if (!Chips.isChip(chip)) return false
+            val changed = if (action == ACTION_FILTER) {
+                Chips.withFilter(chip, Direction.from3DDataValue(face), data ushr FILTER_SHIFT, carried) ?: return false
+            } else {
+                Chips.cycled(chip, Direction.from3DDataValue(face), action == ACTION_MODE, data and BACKWARD == 0)
+            }
+            storage.setSlot(index, IItemStack.of(changed))
+            return true
+        }
+
         const val ACTION_MODE = 0
         const val ACTION_INTERFACE = 1
         const val ACTION_FILTER = 2
@@ -121,5 +129,38 @@ class ConduitMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity
          * Action data for chip [index] in conduit face [face].
          */
         fun data(face: Int, index: Int, backward: Boolean = false): Int = (face * LogisticsConduit.CHIPS_PER_FACE + index) or (if (backward) BACKWARD else 0)
+    }
+}
+
+/**
+ * One chip in a conduit, opened by using the chip where the conduit shows it ([ChipNodes]): the chip's slot (it can be
+ * taken out or swapped) and the conduit menu's chip actions for that chip only ([ConduitMenu.applyChipAction]: the
+ * same action ids and data, naming [chipSlot]).
+ */
+class ChipMenu(containerId: Int, inventory: Inventory, be: ConduitBlockEntity?, @JvmField val chipSlot: Int) :
+    FemtoMenu<ConduitBlockEntity>(LogisticsContent.CHIP_MENU.get(), containerId, inventory, be) {
+    /** The chip's face. */
+    val face: Direction get() = Direction.from3DDataValue(chipSlot / LogisticsConduit.CHIPS_PER_FACE)
+
+    init {
+        if (be != null && chipSlot in 0 until ChipNodes.SLOTS) {
+            addStorageSlots(be.conduit.chips[chipSlot / LogisticsConduit.CHIPS_PER_FACE], CHIP_X, CHIP_Y, first = chipSlot % LogisticsConduit.CHIPS_PER_FACE, count = 1)
+        }
+        addPlayerInventorySlots(inventory, 8, INVENTORY_Y)
+    }
+
+    override fun handleAction(player: Player, action: Int, data: Int): Boolean {
+        val be = blockEntity ?: return false
+        if (data and ConduitMenu.SLOT_MASK != chipSlot) return false
+        return ConduitMenu.applyChipAction(be, carried, action, data)
+    }
+
+    companion object {
+        const val CHIP_X = 8
+        const val CHIP_Y = 18
+
+        /** Below the chip, its controls (settings, buttons, filter: 65 high from y 40) and the inventory label. */
+        const val INVENTORY_Y = 120
+        const val HEIGHT = INVENTORY_Y + 58 + 18 + 6
     }
 }

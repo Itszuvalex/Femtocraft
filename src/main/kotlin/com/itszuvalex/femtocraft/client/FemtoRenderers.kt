@@ -40,6 +40,7 @@ object FemtoRenderers {
         event.registerBlockEntityRenderer(IndustryContent.GERMINATION_CHAMBER_BE.get()) { GerminationChamberRenderer() }
         event.registerBlockEntityRenderer(IndustryContent.FRAME_BE.get()) { FrameRenderer() }
         event.registerBlockEntityRenderer(com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR_BE.get()) { ReservoirRenderer() }
+        event.registerBlockEntityRenderer(com.itszuvalex.femtocraft.logistics.LogisticsContent.CONDUIT_BE.get()) { ConduitChipRenderer() }
     }
 
     /**
@@ -684,6 +685,82 @@ object FemtoRenderers {
             const val SHELL = 0.01f
             const val MARGIN = 1f / 16f
             const val GAP = 1f / 32f
+        }
+    }
+
+    class ConduitChipState : BlockEntityRenderState() {
+        var layout = 0L
+        var arms = 0
+        var light = 0
+
+        /** Per chip kind ([com.itszuvalex.femtocraft.logistics.Chips.KINDS]): its cube's face, `chip_node_<kind>`. */
+        val sprites = ArrayList<net.minecraft.client.renderer.texture.TextureAtlasSprite>()
+    }
+
+    /**
+     * The chips in a logistics conduit, shown on it ([com.itszuvalex.femtocraft.logistics.ChipNodes]): a small cube per
+     * chip at a corner of its face's arm, each face showing the chip (`chip_node_<kind>`, made from the chip's texture
+     * by `tools/gen_assets.py`) with its pins towards the block the arm leads to.
+     */
+    class ConduitChipRenderer : BlockEntityRenderer<com.itszuvalex.femtocraft.logistics.ConduitBlockEntity, ConduitChipState> {
+        override fun createRenderState() = ConduitChipState()
+
+        override fun extractRenderState(
+            be: com.itszuvalex.femtocraft.logistics.ConduitBlockEntity, state: ConduitChipState, partialTicks: Float, cameraPosition: Vec3,
+            breakProgress: ModelFeatureRenderer.CrumblingOverlay?,
+        ) {
+            super.extractRenderState(be, state, partialTicks, cameraPosition, breakProgress)
+            state.layout = be.conduit.chipLayout
+            if (state.layout == 0L) return
+            state.arms = net.minecraft.core.Direction.entries.fold(0) { m, d -> if (be.hasArm(be.blockState, d)) m or (1 shl d.ordinal) else m }
+            state.light = be.level?.let { net.minecraft.client.renderer.LevelRenderer.getLightCoords(it, be.blockPos) } ?: 0
+            // Looked up each frame, so a resource reload's new atlas is used.
+            val atlas = net.minecraft.client.Minecraft.getInstance().atlasManager.getAtlasOrThrow(net.minecraft.data.AtlasIds.BLOCKS)
+            state.sprites.clear()
+            com.itszuvalex.femtocraft.logistics.Chips.KINDS.forEach {
+                state.sprites += atlas.getSprite(net.minecraft.resources.Identifier.fromNamespaceAndPath(com.itszuvalex.femtocraft.Femtocraft.ID, "block/chip_node_${it.name}"))
+            }
+        }
+
+        override fun submit(state: ConduitChipState, poseStack: PoseStack, collector: SubmitNodeCollector, camera: CameraRenderState) {
+            if (state.layout == 0L) return
+            collector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.cutoutMovingBlock()) { pose, buffer ->
+                for (slot in 0 until com.itszuvalex.femtocraft.logistics.ChipNodes.SLOTS) {
+                    val kind = com.itszuvalex.femtocraft.logistics.ChipNodes.kindAt(state.layout, slot)
+                    val sprite = state.sprites.getOrNull(kind - 1) ?: continue
+                    val face = net.minecraft.core.Direction.from3DDataValue(slot / com.itszuvalex.femtocraft.logistics.LogisticsConduit.CHIPS_PER_FACE)
+                    val box = com.itszuvalex.femtocraft.logistics.ChipNodes.box(slot, state.arms and (1 shl face.ordinal) != 0)
+                    cube(pose, buffer, sprite, box, face, state.light)
+                }
+            }
+        }
+
+        /** [box] with [sprite] on each face, the texture's top towards [out] (the arm's direction) on the four sides. */
+        private fun cube(
+            pose: PoseStack.Pose, buffer: com.mojang.blaze3d.vertex.VertexConsumer, sprite: net.minecraft.client.renderer.texture.TextureAtlasSprite,
+            box: AABB, out: net.minecraft.core.Direction, light: Int,
+        ) {
+            val c = Vector3f(box.center.x.toFloat(), box.center.y.toFloat(), box.center.z.toFloat())
+            val h = (box.xsize / 2).toFloat()
+            for (side in net.minecraft.core.Direction.entries) {
+                val n = side.unitVec3f
+                val up = when {
+                    side.axis != out.axis -> out.unitVec3f
+                    out.axis == net.minecraft.core.Direction.Axis.Y -> Vector3f(0f, 0f, -1f)
+                    else -> Vector3f(0f, 1f, 0f)
+                }
+                val right = Vector3f(up).cross(n)
+                val centre = Vector3f(n).mul(h).add(c)
+                fun vertex(r: Float, u: Float, tu: Float, tv: Float) {
+                    val p = Vector3f(right).mul(r * h).add(Vector3f(up).mul(u * h)).add(centre)
+                    buffer.addVertex(pose, p.x, p.y, p.z).setColor(-1).setUv(sprite.getU(tu), sprite.getV(tv))
+                        .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, n.x(), n.y(), n.z())
+                }
+                vertex(-1f, -1f, 0f, 1f)
+                vertex(1f, -1f, 1f, 1f)
+                vertex(1f, 1f, 1f, 0f)
+                vertex(-1f, 1f, 0f, 0f)
+            }
         }
     }
 }

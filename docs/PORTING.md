@@ -211,8 +211,9 @@ status line at the top left of the HUD. Not yet checked in a client.
 **Next passes:**
 
 - Logistics beams (v3's `WorkerProviderBeamRenderer` belonged to the unported logistics test blocks).
-- Germination chamber growth (already commented out in v3). Still to check in a client: the research visuals below;
-  placeholder looks to replace: the mainframe's and Archive Interface's fronts, the atmospheric base (the alpha drew
-  it with insets and a pillar on top).
+- Germination chamber growth (already commented out in v3). Still to check in a client: the research visuals below.
+- The mainframe and Archive Interface have interim glyph fronts (`FRONT_GLYPHS` in `tools/gen_assets.py`, in the v3
+  fronts' style). The intended look is a full multiblock model, or several different fronts; not done yet (maintainer,
+  2026-10-05). The atmospheric base stays as it is for now.
 - The other OBJs in `art/obj_models` (power pedestal, power sink, arc furnace, cyber base, furnace, nanite hive) belong
   to blocks v3 never finished; convert them with `gen_obj.py` when those blocks are built.

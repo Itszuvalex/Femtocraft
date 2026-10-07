@@ -63,6 +63,7 @@
   "gui.femtocraft.atmospheric.coils": "Coils: %s / %s",
   "gui.femtocraft.atmospheric.strikes": "Lightning strikes: %s",
   "gui.femtocraft.atmospheric.uncapped": "No capacitor on top",
+  "gui.femtocraft.chip.face": "In the conduit's %s face",
   "gui.femtocraft.conduit.chips.none": "Click a chip to configure it",
   "gui.femtocraft.conduit.chips.settings": "Face %s: %s, via %s side",
   "gui.femtocraft.conduit.chips.tab": "Chips",

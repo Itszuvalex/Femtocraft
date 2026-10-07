@@ -3,6 +3,10 @@ package com.itszuvalex.femtocraft.dev
 import com.itszuvalex.femtocraft.dev.DevGameTests.place
 import com.itszuvalex.femtocraft.logistics.ConduitBlockEntity
 import com.itszuvalex.femtocraft.logistics.ConduitMenu
+import com.itszuvalex.femtocraft.logistics.ChipMenu
+import com.itszuvalex.femtocraft.logistics.ChipNodes
+import com.itszuvalex.femtocraft.logistics.Chips
+import com.itszuvalex.femtocraft.logistics.LogisticsConduit
 import com.itszuvalex.femtocraft.core.ConduitArms
 import com.itszuvalex.femtocraft.logistics.ConnectionDirection
 import com.itszuvalex.femtocraft.logistics.FluidRepositoryBlockEntity
@@ -58,6 +62,8 @@ object LogisticsGameTests {
         DevGameTests.test("conduit_arms_follow_connections", body = ::conduitArms)
         DevGameTests.test("conduit_chip_progress_moves_with_the_chip", body = ::chipProgress)
         DevGameTests.test("conduit_menu_cycles_chip_mode_and_interface", body = ::conduitMenu)
+        DevGameTests.test("conduit_shows_its_chips_in_the_world", body = ::chipsShown)
+        DevGameTests.test("using_a_shown_chip_opens_its_own_menu", body = ::chipMenu)
         DevGameTests.test("chip_filter_limits_what_an_input_chip_pulls", body = ::filteredInput)
         DevGameTests.test("chip_filter_limits_what_an_output_chip_takes", body = ::filteredOutput)
         DevGameTests.test("chip_pulls_filtered_items_through_a_vault_index", body = ::filteredVault)
@@ -290,6 +296,72 @@ object LogisticsGameTests {
         menu.handleAction(player, ConduitMenu.ACTION_INTERFACE, ConduitMenu.data(Direction.UP.get3DDataValue(), 1))
         helper.assertTrue(data().interfaceDirection == Direction.UP, "interface down -> up")
         helper.assertTrue(!menu.handleAction(player, ConduitMenu.ACTION_MODE, ConduitMenu.data(Direction.UP.get3DDataValue(), 0)), "empty slot ignored")
+        helper.succeed()
+    }
+
+    /**
+     * The conduit sums up its chips' kinds per slot ([ChipNodes]) and syncs it; the block's shape includes a cube per
+     * chip, at its arm's end where the face has an arm and against the core where it has none.
+     */
+    private fun chipsShown(helper: GameTestHelper) {
+        val be = helper.place<ConduitBlockEntity>(CENTER, LogisticsContent.CONDUIT.get())
+        helper.place<ConduitBlockEntity>(CENTER.north(), LogisticsContent.CONDUIT.get())
+        val up = Direction.UP.get3DDataValue() * LogisticsConduit.CHIPS_PER_FACE + 1
+        val north = Direction.NORTH.get3DDataValue() * LogisticsConduit.CHIPS_PER_FACE + 3
+        be.conduit.chips[Direction.UP.get3DDataValue()].setSlot(1, IItemStack.of(chip(Direction.UP)))
+        be.conduit.chips[Direction.NORTH.get3DDataValue()].setSlot(3, IItemStack.of(chip(Direction.NORTH, kind = FluidChipKind)))
+        helper.assertValueEqual(ChipNodes.kindAt(be.conduit.chipLayout, up), Chips.KINDS.indexOf(ItemChipKind) + 1, "item chip in the layout")
+        helper.assertValueEqual(ChipNodes.kindAt(be.conduit.chipLayout, north), Chips.KINDS.indexOf(FluidChipKind) + 1, "fluid chip in the layout")
+        helper.assertValueEqual((0 until ChipNodes.SLOTS).count { ChipNodes.kindAt(be.conduit.chipLayout, it) != 0 }, 2, "nothing else")
+
+        val registries = helper.level.registryAccess()
+        val client = ConduitBlockEntity(be.blockPos, be.blockState)
+        client.handleUpdateTag(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, registries, be.getUpdateTag(registries)))
+        helper.assertValueEqual(client.conduit.chipLayout, be.conduit.chipLayout, "clients get the layout")
+
+        helper.runAfterDelay(2) {
+            val state = helper.getBlockState(CENTER)
+            helper.assertTrue(be.hasArm(state, Direction.NORTH) && !be.hasArm(state, Direction.UP), "an arm north only")
+            val northBox = ChipNodes.box(north, true)
+            helper.assertTrue(northBox.minZ == 0.0, "the north chip touches the next block, at ${northBox}")
+            val upBox = ChipNodes.box(up, false)
+            helper.assertTrue(upBox.minY == 10.0 / 16 && upBox.maxY < 1.0, "the up chip sits against the core, at $upBox")
+            val shape = state.getShape(helper.level, be.blockPos)
+            helper.assertTrue(shape.bounds().minZ == 0.0, "the shape reaches the arm's end")
+            helper.assertTrue(!shape.isEmpty && shape.toAabbs().any { it.contains(upBox.center) }, "the shape holds the up chip's cube")
+            val world = net.minecraft.world.phys.Vec3.atLowerCornerOf(be.blockPos)
+            helper.assertValueEqual(be.chipSlotAt(upBox.center.add(world)), up, "aiming at the up chip finds it")
+            helper.assertValueEqual(be.chipSlotAt(net.minecraft.world.phys.Vec3(0.5, 0.5, 0.5).add(world)), -1, "the core is no chip")
+
+            be.conduit.chips[Direction.UP.get3DDataValue()].setSlot(1, IItemStack.Empty)
+            helper.assertValueEqual(ChipNodes.kindAt(be.conduit.chipLayout, up), 0, "taking the chip out clears it")
+            helper.succeed()
+        }
+    }
+
+    /**
+     * Using a chip on the conduit opens a menu for it alone: its slot and its actions; actions naming another chip are
+     * refused. (Opening it sends NeoForge's menu-with-data payload, which mock players cannot receive, so the menu is
+     * made here for the slot the hit finds.)
+     */
+    private fun chipMenu(helper: GameTestHelper) {
+        val be = helper.place<ConduitBlockEntity>(CENTER, LogisticsContent.CONDUIT.get())
+        val chips = be.conduit.chips[Direction.EAST.get3DDataValue()]
+        chips.setSlot(2, IItemStack.of(chip(Direction.EAST)))
+        chips.setSlot(0, IItemStack.of(chip(Direction.EAST)))
+        val slot = Direction.EAST.get3DDataValue() * LogisticsConduit.CHIPS_PER_FACE + 2
+        val player = helper.makeMockServerPlayerInLevel()
+        val hit = ChipNodes.box(slot, false).center.add(net.minecraft.world.phys.Vec3.atLowerCornerOf(be.blockPos))
+        helper.assertValueEqual(be.chipSlotAt(hit), slot, "the hit finds the chip")
+        val menu = ChipMenu(1, player.inventory, be, slot)
+        helper.assertTrue(menu.slots[0].item.`is`(LogisticsContent.ITEM_CHIP.get()), "its first slot holds the chip")
+        fun direction(i: Int) = chips.get(i).toMinecraft().get(ItemChipKind.component)!!.settings.direction
+        val before = direction(2)
+        helper.assertTrue(menu.handleAction(player, ConduitMenu.ACTION_MODE, ConduitMenu.data(Direction.EAST.get3DDataValue(), 2)), "its mode cycles")
+        helper.assertTrue(direction(2) != before, "changed")
+        val other = direction(0)
+        helper.assertFalse(menu.handleAction(player, ConduitMenu.ACTION_MODE, ConduitMenu.data(Direction.EAST.get3DDataValue(), 0)), "another chip's action refused")
+        helper.assertTrue(direction(0) == other, "the other chip is unchanged")
         helper.succeed()
     }
 

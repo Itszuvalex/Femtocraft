@@ -70,6 +70,9 @@ object LogisticsContent {
     @JvmField val ITEM_VAULT_MENU = R.blockMenu<ItemVaultBlockEntity, ItemVaultMenu>("item_vault", ::ItemVaultMenu)
     @JvmField val FLUID_RESERVOIR_MENU = R.blockMenu<FluidReservoirBlockEntity, FluidReservoirMenu>("fluid_reservoir", ::FluidReservoirMenu)
     @JvmField val NANITE_VAULT_MENU = R.blockMenu<NaniteVaultBlockEntity, NaniteVaultMenu>("nanite_vault", ::NaniteVaultMenu)
+    @JvmField val CHIP_MENU = R.MENUS.register("chip") { ->
+        IMenuTypeExtension.create { id, inv, buf -> ChipMenu(id, inv, com.itszuvalex.itszulib.menu.BlockMenus.blockEntity<ConduitBlockEntity>(inv, buf), buf.readVarInt()) }
+    }
     @JvmField val NANO_PACK_MENU = R.MENUS.register("nano_pack") { ->
         IMenuTypeExtension.create { id, inv, buf -> NanoPackMenu(id, inv, buf.readEnum(net.minecraft.world.InteractionHand::class.java)) }
     }

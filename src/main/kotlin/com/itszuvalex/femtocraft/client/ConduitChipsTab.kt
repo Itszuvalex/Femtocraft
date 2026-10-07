@@ -36,16 +36,23 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor
  */
 object ConduitChipsTab {
     fun panel(menu: ConduitMenu): SidePanel {
-        val selection = Selection(menu)
+        val selection = Selection(menu.containerId) { i -> menu.slots.getOrNull(i)?.item ?: ItemStack.EMPTY }
         val title = Component.translatable("gui.femtocraft.conduit.chips.title")
-        val content = Column(listOf(
-            ChipPicker(selection),
+        val content = Column(listOf<ScreenComponent>(ChipPicker(selection)) + controls(selection), gap = 5)
+        return SidePanel(Component.translatable("gui.femtocraft.conduit.chips.tab"), title, TitledPanel(title, content),
+            icon = ItemStack(LogisticsContent.ITEM_CHIP.get()), accent = ButtonAccents.IO)
+    }
+
+    /**
+     * The selected chip's controls: its settings, the direction and interface buttons and its filter, [width] wide.
+     */
+    fun controls(selection: Selection, width: Int = ChipPicker.WIDTH): List<ScreenComponent> = listOf(
             Label({
                 val chip = selection.chip()
                 val data = Chips.settingsOf(chip)
                 if (chip.isEmpty || data == null) Component.translatable("gui.femtocraft.conduit.chips.none")
                 else Component.translatable("gui.femtocraft.conduit.chips.settings", Direction.from3DDataValue(selection.index / LogisticsConduit.CHIPS_PER_FACE).serializedName, data.direction.name.lowercase(), data.interfaceDirection.serializedName)
-            }, fixedWidth = ChipPicker.WIDTH),
+            }, fixedWidth = width),
             Row(listOf(
                 ButtonComponent(60, 14, { Component.translatable("gui.femtocraft.conduit.mode") }, { selection.send(ConduitMenu.ACTION_MODE) },
                     Component.translatable("gui.femtocraft.conduit.mode.tip"), ButtonAccents.IO, selection::hasChip),
@@ -53,19 +60,19 @@ object ConduitChipsTab {
                     Component.translatable("gui.femtocraft.conduit.interface.tip"), ButtonAccents.IO, selection::hasChip),
             )),
             FilterRow({ selection.filter() }, { action ->
-                if (selection.hasChip()) ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, ConduitMenu.ACTION_FILTER,
+                if (selection.hasChip()) ClientPacketDistributor.sendToServer(MenuActionPayload(selection.containerId, ConduitMenu.ACTION_FILTER,
                     ConduitMenu.filterData(selection.index / LogisticsConduit.CHIPS_PER_FACE, selection.index % LogisticsConduit.CHIPS_PER_FACE, action)))
             }, setHint = Component.translatable("gui.femtocraft.conduit.filter.set")),
-        ), gap = 5)
-        return SidePanel(Component.translatable("gui.femtocraft.conduit.chips.tab"), title, TitledPanel(title, content),
-            icon = ItemStack(LogisticsContent.ITEM_CHIP.get()), accent = ButtonAccents.IO)
-    }
+        )
 
-    /** The selected chip's slot (face * [LogisticsConduit.CHIPS_PER_FACE] + index), or -1. */
-    class Selection(private val menu: ConduitMenu) {
+    /**
+     * The selected chip's slot (face * [LogisticsConduit.CHIPS_PER_FACE] + index), or -1, in menu [containerId];
+     * [stackAt] reads what is in a slot.
+     */
+    class Selection(val containerId: Int, private val stackAt: (Int) -> ItemStack) {
         var index = -1
 
-        fun chipAt(i: Int): ItemStack = menu.slots.getOrNull(i)?.item?.takeIf(Chips::isChip) ?: ItemStack.EMPTY
+        fun chipAt(i: Int): ItemStack = if (i < 0) ItemStack.EMPTY else stackAt(i).takeIf(Chips::isChip) ?: ItemStack.EMPTY
 
         fun chip(): ItemStack = chipAt(index)
 
@@ -81,7 +88,7 @@ object ConduitChipsTab {
         fun send(action: Int) {
             if (!hasChip()) return
             val backward = Minecraft.getInstance().hasShiftDown()
-            ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action,
+            ClientPacketDistributor.sendToServer(MenuActionPayload(containerId, action,
                 ConduitMenu.data(index / LogisticsConduit.CHIPS_PER_FACE, index % LogisticsConduit.CHIPS_PER_FACE, backward)))
         }
     }

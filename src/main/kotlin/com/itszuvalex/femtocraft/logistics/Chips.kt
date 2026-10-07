@@ -178,7 +178,6 @@ abstract class ChipKind<B : Any>(
 
     /** Whether players can set this kind's filters in the conduit screen (by clicking with what to list held). */
     open val filterable: Boolean get() = false
-
     /** How much the buffer may hold of [b]. */
     open fun limit(b: B): Int = bufferLimit
 
