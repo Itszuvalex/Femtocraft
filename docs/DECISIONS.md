@@ -491,3 +491,50 @@ included, whatever the tool rules and mining time. It is a dismantler, not a con
   screen (`ChipMenu`, `ChipScreen`): its slot, which face it is in, its settings, mode and side buttons and filter,
   the same controls as the chips tab, acting on that chip only. Using the conduit anywhere else opens the conduit's
   screen as before.
+
+## D28. Host strains: archetypes, talent trees, talents carried by nanites — DECIDED (maintainer, 2026-10-07)
+
+The maintainer asked for the framework for player nanite improvements: a screen showing the host's enhancements, the
+nanites they carry and their strains, the "magic" part of the mod held in the player. Their direction: every player
+has the same nanite archetypes; each archetype has a talent tree players unlock, which changes how the nanites act on
+the world and machines; the unlocked talents are the strain, encoded in it and shipped around with the nanites, so
+different players' nanites do different things. This follows the 2016 "Back to Magic" notes (the host's progression
+is how far their strain is upgraded; their upgrades augment the machines they feed) and the 2020 "Nanites" notes
+(archetypes and their colours, upgrade paths).
+
+- **Archetypes** (`host/NaniteArchetypes`): Archive (tier 0, the only one bred so far, by the host's body), then the
+  2020 notes' Industry, Energy, Growth, Utility, Fauna and Military. Their trees start empty. Dumb nanites have no tree.
+- **Talents** are a synced datapack registry, `femtocraft:talent` (archetype, prerequisites in the same tree, cost in
+  points, icon, optional name, description and position, and `effects` on stats). The rules are pure (`Talents`:
+  state, refusal, unlock, spent, stat, problems), and data problems are logged at server start.
+- **Stats** are code-registered (`TalentStats`), each with a base value that talents add to. `HOST` stats count every
+  talent the host has unlocked and shape their body (`HostStats`); `NANITE` stats count the talents a stack carries.
+- **Strains** (`HostStrains`): the talents a host has unlocked per archetype, in a synced player attachment kept on
+  death. Only hosts have strains.
+- **Talent points**: one per technology the host's team has researched, minus the cost of unlocked talents (a talent
+  removed from data gives its points back). Decided with the maintainer: research is the source.
+- **Talents travel with the nanites**: `NaniteStack.talents` (sorted, saved as `talents`; older saves load
+  talentless). Bred nanites carry the breeder's current talents of that archetype at version 0.<talent count>; nanites
+  with different talents do not stack. Decided with the maintainer: nanites bred before a change keep the talents they
+  were bred with; only new ones follow the new strain.
+- **Reset**: free, per archetype, giving its points back (decided with the maintainer). Nanites already bred keep their
+  talents.
+- **Consumers read the nanites**: the Archive gets `research_per_nanite` points for each nanite it draws, from that
+  nanite's talents (10 without any, as before). Host draws take any Archive nanites, oldest first
+  (`NaniteHost.drawStacks`), so a machine sees what each nanite carries.
+- **Starter Archive tree** (first-guess numbers): Deep Reservoir (+10 stocked), then Long Tether (+4 reach) or Expanded
+  Vessel (+100 tank); Quickened Breeding (+25% speed), then Frugal Metabolism (-30% hunger) or Dense Thought (+5 research
+  per nanite, carried); Archival Mind joins both branches.
+- **Host screen** (`HostScreen`, opened with the host key, N by default): talent points, a tab per archetype, its tree
+  in ItszuLib's `NodeTreeView` (ItszuLib D22; costs as badges, unaffordable talents greyed), the selected talent's
+  effects and cost with Integrate and Reset, a Nanites panel (tank fill; each kind with strain, version, amount and its
+  talents on hover) and a Body panel (the body's stats). It reads synced data; actions go through `HostMenu`.
+- **Networking and keys**: Femtocraft has its own payload registration (`core/FemtoNetwork`), with a general
+  open-screen request (`OpenScreenPayload`, `FemtoNetwork.screen`), and its own key bindings (`client/FemtoKeys`, the
+  `Femtocraft` controls category). Asked for by the maintainer.
+
+Open: talents for the other archetypes and where their nanites come from (hives, extraction); active abilities (the
+2016 notes' blink, flight, platforms), which would add an activation hook and keys beside these passive stats; whether
+nanites shipped to another player's machines should behave differently from their own; and whether talent points
+should also come from elsewhere.
+

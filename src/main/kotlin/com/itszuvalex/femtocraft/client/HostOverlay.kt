@@ -13,7 +13,7 @@ import net.neoforged.neoforge.client.gui.GuiLayer
 
 /**
  * The nanite host's status, at the top left of the screen while the player is a host: their Archive nanites against
- * what their body keeps stocked ([NaniteHost.REGEN_CAP]), with a bar, and whether they are regrowing. Other systems
+ * what their body keeps stocked ([com.itszuvalex.femtocraft.host.HostStats.regenCap]), with a bar, and whether they are regrowing. Other systems
  * add lines with [addLine] (bonuses, strains, and so on as they come).
  */
 object HostOverlay : GuiLayer {
@@ -39,15 +39,16 @@ object HostOverlay : GuiLayer {
         if (!NaniteHost.isHost(player) || mc.options.hideGui) return
         val font = mc.font
         val amount = NaniteHost.archiveNanites(player)
-        val regrowing = amount < NaniteHost.REGEN_CAP && player.foodData.foodLevel >= NaniteHost.REGEN_MIN_FOOD
-        val title = Component.translatable("hud.femtocraft.host.nanites", amount, NaniteHost.REGEN_CAP)
+        val cap = com.itszuvalex.femtocraft.host.HostStats.of(player).regenCap
+        val regrowing = amount < cap && player.foodData.foodLevel >= NaniteHost.REGEN_MIN_FOOD
+        val title = Component.translatable("hud.femtocraft.host.nanites", amount, cap)
         graphics.text(font, title, X, Y, COLOR, true)
         val barY = Y + LINE
         graphics.fill(X, barY, X + BAR_WIDTH, barY + 3, 0xC0000000.toInt())
-        graphics.fill(X, barY, X + BAR_WIDTH * amount.coerceAtMost(NaniteHost.REGEN_CAP) / NaniteHost.REGEN_CAP, barY + 3, COLOR)
+        graphics.fill(X, barY, X + BAR_WIDTH * amount.coerceAtMost(cap) / cap, barY + 3, COLOR)
         var y = barY + 6
         val status = when {
-            amount >= NaniteHost.REGEN_CAP -> null
+            amount >= cap -> null
             regrowing -> Component.translatable("hud.femtocraft.host.regrowing")
             else -> Component.translatable("hud.femtocraft.host.hungry")
         }

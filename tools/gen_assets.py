@@ -395,6 +395,38 @@ LANG = {
     "gui.femtocraft.conduit.chips.title": "Configure chips",
     "gui.femtocraft.conduit.chips.none": "Click a chip to configure it",
     "gui.femtocraft.conduit.chips.settings": "Face %s: %s, via %s side",
+    "key.category.femtocraft.femtocraft": "Femtocraft",
+    "key.femtocraft.host": "Nanite host",
+    "gui.femtocraft.host.title": "Nanite Host",
+    "gui.femtocraft.host.points": "Talent points: %s / %s",
+    "gui.femtocraft.host.integrate": "Integrate",
+    "gui.femtocraft.host.integrate.tip": "Unlock the selected talent in this strain. Nanites you breed from now on carry it",
+    "gui.femtocraft.host.reset": "Reset",
+    "gui.femtocraft.host.reset.tip": "Forget every talent of this archetype and get its points back. Nanites already bred keep their talents",
+    "gui.femtocraft.host.not_host": "You are not a nanite host. Touch a crystal cluster with a bare hand to let the Archive in.",
+    "gui.femtocraft.host.not_host.short": "not a host",
+    "gui.femtocraft.host.tab.count": "%s of %s talents unlocked",
+    "gui.femtocraft.host.effect": "%s %s",
+    "gui.femtocraft.host.unlocked": "Unlocked",
+    "gui.femtocraft.host.cost": "Cost: %s (you have %s)",
+    "gui.femtocraft.host.cost.short": "Cost: %s",
+    "gui.femtocraft.host.requires": "Requires:",
+    "gui.femtocraft.host.nanites.tab": "Nanites",
+    "gui.femtocraft.host.nanites.title": "Nanites carried",
+    "gui.femtocraft.host.nanites.tank": "Tank: %s / %s",
+    "gui.femtocraft.host.nanites.none": "None",
+    "gui.femtocraft.host.nanites.more": "and %s more kinds",
+    "gui.femtocraft.host.nanites.strain": "Strain %s, version %s",
+    "gui.femtocraft.host.nanites.no_talents": "No talents",
+    "gui.femtocraft.host.body.tab": "Body",
+    "gui.femtocraft.host.body.title": "Host body",
+    "gui.femtocraft.host.body.archive": "Archive nanites",
+    "gui.femtocraft.host.body.regen": "Breeds one every",
+    "gui.femtocraft.host.body.seconds": "%s s",
+    "gui.femtocraft.host.body.hunger": "Food per nanite",
+    "gui.femtocraft.host.body.reach": "Reach for machines",
+    "gui.femtocraft.host.body.tank": "Tank capacity",
+    "gui.femtocraft.host.body.research": "Research per nanite",
     "gui.femtocraft.chip.face": "In the conduit's %s face",
     "tooltip.femtocraft.chip.item": "Buffer: %s",
     "tooltip.femtocraft.chip.flops": "Flops: %s/%s",
@@ -898,8 +930,71 @@ def technologies(lang):
         lang[f"technology.{NS}.{t['id']}.desc"] = t["description"]
 
 
+# Nanite archetypes (host/NaniteArchetypes.kt): name, short tab label, description.
+ARCHETYPES = {
+    "archive": ("Archive", "Arc", "The Archive's own nanites, bred by your body. Their talents shape you and your Archives."),
+    "industry": ("Industry", "Ind", "Nanites for making and processing. No talents yet."),
+    "energy": ("Energy", "Ene", "Nanites for power. No talents yet."),
+    "growth": ("Growth", "Gro", "Nanites for plants and flora. No talents yet."),
+    "utility": ("Utility", "Uti", "Nanites for movement and tools. No talents yet."),
+    "fauna": ("Fauna", "Fau", "Nanites for animals. No talents yet."),
+    "military": ("Military", "Mil", "Nanites for combat. No talents yet."),
+}
+
+# Talent stats (host/Talents.kt TalentStats).
+TALENT_STATS = {
+    "regen_cap": "Archive nanites stocked",
+    "regen_speed": "Breeding speed",
+    "regen_hunger": "Hunger per nanite",
+    "host_reach": "Reach for machines",
+    "tank_capacity": "Tank capacity",
+    "research_per_nanite": "Research per nanite",
+}
+
+# Talents (data/femtocraft/femtocraft/talent/<archetype>/<id>.json): archetype, prerequisites, cost, icon, effects,
+# name, description. First-guess numbers, to tune in play.
+TALENTS = {
+    "archive/deep_reservoir": ("Archive", [], 1, "minecraft:glass_bottle", {"regen_cap": 10},
+                               "Deep Reservoir", "Your body keeps more Archive nanites stocked."),
+    "archive/quickened_breeding": ("Archive", [], 1, "minecraft:sugar", {"regen_speed": 0.25},
+                                   "Quickened Breeding", "Your body breeds Archive nanites faster."),
+    "archive/frugal_metabolism": ("Archive", ["archive/quickened_breeding"], 1, "minecraft:bread", {"regen_hunger": -0.3},
+                                  "Frugal Metabolism", "Breeding a nanite costs you less food."),
+    "archive/long_tether": ("Archive", ["archive/deep_reservoir"], 1, "minecraft:lead", {"host_reach": 4},
+                            "Long Tether", "Machines can draw your nanites from further away."),
+    "archive/expanded_vessel": ("Archive", ["archive/deep_reservoir"], 2, "minecraft:chest", {"tank_capacity": 100},
+                                "Expanded Vessel", "You can carry more nanites of every kind."),
+    "archive/dense_thought": ("Archive", ["archive/quickened_breeding"], 2, "minecraft:book", {"research_per_nanite": 5},
+                              "Dense Thought", "Nanites you breed carry more of the Archive's mind: an Archive gets more research from each."),
+    "archive/archival_mind": ("Archive", ["archive/dense_thought", "archive/long_tether"], 3, "minecraft:enchanted_book",
+                              {"regen_cap": 10, "research_per_nanite": 5},
+                              "Archival Mind", "The Archive settles into you: more nanites stocked, and each worth more to an Archive."),
+}
+
+
+def talents(lang):
+    folder = os.path.join(DATA, NS, "talent")
+    if os.path.isdir(folder):
+        for root, _, files in os.walk(folder):
+            for f in files:
+                os.remove(os.path.join(root, f))
+    for key, (archetype, pre, cost, icon, effects, name, desc) in TALENTS.items():
+        obj = {"archetype": archetype, "prerequisites": [f"{NS}:{p}" for p in pre], "cost": cost, "icon": icon,
+               "effects": {f"{NS}:{stat}": amount for stat, amount in effects.items()}}
+        write(os.path.join(folder, f"{key}.json"), obj)
+        lang[f"talent.{NS}.{key.replace('/', '.')}"] = name
+        lang[f"talent.{NS}.{key.replace('/', '.')}.desc"] = desc
+    for key, (name, short, desc) in ARCHETYPES.items():
+        lang[f"nanite.{NS}.archetype.{key}"] = name
+        lang[f"nanite.{NS}.archetype.{key}.short"] = short
+        lang[f"nanite.{NS}.archetype.{key}.desc"] = desc
+    for key, name in TALENT_STATS.items():
+        lang[f"stat.{NS}.{key}"] = name
+
+
 def main():
     lang = dict(LANG)
+    talents(lang)
     chip_nodes()
     front_glyphs()
     technologies(lang)

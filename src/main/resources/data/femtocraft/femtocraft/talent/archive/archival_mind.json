@@ -1,0 +1,13 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [
+    "femtocraft:archive/dense_thought",
+    "femtocraft:archive/long_tether"
+  ],
+  "cost": 3,
+  "icon": "minecraft:enchanted_book",
+  "effects": {
+    "femtocraft:regen_cap": 10,
+    "femtocraft:research_per_nanite": 5
+  }
+}

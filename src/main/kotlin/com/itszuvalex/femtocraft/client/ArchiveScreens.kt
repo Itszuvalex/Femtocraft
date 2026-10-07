@@ -130,7 +130,7 @@ class ArchiveScreen(menu: ArchiveMenu, inventory: Inventory, title: Component) :
         val y = focusAndQueue(graphics, BELOW_TREE)
         // gui.femtocraft.archive.status.<ArchiveStatus, lower case>
         line(graphics, Component.translatable("gui.femtocraft.archive.this", Component.translatable("gui.femtocraft.archive.status.${menu.status.name.lowercase()}")), 8, y)
-        val own = if (NaniteHost.isHost(player)) Component.translatable("gui.femtocraft.archive.host", NaniteHost.archiveNanites(player), NaniteHost.REGEN_CAP)
+        val own = if (NaniteHost.isHost(player)) Component.translatable("gui.femtocraft.archive.host", NaniteHost.archiveNanites(player), com.itszuvalex.femtocraft.host.HostStats.of(player).regenCap)
         else Component.translatable("gui.femtocraft.archive.not_host")
         line(graphics, own, 8, y + 12)
         line(graphics, Component.translatable("gui.femtocraft.archive.computed", menu.computedPoints), 8, y + 24)

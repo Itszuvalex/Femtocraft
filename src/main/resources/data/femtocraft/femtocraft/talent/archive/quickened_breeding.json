@@ -1,0 +1,9 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [],
+  "cost": 1,
+  "icon": "minecraft:sugar",
+  "effects": {
+    "femtocraft:regen_speed": 0.25
+  }
+}

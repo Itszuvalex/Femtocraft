@@ -41,10 +41,13 @@ object Femtocraft {
         com.itszuvalex.femtocraft.industry.FrameMultiblocks.init()
         com.itszuvalex.femtocraft.archive.ArchiveContent.init()
         NaniteContent.init()
+        com.itszuvalex.femtocraft.host.HostContent.init(MOD_BUS)
         LogisticsContent.init()
         com.itszuvalex.femtocraft.computation.ComputationContent.init()
         CyberContent.init()
         WorldgenContent.init()
+        // After every feature has declared its payloads.
+        com.itszuvalex.femtocraft.core.FemtoNetwork.register(MOD_BUS)
         FemtoRegistries.register(MOD_BUS)
 
         NeoForge.EVENT_BUS.addListener { _: ServerStoppedEvent ->

@@ -88,6 +88,8 @@ object DevShowcase {
         // 31: the chips shown on a conduit, close up; 32: one chip's own screen
         Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
         Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
+        // 33: the host screen: the Archive talent tree with talents unlocked
+        Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
     )
 
     private const val ITEMS_VIEW = 22
@@ -120,6 +122,7 @@ object DevShowcase {
 
     /** A close look at the chips shown on a conduit, then one chip's own screen. */
     private const val CHIPS_VIEW = 31
+    private const val HOST_VIEW = 33
     private val ITEM_VAULT = BlockPos(22, 0, 0)
     private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
@@ -223,6 +226,10 @@ object DevShowcase {
             (level.getBlockEntity(BASE.offset(10, 0, 2)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)
                 ?.let { p.openMenu(it, it.menuPos()) }
         }
+        // The host view makes the player a host whose team researched some technologies, unlocks part of the Archive
+        // tree, breeds nanites with it beside talentless ones, and opens the host screen.
+        if (view == HOST_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
+        if (view == HOST_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) host(p, level)
         if (view == CHIPS_VIEW && (ticks - BUILD_AT) % VIEW_TICKS == 1) p.closeContainer()
         if (view == CHIPS_VIEW + 1 && (ticks - BUILD_AT) % VIEW_TICKS == MENU_DELAY) {
             (level.getBlockEntity(BASE.offset(11, 0, 2)) as? com.itszuvalex.femtocraft.logistics.ConduitBlockEntity)
@@ -351,6 +358,20 @@ object DevShowcase {
             }
             (p.containerMenu as? com.itszuvalex.itszulib.menu.MenuCore)?.channels?.handle(com.itszuvalex.itszulib.menu.MenuChannels.ACTION_SCOPE, 0)
         }
+    }
+
+    private fun host(p: ServerPlayer, level: ServerLevel) {
+        com.itszuvalex.femtocraft.archive.NaniteHost.contact(p)
+        val team = com.itszuvalex.itszulib.ItszuLib.TEAMS.state.teamOf(p.uuid)?.id ?: return
+        val techs = com.itszuvalex.itszulib.research.TechTree.of(level.registryAccess())
+        techs.inTree(com.itszuvalex.femtocraft.archive.ArchiveContent.TREE).filterValues { !it.unlockedByDefault }.keys.sorted().take(6)
+            .forEach { com.itszuvalex.itszulib.research.TechTree.unlock(level.server, team, it) }
+        for (path in listOf("deep_reservoir", "quickened_breeding", "dense_thought")) {
+            com.itszuvalex.femtocraft.host.HostStrains.unlock(p, net.minecraft.resources.Identifier.fromNamespaceAndPath(Femtocraft.ID, "archive/$path"))
+        }
+        com.itszuvalex.femtocraft.archive.NaniteHost.draw(p, 4)
+        com.itszuvalex.femtocraft.archive.NaniteHost.give(p, 6)
+        com.itszuvalex.femtocraft.core.FemtoNetwork.openScreen(p, com.itszuvalex.femtocraft.host.HostMenu.SCREEN)
     }
 
     private fun codex(p: ServerPlayer, level: ServerLevel) {

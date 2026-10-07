@@ -38,16 +38,27 @@ data class NaniteStrainVersion(val major: Int, val minor: Int) : Comparable<Nani
 /**
  * An amount of one strain of nanites. Port of v3's `INaniteStack`/`NaniteStack` (keys `arch`, `strain`, `v`,
  * `amount`). Archetypes and strains are named; [NaniteRegistry] knows which exist.
+ *
+ * [talents] are what the host who bred them had unlocked in their archetype's talent tree
+ * ([com.itszuvalex.femtocraft.host.HostStrains]): they travel with the nanites, so whatever receives them (a machine, a
+ * tank) acts on them ([com.itszuvalex.femtocraft.host.Talents.stat]). Sorted, without duplicates; saved as `talents`
+ * (absent for none, so older saves load as talentless).
  */
-data class NaniteStack(val archetype: String, val strain: String, val version: NaniteStrainVersion, val amount: Int) {
+data class NaniteStack @JvmOverloads constructor(
+    val archetype: String,
+    val strain: String,
+    val version: NaniteStrainVersion,
+    val amount: Int,
+    val talents: List<net.minecraft.resources.Identifier> = emptyList(),
+) {
     val isEmpty: Boolean get() = amount <= 0
 
     fun withAmount(amount: Int): NaniteStack = if (amount <= 0) EMPTY else copy(amount = amount)
 
     /**
-     * Same archetype, strain (case-insensitive, as v3) and version.
+     * Same archetype, strain (case-insensitive, as v3), version and talents: nanites that stack.
      */
-    fun isSameNanite(other: NaniteStack): Boolean = isSameStrain(other) && version == other.version
+    fun isSameNanite(other: NaniteStack): Boolean = isSameStrain(other) && version == other.version && talents == other.talents
 
     fun isSameStrain(other: NaniteStack): Boolean =
         archetype.equals(other.archetype, ignoreCase = true) && strain.equals(other.strain, ignoreCase = true)
@@ -63,6 +74,8 @@ data class NaniteStack(val archetype: String, val strain: String, val version: N
                 Codec.STRING.fieldOf("strain").forGetter(NaniteStack::strain),
                 NaniteStrainVersion.CODEC.optionalFieldOf("v", NaniteStrainVersion.ZERO).forGetter(NaniteStack::version),
                 Codec.INT.fieldOf("amount").forGetter(NaniteStack::amount),
+                net.minecraft.resources.Identifier.CODEC.listOf().optionalFieldOf("talents", emptyList())
+                    .xmap({ it.distinct().sorted() }, { it }).forGetter(NaniteStack::talents),
             ).apply(i, ::NaniteStack)
         }
 

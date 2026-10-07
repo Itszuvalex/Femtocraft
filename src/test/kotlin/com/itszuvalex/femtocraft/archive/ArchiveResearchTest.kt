@@ -18,7 +18,7 @@ private class FakePort(
 
     override fun focus(): Identifier? = focus
     override fun needsItems(tech: Identifier): Boolean = needsItems
-    override fun drawNanite(): Boolean = if (nanites > 0) true.also { nanites-- } else false
+    override fun drawNanite(): Long = if (nanites > 0) ArchiveState.POINTS_PER_NANITE.also { nanites-- } else 0L
     override fun addProgress(tech: Identifier, amount: Long): Long = minOf(amount, keeps - progress).also { progress += it }
 }
 
@@ -99,7 +99,7 @@ class ArchiveResearchTest {
             var current = first
             override fun focus(): Identifier = current
             override fun needsItems(tech: Identifier) = false
-            override fun drawNanite() = true
+            override fun drawNanite() = ArchiveState.POINTS_PER_NANITE
             override fun addProgress(tech: Identifier, amount: Long): Long {
                 spent += tech to amount
                 if (tech == first) current = second // the nanite points finish the first

@@ -112,7 +112,7 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── core/                  FemtoBlockEntity (serverTick/clientTick/onUse/onPlaced), FemtoEntityBlock and
 │                          FemtoHorizontalEntityBlock, FemtoMenu (ItszuLib side configuration with the
 │                          configurator's modes), FragData, FragExpose,
-│                          FragDerivedColor, Loc4 helpers
+│                          FragDerivedColor, Loc4 helpers; FemtoNetwork (Femtocraft's payloads, screen requests)
 ├── power/                 Power API (modules, node interfaces), wireless network + manager (distribution, spanning
 │                          tree), wired network on ItszuLib FragNetworkedWire, power fragments, power crystal item
 │                          (data component), crystal mount, charging/storage arrays, heat exchanger, conduit, glow stick
@@ -124,6 +124,9 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── archive/               The Archive (3x3x3 frame multiblock researching the team's focus in Femtocraft's tech tree),
 │                          ArchiveRegistry (every claimed Archive and its status), Codex, NaniteHost (the player as host
 │                          of tier 0 Archive nanites: first contact, regeneration, drawing)
+├── host/                  The host framework (DECISIONS D28): NaniteArchetypes, talents (datapack registry
+│                          femtocraft:talent, TalentStats, pure Talents rules), HostStrains (each host's strains,
+│                          talent points), HostStats, HostMenu/HostContent
 ├── computation/           Computation (DECISIONS D19): ComputationConduit network (ItszuLib distribution), leaves
 │                          (FragComputationLeaf), mainframe + processors + heat, Archive Interface (FLOPS to research)
 ├── logistics/             Item/fluid/nanite repositories, logistics conduit network + item/fluid/nanite chips, nano pack;
@@ -135,7 +138,7 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 ├── client/                FemtoScreen (functional screens on ItszuLib's ComponentScreen in Femtocraft's theme,
 │                          `femtocraft:femtocraft` from assets/femtocraft/itszulib/themes: power gauges, the 3D
 │                          side configuration panel behind the "IO" tab) and each area's screens; fluid model and
-│                          entity renderer registration. Client only.
+│                          entity renderer registration; FemtoKeys (key bindings), HostScreen. Client only.
 └── dev/                   Game tests (one object per area), registered only outside production
 src/test/kotlin/...        JUnit 5 tests (distribution algorithm, spanning tree, distributed task manager)
 src/main/resources/        assets (v3 textures under 26.1 paths, generated models/lang) and data (generated), plus
@@ -198,6 +201,20 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   (`FemtoParticles.naniteFlow`). The Archive Codex item (`CodexItem`, `CodexItem.open`) opens the tree, queue and the team's Archives anywhere. Hosts see
   their status at the top left (`client/HostOverlay`; other systems add lines with `HostOverlay.addLine`). Gate content
   with `TechTree.isResearched(player, id)`.
+- **Host strains and talents** (DECISIONS D28): every host has the same archetypes (`NaniteArchetypes`: Archive, then
+  Industry, Energy, Growth, Utility, Fauna, Military), each with a talent tree (`femtocraft:talent` datapack entries,
+  `data/femtocraft/femtocraft/talent/<archetype>/<id>.json`, generated from `TALENTS` in `tools/gen_assets.py`). What a
+  host unlocks in a tree is their strain of it (`HostStrains`, a synced attachment kept on death); talent points are one
+  per technology the team has researched, minus what is spent, and a reset gives a tree's points back. Talents add to
+  `TalentStats`: `HOST` stats shape the host's body (`HostStats`: stocked Archive nanites, breeding speed and hunger,
+  reach for machines, tank capacity; `NaniteHost` and `PlayerNanites` read them), `NANITE` stats travel with the nanites:
+  `NaniteStack.talents` holds the talents of the strain that bred them (version 0.<count>), so whatever receives them
+  reads `Talents.stat(stat, stack.talents)` (the Archive: research per nanite). Draw from hosts with
+  `NaniteHost.drawStacks`/`drawStacksTo` to get the stacks. Add a stat with `TalentStats.register`; add talents in data.
+  The host screen (`HostScreen`, key N, `FemtoKeys.HOST`) shows the trees, the nanites carried and the body's stats.
+- **Networking and keys**: declare payloads with `FemtoNetwork.toServer`/`toClient` during mod construction; let
+  clients open a screen with `FemtoNetwork.screen(id) { player -> ... }` and bind a key to it with
+  `FemtoKeys.screenKey(name, key, id)` (or any action with `FemtoKeys.key`). Menus use ItszuLib's menu syncs and actions.
 - **Computation** (DECISIONS D19): computation conduits (`ComputationConduit`, on `core/LeafConduit` like the power
   conduit) form an ItszuLib `DistributingTileNetwork` over `ComputationModules.LEAF` leaves: mainframes are producers
   (`MainframeComputer`: processors' FLOPS at the mainframe's speed, power spent per FLOP taken, most efficient first),

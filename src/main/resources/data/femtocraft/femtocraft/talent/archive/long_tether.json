@@ -1,0 +1,11 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [
+    "femtocraft:archive/deep_reservoir"
+  ],
+  "cost": 1,
+  "icon": "minecraft:lead",
+  "effects": {
+    "femtocraft:host_reach": 4
+  }
+}

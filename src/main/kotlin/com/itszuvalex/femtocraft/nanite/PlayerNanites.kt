@@ -7,7 +7,8 @@ import net.neoforged.neoforge.attachment.AttachmentType
 import net.neoforged.neoforge.registries.DeferredHolder
 
 /**
- * The player's own nanite tank (100 nanites), a synced data attachment. Port of v3's `PlayerNaniteCapability`; the
+ * The player's own nanite tank ([CAPACITY] nanites before talents, [com.itszuvalex.femtocraft.host.HostStats.tankCapacity]),
+ * a synced data attachment. Port of v3's `PlayerNaniteCapability`; the
  * HUD overlay (`PlayerNaniteCapabilitiesOverlay`) is client rendering, follow-up work. As in v3 the nanites are lost on
  * death.
  */
@@ -25,7 +26,8 @@ object PlayerNanites {
     /**
      * A working copy of the player's tank. Call [save] after changing it (that also syncs it to the player).
      */
-    fun tank(player: Player): NaniteTank = NaniteTank(CAPACITY).also { it.setContents(player.getData(ATTACHMENT.get())) }
+    fun tank(player: Player): NaniteTank =
+        NaniteTank(com.itszuvalex.femtocraft.host.HostStats.of(player).tankCapacity).also { it.setContents(player.getData(ATTACHMENT.get())) }
 
     fun save(player: Player, tank: NaniteTank) {
         player.setData(ATTACHMENT.get(), tank.contents())

@@ -28,6 +28,7 @@ object FemtoClient {
         modBus.addListener(FemtoParticleProviders::register)
         modBus.addListener(NaniteOverlay::register)
         modBus.addListener(HostOverlay::register)
+        FemtoKeys.register(modBus)
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(Previews::submit)
         modBus.addListener { event: EntityRenderersEvent.RegisterRenderers -> event.registerEntityRenderer(NaniteContent.NANO_LASH_ENTITY.get(), ::ThrownItemRenderer) }
     }
@@ -43,6 +44,7 @@ object FemtoClient {
 
     private fun registerScreens(event: RegisterMenuScreensEvent) {
         event.register(PowerContent.CRYSTAL_MOUNT_MENU.get(), ::CrystalMountScreen)
+        event.register(com.itszuvalex.femtocraft.host.HostContent.MENU.get(), ::HostScreen)
         event.register(PowerContent.CRYSTAL_MACHINE_MENU.get(), ::CrystalMachineScreen)
         event.register(PowerContent.CRYO_BASE_MENU.get(), ::CryoChargingBaseScreen)
         event.register(PowerContent.ATMOSPHERIC_BASE_MENU.get(), ::AtmosphericChargingBaseScreen)

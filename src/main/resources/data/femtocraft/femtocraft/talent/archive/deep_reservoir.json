@@ -1,0 +1,9 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [],
+  "cost": 1,
+  "icon": "minecraft:glass_bottle",
+  "effects": {
+    "femtocraft:regen_cap": 10
+  }
+}

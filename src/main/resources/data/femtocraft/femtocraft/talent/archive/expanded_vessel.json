@@ -1,0 +1,11 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [
+    "femtocraft:archive/deep_reservoir"
+  ],
+  "cost": 2,
+  "icon": "minecraft:chest",
+  "effects": {
+    "femtocraft:tank_capacity": 100
+  }
+}

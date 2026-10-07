@@ -1,0 +1,11 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [
+    "femtocraft:archive/quickened_breeding"
+  ],
+  "cost": 1,
+  "icon": "minecraft:bread",
+  "effects": {
+    "femtocraft:regen_hunger": -0.3
+  }
+}

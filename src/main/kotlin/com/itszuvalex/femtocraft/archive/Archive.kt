@@ -1,5 +1,8 @@
 package com.itszuvalex.femtocraft.archive
 
+import com.itszuvalex.femtocraft.host.TalentStats
+import com.itszuvalex.femtocraft.host.Talents
+
 import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.FemtoRegistries
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
@@ -70,8 +73,11 @@ interface ResearchPort {
     /** Whether [tech] has all its points and waits only for delivered items. */
     fun needsItems(tech: Identifier): Boolean
 
-    /** Takes one Archive nanite from a host of the team. @return False if none could be drawn. */
-    fun drawNanite(): Boolean
+    /**
+     * Takes one Archive nanite from a host of the team. @return The research points it is worth (by the talents it
+     * carries, [TalentStats.RESEARCH_PER_NANITE]), or 0 if none could be drawn.
+     */
+    fun drawNanite(): Long
 
     /** Adds up to [amount] points to [tech]. @return How many it kept. */
     fun addProgress(tech: Identifier, amount: Long): Long
@@ -87,9 +93,10 @@ private class LiveResearch(private val level: ServerLevel, private val team: UUI
         return remaining.points <= 0L && !remaining.complete
     }
 
-    override fun drawNanite(): Boolean {
-        val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team } ?: return false
-        return NaniteHost.drawTo(host, 1, level, center) == 1
+    override fun drawNanite(): Long {
+        val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team } ?: return 0L
+        val talents = Talents.of(level.registryAccess())
+        return NaniteHost.drawStacksTo(host, 1, level, center).sumOf { talents.stat(TalentStats.RESEARCH_PER_NANITE, it.talents).toLong() * it.amount }
     }
 
     override fun addProgress(tech: Identifier, amount: Long): Long = TechTree.addProgress(level.server, team, tech, amount)
@@ -102,7 +109,8 @@ private class LiveResearch(private val level: ServerLevel, private val team: UUI
  * Every Archive of a team works on the team's focus: the first technology of Femtocraft's tree in the team's research
  * queue that it can research now ([TechTree.focus]). Every [STEP_TICKS] ticks: if fewer than [RATE] points are
  * buffered, it draws one Archive nanite from the nearest host of the team within [RADIUS] blocks
- * ([NaniteHost.nearbyHosts]) for [POINTS_PER_NANITE] points, then spends up to [RATE] points on the focus
+ * ([NaniteHost.nearbyHosts]) for the points its talents make it worth ([POINTS_PER_NANITE] without any,
+ * [com.itszuvalex.femtocraft.host.TalentStats.RESEARCH_PER_NANITE]), then spends up to [RATE] points on the focus
  * ([TechTree.addProgress], which keeps what is not needed). Points left over go to the next focus. More Archives with
  * more hosts research faster; one host feeds about one Archive.
  *
@@ -200,9 +208,12 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
             status = ArchiveStatus.NEEDS_ITEMS
             return 0L
         }
-        if (points < RATE && port.drawNanite()) {
-            points += POINTS_PER_NANITE
-            onChanged.run()
+        if (points < RATE) {
+            val bought = port.drawNanite()
+            if (bought > 0L) {
+                points += bought
+                onChanged.run()
+            }
         }
         if (points <= 0L && computedPoints <= 0L) {
             status = ArchiveStatus.NO_HOST

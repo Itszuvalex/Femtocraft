@@ -1,0 +1,11 @@
+{
+  "archetype": "Archive",
+  "prerequisites": [
+    "femtocraft:archive/quickened_breeding"
+  ],
+  "cost": 2,
+  "icon": "minecraft:book",
+  "effects": {
+    "femtocraft:research_per_nanite": 5
+  }
+}

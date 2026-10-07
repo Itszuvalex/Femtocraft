@@ -54,7 +54,7 @@ object NaniteOverlay : GuiLayer {
         val x = graphics.guiWidth() - WIDTH + offset
         val y = (graphics.guiHeight() - HEIGHT) / 2
         graphics.blit(BASE, x, y, x + WIDTH, y + HEIGHT, 0f, 1f, 0f, 1f)
-        val fill = ((HEIGHT - 2 * FILL_INSET) * amount.toFloat() / PlayerNanites.CAPACITY).toInt() + FILL_INSET
+        val fill = ((HEIGHT - 2 * FILL_INSET) * amount.toFloat() / com.itszuvalex.femtocraft.host.HostStats.of(player).tankCapacity).toInt() + FILL_INSET
         val v = 1f - fill.toFloat() / HEIGHT
         graphics.blit(FILL, x, y + HEIGHT - fill, x + WIDTH, y + HEIGHT, 0f, 1f, v, 1f)
     }

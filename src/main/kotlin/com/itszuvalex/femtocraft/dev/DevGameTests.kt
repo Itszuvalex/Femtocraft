@@ -54,6 +54,7 @@ object DevGameTests {
         LogisticsGameTests.register()
         CyberGameTests.register()
         ArchiveGameTests.register()
+        HostGameTests.register()
         ComputationGameTests.register()
         VaultGameTests.register()
         IntegrityGameTests.register()
