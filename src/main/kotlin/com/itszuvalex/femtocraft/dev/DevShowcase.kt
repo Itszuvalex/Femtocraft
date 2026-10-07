@@ -73,9 +73,39 @@ object DevShowcase {
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
         Vec3(25.0, 3.2, -2.2) to Vec3(27.5, 1.2, 1.5),
         Vec3(10.5, 2.5, -1.0) to Vec3(10.5, 0.5, 2.0),
+        // 22: the storage multiblock items in item frames; 23: one in hand; 24: dropped on the ground
+        Vec3(30.0, 1.6, 4.2) to Vec3(30.0, 1.4, 7.0),
+        Vec3(30.0, 1.6, 4.2) to Vec3(30.0, 1.6, 7.0),
+        Vec3(30.0, 1.9, 4.0) to Vec3(30.0, 0.2, 6.0),
+        // 25-28: the channel panel: joined, waiting for a deleted channel, the team's channels, asking before a delete
+        Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        // 29-30: a long list of long names: the scrollbar, then scrolled down
+        Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        Vec3(2.5, 2.0, 9.0) to Vec3(2.5, 0.5, 5.5),
+        // 31: the chips shown on a conduit, close up; 32: one chip's own screen
         Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
         Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
     )
+
+    private const val ITEMS_VIEW = 22
+    private const val HAND_VIEW = 23
+    private const val DROPPED_VIEW = 24
+    private const val CHANNELS_VIEW = 25
+    private val CHANNEL_BLOCK = BlockPos(2, 0, 6)
+    private val CHANNEL_BLOCK_2 = BlockPos(4, 0, 6)
+
+    /** The view being shown, for the client half (screenshots). */
+    @Volatile
+    @JvmStatic
+    var currentView = -1
+
+    /** Ticks into the current view. */
+    @Volatile
+    @JvmStatic
+    var viewTicks = 0
 
     private const val FRAMES_VIEW = 9
     private const val SIDE_CONFIG_VIEW = 10
@@ -89,7 +119,7 @@ object DevShowcase {
     private const val CONDUIT_VIEW = 21
 
     /** A close look at the chips shown on a conduit, then one chip's own screen. */
-    private const val CHIPS_VIEW = 22
+    private const val CHIPS_VIEW = 31
     private val ITEM_VAULT = BlockPos(22, 0, 0)
     private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
@@ -204,6 +234,9 @@ object DevShowcase {
                 pole.capacitorPos()?.let { pole.strike(level, it) }
             }
         }
+        currentView = view
+        viewTicks = (ticks - BUILD_AT) % VIEW_TICKS
+        if (view >= ITEMS_VIEW) extraViews(p, level, view, viewTicks)
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
@@ -220,6 +253,104 @@ object DevShowcase {
         }
         look(p, view)
         Femtocraft.LOGGER.info("SHOWCASE view {}", view)
+    }
+
+    /**
+     * The views for the storage multiblock items and the channel panel. Item frames hold the three machine items (and a
+     * full item vault), the next view holds one in hand, the next drops them on the ground; then the dev channel
+     * block's menu opens on the channel tab, a channel is deleted under it, and the team's channels and a delete
+     * confirmation show (the last by the client half).
+     */
+    private fun extraViews(p: ServerPlayer, level: ServerLevel, view: Int, t: Int) {
+        val server = level.server
+        fun run(command: String) = server.commands.performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command)
+        fun at(x: Int, y: Int, z: Int) = BASE.offset(x, y, z)
+        fun stackOf(multi: com.itszuvalex.femtocraft.industry.FrameMultiblock, full: Boolean): net.minecraft.world.item.ItemStack {
+            val state = multi.newState() as com.itszuvalex.femtocraft.industry.PackedState
+            if (full && state is com.itszuvalex.femtocraft.logistics.ItemVaultState) {
+                state.storage.setSlot(0, IItemStack.of(net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 40)))
+                state.storage.setSlot(1, IItemStack.of(net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GOLD_INGOT, 12)))
+            }
+            return com.itszuvalex.femtocraft.industry.PackedMultiblocks.pack(multi, state, level.registryAccess())
+        }
+        val multis = listOf(FrameMultiblocks.ITEM_VAULT, FrameMultiblocks.FLUID_RESERVOIR, FrameMultiblocks.NANITE_VAULT)
+        if (view != HAND_VIEW && t == 1) p.setGameMode(GameType.SPECTATOR)
+        if (view == ITEMS_VIEW && t == 1) {
+            for (x in 26..34) for (y in 0..2) level.setBlockAndUpdate(at(x, y, 8), Blocks.SMOOTH_STONE.defaultBlockState())
+            val frame = net.minecraft.world.entity.EntityType.ITEM_FRAME
+            listOf(multis[0] to false, multis[1] to false, multis[2] to false, multis[0] to true).forEachIndexed { i, (multi, full) ->
+                val item = net.minecraft.world.entity.decoration.ItemFrame(level, at(27 + i * 2, 1, 7), net.minecraft.core.Direction.NORTH)
+                item.setItem(stackOf(multi, full), false)
+                level.addFreshEntity(item)
+            }
+        }
+        if (view == HAND_VIEW && t == 1) {
+            p.setGameMode(GameType.CREATIVE)
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stackOf(multis[0], true))
+        }
+        if (view == DROPPED_VIEW && t == 1) {
+            p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY)
+            multis.forEachIndexed { i, multi ->
+                val e = net.minecraft.world.entity.item.ItemEntity(level, BASE.x + 28.5 + i * 1.5, BASE.y + 0.3, BASE.z + 6.0, stackOf(multi, i == 0))
+                e.setNoPickUpDelay()
+                e.setDeltaMovement(0.0, 0.0, 0.0)
+                level.addFreshEntity(e)
+            }
+        }
+        // The channel views: two dev channel blocks, a few channels, the first block on "Alpha".
+        if (view == CHANNELS_VIEW && t == 1) {
+            p.closeContainer()
+            level.getEntitiesOfClass(net.minecraft.world.entity.Entity::class.java, net.minecraft.world.phys.AABB(Vec3.atLowerCornerOf(BASE).add(20.0, -2.0, -6.0), Vec3.atLowerCornerOf(BASE).add(40.0, 6.0, 8.0)))
+                .filter { it !is ServerPlayer }.forEach { it.discard() }
+            val channels = com.itszuvalex.itszulib.ItszuLib.CHANNELS
+            for (resource in listOf(com.itszuvalex.itszulib.dev.DevChannelBlockEntity.POWER, com.itszuvalex.itszulib.dev.DevChannelBlockEntity.ITEMS)) {
+                com.itszuvalex.itszulib.channel.ChannelResources.register(resource, net.minecraft.network.chat.Component.literal(resource.path.removePrefix("dev_").replaceFirstChar { it.uppercase() }))
+            }
+            level.setBlockAndUpdate(at(CHANNEL_BLOCK.x, 0, CHANNEL_BLOCK.z), com.itszuvalex.itszulib.dev.DevContent.DEV_CHANNEL_BLOCK.get().defaultBlockState())
+            level.setBlockAndUpdate(at(CHANNEL_BLOCK_2.x, 0, CHANNEL_BLOCK_2.z), com.itszuvalex.itszulib.dev.DevContent.DEV_CHANNEL_BLOCK.get().defaultBlockState())
+            val power = com.itszuvalex.itszulib.dev.DevChannelBlockEntity.POWER
+            val existing = channels.visible(p.uuid, power, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER).map { it.name }
+            for (name in listOf("Alpha", "Beta", "Workshop north", "Far field")) if (name !in existing) channels.create(p.uuid, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER, power, name)
+            val alpha = channels.visible(p.uuid, power, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER).first { it.name == "Alpha" }
+            for (pos in listOf(CHANNEL_BLOCK, CHANNEL_BLOCK_2)) {
+                (level.getBlockEntity(at(pos.x, 0, pos.z)) as? com.itszuvalex.itszulib.dev.DevChannelBlockEntity)?.channels?.bind(power, p.uuid, alpha)
+            }
+            if (channels.visible(p.uuid, power, com.itszuvalex.itszulib.channel.ChannelScope.TEAM).none { it.name == "Shared base" }) {
+                channels.create(p.uuid, com.itszuvalex.itszulib.channel.ChannelScope.TEAM, power, "Shared base")
+            }
+        }
+        if (view == CHANNELS_VIEW && t == MENU_DELAY) {
+            (level.getBlockEntity(at(CHANNEL_BLOCK.x, 0, CHANNEL_BLOCK.z)) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)
+                ?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)?.let { p.openMenu(it, it.menuPos()) }
+        }
+        // Delete "Alpha" under the open menu: both blocks are waiting for it.
+        if (view == CHANNELS_VIEW + 1 && t == 1) {
+            val power = com.itszuvalex.itszulib.dev.DevChannelBlockEntity.POWER
+            com.itszuvalex.itszulib.ItszuLib.CHANNELS.visible(p.uuid, power, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER).firstOrNull { it.name == "Alpha" }
+                ?.let { com.itszuvalex.itszulib.ItszuLib.CHANNELS.delete(p.uuid, it.id) }
+        }
+        // The team's channels.
+        if (view == CHANNELS_VIEW + 2 && t == 1) {
+            (p.containerMenu as? com.itszuvalex.itszulib.menu.MenuCore)?.channels?.handle(com.itszuvalex.itszulib.menu.MenuChannels.ACTION_SCOPE, 1)
+        }
+        // More channels than fit, with names too long for a row.
+        if (view == CHANNELS_VIEW + 4 && t == 1) {
+            val power = com.itszuvalex.itszulib.dev.DevChannelBlockEntity.POWER
+            val existing = com.itszuvalex.itszulib.ItszuLib.CHANNELS.visible(p.uuid, power, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER).map { it.name }
+            for (i in 1..14) {
+                val name = "Workshop north-east line %02d".format(i)
+                if (name !in existing) com.itszuvalex.itszulib.ItszuLib.CHANNELS.create(p.uuid, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER, power, name)
+            }
+        }
+        // Back to the player's own, with a block on "Beta" so the confirmation says it is in use; the client half then asks
+        // before deleting the first channel in the list.
+        if (view == CHANNELS_VIEW + 3 && t == 1) {
+            val power = com.itszuvalex.itszulib.dev.DevChannelBlockEntity.POWER
+            com.itszuvalex.itszulib.ItszuLib.CHANNELS.visible(p.uuid, power, com.itszuvalex.itszulib.channel.ChannelScope.PLAYER).firstOrNull { it.name == "Beta" }?.let { beta ->
+                (level.getBlockEntity(at(CHANNEL_BLOCK.x, 0, CHANNEL_BLOCK.z)) as? com.itszuvalex.itszulib.dev.DevChannelBlockEntity)?.channels?.bind(power, p.uuid, beta)
+            }
+            (p.containerMenu as? com.itszuvalex.itszulib.menu.MenuCore)?.channels?.handle(com.itszuvalex.itszulib.menu.MenuChannels.ACTION_SCOPE, 0)
+        }
     }
 
     private fun codex(p: ServerPlayer, level: ServerLevel) {

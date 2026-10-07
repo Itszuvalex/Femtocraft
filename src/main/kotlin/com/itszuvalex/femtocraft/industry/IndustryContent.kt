@@ -50,6 +50,7 @@ object IndustryContent {
     // Tools
     @JvmField val FRAME_ITEM = R.ITEMS.registerItem("frame", ::FrameItem)
     @JvmField val CONFIGURATOR = R.ITEMS.registerItem("configurator", ::ConfiguratorItem, UnaryOperator { it.stacksTo(1) })
+    @JvmField val WRENCH = R.ITEMS.registerItem("wrench", ::WrenchItem, UnaryOperator { it.stacksTo(1) })
     @JvmField val SHIFT_ITEM = R.ITEMS.registerItem("shift_test", ::ShiftItem, UnaryOperator { it.stacksTo(1) })
 
     // Machines

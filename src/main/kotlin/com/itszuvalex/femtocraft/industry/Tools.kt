@@ -203,3 +203,14 @@ class ShiftItem(properties: Properties) : Item(properties) {
         }
     }
 }
+
+/**
+ * The wrench: sneak and use it on a machine to break it at once, with everything it keeps. The breaking is ItszuLib's
+ * (`itszulib:wrenches`, `EntityBlockCore.useItemOn`); this item is in that tag. A storage multiblock drops as one item
+ * carrying its contents ([PackedMultiblockItem]).
+ */
+class WrenchItem(properties: Properties) : Item(properties) {
+    override fun appendHoverText(stack: ItemStack, context: TooltipContext, display: TooltipDisplay, builder: Consumer<Component>, flag: TooltipFlag) {
+        builder.accept(Component.translatable("tooltip.femtocraft.wrench").withStyle(ChatFormatting.GRAY))
+    }
+}

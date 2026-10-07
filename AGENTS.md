@@ -212,7 +212,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
   subclassing `ChipKind` and listing it in `Chips.KINDS`. Chips carry an ItszuLib `ResourceFilter` (`ChipData.filter`, nine entries, allow
   or deny; edited with ItszuLib's `FilterRow` in the conduit screen's chips tab, DECISIONS D24, D25); the conduit shows
   its chips as cubes on its arms, faced with the chip (`chip_node_<kind>` textures from `gen_assets.py`) (`ChipNodes`, synced as `chipLayout`), and using one opens that chip's
-  `ChipMenu` (D26);
+  `ChipMenu` (D27);
   item chips pull through a block's `LogisticsModules.ITEM_INDEX` (an ItszuLib `ItemStorageIndex`, e.g. the item
   vault's) when it has one. `DistributedManager` matches
   idle `IWorker`s with open `ITask`s in range (providers add themselves when loaded and remove themselves when unloaded
@@ -253,7 +253,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
 `PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`,
-`ComputationGameTests`, `VaultGameTests`. Add one with
+`ComputationGameTests`, `VaultGameTests`, `IntegrityGameTests` (ItszuLib's checks over everything registered: assets, save/load/sync, break behaviour, ticking, menus, capabilities; technologies and machine recipe tables are sound), `ReachabilityGameTests` (which items can be obtained; baseline in REVIEW O13), `InfrastructureGameTests` (frame requirement slots, chip data codecs). Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode

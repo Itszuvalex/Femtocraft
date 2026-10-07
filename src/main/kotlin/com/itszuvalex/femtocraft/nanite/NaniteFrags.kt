@@ -4,7 +4,9 @@ import com.itszuvalex.itszulib.api.adapters.IBlockEntity
 import com.itszuvalex.itszulib.api.adapters.ILevel
 import com.itszuvalex.itszulib.api.adapters.IModule
 import com.itszuvalex.itszulib.api.utility.NBTSerializationScope
+import com.itszuvalex.itszulib.core.BreakBehavior
 import com.itszuvalex.itszulib.core.EnumAutomaticIO
+import com.itszuvalex.itszulib.core.IBreakContents
 import com.itszuvalex.itszulib.core.IBlockEntityTickable
 import com.itszuvalex.itszulib.core.frag.BlockEntityFragment
 import com.itszuvalex.itszulib.core.frag.FragAutoIO
@@ -21,8 +23,21 @@ import net.minecraft.world.level.storage.ValueOutput
  * Exposes a nanite tank through [NaniteModules.NANITE_TANK], per side following the block's nanite configuration, and
  * saves it (LEVEL). Port of v3's `ModuleINaniteTank`.
  */
-class FragNaniteTank @JvmOverloads constructor(val tank: INaniteTank, private val name: String = "NaniteTank", private val persist: Boolean = true) :
-    BlockEntityFragment<INaniteTank>() {
+class FragNaniteTank @JvmOverloads constructor(
+    val tank: INaniteTank,
+    private val name: String = "NaniteTank",
+    val persist: Boolean = true,
+    override val breakBehavior: BreakBehavior = BreakBehavior.DISCARD,
+) : BlockEntityFragment<INaniteTank>(), IBreakContents {
+    init {
+        require(breakBehavior != BreakBehavior.DROP) { "Nanites cannot be dropped; use KEEP or DISCARD" }
+    }
+
+    override fun isContentEmpty(): Boolean = tank.amount <= 0
+
+    override fun describe(): List<net.minecraft.network.chat.Component> =
+        listOf(net.minecraft.network.chat.Component.translatable("tooltip.femtocraft.contents.nanites", tank.amount, tank.capacity))
+
     fun tankFor(side: Direction?): INaniteTank? {
         if (side == null) return tank
         val config = host?.blockEntity()?.getModule(NaniteModules.NANITE_STORAGE_CONFIGURABLE, null) ?: return tank
@@ -32,7 +47,8 @@ class FragNaniteTank @JvmOverloads constructor(val tank: INaniteTank, private va
     override fun name(): String = name
     override fun module(): IModule<INaniteTank> = NaniteModules.NANITE_TANK
     override fun faceToModuleMapper(be: IBlockEntity): (Direction?) -> INaniteTank? = ::tankFor
-    override fun handlesScope(scope: NBTSerializationScope): Boolean = persist && scope == NBTSerializationScope.LEVEL
+    override fun handlesScope(scope: NBTSerializationScope): Boolean =
+        persist && (scope == NBTSerializationScope.LEVEL || (scope == NBTSerializationScope.ITEM && breakBehavior == BreakBehavior.KEEP))
     override fun serializeTo(scope: NBTSerializationScope, output: ValueOutput) = tank.serialize(output)
     override fun deserialize(input: ValueInput, scope: NBTSerializationScope) = tank.deserialize(input)
 }

@@ -67,8 +67,13 @@ class FrameMultiblock(
     val size: Triple<Int, Int, Int>,
     private val requiredItems: () -> List<ItemStack>,
     private val blockSupplier: () -> Block,
-    state: (Runnable) -> IMultiblockState,
+    private val stateFactory: (Runnable) -> IMultiblockState,
+    /** The item that is this machine when it is broken or wrenched, if it keeps its contents ([PackedState]). */
+    val packedItem: (() -> Item)? = null,
 ) {
+    /** A fresh shared state, e.g. to read what a packed item holds. */
+    fun newState(onChanged: Runnable = Runnable {}): IMultiblockState = stateFactory(onChanged)
+
     val displayName: Component get() = Component.translatable("multiblock.femtocraft.$id")
 
     val numFrames: Int get() = size.first * size.second * size.third
@@ -92,7 +97,7 @@ class FrameMultiblock(
 
     val shape: MultiblockShape = MultiblockShape.register(
         Identifier.fromNamespaceAndPath(Femtocraft.ID, id), MultiblockShape.box(size.first, size.second, size.third, MACHINE_ROLE),
-        MultiblockBreakPolicy.DESTROY_ALL, state,
+        MultiblockBreakPolicy.DESTROY_ALL, stateFactory,
     )
 
     fun takenLocations(anchor: BlockPos): List<BlockPos> = shape.positions(anchor)
@@ -149,17 +154,20 @@ object FrameMultiblocks {
     @JvmField
     val ITEM_VAULT = register(FrameMultiblock("item_vault", setOf(BASIC), Triple(3, 3, 3),
         { listOf(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 16), ItemStack(IndustryContent.BASIC_CIRCUIT.get(), 4)) },
-        { com.itszuvalex.femtocraft.logistics.LogisticsContent.ITEM_VAULT.get() }, ::ItemVaultState))
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.ITEM_VAULT.get() }, ::ItemVaultState,
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.ITEM_VAULT_ITEM.get() }))
 
     @JvmField
     val FLUID_RESERVOIR = register(FrameMultiblock("fluid_reservoir", setOf(BASIC), Triple(3, 3, 3),
         { listOf(ItemStack(IndustryContent.RIFTIRON_INGOT_ACTIVATED.get(), 16), ItemStack(IndustryContent.NANO_CHANNEL.get(), 4)) },
-        { com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR.get() }, ::FluidReservoirState))
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR.get() }, ::FluidReservoirState,
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.FLUID_RESERVOIR_ITEM.get() }))
 
     @JvmField
     val NANITE_VAULT = register(FrameMultiblock("nanite_vault", setOf(BASIC), Triple(3, 3, 3),
         { listOf(ItemStack(IndustryContent.PHASEMETAL_INGOT_ACTIVATED.get(), 8), ItemStack(IndustryContent.NANITE_BEACON.get(), 2)) },
-        { com.itszuvalex.femtocraft.logistics.LogisticsContent.NANITE_VAULT.get() }, ::NaniteVaultState))
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.NANITE_VAULT.get() }, ::NaniteVaultState,
+        { com.itszuvalex.femtocraft.logistics.LogisticsContent.NANITE_VAULT_ITEM.get() }))
 
     fun register(multi: FrameMultiblock): FrameMultiblock = multi.also { all += it }
 

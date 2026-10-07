@@ -4,6 +4,10 @@ import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.femtocraft.core.FemtoMenu
 import com.itszuvalex.femtocraft.industry.FrameMachineBlockEntity
 import com.itszuvalex.femtocraft.industry.FrameMultiblocks
+import com.itszuvalex.femtocraft.industry.PackedMultiblocks
+import com.itszuvalex.femtocraft.industry.PackedState
+import net.minecraft.network.chat.Component
+import java.util.Locale
 import com.itszuvalex.femtocraft.nanite.FragNaniteAutoIO
 import com.itszuvalex.femtocraft.nanite.FragNaniteTank
 import com.itszuvalex.femtocraft.nanite.INaniteTank
@@ -96,7 +100,7 @@ class FragItemIndex(private val storage: IItemStorage, private val index: () -> 
  * item reads only the slots holding it, and an [index] over it for the terminal (and for anything that wants several
  * vaults searched as one).
  */
-class ItemVaultState(onChanged: Runnable) : IMultiblockState {
+class ItemVaultState(onChanged: Runnable) : PackedState {
     @JvmField
     val storage = IndexedItemStorage(ItemStorageArray(SLOTS, onChanged))
 
@@ -105,8 +109,15 @@ class ItemVaultState(onChanged: Runnable) : IMultiblockState {
 
     fun drops() = (0 until storage.size()).map { storage.get(it).toMinecraft().copy() }.filter { !it.isEmpty }
 
-    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) =
-        drops().forEach { Block.popResource(level.toMinecraft(), anchor, it) }
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) = PackedMultiblocks.drop(level, anchor, FrameMultiblocks.ITEM_VAULT, this)
+
+    override fun isPackedEmpty(): Boolean = (0 until storage.size()).all { storage.get(it).isEmpty() }
+
+    override fun describe(): List<Component> {
+        val used = (0 until storage.size()).count { !storage.get(it).isEmpty() }
+        val total = (0 until storage.size()).sumOf { storage.get(it).stackSize().toLong() }
+        return listOf(Component.translatable("tooltip.itszulib.contents.items", "%,d".format(Locale.ROOT, used), "%,d".format(Locale.ROOT, storage.size()), "%,d".format(Locale.ROOT, total)))
+    }
 
     override fun serialize(output: ValueOutput) = storage.serialize(output.child("Items"))
 
@@ -125,7 +136,7 @@ class ItemVaultState(onChanged: Runnable) : IMultiblockState {
  * tank, and a tank can be locked to a fluid) behind an [IndexedFluidStorage] (a fluid goes to the tanks holding it,
  * then to empty tanks locked to it, then to any empty one), with an [index] over it.
  */
-class FluidReservoirState(onChanged: Runnable) : IMultiblockState {
+class FluidReservoirState(onChanged: Runnable) : PackedState {
     @JvmField
     val cells = ReservoirTanks(TANKS, CAPACITY, onChanged)
 
@@ -135,7 +146,18 @@ class FluidReservoirState(onChanged: Runnable) : IMultiblockState {
     @JvmField
     val index = FluidStorageIndex().apply { add(tanks) }
 
-    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) {}
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) = PackedMultiblocks.drop(level, anchor, FrameMultiblocks.FLUID_RESERVOIR, this)
+
+    override fun isPackedEmpty(): Boolean = (0 until cells.size()).all { cells.get(it).isEmpty() }
+
+    override fun describe(): List<Component> = (0 until cells.size()).map { i ->
+        val stack = cells.get(i).toMinecraft()
+        Component.translatable(
+            "tooltip.itszulib.contents.fluid",
+            if (stack.isEmpty) Component.translatable("gui.itszulib.tank.empty") else stack.hoverName,
+            "%,d".format(Locale.ROOT, stack.amount), "%,d".format(Locale.ROOT, cells.capacity(i)),
+        )
+    }
 
     override fun serialize(output: ValueOutput) = tanks.serialize(output.child("Tanks"))
 
@@ -188,11 +210,15 @@ class FluidReservoirState(onChanged: Runnable) : IMultiblockState {
 /**
  * The nanite vault's contents: one [NaniteTank] of [VOLUME] holding any number of strains.
  */
-class NaniteVaultState(onChanged: Runnable) : IMultiblockState {
+class NaniteVaultState(onChanged: Runnable) : PackedState {
     @JvmField
     val tank = NaniteTank(VOLUME, onChanged)
 
-    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) {}
+    override fun onBreak(level: ILevel, anchor: BlockPos, brokenAt: BlockPos) = PackedMultiblocks.drop(level, anchor, FrameMultiblocks.NANITE_VAULT, this)
+
+    override fun isPackedEmpty(): Boolean = tank.amount <= 0
+
+    override fun describe(): List<Component> = listOf(Component.translatable("tooltip.femtocraft.contents.nanites", tank.amount, tank.capacity))
 
     override fun serialize(output: ValueOutput) = tank.serialize(output.child("Nanites"))
 

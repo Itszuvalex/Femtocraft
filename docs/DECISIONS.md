@@ -446,7 +446,40 @@ for reuse (ItszuLib D18).
   through their line and stepping through the lines when there are more than fit. Building starts as soon as every slot is full (it no longer waits for a 2-second
   check) and uses exactly what the slots hold.
 
-## D26. Chips shown on the conduit, each with its own screen — DECIDED (maintainer, 2026-10-05)
+## D26. Break behaviour and automated checks — DECIDED (maintainer, 2026-10-05)
+
+Break behaviour is ItszuLib's (ItszuLib D20): each fragment holding contents says whether breaking its block drops them
+(`DROP`), keeps them on the item (`KEEP`) or loses them (`DISCARD`). Femtocraft's machines keep what they did: items
+drop (`FragDropInventory`, or `FragItemStorage`'s default), fluids and nanites (`FragNaniteTank`, which now takes a
+`breakBehavior`) are lost. Which blocks should `KEEP` instead is a design call, listed as REVIEW O12.
+
+`dev/IntegrityGameTests` runs ItszuLib's checks over everything Femtocraft registers (assets, save/load/sync, break
+behaviour, ticking, menus, capabilities), with a nanite probe so nanite tanks are filled and measured too;
+`ReachabilityGameTests` checks which Femtocraft items can be obtained and writes the full report to
+`run/build/reports/femtocraft-reachability.txt`. Its baseline of unobtainable items is REVIEW O13.
+
+**Addendum (maintainer, 2026-10-05).** The item, fluid and nanite repositories use `BreakBehavior.KEEP`: the dropped item
+carries what they hold and its tooltip says how much is used of how much it can hold ("Items: 2 / 54 slots used (43
+items)", "Water: 1,200 / 5,000 mB", "Nanites: 37 / 250"). Their block items are ItszuLib's `ContentBlockItem`
+(`LogisticsContent.keepingBlock`), which builds an unplaced block entity from the item's data and asks its fragments
+(`IBreakContents.describe`).
+
+**Addendum: storage multiblocks and the wrench (maintainer, 2026-10-05).** The item vault, fluid reservoir and nanite
+vault keep their contents in one item. Breaking any block of one (by hand, an explosion, a wrench) drops a single
+machine item (`item_vault`, `fluid_reservoir`, `nanite_vault`; `PackedMultiblockItem`) carrying the shared state in the
+`femtocraft:packed_state` component (what `IMultiblockState.serialize` writes); an empty machine drops a plain item, so
+empty ones stack. Using the item where a frame would go builds the whole machine at once, if there is room, with its
+contents restored (`PackedMultiblocks.restore`). The item's tooltip says what it holds, used out of capacity
+(`PackedState.describe`), and its model is the whole 3x3x3 drawn at the size of one block (`gen_assets.py`
+`packed_model`: 27 blocks at a third of the size, outer faces only, each face showing the texture three times across).
+Not checked in a client. Other frame multiblocks (archive, chambers, mainframe) still drop their contents; they
+become packable by implementing `PackedState` and giving their `FrameMultiblock` a `packedItem`.
+
+The **wrench** (`femtocraft:wrench`, shaped from iron ingots) is in ItszuLib's `itszulib:wrenches` tag: a sneaking player
+using it on any `EntityBlockCore` block (every Femtocraft machine) breaks it at once with its drops, kept contents
+included, whatever the tool rules and mining time. It is a dismantler, not a configurator.
+
+## D27. Chips shown on the conduit, each with its own screen — DECIDED (maintainer, 2026-10-05)
 
 - **Shown in the world.** A conduit draws each chip as a small cube whose faces show the chip: its texture's chip
   (pins, body, light and the kind's coloured pads) on a dark square, `textures/block/chip_node_<kind>.png`, made from
@@ -458,4 +491,3 @@ for reuse (ItszuLib D18).
   screen (`ChipMenu`, `ChipScreen`): its slot, which face it is in, its settings, mode and side buttons and filter,
   the same controls as the chips tab, acting on that chip only. Using the conduit anywhere else opens the conduit's
   screen as before.
-

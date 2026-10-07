@@ -61,6 +61,41 @@ enum class ArchiveStatus {
 }
 
 /**
+ * What an Archive's research step needs from the game, so [ArchiveState.research] can be tested without one.
+ */
+interface ResearchPort {
+    /** The technology the team's Archives work on now, or null if it has none. */
+    fun focus(): Identifier?
+
+    /** Whether [tech] has all its points and waits only for delivered items. */
+    fun needsItems(tech: Identifier): Boolean
+
+    /** Takes one Archive nanite from a host of the team. @return False if none could be drawn. */
+    fun drawNanite(): Boolean
+
+    /** Adds up to [amount] points to [tech]. @return How many it kept. */
+    fun addProgress(tech: Identifier, amount: Long): Long
+}
+
+/** [ResearchPort] over the running server: ItszuLib's tech tree and the team's nearby [hosts]. */
+private class LiveResearch(private val level: ServerLevel, private val team: UUID, private val hosts: List<Player>, private val center: Vec3) : ResearchPort {
+    override fun focus(): Identifier? = TechTree.focus(level.server, team, ArchiveContent.TREE)
+
+    override fun needsItems(tech: Identifier): Boolean {
+        val research = ItszuLib.TEAMS.state.team(team)?.get(com.itszuvalex.itszulib.team.Research.TYPE) ?: return false
+        val remaining = TechTree.of(level.registryAccess()).remaining(tech, research) ?: return false
+        return remaining.points <= 0L && !remaining.complete
+    }
+
+    override fun drawNanite(): Boolean {
+        val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team } ?: return false
+        return NaniteHost.drawTo(host, 1, level, center) == 1
+    }
+
+    override fun addProgress(tech: Identifier, amount: Long): Long = TechTree.addProgress(level.server, team, tech, amount)
+}
+
+/**
  * Shared state of the Archive (on its home block): who claimed it (the first player to use it; it researches for that
  * player's team, whichever that is now), and research points bought with nanites but not yet spent.
  *
@@ -145,24 +180,29 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
     }
 
     private fun research(level: ServerLevel, hosts: List<Player>, center: Vec3): Long {
-        val team = team()
-        val tech = team?.let { TechTree.focus(level.server, it, ArchiveContent.TREE) }
-        if (team == null || tech == null) {
+        val team = team() ?: return research(null, null)
+        return research(team, LiveResearch(level, team, hosts, center))
+    }
+
+    /**
+     * One step of the accounting, apart from the game ([ResearchPort]): sets [status], buys points with a nanite when
+     * fewer than [RATE] are buffered, and spends them on the team's focus.
+     *
+     * @return The progress made.
+     */
+    fun research(team: UUID?, port: ResearchPort?): Long {
+        val tech = if (team == null || port == null) null else port.focus()
+        if (team == null || port == null || tech == null) {
             status = ArchiveStatus.IDLE
             return 0L
         }
-        val research = ItszuLib.TEAMS.state.team(team)?.get(com.itszuvalex.itszulib.team.Research.TYPE)
-        val remaining = research?.let { TechTree.of(level.registryAccess()).remaining(tech, it) }
-        if (remaining != null && remaining.points <= 0L && !remaining.complete) {
+        if (port.needsItems(tech)) {
             status = ArchiveStatus.NEEDS_ITEMS
             return 0L
         }
-        if (points < RATE) {
-            val host = hosts.firstOrNull { ItszuLib.TEAMS.state.teamOf(it.uuid)?.id == team }
-            if (host != null && NaniteHost.drawTo(host, 1, level, center) == 1) {
-                points += POINTS_PER_NANITE
-                onChanged.run()
-            }
+        if (points < RATE && port.drawNanite()) {
+            points += POINTS_PER_NANITE
+            onChanged.run()
         }
         if (points <= 0L && computedPoints <= 0L) {
             status = ArchiveStatus.NO_HOST
@@ -171,14 +211,14 @@ class ArchiveState(private val onChanged: Runnable) : IMultiblockState {
         status = ArchiveStatus.RESEARCHING
         var used = 0L
         if (points > 0L) {
-            val spent = TechTree.addProgress(level.server, team, tech, minOf(points, RATE))
+            val spent = port.addProgress(tech, minOf(points, RATE))
             points -= spent
             used += spent
         }
         // Computed points go to the focus as it is now (the nanite points may just have finished the last one).
-        val next = if (computedPoints > 0L) TechTree.focus(level.server, team, ArchiveContent.TREE) else null
+        val next = if (computedPoints > 0L) port.focus() else null
         if (next != null) {
-            val spent = TechTree.addProgress(level.server, team, next, minOf(computedPoints, COMPUTED_RATE))
+            val spent = port.addProgress(next, minOf(computedPoints, COMPUTED_RATE))
             computedPoints -= spent
             used += spent
         }
