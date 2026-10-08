@@ -590,7 +590,11 @@ Open: whether a swarm window is visible (proposed: an agitated cloud and sound, 
 early random swarms are not missed); whether trees are direct (any talent whose prerequisites are met can be gained) or this-or-that (at a fork, gaining
 one talent shuts the other branch for that strain and its descendants; proposed: this-or-that at key forks, since a
 swarm then splits a lineage into two different strains and catching the pushed-out core keeps the other branch open,
-and the forks bound how many talents a strain can hold); how strongly study weights a swarm's talent against chance; whether the host's own Archive tree
+and the forks bound how many talents a strain can hold); and if this-or-that, whether a choice opens a completely
+different set of further talents (branches) or only decides that level, the next level open either way (rows).
+Proposed: both, with one or two major branches per archetype (sub-specializations, e.g. Growth into crops or forest)
+and rows inside each branch, so lineages split for good a few times while content stays bounded; both are one
+mechanism in data (an exclusive group of talents, each with its own prerequisites); how strongly study weights a swarm's talent against chance; whether the host's own Archive tree
 keeps D28's point spending; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
 hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
 a wild hive); whether a strain drops talents beyond some capacity; whether hives also act on their surroundings (a
