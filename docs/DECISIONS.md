@@ -552,7 +552,9 @@ undecided.
   subjects it already knows, and picks one it does not; study time grows with how rare or complex the subject is.
   Subjects and what they teach are data (blocks, tags, entities per archetype).
 - **What a hive studied is its strain.** Studying a subject gives the hive traits (cactus: drought, thorns; kelp:
-  water work), so a strain's traits come from where its hive lived rather than from a menu. Hives in different places
+  water work), so a strain's traits come from where its hive lived rather than from a menu. The archetype's talent
+  tree (D28) stays as what a hive can learn, but nobody spends points in it: the hive's path through it is random,
+  guided by what is brought near it (subjects push it towards the talents they relate to). Hives in different places
   breed different nanites, and bred nanites carry the hive's traits (`NaniteStack.talents`, D28). As D5 anticipated,
   the upgrades belong to the hive, not the player. Hives exhaust what is near them, so the player builds hives in new
   places or brings subjects to them (tending a garden around a hive).
@@ -571,8 +573,8 @@ undecided.
 - **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, what it already knows,
   its traits, how full it is and how close it is to swarming.
 
-Open: whether D28's talent trees stay (for the host's own body, or as the list of traits a hive can learn) or are
-retired; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
+Open: how strongly subjects guide a hive's path through its tree against chance; whether the host's own Archive tree
+keeps D28's point spending; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
 hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
 a wild hive); whether a hive forgets traits beyond some capacity; whether hives also act on their surroundings (a
 Growth hive speeding up the crops it knows); whether a pushed-out core's timer runs in the inventory (proposed: yes,
