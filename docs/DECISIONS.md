@@ -577,11 +577,13 @@ undecided.
 - **Progression.** Early hives swarm at random and decide the takeover by chance, and the player catches swarms by
   hand. Later talents and better hive mechanisms let the player trigger a swarm during a window, or prevent swarming
   altogether. A machine collects pushed-out cores automatically, and more advanced hives let the player choose which
-  core stays and which goes.
+  core stays and which goes. Later hives also accept the player's guidance and can force a specific talent onto the
+  next swarm's copy: that is how talents get selected deliberately, late in progression rather than from the start.
 - **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, what it already knows,
   its traits, how full it is and how close it is to swarming.
 
-Open: how strongly subjects guide a hive's path through its tree against chance; whether the host's own Archive tree
+Open: whether a swarm window is visible (proposed: an agitated cloud and sound, and a line on the hive's screen, so
+early random swarms are not missed); how strongly subjects guide a hive's path through its tree against chance; whether the host's own Archive tree
 keeps D28's point spending; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
 hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
 a wild hive); whether a hive forgets traits beyond some capacity; whether hives also act on their surroundings (a
