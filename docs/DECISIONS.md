@@ -550,7 +550,16 @@ undecided.
   each one. The study is visible: nanites stream from the hive to the subject (`NaniteHost.drawTo`-style particles)
   and swarm around it while it is studied. Sketch: the hive sweeps its radius a few positions per tick, keeps the
   subjects it already knows, and picks one it does not; study time grows with how rare or complex the subject is.
-  Subjects and what they teach are data (blocks, tags, entities per archetype).
+  Subjects and what they teach are data (below).
+- **Subject registry** (proposed): a synced datapack registry, `femtocraft:hive_subject`. An entry matches blocks,
+  block tags, entity types or entity tags (tags let other mods' plants and animals count without entries of their
+  own, e.g. `#minecraft:crops`, `#minecraft:saplings`), and gives: the archetypes that study it; the archetype it
+  founds when an Archive core studies it first; how long it takes to study; and its influence, weights towards
+  talents or whole branches (negative to push away). It can also be limited to or change for specific strains:
+  `requires` talents (only a strain that went one way can study it, e.g. nether flora needing a heat-hardened
+  strain) and influence that differs by the strain's talents. Each distinct block or entity is its own subject, and
+  studying one again gives nothing; when several entries match, the most specific one (a block over a tag) applies.
+  Data problems (unknown talents, influences outside the archetype's tree) are logged at server start like talents'.
 - **Study guides the strain; swarms change it.** Studying a subject pushes the hive towards the talents it relates to
   (cactus: drought, thorns; kelp: water work), so a strain's talents come from where its hive lived rather than from
   a menu. The archetype's talent tree (D28) stays as what a hive can learn, but nobody spends points in it. Study
