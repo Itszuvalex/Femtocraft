@@ -538,3 +538,43 @@ Open: talents for the other archetypes and where their nanites come from (hives,
 nanites shipped to another player's machines should behave differently from their own; and whether talent points
 should also come from elsewhere.
 
+
+## D29. Nanite hives: study, swarming, strains that live in hives — OPEN (proposal, maintainer, 2026-10-08)
+
+The maintainer is not sold on talent points spent in a tree (D28) as how nanites improve, and proposed hives in the
+world instead. This is the design as discussed so far; nothing is built yet, and the open questions at the end are
+undecided.
+
+- **Hives study their surroundings.** A hive of an archetype looks around it for subjects related to its role (a
+  Growth hive: plants; Fauna: animals; Industry: ores and machines; Energy: power sources) and spends time researching
+  each one. The study is visible: nanites stream from the hive to the subject (`NaniteHost.drawTo`-style particles)
+  and swarm around it while it is studied. Sketch: the hive sweeps its radius a few positions per tick, keeps the
+  subjects it already knows, and picks one it does not; study time grows with how rare or complex the subject is.
+  Subjects and what they teach are data (blocks, tags, entities per archetype).
+- **What a hive studied is its strain.** Studying a subject gives the hive traits (cactus: drought, thorns; kelp:
+  water work), so a strain's traits come from where its hive lived rather than from a menu. Hives in different places
+  breed different nanites, and bred nanites carry the hive's traits (`NaniteStack.talents`, D28). As D5 anticipated,
+  the upgrades belong to the hive, not the player. Hives exhaust what is near them, so the player builds hives in new
+  places or brings subjects to them (tending a garden around a hive).
+- **Body and core.** A hive is a body (the placed block or structure) holding a core (the strain: traits, what it
+  has learned, its lineage). Cores move between bodies; bodies stay. A host seeds the first core from their own
+  nanites, so the host still starts everything.
+- **Swarming.** Every so often (proposed: when the hive is full, so harvesting it holds swarming off) a hive swarms
+  and makes a copy of its core. Either the copy takes over and the old core is pushed out, or the old core stays and
+  the copy is pushed out. Proposed: the copy weights what the hive learned recently and the old core its long-held
+  traits, and the odds favour whichever strain fits the hive's surroundings better.
+- **The pushed-out core** becomes a small hive in the immediate area, which survives for a limited time unless the
+  player picks it up and places it in another hive body. Proposed: its end is a stored game time, so it expires
+  correctly in unloaded chunks; a host picks it up by hand; one swarm per hive at a time.
+- **Progression.** Early hives decide the takeover by chance and the player catches swarms by hand. A later machine
+  collects pushed-out cores automatically. More advanced hives let the player choose which core stays and which goes.
+- **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, what it already knows,
+  its traits, how full it is and how close it is to swarming.
+
+Open: whether D28's talent trees stay (for the host's own body, or as the list of traits a hive can learn) or are
+retired; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
+hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
+a wild hive); whether a hive forgets traits beyond some capacity; whether hives also act on their surroundings (a
+Growth hive speeding up the crops it knows); whether a pushed-out core's timer runs in the inventory (proposed: yes,
+with a vessel item that pauses it); who may catch another team's swarm; whether cores record their generation and
+parent (the D5 `major.minor` version could carry the generation); and what a study costs and how long it takes.
