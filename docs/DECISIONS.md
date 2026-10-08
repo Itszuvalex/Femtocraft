@@ -559,8 +559,14 @@ undecided.
   the upgrades belong to the hive, not the player. Hives exhaust what is near them, so the player builds hives in new
   places or brings subjects to them (tending a garden around a hive).
 - **Body and core.** A hive is a body (the placed block or structure) holding a core (the strain: traits, what it
-  has learned, its lineage). Cores move between bodies; bodies stay. A host seeds the first core from their own
-  nanites, so the host still starts everything.
+  has learned, its lineage). Cores move between bodies; bodies stay.
+- **Founding: from Archive to an archetype.** An Archive core (a piece of tech, made at the Archive from the host's
+  Archive nanites) is placed in an empty hive body. Its first study decides the archetype (a plant: Growth; an
+  animal: Fauna; an ore or machine: Industry) and it specializes as soon as that study finishes; from then on the
+  strain spreads by swarming. Proposed: Archive cores can always be made again, not once per player, so a lost strain
+  costs resources rather than progress. A refounded strain starts at generation 0 with only its founding subject
+  learned, so what is really lost with a strain is its history, which is why catching swarms matters. The first
+  core might still be given at first contact.
 - **Swarming.** Every so often (proposed: when the hive is full, so harvesting it holds swarming off) a hive swarms
   and makes a copy of its core. Either the copy takes over and the old core is pushed out, or the old core stays and
   the copy is pushed out. Proposed: the copy weights what the hive learned recently and the old core its long-held
