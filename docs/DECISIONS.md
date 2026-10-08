@@ -567,15 +567,17 @@ undecided.
   costs resources rather than progress. A refounded strain starts at generation 0 with only its founding subject
   learned, so what is really lost with a strain is its history, which is why catching swarms matters. The first
   core might still be given at first contact.
-- **Swarming.** Every so often (proposed: when the hive is full, so harvesting it holds swarming off) a hive swarms
-  and makes a copy of its core. Either the copy takes over and the old core is pushed out, or the old core stays and
+- **Swarming.** Every so often a hive enters a short swarm window, at random, and early on it swarms at a random
+  moment inside it, making a copy of its core. Either the copy takes over and the old core is pushed out, or the old core stays and
   the copy is pushed out. Proposed: the copy weights what the hive learned recently and the old core its long-held
   traits, and the odds favour whichever strain fits the hive's surroundings better.
 - **The pushed-out core** becomes a small hive in the immediate area, which survives for a limited time unless the
   player picks it up and places it in another hive body. Proposed: its end is a stored game time, so it expires
   correctly in unloaded chunks; a host picks it up by hand; one swarm per hive at a time.
-- **Progression.** Early hives decide the takeover by chance and the player catches swarms by hand. A later machine
-  collects pushed-out cores automatically. More advanced hives let the player choose which core stays and which goes.
+- **Progression.** Early hives swarm at random and decide the takeover by chance, and the player catches swarms by
+  hand. Later talents and better hive mechanisms let the player trigger a swarm during a window, or prevent swarming
+  altogether. A machine collects pushed-out cores automatically, and more advanced hives let the player choose which
+  core stays and which goes.
 - **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, what it already knows,
   its traits, how full it is and how close it is to swarming.
 
