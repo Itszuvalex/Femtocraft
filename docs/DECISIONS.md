@@ -569,8 +569,10 @@ undecided.
   core might still be given at first contact.
 - **Swarming.** Every so often a hive enters a short swarm window, at random, and early on it swarms at a random
   moment inside it, making a copy of its core. Either the copy takes over and the old core is pushed out, or the old core stays and
-  the copy is pushed out. Proposed: the copy weights what the hive learned recently and the old core its long-held
-  traits, and the odds favour whichever strain fits the hive's surroundings better.
+  the copy is pushed out. The copy differs from its parent by a talent it
+  gains: early on that talent is random (among those the tree allows, guided by what is near the hive); later hives
+  let the player force it (below). Proposed: the takeover odds favour whichever strain fits the hive's surroundings
+  better.
 - **The pushed-out core** becomes a small hive in the immediate area, which survives for a limited time unless the
   player picks it up and places it in another hive body. Proposed: its end is a stored game time, so it expires
   correctly in unloaded chunks; a host picks it up by hand; one swarm per hive at a time.
