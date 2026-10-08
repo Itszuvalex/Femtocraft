@@ -551,27 +551,28 @@ undecided.
   and swarm around it while it is studied. Sketch: the hive sweeps its radius a few positions per tick, keeps the
   subjects it already knows, and picks one it does not; study time grows with how rare or complex the subject is.
   Subjects and what they teach are data (blocks, tags, entities per archetype).
-- **What a hive studied is its strain.** Studying a subject gives the hive traits (cactus: drought, thorns; kelp:
-  water work), so a strain's traits come from where its hive lived rather than from a menu. The archetype's talent
-  tree (D28) stays as what a hive can learn, but nobody spends points in it: the hive's path through it is random,
-  guided by what is brought near it (subjects push it towards the talents they relate to). Hives in different places
-  breed different nanites, and bred nanites carry the hive's traits (`NaniteStack.talents`, D28). As D5 anticipated,
+- **Study guides the strain; swarms change it.** Studying a subject pushes the hive towards the talents it relates to
+  (cactus: drought, thorns; kelp: water work), so a strain's talents come from where its hive lived rather than from
+  a menu. The archetype's talent tree (D28) stays as what a hive can learn, but nobody spends points in it. Study
+  does not change the living core: a strain gains talents only when it swarms (below), and what was studied weights
+  which talent that is. Hives in different places
+  breed different nanites, and bred nanites carry the hive's talents (`NaniteStack.talents`, D28). As D5 anticipated,
   the upgrades belong to the hive, not the player. Hives exhaust what is near them, so the player builds hives in new
   places or brings subjects to them (tending a garden around a hive).
-- **Body and core.** A hive is a body (the placed block or structure) holding a core (the strain: traits, what it
-  has learned, its lineage). Cores move between bodies; bodies stay.
+- **Body and core.** A hive is a body (the placed block or structure) holding a core (the strain: its talents, what
+  it has studied, its lineage). Cores move between bodies; bodies stay.
 - **Founding: from Archive to an archetype.** An Archive core (a piece of tech, made at the Archive from the host's
   Archive nanites) is placed in an empty hive body. Its first study decides the archetype (a plant: Growth; an
-  animal: Fauna; an ore or machine: Industry) and it specializes as soon as that study finishes; from then on the
+  animal: Fauna; an ore or machine: Industry) and it specializes as soon as that study finishes, with no talents yet; from then on the
   strain spreads by swarming. Proposed: Archive cores can always be made again, not once per player, so a lost strain
   costs resources rather than progress. A refounded strain starts at generation 0 with only its founding subject
   learned, so what is really lost with a strain is its history, which is why catching swarms matters. The first
   core might still be given at first contact.
 - **Swarming.** Every so often a hive enters a short swarm window, at random, and early on it swarms at a random
-  moment inside it, making a copy of its core. Either the copy takes over and the old core is pushed out, or the old core stays and
-  the copy is pushed out. The copy differs from its parent by a talent it
-  gains: early on that talent is random (among those the tree allows, guided by what is near the hive); later hives
-  let the player force it (below). Proposed: the takeover odds favour whichever strain fits the hive's surroundings
+  moment inside it, making a copy of its core. Either the copy takes over and the old core is pushed out, or the old
+  core stays and the copy is pushed out. The copy differs from its parent by one talent it gains, the only way a
+  strain gains talents: early on that talent is random among those the tree allows, weighted by what the hive has
+  studied; later hives let the player see and lock it (below). Proposed: the takeover odds favour whichever strain fits the hive's surroundings
   better.
 - **The pushed-out core** becomes a small hive in the immediate area, which survives for a limited time unless the
   player picks it up and places it in another hive body. Proposed: its end is a stored game time, so it expires
@@ -579,16 +580,17 @@ undecided.
 - **Progression.** Early hives swarm at random and decide the takeover by chance, and the player catches swarms by
   hand. Later talents and better hive mechanisms let the player trigger a swarm during a window, or prevent swarming
   altogether. A machine collects pushed-out cores automatically, and more advanced hives let the player choose which
-  core stays and which goes. Later hives also accept the player's guidance and can force a specific talent onto the
-  next swarm's copy: that is how talents get selected deliberately, late in progression rather than from the start.
+  core stays and which goes. For the talent a swarm gains: later tech shows which talents are currently most likely,
+  and later still the player can lock in the talent they want while the hive is preparing to swarm. That is how
+  talents get chosen deliberately, late in progression rather than from the start.
 - **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, what it already knows,
-  its traits, how full it is and how close it is to swarming.
+  its talents, how full it is and how close it is to swarming (and, with later tech, the likely next talent).
 
 Open: whether a swarm window is visible (proposed: an agitated cloud and sound, and a line on the hive's screen, so
-early random swarms are not missed); how strongly subjects guide a hive's path through its tree against chance; whether the host's own Archive tree
+early random swarms are not missed); how strongly study weights a swarm's talent against chance; whether the host's own Archive tree
 keeps D28's point spending; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
 hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
-a wild hive); whether a hive forgets traits beyond some capacity; whether hives also act on their surroundings (a
+a wild hive); whether a strain drops talents beyond some capacity; whether hives also act on their surroundings (a
 Growth hive speeding up the crops it knows); whether a pushed-out core's timer runs in the inventory (proposed: yes,
 with a vessel item that pauses it); who may catch another team's swarm; whether cores record their generation and
 parent (the D5 `major.minor` version could carry the generation); and what a study costs and how long it takes.
