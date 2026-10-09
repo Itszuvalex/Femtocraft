@@ -661,7 +661,8 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   bursts). Space phases need specific catalysts placed at specific places on the space multiblock, places known only
   once it opens up during the phase and different every time (the recipe decides which catalysts, the fold where), so a space phase is played rather than fired and forgotten. Time phases ask
   for something similar and/or for time to be toggled between fast and slow, fast costing extra resources for as
-  long as it is held. Phases combine: a complex recipe might have the player switch time to fast, open the space
+  long as it is held. An open fold is unstable and collapses quickly in normal time, so a space
+  phase needs fast time to give the player room to place its catalysts. Phases combine: a complex recipe might have the player switch time to fast, open the space
   fold and place its catalysts, then turn time back once the space phase is done; a slow player spends longer in
   fast time and pays more for it. Late-game constructs can fill a space phase's places automatically, the automation
   reward for space as the swarm collector is for hives (D29). Proposed failures match the effect: a time slip ages or rewinds the item or wastes a phase; a space slip
@@ -674,5 +675,5 @@ only yield discovered patterns; proposed) or one; whether markers are the right 
 lattice is the only way patterns move between blocks, with constructs moving items; what becomes of the existing
 nanite tanks, nanite vault and host-fed machines (a later tier, or retired); whether time and space could later come
 from strains (Temporal and Dimensional archetypes) instead of power; how harsh slips are (proposed: early ones cost
-only materials, displacement and worse for high tiers); whether a space phase outside fast time has a limit of its own; and whether failures can release runaway swarms (grey goo,
+only materials, displacement and worse for high tiers); and whether failures can release runaway swarms (grey goo,
 the counterpart of Thaumcraft's flux and taint).
