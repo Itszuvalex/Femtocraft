@@ -595,6 +595,18 @@ agreed. Nothing is built yet.
   little each swarm, revealed by later tech; and a small chance of a wild pick (any affordable talent), which locking
   suppresses. Not proposed: randomizing aspects per world (opaque; at most a server option).
 
+- **Alternative under consideration: a talent library and slots** (maintainer, 2026-10-09; recorded beside the
+  model above, not chosen). Researching a subject either teaches the team a talent or gives points. A strain has
+  slots, a few major and more minor, and a slot can only hold a talent the team has discovered, so talents are
+  learned from research and picked into a strain. Simpler to read and build than aspects and a tree (no tree layout,
+  forks or aspect cap; slots bound power). Risks: strains become interchangeable if loadouts can be changed freely,
+  players converge on the best loadout, and research stops mattering once every talent is found. Proposed to keep
+  the hive game with it: a strain's loadout changes only when it swarms (the copy fills an empty slot or swaps one
+  talent: random among discovered talents early, weighted by surroundings; later shown, then chosen); slots grow
+  with research or generation (a fresh core has one minor slot); points raise talent ranks, fed by repeat studies,
+  so a field of one thing still steers a hive; major talents belong to an archetype, minor ones are shared more
+  widely.
+
 Replaces from D28: talent points from researched technologies (aspects from discoveries instead) and integrating
 talents in the host screen (swarming instead). D28's archetypes, talent registry, stats and talents carried by
 nanites stay.
