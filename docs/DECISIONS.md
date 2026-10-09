@@ -539,76 +539,71 @@ nanites shipped to another player's machines should behave differently from thei
 should also come from elsewhere.
 
 
-## D29. Nanite hives: study, swarming, strains that live in hives — OPEN (proposal, maintainer, 2026-10-08)
+## D29. Nanite hives: discovery, aspects, strains as builds, swarming — OPEN (proposal, maintainer, 2026-10-09)
 
 The maintainer is not sold on talent points spent in a tree (D28) as how nanites improve, and proposed hives in the
-world instead. This is the design as discussed so far; nothing is built yet, and the open questions at the end are
-undecided.
+world instead. The model below is the maintainer's (2026-10-09); items marked proposed are suggestions not yet
+agreed. Nothing is built yet.
 
-- **Hives study their surroundings.** A hive of an archetype looks around it for subjects related to its role (a
-  Growth hive: plants; Fauna: animals; Industry: ores and machines; Energy: power sources) and spends time researching
-  each one. The study is visible: nanites stream from the hive to the subject (`NaniteHost.drawTo`-style particles)
-  and swarm around it while it is studied. Sketch: the hive sweeps its radius a few positions per tick, keeps the
-  subjects it already knows, and picks one it does not; study time grows with how rare or complex the subject is.
-  Subjects and what they teach are data (below).
-- **Subject registry** (proposed): a synced datapack registry, `femtocraft:hive_subject`. An entry matches blocks,
-  block tags, entity types or entity tags (tags let other mods' plants and animals count without entries of their
-  own, e.g. `#minecraft:crops`, `#minecraft:saplings`), and gives: the archetypes that study it; the archetype it
-  founds when an Archive core studies it first; how long it takes to study; and its influence, weights towards
-  talents or whole branches (negative to push away). It can also be limited to or change for specific strains:
-  `requires` talents (only a strain that went one way can study it, e.g. nether flora needing a heat-hardened
-  strain) and influence that differs by the strain's talents. Each distinct block or entity is its own subject. The first
-  study of a subject gives the biggest push; studying it again (another block of a field) still adds influence, with
-  diminishing returns, so placing a hive in a field of one thing steers it while variety still pays most; when several entries match, the most specific one (a block over a tag) applies.
-  Data problems (unknown talents, influences outside the archetype's tree) are logged at server start like talents'.
-- **Study guides the strain; swarms change it.** Studying a subject pushes the hive towards the talents it relates to
-  (cactus: drought, thorns; kelp: water work), so a strain's talents come from where its hive lived rather than from
-  a menu. The archetype's talent tree (D28) stays as what a hive can learn, but nobody spends points in it. Study
-  does not change the living core: a strain gains talents only when it swarms (below), and what was studied weights
-  which talent that is. Hives in different places
-  breed different nanites, and bred nanites carry the hive's talents (`NaniteStack.talents`, D28). As D5 anticipated,
-  the upgrades belong to the hive, not the player. Hives exhaust what is near them, so the player builds hives in new
-  places or brings subjects to them (tending a garden around a hive).
-- **Body and core.** A hive is a body (the placed block or structure) holding a core (the strain: its talents, what
-  it has studied, its lineage). Cores move between bodies; bodies stay.
-- **Founding: from Archive to an archetype.** An Archive core (a piece of tech, made at the Archive from the host's
-  Archive nanites) is placed in an empty hive body. Its first study decides the archetype (a plant: Growth; an
-  animal: Fauna; an ore or machine: Industry) and it specializes as soon as that study finishes, with no talents yet; from then on the
-  strain spreads by swarming. Proposed: Archive cores can always be made again, not once per player, so a lost strain
-  costs resources rather than progress. A refounded strain starts at generation 0 with only its founding subject
-  learned, so what is really lost with a strain is its history, which is why catching swarms matters. The first
-  core might still be given at first contact.
-- **Swarming.** Every so often a hive enters a short swarm window, at random, and early on it swarms at a random
-  moment inside it, making a copy of its core. Either the copy takes over and the old core is pushed out, or the old
-  core stays and the copy is pushed out. The copy differs from its parent by one talent it gains, the only way a
-  strain gains talents: early on that talent is random among those the tree allows, weighted by what the hive has
-  studied; later hives let the player see and lock it (below). Proposed: the takeover odds favour whichever strain fits the hive's surroundings
-  better.
+- **Hive cores** are made from Archive nanites and placed in a hive body (the placed block or structure). The core
+  is the strain: its archetype, talents, lineage and what it has studied. Cores move between bodies; bodies stay.
+- **Hives study their surroundings.** A hive looks around it for subjects related to its archetype (Growth: plants;
+  Fauna: animals; Industry: ores and machines; Energy: power sources) and spends time researching each one. The
+  study is visible: nanites stream from the hive to the subject (`NaniteHost.drawTo`-style particles) and swarm
+  around it while it is studied. Sketch: the hive sweeps its radius a few positions per tick and picks a subject it
+  has not studied; study time grows with how rare or complex the subject is.
+- **Discovery unlocks things for the team.** The first time any of a team's hives researches a subject, it is
+  unlocked for the whole team (research is per team, D15) and bursts its aspects: the team's unlocked aspects grow
+  by what that subject is made of (wheat: Growth, Harvest; cactus: Arid, Thorn). Unlocked aspects are never spent.
+- **Aspects are levels; strains are builds.** Talents in an archetype's tree (D28) require specific aspects to
+  unlock instead of talent points. A strain's talents together may use at most the team's unlocked amount of each
+  aspect, but choosing talents consumes nothing globally, so every strain can use the full budget: like a level 10
+  character having 10 talent points while keeping several different talent setups. Each strain is one setup, with
+  more specific resources than plain points. A route the player wants may simply need aspects not yet discovered.
+- **Founding.** A fresh Archive core's first research bursts an aspect, which triggers a swarm at once; as a special
+  case the Archive core upgrades directly into a specialized core of that subject's archetype, with no talents yet.
+- **Swarming gains talents.** A strain gains talents only by swarming. A hive becomes ready to swarm when the team's
+  unlocked aspects finally afford one of the next talents in its tree (often after a discovery). The swarm copies
+  the core and the copy gains one affordable next talent; either the copy takes over and the old core is pushed out,
+  or the old core stays and the copy is pushed out. Early hives swarm at a random moment within a short window once
+  ready, and the talent is random among the affordable ones. Proposed: weighted by what the hive has studied and what
+  is around it (a hive in a field of one thing leans towards that thing's talents; repeat studies add a little,
+  first studies most), and the takeover odds favour whichever strain fits the surroundings better.
 - **The pushed-out core** becomes a small hive in the immediate area, which survives for a limited time unless the
   player picks it up and places it in another hive body. Proposed: its end is a stored game time, so it expires
   correctly in unloaded chunks; a host picks it up by hand; one swarm per hive at a time.
-- **Progression.** Early hives swarm at random and decide the takeover by chance, and the player catches swarms by
-  hand. Later talents and better hive mechanisms let the player trigger a swarm during a window, or prevent swarming
-  altogether. A machine collects pushed-out cores automatically, and more advanced hives let the player choose which
-  core stays and which goes. For the talent a swarm gains: later tech shows which talents are currently most likely,
-  and later still the player can lock in the talent they want while the hive is preparing to swarm. That is how
-  talents get chosen deliberately, late in progression rather than from the start.
-- **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, what it already knows,
-  its talents, how full it is and how close it is to swarming (and, with later tech, the likely next talent).
+- **Progression.** Early hives swarm at random and pick talents and takeovers by chance, and the player catches
+  swarms by hand. Later talents and better hive mechanisms let the player trigger a swarm during a window or prevent
+  swarming altogether; a machine collects pushed-out cores automatically; later tech shows which talent is most
+  likely; more advanced hives let the player choose which core stays and which goes, and lock in the talent they
+  want while the hive prepares to swarm. Talents are chosen deliberately late in progression, not from the start.
+- **Subject registry** (proposed): a synced datapack registry, `femtocraft:hive_subject`. An entry matches blocks,
+  block tags, entity types or entity tags (tags let other mods' content count without entries of their own, e.g.
+  `#minecraft:crops`), and gives the archetypes that study it, the archetype it founds, its study time and its
+  aspects. It can be limited to specific strains (`requires` talents: nether flora only studied by a heat-hardened
+  strain). When several entries match, the most specific one (a block over a tag) applies. Talents gain an aspect
+  requirement. Data problems are logged at server start like talents'.
+- **Seeing what a hive does.** The hive's screen shows what it is studying and its progress, its talents and the
+  aspects they use against the team's, the next talents and what they still need, and how close it is to swarming.
+  The Codex lists the team's discoveries and unlocked aspects.
+- **Variety between players** (proposed). Players start among the same things, so early strains would evolve alike.
+  Some convergence in the first talents is fine, with identity coming at the tree's major branches, but: each
+  founding rolls a hidden temperament (small biases on which talents a swarm leans to), inherited and drifting a
+  little each swarm, revealed by later tech; and a small chance of a wild pick (any affordable talent), which locking
+  suppresses. Not proposed: randomizing aspects per world (opaque; at most a server option).
 
-Open: whether a swarm window is visible (proposed: an agitated cloud and sound, and a line on the hive's screen, so
-early random swarms are not missed); whether trees are direct (any talent whose prerequisites are met can be gained) or this-or-that (at a fork, gaining
-one talent shuts the other branch for that strain and its descendants; proposed: this-or-that at key forks, since a
-swarm then splits a lineage into two different strains and catching the pushed-out core keeps the other branch open,
-and the forks bound how many talents a strain can hold); and if this-or-that, whether a choice opens a completely
-different set of further talents (branches) or only decides that level, the next level open either way (rows).
-Proposed: both, with one or two major branches per archetype (sub-specializations, e.g. Growth into crops or forest)
-and rows inside each branch, so lineages split for good a few times while content stays bounded; both are one
-mechanism in data (an exclusive group of talents, each with its own prerequisites); how strongly study weights a swarm's talent against chance; whether influence carries on after a swarm or is
-used up by it (so each swarm follows what was studied since the last one); whether the host's own Archive tree
-keeps D28's point spending; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
-hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
-a wild hive); whether a strain drops talents beyond some capacity; whether hives also act on their surroundings (a
-Growth hive speeding up the crops it knows); whether a pushed-out core's timer runs in the inventory (proposed: yes,
-with a vessel item that pauses it); who may catch another team's swarm; whether cores record their generation and
-parent (the D5 `major.minor` version could carry the generation); and what a study costs and how long it takes.
+Replaces from D28: talent points from researched technologies (aspects from discoveries instead) and integrating
+talents in the host screen (swarming instead). D28's archetypes, talent registry, stats and talents carried by
+nanites stay.
+
+Open: whether a full tree costs more than every aspect a team can discover, so a strain can never take everything
+(or whether this-or-that forks alone keep builds distinct); whether trees are direct or this-or-that, and whether a
+choice opens a different set of further talents (branches) or only decides that level (rows), proposed both, a few
+major branches with rows inside, as one mechanism in data (an exclusive group of talents); whether the host's own
+Archive tree works the same way or keeps D28's integrating; whether hives are only player-seeded or also generated
+in the world (and whether an uncaught swarm could go feral); whether swarm windows are visible (proposed: an
+agitated cloud and sound, and a line on the hive's screen); whether hives also act on their surroundings (a Growth
+hive speeding up the crops it knows); whether a pushed-out core's timer runs in the inventory (proposed: yes, with a
+vessel item that pauses it); who may catch another team's swarm; whether cores record their generation and parent
+(the D5 `major.minor` version could carry the generation); what nanites carrying talents beyond a team's aspects do
+in that team's machines (another team's strain); and what a study costs and how long it takes.
