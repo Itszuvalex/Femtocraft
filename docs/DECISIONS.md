@@ -658,7 +658,9 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   tech tree already ends at temporal and dimensional). These come from large multiblocks added to the integration
   setup, which idle and then draw power and materials hard during the phases that need them, so an integration tests
   the base's buffers and distribution at a moment the player chooses (the charging pole's lightning suits the
-  bursts). Proposed failures match the effect: a time slip ages or rewinds the item or wastes a phase; a space slip
+  bursts). Space phases need specific catalysts placed at specific places on the space multiblock, places known only
+  once it opens up during the phase, so a space phase is played rather than fired and forgotten. Proposed failures
+  match the effect: a time slip ages or rewinds the item or wastes a phase; a space slip
   displaces the item or catalysts, or swaps nearby blocks. Proposed uses outside integration: speeding crops or
   hives, slowing a pushed-out core's expiry (D29), folded vessels that hold more, and folding linking distant
   crystal nodes.
@@ -668,5 +670,6 @@ only yield discovered patterns; proposed) or one; whether markers are the right 
 lattice is the only way patterns move between blocks, with constructs moving items; what becomes of the existing
 nanite tanks, nanite vault and host-fed machines (a later tier, or retired); whether time and space could later come
 from strains (Temporal and Dimensional archetypes) instead of power; how harsh slips are (proposed: early ones cost
-only materials, displacement and worse for high tiers); and whether failures can release runaway swarms (grey goo,
+only materials, displacement and worse for high tiers); whether a space phase's places differ every time and how long the player has to fill them (and whether constructs
+can learn to fill them later); and whether failures can release runaway swarms (grey goo,
 the counterpart of Thaumcraft's flux and taint).
