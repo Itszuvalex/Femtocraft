@@ -634,9 +634,8 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
 
 - **Conversion.** A host releases nanites into a vanilla block with a bare hand (as at first contact; no wand) and
   they rebuild it from inside, shown by motes crawling over it. Proposed set: crafting table to integration table,
-  cauldron to dissolution vat, glass bottles to vessels, armor stand to construct husk, bookshelf to an Archive
-  reading node. Some need the structure completed first (a crafting table with an amethyst cluster on top, a
-  cauldron over a campfire).
+  glass bottles to vessels, armor stand to construct husk, bookshelf to an Archive reading node. Some need the
+  structure completed first (a crafting table with an amethyst cluster on top).
 - **The lattice** (proposed). Crystal clusters are nodes of the Archive (first contact is touching one). Converted
   blocks near a crystal link to it without the player knowing, and blocks linked to the same node share microstructures
   and stability with no pipes. Later research or a host talent shows the links, and the Codex explains them. Moving and
@@ -647,13 +646,14 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   leather a collagen weave, bone a mineral mesh, silk protein strands, slime a gel matrix, glowstone luminous cells,
   redstone conductive filaments, iron crystal grains, ender pearls folded geometry. Integrations then read as what
   they build from (an item that moves fluids needs capillaries). Not "components": that is Minecraft's name for item
-  data. Discovering a subject (D29) shows which microstructures it holds, and a vat only extracts discovered ones.
-- **Dissolution.** Items dropped into a dissolution vat are taken apart into microstructures, shown as coloured
-  murk; each item's microstructures come from the registry (the hive subject registry, D29, extended to items). The vat's nanites must
-  be fed and kept lively (proposed: a campfire under it). Overloading or mixing leaves residue.
+  data. Discovering a subject (D29) shows which microstructures it holds, and a pool only extracts discovered ones.
+- **Dissolution in a nanite pool.** No furnace or machine: microstructures are extracted by throwing things into
+  a pool of nanites in the world, which break apart whatever lands in it. Items sink and come apart in a fizz of
+  motes, and the pool takes on the colours of what it holds; each item's microstructures come from the registry
+  (the hive subject registry, D29, extended to items). Overloading or mixing leaves residue.
 - **Vessels.** Nanites carrying microstructures settle in vessels placed in the world, visible as a cloud of the
   microstructure's
-  colour whose density shows the amount; vessels stacked over a vat fill from it, and an attached item labels one.
+  colour whose density shows the amount; vessels at a pool's edge fill from it, and an attached item labels one.
 - **Constructs.** A construct husk with a core carries items and vessels between places, like Thaumcraft's golems.
   Proposed: directed by markers placed on blocks (take from here, bring here); the strain in its core decides what it
   is good at.
@@ -678,7 +678,10 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   hives, slowing a pushed-out core's expiry (D29), folded vessels that hold more, and folding linking distant
   crystal nodes.
 
-Open: the final name for microstructures and the set of them; whether markers are the right way to direct constructs; whether the
+Open: the final name for microstructures and the set of them; what a nanite pool is (a nanite fluid poured into
+any basin, or a built basin) and where its nanites come from (the host, a hive, a strain that dissolves faster);
+whether it harms players and mobs that fall in (and whether mobs dissolve into microstructures); whether a pool
+must be fed; whether markers are the right way to direct constructs; whether the
 lattice is the only way microstructures move between blocks, with constructs moving items; what becomes of the existing
 nanite tanks, nanite vault and host-fed machines (a later tier, or retired); whether time and space could later come
 from strains (Temporal and Dimensional archetypes) instead of power; how harsh slips are (proposed: early ones cost
