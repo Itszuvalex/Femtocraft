@@ -623,3 +623,50 @@ vessel item that pauses it); who may catch another team's swarm; whether cores r
 (the D5 `major.minor` version could carry the generation); what nanites carrying talents beyond a team's aspects do
 in that team's machines (another team's strain); what founds Utility and Military (their subjects are less obvious than plants or animals); which technologies
 unlock which specializations; and what a study costs and how long it takes.
+
+## D30. Nanite arts: conversion, the lattice, dissolution, vessels, constructs, integration — OPEN (proposal, maintainer, 2026-10-09)
+
+The maintainer wants nanites to stay a magical analogue, and asked what Femtocraft could borrow from Thaumcraft:
+integration (infusion), breaking items down by dropping them in, storage in the world with golems pulling from it,
+and turning existing blocks into something new that joins a network the player only discovers later. The pieces
+below form one loop: convert blocks, dissolve items into patterns, store them in the world, move them, integrate.
+Items marked proposed are suggestions not yet agreed. Nothing is built yet.
+
+- **Conversion.** A host releases nanites into a vanilla block with a bare hand (as at first contact; no wand) and
+  they rebuild it from inside, shown by motes crawling over it. Proposed set: crafting table to integration table,
+  cauldron to dissolution vat, glass bottles to vessels, armor stand to construct husk, bookshelf to an Archive
+  reading node. Some need the structure completed first (a crafting table with an amethyst cluster on top, a
+  cauldron over a campfire).
+- **The lattice** (proposed). Crystal clusters are nodes of the Archive (first contact is touching one). Converted
+  blocks near a crystal link to it without the player knowing, and blocks linked to the same node share patterns and
+  stability with no pipes. Later research or a host talent shows the links, and the Codex explains them. Moving and
+  growing crystals (budding amethyst) extends it.
+- **Dissolution.** Items dropped into a dissolution vat are taken apart into patterns, shown as coloured murk; each
+  item's patterns come from the registry (the hive subject registry, D29, extended to items). The vat's nanites must
+  be fed and kept lively (proposed: a campfire under it). Overloading or mixing leaves residue.
+- **Vessels.** Pattern-laden nanites settle in vessels placed in the world, visible as a cloud of the pattern's
+  colour whose density shows the amount; vessels stacked over a vat fill from it, and an attached item labels one.
+- **Constructs.** A construct husk with a core carries items and vessels between places, like Thaumcraft's golems.
+  Proposed: directed by markers placed on blocks (take from here, bring here); the strain in its core decides what it
+  is good at.
+- **Integration, in phases.** An item on the integration table, catalysts around it and patterns streamed in (from
+  vessels, or through the lattice) are rebuilt by nanites over time. An integration runs in phases (for example break
+  down, bind, seat), and the table shows them. Early integrations are set up, then fire and forget. They use power,
+  nanites and patterns. Instability rises with mismatched patterns, missing catalysts or a weak link; proposed
+  stabilizers are nearby hives whose strains have steadying talents.
+- **Time and space.** Later integrations need time slowed or sped up, or space folded, in some phases (the alpha's
+  tech tree already ends at temporal and dimensional). These come from large multiblocks added to the integration
+  setup, which idle and then draw power and materials hard during the phases that need them, so an integration tests
+  the base's buffers and distribution at a moment the player chooses (the charging pole's lightning suits the
+  bursts). Proposed failures match the effect: a time slip ages or rewinds the item or wastes a phase; a space slip
+  displaces the item or catalysts, or swaps nearby blocks. Proposed uses outside integration: speeding crops or
+  hives, slowing a pushed-out core's expiry (D29), folded vessels that hold more, and folding linking distant
+  crystal nodes.
+
+Open: whether patterns are two things (team knowledge from discovery, D29, and a material from dissolution, which can
+only yield discovered patterns; proposed) or one; whether markers are the right way to direct constructs; whether the
+lattice is the only way patterns move between blocks, with constructs moving items; what becomes of the existing
+nanite tanks, nanite vault and host-fed machines (a later tier, or retired); whether time and space could later come
+from strains (Temporal and Dimensional archetypes) instead of power; how harsh slips are (proposed: early ones cost
+only materials, displacement and worse for high tiers); and whether failures can release runaway swarms (grey goo,
+the counterpart of Thaumcraft's flux and taint).
