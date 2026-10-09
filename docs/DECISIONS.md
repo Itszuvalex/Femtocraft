@@ -562,6 +562,9 @@ agreed. Nothing is built yet.
   more specific resources than plain points. A route the player wants may simply need aspects not yet discovered.
 - **Founding.** A fresh Archive core's first research bursts an aspect, which triggers a swarm at once; as a special
   case the Archive core upgrades directly into a specialized core of that subject's archetype, with no talents yet.
+  In the base mod a player makes six cores (Industry, Energy, Growth, Utility, Fauna, Military) and places each by
+  the kind of thing that founds the archetype they want. Specializations may be research-locked: proposed, an
+  Archive core only studies subjects of archetypes its team has unlocked, so it does not found a locked one.
 - **Swarming gains talents.** A strain gains talents only by swarming. A hive becomes ready to swarm when the team's
   unlocked aspects finally afford one of the next talents in its tree (often after a discovery). The swarm copies
   the core and the copy gains one affordable next talent; either the copy takes over and the old core is pushed out,
@@ -606,4 +609,5 @@ agitated cloud and sound, and a line on the hive's screen); whether hives also a
 hive speeding up the crops it knows); whether a pushed-out core's timer runs in the inventory (proposed: yes, with a
 vessel item that pauses it); who may catch another team's swarm; whether cores record their generation and parent
 (the D5 `major.minor` version could carry the generation); what nanites carrying talents beyond a team's aspects do
-in that team's machines (another team's strain); and what a study costs and how long it takes.
+in that team's machines (another team's strain); what founds Utility and Military (their subjects are less obvious than plants or animals); which technologies
+unlock which specializations; and what a study costs and how long it takes.
