@@ -557,8 +557,9 @@ undecided.
   founds when an Archive core studies it first; how long it takes to study; and its influence, weights towards
   talents or whole branches (negative to push away). It can also be limited to or change for specific strains:
   `requires` talents (only a strain that went one way can study it, e.g. nether flora needing a heat-hardened
-  strain) and influence that differs by the strain's talents. Each distinct block or entity is its own subject, and
-  studying one again gives nothing; when several entries match, the most specific one (a block over a tag) applies.
+  strain) and influence that differs by the strain's talents. Each distinct block or entity is its own subject. The first
+  study of a subject gives the biggest push; studying it again (another block of a field) still adds influence, with
+  diminishing returns, so placing a hive in a field of one thing steers it while variety still pays most; when several entries match, the most specific one (a block over a tag) applies.
   Data problems (unknown talents, influences outside the archetype's tree) are logged at server start like talents'.
 - **Study guides the strain; swarms change it.** Studying a subject pushes the hive towards the talents it relates to
   (cactus: drought, thorns; kelp: water work), so a strain's talents come from where its hive lived rather than from
@@ -603,7 +604,8 @@ and the forks bound how many talents a strain can hold); and if this-or-that, wh
 different set of further talents (branches) or only decides that level, the next level open either way (rows).
 Proposed: both, with one or two major branches per archetype (sub-specializations, e.g. Growth into crops or forest)
 and rows inside each branch, so lineages split for good a few times while content stays bounded; both are one
-mechanism in data (an exclusive group of talents, each with its own prerequisites); how strongly study weights a swarm's talent against chance; whether the host's own Archive tree
+mechanism in data (an exclusive group of talents, each with its own prerequisites); how strongly study weights a swarm's talent against chance; whether influence carries on after a swarm or is
+used up by it (so each swarm follows what was studied since the last one); whether the host's own Archive tree
 keeps D28's point spending; whether the Archive archetype in the host learns the same way, from what the host touches or scans; whether
 hives are only player-seeded or also generated in the world (and whether an uncaught swarm could go feral and found
 a wild hive); whether a strain drops talents beyond some capacity; whether hives also act on their surroundings (a
