@@ -629,7 +629,7 @@ unlock which specializations; and what a study costs and how long it takes.
 The maintainer wants nanites to stay a magical analogue, and asked what Femtocraft could borrow from Thaumcraft:
 integration (infusion), breaking items down by dropping them in, storage in the world with golems pulling from it,
 and turning existing blocks into something new that joins a network the player only discovers later. The pieces
-below form one loop: convert blocks, dissolve items into patterns, store them in the world, move them, integrate.
+below form one loop: convert blocks, dissolve items into microstructures, store them in the world, move them, integrate.
 Items marked proposed are suggestions not yet agreed. Nothing is built yet.
 
 - **Conversion.** A host releases nanites into a vanilla block with a bare hand (as at first contact; no wand) and
@@ -638,21 +638,29 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   reading node. Some need the structure completed first (a crafting table with an amethyst cluster on top, a
   cauldron over a campfire).
 - **The lattice** (proposed). Crystal clusters are nodes of the Archive (first contact is touching one). Converted
-  blocks near a crystal link to it without the player knowing, and blocks linked to the same node share patterns and
-  stability with no pipes. Later research or a host talent shows the links, and the Codex explains them. Moving and
+  blocks near a crystal link to it without the player knowing, and blocks linked to the same node share microstructures
+  and stability with no pipes. Later research or a host talent shows the links, and the Codex explains them. Moving and
   growing crystals (budding amethyst) extends it.
-- **Dissolution.** Items dropped into a dissolution vat are taken apart into patterns, shown as coloured murk; each
-  item's patterns come from the registry (the hive subject registry, D29, extended to items). The vat's nanites must
+- **Microstructures** (working name; maintainer's idea, replacing "patterns" for the material). Dissolving keeps
+  something fundamental to what was broken down that can be reused: a microscopic structure that is easier to
+  extract than for the nanites to build themselves. Plants give capillaries; proposed others: wood a fibre scaffold,
+  leather a collagen weave, bone a mineral mesh, silk protein strands, slime a gel matrix, glowstone luminous cells,
+  redstone conductive filaments, iron crystal grains, ender pearls folded geometry. Integrations then read as what
+  they build from (an item that moves fluids needs capillaries). Not "components": that is Minecraft's name for item
+  data. Discovering a subject (D29) shows which microstructures it holds, and a vat only extracts discovered ones.
+- **Dissolution.** Items dropped into a dissolution vat are taken apart into microstructures, shown as coloured
+  murk; each item's microstructures come from the registry (the hive subject registry, D29, extended to items). The vat's nanites must
   be fed and kept lively (proposed: a campfire under it). Overloading or mixing leaves residue.
-- **Vessels.** Pattern-laden nanites settle in vessels placed in the world, visible as a cloud of the pattern's
+- **Vessels.** Nanites carrying microstructures settle in vessels placed in the world, visible as a cloud of the
+  microstructure's
   colour whose density shows the amount; vessels stacked over a vat fill from it, and an attached item labels one.
 - **Constructs.** A construct husk with a core carries items and vessels between places, like Thaumcraft's golems.
   Proposed: directed by markers placed on blocks (take from here, bring here); the strain in its core decides what it
   is good at.
-- **Integration, in phases.** An item on the integration table, catalysts around it and patterns streamed in (from
+- **Integration, in phases.** An item on the integration table, catalysts around it and microstructures streamed in (from
   vessels, or through the lattice) are rebuilt by nanites over time. An integration runs in phases (for example break
   down, bind, seat), and the table shows them. Early integrations are set up, then fire and forget. They use power,
-  nanites and patterns. Instability rises with mismatched patterns, missing catalysts or a weak link; proposed
+  nanites and microstructures. Instability rises with mismatched microstructures, missing catalysts or a weak link; proposed
   stabilizers are nearby hives whose strains have steadying talents.
 - **Time and space.** Later integrations need time slowed or sped up, or space folded, in some phases (the alpha's
   tech tree already ends at temporal and dimensional). These come from large multiblocks added to the integration
@@ -670,9 +678,8 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   hives, slowing a pushed-out core's expiry (D29), folded vessels that hold more, and folding linking distant
   crystal nodes.
 
-Open: whether patterns are two things (team knowledge from discovery, D29, and a material from dissolution, which can
-only yield discovered patterns; proposed) or one; whether markers are the right way to direct constructs; whether the
-lattice is the only way patterns move between blocks, with constructs moving items; what becomes of the existing
+Open: the final name for microstructures and the set of them; whether markers are the right way to direct constructs; whether the
+lattice is the only way microstructures move between blocks, with constructs moving items; what becomes of the existing
 nanite tanks, nanite vault and host-fed machines (a later tier, or retired); whether time and space could later come
 from strains (Temporal and Dimensional archetypes) instead of power; how harsh slips are (proposed: early ones cost
 only materials, displacement and worse for high tiers); and whether failures can release runaway swarms (grey goo,
