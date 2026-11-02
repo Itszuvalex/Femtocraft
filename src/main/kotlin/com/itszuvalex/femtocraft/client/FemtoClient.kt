@@ -27,6 +27,7 @@ object FemtoClient {
         modBus.addListener(FemtoRenderers::register)
         modBus.addListener(FemtoParticleProviders::register)
         modBus.addListener(NaniteOverlay::register)
+        modBus.addListener(Previews::registerPipelines)
         modBus.addListener(HostOverlay::register)
         FemtoKeys.register(modBus)
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(Previews::submit)

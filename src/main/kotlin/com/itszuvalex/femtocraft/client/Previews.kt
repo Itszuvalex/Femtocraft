@@ -1,28 +1,57 @@
 package com.itszuvalex.femtocraft.client
 
+import com.itszuvalex.femtocraft.Femtocraft
 import com.itszuvalex.femtocraft.industry.FrameItem
 import com.itszuvalex.femtocraft.industry.FrameMultiblocks
 import com.itszuvalex.femtocraft.industry.ShiftItem
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.rendertype.LayeringTransform
+import net.minecraft.client.renderer.rendertype.OutputTarget
+import net.minecraft.client.renderer.rendertype.RenderSetup
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.rendertype.RenderTypes
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent
 import org.joml.Vector3f
+import java.util.Optional
 
 /**
  * Previews of where held items act (v3's `IPreviewable` items): a frame item outlines the multiblock it would place
  * where the player is looking, green where it fits and red where it does not (v3 `FramePreviewableRenderer`); a shift
- * device outlines where it would put the player (v3 `ItemShiftTest`'s previewable).
+ * device outlines where it would put the player (v3 `ItemShiftTest`'s previewable), drawn over terrain so the
+ * destination shows on the far side of walls.
  */
 object Previews {
     private const val FITS = 0xFF40FF40.toInt()
     private const val BLOCKED = 0xFFFF4040.toInt()
     private const val INNER_ALPHA = 0x60000000
     private const val SHIFT = 0xFF40E0FF.toInt()
+
+    /**
+     * Vanilla's lines pipeline without a depth test, so the lines show through blocks. Registered by [registerPipelines].
+     */
+    private val SEE_THROUGH_PIPELINE: RenderPipeline = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+        .withLocation(Identifier.fromNamespaceAndPath(Femtocraft.ID, "pipeline/lines_see_through"))
+        .withDepthStencilState(Optional.empty())
+        .build()
+
+    private val SEE_THROUGH_LINES: RenderType = RenderType.create(
+        "${Femtocraft.ID}_lines_see_through",
+        RenderSetup.builder(SEE_THROUGH_PIPELINE)
+            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+            .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+            .createRenderSetup(),
+    )
+
+    fun registerPipelines(event: RegisterRenderPipelinesEvent) = event.registerPipeline(SEE_THROUGH_PIPELINE)
 
     fun submit(event: SubmitCustomGeometryEvent) {
         val mc = Minecraft.getInstance()
@@ -48,7 +77,7 @@ object Previews {
 
         held.firstOrNull { it.item is ShiftItem }?.let {
             val dest = shiftDestination(player, level) ?: return@let
-            lines(event, camera, listOf(player.boundingBox.move(dest.subtract(player.position())) to SHIFT))
+            lines(event, camera, listOf(player.boundingBox.move(dest.subtract(player.position())) to SHIFT), SEE_THROUGH_LINES)
         }
     }
 
@@ -71,8 +100,8 @@ object Previews {
     private fun hasFrames(player: net.minecraft.world.entity.player.Player, stack: ItemStack, needed: Int) =
         player.abilities.instabuild || stack.count >= needed
 
-    private fun lines(event: SubmitCustomGeometryEvent, camera: Vec3, boxes: List<Pair<AABB, Int>>) {
-        event.submitNodeCollector.submitCustomGeometry(event.poseStack, RenderTypes.lines()) { pose, buffer ->
+    private fun lines(event: SubmitCustomGeometryEvent, camera: Vec3, boxes: List<Pair<AABB, Int>>, type: RenderType = RenderTypes.lines()) {
+        event.submitNodeCollector.submitCustomGeometry(event.poseStack, type) { pose, buffer ->
             for ((box, color) in boxes) {
                 val b = box.move(-camera.x, -camera.y, -camera.z)
                 for ((from, to) in edges(b)) {
