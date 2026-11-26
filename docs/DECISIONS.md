@@ -698,7 +698,7 @@ suggestions to confirm or change.
   grid of holder slots: each slot shows a ghost of the item the recipe needs there and holds up to N x M of it, where
   N is how many of that item one craft takes from the slot and M is the block's buffer multiplier, how many crafts it
   can hold. Vanilla crafting takes one item per slot (N = 1), but N stays per slot so other recipe kinds can take
-  more. M belongs to the block type, so tiers can raise it later; the first autocrafter has M = 16 (proposed).
+  more. M belongs to the block type, so tiers can raise it later; the basic autocrafter has M = 4 (maintainer, 2026-11-26).
 - **Holder slots** (proposed) take anything the recipe's ingredient accepts in that place (any planks for a recipe
   that takes planks), with the example item as the ghost. A slot holds at most a stack of its item, so recipes with
   unstackable ingredients buffer fewer crafts (open: hold more than a stack).
@@ -730,7 +730,7 @@ suggestions to confirm or change.
 
 - Holder slots take an item when the encoded recipe still matches with it in place of the example and makes the same
   result item (`AutocrafterBlockEntity.accepts`), so tags and shapeless recipes work without mapping ingredients to
-  slots. Capacity is `min(N x M, the item's stack size)`.
+  slots. Capacity is `min(N x M, the item's stack size)`; M = 4.
 - While no encoded template is in, a plain click on a grid slot with an item sets its ghost (nothing taken) and a click
   with an empty hand on an empty slot clears it. Real items get into the grid by shift-click or drag (or are left over),
   and Set recipe reads them before ghosts. Automation puts nothing in while editing.

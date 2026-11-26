@@ -102,9 +102,9 @@ object AutocrafterGameTests {
         helper.assertTrue(be.accepts(0, ItemStack(Items.BIRCH_PLANKS)), "other planks fit the recipe")
         helper.assertFalse(be.accepts(0, ItemStack(Items.STONE)), "stone does not")
         helper.assertFalse(be.accepts(1, ItemStack(Items.OAK_PLANKS)), "nothing goes where the recipe has nothing")
-        helper.assertValueEqual(be.capacity(0), Autocrafter.BUFFERED_CRAFTS, "N x M = 1 x 16")
+        helper.assertValueEqual(be.capacity(0), Autocrafter.BUFFERED_CRAFTS, "N x M = 1 x 4")
         val left = be.holders.insert(0, IItemStack.of(ItemStack(Items.OAK_PLANKS, 64)))
-        helper.assertValueEqual(be.holders.get(0).toMinecraft().count, Autocrafter.BUFFERED_CRAFTS, "holds 16")
+        helper.assertValueEqual(be.holders.get(0).toMinecraft().count, Autocrafter.BUFFERED_CRAFTS, "holds M")
         helper.assertValueEqual(left.toMinecraft().count, 64 - Autocrafter.BUFFERED_CRAFTS, "the rest refused")
         helper.assertFalse(be.inventory.canInsert(Autocrafter.FIRST_OUTPUT, IItemStack.of(ItemStack(Items.STICK))), "outputs take nothing from outside")
         helper.assertFalse(be.inventory.canInsert(Autocrafter.TEMPLATE_SLOT, IItemStack.of(ItemStack(Items.PAPER))), "template slot takes templates")
@@ -116,7 +116,7 @@ object AutocrafterGameTests {
         val be = autocrafter(helper)
         be.setGhost(4, ItemStack(Items.HONEY_BOTTLE))
         helper.assertTrue(be.setRecipe(), "set")
-        helper.assertValueEqual(be.capacity(4), 16, "a stack of honey bottles")
+        helper.assertValueEqual(be.capacity(4), Autocrafter.BUFFERED_CRAFTS, "M honey bottles")
         be.holders.insert(4, IItemStack.of(ItemStack(Items.HONEY_BOTTLE, 2)))
         be.job.add(Autocrafter.FLOPS_PER_CRAFT)
         helper.assertTrue(be.tryCraft(), "crafted")
@@ -128,12 +128,12 @@ object AutocrafterGameTests {
     private fun clear(helper: GameTestHelper) {
         val be = autocrafter(helper)
         sticks(be)
-        be.holders.insert(0, IItemStack.of(ItemStack(Items.OAK_PLANKS, 5)))
+        be.holders.insert(0, IItemStack.of(ItemStack(Items.OAK_PLANKS, 3)))
         val player = helper.makeMockPlayer(GameType.SURVIVAL)
         helper.assertTrue(be.clearRecipe(player), "cleared")
         helper.assertTrue(CraftingTemplateItem.isBlank(be.template()), "template blank again")
         helper.assertTrue(be.holders.isEmpty(), "grid emptied")
-        helper.assertValueEqual(player.inventory.countItem(Items.OAK_PLANKS), 5, "items handed back")
+        helper.assertValueEqual(player.inventory.countItem(Items.OAK_PLANKS), 3, "items handed back")
         helper.assertTrue(be.ghost(0).`is`(Items.OAK_PLANKS), "ghosts keep the old pattern to edit")
         helper.assertFalse(be.clearRecipe(player), "nothing to clear")
         helper.succeed()
@@ -160,8 +160,8 @@ object AutocrafterGameTests {
         helper.assertTrue(menu.handleAction(player, AutocrafterMenu.ACTION_SET, 0), "set recipe action")
         menu.setCarried(ItemStack(Items.OAK_PLANKS, 10))
         menu.clicked(0, 0, ContainerInput.PICKUP, player)
-        helper.assertValueEqual(be.holders.get(0).toMinecraft().count, 10, "items go in once encoded")
-        helper.assertTrue(menu.carried.isEmpty, "taken from the hand")
+        helper.assertValueEqual(be.holders.get(0).toMinecraft().count, Autocrafter.BUFFERED_CRAFTS, "items go in once encoded, up to M")
+        helper.assertValueEqual(menu.carried.count, 10 - Autocrafter.BUFFERED_CRAFTS, "taken from the hand")
         helper.succeed()
     }
 
@@ -178,6 +178,11 @@ object AutocrafterGameTests {
         sticks(be)
         be.holders.insert(0, IItemStack.of(ItemStack(Items.OAK_PLANKS, 16)))
         be.holders.insert(3, IItemStack.of(ItemStack(Items.OAK_PLANKS, 16)))
+        // Refill as it crafts, as a pipe would.
+        helper.onEachTick {
+            be.holders.insert(0, IItemStack.of(ItemStack(Items.OAK_PLANKS, 4)))
+            be.holders.insert(3, IItemStack.of(ItemStack(Items.OAK_PLANKS, 4)))
+        }
         helper.place<ComputationConduitBlockEntity>(POS.west(), ComputationContent.COMPUTATION_CONDUIT.get())
         val mainframe = mainframe(helper, POS.west(2))
         helper.succeedWhen {

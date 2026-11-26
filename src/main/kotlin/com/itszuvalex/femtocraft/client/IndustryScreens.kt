@@ -144,6 +144,5 @@ class AutocrafterScreen(menu: AutocrafterMenu, inventory: Inventory, title: Comp
         ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, leftPos + x - 3, topPos + y + 21, 22, 4, listOf(
             Component.translatable("gui.femtocraft.autocrafter.flops", fmt(menu.flops), fmt(Autocrafter.FLOPS_PER_CRAFT)),
         ))
-        if (menu.editing()) text(graphics, Component.translatable("gui.femtocraft.autocrafter.editing"), AutocrafterMenu.GRID_X, 92)
     }
 }

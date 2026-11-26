@@ -176,10 +176,10 @@ object Autocrafter {
     const val SLOTS = TEMPLATE_SLOT + 1
 
     /**
-     * M: how many crafts the first autocrafter buffers (DECISIONS D31, proposed). A holder slot holds N x M of its item,
-     * capped at a stack of it.
+     * M: how many crafts the basic autocrafter buffers (DECISIONS D31; maintainer: 4 for basic machines). A holder slot
+     * holds N x M of its item, capped at a stack of it.
      */
-    const val BUFFERED_CRAFTS = 16
+    const val BUFFERED_CRAFTS = 4
 
     /** FLOPS and power per craft (proposed). */
     const val FLOPS_PER_CRAFT = 100.0

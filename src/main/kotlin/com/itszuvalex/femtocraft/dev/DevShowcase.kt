@@ -90,6 +90,12 @@ object DevShowcase {
         Vec3(11.6, 1.9, 0.6) to Vec3(11.2, 0.5, 2.5),
         // 33: the host screen: the Archive talent tree with talents unlocked
         Vec3(9.0, 4.5, -9.0) to Vec3(9.0, 1.0, 2.0),
+        // 34: computation conduits between a red and a blue mainframe, blending (D31); 35: close up; 36: the
+        // autocrafter's screen with a recipe set; 37: an autocrafter's screen while a recipe is edited
+        Vec3(4.5, 3.0, -4.5) to Vec3(4.5, 0.5, -9.5),
+        Vec3(4.5, 1.4, -7.6) to Vec3(4.5, 0.5, -9.5),
+        Vec3(4.5, 3.0, -4.5) to Vec3(4.5, 0.5, -9.5),
+        Vec3(4.5, 3.0, -4.5) to Vec3(4.5, 0.5, -9.5),
     )
 
     private const val ITEMS_VIEW = 22
@@ -123,6 +129,7 @@ object DevShowcase {
     /** A close look at the chips shown on a conduit, then one chip's own screen. */
     private const val CHIPS_VIEW = 31
     private const val HOST_VIEW = 33
+    const val AUTOCRAFTER_VIEW = 34
     private val ITEM_VAULT = BlockPos(22, 0, 0)
     private val POLE = BlockPos(19, 0, 7)
     private val CHAMBER = BlockPos(17, 0, 0)
@@ -244,6 +251,7 @@ object DevShowcase {
         currentView = view
         viewTicks = (ticks - BUILD_AT) % VIEW_TICKS
         if (view >= ITEMS_VIEW) extraViews(p, level, view, viewTicks)
+        if (view >= AUTOCRAFTER_VIEW) autocrafterViews(p, level, view, viewTicks)
         if ((ticks - BUILD_AT) % VIEW_TICKS != 0) return
         if (view >= VIEWS.size) {
             if (view == VIEWS.size) Femtocraft.LOGGER.info("SHOWCASE done")
@@ -358,6 +366,60 @@ object DevShowcase {
             }
             (p.containerMenu as? com.itszuvalex.itszulib.menu.MenuCore)?.channels?.handle(com.itszuvalex.itszulib.menu.MenuChannels.ACTION_SCOPE, 0)
         }
+    }
+
+    /**
+     * The D31 views: a line of five computation conduits between two mainframes, each the child of a crystal mount of
+     * its own colour (red west, blue east), so the conduits blend from red to blue; then an autocrafter's screen with
+     * the stick recipe set and some planks buffered, and another's while a recipe is being edited (ghosts).
+     */
+    private fun autocrafterViews(p: ServerPlayer, level: ServerLevel, view: Int, t: Int) {
+        fun at(x: Int, z: Int) = BASE.offset(x, 0, z)
+        val computation = com.itszuvalex.femtocraft.computation.ComputationContent
+        val industry = com.itszuvalex.femtocraft.industry.IndustryContent
+        fun open(pos: BlockPos) = (level.getBlockEntity(pos) as? com.itszuvalex.itszulib.api.adapters.IBlockEntity)
+            ?.getModule(com.itszuvalex.itszulib.api.Modules.MENU, null)?.let { p.openMenu(it, it.menuPos()) }
+        if (view == AUTOCRAFTER_VIEW && t == 1) {
+            p.closeContainer()
+            for (x in -1..9) for (z in -12..-5) {
+                level.setBlockAndUpdate(BASE.offset(x, -1, z), Blocks.SMOOTH_STONE.defaultBlockState())
+                for (y in 0..4) level.setBlockAndUpdate(BASE.offset(x, y, z), Blocks.AIR.defaultBlockState())
+            }
+            level.setBlockAndUpdate(at(0, -9), PowerContent.CRYSTAL_MOUNT.get().defaultBlockState())
+            level.setBlockAndUpdate(at(9, -9), PowerContent.CRYSTAL_MOUNT.get().defaultBlockState())
+            mountCrystal(level, at(0, -9), 0xFF3030)
+            mountCrystal(level, at(9, -9), 0x3060FF)
+            for (x in listOf(1, 8)) {
+                level.setBlockAndUpdate(at(x, -9), computation.MAINFRAME.get().defaultBlockState())
+                (level.getBlockEntity(at(x, -9)) as? com.itszuvalex.femtocraft.computation.MainframeBlockEntity)
+                    ?.processors?.setSlot(0, IItemStack.of(net.minecraft.world.item.ItemStack(computation.MICRO_LOGIC_CORE.get())))
+            }
+            for (x in 2..7) level.setBlockAndUpdate(at(x, -9), computation.COMPUTATION_CONDUIT.get().defaultBlockState())
+            for (x in listOf(3, 6)) {
+                level.setBlockAndUpdate(at(x, -7), industry.AUTOCRAFTER.get().defaultBlockState())
+                (level.getBlockEntity(at(x, -7)) as? com.itszuvalex.femtocraft.industry.AutocrafterBlockEntity)?.let { be ->
+                    be.inventory.setSlot(com.itszuvalex.femtocraft.industry.Autocrafter.TEMPLATE_SLOT, IItemStack.of(net.minecraft.world.item.ItemStack(industry.CRAFTING_TEMPLATE.get())))
+                    be.battery.setStorage(com.itszuvalex.femtocraft.industry.Autocrafter.BATTERY_SIZE * 0.6)
+                }
+            }
+            val planks = net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_PLANKS)
+            (level.getBlockEntity(at(3, -7)) as? com.itszuvalex.femtocraft.industry.AutocrafterBlockEntity)?.let { be ->
+                be.setGhost(1, planks)
+                be.setGhost(4, planks)
+                be.setRecipe()
+                be.holders.setSlot(1, IItemStack.of(planks.copyWithCount(3)))
+                be.holders.setSlot(4, IItemStack.of(planks.copyWithCount(4)))
+                be.outputs.setSlot(0, IItemStack.of(net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK, 12)))
+                be.job.stored = 60.0
+            }
+            (level.getBlockEntity(at(6, -7)) as? com.itszuvalex.femtocraft.industry.AutocrafterBlockEntity)?.let { be ->
+                for (i in 0 until 9) if (i != 4) be.setGhost(i, planks)
+                be.holders.setSlot(0, IItemStack.of(net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BIRCH_PLANKS, 2)))
+            }
+        }
+        if (view == AUTOCRAFTER_VIEW + 2 && t == MENU_DELAY) open(at(3, -7))
+        if (view == AUTOCRAFTER_VIEW + 3 && t == 1) p.closeContainer()
+        if (view == AUTOCRAFTER_VIEW + 3 && t == MENU_DELAY) open(at(6, -7))
     }
 
     private fun host(p: ServerPlayer, level: ServerLevel) {
