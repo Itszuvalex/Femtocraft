@@ -611,6 +611,8 @@ Replaces from D28: talent points from researched technologies (aspects from disc
 talents in the host screen (swarming instead). D28's archetypes, talent registry, stats and talents carried by
 nanites stay.
 
+Implementation plan (with the defaults it assumes for the open points below): [PLAN-HIVES-ARTS](PLAN-HIVES-ARTS.md).
+
 Open: whether a full tree costs more than every aspect a team can discover, so a strain can never take everything
 (or whether this-or-that forks alone keep builds distinct); whether trees are direct or this-or-that, and whether a
 choice opens a different set of further talents (branches) or only decides that level (rows), proposed both, a few
@@ -677,6 +679,8 @@ Items marked proposed are suggestions not yet agreed. Nothing is built yet.
   displaces the item or catalysts, or swaps nearby blocks. Proposed uses outside integration: speeding crops or
   hives, slowing a pushed-out core's expiry (D29), folded vessels that hold more, and folding linking distant
   crystal nodes.
+
+Implementation plan: [PLAN-HIVES-ARTS](PLAN-HIVES-ARTS.md).
 
 Open: the final name for microstructures and the set of them; what a nanite pool is (a nanite fluid poured into
 any basin, or a built basin) and where its nanites come from (the host, a hive, a strain that dissolves faster);
