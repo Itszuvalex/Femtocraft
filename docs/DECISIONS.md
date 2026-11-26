@@ -687,3 +687,42 @@ nanite tanks, nanite vault and host-fed machines (a later tier, or retired); whe
 from strains (Temporal and Dimensional archetypes) instead of power; how harsh slips are (proposed: early ones cost
 only materials, displacement and worse for high tiers); and whether failures can release runaway swarms (grey goo,
 the counterpart of Thaumcraft's flux and taint).
+
+## D31. Autocrafter and computation cable — OPEN (maintainer's spec, 2026-11-26; details proposed)
+
+The maintainer asked for an autocrafter that runs on power and FLOPS, and for a thin cable joining mainframes to the
+machines that need FLOPS. The spec is the maintainer's; the numbers and the details marked proposed are
+suggestions to confirm or change.
+
+- **Autocrafter** (block `autocrafter`). It is given one crafting recipe and crafts it whenever it can. It has a 3x3
+  grid of holder slots: each slot shows a ghost of the item the recipe needs there and holds up to N x M of it, where
+  N is how many of that item one craft takes from the slot and M is the block's buffer multiplier, how many crafts it
+  can hold. Vanilla crafting takes one item per slot (N = 1), but N stays per slot so other recipe kinds can take
+  more. M belongs to the block type, so tiers can raise it later; the first autocrafter has M = 16 (proposed).
+- **Holder slots** (proposed) take anything the recipe's ingredient accepts in that place (any planks for a recipe
+  that takes planks), with the example item as the ghost. A slot holds at most a stack of its item, so recipes with
+  unstackable ingredients buffer fewer crafts (open: hold more than a stack).
+- **Setting the recipe** (maintainer: no items needed; details proposed). The recipe lives on a crafting template
+  (`crafting_template`, pattern in the `femtocraft:crafting_pattern` component) in the autocrafter's template slot, an
+  extra cost per recipe; the autocrafter crafts only while an encoded template is there. With a blank template in the
+  slot, the player sets ghosts in the grid by clicking a holder slot with an item (nothing is taken; an empty hand
+  clears it) or through JEI's recipe transfer, sees the result, and presses Set recipe, which writes the pattern onto
+  the template. Shorthand: if the grid already holds real items, Set recipe takes the pattern from them and they stay
+  as the first buffered craft. An encoded template moves the recipe between autocrafters; Clear recipe blanks it and
+  hands buffered items back. Recipes are vanilla `crafting` recipes looked up by the pattern; remainders (empty
+  buckets) go to the output.
+- **Cost** (proposed). Each craft takes 100 FLOPS and 40 power, at most one craft a tick. The autocrafter is a
+  computation job (`FragComputationLeaf`, consumer) only while a craft could go (inputs buffered, room in the output,
+  power), so idle autocrafters take no FLOPS. Power comes from wired or wireless power like the mainframe.
+- **Sides** (proposed). Items go in to the holder slots and out of a nine-slot output buffer through ItszuLib sided
+  configuration and item auto IO, as the processing machines do.
+- **Computation cable** (block `computation_cable`). A quarter-block thick (4 pixels), joining mainframes, jobs
+  (autocrafters, Archive Interfaces, logistics conduits) and other cables into the same `ComputationNetwork` as the
+  crystal computation conduit. It is drawn like the logistics beam, with its circuitry texture
+  (`logistics_beam_outer` as the shell, `logistics_beam_colored` tinted inside, scrolling along each arm).
+- **Cable colour** (proposed). Client side, a cable takes the average colour of the blocks it attaches to
+  (`Modules.COLORABLE`, so a mainframe's crystal colour); a cable attached to nothing takes the average of its
+  neighbouring cables, so colours spread along a line and blend where they meet. The existing conduits keep a fixed
+  colour today; the cable is the first to blend.
+
+Later: whether item and fluid chips on logistics conduits can reach this network.
