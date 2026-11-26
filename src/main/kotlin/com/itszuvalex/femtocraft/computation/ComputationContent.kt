@@ -5,6 +5,11 @@ import com.itszuvalex.femtocraft.core.ConduitArms
 import com.itszuvalex.femtocraft.core.FemtoBlockEntity
 import com.itszuvalex.femtocraft.core.FemtoEntityBlock
 import com.itszuvalex.femtocraft.core.FemtoMenu
+import com.itszuvalex.femtocraft.core.FragDerivedColor
+import com.itszuvalex.itszulib.api.Modules
+import com.itszuvalex.itszulib.api.adapters.IBlockEntity
+import com.itszuvalex.itszulib.util.Color
+import net.minecraft.core.Direction
 import com.itszuvalex.itszulib.api.storage.IItemStorage
 import com.itszuvalex.itszulib.menu.EnergyView
 import com.itszuvalex.itszulib.menu.MenuSyncs
@@ -41,12 +46,47 @@ class ComputationConduitBlockEntity(pos: BlockPos, state: BlockState) : FemtoBlo
     @JvmField
     val conduit = ComputationConduit()
 
+    /** The circuit layer's colour (client side; [ConduitBlend]), null for the default. */
+    var blend: ConduitBlend? = null
+        private set
+
     init {
         fragList.addFragment(conduit)
+        fragList.addFragment(FragDerivedColor { blend?.let { Color(it.color) } ?: FragDerivedColor.NONE })
     }
 
     /** Arms towards connected conduits and attached leaves (the model's, see [ConduitArms]). */
     override fun serverTick() = ConduitArms.sync(this) { conduit.isConnected(it) || conduit.leafFaces[it] }
+
+    override fun clientTick() = updateBlend()
+
+    /**
+     * Blends the colours of the attached blocks ([Modules.COLORABLE], e.g. a mainframe's crystal colour), or of the
+     * neighbouring conduits the arms reach, into [blend] ([ConduitBlend.next]). The block's tint follows within half a
+     * second ([FemtoBlockEntity]'s tint watch).
+     */
+    fun updateBlend() {
+        val level = level ?: return
+        val attached = ArrayList<Int>(2)
+        val neighbours = ArrayList<ConduitBlend?>(2)
+        for (face in Direction.entries) {
+            val at = blockPos.relative(face)
+            if (!level.isLoaded(at)) continue
+            val be = level.getBlockEntity(at)
+            if (conduit.leafFaces[face]) {
+                val color = (be as? IBlockEntity)?.getModule(Modules.COLORABLE, face.opposite)?.getColor() ?: continue
+                if (color != FragDerivedColor.NONE) attached += color.toInt() or 0xFF000000.toInt()
+            } else if (be is ComputationConduitBlockEntity && armed(face)) {
+                neighbours += be.blend
+            }
+        }
+        blend = ConduitBlend.next(attached, neighbours)
+    }
+
+    private fun armed(face: Direction): Boolean {
+        val property = ConduitArms.PROPERTIES[face] ?: return false
+        return property in blockState.properties && blockState.getValue(property)
+    }
 }
 
 /**

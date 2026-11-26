@@ -1,6 +1,11 @@
 package com.itszuvalex.femtocraft.client
 
+import com.itszuvalex.femtocraft.industry.Autocrafter
+import com.itszuvalex.femtocraft.industry.AutocrafterMenu
 import com.itszuvalex.femtocraft.industry.CrystalLiquifierBlockEntity
+import com.itszuvalex.itszulib.client.screen.ButtonAccents
+import com.itszuvalex.itszulib.menu.MenuActionPayload
+import net.neoforged.neoforge.client.network.ClientPacketDistributor
 import com.itszuvalex.femtocraft.industry.FocusingChamberMenu
 import com.itszuvalex.femtocraft.industry.FrameMenu
 import com.itszuvalex.femtocraft.industry.FrameSelectionMenu
@@ -93,5 +98,52 @@ class FrameSelectionScreen(menu: FrameSelectionMenu, inventory: Inventory, title
 
     override fun extractLabels(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         graphics.text(font, title, titleLabelX, titleLabelY, TEXT, false)
+    }
+}
+
+/**
+ * The autocrafter (DECISIONS D31): the grid (what each slot wants shown faded), the result, FLOPS towards the next
+ * craft, the template slot, the output, and the Set recipe and Clear recipe buttons.
+ */
+class AutocrafterScreen(menu: AutocrafterMenu, inventory: Inventory, title: Component) :
+    FemtoScreen<AutocrafterMenu>(menu, inventory, title, height = AutocrafterMenu.HEIGHT) {
+    override fun init() {
+        super.init()
+        addRenderableWidget(ThemedButton(
+            leftPos + AutocrafterMenu.GRID_X, topPos + 74, 54, 14, Component.translatable("gui.femtocraft.autocrafter.set"),
+            { send(AutocrafterMenu.ACTION_SET) }, Component.translatable("gui.femtocraft.autocrafter.set.tooltip"), accent = ButtonAccents.IO,
+        ))
+        addRenderableWidget(ThemedButton(
+            leftPos + AutocrafterMenu.OUTPUT_X, topPos + 74, 54, 14, Component.translatable("gui.femtocraft.autocrafter.clear"),
+            { send(AutocrafterMenu.ACTION_CLEAR) }, Component.translatable("gui.femtocraft.autocrafter.clear.tooltip"), accent = ButtonAccents.DANGER,
+        ))
+    }
+
+    private fun send(action: Int) = ClientPacketDistributor.sendToServer(MenuActionPayload(menu.containerId, action, 0))
+
+    override fun addComponents() {
+        addPowerGauge(8, 18) { menu.battery }
+    }
+
+    override fun extractContents(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+        val x = AutocrafterMenu.RESULT_X
+        val y = AutocrafterMenu.RESULT_Y
+        inset(graphics, x - 1, y - 1, 18, 18)
+        if (!menu.result.isEmpty) {
+            graphics.item(menu.result, leftPos + x, topPos + y)
+            if (menu.result.count > 1) {
+                val count = menu.result.count.toString()
+                graphics.text(font, count, leftPos + x + 17 - font.width(count), topPos + y + 9, 0xFFFFFFFF.toInt(), true)
+            }
+            if (mouseX in leftPos + x until leftPos + x + 16 && mouseY in topPos + y until topPos + y + 16) {
+                val lines = net.minecraft.client.gui.screens.Screen.getTooltipFromItem(net.minecraft.client.Minecraft.getInstance(), menu.result)
+                graphics.setTooltipForNextFrame(font, lines, menu.result.tooltipImage, menu.result, mouseX, mouseY)
+            }
+        }
+        progress(graphics, x - 3, y + 21, 22, 4, menu.flops / Autocrafter.FLOPS_PER_CRAFT)
+        ScreenHelpers.tooltipIfHovered(graphics, mouseX, mouseY, leftPos + x - 3, topPos + y + 21, 22, 4, listOf(
+            Component.translatable("gui.femtocraft.autocrafter.flops", fmt(menu.flops), fmt(Autocrafter.FLOPS_PER_CRAFT)),
+        ))
+        if (menu.editing()) text(graphics, Component.translatable("gui.femtocraft.autocrafter.editing"), AutocrafterMenu.GRID_X, 92)
     }
 }

@@ -688,7 +688,7 @@ from strains (Temporal and Dimensional archetypes) instead of power; how harsh s
 only materials, displacement and worse for high tiers); and whether failures can release runaway swarms (grey goo,
 the counterpart of Thaumcraft's flux and taint).
 
-## D31. Autocrafter and computation cable — OPEN (maintainer's spec, 2026-11-26; details proposed)
+## D31. Autocrafter and computation cable — IMPLEMENTED, numbers OPEN (maintainer's spec, 2026-11-26; details proposed)
 
 The maintainer asked for an autocrafter that runs on power and FLOPS, and for a thin cable joining mainframes to the
 machines that need FLOPS. The spec is the maintainer's; the numbers and the details marked proposed are
@@ -724,5 +724,23 @@ suggestions to confirm or change.
   it attaches to (`Modules.COLORABLE`, so a mainframe's crystal colour); a conduit attached to nothing takes the
   average of its neighbouring conduits, so colours spread along a line and blend where they meet. Until now every
   conduit has had one fixed colour; this is the first to blend.
+
+**As built** (2026-11-26; `industry/Autocrafter.kt`, `computation/ConduitBlend.kt`, tests in
+`dev/AutocrafterGameTests.kt`). Everything above, with these choices:
+
+- Holder slots take an item when the encoded recipe still matches with it in place of the example and makes the same
+  result item (`AutocrafterBlockEntity.accepts`), so tags and shapeless recipes work without mapping ingredients to
+  slots. Capacity is `min(N x M, the item's stack size)`.
+- While no encoded template is in, a plain click on a grid slot with an item sets its ghost (nothing taken) and a click
+  with an empty hand on an empty slot clears it. Real items get into the grid by shift-click or drag (or are left over),
+  and Set recipe reads them before ghosts. Automation puts nothing in while editing.
+- The template slot holds one template. Clear recipe keeps the old pattern as ghosts, to edit.
+- The FLOPS job holds at most one craft's FLOPS and asks for them only while a craft could go; the craft itself happens
+  in the block's tick once the FLOPS are there. Gathered FLOPS are saved.
+- The conduit's blend counts conduit hops back to a coloured block and gives up past 32, so a line cut off from every
+  coloured block loses its colour instead of keeping it forever. Only a block with a colour counts (a mainframe without a
+  wireless parent has none), and the colour shows within half a second through the existing tint watch.
+- Not done yet: JEI recipe transfer into the grid, recipe kinds other than vanilla `crafting`, tech tree gating, and
+  textures beyond the generated front and template placeholder.
 
 Later: the conduit's crystal texture may be too busy (maintainer, 2026-11-26; revisit the art). Whether item and fluid chips on logistics conduits can reach this network.

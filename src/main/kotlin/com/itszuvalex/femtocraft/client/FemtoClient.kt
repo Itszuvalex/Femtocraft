@@ -50,6 +50,7 @@ object FemtoClient {
         event.register(PowerContent.CRYO_BASE_MENU.get(), ::CryoChargingBaseScreen)
         event.register(PowerContent.ATMOSPHERIC_BASE_MENU.get(), ::AtmosphericChargingBaseScreen)
         event.register(IndustryContent.MACHINE_MENU.get(), ::MachineScreen)
+        event.register(IndustryContent.AUTOCRAFTER_MENU.get(), ::AutocrafterScreen)
         event.register(IndustryContent.FRAME_MENU.get(), ::FrameScreen)
         event.register(IndustryContent.FRAME_SELECTION_MENU.get(), ::FrameSelectionScreen)
         event.register(IndustryContent.GERMINATION_CHAMBER_MENU.get(), ::GerminationChamberScreen)

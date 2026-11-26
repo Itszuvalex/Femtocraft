@@ -44,7 +44,7 @@ object FemtoTints {
         event.register(
             listOf(ColorableTint(MACHINE_DEFAULT)),
             IndustryContent.NANO_FURNACE.get(), IndustryContent.DEMOLISHER.get(), IndustryContent.CRYSTAL_FURNACE.get(),
-            IndustryContent.CRYSTAL_CRUSHER.get(), IndustryContent.CRYSTAL_LIQUIFIER.get(),
+            IndustryContent.CRYSTAL_CRUSHER.get(), IndustryContent.CRYSTAL_LIQUIFIER.get(), IndustryContent.AUTOCRAFTER.get(),
             PowerContent.CRYSTAL_CHARGING_ARRAY.get(), PowerContent.CRYSTAL_STORAGE_ARRAY.get(), PowerContent.CRYSTAL_HEAT_EXCHANGER.get(),
             com.itszuvalex.femtocraft.nanite.NaniteContent.NANITE_EXTRACTOR.get(), com.itszuvalex.femtocraft.nanite.NaniteContent.NANITE_INFUSER.get(),
             com.itszuvalex.femtocraft.computation.ComputationContent.MAINFRAME.get(), com.itszuvalex.femtocraft.computation.ComputationContent.ARCHIVE_INTERFACE.get(),
