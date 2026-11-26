@@ -716,13 +716,13 @@ suggestions to confirm or change.
   power), so idle autocrafters take no FLOPS. Power comes from wired or wireless power like the mainframe.
 - **Sides** (proposed). Items go in to the holder slots and out of a nine-slot output buffer through ItszuLib sided
   configuration and item auto IO, as the processing machines do.
-- **Computation cable** (block `computation_cable`). A quarter-block thick (4 pixels), joining mainframes, jobs
-  (autocrafters, Archive Interfaces, logistics conduits) and other cables into the same `ComputationNetwork` as the
-  crystal computation conduit. It is drawn like the logistics beam, with its circuitry texture
-  (`logistics_beam_outer` as the shell, `logistics_beam_colored` tinted inside, scrolling along each arm).
-- **Cable colour** (proposed). Client side, a cable takes the average colour of the blocks it attaches to
-  (`Modules.COLORABLE`, so a mainframe's crystal colour); a cable attached to nothing takes the average of its
-  neighbouring cables, so colours spread along a line and blend where they meet. The existing conduits keep a fixed
-  colour today; the cable is the first to blend.
+- **Cabling is the computation conduit** (maintainer, 2026-11-26). The existing crystal computation conduit (D19,
+  `computation_conduit_crystal`: quarter-block `wire_thin` model, circuit-pattern texture) is the cable the maintainer
+  wants; no new block. It joins mainframes, jobs (autocrafters, Archive Interfaces, logistics conduits) and other
+  conduits into one `ComputationNetwork`.
+- **Conduit colour** (proposed). Client side, a conduit's tinted circuit layer takes the average colour of the blocks
+  it attaches to (`Modules.COLORABLE`, so a mainframe's crystal colour); a conduit attached to nothing takes the
+  average of its neighbouring conduits, so colours spread along a line and blend where they meet. Until now every
+  conduit has had one fixed colour; this is the first to blend.
 
 Later: whether item and fluid chips on logistics conduits can reach this network.
