@@ -725,4 +725,4 @@ suggestions to confirm or change.
   average of its neighbouring conduits, so colours spread along a line and blend where they meet. Until now every
   conduit has had one fixed colour; this is the first to blend.
 
-Later: whether item and fluid chips on logistics conduits can reach this network.
+Later: the conduit's crystal texture may be too busy (maintainer, 2026-11-26; revisit the art). Whether item and fluid chips on logistics conduits can reach this network.
