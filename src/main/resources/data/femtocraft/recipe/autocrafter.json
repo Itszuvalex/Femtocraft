@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "TFT",
+    "SRS"
+  ],
+  "key": {
+    "S": "femtocraft:nanoweave_sheet",
+    "C": "femtocraft:basic_circuit",
+    "T": "minecraft:crafting_table",
+    "F": "femtocraft:frame",
+    "R": "femtocraft:energy_regulator"
+  },
+  "result": {
+    "id": "femtocraft:autocrafter",
+    "count": 1
+  }
+}

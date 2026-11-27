@@ -183,6 +183,7 @@ BLOCKS = {
     "crystal_furnace": ("Crystal Furnace", ("machine", "crystal_furnace_front"), "self", "pickaxe"),
     "crystal_crusher": ("Crystal Crusher", ("machine", "crystal_crusher_front"), "self", "pickaxe"),
     "crystal_liquifier": ("Crystal Liquifier", ("machine", "liquifier_front"), "self", "pickaxe"),
+    "autocrafter": ("Autocrafter", ("machine", "autocrafter_front"), "self", "pickaxe"),
     # --- nanite ---
     "nanite_extractor": ("Nanite Extractor", ("machine", "naniteextractor_front"), "self", "pickaxe"),
     "nanite_infuser": ("Nanite Infuser", ("machine", "naniteinfuser_front"), "self", "pickaxe"),
@@ -263,6 +264,7 @@ ITEMS = {
     # The 1.7.10 alpha's textures.
     "micro_logic_core": ("Micro Logic Core", "micro_logic_core"),
     "orpheus_processor": ("Orpheus Processor", "orpheus_processor"),
+    "crafting_template": ("Crafting Template", "crafting_template"),
 }
 
 # Placeholder textures for blocks/items v3 had no flat texture for (it rendered them with OBJ models or TESRs).
@@ -273,6 +275,7 @@ PLACEHOLDERS = {
     "block/archive": ((40, 60, 80, 255), (90, 200, 220, 255)),
     "item/codex": ((30, 45, 60, 255), (90, 230, 255, 255)),
     "item/itemwrench": ((0, 0, 0, 0), (190, 195, 210, 255)),
+    "item/crafting_template": ((40, 60, 80, 255), (102, 255, 153, 255)),
 }
 
 # Machine fronts drawn as the v3 fronts are: a 10x10 dark panel in the middle of the face ("#"), the glyph cut out of
@@ -290,6 +293,19 @@ FRONT_GLYPHS = {
         "##########",
         "#.#.#.#.##",
         "##.#.#.#.#",
+        "##########",
+    ],
+    # A crafting grid: three by three cells.
+    "autocrafter_front": [
+        "##########",
+        "#..#..#..#",
+        "#..#..#..#",
+        "##########",
+        "#..#..#..#",
+        "#..#..#..#",
+        "##########",
+        "#..#..#..#",
+        "#..#..#..#",
         "##########",
     ],
     # A socket into the Archive: rings around its core.
@@ -472,6 +488,14 @@ LANG = {
     "tooltip.femtocraft.processor.flops": "%s FLOPS/t",
     "tooltip.femtocraft.processor.power": "%s DE per FLOP",
     "gui.femtocraft.mainframe.flops": "FLOPS: %s/t",
+    "gui.femtocraft.autocrafter.set": "Set",
+    "gui.femtocraft.autocrafter.set.tooltip": "Set recipe: writes the grid's recipe onto the blank template (click grid slots with items to choose it; nothing is taken). Real items in the grid count before ghosts and stay as the first craft.",
+    "gui.femtocraft.autocrafter.clear": "Clear",
+    "gui.femtocraft.autocrafter.clear.tooltip": "Clear recipe: blanks the template and hands the buffered items back.",
+    "gui.femtocraft.autocrafter.flops": "FLOPS: %s/%s for the next craft",
+    "tooltip.femtocraft.crafting_template.blank": "Blank: set a recipe in an autocrafter",
+    "tooltip.femtocraft.crafting_template.crafts": "Crafts %sx %s",
+    "tooltip.femtocraft.crafting_template.needs": "%sx %s",
     "gui.femtocraft.mainframe.capacity": "Max: %s/t",
     "gui.femtocraft.mainframe.temperature": "Heat: %s °C",
     "gui.femtocraft.mainframe.ambient": "Ambient: %s °C",
@@ -571,6 +595,8 @@ RECIPES = {
     "micro_logic_core": shaped(["RCR", "CDC", "RCR"], {"R": "minecraft:redstone", "C": f"{NS}:basic_circuit", "D": f"{NS}:crackling_dust"}, f"{NS}:micro_logic_core"),
     "orpheus_processor": shaped(["PMP", "MDM", "PMP"], {"P": f"{NS}:phasemetal_ingot_devoid", "M": f"{NS}:micro_logic_core", "D": f"{NS}:diamond_dust"}, f"{NS}:orpheus_processor"),
     "mainframe": shaped(["SCS", "CFC", "SRS"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:mainframe"),
+    "autocrafter": shaped(["SCS", "TFT", "SRS"], {"S": f"{NS}:nanoweave_sheet", "C": f"{NS}:basic_circuit", "T": "minecraft:crafting_table", "F": f"{NS}:frame", "R": f"{NS}:energy_regulator"}, f"{NS}:autocrafter"),
+    "crafting_template": shaped([" P ", "PCP", " P "], {"P": "minecraft:paper", "C": f"{NS}:basic_circuit"}, f"{NS}:crafting_template", 4),
     "archive_interface": shaped(["SDS", "CFC", "SCS"], {"S": f"{NS}:nanoweave_sheet", "D": f"{NS}:crackling_dust", "C": f"{NS}:basic_circuit", "F": f"{NS}:frame"}, f"{NS}:archive_interface"),
     "codex": shapeless(["minecraft:book", f"{NS}:crackling_dust"], f"{NS}:codex"),
     "frame": shaped(["CIC", "I I", "CIC"], {"C": f"{NS}:substrate", "I": "minecraft:iron_ingot"}, f"{NS}:frame"),

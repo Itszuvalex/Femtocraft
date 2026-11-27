@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "PCP",
+    " P "
+  ],
+  "key": {
+    "P": "minecraft:paper",
+    "C": "femtocraft:basic_circuit"
+  },
+  "result": {
+    "id": "femtocraft:crafting_template",
+    "count": 4
+  }
+}

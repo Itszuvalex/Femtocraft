@@ -118,7 +118,8 @@ src/main/kotlin/com/itszuvalex/femtocraft/
 │                          (data component), crystal mount, charging/storage arrays, heat exchanger, conduit, glow stick
 ├── industry/              Recipes (code tables), single-block machines (ProcessingMachineBlockEntity on ItszuLib sided
 │                          storage/auto IO), frames and frame multiblocks (germination chamber, focusing chamber),
-│                          configurator, shift device, gritty slurry fluid
+│                          configurator, shift device, gritty slurry fluid; the autocrafter and crafting template
+│                          (Autocrafter.kt, DECISIONS D31)
 ├── nanite/                Nanite API (stack, tank, registry, sided configuration, auto IO), extractor/infuser,
 │                          player nanites (synced data attachment), nano lash
 ├── archive/               The Archive (3x3x3 frame multiblock researching the team's focus in Femtocraft's tech tree),
@@ -215,11 +216,18 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 - **Networking and keys**: declare payloads with `FemtoNetwork.toServer`/`toClient` during mod construction; let
   clients open a screen with `FemtoNetwork.screen(id) { player -> ... }` and bind a key to it with
   `FemtoKeys.screenKey(name, key, id)` (or any action with `FemtoKeys.key`). Menus use ItszuLib's menu syncs and actions.
+- **Autocrafter** (DECISIONS D31): crafts the vanilla crafting recipe on the crafting template in its template slot
+  (`femtocraft:crafting_pattern`, a `CraftingPattern`), taking 100 FLOPS and 40 power a craft (a computation consumer
+  only while a craft could go). Holder slots (0-8) take whatever the recipe still matches with and hold N x M (M =
+  `Autocrafter.BUFFERED_CRAFTS`); outputs are 9-17, the template 18. Without an encoded template the grid is a recipe
+  editor: menu clicks set ghosts, and Set recipe (`setRecipe`) encodes a blank template from real items first, then ghosts.
 - **Computation** (DECISIONS D19): computation conduits (`ComputationConduit`, on `core/LeafConduit` like the power
   conduit) form an ItszuLib `DistributingTileNetwork` over `ComputationModules.LEAF` leaves: mainframes are producers
   (`MainframeComputer`: processors' FLOPS at the mainframe's speed, power spent per FLOP taken, most efficient first),
   jobs are consumers (`ArchiveJob` behind the Archive Interface: 200 FLOPS per research point; logistics conduits'
   active chips). Mainframes heat up and slow down from 60 °C (`MainframeHeat`); cold blocks beside them cool them.
+  Each conduit's circuit layer blends the colours of the blocks it attaches to, spreading along unattached conduits
+  (`ConduitBlend`, client side).
 - **Logistics**: conduits form a `LogisticsNetwork` (ItszuLib `TileNetwork`). Chips in a conduit face keep their state
   in a `femtocraft:<kind>_connection` component (`ChipData`: shared `ConnectionSettings` plus a buffer) and run one
   operation per 5000 flops; a `ChipKind` (`ItemChipKind`, `FluidChipKind`, `NaniteChipKind`) says what moves and how
@@ -270,7 +278,7 @@ v3's ItszuLib "modules" map one-to-one onto fragments, and its capabilities onto
 
 `dev/DevGameTests.kt` registers every test on `femtocraft:test_area` (empty 9x5x9). Tests are grouped by area:
 `PowerGameTests`, `IndustryGameTests`, `NaniteGameTests`, `LogisticsGameTests`, `CyberGameTests`, `ArchiveGameTests`,
-`ComputationGameTests`, `VaultGameTests`, `IntegrityGameTests` (ItszuLib's checks over everything registered: assets, save/load/sync, break behaviour, ticking, menus, capabilities; technologies and machine recipe tables are sound), `ReachabilityGameTests` (which items can be obtained; baseline in REVIEW O13), `InfrastructureGameTests` (frame requirement slots, chip data codecs). Add one with
+`ComputationGameTests`, `AutocrafterGameTests` (autocrafter and conduit colour), `VaultGameTests`, `IntegrityGameTests` (ItszuLib's checks over everything registered: assets, save/load/sync, break behaviour, ticking, menus, capabilities; technologies and machine recipe tables are sound), `ReachabilityGameTests` (which items can be obtained; baseline in REVIEW O13), `InfrastructureGameTests` (frame requirement slots, chip data codecs). Add one with
 `DevGameTests.test("name", maxTicks, ::body)` from the group's `register()`; use `succeedWhen` for anything that needs
 ticks. Level-wide APIs need `helper.absolutePos(...)`. `GameTestHelper#assertValueEqual(value, expected, name)` takes
 the actual value first. `makeMockServerPlayerInLevel` gives a creative-mode player at (0, 0, 0): set the game mode

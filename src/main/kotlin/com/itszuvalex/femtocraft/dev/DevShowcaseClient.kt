@@ -53,7 +53,7 @@ object DevShowcaseClient {
             mc.options.hideGui = !nanites && DevShowcase.currentView != 23
             shoot(mc)
             val screen = mc.screen as? com.itszuvalex.itszulib.client.screen.ComponentScreen<*>
-            if (screen != null && screen !== panelOpenedFor && screen.openPanel == null) {
+            if (screen != null && screen !== panelOpenedFor && screen.openPanel == null && DevShowcase.currentView < DevShowcase.AUTOCRAFTER_VIEW) {
                 panelOpenedFor = screen
                 screen.panels().firstOrNull()?.let(screen::togglePanel)
             }

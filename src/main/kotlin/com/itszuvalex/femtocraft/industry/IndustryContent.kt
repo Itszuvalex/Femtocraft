@@ -52,6 +52,7 @@ object IndustryContent {
     @JvmField val CONFIGURATOR = R.ITEMS.registerItem("configurator", ::ConfiguratorItem, UnaryOperator { it.stacksTo(1) })
     @JvmField val WRENCH = R.ITEMS.registerItem("wrench", ::WrenchItem, UnaryOperator { it.stacksTo(1) })
     @JvmField val SHIFT_ITEM = R.ITEMS.registerItem("shift_test", ::ShiftItem, UnaryOperator { it.stacksTo(1) })
+    @JvmField val CRAFTING_TEMPLATE = R.ITEMS.registerItem("crafting_template", ::CraftingTemplateItem, UnaryOperator { it.stacksTo(16) })
 
     // Machines
     @JvmField val NANO_FURNACE = block("nano_furnace", true, ::NanoFurnaceBlock, ::machine)
@@ -59,6 +60,7 @@ object IndustryContent {
     @JvmField val CRYSTAL_FURNACE = block("crystal_furnace", true, ::CrystalFurnaceBlock, ::machine)
     @JvmField val CRYSTAL_CRUSHER = block("crystal_crusher", true, ::CrystalCrusherBlock, ::machine)
     @JvmField val CRYSTAL_LIQUIFIER = block("crystal_liquifier", true, ::CrystalLiquifierBlock, ::machine)
+    @JvmField val AUTOCRAFTER = block("autocrafter", true, ::AutocrafterBlock, ::machine)
 
     // Frames and frame-built multiblocks (placed by the frame item; no block items, DECISIONS D8)
     @JvmField val FRAME = block("frame", false, ::FrameBlock) { machine(it).noOcclusion() }
@@ -70,11 +72,13 @@ object IndustryContent {
     @JvmField val CRYSTAL_FURNACE_BE = R.blockEntity("crystal_furnace", ::CrystalFurnaceBlockEntity, CRYSTAL_FURNACE::get)
     @JvmField val CRYSTAL_CRUSHER_BE = R.blockEntity("crystal_crusher", ::CrystalCrusherBlockEntity, CRYSTAL_CRUSHER::get)
     @JvmField val CRYSTAL_LIQUIFIER_BE = R.blockEntity("crystal_liquifier", ::CrystalLiquifierBlockEntity, CRYSTAL_LIQUIFIER::get)
+    @JvmField val AUTOCRAFTER_BE = R.blockEntity("autocrafter", ::AutocrafterBlockEntity, AUTOCRAFTER::get)
     @JvmField val FRAME_BE = R.blockEntity("frame", ::FrameBlockEntity, FRAME::get)
     @JvmField val GERMINATION_CHAMBER_BE = R.blockEntity("germination_chamber", ::GerminationChamberBlockEntity, GERMINATION_CHAMBER::get)
     @JvmField val CRYSTAL_FOCUSING_CHAMBER_BE = R.blockEntity("crystal_focusing_chamber", ::CrystalFocusingChamberBlockEntity, CRYSTAL_FOCUSING_CHAMBER::get)
 
     @JvmField val MACHINE_MENU = R.blockMenu<ProcessingMachineBlockEntity, MachineMenu>("machine", ::MachineMenu)
+    @JvmField val AUTOCRAFTER_MENU = R.blockMenu<AutocrafterBlockEntity, AutocrafterMenu>("autocrafter", ::AutocrafterMenu)
     @JvmField val FRAME_MENU = R.blockMenu<FrameBlockEntity, FrameMenu>("frame", ::FrameMenu)
     @JvmField val GERMINATION_CHAMBER_MENU = R.blockMenu<GerminationChamberBlockEntity, GerminationChamberMenu>("germination_chamber", ::GerminationChamberMenu)
     @JvmField val FOCUSING_CHAMBER_MENU = R.blockMenu<CrystalFocusingChamberBlockEntity, FocusingChamberMenu>("crystal_focusing_chamber", ::FocusingChamberMenu)
@@ -87,5 +91,6 @@ object IndustryContent {
         FemtoFluids.FLUIDS.register(modBus)
         FrameItem.SELECTION
         ConfiguratorItem.MODE
+        CraftingTemplateItem.PATTERN
     }
 }
